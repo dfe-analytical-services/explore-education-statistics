@@ -550,10 +550,28 @@ user adds link to accordion section text block
     user presses keys    ${\n}
     user presses keys    ARROW_DOWN
 
+    user presses keys    Link text
+    # Select the link text
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+    user presses keys    SHIFT+ARROW_LEFT
+
     ${toolbar}=    get editor toolbar    ${block}
     ${button}=    user gets button element    Link    ${toolbar}
     user clicks element    ${button}
     user enters text into element    label:Link URL    ${url}
+    
+    # Select Open in a new tab
+    user presses keys    TAB 
+    user presses keys    ENTER
+    # Save
+    user presses keys    TAB
     user presses keys    ENTER
 
 user saves autosaving text block

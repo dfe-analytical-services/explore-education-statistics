@@ -1,9 +1,9 @@
 import EditableKeyStatDataBlockForm, {
   KeyStatDataBlockFormValues,
 } from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
+import render from '@common-test/render';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -50,11 +50,9 @@ describe('EditableKeyStatDataBlockForm', () => {
   });
 
   test('submitting the form calls `onSubmit` handler with updated values', async () => {
-    const user = userEvent.setup();
-
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <EditableKeyStatDataBlockForm
         keyStat={keyStatDataBlock}
         statistic="Key stat statistic"
@@ -92,11 +90,9 @@ describe('EditableKeyStatDataBlockForm', () => {
   });
 
   test('submitting the form calls `onSubmit` handler with trimmed updated guidance title', async () => {
-    const user = userEvent.setup();
-
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <EditableKeyStatDataBlockForm
         keyStat={keyStatDataBlock}
         statistic="Key stat statistic"
@@ -122,5 +118,78 @@ describe('EditableKeyStatDataBlockForm', () => {
         guidanceText: 'DataBlock guidance text',
       });
     });
+  });
+
+  test('shows a validation error when have guidance text without a guidance title', async () => {
+    const handleSubmit = jest.fn();
+
+    const { user } = render(
+      <EditableKeyStatDataBlockForm
+        keyStat={{ ...keyStatDataBlock, guidanceText: '', guidanceTitle: '' }}
+        statistic="Key stat statistic"
+        testId="test-id"
+        title="Key stat title"
+        onCancel={noop}
+        onSubmit={handleSubmit}
+      />,
+    );
+
+    await user.type(
+      screen.getByLabelText('Guidance text'),
+      'Test guidance text',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByText('There is a problem')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('errorSummary')).getByRole('link', {
+        name: 'Enter a guidance title',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '#editableKeyStatDataBlockForm-keyStatDataBlock-1-guidanceTitle',
+    );
+    expect(
+      screen.getByTestId(
+        'editableKeyStatDataBlockForm-keyStatDataBlock-1-guidanceTitle-error',
+      ),
+    ).toHaveTextContent('Enter a guidance title');
+  });
+
+  test('shows a validation error when the guidance title is not unique', async () => {
+    const handleSubmit = jest.fn();
+
+    const { user } = render(
+      <EditableKeyStatDataBlockForm
+        keyStat={{ ...keyStatDataBlock, guidanceText: '', guidanceTitle: '' }}
+        keyStatisticGuidanceTitles={['test guidance title', 'something else']}
+        statistic="Key stat statistic"
+        testId="test-id"
+        title="Key stat title"
+        onCancel={noop}
+        onSubmit={handleSubmit}
+      />,
+    );
+
+    await user.type(
+      screen.getByLabelText('Guidance title'),
+      'test guidance title',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByText('There is a problem')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('errorSummary')).getByRole('link', {
+        name: 'Guidance titles must be unique',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '#editableKeyStatDataBlockForm-keyStatDataBlock-1-guidanceTitle',
+    );
+    expect(
+      screen.getByTestId(
+        'editableKeyStatDataBlockForm-keyStatDataBlock-1-guidanceTitle-error',
+      ),
+    ).toHaveTextContent('Guidance titles must be unique');
   });
 });
