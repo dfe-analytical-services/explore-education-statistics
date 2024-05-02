@@ -87,7 +87,6 @@ internal class DataSetService(
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccessDo(async _ => await CheckDataSetVersionForReleaseFileDoesNotExist(releaseFileId, cancellationToken))
             .OnSuccess(async _ => await processorClient.Process(
                 releaseFileId: releaseFileId,
                 cancellationToken: cancellationToken))
@@ -285,19 +284,5 @@ internal class DataSetService(
             .Include(rf => rf.ReleaseVersion)
             .Include(rf => rf.File)
             .ToDictionaryAsync(rf => dataSetVersionIdsByReleaseFileId[rf.Id], cancellationToken);
-    }
-
-    private async Task<Either<ActionResult, Unit>> CheckDataSetVersionForReleaseFileDoesNotExist(
-        Guid releaseFileId, 
-        CancellationToken cancellationToken)
-    {
-        var dataSetVersionExists = await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .Where(dsv => dsv.ReleaseFileId == releaseFileId)
-            .SingleOrNotFoundAsync(cancellationToken);
-
-        return dataSetVersionExists.IsRight 
-            ? new ConflictObjectResult(new { Message = $"A data set version associated with release file ID '{releaseFileId}' has already been created." }) 
-            : Unit.Instance;
     }
 }

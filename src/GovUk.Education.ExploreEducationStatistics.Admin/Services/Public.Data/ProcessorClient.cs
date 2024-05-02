@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -19,7 +20,6 @@ internal class ProcessorClient(ILogger<ProcessorClient> logger, HttpClient httpC
         Guid releaseFileId, 
         CancellationToken cancellationToken = default)
     {
-        throw new Exception();
         var request = new ProcessorTriggerRequest
         {
             ReleaseFileId = releaseFileId,

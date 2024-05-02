@@ -5,12 +5,14 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -951,7 +953,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
         [Theory]
         [MemberData(nameof(AllDataSetVersionStatuses))]
-        public async Task DataSetVersionExistsForReleaseFile_Returns409(DataSetVersionStatus dataSetVersionStatus)
+        public async Task DataSetVersionExistsForReleaseFile_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             var releaseFileId = Guid.NewGuid();
 
@@ -979,10 +981,13 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             var response = await CreateDataSetVersion(releaseFileId);
 
-            response.AssertConflict(new 
-            {
-                Message = $"A data set version associated with release file ID '{releaseFileId}' has already been created."
-            });
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = validationProblem.AssertHasError("releaseFileId", ValidationMessages.HasExistingApiDataSetVersion.Code);
+
+            var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+            Assert.Equal(releaseFileId.ToString(), errorDetail["value"].GetString());
         }
 
         private WebApplicationFactory<TestStartup> BuildApp(

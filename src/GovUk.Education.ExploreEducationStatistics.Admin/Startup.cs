@@ -465,6 +465,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRedirectsService, RedirectsService>();
             services.AddTransient<Services.Interfaces.Public.Data.IReleaseService, Services.Public.Data.ReleaseService>();
 
+            services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
+
             services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
             {
                 var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
