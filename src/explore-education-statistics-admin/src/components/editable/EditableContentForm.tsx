@@ -30,6 +30,7 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
+import parseNumber from '@common/utils/number/parseNumber';
 
 export interface InvalidUrl {
   text: string;
@@ -85,6 +86,9 @@ const EditableContentForm = ({
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
   const [altTextError, setAltTextError] = useState<string>();
   const [elements, setElements] = useState<Element[] | undefined>();
+  const [accessibilityErrors, setAccessibilityErrors] = useState<
+    AccessibilityError[]
+  >([]);
   const [invalidLinkErrors, setInvalidLinkErrors] = useState<InvalidUrl[]>([]);
   const [submitError, setSubmitError] = useState<string>();
 
@@ -98,6 +102,8 @@ const EditableContentForm = ({
     onAction,
     onIdle,
   });
+
+  console.log('accessibilityErrors', accessibilityErrors);
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
     return {
@@ -155,6 +161,14 @@ const EditableContentForm = ({
       onAddSave={toggleCommentAddForm.off}
       onAdd={toggleCommentAddForm.on}
     >
+      <div>
+        <h3>Accessibility errors</h3>
+        {accessibilityErrors.map((error, index) => (
+          <p key={`${index.toString()}`}>
+            <strong>{error.type}</strong>: {error.message}
+          </p>
+        ))}
+      </div>
       <div className={styles.form}>
         <FormProvider
           initialValues={{
@@ -219,7 +233,13 @@ const EditableContentForm = ({
                   toolbarConfig={toolbarConfig}
                   onAutoSave={handleAutoSave}
                   onBlur={onBlur}
-                  onChange={setElements}
+                  onChange={els => {
+                    if (els) {
+                      setElements(els);
+                      const errs = checkStuff(els);
+                      setAccessibilityErrors(errs);
+                    }
+                  }}
                   onCancelComment={toggleCommentAddForm.off}
                   onClickAddComment={toggleCommentAddForm.on}
                   onImageUpload={onImageUpload}
@@ -302,4 +322,153 @@ function getInvalidLinks(elements: Element[]) {
       }
       return acc;
     }, []);
+}
+
+function isHeading(element: Element) {
+  return (
+    element.name === 'heading3' ||
+    element.name === 'heading4' ||
+    element.name === 'heading5'
+  );
+}
+
+interface AccessibilityError {
+  type:
+    | 'clickHereLink'
+    | 'matchingLinkText'
+    | 'oneWordLinkText'
+    | 'urlLinkText'
+    | 'headingLevel'
+    | 'table'
+    | 'boldAsHeading'
+    | 'emptyHeading';
+  message?: string;
+}
+function checkStuff(elements: Element[]) {
+  const errors: AccessibilityError[] = [];
+  elements.forEach(element => {
+    // Check for lines that are entirely bold so should be headings
+    if (element.name === 'paragraph') {
+      const children = Array.from(element.getChildren());
+      if (children.length === 1 && children[0].getAttribute('bold')) {
+        // console.log('bold not a heading', element);
+        errors.push({
+          type: 'boldAsHeading',
+          message: children[0].toJSON().data as string,
+        });
+      }
+    }
+
+    // Check for empty heading elements
+    // Could use css to highlight this?
+    if (isHeading(element) && element.isEmpty) {
+      // console.log('is empty heading', element);
+      errors.push({
+        type: 'emptyHeading',
+        message: 'Empty heading element present',
+      });
+    }
+
+    // Check for table header
+    if (
+      element.name === 'table' &&
+      !element.getAttribute('headingRows') &&
+      !element.getAttribute('headingColumns')
+    ) {
+      // console.log('table has no headers', element);
+      errors.push({
+        type: 'table',
+        message: 'All tables should have a header row or column',
+      });
+    }
+  });
+
+  const allHeadings = elements.filter(element => isHeading(element));
+
+  // Check if headings only increase by one
+  allHeadings.forEach((heading, index) => {
+    if (index === 0) {
+      return;
+    }
+    const level = parseNumber(heading.name.split('heading')[1]);
+    const previousLevel = parseNumber(
+      allHeadings[index - 1].name.split('heading')[1],
+    );
+    if (
+      level &&
+      previousLevel &&
+      level > previousLevel &&
+      previousLevel - 1 !== level
+    ) {
+      // console.log('skipped a level', heading, level, previousLevel);
+      errors.push({
+        type: 'headingLevel',
+        message: `h${previousLevel} to h${level}`,
+      });
+    }
+  });
+
+  const flat = elements.flatMap(element =>
+    Array.from(element.getChildren()).flatMap(child => child),
+  );
+
+  const allLinks = flat.reduce<{ text: string; href: string }[]>((acc, el) => {
+    if (el.getAttribute('linkHref')) {
+      const json = el.toJSON();
+      acc.push({
+        text: json.data as string,
+        href: (json.attributes as Record<string, unknown>).linkHref as string,
+      });
+    }
+    return acc;
+  }, []);
+
+  // Check for repeated link text within the same page where the links are different
+  allLinks.forEach(link => {
+    const matchingText = allLinks.filter(
+      l => l.text === link.text && l.href !== link.href,
+    );
+
+    if (matchingText.length) {
+      // console.log('has matching link text', link);
+      errors.push({
+        type: 'matchingLinkText',
+        message: link.text,
+      });
+    }
+  });
+
+  // Check for links with only one word, just urls and click here
+  allLinks.forEach(link => {
+    if (link.text.toLowerCase().trim() === 'click here') {
+      // console.log('link is click here');
+      errors.push({
+        type: 'clickHereLink',
+        message: 'Do not use "click here" as link text',
+      });
+      return;
+    }
+    if (link.text.split(' ').length === 1) {
+      if (link.text.startsWith('http')) {
+        // console.log('link text is url', link);
+        errors.push({
+          type: 'urlLinkText',
+          message: link.text,
+        });
+        return;
+      }
+      // console.log('link text is jsut one word', link);
+      errors.push({
+        type: 'oneWordLinkText',
+        message: link.text,
+      });
+    }
+  });
+
+  // console.log('errors', errors);
+  return errors;
+
+  // attribute linkOpenInNewTab
+
+  // hasAttribute instead of get?
 }
