@@ -74,6 +74,7 @@ var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 var adminAppServiceFullName = '${subscription}-as-ees-admin'
+var publisherFunctionAppFullName = '${subscription}-fa-ees-publisher'
 var dataProcessorFunctionAppName = 'processor'
 var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
 var psqlServerName = 'psql-flexibleserver'
@@ -277,6 +278,13 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (apiContainerA
         // tables in the "public_data" database successfully.
         name: 'DataProcessorFunctionAppIdentityName'
         value: dataProcessorFunctionAppFullName
+      }
+      {
+        // This property informs the Container App of the name of the Publisher's system-assigned identity.
+        // It uses this to grant permissions to the Publisher user in order for it to be able to access
+        // tables in the "public_data" database successfully.
+        name: 'PublisherFunctionAppIdentityName'
+        value: publisherFunctionAppFullName
       }
     ]
     tagValues: tagValues
