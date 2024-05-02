@@ -758,7 +758,6 @@ const seoRedirects = [
     from: '/statistics/pupil-absence-in-schools-in-england',
     to: '/find-statistics',
   },
-  { from: '/subscriptions', to: '/' },
 ];
 
 module.exports = seoRedirects;
