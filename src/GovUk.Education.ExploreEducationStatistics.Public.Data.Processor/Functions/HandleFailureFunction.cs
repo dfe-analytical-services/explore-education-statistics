@@ -5,19 +5,15 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class CompleteImportFunction(
-    ILogger<CompleteImportFunction> logger,
+public class HandleFailureFunction(
+    ILogger<HandleFailureFunction> logger,
     IDataSetVersionImportRepository dataSetVersionImportRepository,
     IDataSetVersionRepository dataSetVersionRepository)
 {
-    [Function(nameof(CompleteImport))]
-    public async Task CompleteImport([ActivityTrigger] Guid dataSetVersionId)
+    [Function(nameof(HandleFailure))]
+    public async Task HandleFailure([ActivityTrigger] Guid dataSetVersionId)
     {
-        await dataSetVersionImportRepository.SetStage(dataSetVersionId, DataSetVersionImportStage.Completing);
-
-        // Any additional logic to tidy up after importing will be added here
-
-        await dataSetVersionRepository.SetStatus(dataSetVersionId, DataSetVersionStatus.Draft);
+        await dataSetVersionRepository.SetStatus(dataSetVersionId, DataSetVersionStatus.Failed);
         await dataSetVersionImportRepository.SetCompleted(dataSetVersionId, DateTimeOffset.UtcNow);
     }
 }

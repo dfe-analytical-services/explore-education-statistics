@@ -4,7 +4,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public interface IDataSetVersionImportRepository
 {
-    Task UpdateStage(Guid dataSetVersionId,
+    Task SetCompleted(Guid dataSetVersionId,
+        DateTimeOffset completed,
+        CancellationToken cancellationToken = default);
+
+    Task SetStage(Guid dataSetVersionId,
         DataSetVersionImportStage stage,
         CancellationToken cancellationToken = default);
 }

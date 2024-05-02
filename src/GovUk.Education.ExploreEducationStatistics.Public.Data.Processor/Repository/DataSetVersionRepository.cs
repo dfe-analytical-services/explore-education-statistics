@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class DataSetVersionRepository(PublicDataDbContext publicDataDbContext) : IDataSetVersionRepository
 {
-    public async Task UpdateStatus(Guid dataSetVersionId,
+    public async Task SetStatus(Guid dataSetVersionId,
         DataSetVersionStatus status,
         CancellationToken cancellationToken)
     {

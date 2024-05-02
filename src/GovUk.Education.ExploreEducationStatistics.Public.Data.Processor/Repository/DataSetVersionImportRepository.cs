@@ -7,7 +7,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class DataSetVersionImportRepository(PublicDataDbContext publicDataDbContext) : IDataSetVersionImportRepository
 {
-    public async Task UpdateStage(Guid dataSetVersionId,
+    public async Task SetCompleted(Guid dataSetVersionId,
+        DateTimeOffset completed,
+        CancellationToken cancellationToken = default)
+    {
+        // This currently assumes a single import per DataSetVersion
+        var dataSetVersionImport = await publicDataDbContext.DataSetVersionImports
+            .SingleAsync(i => i.DataSetVersionId == dataSetVersionId, cancellationToken: cancellationToken);
+        dataSetVersionImport.Completed = completed;
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SetStage(Guid dataSetVersionId,
         DataSetVersionImportStage stage,
         CancellationToken cancellationToken)
     {

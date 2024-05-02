@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public interface IDataSetVersionRepository
 {
-    Task UpdateStatus(Guid dataSetVersionId,
+    Task SetStatus(Guid dataSetVersionId,
         DataSetVersionStatus status,
         CancellationToken cancellationToken = default);
 }

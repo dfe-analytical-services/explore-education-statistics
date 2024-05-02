@@ -1,8 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
@@ -18,8 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class ProcessorFunction(
     ContentDbContext contentDbContext,
-    IDataSetService dataSetService,
-    IDataSetVersionRepository dataSetVersionRepository
+    IDataSetService dataSetService
 )
 {
     [Function(nameof(ProcessorFunction))]
@@ -38,7 +35,7 @@ public class ProcessorFunction(
             // Other activity function calls to be added here to cover the following stages:
             // Move CSV files from Azure Blob Storage to Azure File Share
             // Create meta summary for the DataSetVersion
-            // Import meta data to DuckDb
+            // Import metadata to DuckDb
             // Import data to DuckDb
             // Export to Parquet files
 
@@ -58,7 +55,7 @@ public class ProcessorFunction(
                 context.InstanceId,
                 dataSetVersionId);
 
-            await dataSetVersionRepository.UpdateStatus(dataSetVersionId, DataSetVersionStatus.Failed);
+            await context.CallActivityAsync(nameof(HandleFailureFunction.HandleFailure), dataSetVersionId);
         }
 
         return output;

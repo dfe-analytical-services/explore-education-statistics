@@ -20,11 +20,6 @@ public class DataSetService(
                 .FirstAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             : await CreateDataSet(releaseFileId, cancellationToken);
 
-        var file = await contentDbContext.ReleaseFiles
-            .Where(rf => rf.Id == releaseFileId)
-            .Select(rf => rf.File)
-            .FirstAsync(cancellationToken: cancellationToken);
-
         var dataSetVersion = new DataSetVersion
         {
             ReleaseFileId = releaseFileId,
@@ -45,34 +40,47 @@ public class DataSetService(
         dataSet.Versions.Add(dataSetVersion);
         dataSet.LatestDraftVersion = dataSetVersion;
 
-        // TODO does this work if a dataset id is passed in?
-        // publicDataDbContext.DataSets.Update(dataSet);
-        // await publicDataDbContext.SaveChangesAsync(cancellationToken);
+        publicDataDbContext.DataSets.Update(dataSet);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        file.PublicDataSetVersionId = dataSetVersion.Id;
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+        await UpdateFilePublicDataSetVersionId(releaseFileId: releaseFileId,
+            dataSetVersionId: dataSetVersion.Id,
+            cancellationToken);
 
         return dataSetVersion.Id;
     }
 
     private async Task<DataSet> CreateDataSet(Guid releaseFileId, CancellationToken cancellationToken)
     {
-        var file = await contentDbContext.ReleaseFiles
+        var dataSet = await contentDbContext
+            .ReleaseFiles
             .Where(rf => rf.Id == releaseFileId)
-            .Select(rf => new
+            .Select(rf => new DataSet
             {
-                Title = rf.Name!, rf.Summary, rf.ReleaseVersion.PublicationId
+                Status = DataSetStatus.Draft,
+                Title = rf.Name!,
+                Summary = rf.Summary ?? "",
+                PublicationId = rf.ReleaseVersion.PublicationId,
             })
             .FirstAsync(cancellationToken: cancellationToken);
 
-        var dataSet = new DataSet
-        {
-            Status = DataSetStatus.Draft,
-            Title = file.Title,
-            Summary = file.Summary ?? "",
-            PublicationId = file.PublicationId,
-        };
+        publicDataDbContext.Add(dataSet);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         return dataSet;
+    }
+
+    private async Task UpdateFilePublicDataSetVersionId(Guid releaseFileId,
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var file = await contentDbContext.ReleaseFiles
+            .Where(rf => rf.Id == releaseFileId)
+            .Select(rf => rf.File)
+            .FirstAsync(cancellationToken: cancellationToken);
+
+        file.PublicDataSetVersionId = dataSetVersionId;
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 }
