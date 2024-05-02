@@ -280,6 +280,14 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         value: publicUrls!.contentApi
       }
       {
+        name: 'MiniProfiler__Enabled'
+        value: 'true'
+      }
+      {
+        name: 'ParquetFiles__BasePath'
+        value: 'data/public-api-parquet'
+      }
+      {
         // This property informs the Container App of the name of the Admin's system-assigned identity.
         // It uses this to grant permissions to the Admin user in order for it to be able to access
         // tables in the "public_data" database successfully.
