@@ -146,5 +146,3 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
 
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
-
-output managedIdentityConnectionStringTemplate string = 'Server=${postgreSQLDatabase.name}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'

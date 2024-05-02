@@ -54,4 +54,5 @@ stages:
                     postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                     deployContainerApp=true \
+                    updatePsqlFlexibleServer=true \
                     dataProcessorFunctionAppExists=true

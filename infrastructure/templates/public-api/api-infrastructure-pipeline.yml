@@ -10,6 +10,9 @@ parameters:
   - name: deployContainerApp
     displayName: Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.
     default: true
+  - name: updatePsqlFlexibleServer
+    displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
+    default: false
 
 variables:
   - group: Public API Infrastructure - common
@@ -39,6 +42,8 @@ variables:
     value: $(resources.pipeline.EESBuildPipeline.runName)
   - name: deployContainerApp
     value: ${{parameters.deployContainerApp}}
+  - name: updatePsqlFlexibleServer
+    value: ${{parameters.updatePsqlFlexibleServer}}
 
 pool:
   vmImage: $(vmImageName)

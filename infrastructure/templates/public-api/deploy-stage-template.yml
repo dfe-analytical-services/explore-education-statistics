@@ -66,6 +66,7 @@ stages:
                       postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
                       dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                       deployContainerApp=$(deployContainerApp) \
+                      updatePsqlFlexibleServer=$(updatePsqlFlexibleServer)
                       dataProcessorFunctionAppExists=$dataProcessorExists
 
           - template: pipeline-variables-from-bicep-outputs-template.yml

@@ -22,6 +22,11 @@ resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' exis
   parent: vNet
 }
 
+resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+  name: '${subscription}-snet-ees-publisher'
+  parent: vNet
+}
+
 resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
   name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}'
   parent: vNet
@@ -58,3 +63,9 @@ output adminAppServiceSubnetStartIpAddress string = parseCidr(adminSubnet.proper
 
 @description('The last usable IP address for the Admin App Service Subnet.')
 output adminAppServiceSubnetEndIpAddress string = parseCidr(adminSubnet.properties.addressPrefix).lastUsable
+
+@description('The first usable IP address for the Publisher Function App Subnet.')
+output publisherFunctionAppSubnetStartIpAddress string = parseCidr(publisherSubnet.properties.addressPrefix).firstUsable
+
+@description('The last usable IP address for the Publisher Function App Subnet.')
+output publisherFunctionAppSubnetEndIpAddress string = parseCidr(publisherSubnet.properties.addressPrefix).lastUsable
