@@ -3,12 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -16,7 +22,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
@@ -894,6 +903,110 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
             return await client.GetAsync(uri);
+        }
+    }
+
+    public class CreateDataSetVersionTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    {
+        public static IEnumerable<object[]> AllDataSetVersionStatuses =>
+            EnumUtil.GetEnums<DataSetVersionStatus>()
+            .Select(e => new object[] { e });
+
+        [Fact]
+        public async Task Success()
+        {
+            var dataSetVersionId = Guid.NewGuid();
+            var releaseFileId = Guid.NewGuid();
+
+            var processorClient = new Mock<IProcessorClient>();
+            processorClient
+                .Setup(c => c.Process(
+                    releaseFileId,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ProcessorTriggerResponseViewModel
+                {
+                    DataSetVersionId = dataSetVersionId,
+                    InstanceId = Guid.NewGuid()
+                });
+
+            var client = BuildApp(processorClient.Object).CreateClient();
+
+            var response = await CreateDataSetVersion(releaseFileId, client);
+
+            var content = response.AssertOk<DataSetVersionCreateViewModel>();
+
+            Assert.NotNull(content);
+            Assert.Equal(dataSetVersionId, content.DataSetVersionId);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await CreateDataSetVersion(Guid.NewGuid(), client);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [MemberData(nameof(AllDataSetVersionStatuses))]
+        public async Task DataSetVersionExistsForReleaseFile_Returns409(DataSetVersionStatus dataSetVersionStatus)
+        {
+            var releaseFileId = Guid.NewGuid();
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 2)
+                .WithStatus(dataSetVersionStatus)
+                .WithReleaseFileId(releaseFileId)
+                .WithDataSet(dataSet);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await CreateDataSetVersion(releaseFileId);
+
+            response.AssertConflict(new 
+            {
+                Message = $"A data set version associated with release file ID '{releaseFileId}' has already been created."
+            });
+        }
+
+        private WebApplicationFactory<TestStartup> BuildApp(
+            IProcessorClient? processorClient = null,
+            ClaimsPrincipal? user = null)
+        {
+            return TestApp.ConfigureServices(
+                    services => { services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>()); }
+                )
+                .SetUser(user ?? BauUser());
+        }
+
+        private async Task<HttpResponseMessage> CreateDataSetVersion(
+            Guid releaseFileId, 
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var request = new DataSetVersionCreateRequest
+            {
+                ReleaseFileId = releaseFileId
+            };
+
+            return await client.PostAsJsonAsync(BaseUrl, request);
         }
     }
 }

@@ -68,6 +68,12 @@ public static class HttpResponseMessageTestExtensions
         Assert.Equal(NotFound, message.StatusCode);
     }
 
+    public static T AssertConflict<T>(this HttpResponseMessage message, T expectedBody)
+    {
+        Assert.Equal(Conflict, message.StatusCode);
+        return message.AssertBodyEqualTo(expectedBody);
+    }
+
     public static void AssertForbidden(this HttpResponseMessage message)
     {
         Assert.Equal(Forbidden, message.StatusCode);
