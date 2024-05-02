@@ -59,7 +59,7 @@ param dockerImagesTag string = ''
 @description('Has the user-assigned Managed Identity for the API Container App been created and been assigned the AcrPull role yet?')
 param apiContainerAppUserCreatedWithAcrPull bool = true
 
-@description('Have database users been added to PSQL yet for Container App and Function App?')
+@description('Have database users been added to PSQL yet?')
 param psqlDbUsersAdded bool = true
 
 @description('Public URLs of other components in the service.')

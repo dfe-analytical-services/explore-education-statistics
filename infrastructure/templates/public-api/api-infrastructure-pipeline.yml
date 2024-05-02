@@ -11,7 +11,7 @@ parameters:
     displayName: Has the user-assigned Managed Identity for the API Container App been created and been assigned the AcrPull role yet?
     default: true
   - name: psqlDbUsersAdded
-    displayName: Have database users been added to PSQL yet for Container App and Function App?
+    displayName: Have database users been added to PSQL yet?
     default: true
 
 variables:
