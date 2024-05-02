@@ -3,14 +3,12 @@ import FormEditor, {
   EditorElementsHandler,
   FormEditorProps,
 } from '@admin/components/form/FormEditor';
-import { InvalidUrl } from '@admin/components/editable/EditableContentForm';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormGroup from '@common/components/form/FormGroup';
 import { OmitStrict } from '@common/types';
-import WarningMessage from '@common/components/WarningMessage';
 import useRegister from '@common/components/form/hooks/useRegister';
 import getErrorMessage from '@common/components/form/util/getErrorMessage';
-import React, { useRef } from 'react';
+import React, { ReactNode, useRef } from 'react';
 import {
   FieldValues,
   Path,
@@ -23,11 +21,10 @@ export const elementsFieldName = (name: string) => `__${name}`;
 
 export interface Props<TFormValues extends FieldValues>
   extends OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange' | 'onBlur'> {
-  altTextError?: string;
+  contentErrorDetails?: ReactNode;
   name: Path<TFormValues>;
   formGroupClass?: string;
   id?: string;
-  invalidLinkErrors?: InvalidUrl[];
   shouldValidateLinks?: boolean;
   showError?: boolean;
   testId?: string;
@@ -36,11 +33,10 @@ export interface Props<TFormValues extends FieldValues>
 }
 
 export default function FormFieldEditor<TFormValues extends FieldValues>({
-  altTextError,
+  contentErrorDetails,
   error,
   formGroupClass,
   id,
-  invalidLinkErrors = [],
   name,
   showError = true,
   testId,
@@ -68,20 +64,7 @@ export default function FormFieldEditor<TFormValues extends FieldValues>({
 
   return (
     <FormGroup hasError={!!errorMessage} className={formGroupClass}>
-      {altTextError && <AltTextWarningMessage />}
-
-      {invalidLinkErrors.length > 0 && (
-        <WarningMessage className="govuk-!-margin-bottom-1">
-          The following links have invalid URLs:
-          <ul className="govuk-!-font-weight-regular govuk-!-margin-bottom-1 govuk-!-margin-top-1">
-            {invalidLinkErrors.map(link => (
-              <li key={link?.text}>
-                {link?.text} ({link?.url})
-              </li>
-            ))}
-          </ul>
-        </WarningMessage>
-      )}
+      {contentErrorDetails}
 
       <FormEditor
         testId={testId}
@@ -116,22 +99,5 @@ export default function FormFieldEditor<TFormValues extends FieldValues>({
         error={errorMessage}
       />
     </FormGroup>
-  );
-}
-
-export function AltTextWarningMessage() {
-  return (
-    <WarningMessage>
-      Alternative text must be added for images, for guidance see{' '}
-      <a
-        href="https://www.w3.org/WAI/tutorials/images/tips/"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        W3C tips on writing alternative text
-      </a>
-      . <br />
-      Images without alternative text are outlined in red.
-    </WarningMessage>
   );
 }
