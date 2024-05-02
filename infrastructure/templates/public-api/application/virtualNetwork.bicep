@@ -11,7 +11,7 @@ param resourcePrefix string
 param dataProcessorFunctionAppNameSuffix string
 
 @description('Specifies the name suffix of the Container App Environment')
-var containerAppEnvironmentNameSuffix string
+param containerAppEnvironmentNameSuffix string
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: vNetName
@@ -43,9 +43,9 @@ output dataProcessorSubnetStartIpAddress string = parseCidr(dataProcessorSubnet.
 
 @description('The last usable IP address for the Data Processor Function App Subnet.')
 output dataProcessorSubnetEndIpAddress string = parseCidr(dataProcessorSubnet.properties.addressPrefix).lastUsable
-*/
+
 @description('The fully qualified Azure resource ID of the API Container App Subnet.')
-output containerAppEnvironmentSubnetRef string = containerAppEnvironmentSubnet.Id
+output containerAppEnvironmentSubnetRef string = containerAppEnvironmentSubnet.id
 
 @description('The first usable IP address for the API Container App Subnet.')
 output containerAppEnvironmentSubnetStartIpAddress string = parseCidr(containerAppEnvironmentSubnet.properties.addressPrefix).firstUsable

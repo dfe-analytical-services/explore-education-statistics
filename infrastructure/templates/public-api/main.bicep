@@ -110,7 +110,7 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     resourcePrefix: resourcePrefix
     subscription: subscription
     dataProcessorFunctionAppNameSuffix: dataProcessorFunctionAppName
-    containerAppEnvironmentName: containerAppEnvironmentNameSuffix
+    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
     /* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
        Security Group guidance on accessing resources behind VNet protection.
     postgreSqlServerName: psqlServerName

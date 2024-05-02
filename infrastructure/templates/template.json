@@ -1034,7 +1034,11 @@
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
+    "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
+    "containerAppEnvironmentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('containerAppEnvironmentSubnetName'))]",
+    "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
+    "applicationGatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('applicationGatewaySubnetName'))]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -1055,6 +1059,10 @@
       {
         "name": "data",
         "id": "[variables('dataSubnetRef')]"
+      },
+      {
+        "name": "publicApiDataProcessor",
+        "id": "[variables('publicApiDataProcessorSubnetRef')]"
       }
     ],
     "publicSqlAllowedSubnets": [
@@ -3463,6 +3471,9 @@
               "addressPrefix": "10.0.6.0/24",
               "serviceEndpoints": [
                 {
+                  "service": "Microsoft.Sql"
+                },
+                {
                   "service": "Microsoft.Storage"
                 }
               ],
@@ -3479,7 +3490,7 @@
           {
             "name": "[variables('containerAppEnvironmentSubnetName')]",
             "properties": {
-              "addressPrefix": "10.0.8.0/24",
+              "addressPrefix": "10.0.8.0/23",
               "delegations": [
                 {
                   "name": "environment",
@@ -3488,6 +3499,12 @@
                   }
                 }
               ]
+            }
+          },
+          {
+            "name": "[variables('applicationGatewaySubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.10.0/24"
             }
           }
         ]
