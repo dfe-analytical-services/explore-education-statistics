@@ -48,17 +48,19 @@ public static class DataImportGeneratorExtensions
         this InstanceSetters<DataImport> setters,
         string dataFileName)
         => setters
-            .Set(d => d.File, new File
+            .Set(d => d.File, (_, dataImport) => new File
             {
                 Id = Guid.NewGuid(),
                 Filename = $"{dataFileName}.csv",
-                Type = FileType.Data
+                Type = FileType.Data,
+                SubjectId = dataImport.SubjectId,
             })
-            .Set(d => d.MetaFile, new File
+            .Set(d => d.MetaFile, (_, dataImport) => new File
             {
                 Id = Guid.NewGuid(),
                 Filename = $"{dataFileName}.meta.csv",
-                Type = FileType.Metadata
+                Type = FileType.Metadata,
+                SubjectId = dataImport.SubjectId,
             });
 
 }

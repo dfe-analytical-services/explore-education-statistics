@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             );
 
             var completedImport = await _dataImportService.GetImport(import.Id);
-            await CheckComplete(completedImport, context);
+            await CompleteImport(completedImport, context);
         }
 
         public async Task ImportFiltersAndLocations(
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 context);
         }
 
-        public async Task CheckComplete(DataImport import, StatisticsDbContext context)
+        public async Task CompleteImport(DataImport import, StatisticsDbContext context)
         {
             if (import.Status.IsFinished())
             {
@@ -102,6 +102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     "mark as completed or failed",
                     import.File.Filename,
                     import.Status);
+
+                if (import.Status == COMPLETE)
+                {
+                    await _dataImportService.WriteDataSetFileMeta(import.SubjectId);
+                }
+
                 return;
             }
 
@@ -133,6 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 if (import.Errors.Count == 0)
                 {
                     await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
+                    await _dataImportService.WriteDataSetFileMeta(import.SubjectId);
                 }
                 else
                 {

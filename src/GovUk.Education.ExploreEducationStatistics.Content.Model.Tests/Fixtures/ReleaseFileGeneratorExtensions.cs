@@ -73,6 +73,16 @@ public static class ReleaseFileGeneratorExtensions
         string summary)
         => generator.ForInstance(s => s.SetSummary(summary));
 
+    public static Generator<ReleaseFile> WithFilterSequence(
+        this Generator<ReleaseFile> generator,
+        List<FilterSequenceEntry> sequence)
+        => generator.ForInstance(s => s.SetFilterSequence(sequence));
+
+    public static Generator<ReleaseFile> WithIndicatorSequence(
+        this Generator<ReleaseFile> generator,
+        List<IndicatorGroupSequenceEntry> sequence)
+        => generator.ForInstance(s => s.SetIndicatorSequence(sequence));
+
     public static InstanceSetters<ReleaseFile> SetFile(
         this InstanceSetters<ReleaseFile> setters,
         File file)
@@ -110,4 +120,14 @@ public static class ReleaseFileGeneratorExtensions
         this InstanceSetters<ReleaseFile> setters,
         string summary)
         => setters.Set(rf => rf.Summary, summary);
+
+    public static InstanceSetters<ReleaseFile> SetFilterSequence(
+        this InstanceSetters<ReleaseFile> setters,
+        List<FilterSequenceEntry> sequence)
+        => setters.Set(rf => rf.FilterSequence, sequence);
+
+    public static InstanceSetters<ReleaseFile> SetIndicatorSequence(
+        this InstanceSetters<ReleaseFile> setters,
+        List<IndicatorGroupSequenceEntry> sequence)
+        => setters.Set(rf => rf.IndicatorSequence, sequence);
 }

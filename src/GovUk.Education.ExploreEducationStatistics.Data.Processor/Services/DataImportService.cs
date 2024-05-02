@@ -3,10 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -147,6 +151,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             import.Status = newStatus;
             context.DataImports.Update(import);
             await context.SaveChangesAsync();
+        }
+
+        public async Task WriteDataSetFileMeta(Guid subjectId)
+        {
+            await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+            await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
+
+            var observations = statisticsDbContext.Observation
+                .AsNoTracking()
+                .Where(o => o.SubjectId == subjectId);
+
+            var geographicLevels = observations
+                .Select(o => o.Location.GeographicLevel)
+                .Distinct()
+                .OrderBy(gl => gl)
+                .ToList();
+
+            var timePeriods = observations
+                .Select(o => new TimePeriodMeta { Year = o.Year, TimeIdentifier = o.TimeIdentifier })
+                .Distinct()
+                .OrderBy(tp => tp.Year)
+                .ToList();
+
+            var filters = await statisticsDbContext.Filter
+                .AsNoTracking()
+                .Where(f => f.SubjectId == subjectId)
+                .OrderBy(f => f.Label)
+                .Select(f => new FilterMeta
+                {
+                    Id = f.Id,
+                    Label = f.Label,
+                    Hint = f.Hint,
+                    ColumnName = f.Name,
+                })
+                .ToListAsync();
+
+            var indicators = await statisticsDbContext.Indicator
+                .AsNoTracking()
+                .Where(i => i.IndicatorGroup.SubjectId == subjectId)
+                .Select(i => new IndicatorMeta
+                {
+                    Id = i.Id,
+                    Label = i.Label,
+                    ColumnName = i.Name,
+                })
+                .OrderBy(i => i.Label)
+                .ToListAsync();
+
+            var dataSetFileMeta = new DataSetFileMeta
+            {
+                GeographicLevels = geographicLevels
+                    .Select(gl => gl.GetEnumLabel()).ToList(),
+                TimeIdentifier = timePeriods[0].TimeIdentifier,
+                Years = timePeriods.Select(tp => tp.Year).ToList(),
+                Filters = filters,
+                Indicators = indicators,
+            };
+
+            var file = contentDbContext.Files
+                .Single(f => f.Type == FileType.Data
+                             && f.SubjectId == subjectId);
+            file.DataSetFileMeta = dataSetFileMeta;
+            await contentDbContext.SaveChangesAsync();
         }
     }
 }
