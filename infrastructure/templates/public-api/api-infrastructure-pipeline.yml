@@ -37,8 +37,8 @@ variables:
     value: $(paramDirectory)/main-prod.bicepparam
   - name: upstreamPipelineBuildNumber
     value: $(resources.pipeline.EESBuildPipeline.runName)
-  - name: psqlDbUsersAdded
-    value: ${{parameters.psqlDbUsersAdded}}
+  - name: deployContainerApp
+    value: ${{parameters.deployContainerApp}}
 
 pool:
   vmImage: $(vmImageName)
