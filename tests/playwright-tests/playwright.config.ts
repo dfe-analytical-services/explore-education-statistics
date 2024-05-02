@@ -4,15 +4,20 @@ import environment from '@util/env';
 const { PUBLIC_USERNAME, PUBLIC_PASSWORD, PUBLIC_URL } = environment;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config();
-
-const encodeBasicAuth = (username: string, password: string) => {
-  if (PUBLIC_URL) {
-    const unencodedString = `${username}:${password}`;
-    return `Basic ${btoa(unencodedString)}`;
+function appendBasicAuthCredentialsToPublic(pubUrl: string) {
+  if (typeof pubUrl !== 'string') {
+    return null;
   }
-  return {};
-};
+  if (pubUrl.includes(PUBLIC_URL)) {
+    const username = PUBLIC_USERNAME;
+    const password = PUBLIC_PASSWORD;
+
+    if (username && password) {
+      return { username, password };
+    }
+  }
+  return null;
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -28,7 +33,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 4 : undefined,
+  workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI
     ? [
@@ -43,8 +48,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: ' ',
     ignoreHTTPSErrors: true,
-    extraHTTPHeaders: encodeBasicAuth(PUBLIC_USERNAME, PUBLIC_PASSWORD),
-
+    httpCredentials: appendBasicAuthCredentialsToPublic(PUBLIC_URL),
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
     video: 'retain-on-failure',
