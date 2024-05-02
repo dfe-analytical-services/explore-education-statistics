@@ -3145,6 +3145,11 @@
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "PublicDataDb",
+              "type": "PostgreSQL",
+              "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-publisher-connectionstring-publicdatadb)')]"
             }
           ]
         }
@@ -3178,7 +3183,8 @@
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
         "NotificationStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
-        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]"
+        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
     {

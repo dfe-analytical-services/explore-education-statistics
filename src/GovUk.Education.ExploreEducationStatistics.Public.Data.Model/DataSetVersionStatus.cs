@@ -11,5 +11,6 @@ public enum DataSetVersionStatus
     Draft,
     Published,
     Deprecated,
-    Withdrawn
+    Withdrawn,
+    Cancelled,
 }

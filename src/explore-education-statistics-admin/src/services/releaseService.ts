@@ -148,6 +148,10 @@ export const ReleaseChecklistErrorCode = [
   'RelatedDashboardsSectionContainsEmptyHtmlBlock',
   'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock',
   'SummarySectionContainsEmptyHtmlBlock',
+  'PublicApiDataSetImportsMustBeCompleted',
+  'PublicApiDataSetCancellationsMustBeResolved',
+  'PublicApiDataSetFailuresMustBeResolved',
+  'PublicApiDataSetMappingsMustBeCompleted',
 ] as const;
 
 export type ReleaseChecklistError = {

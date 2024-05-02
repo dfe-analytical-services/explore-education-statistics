@@ -223,7 +223,7 @@ public static class DataSetVersionGeneratorExtensions
         this InstanceSetters<DataSetVersion> instanceSetter)
         => instanceSetter
             .SetStatus(DataSetVersionStatus.Published)
-            .SetPublished(DateTimeOffset.UtcNow)
+            .SetPublished(DateTimeOffset.UtcNow.AddDays(-1))
             .SetWithdrawn(null);
 
 
@@ -258,8 +258,8 @@ public static class DataSetVersionGeneratorExtensions
         this InstanceSetters<DataSetVersion> instanceSetter)
         => instanceSetter
             .SetStatus(DataSetVersionStatus.Withdrawn)
-            .SetWithdrawn(DateTimeOffset.UtcNow)
-            .Set((_, dsv) => dsv.Published ??= DateTimeOffset.UtcNow.AddDays(-1));
+            .SetWithdrawn(DateTimeOffset.UtcNow.AddDays(-1))
+            .Set((_, dsv) => dsv.Published ??= DateTimeOffset.UtcNow.AddDays(-2));
 
     public static InstanceSetters<DataSetVersion> SetPublished(
         this InstanceSetters<DataSetVersion> instanceSetter,

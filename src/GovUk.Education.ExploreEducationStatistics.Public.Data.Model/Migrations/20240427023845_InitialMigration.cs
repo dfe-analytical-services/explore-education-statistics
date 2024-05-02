@@ -572,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 principalColumn: "Id");
 
             // Grant permissions on database tables created by this resource's database user to the
-            // Admin App Service and Data Processor Function App users.
+            // Admin App Service user.
             var adminAppServiceIdentityName = Environment.GetEnvironmentVariable("AdminAppServiceIdentityName");
             if (adminAppServiceIdentityName != null)
             {
@@ -580,11 +580,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{adminAppServiceIdentityName}\"");
             }
 
+            // Grant permissions on database tables created by this resource's database user to the
+            // Public API Data Processor Function App user.
             var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
             if (dataProcessorFunctionAppIdentityName != null)
             {
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+            }
+
+            // Grant permissions on database tables created by this resource's database user to the
+            // Publisher Function App user.
+            var publisherFunctionAppIdentityName = Environment.GetEnvironmentVariable("PublisherFunctionAppIdentityName");
+            if (publisherFunctionAppIdentityName != null)
+            {
+                migrationBuilder.Sql(
+                    $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{publisherFunctionAppIdentityName}\"");
             }
         }
 
