@@ -20,4 +20,8 @@ public interface IDataSetService
     Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, DataSetVersionCreateViewModel>> CreateDataSetVersion(
+        Guid releaseFileId,
+        CancellationToken cancellationToken = default);
 }

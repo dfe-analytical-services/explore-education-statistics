@@ -1,4 +1,5 @@
 #nullable enable
+using AngleSharp.Io;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Settings;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -65,6 +67,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -354,6 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Configuration options
              */
 
+            services.Configure<PublicDataProcessorOptions>(configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
             services.Configure<PreReleaseOptions>(configuration);
             services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
             services.Configure<ReleaseApprovalOptions>(
@@ -461,6 +465,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRedirectsService, RedirectsService>();
             services.AddTransient<Services.Interfaces.Public.Data.IReleaseService, Services.Public.Data.ReleaseService>();
 
+            services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
+            {
+                var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
+                httpClient.BaseAddress = new Uri(options.Value.Url);
+                httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
+            });
+
             if (publicDataDbExists)
             {
                 services.AddTransient<IDataSetService, DataSetService>();
@@ -473,6 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetService, DataSetService>(provider =>
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
                         provider.GetService<PublicDataDbContext>(),
+                        provider.GetRequiredService<IProcessorClient>(),
                         provider.GetRequiredService<IUserService>()));
                 
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();

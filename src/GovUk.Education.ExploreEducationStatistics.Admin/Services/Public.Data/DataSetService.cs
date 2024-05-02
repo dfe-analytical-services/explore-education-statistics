@@ -20,9 +20,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-public class DataSetService(
+internal class DataSetService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
+    IProcessorClient processorClient,
     IUserService userService)
     : IDataSetService
 {
@@ -65,7 +66,10 @@ public class DataSetService(
         Guid dataSetId,
         CancellationToken cancellationToken = default)
     {
-        return await CheckDataSetExists(dataSetId, cancellationToken)
+        return await CheckDataSetExists(
+                dataSetId: dataSetId,
+                cancellationToken: cancellationToken,
+                hydrateEntity: true)
             .OnSuccessDo(dataSet => CheckPublicationExists(dataSet.PublicationId, cancellationToken)
                 .OnSuccess(userService.CheckCanViewPublication)
             )
@@ -75,6 +79,21 @@ public class DataSetService(
                     await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken);
 
                 return MapDataSet(dataSet, releaseFilesByDataSetVersionId);
+            });
+    }
+
+    public async Task<Either<ActionResult, DataSetVersionCreateViewModel>> CreateDataSetVersion(
+        Guid releaseFileId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccessDo(async _ => await CheckDataSetVersionForReleaseFileDoesNotExist(releaseFileId, cancellationToken))
+            .OnSuccess(async _ => await processorClient.Process(
+                releaseFileId: releaseFileId,
+                cancellationToken: cancellationToken))
+            .OnSuccess(processorResponse => new DataSetVersionCreateViewModel
+            {
+                DataSetVersionId = processorResponse.DataSetVersionId
             });
     }
 
@@ -215,13 +234,21 @@ public class DataSetService(
 
     private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(
         Guid dataSetId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool hydrateEntity = false)
     {
-        return await publicDataDbContext.DataSets
+        var queryable = publicDataDbContext.DataSets
             .AsNoTracking()
-            .Include(ds => ds.LatestDraftVersion)
-            .Include(ds => ds.LatestLiveVersion)
-            .Where(ds => ds.Id == dataSetId)
+            .Where(ds => ds.Id == dataSetId);
+
+        if (hydrateEntity)
+        {
+            queryable = queryable
+                .Include(ds => ds.LatestDraftVersion)
+                .Include(ds => ds.LatestLiveVersion);
+        }
+
+        return await queryable
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
@@ -258,5 +285,19 @@ public class DataSetService(
             .Include(rf => rf.ReleaseVersion)
             .Include(rf => rf.File)
             .ToDictionaryAsync(rf => dataSetVersionIdsByReleaseFileId[rf.Id], cancellationToken);
+    }
+
+    private async Task<Either<ActionResult, Unit>> CheckDataSetVersionForReleaseFileDoesNotExist(
+        Guid releaseFileId, 
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersionExists = await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Where(dsv => dsv.ReleaseFileId == releaseFileId)
+            .SingleOrNotFoundAsync(cancellationToken);
+
+        return dataSetVersionExists.IsRight 
+            ? new ConflictObjectResult(new { Message = $"A data set version associated with release file ID '{releaseFileId}' has already been created." }) 
+            : Unit.Instance;
     }
 }

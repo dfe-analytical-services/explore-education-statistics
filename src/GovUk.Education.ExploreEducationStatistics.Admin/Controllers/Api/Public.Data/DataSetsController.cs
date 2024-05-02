@@ -44,4 +44,17 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
+
+    [HttpPost]
+    [Produces("application/json")]
+    public async Task<ActionResult<DataSetVersionCreateViewModel>> CreateDataSetVersion(
+        [FromBody] DataSetVersionCreateRequest dataSetVersionCreateRequest,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetService
+            .CreateDataSetVersion(
+                releaseFileId: dataSetVersionCreateRequest.ReleaseFileId,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
 }
