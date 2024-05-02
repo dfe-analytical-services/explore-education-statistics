@@ -28,6 +28,10 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
   const [isReordering, toggleReordering] = useToggle(false);
 
+  const keyStatisticGuidanceTitles = keyStatistics.map(
+    stat => stat.guidanceTitle?.toLowerCase(),
+  );
+
   const reorderKeyStatisticsButton = () => {
     return !isReordering ? (
       <Button variant="secondary" onClick={toggleReordering.on}>
@@ -65,7 +69,10 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     <>
       {isEditing && (
         <>
-          <AddKeyStatistics release={release} />
+          <AddKeyStatistics
+            keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+            release={release}
+          />
           <hr />
           {keyStatistics.length > 1 && reorderKeyStatisticsButton()}
         </>
@@ -109,6 +116,9 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         <EditableKeyStat
                           key={keyStat.id}
                           keyStat={keyStat}
+                          keyStatisticGuidanceTitles={
+                            keyStatisticGuidanceTitles
+                          }
                           releaseId={release.id}
                           isEditing={isEditing}
                           isReordering={isReordering}

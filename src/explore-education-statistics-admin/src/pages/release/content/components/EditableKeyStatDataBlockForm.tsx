@@ -11,14 +11,15 @@ import Yup from '@common/validation/yup';
 import React from 'react';
 
 export interface KeyStatDataBlockFormValues {
-  trend: string;
-  guidanceTitle: string;
-  guidanceText: string;
+  trend?: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
 }
 
 export interface EditableKeyStatDataBlockFormProps {
   isReordering?: boolean;
   keyStat: KeyStatisticDataBlock;
+  keyStatisticGuidanceTitles?: (string | undefined)[];
   statistic: string;
   testId: string;
   title: string;
@@ -29,6 +30,7 @@ export interface EditableKeyStatDataBlockFormProps {
 export default function EditableKeyStatDataBlockForm({
   isReordering = false,
   keyStat,
+  keyStatisticGuidanceTitles,
   statistic,
   testId,
   title,
@@ -46,13 +48,28 @@ export default function EditableKeyStatDataBlockForm({
   return (
     <FormProvider
       initialValues={{
-        trend: keyStat.trend ?? '',
-        guidanceTitle: keyStat.guidanceTitle ?? 'Help',
+        trend: keyStat.trend,
+        guidanceTitle: keyStat.guidanceTitle,
         guidanceText: keyStat.guidanceText,
       }}
       validationSchema={Yup.object<KeyStatDataBlockFormValues>({
         trend: Yup.string().max(230),
-        guidanceTitle: Yup.string().max(65),
+        guidanceTitle: Yup.string()
+          .max(65)
+          .when('guidanceText', {
+            is: (val: string) => val !== '',
+            then: s => s.required('Enter a guidance title'),
+          })
+          .test({
+            name: 'duplicateGuidanceTitles',
+            message: 'Guidance titles must be unique',
+            test: (value?: string) =>
+              !(
+                value !== undefined &&
+                value !== '' &&
+                keyStatisticGuidanceTitles?.includes(value?.toLowerCase())
+              ),
+          }),
         guidanceText: Yup.string(),
       })}
     >
