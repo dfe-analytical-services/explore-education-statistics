@@ -57,16 +57,16 @@ export default defineConfig({
   /* Configure different test suites and running against chrome browser */
   projects: [
     {
-      name: 'public',
-      testDir: './tests/public',
-    },
-    {
       name: 'admin',
-      testDir: './tests/admin',
+      testDir: '.tests/admin',
     },
     {
       name: 'adminandpublic',
-      testDir: './tests/admin-and-public',
+      testDir: '.tests/admin-and-public',
+    },
+    {
+      name: 'public',
+      testDir: '.tests/public',
     },
     {
       use: {
