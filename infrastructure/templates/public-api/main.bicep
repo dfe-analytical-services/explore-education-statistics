@@ -59,8 +59,8 @@ param dockerImagesTag string = ''
 @description('Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.')
 param deployContainerApp bool = true
 
-// Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL will redeploy even if no changes exist in
-// this deploy from the previous one.
+// TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL 
+// will redeploy even if no changes exist in this deploy from the previous one.
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
 param updatePsqlFlexibleServer bool = false
 
@@ -169,6 +169,9 @@ var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   endIpAddress: rule.endIpAddress
 })
 
+// TODO EES-5128 - if keeping the flag for the future, move this conditional logic into the postgresqlDatabase.bicep 
+// module itself so that we always have a set of outputs that we can use. This will in turn allow us to move 
+// psqlManagedIdentityConnectionStringTemplate into the module's outputs.
 resource postgreSqlServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' existing = if (!updatePsqlFlexibleServer) {
   name: psqlServerFullName
 }
@@ -194,6 +197,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
 
 var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
 
+// TODO EES-5128 - move into the Container App module?
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
 }
