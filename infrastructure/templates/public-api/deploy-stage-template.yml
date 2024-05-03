@@ -81,13 +81,21 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
+                
                 az functionapp config appsettings set \
                   --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
                   --settings \
-                    "ConnectionStrings__PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))" \
                     "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))"
+                
+                az webapp config connection-string set \
+                  --name '$(dataProcessorFunctionAppName)' \
+                  --resource-group '$(resourceGroupName)' \
+                  --slot 'staging' \
+                  --connection-string-type=PostgreSQL \
+                  --settings \
+                    "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - deploy to staging slot'

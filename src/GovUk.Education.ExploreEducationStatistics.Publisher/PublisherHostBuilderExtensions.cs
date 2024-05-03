@@ -162,7 +162,7 @@ public static class PublisherHostBuilderExtensions
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = configuration.GetConnectionString("PublicDataDb")!;
+                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
 
                     if (hostEnvironment.IsDevelopment())
                     {

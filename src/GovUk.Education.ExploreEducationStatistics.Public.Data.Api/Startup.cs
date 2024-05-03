@@ -7,6 +7,7 @@ using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
@@ -98,12 +99,12 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // cause the data source builder to throw a host exception.
         if (!hostEnvironment.IsIntegrationTest())
         {
-            var connectionString = configuration.GetConnectionString("PublicDataDb")!;
+            var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
 
             if (hostEnvironment.IsDevelopment())
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    configuration.GetConnectionString("PublicDataDb"));
+                    ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb"));
 
                 // Set up the data source outside the `AddDbContext` action as this
                 // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
