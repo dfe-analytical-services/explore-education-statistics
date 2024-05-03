@@ -1039,6 +1039,8 @@
     "containerAppEnvironmentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('containerAppEnvironmentSubnetName'))]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "applicationGatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('applicationGatewaySubnetName'))]",
+    "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
+    "psqlFlexibleServerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('psqlFlexibleServerSubnetName'))]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -3505,6 +3507,12 @@
             "name": "[variables('applicationGatewaySubnetName')]",
             "properties": {
               "addressPrefix": "10.0.10.0/24"
+            }
+          },
+          {
+            "name": "[variables('psqlFlexibleServerSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.12.0/24"
             }
           }
         ]

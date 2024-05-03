@@ -218,28 +218,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
     */
     // privateDnsZoneId: postgreSqlPrivateDnsZone.id
     // subnetId: vNetModule.outputs.postgreSqlSubnetRef
-    firewallRules: concat(formattedPostgreSqlFirewallRules, [
-      {
-        name: '${resourcePrefix}-ca-${apiContainerAppName}-subnet'
-        startIpAddress: vNetModule.outputs.containerAppEnvironmentSubnetStartIpAddress
-        endIpAddress: vNetModule.outputs.containerAppEnvironmentSubnetEndIpAddress
-      }
-      {
-        name: '${dataProcessorFunctionAppFullName}-subnet'
-        startIpAddress: vNetModule.outputs.dataProcessorSubnetStartIpAddress
-        endIpAddress: vNetModule.outputs.dataProcessorSubnetEndIpAddress
-      }
-      {
-        name: '${subscription}-as-ees-admin-subnet'
-        startIpAddress: vNetModule.outputs.adminAppServiceSubnetStartIpAddress
-        endIpAddress: vNetModule.outputs.adminAppServiceSubnetEndIpAddress
-      }
-      {
-        name: '${subscription}-fa-ees-publisher-subnet'
-        startIpAddress: vNetModule.outputs.publisherFunctionAppSubnetStartIpAddress
-        endIpAddress: vNetModule.outputs.publisherFunctionAppSubnetEndIpAddress
-      }
-    ])
+    firewallRules: formattedPostgreSqlFirewallRules
     databaseNames: ['public_data']
   }
 }
