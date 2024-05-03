@@ -62,22 +62,18 @@ public class ProcessorFunction(
     [Function(nameof(ProcessorTrigger))]
     public async Task<IActionResult> ProcessorTrigger(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "orchestrators/processor")] [FromBody]
-        ProcessorTriggerRequest processorTriggerRequest,
+        ProcessorTriggerRequest request,
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext,
         CancellationToken cancellationToken)
     {
         var logger = executionContext.GetLogger(nameof(ProcessorTrigger));
 
-        var validationResult = await requestValidator.ValidateAsync(processorTriggerRequest, cancellationToken);
- 
-        if (!validationResult.IsValid)
-        {
-            return new BadRequestObjectResult(validationResult.Errors.Select(failure => failure.ErrorMessage));
-        }
-
-        return await dataSetService
-            .CreateDataSetVersion(processorTriggerRequest.ReleaseFileId, cancellationToken: cancellationToken)
+        return await requestValidator.Validate(request, cancellationToken)
+            .OnSuccess(() => dataSetService.CreateDataSetVersion(
+                releaseFileId: request.ReleaseFileId,
+                cancellationToken: cancellationToken
+            ))
             .OnSuccess(async dataSetVersionId =>
             {
                 var instanceId = await ScheduleNewOrchestrationInstance(client, dataSetVersionId, cancellationToken);
