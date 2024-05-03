@@ -578,6 +578,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             {
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{adminAppServiceIdentityName}\"");
+                migrationBuilder.Sql(
+                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{adminAppServiceIdentityName}\"");
             }
 
             // Grant permissions on database tables created by this resource's database user to the
@@ -587,6 +589,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             {
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+                migrationBuilder.Sql(
+                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{dataProcessorFunctionAppIdentityName}\"");
             }
 
             // Grant permissions on database tables created by this resource's database user to the
@@ -596,6 +600,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             {
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{publisherFunctionAppIdentityName}\"");
+                migrationBuilder.Sql(
+                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{publisherFunctionAppIdentityName}\"");
             }
         }
 

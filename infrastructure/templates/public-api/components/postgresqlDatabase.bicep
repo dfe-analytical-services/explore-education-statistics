@@ -50,9 +50,6 @@ param backupRetentionDays int = 7
 @description('Geo-Redundant Backup setting')
 param geoRedundantBackup string = 'Disabled'
 
-@description('Specifies the subnet id')
-param subnetId string
-
 @description('An array of database names')
 param databaseNames string[]
 
@@ -65,9 +62,6 @@ param firewallRules {
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
-
-@description('Id of the PostgreSQL Private DNS Zone')
-param privateDnsZoneId string
 
 @description('Create mode for the PostgreSQL Flexible Server resource')
 @allowed([
@@ -113,10 +107,6 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     highAvailability: {
       mode: 'Disabled'
     }
-    network: {
-      delegatedSubnetResourceId: subnetId
-      privateDnsZoneArmResourceId: privateDnsZoneId
-    }
   }
 
   resource database 'databases' = [for name in databaseNames: {
@@ -136,5 +126,3 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
 
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
-
-output managedIdentityConnectionStringTemplate string = 'Server=${postgreSQLDatabase.name}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'

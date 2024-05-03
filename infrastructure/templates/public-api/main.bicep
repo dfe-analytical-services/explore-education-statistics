@@ -56,8 +56,13 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Have database users been added to PSQL yet for Container App and Function App?')
-param psqlDbUsersAdded bool = true
+@description('Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.')
+param deployContainerApp bool = true
+
+// TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL 
+// will redeploy even if no changes exist in this deploy from the previous one.
+@description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
+param updatePsqlFlexibleServer bool = false
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -71,13 +76,16 @@ var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 var adminAppServiceFullName = '${subscription}-as-ees-admin'
+var publisherFunctionAppFullName = '${subscription}-fa-ees-publisher'
 var dataProcessorFunctionAppName = 'processor'
 var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
 var psqlServerName = 'psql-flexibleserver'
+var psqlServerFullName = '${subscription}-ees-${psqlServerName}'
 var coreStorageAccountName = '${subscription}saeescore'
 var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
+var containerAppEnvironmentNameSuffix = '01'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -105,8 +113,8 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     vNetName: vNetName
     resourcePrefix: resourcePrefix
     subscription: subscription
-    dataProcessorFunctionAppName: dataProcessorFunctionAppName
-    postgreSqlServerName: psqlServerName
+    dataProcessorFunctionAppNameSuffix: dataProcessorFunctionAppName
+    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
   }
 }
 
@@ -136,6 +144,7 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
   params: {
     subscription: subscription
     location: location
+    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
@@ -154,25 +163,21 @@ module fileShareModule 'components/fileShares.bicep' = {
   }
 }
 
-// In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
-// with "postgres.database.azure.com".
-resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'private.postgres.database.azure.com'
-  location: 'global'
-  resource vNetLink 'virtualNetworkLinks' = {
-    name: '${subscription}-ees-${psqlServerName}-vnet-link'
-    location: 'global'
-    properties: {
-      registrationEnabled: false
-      virtualNetwork: {
-        id: vNetModule.outputs.vNetRef
-      }
-    }
-  }
+var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
+  name: replace(rule.name, ' ', '_')
+  startIpAddress: rule.startIpAddress
+  endIpAddress: rule.endIpAddress
+})
+
+// TODO EES-5128 - if keeping the flag for the future, move this conditional logic into the postgresqlDatabase.bicep 
+// module itself so that we always have a set of outputs that we can use. This will in turn allow us to move 
+// psqlManagedIdentityConnectionStringTemplate into the module's outputs.
+resource postgreSqlServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' existing = if (!updatePsqlFlexibleServer) {
+  name: psqlServerFullName
 }
 
 // Deploy PostgreSQL Database.
-module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
+module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (updatePsqlFlexibleServer) {
   name: 'postgreSQLDatabaseDeploy'
   params: {
     resourcePrefix: '${subscription}-ees'
@@ -185,32 +190,20 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
     dbAutoGrowStatus: postgreSqlAutoGrowStatus
     postgreSqlVersion: '16'
     tagValues: tagValues
-    privateDnsZoneId: postgreSqlPrivateDnsZone.id
-    firewallRules: postgreSqlFirewallRules
-    subnetId: vNetModule.outputs.postgreSqlSubnetRef
+    firewallRules: formattedPostgreSqlFirewallRules
     databaseNames: ['public_data']
   }
 }
 
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
+
+// TODO EES-5128 - move into the Container App module?
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
-  location: location
-}
-
-var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
-
-@description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
-resource apiContainerAppManagedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, apiContainerAppManagedIdentity.id, acrPullRole)
-  properties: {
-    roleDefinitionId: acrPullRole
-    principalId: apiContainerAppManagedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
 }
 
 // Deploy main Public API Container App.
-module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
+module apiContainerAppModule 'components/containerApp.bicep' = if (deployContainerApp) {
   name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
@@ -223,7 +216,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'
-        value: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
+        value: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
       }
       {
         // This settings allows the Container App to identify which user-assigned identity it should use in order to
@@ -239,6 +232,14 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
         value: publicUrls!.contentApi
       }
       {
+        name: 'MiniProfiler__Enabled'
+        value: 'true'
+      }
+      {
+        name: 'ParquetFiles__BasePath'
+        value: 'data/public-api-parquet'
+      }
+      {
         // This property informs the Container App of the name of the Admin's system-assigned identity.
         // It uses this to grant permissions to the Admin user in order for it to be able to access
         // tables in the "public_data" database successfully.
@@ -252,9 +253,19 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
         name: 'DataProcessorFunctionAppIdentityName'
         value: dataProcessorFunctionAppFullName
       }
+      {
+        // This property informs the Container App of the name of the Publisher's system-assigned identity.
+        // It uses this to grant permissions to the Publisher user in order for it to be able to access
+        // tables in the "public_data" database successfully.
+        name: 'PublisherFunctionAppIdentityName'
+        value: publisherFunctionAppFullName
+      }
     ]
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSqlServerModule
+  ]
 }
 
 // Deploy Data Processor Function.
@@ -280,7 +291,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   }
 }
 
-var dataProcessorPsqlConnectionStringSecretKey = 'dataProcessorPsqlConnectionString'
+var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 
 module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' = {
   name: 'storeDataProcessorPsqlConnectionString'
@@ -288,7 +299,33 @@ module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' 
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
+    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
+    contentType: 'text/plain'
+  }
+}
+
+var publisherPsqlConnectionStringSecretKey = 'ees-publisher-connectionstring-publicdatadb'
+
+module storePublisherPsqlConnectionString 'components/keyVaultSecret.bicep' = {
+  name: 'storePublisherPsqlConnectionString'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: publisherPsqlConnectionStringSecretKey
+    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', publisherFunctionAppFullName)
+    contentType: 'text/plain'
+  }
+}
+
+var adminPsqlConnectionStringSecretKey = 'ees-admin-connectionstring-publicdatadb'
+
+module storeAdminPsqlConnectionString 'components/keyVaultSecret.bicep' = {
+  name: 'storeAdminPsqlConnectionString'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: adminPsqlConnectionStringSecretKey
+    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', adminAppServiceFullName)
     contentType: 'text/plain'
   }
 }
