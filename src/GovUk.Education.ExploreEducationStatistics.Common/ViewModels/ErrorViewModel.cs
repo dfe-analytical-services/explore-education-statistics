@@ -1,4 +1,6 @@
 #nullable enable
+using FluentValidation.Results;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
@@ -32,4 +34,17 @@ public record ErrorViewModel
     /// more context to users. May be omitted if there is none.
     /// </summary>
     public object? Detail { get; init; }
+
+    public static ErrorViewModel Create(ValidationFailure failure)
+    {
+        var detail = failure.GetErrorDetail();
+
+        return new ErrorViewModel
+        {
+            Path = failure.PropertyName,
+            Code = failure.ErrorCode.Replace("Validator", ""),
+            Message = failure.ErrorMessage,
+            Detail = detail.Count > 0 ? detail : null
+        };
+    }
 }
