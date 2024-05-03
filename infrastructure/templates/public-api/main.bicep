@@ -115,10 +115,6 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     subscription: subscription
     dataProcessorFunctionAppNameSuffix: dataProcessorFunctionAppName
     containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
-    /* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
-       Security Group guidance on accessing resources behind VNet protection.
-    postgreSqlServerName: psqlServerName
-    */
   }
 }
 
@@ -167,26 +163,6 @@ module fileShareModule 'components/fileShares.bicep' = {
   }
 }
 
-/* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
-   Security Group guidance on accessing resources behind VNet protection.
-// In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
-// with "postgres.database.azure.com".
-resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'private.postgres.database.azure.com'
-  location: 'global'
-  resource vNetLink 'virtualNetworkLinks' = {
-    name: '${subscription}-ees-${psqlServerName}-vnet-link'
-    location: 'global'
-    properties: {
-      registrationEnabled: false
-      virtualNetwork: {
-        id: vNetModule.outputs.vNetRef
-      }
-    }
-  }
-}
-*/
-
 var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   name: replace(rule.name, ' ', '_')
   startIpAddress: rule.startIpAddress
@@ -211,13 +187,6 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
     dbAutoGrowStatus: postgreSqlAutoGrowStatus
     postgreSqlVersion: '16'
     tagValues: tagValues
-    /*
-    TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
-    Security Group guidance on accessing resources behind VNet protection. Replacing for now with public access
-    but only on specific subnets.
-    */
-    // privateDnsZoneId: postgreSqlPrivateDnsZone.id
-    // subnetId: vNetModule.outputs.postgreSqlSubnetRef
     firewallRules: formattedPostgreSqlFirewallRules
     databaseNames: ['public_data']
   }

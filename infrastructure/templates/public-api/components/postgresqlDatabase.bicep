@@ -50,14 +50,6 @@ param backupRetentionDays int = 7
 @description('Geo-Redundant Backup setting')
 param geoRedundantBackup string = 'Disabled'
 
-/*
-TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
-Security Group guidance on accessing resources behind VNet protection. Replacing for now with public access
-but only on specific subnets.
-@description('Specifies the subnet id')
-param subnetId string
-*/
-
 @description('An array of database names')
 param databaseNames string[]
 
@@ -70,9 +62,6 @@ param firewallRules {
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
-
-// @description('Id of the PostgreSQL Private DNS Zone')
-// param privateDnsZoneId string
 
 @description('Create mode for the PostgreSQL Flexible Server resource')
 @allowed([
@@ -118,15 +107,6 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     highAvailability: {
       mode: 'Disabled'
     }
-
-    /*
-    TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
-    Security Group guidance on accessing resources behind VNet protection. Replacing for now with public access
-    but only on specific subnets.
-    network: {
-      delegatedSubnetResourceId: subnetId
-      privateDnsZoneArmResourceId: privateDnsZoneId
-    }*/
   }
 
   resource database 'databases' = [for name in databaseNames: {
