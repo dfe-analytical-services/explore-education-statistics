@@ -13,7 +13,7 @@ param dataProcessorFunctionAppNameSuffix string
 @description('Specifies the name suffix of the Container App Environment')
 param containerAppEnvironmentNameSuffix string
 
-resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
+resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: vNetName
 }
 
