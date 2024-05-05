@@ -1088,10 +1088,9 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: []
-            );
+            var client = BuildApp().CreateClient();
+
+            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query?indicators[]=");
 
             var validationProblem = response.AssertValidationProblem();
 

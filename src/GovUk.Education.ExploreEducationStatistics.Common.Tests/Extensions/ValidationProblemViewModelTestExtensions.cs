@@ -321,6 +321,41 @@ public static class ValidationProblemViewModelTestExtensions
         return error;
     }
 
+    public static ErrorViewModel AssertHasNotEmptyBodyError(
+        this ValidationProblemViewModel validationProblem)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: null,
+            expectedCode: ValidationMessages.NotEmptyBody.Code
+        );
+
+        return error;
+    }
+
+    public static ErrorViewModel AssertHasInvalidInputError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.InvalidInput.Code
+        );
+
+        return error;
+    }
+
+    public static ErrorViewModel AssertHasRequiredFieldError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.RequiredField.Code
+        );
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasError(
         this ValidationProblemViewModel validationProblem,
         string? expectedPath,
