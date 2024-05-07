@@ -58,15 +58,15 @@ export default defineConfig({
   projects: [
     {
       name: 'admin',
-      testDir: '.tests/admin',
+      testDir: './tests/admin',
     },
     {
       name: 'adminandpublic',
-      testDir: '.tests/admin-and-public',
+      testDir: './tests/admin-and-public',
     },
     {
       name: 'public',
-      testDir: '.tests/public',
+      testDir: './tests/public',
     },
     {
       use: {
