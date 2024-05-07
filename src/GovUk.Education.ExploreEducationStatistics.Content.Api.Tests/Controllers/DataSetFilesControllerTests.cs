@@ -1,12 +1,16 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -25,13 +29,18 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MockQueryable.Moq;
 using Moq;
+using Testcontainers.Azurite;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
@@ -1845,7 +1854,27 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithSubjectId(Guid.NewGuid())
                 );
 
-            var client = BuildApp()
+            var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: await CreateConfigurtionWithAzurite());
+
+            var formFile = CreateDataCsvFormFile("""
+                                                 Headers
+                                                 Line 1
+                                                 Line 2
+                                                 Line 3
+                                                 Line 4
+                                                 Line 5
+                                                 Line 6
+                                                 """);
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
                 .AddContentDbTestData(context =>
                 {
                     context.ReleaseFiles.Add(releaseFile);
@@ -1912,6 +1941,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .Select(i => i.Label)
                 .ToList(),
                 viewModel.Meta.Indicators);
+
+            viewModel.File.DataCsvPreviewLines // @MarkFix Assert.Equal here?
+                .AssertDeepEqualTo([
+                    "Headers",
+                    "Line 1",
+                    "Line 2",
+                    "Line 3",
+                    "Line 4",
+                    "Line 5",
+                ]);
         }
 
         [Fact]
@@ -1944,7 +1983,19 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new FilterMeta { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
                         ])));
 
-            var client = BuildApp()
+            var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: await CreateConfigurtionWithAzurite());
+
+            var formFile = CreateDataCsvFormFile(string.Empty);
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
                 .AddContentDbTestData(context =>
                 {
                     context.ReleaseFiles.Add(releaseFile);
@@ -1997,7 +2048,19 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
 
-            var client = BuildApp()
+            var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: await CreateConfigurtionWithAzurite());
+
+            var formFile = CreateDataCsvFormFile(string.Empty);
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
                 .AddContentDbTestData(context =>
                 {
                     context.ReleaseFiles.Add(releaseFile);
@@ -2098,7 +2161,19 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithReleaseVersion(publication.ReleaseVersions[2]) // the draft version
                 .WithFile(file);
 
-            var client = BuildApp()
+            var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: await CreateConfigurtionWithAzurite());
+
+            var formFile = CreateDataCsvFormFile(string.Empty);
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile1.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
                 .AddContentDbTestData(context =>
                 {
                     context.ReleaseFiles.AddRange(releaseFile0, releaseFile1, releaseFile2);
@@ -2149,7 +2224,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
     }
 
     private WebApplicationFactory<TestStartup> BuildApp(
-        ContentDbContext? contentDbContext = null)
+        ContentDbContext? contentDbContext = null,
+        //StatisticsDbContext? statisticsDbContext = null,
+        IPublicBlobStorageService? publicBlobStorageService = null)
     {
         return TestApp
             .ResetDbContexts()
@@ -2157,10 +2234,63 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             {
                 services.AddTransient<IReleaseVersionRepository>(s => new ReleaseVersionRepository(
                     contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
+                services.AddTransient<IPublicBlobStorageService>(s =>
+                    publicBlobStorageService ?? new PublicBlobStorageService(
+                            s.GetRequiredService<ILogger<IBlobStorageService>>(),
+                        new ConfigurationBuilder()
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                             // Use appsettings.IntegrationTest.json to prevent passing due to data-storage docker
+                             // container running separately. appsettings.IntegrationTest.json doesn't use ports
+                             // 10000/10001 for blobs/queues
+                            .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
+                            .AddEnvironmentVariables()
+                            .Build()));
+                //services.AddTransient<IFootnoteRepository>(s => new FootnoteRepository(
+                //    statisticsDbContext ?? s.GetRequiredService<StatisticsDbContext>()));
                 services.AddTransient<IDataSetFileService>(
                     s => new DataSetFileService(
                         contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
-                        s.GetRequiredService<IReleaseVersionRepository>()));
+                        s.GetRequiredService<IReleaseVersionRepository>(),
+                        s.GetRequiredService<IPublicBlobStorageService>()));
             });
+    }
+
+    private async Task<IConfiguration> CreateConfigurtionWithAzurite()
+    {
+        var azuriteContainer = new AzuriteBuilder()
+            .WithImage("mcr.microsoft.com/azure-storage/azurite:3.27.0")
+            .WithHostname("data-storage-test")
+            .Build();
+        await azuriteContainer.StartAsync();
+
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
+            .AddEnvironmentVariables()
+            .Build();
+        configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
+        return configuration;
+    }
+
+    private IFormFile CreateDataCsvFormFile(string content)
+    {
+        var memoryStream = new MemoryStream();
+        var writer = new StreamWriter(memoryStream);
+        writer.Write(content);
+        writer.Flush();
+        memoryStream.Position = 0;
+        var headerDictionary = new HeaderDictionary();
+        headerDictionary["ContentType"] = "text/csv";
+
+        return new FormFile(
+            memoryStream,
+            0,
+            memoryStream.Length,
+            "id_from_form",
+            "dataCsv.csv")
+        {
+            Headers = headerDictionary,
+        };
     }
 }

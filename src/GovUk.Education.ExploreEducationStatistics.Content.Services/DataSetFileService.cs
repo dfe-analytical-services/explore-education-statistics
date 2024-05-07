@@ -6,8 +6,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -18,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
@@ -31,13 +34,19 @@ public class DataSetFileService : IDataSetFileService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IReleaseVersionRepository _releaseVersionRepository;
+    private readonly IPublicBlobStorageService _publicBlobStorageService;
+    //private readonly IFootnoteRepository _footnoteRepository;
 
     public DataSetFileService(
         ContentDbContext contentDbContext,
-        IReleaseVersionRepository releaseVersionRepository)
+        IReleaseVersionRepository releaseVersionRepository,
+        IPublicBlobStorageService publicBlobStorageService)
+        //IFootnoteRepository footnoteRepository)
     {
         _contentDbContext = contentDbContext;
         _releaseVersionRepository = releaseVersionRepository;
+        _publicBlobStorageService = publicBlobStorageService;
+        //_footnoteRepository = footnoteRepository;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
@@ -159,6 +168,12 @@ public class DataSetFileService : IDataSetFileService
             return new NotFoundResult();
         }
 
+        var dataCsvPreviewLines = await GetDataCsvPreviewLines(releaseFile);
+
+        // Fetch variable names and descriptions from DataSetFileMeta
+
+        // Fetch footnotes
+
         return new DataSetFileViewModel
         {
             Id = releaseFile.File.DataSetFileId!.Value, // we ensure this is set when fetching releaseFile
@@ -187,6 +202,7 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
+                DataCsvPreviewLines = dataCsvPreviewLines,
                 SubjectId = releaseFile.File.SubjectId!.Value,
             },
             Meta = BuildDataSetFileMetaViewModel(
@@ -224,6 +240,24 @@ public class DataSetFileService : IDataSetFileService
             Filters = GetOrderedFilters(meta.Filters, filterSequence),
             Indicators = GetOrderedIndicators(meta.Indicators, indicatorGroupSequence),
         };
+    }
+
+    private async Task<List<string>> GetDataCsvPreviewLines(ReleaseFile releaseFile)
+    {
+        List<string> dataCsvPreviewLines = new();
+        var datafileStreamProvider = () => _publicBlobStorageService.StreamBlob(
+            containerName: BlobContainers.PublicReleaseFiles,
+            path: releaseFile.PublicPath());
+        using var dataFileReader = new StreamReader(await datafileStreamProvider.Invoke());
+
+        for (var i = 0; i < 6; i++)
+        {
+            var line = await dataFileReader.ReadLineAsync();
+            if (line == null) { break; }
+            dataCsvPreviewLines.Add(line);
+        }
+
+        return dataCsvPreviewLines;
     }
 
     private static List<string> GetOrderedFilters(List<FilterMeta> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)

@@ -216,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             _logger.LogInformation("Uploading file to blob {containerName}/{path}", containerName, path);
 
-            await blob.UploadAsync(
+            await blob.UploadAsync( // @MarkFix fails to find container here?
                 path: tempFilePath,
                 httpHeaders: new BlobHttpHeaders
                 {
