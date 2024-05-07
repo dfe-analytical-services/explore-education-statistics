@@ -30,6 +30,7 @@ export interface TableToolPageProps {
   fastTrack?: FastTrackTable;
   featuredTables?: FeaturedTable[];
   selectedPublication?: SelectedPublication;
+  selectedSubjectId?: string;
   subjects?: Subject[];
   subjectMeta?: SubjectMeta;
   themeMeta: Theme[];
@@ -39,6 +40,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   fastTrack,
   featuredTables = [],
   selectedPublication,
+  selectedSubjectId,
   subjects,
   subjectMeta,
   themeMeta,
@@ -96,6 +98,24 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       };
     }
 
+    if (selectedSubjectId && subjectMeta) {
+      return {
+        initialStep: 3,
+        subjects,
+        featuredTables,
+        query: {
+          publicationId: selectedPublication?.id,
+          releaseId: selectedPublication?.selectedRelease.id,
+          subjectId: selectedSubjectId,
+          indicators: [],
+          filters: [],
+          locationIds: [],
+        },
+        selectedPublication,
+        subjectMeta,
+      };
+    }
+
     return {
       initialStep: 2,
       subjects,
@@ -110,7 +130,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       },
       selectedPublication,
     };
-  }, [selectedPublication, fastTrack, subjects, featuredTables, subjectMeta]);
+  }, [
+    subjects,
+    fastTrack,
+    subjectMeta,
+    selectedSubjectId,
+    featuredTables,
+    selectedPublication,
+  ]);
 
   return (
     <Page title="Create your own tables" caption="Table Tool" wide>
@@ -245,8 +272,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 export const getServerSideProps: GetServerSideProps<
   TableToolPageProps
 > = async ({ query }) => {
-  const { publicationSlug = '', releaseSlug = '' } =
-    query as Dictionary<string>;
+  const {
+    publicationSlug = '',
+    releaseSlug = '',
+    subjectId = '',
+  } = query as Dictionary<string>;
 
   const themeMeta = await publicationService.getPublicationTree({
     publicationFilter: 'DataTables',
@@ -282,6 +312,37 @@ export const getServerSideProps: GetServerSideProps<
     tableBuilderService.listReleaseSubjects(selectedRelease.id),
     tableBuilderService.listReleaseFeaturedTables(selectedRelease.id),
   ]);
+
+  if (subjectId && subjects.some(subject => subject.id === subjectId)) {
+    const subjectMeta = await tableBuilderService.getSubjectMeta(
+      subjectId,
+      selectedRelease.id,
+    );
+
+    return {
+      props: {
+        featuredTables,
+
+        selectedPublication: {
+          ...selectedPublication,
+          selectedRelease: {
+            id: selectedRelease.id,
+            latestData: selectedRelease.latestRelease,
+            slug: selectedRelease.slug,
+            title: selectedRelease.title,
+            type: selectedRelease.type,
+          },
+          latestRelease: {
+            title: latestRelease.title,
+          },
+        },
+        selectedSubjectId: subjectId,
+        subjects,
+        subjectMeta,
+        themeMeta,
+      },
+    };
+  }
 
   return {
     props: {

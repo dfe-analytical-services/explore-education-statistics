@@ -22,7 +22,7 @@ interface Props<TFormValues extends FieldValues>
 export default function RHFFormFieldCheckboxGroupsMenu<
   TFormValues extends FieldValues,
 >(props: Props<TFormValues>) {
-  const { hiddenText, legend, name, open = false, onToggle } = props;
+  const { hiddenText, legend, name, open = false, id, onToggle } = props;
 
   const {
     formState: { errors },
@@ -39,6 +39,7 @@ export default function RHFFormFieldCheckboxGroupsMenu<
 
   return (
     <DetailsMenu
+      id={`details-${id}`}
       open={open}
       hiddenText={hiddenText}
       jsRequired

@@ -426,6 +426,40 @@ describe('TableToolPage', () => {
     expect(screen.getByLabelText('Test subject')).toBeInTheDocument();
   });
 
+  test('renders the page correctly with pre-selected data set', async () => {
+    render(
+      <TableToolPage
+        selectedPublication={testSelectedPublicationWithLatestRelease}
+        selectedSubjectId={testSubjects[0].id}
+        subjectMeta={testSubjectMeta}
+        subjects={testSubjects}
+        themeMeta={testThemeMeta}
+      />,
+    );
+
+    // Check we are on step 3
+    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByTestId('wizardStep-3')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+
+    expect(screen.getByTestId('Publication')).toHaveTextContent(
+      'Test publication',
+    );
+
+    expect(screen.getByTestId('Data set')).toHaveTextContent('Test subject');
+    expect(screen.getByText('Choose Countries')).toBeInTheDocument();
+    expect(screen.getByLabelText('Great Britain')).toBeInTheDocument();
+  });
+
   test('renders the page correctly with pre-built table when a fast track is provided', async () => {
     render(
       <TableToolPage
