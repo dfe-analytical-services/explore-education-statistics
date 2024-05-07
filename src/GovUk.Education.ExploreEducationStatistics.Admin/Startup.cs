@@ -69,6 +69,8 @@ using Notify.Client;
 using Notify.Interfaces;
 using Npgsql;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -469,9 +471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         provider.GetService<PublicDataDbContext>(),
                         provider.GetRequiredService<IUserService>()));
                 
-                services.AddTransient<IDataSetVersionService, DataSetVersionService>(provider =>
-                    new DataSetVersionService(provider.GetRequiredService<ContentDbContext>(),
-                        provider.GetService<PublicDataDbContext>()));
+                services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -751,5 +751,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 migration.Apply();
             }
         }
+    }
+
+    internal class NoOpDataSetVersionService : IDataSetVersionService
+    {
+        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(Guid releaseVersionId)
+        {
+            return Task.FromResult(new List<DataSetVersionStatusSummary>());
+        } 
     }
 }
