@@ -4,14 +4,14 @@ import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import render from '@common-test/render';
 import { horizontalBarBlockDefinition } from '@common/modules/charts/components/HorizontalBarBlock';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
 import {
   AxesConfiguration,
   AxisConfiguration,
 } from '@common/modules/charts/types/chart';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -73,6 +73,7 @@ describe('ChartAxisConfiguration', () => {
       },
     ],
     groupBy: 'timePeriod',
+    groupByFilter: '',
     min: 0,
     referenceLines: [],
     showGrid: true,
@@ -90,13 +91,19 @@ describe('ChartAxisConfiguration', () => {
   };
   const testMinorAxisConfiguration: AxisConfiguration = {
     dataSets: [],
-    max: undefined,
-    min: undefined,
+    groupByFilterGroups: false,
     referenceLines: [],
+    showGrid: true,
+    sortAsc: true,
     size: 50,
+    tickConfig: 'default',
     tickSpacing: 1,
     type: 'minor',
+    unit: '',
     visible: true,
+    label: { text: '', width: 100, rotated: false },
+    max: undefined,
+    min: undefined,
   };
 
   const testAxesConfiguration: AxesConfiguration = {
@@ -193,21 +200,20 @@ describe('ChartAxisConfiguration', () => {
       screen.getByRole('group', { name: 'Axis range' }),
     );
     expect(axisSection.getByLabelText('Minimum')).toHaveValue('0');
-    expect(axisSection.getByLabelText('Maximum')).toHaveValue('');
+    expect(axisSection.getByLabelText('Maximum')).toHaveValue('1');
 
-    const referenceLinesSection = within(
-      screen.getByRole('table', { name: 'Reference lines' }),
-    );
-    expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
-    expect(referenceLinesSection.getByLabelText('Position')).toHaveValue('');
-    expect(referenceLinesSection.getByLabelText('Label')).toHaveValue('');
-    expect(referenceLinesSection.getByLabelText('Style')).toHaveValue('none');
+    expect(
+      screen.getByRole('heading', { name: 'Reference lines' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Add new line' }),
+    ).toBeInTheDocument();
   });
 
   test('calls `onChange` when form values change', async () => {
     const handleChange = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartAxisConfiguration
           id="chartBuilder-major"
@@ -226,17 +232,20 @@ describe('ChartAxisConfiguration', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    await userEvent.clear(sizeInput);
-    await userEvent.type(sizeInput, '20');
+    await user.clear(sizeInput);
+    await user.type(sizeInput, '20');
 
     expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
       ...testMajorAxisConfiguration,
+      groupByFilterGroups: undefined,
+      label: { rotated: false, text: '', width: undefined },
+      max: 1,
       size: 20,
     });
   });
 
   test('shows validation error if invalid custom tick spacing given', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartAxisConfiguration
           id="chartBuilder-major"
@@ -251,10 +260,10 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(screen.getByLabelText('Custom'));
-    await userEvent.clear(screen.getByLabelText('Every nth value'));
-    await userEvent.type(screen.getByLabelText('Every nth value'), 'x');
-    await userEvent.tab();
+    await user.click(screen.getByLabelText('Custom'));
+    await user.clear(screen.getByLabelText('Every nth value'));
+    await user.type(screen.getByLabelText('Every nth value'), 'x');
+    await user.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -264,9 +273,9 @@ describe('ChartAxisConfiguration', () => {
       screen.getByRole('link', { name: 'Enter tick spacing' }),
     ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
 
-    await userEvent.clear(screen.getByLabelText('Every nth value'));
-    await userEvent.type(screen.getByLabelText('Every nth value'), '-1');
-    await userEvent.tab();
+    await user.clear(screen.getByLabelText('Every nth value'));
+    await user.type(screen.getByLabelText('Every nth value'), '-1');
+    await user.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -278,7 +287,7 @@ describe('ChartAxisConfiguration', () => {
   });
 
   test('shows validation error if invalid label width given', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartAxisConfiguration
           id="chartBuilder-major"
@@ -293,8 +302,8 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
-    await userEvent.tab();
+    await user.type(screen.getByLabelText('Width (pixels)'), '-1');
+    await user.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -306,7 +315,7 @@ describe('ChartAxisConfiguration', () => {
   });
 
   test('shows validation error if invalid axis width given', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartAxisConfiguration
           id="chartBuilder-major"
@@ -320,9 +329,9 @@ describe('ChartAxisConfiguration', () => {
         />
       </ChartBuilderFormsContextProvider>,
     );
-    await userEvent.clear(screen.getByLabelText('Size of axis (pixels)'));
-    await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
-    await userEvent.tab();
+    await user.clear(screen.getByLabelText('Size of axis (pixels)'));
+    await user.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
+    await user.tab();
 
     expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
@@ -334,7 +343,7 @@ describe('ChartAxisConfiguration', () => {
   test('submitting fails with invalid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartAxisConfiguration
           id="chartBuilder-major"
@@ -349,11 +358,11 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
+    await user.type(screen.getByLabelText('Width (pixels)'), '-1');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -365,7 +374,7 @@ describe('ChartAxisConfiguration', () => {
   test('submitting succeeds with valid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartAxisConfiguration
           id="chartBuilder-major"
@@ -380,14 +389,12 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.clear(screen.getByLabelText('Size of axis (pixels)'));
-    await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '100');
+    await user.clear(screen.getByLabelText('Size of axis (pixels)'));
+    await user.type(screen.getByLabelText('Size of axis (pixels)'), '100');
 
-    await userEvent.click(
-      screen.getByRole('checkbox', { name: 'Sort ascending' }),
-    );
+    await user.click(screen.getByRole('checkbox', { name: 'Sort ascending' }));
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -395,8 +402,10 @@ describe('ChartAxisConfiguration', () => {
       const formValues: AxisConfiguration = {
         dataSets: testMajorAxisConfiguration.dataSets,
         groupBy: 'timePeriod',
+        groupByFilter: '',
+        groupByFilterGroups: undefined,
         min: 0,
-        max: undefined,
+        max: 1,
         referenceLines: [],
         showGrid: true,
         size: 100,
@@ -408,7 +417,9 @@ describe('ChartAxisConfiguration', () => {
         visible: true,
         unit: '',
         label: {
+          rotated: false,
           text: '',
+          width: undefined,
         },
       };
       expect(handleSubmit).toHaveBeenCalledWith(formValues);
@@ -419,7 +430,7 @@ describe('ChartAxisConfiguration', () => {
     test('submitting succeeds with the group data by option changed', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -434,9 +445,9 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.click(screen.getByRole('radio', { name: 'Locations' }));
+      await user.click(screen.getByRole('radio', { name: 'Locations' }));
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -446,7 +457,7 @@ describe('ChartAxisConfiguration', () => {
           groupBy: 'locations',
           groupByFilter: '',
           min: 0,
-          max: undefined,
+          max: 1,
           referenceLines: [],
           showGrid: true,
           size: 50,
@@ -459,6 +470,8 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
+            rotated: false,
+            width: undefined,
           },
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
@@ -468,7 +481,7 @@ describe('ChartAxisConfiguration', () => {
     test('submitting succeeds with group by a specific filter selected', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -483,13 +496,13 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.click(screen.getByRole('radio', { name: 'Filters' }));
+      await user.click(screen.getByRole('radio', { name: 'Filters' }));
 
-      await userEvent.selectOptions(screen.getByLabelText('Select a filter'), [
+      await user.selectOptions(screen.getByLabelText('Select a filter'), [
         'school_type',
       ]);
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -498,8 +511,9 @@ describe('ChartAxisConfiguration', () => {
           dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'filters',
           groupByFilter: 'school_type',
+          groupByFilterGroups: undefined,
           min: 0,
-          max: undefined,
+          max: 1,
           referenceLines: [],
           showGrid: true,
           size: 50,
@@ -512,6 +526,8 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
+            rotated: false,
+            width: undefined,
           },
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
@@ -605,7 +621,7 @@ describe('ChartAxisConfiguration', () => {
 
     test('setting `Group by filter groups`', async () => {
       const handleSubmit = jest.fn();
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -628,9 +644,9 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.click(screen.getByLabelText('Group by filter groups'));
+      await user.click(screen.getByLabelText('Group by filter groups'));
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -641,7 +657,7 @@ describe('ChartAxisConfiguration', () => {
           groupByFilter: 'characteristic',
           groupByFilterGroups: true,
           min: 0,
-          max: undefined,
+          max: 1,
           referenceLines: [],
           showGrid: true,
           size: 50,
@@ -654,6 +670,8 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
+            rotated: false,
+            widht: undefined,
           },
         });
       });
@@ -661,8 +679,8 @@ describe('ChartAxisConfiguration', () => {
   });
 
   describe('reference lines', () => {
-    test('adding reference line for major axis', async () => {
-      render(
+    test('adding a reference line for major axis', async () => {
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -677,21 +695,20 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
+      await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
       const referenceLines = within(
         screen.getByRole('table', { name: 'Reference lines' }),
       );
       expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-      await userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+      await user.selectOptions(referenceLines.getByLabelText('Position'), [
         '2014_AY',
       ]);
 
-      await userEvent.type(
-        referenceLines.getByLabelText('Label'),
-        'Test label',
-      );
+      await user.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-      await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+      await user.click(screen.getByRole('button', { name: 'Add' }));
 
       await waitFor(() => {
         expect(referenceLines.getByText('Test label')).toBeInTheDocument();
@@ -699,13 +716,15 @@ describe('ChartAxisConfiguration', () => {
 
       const rows = referenceLines.getAllByRole('row');
 
-      expect(rows).toHaveLength(3);
+      expect(rows).toHaveLength(2);
       expect(within(rows[1]).getByText('2014/15')).toBeInTheDocument();
       expect(within(rows[1]).getByText('Test label')).toBeInTheDocument();
       expect(within(rows[1]).getByRole('button', { name: /Remove line/ }));
 
+      await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
       // Added reference line should be removed from Position options
-      const position = within(rows[2]).getByLabelText('Position');
+      const position = screen.getByLabelText('Position');
       const options = within(position).getAllByRole('option');
 
       expect(options).toHaveLength(2);
@@ -715,11 +734,11 @@ describe('ChartAxisConfiguration', () => {
       expect(options[1]).toHaveAttribute('value', '2015_AY');
     });
 
-    test('adding reference line for minor axis', async () => {
-      render(
+    test('adding a reference line for minor axis', async () => {
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
-            id="chartBuilder-major"
+            id="chartBuilder-minor"
             type="minor"
             axesConfiguration={testAxesConfiguration}
             definition={verticalBarBlockDefinition}
@@ -731,19 +750,18 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
+      await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
       const referenceLines = within(
         screen.getByRole('table', { name: 'Reference lines' }),
       );
       expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-      await userEvent.type(referenceLines.getByLabelText('Position'), '3000');
+      await user.type(referenceLines.getByLabelText('Position'), '3000');
 
-      await userEvent.type(
-        referenceLines.getByLabelText('Label'),
-        'Test label',
-      );
+      await user.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-      await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+      await user.click(screen.getByRole('button', { name: 'Add' }));
 
       await waitFor(() => {
         expect(referenceLines.getByText('Test label')).toBeInTheDocument();
@@ -751,16 +769,16 @@ describe('ChartAxisConfiguration', () => {
 
       const rows = referenceLines.getAllByRole('row');
 
-      expect(rows).toHaveLength(3);
+      expect(rows).toHaveLength(2);
       expect(within(rows[1]).getByText('3000')).toBeInTheDocument();
       expect(within(rows[1]).getByText('Test label')).toBeInTheDocument();
       expect(within(rows[1]).getByRole('button', { name: /Remove line/ }));
     });
 
-    test('successfully submitting with new reference line', async () => {
+    test('successfully submitting with a new reference line', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -775,29 +793,30 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
+      await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
       const referenceLinesSection = within(
         screen.getByRole('table', { name: 'Reference lines' }),
       );
       expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
 
-      await userEvent.selectOptions(
+      await user.selectOptions(
         referenceLinesSection.getByLabelText('Position'),
         ['2014_AY'],
       );
 
-      await userEvent.type(
+      await user.type(
         referenceLinesSection.getByLabelText('Label'),
         'I am label',
       );
 
-      await userEvent.selectOptions(
-        referenceLinesSection.getByLabelText('Style'),
-        ['dashed'],
-      );
+      await user.selectOptions(referenceLinesSection.getByLabelText('Style'), [
+        'dashed',
+      ]);
 
-      await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+      await user.click(screen.getByRole('button', { name: 'Add' }));
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -805,11 +824,14 @@ describe('ChartAxisConfiguration', () => {
         const formValues: AxisConfiguration = {
           dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
+          groupByFilterGroups: undefined,
+          groupByFilter: '',
           min: 0,
-          max: undefined,
+          max: 1,
           referenceLines: [
             {
               label: 'I am label',
+
               position: '2014_AY',
               style: 'dashed',
             },
@@ -825,6 +847,8 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
+            rotated: false,
+            width: undefined,
           },
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
@@ -834,7 +858,7 @@ describe('ChartAxisConfiguration', () => {
     test('removing reference lines', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -866,7 +890,7 @@ describe('ChartAxisConfiguration', () => {
 
       expect(rows).toHaveLength(3);
 
-      await userEvent.click(
+      await user.click(
         within(rows[2]).getByRole('button', { name: /Remove line/ }),
       );
 
@@ -878,18 +902,15 @@ describe('ChartAxisConfiguration', () => {
 
       rows = referenceLines.getAllByRole('row');
 
-      expect(rows).toHaveLength(3);
+      expect(rows).toHaveLength(2);
       expect(within(rows[1]).getByText('2014/15')).toBeInTheDocument();
       expect(within(rows[1]).getByText('Test label 1')).toBeInTheDocument();
-
-      expect(within(rows[2]).getByLabelText('Position')).toBeInTheDocument();
-      expect(within(rows[2]).getByLabelText('Label')).toBeInTheDocument();
     });
 
-    test('successfully submitting with removed reference line', async () => {
+    test('successfully submitting with a removed reference line', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -921,10 +942,10 @@ describe('ChartAxisConfiguration', () => {
 
       expect(rows).toHaveLength(3);
 
-      await userEvent.click(
+      await user.click(
         within(rows[1]).getByRole('button', { name: /Remove line/ }),
       );
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -932,9 +953,13 @@ describe('ChartAxisConfiguration', () => {
         const formValues: AxisConfiguration = {
           dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
+          groupByFilterGroups: undefined,
+          groupByFilter: '',
           min: 0,
-          max: undefined,
-          referenceLines: [{ position: '2015_AY', label: 'Test label 2' }],
+          max: 1,
+          referenceLines: [
+            { position: '2015_AY', label: 'Test label 2', style: 'none' },
+          ],
           showGrid: true,
           size: 50,
           sortAsc: true,
@@ -946,16 +971,107 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
+            rotated: false,
+            width: undefined,
           },
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
       });
     });
 
+    test('editing a reference line', async () => {
+      const handleSubmit = jest.fn();
+
+      const { user } = render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="major"
+            axesConfiguration={{
+              major: {
+                ...testMajorAxisConfiguration,
+                referenceLines: [
+                  { position: '2014_AY', label: 'Test label 1', style: 'none' },
+                  { position: '2015_AY', label: 'Test label 2', style: 'none' },
+                ],
+              },
+              minor: testMinorAxisConfiguration,
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={handleSubmit}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      const referenceLines = within(
+        screen.getByRole('table', { name: 'Reference lines' }),
+      );
+
+      const rows = referenceLines.getAllByRole('row');
+
+      expect(within(rows[1]).getByText('Test label 1')).toBeInTheDocument();
+
+      await user.click(
+        within(rows[1]).getByRole('button', { name: 'Edit line' }),
+      );
+
+      await user.type(within(rows[1]).getByLabelText('Label'), ' edited');
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      await user.click(within(rows[1]).getByRole('button', { name: 'Save' }));
+
+      await user.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledTimes(1);
+      });
+
+      const formValues: AxisConfiguration = {
+        dataSets: testMajorAxisConfiguration.dataSets,
+        groupBy: 'timePeriod',
+        groupByFilter: '',
+        min: 0,
+        max: 1,
+        referenceLines: [
+          {
+            label: 'Test label 1 edited',
+            position: '2014_AY',
+            style: 'none',
+          },
+          {
+            position: '2015_AY',
+            label: 'Test label 2',
+            style: 'none',
+          },
+        ],
+        showGrid: true,
+        size: 50,
+        sortAsc: true,
+        sortBy: 'name',
+        tickConfig: 'default',
+        tickSpacing: 1,
+        type: 'major',
+        visible: true,
+        unit: '',
+        label: {
+          text: '',
+          rotated: false,
+          width: undefined,
+        },
+      };
+      expect(handleSubmit).toHaveBeenCalledWith(formValues);
+    });
+
     test('submitting filters out reference lines that no longer match the `groupBy`', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-major"
@@ -988,20 +1104,23 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.click(
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      await user.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
-
       await waitFor(() => {
         const formValues: AxisConfiguration = {
           dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
+          groupByFilter: '',
+          groupByFilterGroups: undefined,
           min: 0,
-          max: undefined,
+          max: 1,
           referenceLines: [
             // Only reference lines for time periods should remain
-            { position: '2014_AY', label: 'Test label 1' },
-            { position: '2015_AY', label: 'Test label 2' },
+            { position: '2014_AY', label: 'Test label 1', style: 'none' },
+            { position: '2015_AY', label: 'Test label 2', style: 'none' },
           ],
           showGrid: true,
           size: 50,
@@ -1014,6 +1133,8 @@ describe('ChartAxisConfiguration', () => {
           unit: '',
           label: {
             text: '',
+            rotated: false,
+            width: undefined,
           },
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
@@ -1023,7 +1144,7 @@ describe('ChartAxisConfiguration', () => {
     test('submitting does not filter out reference lines when there is no `groupBy`', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
             id="chartBuilder-minor"
@@ -1047,7 +1168,7 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -1055,11 +1176,564 @@ describe('ChartAxisConfiguration', () => {
         const formValues: AxisConfiguration = {
           ...testMinorAxisConfiguration,
           referenceLines: [
-            { position: 1000, label: 'Test label 1' },
-            { position: 2000, label: 'Test label 2' },
+            { position: 1000, label: 'Test label 1', style: 'none' },
+            { position: 2000, label: 'Test label 2', style: 'none' },
           ],
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
+      });
+    });
+
+    describe('validation', () => {
+      test('shows validation error when `Position` is empty', async () => {
+        const { user } = render(
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartAxisConfiguration
+              id="chartBuilder-major"
+              type="major"
+              axesConfiguration={{
+                major: testMajorAxisConfiguration,
+                minor: testMinorAxisConfiguration,
+              }}
+              definition={verticalBarBlockDefinition}
+              data={testTable.results}
+              meta={testTable.subjectMeta}
+              onChange={noop}
+              onSubmit={noop}
+            />
+          </ChartBuilderFormsContextProvider>,
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        const referenceLines = within(
+          screen.getByRole('table', { name: 'Reference lines' }),
+        );
+
+        expect(
+          referenceLines.queryByText('Enter position'),
+        ).not.toBeInTheDocument();
+
+        await user.click(referenceLines.getByLabelText('Position'));
+        await user.tab();
+
+        expect(
+          await referenceLines.findByText('Enter position'),
+        ).toBeInTheDocument();
+      });
+
+      test('shows validation error for a major axis line when `otherAxisPosition` is not valid', async () => {
+        const { user } = render(
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartAxisConfiguration
+              id="chartBuilder-major"
+              type="major"
+              axesConfiguration={{
+                major: testMajorAxisConfiguration,
+                minor: testMinorAxisConfiguration,
+              }}
+              definition={verticalBarBlockDefinition}
+              data={testTable.results}
+              meta={testTable.subjectMeta}
+              onChange={noop}
+              onSubmit={noop}
+            />
+          </ChartBuilderFormsContextProvider>,
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        const referenceLines = within(
+          screen.getByRole('table', { name: 'Reference lines' }),
+        );
+
+        expect(
+          referenceLines.queryByText(
+            'Enter a position within the Y axis min/max range',
+          ),
+        ).not.toBeInTheDocument();
+
+        await user.type(
+          referenceLines.getByLabelText('Y axis position'),
+          '50500',
+        );
+        await user.tab();
+
+        expect(
+          await referenceLines.findByText(
+            'Enter a position within the Y axis min/max range',
+          ),
+        ).toBeInTheDocument();
+      });
+
+      test('shows validation error when `Label` is empty', async () => {
+        const { user } = render(
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartAxisConfiguration
+              id="chartBuilder-major"
+              type="major"
+              axesConfiguration={{
+                major: testMajorAxisConfiguration,
+                minor: testMinorAxisConfiguration,
+              }}
+              definition={verticalBarBlockDefinition}
+              data={testTable.results}
+              meta={testTable.subjectMeta}
+              onChange={noop}
+              onSubmit={noop}
+            />
+          </ChartBuilderFormsContextProvider>,
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        const referenceLines = within(
+          screen.getByRole('table', { name: 'Reference lines' }),
+        );
+
+        expect(
+          referenceLines.queryByText('Enter label'),
+        ).not.toBeInTheDocument();
+
+        await user.click(referenceLines.getByLabelText('Label'));
+        await user.tab();
+
+        expect(
+          await referenceLines.findByText('Enter label'),
+        ).toBeInTheDocument();
+      });
+
+      test('disables the add button when adding a reference line with invalid values', async () => {
+        const { user } = render(
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartAxisConfiguration
+              id="chartBuilder-major"
+              type="major"
+              axesConfiguration={{
+                major: testMajorAxisConfiguration,
+                minor: testMinorAxisConfiguration,
+              }}
+              definition={verticalBarBlockDefinition}
+              data={testTable.results}
+              meta={testTable.subjectMeta}
+              onChange={noop}
+              onSubmit={noop}
+            />
+          </ChartBuilderFormsContextProvider>,
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        const referenceLines = within(
+          screen.getByRole('table', { name: 'Reference lines' }),
+        );
+
+        expect(
+          referenceLines.getByRole('tooltip', { hidden: true }),
+        ).toHaveTextContent('Cannot add invalid reference line');
+      });
+
+      test('shows validation error for a minor axis line when `Position` is not valid', async () => {
+        const { user } = render(
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartAxisConfiguration
+              id="chartBuilder-minor"
+              type="minor"
+              axesConfiguration={{
+                major: testMajorAxisConfiguration,
+                minor: testMinorAxisConfiguration,
+              }}
+              definition={verticalBarBlockDefinition}
+              data={testTable.results}
+              meta={testTable.subjectMeta}
+              onChange={noop}
+              onSubmit={noop}
+            />
+          </ChartBuilderFormsContextProvider>,
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        const referenceLines = within(
+          screen.getByRole('table', { name: 'Reference lines' }),
+        );
+
+        expect(
+          referenceLines.queryByText(
+            'Enter a position within the Y axis min/max range',
+          ),
+        ).not.toBeInTheDocument();
+
+        await user.type(referenceLines.getByLabelText('Position'), '50500');
+        await user.tab();
+
+        await waitFor(() => {
+          expect(
+            referenceLines.getByText(
+              'Enter a position within the Y axis min/max range',
+            ),
+          ).toBeInTheDocument();
+        });
+      });
+
+      test('shows validation error for a minor axis line when `otherAxisPosition` is not valid', async () => {
+        const { user } = render(
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartAxisConfiguration
+              id="chartBuilder-minor"
+              type="minor"
+              axesConfiguration={{
+                major: testMajorAxisConfiguration,
+                minor: testMinorAxisConfiguration,
+              }}
+              definition={verticalBarBlockDefinition}
+              data={testTable.results}
+              meta={testTable.subjectMeta}
+              onChange={noop}
+              onSubmit={noop}
+            />
+          </ChartBuilderFormsContextProvider>,
+        );
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        const referenceLines = within(
+          screen.getByRole('table', { name: 'Reference lines' }),
+        );
+
+        expect(
+          referenceLines.queryByText('Enter a percentage between 0 and 100%'),
+        ).not.toBeInTheDocument();
+
+        await user.selectOptions(
+          referenceLines.getByLabelText('X axis position'),
+          ['custom'],
+        );
+
+        await user.type(referenceLines.getByLabelText(/Percent/), '101');
+        await user.tab();
+
+        await waitFor(() => {
+          expect(
+            referenceLines.getByText('Enter a percentage between 0 and 100%'),
+          ).toBeInTheDocument();
+        });
+      });
+
+      test('shows validation error when trying to add a duplicate line on the minor axis', async () => {
+        const { user } = render(
+          <ChartBuilderFormsContextProvider initialForms={testFormState}>
+            <ChartAxisConfiguration
+              id="chartBuilder-minor"
+              type="minor"
+              axesConfiguration={{
+                major: testMajorAxisConfiguration,
+                minor: testMinorAxisConfiguration,
+              }}
+              definition={verticalBarBlockDefinition}
+              data={testTable.results}
+              meta={testTable.subjectMeta}
+              onChange={noop}
+              onSubmit={noop}
+            />
+          </ChartBuilderFormsContextProvider>,
+        );
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        const referenceLines = within(
+          screen.getByRole('table', { name: 'Reference lines' }),
+        );
+
+        await user.type(referenceLines.getByLabelText('Position'), '10');
+        await user.type(referenceLines.getByLabelText('Label'), 'Test label');
+        await user.click(referenceLines.getByRole('button', { name: 'Add' }));
+
+        await user.click(screen.getByRole('button', { name: 'Add new line' }));
+
+        expect(
+          referenceLines.queryByText(
+            'A line with these settings has already been added',
+          ),
+        ).not.toBeInTheDocument();
+
+        await user.type(referenceLines.getByLabelText('Position'), '10');
+        await user.type(referenceLines.getByLabelText('Label'), 'Test label');
+        await user.click(referenceLines.getByRole('button', { name: 'Add' }));
+
+        await waitFor(() => {
+          expect(
+            referenceLines.getByText(
+              'A line with these settings has already been added',
+            ),
+          ).toBeInTheDocument();
+        });
+      });
+
+      describe('reference lines between data points on the major axis', () => {
+        test('shows validation error when start and end point are empty', async () => {
+          const { user } = render(
+            <ChartBuilderFormsContextProvider initialForms={testFormState}>
+              <ChartAxisConfiguration
+                id="chartBuilder-major"
+                type="major"
+                axesConfiguration={{
+                  major: testMajorAxisConfiguration,
+                  minor: testMinorAxisConfiguration,
+                }}
+                definition={verticalBarBlockDefinition}
+                data={testTable.results}
+                meta={testTable.subjectMeta}
+                onChange={noop}
+                onSubmit={noop}
+              />
+            </ChartBuilderFormsContextProvider>,
+          );
+
+          await user.click(
+            screen.getByRole('button', { name: 'Add new line' }),
+          );
+
+          const referenceLines = within(
+            screen.getByRole('table', { name: 'Reference lines' }),
+          );
+
+          await user.selectOptions(referenceLines.getByLabelText('Position'), [
+            'between-data-points',
+          ]);
+
+          expect(
+            referenceLines.queryByText('Enter start point'),
+          ).not.toBeInTheDocument();
+          expect(
+            referenceLines.queryByText('Enter end point'),
+          ).not.toBeInTheDocument();
+
+          await user.click(referenceLines.getByLabelText('Start point'));
+          await user.tab();
+
+          await waitFor(() => {
+            expect(
+              referenceLines.getByText('Enter start point'),
+            ).toBeInTheDocument();
+          });
+
+          await user.click(referenceLines.getByLabelText('End point'));
+          await user.tab();
+
+          await waitFor(() => {
+            expect(
+              referenceLines.getByText('Enter end point'),
+            ).toBeInTheDocument();
+          });
+        });
+
+        test('shows validation error when start and end point are the same', async () => {
+          const { user } = render(
+            <ChartBuilderFormsContextProvider initialForms={testFormState}>
+              <ChartAxisConfiguration
+                id="chartBuilder-major"
+                type="major"
+                axesConfiguration={{
+                  major: testMajorAxisConfiguration,
+                  minor: testMinorAxisConfiguration,
+                }}
+                definition={verticalBarBlockDefinition}
+                data={testTable.results}
+                meta={testTable.subjectMeta}
+                onChange={noop}
+                onSubmit={noop}
+              />
+            </ChartBuilderFormsContextProvider>,
+          );
+
+          await user.click(
+            screen.getByRole('button', { name: 'Add new line' }),
+          );
+
+          const referenceLines = within(
+            screen.getByRole('table', { name: 'Reference lines' }),
+          );
+
+          await user.selectOptions(referenceLines.getByLabelText('Position'), [
+            'between-data-points',
+          ]);
+
+          expect(
+            referenceLines.queryByText('End point cannot match start point'),
+          ).not.toBeInTheDocument();
+
+          await user.selectOptions(
+            referenceLines.getByLabelText('Start point'),
+            ['2014_AY'],
+          );
+
+          await user.selectOptions(referenceLines.getByLabelText('End point'), [
+            '2014_AY',
+          ]);
+          await user.tab();
+
+          await waitFor(() => {
+            expect(
+              referenceLines.getByText('End point cannot match start point'),
+            ).toBeInTheDocument();
+          });
+        });
+
+        test('shows validation error when other axis position is empty', async () => {
+          const { user } = render(
+            <ChartBuilderFormsContextProvider initialForms={testFormState}>
+              <ChartAxisConfiguration
+                id="chartBuilder-major"
+                type="major"
+                axesConfiguration={{
+                  major: testMajorAxisConfiguration,
+                  minor: testMinorAxisConfiguration,
+                }}
+                definition={verticalBarBlockDefinition}
+                data={testTable.results}
+                meta={testTable.subjectMeta}
+                onChange={noop}
+                onSubmit={noop}
+              />
+            </ChartBuilderFormsContextProvider>,
+          );
+
+          await user.click(
+            screen.getByRole('button', { name: 'Add new line' }),
+          );
+
+          const referenceLines = within(
+            screen.getByRole('table', { name: 'Reference lines' }),
+          );
+
+          await user.selectOptions(referenceLines.getByLabelText('Position'), [
+            'between-data-points',
+          ]);
+
+          expect(
+            referenceLines.queryByText('Enter a Y axis position'),
+          ).not.toBeInTheDocument();
+
+          await user.click(referenceLines.getByLabelText('Y axis position'));
+          await user.tab();
+
+          await waitFor(() => {
+            expect(
+              referenceLines.getByText('Enter a Y axis position'),
+            ).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('reference lines between data points on the minor axis', () => {
+        test('shows validation error when start and end point are empty', async () => {
+          const { user } = render(
+            <ChartBuilderFormsContextProvider initialForms={testFormState}>
+              <ChartAxisConfiguration
+                id="chartBuilder-minor"
+                type="minor"
+                axesConfiguration={{
+                  major: testMajorAxisConfiguration,
+                  minor: testMinorAxisConfiguration,
+                }}
+                definition={verticalBarBlockDefinition}
+                data={testTable.results}
+                meta={testTable.subjectMeta}
+                onChange={noop}
+                onSubmit={noop}
+              />
+            </ChartBuilderFormsContextProvider>,
+          );
+
+          await user.click(
+            screen.getByRole('button', { name: 'Add new line' }),
+          );
+
+          const referenceLines = within(
+            screen.getByRole('table', { name: 'Reference lines' }),
+          );
+
+          await user.selectOptions(
+            referenceLines.getByLabelText('X axis position'),
+            ['between-data-points'],
+          );
+
+          expect(
+            referenceLines.queryByText('Enter start point'),
+          ).not.toBeInTheDocument();
+          expect(
+            referenceLines.queryByText('Enter end point'),
+          ).not.toBeInTheDocument();
+
+          await user.click(referenceLines.getByLabelText('Start point'));
+          await user.tab();
+
+          await waitFor(() => {
+            expect(
+              referenceLines.getByText('Enter start point'),
+            ).toBeInTheDocument();
+          });
+
+          await user.click(referenceLines.getByLabelText('End point'));
+          await user.tab();
+
+          await waitFor(() => {
+            expect(
+              referenceLines.getByText('Enter end point'),
+            ).toBeInTheDocument();
+          });
+        });
+
+        test('shows validation error when start and end point are the same', async () => {
+          const { user } = render(
+            <ChartBuilderFormsContextProvider initialForms={testFormState}>
+              <ChartAxisConfiguration
+                id="chartBuilder-minor"
+                type="minor"
+                axesConfiguration={{
+                  major: testMajorAxisConfiguration,
+                  minor: testMinorAxisConfiguration,
+                }}
+                definition={verticalBarBlockDefinition}
+                data={testTable.results}
+                meta={testTable.subjectMeta}
+                onChange={noop}
+                onSubmit={noop}
+              />
+            </ChartBuilderFormsContextProvider>,
+          );
+          await user.click(
+            screen.getByRole('button', { name: 'Add new line' }),
+          );
+
+          const referenceLines = within(
+            screen.getByRole('table', { name: 'Reference lines' }),
+          );
+
+          await user.selectOptions(
+            referenceLines.getByLabelText('X axis position'),
+            ['between-data-points'],
+          );
+
+          expect(
+            referenceLines.queryByText('End point cannot match start point'),
+          ).not.toBeInTheDocument();
+
+          await user.selectOptions(
+            referenceLines.getByLabelText('Start point'),
+            ['2014_AY'],
+          );
+
+          await user.selectOptions(referenceLines.getByLabelText('End point'), [
+            '2014_AY',
+          ]);
+          await user.tab();
+
+          await waitFor(() => {
+            expect(
+              referenceLines.getByText('End point cannot match start point'),
+            ).toBeInTheDocument();
+          });
+        });
       });
     });
   });

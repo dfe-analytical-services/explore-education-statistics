@@ -5,7 +5,6 @@ import generateDataSetLabel from '@admin/pages/release/datablocks/components/cha
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import ButtonText from '@common/components/ButtonText';
 import Effect from '@common/components/Effect';
-import { Form } from '@common/components/form';
 import Modal from '@common/components/Modal';
 import {
   AxisConfiguration,
@@ -20,9 +19,8 @@ import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { Formik } from 'formik';
 import isEqual from 'lodash/isEqual';
-import React, { ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 const formId = 'chartDataGroupingsConfigurationForm';
 
@@ -57,12 +55,7 @@ const ChartDataGroupingsConfiguration = ({
     dataSetConfig: MapDataSetConfig;
     unit: string;
   }>();
-  const { updateForm, submitForms } = useChartBuilderFormsContext();
-
-  const handleChange = useCallback(
-    (values: FormValues) => onChange(values.dataSetConfigs),
-    [onChange],
-  );
+  const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
 
   const initialValues = useMemo<FormValues>(() => {
     const dataSetCategories = createDataSetCategories({
@@ -100,110 +93,97 @@ const ChartDataGroupingsConfiguration = ({
   }
 
   return (
-    <Formik<FormValues>
-      enableReinitialize
-      initialValues={initialValues}
-      onSubmit={async values => {
-        onSubmit(values.dataSetConfigs);
-        await submitForms();
-      }}
-    >
-      {form => (
-        <>
-          <Form id={formId}>
-            <Effect
-              value={form.values}
-              onChange={handleChange}
-              onMount={handleChange}
-            />
+    <>
+      <Effect
+        value={{
+          formKey: 'dataGroupings',
+          isValid: true,
+          submitCount: 0,
+        }}
+        onChange={updateForm}
+        onMount={updateForm}
+      />
+      <table data-testid="chart-data-groupings">
+        <thead>
+          <tr>
+            <th>Data set</th>
+            <th>Groupings</th>
+            <th className="govuk-!-text-align-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {initialValues.dataSetConfigs.map(dataSetConfig => {
+            const expandedDataSet = expandDataSet(dataSetConfig.dataSet, meta);
+            const label = generateDataSetLabel(expandedDataSet);
+            const key = generateDataSetKey(dataSetConfig.dataSet);
+            const { unit } = expandedDataSet.indicator;
 
-            <Effect
-              value={{
-                formKey: 'dataGroupings',
-                isValid: form.isValid,
-                submitCount: form.submitCount,
-              }}
-              onChange={updateForm}
-              onMount={updateForm}
-            />
-
-            <table data-testid="chart-data-groupings">
-              <thead>
-                <tr>
-                  <th>Data set</th>
-                  <th>Groupings</th>
-                  <th className="govuk-!-text-align-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {form.values.dataSetConfigs.map(dataSetConfig => {
-                  const expandedDataSet = expandDataSet(
-                    dataSetConfig.dataSet,
-                    meta,
-                  );
-                  const label = generateDataSetLabel(expandedDataSet);
-                  const key = generateDataSetKey(dataSetConfig.dataSet);
-                  const { unit } = expandedDataSet.indicator;
-
-                  return (
-                    <tr key={key}>
-                      <td>{label}</td>
-                      <td>
-                        {dataSetConfig.dataGrouping.type === 'Custom'
-                          ? dataGroupingTypes[dataSetConfig.dataGrouping.type]
-                          : `${
-                              dataSetConfig.dataGrouping.numberOfGroups
-                            } ${dataGroupingTypes[
-                              dataSetConfig.dataGrouping.type
-                            ].toLowerCase()}`}
-                      </td>
-                      <td className="govuk-!-text-align-right">
-                        <ButtonText
-                          onClick={() =>
-                            setEditDataSetConfig({ dataSetConfig, unit })
-                          }
-                        >
-                          Edit
-                        </ButtonText>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-
-            <ChartBuilderSaveActions
-              formId={formId}
-              formKey="dataGroupings"
-              disabled={form.isSubmitting}
-            >
-              {buttons}
-            </ChartBuilderSaveActions>
-          </Form>
-          {editDataSetConfig && (
-            <Modal open={!!editDataSetConfig} title="Edit groupings">
-              <ChartDataGroupingForm
-                dataSetConfig={editDataSetConfig.dataSetConfig}
-                dataSetConfigs={form.values.dataSetConfigs}
-                meta={meta}
-                unit={editDataSetConfig.unit}
-                onCancel={() => setEditDataSetConfig(undefined)}
-                onSubmit={values => {
-                  const updated = form.values.dataSetConfigs.map(config => {
-                    if (isEqual(config.dataSet, values.dataSet)) {
-                      return values;
+            return (
+              <tr key={key}>
+                <td>{label}</td>
+                <td>
+                  {dataSetConfig.dataGrouping.type === 'Custom'
+                    ? dataGroupingTypes[dataSetConfig.dataGrouping.type]
+                    : `${
+                        dataSetConfig.dataGrouping.numberOfGroups
+                      } ${dataGroupingTypes[
+                        dataSetConfig.dataGrouping.type
+                      ].toLowerCase()}`}
+                </td>
+                <td className="govuk-!-text-align-right">
+                  <ButtonText
+                    onClick={() =>
+                      setEditDataSetConfig({ dataSetConfig, unit })
                     }
-                    return config;
-                  });
-                  form.setFieldValue('dataSetConfigs', updated);
-                  setEditDataSetConfig(undefined);
-                }}
-              />
-            </Modal>
-          )}
-        </>
+                  >
+                    Edit
+                  </ButtonText>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      {editDataSetConfig && (
+        <Modal open={!!editDataSetConfig} title="Edit groupings">
+          <ChartDataGroupingForm
+            dataSetConfig={editDataSetConfig.dataSetConfig}
+            dataSetConfigs={initialValues.dataSetConfigs}
+            meta={meta}
+            unit={editDataSetConfig.unit}
+            onCancel={() => setEditDataSetConfig(undefined)}
+            onSubmit={values => {
+              const updated = initialValues.dataSetConfigs.map(config => {
+                if (isEqual(config.dataSet, values.dataSet)) {
+                  return values;
+                }
+                return config;
+              });
+              onChange(updated);
+              setEditDataSetConfig(undefined);
+            }}
+          />
+        </Modal>
       )}
-    </Formik>
+
+      <ChartBuilderSaveActions
+        formId={formId}
+        formKey="dataGroupings"
+        onClick={async () => {
+          updateForm({
+            formKey: 'dataGroupings',
+            submitCount: forms.dataGroupings
+              ? forms.dataGroupings.submitCount + 1
+              : 1,
+          });
+          onSubmit(initialValues.dataSetConfigs);
+          await submitForms();
+        }}
+      >
+        {buttons}
+      </ChartBuilderSaveActions>
+    </>
   );
 };
 

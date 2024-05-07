@@ -1,9 +1,10 @@
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldSelect } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import Button from '@common/components/Button';
 import Yup from '@common/validation/yup';
 import React from 'react';
-import { Formik } from 'formik';
 import {
   PrototypeSubject,
   PublicationSubject,
@@ -39,23 +40,25 @@ const PrototypeEditPublicationSubject = ({
         <span className="govuk-caption-l">{publicationSubject.title}</span>
         <h2>Change data set to publish</h2>
 
-        <Formik<FormValues>
+        <FormProvider
           initialValues={{
             subjectId: publicationSubject.subjectId,
           }}
           validationSchema={Yup.object({
             subjectId: Yup.string().required('Enter a subject'),
           })}
-          onSubmit={values => {
-            onSubmit({
-              ...publicationSubject,
-              subjectId: values.subjectId,
-            });
-          }}
         >
           {() => (
-            <Form id="form">
-              <FormFieldSelect<FormValues>
+            <RHFForm
+              id="form"
+              onSubmit={values => {
+                onSubmit({
+                  ...publicationSubject,
+                  subjectId: values.subjectId,
+                });
+              }}
+            >
+              <RHFFormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
                 label="Available data sets"
@@ -66,9 +69,9 @@ const PrototypeEditPublicationSubject = ({
                 placeholder="Choose a subject"
               />
               <Button type="submit">Save</Button>
-            </Form>
+            </RHFForm>
           )}
-        </Formik>
+        </FormProvider>
       </section>
     </>
   );

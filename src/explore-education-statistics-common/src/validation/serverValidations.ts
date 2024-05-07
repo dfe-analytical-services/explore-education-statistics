@@ -9,6 +9,7 @@ import camelCase from 'lodash/camelCase';
 import has from 'lodash/has';
 import set from 'lodash/set';
 import toPath from 'lodash/toPath';
+import { FieldErrors, FieldValues } from 'react-hook-form';
 
 export interface ServerValidationError {
   sourceField?: string;
@@ -144,6 +145,23 @@ export function convertServerFieldErrors<FormValues>(
   >((errors, { field, message }) => {
     if (has(formValues, field)) {
       set(errors, field, message);
+    }
+
+    return errors;
+  }, {});
+}
+
+export function rhfConvertServerFieldErrors<FormValues extends FieldValues>(
+  response: ValidationProblemDetails,
+  formValues: FormValues,
+  messageMappers: FieldMessageMapper<FormValues>[] = [],
+  fallbackMapper?: FieldMessageMapper<FormValues>,
+): FieldErrors<FormValues> {
+  return mapServerFieldErrors(response, messageMappers, fallbackMapper).reduce<
+    FieldErrors<FormValues>
+  >((errors, { field, message }) => {
+    if (has(formValues, field)) {
+      set(errors, field, { message });
     }
 
     return errors;

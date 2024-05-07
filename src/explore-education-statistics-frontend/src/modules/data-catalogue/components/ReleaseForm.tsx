@@ -1,15 +1,14 @@
-import { Form } from '@common/components/form';
-import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
+import RHFFormFieldRadioSearchGroup from '@common/components/form/rhf/RHFFormFieldRadioSearchGroup';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import Tag from '@common/components/Tag';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import { ReleaseSummary } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React, { ReactNode, useMemo } from 'react';
 
 export interface ReleaseFormValues {
@@ -60,22 +59,20 @@ export default function ReleaseForm({
     [options, hideLatestDataTag],
   );
 
-  const handleSubmit = useFormSubmit(
-    async ({ releaseId }: ReleaseFormValues) => {
-      const release = options.find(r => r.id === releaseId);
+  const handleSubmit = async ({ releaseId }: ReleaseFormValues) => {
+    const release = options.find(r => r.id === releaseId);
 
-      if (!release) {
-        throw new Error('Selected release not found');
-      }
+    if (!release) {
+      throw new Error('Selected release not found');
+    }
 
-      await goToNextStep(async () => {
-        await onSubmit({ release });
-      });
-    },
-  );
+    await goToNextStep(async () => {
+      await onSubmit({ release });
+    });
+  };
 
   return (
-    <Formik<ReleaseFormValues>
+    <FormProvider
       enableReinitialize
       initialValues={{
         releaseId:
@@ -83,19 +80,17 @@ export default function ReleaseForm({
             ? radioOptions[0].value
             : initialValues.releaseId,
       }}
-      validateOnBlur={false}
       validationSchema={Yup.object<ReleaseFormValues>({
         releaseId: Yup.string().required('Choose a release'),
       })}
-      onSubmit={handleSubmit}
     >
-      {form => {
+      {({ formState, reset }) => {
         return isActive ? (
-          <Form id={formId}>
-            <FormFieldRadioSearchGroup<ReleaseFormValues>
+          <RHFForm id={formId} onSubmit={handleSubmit}>
+            <RHFFormFieldRadioSearchGroup<ReleaseFormValues>
               name="releaseId"
               legend={legend}
-              disabled={form.isSubmitting}
+              disabled={formState.isSubmitting}
               options={radioOptions}
               order={[]}
             />
@@ -103,20 +98,20 @@ export default function ReleaseForm({
             {options.length > 0 ? (
               <WizardStepFormActions
                 {...stepProps}
-                isSubmitting={form.isSubmitting}
+                isSubmitting={formState.isSubmitting}
               />
             ) : (
               <p>No releases available.</p>
             )}
-          </Form>
+          </RHFForm>
         ) : (
           <ResetFormOnPreviousStep
             currentStep={currentStep}
             stepNumber={stepNumber}
-            onReset={form.resetForm}
+            onReset={reset}
           />
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 }

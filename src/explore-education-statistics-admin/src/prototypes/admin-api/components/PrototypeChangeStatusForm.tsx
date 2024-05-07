@@ -1,12 +1,10 @@
 import Button from '@common/components/Button';
-import {
-  Form,
-  FormFieldRadioGroup,
-  FormFieldTextArea,
-} from '@common/components/form';
-import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldDateInput from '@common/components/form/rhf/RHFFormFieldDateInput';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
 import { PartialDate } from '@common/utils/date/partialDate';
-import { Formik } from 'formik';
 import React from 'react';
 
 export interface StatusFormValues {
@@ -23,18 +21,17 @@ interface Props {
 const PrototypeChangeStatusForm = ({ selectedStatus, onSubmit }: Props) => {
   const { date, notes, status } = selectedStatus;
   return (
-    <Formik<StatusFormValues>
+    <FormProvider
       initialValues={{
         date,
         notes,
         status,
       }}
-      onSubmit={onSubmit}
     >
       {() => (
-        <Form id="form">
+        <RHFForm id="form" onSubmit={onSubmit}>
           <>
-            <FormFieldRadioGroup<StatusFormValues>
+            <RHFFormFieldRadioGroup<StatusFormValues>
               legend="Changes on current live version (version 1.0)"
               name="status"
               order={[]}
@@ -48,14 +45,14 @@ const PrototypeChangeStatusForm = ({ selectedStatus, onSubmit }: Props) => {
                   value: 'deprecated',
                   conditional: (
                     <>
-                      <FormFieldTextArea<StatusFormValues>
+                      <RHFFormFieldTextArea<StatusFormValues>
                         hint="These notes will be appended to the published API dataset. They are used to explain to the public users why this data set is being deprecated."
                         label="Public guidance notes"
                         name="notes"
                         rows={3}
                       />
 
-                      <FormFieldDateInput
+                      <RHFFormFieldDateInput
                         name="date"
                         legend="Expiry date (expected date of deletion)"
                         legendSize="s"
@@ -69,9 +66,9 @@ const PrototypeChangeStatusForm = ({ selectedStatus, onSubmit }: Props) => {
             />
             <Button type="submit">Update</Button>
           </>
-        </Form>
+        </RHFForm>
       )}
-    </Formik>
+    </FormProvider>
   );
 };
 

@@ -1,7 +1,6 @@
 import FormRadioGroup, {
   FormRadioGroupProps,
 } from '@common/components/form/FormRadioGroup';
-import useRegister from '@common/components/form/rhf/hooks/useRegister';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import { RadioChangeEventHandler } from '@common/components/form/FormRadio';
 import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
@@ -29,7 +28,9 @@ function RHFFormFieldRadioGroup<TFormValues extends FieldValues>({
     register,
   } = useFormContext<TFormValues>();
 
-  const { ref: inputRef, ...field } = useRegister(name, register);
+  // Use standard register instead of `useRegister` as the memoisation
+  // there causes the field to not work after reseting the form.
+  const { ref: inputRef, ...field } = register(name);
   const { fieldId } = useFormIdContext();
   const id = fieldId(name, customId);
 

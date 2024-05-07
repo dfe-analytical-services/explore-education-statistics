@@ -60,11 +60,16 @@ export const infographicBlockDefinition: ChartDefinition = {
   options: {
     defaults: {
       height: 600,
+      width: undefined,
     },
   },
   legend: {},
   capabilities: {
+    canIncludeNonNumericData: false,
     canPositionLegendInline: false,
+    canSetBarThickness: false,
+    canSetDataLabelPosition: false,
+    canShowDataLabels: false,
     canSize: true,
     canSort: false,
     hasGridLines: false,

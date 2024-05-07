@@ -4,20 +4,14 @@ import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import render from '@common-test/render';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import {
   DataSet,
   DataSetConfiguration,
 } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -623,7 +617,7 @@ describe('ChartLegendConfiguration', () => {
       indicator: 'authorised-absence-sessions',
     };
 
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
           definition={lineChartBlockDefinition}
@@ -646,7 +640,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.selectOptions(
+    await user.selectOptions(
       screen.getByLabelText('Legend position'),
       'inline',
     );
@@ -656,16 +650,13 @@ describe('ChartLegendConfiguration', () => {
 
     const legendItem1 = within(legendItems[0]);
 
-    await userEvent.clear(legendItem1.getByLabelText('Label'));
-    await userEvent.type(
+    await user.clear(legendItem1.getByLabelText('Label'));
+    await user.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
     );
 
-    await userEvent.selectOptions(
-      legendItem1.getByLabelText('Position'),
-      'below',
-    );
+    await user.selectOptions(legendItem1.getByLabelText('Position'), 'below');
 
     expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
       position: 'inline',
@@ -683,7 +674,7 @@ describe('ChartLegendConfiguration', () => {
   });
 
   test('shows validation errors if missing legend item label', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
           definition={lineChartBlockDefinition}
@@ -717,8 +708,8 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
     const legendItem2 = within(legendItems[1]);
 
-    await userEvent.clear(legendItem2.getByLabelText('Label'));
-    await userEvent.tab();
+    await user.clear(legendItem2.getByLabelText('Label'));
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -739,7 +730,7 @@ describe('ChartLegendConfiguration', () => {
   });
 
   test('shows validation error if position is inline and showDataLabels is true', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
           definition={lineChartBlockDefinition}
@@ -768,11 +759,11 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.selectOptions(
+    await user.selectOptions(
       screen.getByLabelText('Legend position'),
       'inline',
     );
-    await userEvent.tab();
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -786,7 +777,7 @@ describe('ChartLegendConfiguration', () => {
   test('submitting fails with invalid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
           definition={lineChartBlockDefinition}
@@ -823,11 +814,11 @@ describe('ChartLegendConfiguration', () => {
 
     const legendItem1 = within(legendItems[0]);
 
-    await userEvent.clear(legendItem1.getByLabelText('Label'));
+    await user.clear(legendItem1.getByLabelText('Label'));
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -839,7 +830,7 @@ describe('ChartLegendConfiguration', () => {
   test('submitting fails if another form is invalid', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider
         initialForms={{
           ...testFormState,
@@ -879,7 +870,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -890,7 +881,7 @@ describe('ChartLegendConfiguration', () => {
   test('successfully submits with updated values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
           definition={lineChartBlockDefinition}
@@ -922,7 +913,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.selectOptions(
+    await user.selectOptions(
       screen.getByLabelText('Legend position'),
       'inline',
     );
@@ -932,8 +923,8 @@ describe('ChartLegendConfiguration', () => {
 
     const legendItem1 = within(legendItems[0]);
 
-    await userEvent.clear(legendItem1.getByLabelText('Label'));
-    await userEvent.type(
+    await user.clear(legendItem1.getByLabelText('Label'));
+    await user.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
     );
@@ -944,22 +935,13 @@ describe('ChartLegendConfiguration', () => {
       },
     });
 
-    await userEvent.selectOptions(
-      legendItem1.getByLabelText('Symbol'),
-      'diamond',
-    );
-    await userEvent.selectOptions(
-      legendItem1.getByLabelText('Style'),
-      'dotted',
-    );
-    await userEvent.selectOptions(
-      legendItem1.getByLabelText('Position'),
-      'below',
-    );
+    await user.selectOptions(legendItem1.getByLabelText('Symbol'), 'diamond');
+    await user.selectOptions(legendItem1.getByLabelText('Style'), 'dotted');
+    await user.selectOptions(legendItem1.getByLabelText('Position'), 'below');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 

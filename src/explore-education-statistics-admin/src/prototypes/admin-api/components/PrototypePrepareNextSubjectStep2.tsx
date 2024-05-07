@@ -5,8 +5,9 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
-import { Form, FormFieldset } from '@common/components/form';
-import { Formik } from 'formik';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import React, { useState } from 'react';
 import Yup from '@common/validation/yup';
 import capitalize from 'lodash/capitalize';
@@ -70,7 +71,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
       <>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
-            <Formik
+            <FormProvider
               initialValues={{
                 unmapped: unmappedItems,
               }}
@@ -86,12 +87,14 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                   },
                 }),
               })}
-              onSubmit={() => {
-                goToNextStep();
-              }}
             >
-              {form => (
-                <Form id="form">
+              {({ formState }) => (
+                <RHFForm
+                  id="form"
+                  onSubmit={() => {
+                    goToNextStep();
+                  }}
+                >
                   <FormFieldset id="downloadFiles" legend={stepHeading}>
                     <>
                       <p>
@@ -149,7 +152,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                       }
                       legendSize="m"
                       error={
-                        form.submitCount > 0 && unmappedItems.length
+                        formState.submitCount > 0 && unmappedItems.length
                           ? `All ${namePlural} from the current data set should be mapped to the next data set`
                           : undefined
                       }
@@ -264,9 +267,9 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                     {...stepProps}
                     submitText={`Next -  ${nextStep}`}
                   />
-                </Form>
+                </RHFForm>
               )}
-            </Formik>
+            </FormProvider>
           </div>
         </div>
 

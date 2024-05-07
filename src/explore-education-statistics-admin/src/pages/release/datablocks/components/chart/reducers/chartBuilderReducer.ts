@@ -63,10 +63,12 @@ export type ChartBuilderActions =
 
 const defaultOptions: ChartOptions = {
   alt: '',
+  barThickness: undefined,
   height: 300,
   subtitle: '',
   title: '',
   titleType: 'default',
+  width: undefined,
 };
 
 const defaultLegend: LegendConfiguration = {
@@ -80,7 +82,10 @@ const updateAxis = (
 ): AxisConfiguration => {
   const defaultAxisOptions: AxisConfiguration = {
     dataSets: [],
+    max: undefined,
+    min: undefined,
     referenceLines: [],
+    size: undefined,
     visible: true,
     label: {
       text: '',
@@ -126,6 +131,8 @@ const getInitialState = (
   return {
     definition,
     options: {
+      ...defaultOptions,
+      ...(definition?.options.defaults ?? {}),
       ...options,
       titleType: initialChart.title === tableTitle ? 'default' : 'alternative',
     },

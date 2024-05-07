@@ -258,7 +258,11 @@ export const lineChartBlockDefinition: ChartDefinition = {
   type: 'line',
   name: 'Line',
   capabilities: {
+    canIncludeNonNumericData: true,
     canPositionLegendInline: true,
+    canSetBarThickness: false,
+    canSetDataLabelPosition: true,
+    canShowDataLabels: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,
@@ -273,6 +277,8 @@ export const lineChartBlockDefinition: ChartDefinition = {
   options: {
     defaults: {
       height: 300,
+      includeNonNumericData: false,
+      showDataLabels: false,
     },
   },
   legend: {

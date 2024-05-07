@@ -482,9 +482,10 @@ Configure line chart data sets
 
 Add reference line
     user clicks link    X Axis (major axis)
+    user clicks button    Add new line
     user chooses select option    id:chartAxisConfiguration-major-referenceLines-position    2005
     user enters text into element    id:chartAxisConfiguration-major-referenceLines-label    Reference line 1
-    user clicks button    Add line
+    user clicks button    Add
 
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview
@@ -938,8 +939,13 @@ Configure basic infographic chart
     user clicks button    Choose an infographic as alternative
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
 
+    # Editing the subtitle to ensure the validation updates, otherwise it
+    # doesn't always get triggered before submit the form.
+    user enters text into element    label:Subtitle    Infographic subtitle
+
 Validate basic infographic chart preview
     user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart subtitle contains    id:chartBuilderPreview    Infographic subtitle
     user waits until element contains infographic chart    id:chartBuilderPreview
     user checks infographic chart contains alt    id:chartBuilderPreview    Test chart alt
 

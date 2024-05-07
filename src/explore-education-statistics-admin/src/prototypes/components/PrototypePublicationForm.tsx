@@ -1,6 +1,4 @@
 import {
-  Form,
-  FormFieldRadioGroup,
   FormFieldset,
   FormGroup,
   FormRadioGroup,
@@ -8,7 +6,6 @@ import {
 import SubmitError from '@common/components/form/util/SubmitError';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
   PublicationTreeSummary,
@@ -21,8 +18,10 @@ import Button from '@common/components/Button';
 import styles from '@admin/prototypes/components/PrototypePublicationForm.module.scss';
 import PrototypeFormTextSearchInput from '@admin/prototypes/components/PrototypeFormTextSearchInput';
 import orderBy from 'lodash/orderBy';
-import { Formik } from 'formik';
 import React, { useMemo, useState } from 'react';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
 
 export interface PublicationFormValues {
   publicationId: string;
@@ -80,35 +79,31 @@ const PrototypePublicationForm = ({
     </WizardStepHeading>
   );
 
-  const handleSubmit = useFormSubmit(
-    async ({ publicationId }: PublicationFormValues) => {
-      const publication = publications.find(p => p.id === publicationId);
+  const handleSubmit = async ({ publicationId }: PublicationFormValues) => {
+    const publication = publications.find(p => p.id === publicationId);
 
-      if (!publication) {
-        throw new SubmitError('Selected publication not found');
-      }
+    if (!publication) {
+      throw new SubmitError('Selected publication not found');
+    }
 
-      await goToNextStep(async () => {
-        await onSubmit({ publication });
-      });
-    },
-  );
+    await goToNextStep(async () => {
+      await onSubmit({ publication });
+    });
+  };
 
   return (
-    <Formik<PublicationFormValues>
+    <FormProvider
       enableReinitialize
       initialValues={initialValues}
-      validateOnBlur={false}
-      validateOnChange={false}
       validationSchema={Yup.object<PublicationFormValues>({
         publicationId: Yup.string().required('Choose publication'),
       })}
-      onSubmit={handleSubmit}
     >
-      {form => {
+      {({ watch }) => {
+        const values = watch();
         if (isActive) {
           return (
-            <Form {...form} id={formId}>
+            <RHFForm id={formId} onSubmit={handleSubmit}>
               <FormFieldset id="publicationForm" legend={stepHeading}>
                 <p>Search or select a theme to find publications</p>
                 <FormGroup className="govuk-!-margin-bottom-3">
@@ -163,7 +158,7 @@ const PrototypePublicationForm = ({
                   />
 
                   <div className={styles.publicationsList} id="publications">
-                    <FormFieldRadioGroup
+                    <RHFFormFieldRadioGroup<PublicationFormValues>
                       id={`${formId}-publications`}
                       legend={
                         <>
@@ -201,13 +196,17 @@ const PrototypePublicationForm = ({
                   </div>
                 </div>
               </FormFieldset>
-            </Form>
+            </RHFForm>
           );
         }
+
         const publication = options
           .flatMap(option => option.topics)
           .flatMap(option => option.publications)
-          .find(option => option.id === form.values.publicationId);
+          .find(
+            option =>
+              option.id === (values as PublicationFormValues).publicationId,
+          );
 
         return (
           <WizardStepSummary {...stepProps} goToButtonText="Change publication">
@@ -221,7 +220,7 @@ const PrototypePublicationForm = ({
           </WizardStepSummary>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

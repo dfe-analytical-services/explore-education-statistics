@@ -1,8 +1,9 @@
 import Button from '@common/components/Button';
-import { Form, FormFieldSelect } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import React from 'react';
 import WarningMessage from '@common/components/WarningMessage';
 import {
@@ -64,31 +65,33 @@ const PrototypeAddPublicationSubject = ({
       </InsetText>
 
       {!isCurrentReleasePublished && (
-        <Formik<FormValues>
+        <FormProvider
           initialValues={{
             title: '',
             subjectId: '',
           }}
           validationSchema={Yup.object({
             subjectId: Yup.string().required('Select a data set'),
-            // title: Yup.string().required('Enter a title'),
+            title: Yup.string(),
           })}
-          onSubmit={(values, { resetForm }) => {
-            resetForm();
-            onSubmit(values);
-          }}
         >
-          {() => (
-            <Form id="form">
+          {({ reset }) => (
+            <RHFForm
+              id="form"
+              onSubmit={values => {
+                reset();
+                onSubmit(values as PublicationSubject);
+              }}
+            >
               {/* 
-                <FormFieldTextInput
+                <RHFFormFieldTextInput
                   id="title"
                   name="title"
                   label="Title"
                   width={20}
                 /> 
               */}
-              <FormFieldSelect<FormValues>
+              <RHFFormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
                 label="Available data sets"
@@ -99,9 +102,9 @@ const PrototypeAddPublicationSubject = ({
                 placeholder="Select a data set"
               />
               <Button type="submit">Create API data set</Button>
-            </Form>
+            </RHFForm>
           )}
-        </Formik>
+        </FormProvider>
       )}
     </>
   );

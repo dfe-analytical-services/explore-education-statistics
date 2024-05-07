@@ -1,52 +1,43 @@
-import FormFieldSortableListGroup from '@admin/prototypes/components/PrototypeFormFieldSortableListGroup';
-import styles from '@admin/prototypes/components/PrototypeTableHeadersForm.module.scss';
-import Button from '@admin/prototypes/components/PrototypeButton';
+import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
-import useMounted from '@common/hooks/useMounted';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import useToggle from '@common/hooks/useToggle';
+import useMounted from '@common/hooks/useMounted';
+import TableHeadersAxis from '@common/modules/table-tool/components/TableHeadersAxis';
+import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import { PickByType } from '@common/types';
+import styles from '@common/modules/table-tool/components/TableHeadersForm.module.scss';
 import reorder from '@common/utils/reorder';
 import Yup from '@common/validation/yup';
-import classNames from 'classnames';
-import { Form, Formik, FormikProps } from 'formik';
 import compact from 'lodash/compact';
 import last from 'lodash/last';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
+import { UseFormReturn } from 'react-hook-form';
+import { ObjectSchema } from 'yup';
 
-interface FormValues {
+export interface TableHeadersFormValues {
   rowGroups: Filter[][];
   columnGroups: Filter[][];
 }
 
 interface Props {
-  showTableHeadersForm: boolean;
-  initialValues?: TableHeadersConfig;
-  onSubmit: (values: TableHeadersConfig) => void;
-  id?: string;
+  initialValues: TableHeadersConfig;
+  onSubmit: (values: TableHeadersConfig) => void | Promise<void>;
 }
 
-const TableHeadersForm = ({
-  showTableHeadersForm,
-  onSubmit,
-  id = 'tableHeadersForm',
-  initialValues = {
-    columnGroups: [],
-    columns: [],
-    rowGroups: [],
-    rows: [],
-  },
-}: Props) => {
+export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
   const { isMounted } = useMounted();
-  const [isDraggingGroup, toggleIsDraggingGroup] = useToggle(false);
   const [screenReaderMessage, setScreenReaderMessage] = useState('');
-  const [readOnly, toggleReadOnly] = useToggle(false);
+  const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
+  const id = 'tableHeaderForm';
 
   const handleSubmit = useCallback(
-    (values: FormValues) => {
-      onSubmit({
+    async (values: TableHeadersFormValues) => {
+      await onSubmit({
         columnGroups:
           values.columnGroups.length > 1
             ? values.columnGroups.slice(0, -1)
@@ -56,85 +47,116 @@ const TableHeadersForm = ({
         columns: last(values.columnGroups) as Filter[],
         rows: last(values.rowGroups) as Filter[],
       });
+
+      toggleShowTableHeadersForm.off();
     },
-    [onSubmit],
+    [onSubmit, toggleShowTableHeadersForm],
   );
 
   const moveGroupToAxis = ({
     destinationId,
     destinationIndex,
-    form,
     sourceId,
     sourceIndex,
+    form,
   }: {
-    destinationId: keyof FormValues;
+    destinationId: keyof TableHeadersFormValues;
     destinationIndex: number;
-    form: FormikProps<FormValues>;
-    sourceId: keyof FormValues;
+    sourceId: keyof TableHeadersFormValues;
     sourceIndex: number;
+    form: UseFormReturn<TableHeadersFormValues>;
   }) => {
-    const nextSourceValue = [...form.values[sourceId]];
-    const nextDestinationValue = [...form.values[destinationId]];
+    const nextSourceValue = form.getValues(sourceId);
+    const nextDestinationValue = form.getValues(destinationId);
+
     const [sourceItem] = nextSourceValue.splice(sourceIndex, 1);
+
     nextDestinationValue.splice(destinationIndex, 0, sourceItem);
 
-    form.setFieldValue(sourceId, nextSourceValue);
-    form.setFieldValue(destinationId, nextDestinationValue);
-    form.setFieldTouched(sourceId);
-    form.setFieldTouched(destinationId);
+    form.setValue(sourceId, nextSourceValue, { shouldTouch: true });
+    form.setValue(destinationId, nextDestinationValue, { shouldTouch: true });
+
+    form.trigger(destinationId);
   };
 
-  const handleMoveGroupToOtherAxis = (
-    sourceId: keyof FormValues,
-    groupIndex: number,
-    form: FormikProps<FormValues>,
-  ) => {
-    const destinationId: keyof FormValues =
+  const handleMoveGroupToOtherAxis = ({
+    groupIndex,
+    sourceId,
+    form,
+  }: {
+    groupIndex: number;
+    sourceId: keyof TableHeadersFormValues;
+    form: UseFormReturn<TableHeadersFormValues>;
+  }) => {
+    const destinationId: keyof TableHeadersFormValues =
       sourceId === 'rowGroups' ? 'columnGroups' : 'rowGroups';
+    const destinationIndex = form.getValues(destinationId).length;
 
     moveGroupToAxis({
       destinationId,
-      destinationIndex: form.values[destinationId].length,
-      form,
+      destinationIndex,
       sourceIndex: groupIndex,
       sourceId,
+      form,
     });
 
     const message =
       sourceId === 'rowGroups'
-        ? ' You have moved the group from row groups to column groups'
-        : 'You have moved the group from column groups to row groups';
+        ? 'You have moved the group from row headers to column headers'
+        : 'You have moved the group from column headers to row headers';
 
-    // Clear the message then repopulate to ensure the new message is read,
-    // and only read once.
-    setScreenReaderMessage('');
-    setTimeout(() => {
-      setScreenReaderMessage(message);
-    }, 200);
+    setScreenReaderMessage(message);
   };
 
-  const handleDragEnd = (form: FormikProps<FormValues>, result: DropResult) => {
-    toggleIsDraggingGroup.off();
+  // Move group within axis via button controls
+  const handleMoveGroup = ({
+    groupIndex,
+    sourceId,
+    form,
+    direction,
+  }: {
+    groupIndex: number;
+    sourceId: keyof TableHeadersFormValues;
+    form: UseFormReturn<TableHeadersFormValues>;
+    direction: 'up' | 'down';
+  }) => {
+    const sourceValue = form.getValues(sourceId);
+    const newIndex = direction === 'up' ? groupIndex - 1 : groupIndex + 1;
+    if (
+      (direction === 'up' && groupIndex === 0) ||
+      (direction === 'down' && groupIndex === sourceValue.length - 1)
+    ) {
+      return;
+    }
+    const reordered = reorder(sourceValue, groupIndex, newIndex);
 
+    form.setValue(sourceId, reordered);
+    form.trigger(sourceId);
+  };
+
+  const handleDragEnd = ({
+    result,
+    form,
+  }: {
+    result: DropResult;
+    form: UseFormReturn<TableHeadersFormValues>;
+  }) => {
     const { source, destination } = result;
 
     if (!destination) {
       return;
     }
 
-    const destinationId = destination.droppableId as keyof FormValues;
-    const sourceId = source.droppableId as keyof FormValues;
+    const destinationId =
+      destination.droppableId as keyof TableHeadersFormValues;
+    const sourceId = source.droppableId as keyof TableHeadersFormValues;
 
     // Moving group within its axis
     if (destinationId === sourceId) {
-      form.setFieldTouched(destinationId);
-      form.setFieldValue(
+      const values = form.getValues(destinationId);
+      form.setValue(
         destinationId,
-        reorder(
-          form.values[destinationId] as unknown[],
-          source.index,
-          destination.index,
-        ),
+        reorder(values, source.index, destination.index),
       );
 
       return;
@@ -144,26 +166,56 @@ const TableHeadersForm = ({
     moveGroupToAxis({
       destinationId,
       destinationIndex: destination.index,
-      form,
       sourceId,
       sourceIndex: source.index,
+      form,
     });
   };
 
-  const handleSwitchReorderingType = (
-    axisName: string,
-    reorderingGroups: boolean,
-  ) => {
-    const message = reorderingGroups
-      ? `Reorder ${axisName} selected, click to change to items`
-      : 'Reorder items selected, click to change to groups';
+  const validationSchema = useMemo<ObjectSchema<TableHeadersFormValues>>(() => {
+    return Yup.object({
+      rowGroups: Yup.array()
+        .required()
+        .of(
+          Yup.array()
+            .required()
+            .of<Filter>(
+              Yup.object({
+                id: Yup.string().required(),
+                label: Yup.string().required('Label is required'),
+                value: Yup.string().required('Value is required'),
+              }),
+            )
+            .ensure(),
+        )
+        .min(1, 'Must have at least one row group'),
+      columnGroups: Yup.array()
+        .required()
+        .of(
+          Yup.array()
+            .required()
+            .of<Filter>(
+              Yup.object({
+                id: Yup.string().required(),
+                label: Yup.string().required('Label is required'),
+                value: Yup.string().required('Value is required'),
+              }),
+            )
+            .ensure(),
+        )
+        .min(1, 'Must have at least one column group'),
+    });
+  }, []);
 
-    // Clear the message then repopulate to ensure the new message is read,
-    // and only read once.
-    setScreenReaderMessage('');
-    setTimeout(() => {
-      setScreenReaderMessage(message);
-    }, 200);
+  const initialFormValues: TableHeadersFormValues = {
+    columnGroups: compact([
+      ...(initialValues?.columnGroups ?? []),
+      initialValues?.columns,
+    ]),
+    rowGroups: compact([
+      ...(initialValues?.rowGroups ?? []),
+      initialValues?.rows,
+    ]),
   };
 
   if (!isMounted) {
@@ -171,143 +223,145 @@ const TableHeadersForm = ({
   }
 
   return (
-    <>
-      <div
-        className={classNames(styles.formContainer, {
-          [styles.hide]: !showTableHeadersForm,
-        })}
-        id={id}
-      >
-        <div className="govuk-width-container govuk-!-margin-2 govuk-!-margin-bottom-4">
-          <h3>Move and reorder table headers</h3>
-          <h4>Using a mouse, track pad, touch screen and a keyboard</h4>
-          <p className="govuk-hint">
-            Drag and drop or use the keyboard to reorder headers within or
-            between columns and rows. Click the Reorder button on a header group
-            to reorder the items within that group. Hold the Ctrl key and click
-            to select multiple items to drag and drop.{' '}
-          </p>
-          <h4>Using only a keyboard</h4>
-          <p className="govuk-hint">
-            For keyboard users, use the Tab key to navigate to items or groups,
-            select and deselect a draggable item with Space and use the arrow
-            keys to move a selected item. To move multiple items, you can press
-            Ctrl and Enter to add an item to your selected items.
-          </p>
-          <p className="govuk-visually-hidden">
-            If you are using a screen reader disable scan mode.
-          </p>
-        </div>
-        <Formik<FormValues>
-          enableReinitialize
-          initialValues={{
-            columnGroups: compact([
-              ...(initialValues?.columnGroups ?? []),
-              initialValues?.columns,
-            ]),
-            rowGroups: compact([
-              ...(initialValues?.rowGroups ?? []),
-              initialValues?.rows,
-            ]),
-          }}
-          validationSchema={Yup.object<FormValues>({
-            rowGroups: Yup.array()
-              .of(
-                Yup.array()
-                  .of<Omit<Filter, 'id'>>(
-                    Yup.object().shape({
-                      label: Yup.string().required('Label is required'),
-                      value: Yup.string().required('Value is required'),
-                    }),
-                  )
-                  .ensure(),
-              )
-              .min(1, 'Must have at least one row group'),
-            columnGroups: Yup.array()
-              .of(
-                Yup.array()
-                  .of<Omit<Filter, 'id'>>(
-                    Yup.object().shape({
-                      label: Yup.string().required('Label is required'),
-                      value: Yup.string().required('Value is required'),
-                    }),
-                  )
-                  .ensure(),
-              )
-              .min(1, 'Must have at least one column group'),
-          })}
-          onSubmit={handleSubmit}
-        >
-          {form => {
-            return (
-              <Form id={`${id}-form`}>
-                <DragDropContext
-                  onDragEnd={result => handleDragEnd(form, result)}
-                  onDragStart={toggleIsDraggingGroup.on}
-                >
-                  <FormGroup className="govuk-!-margin-bottom-4">
-                    <FormFieldSortableListGroup<
-                      PickByType<TableHeadersConfig, Filter[][]>
+    <TableHeadersContextProvider>
+      {({ toggleGroupDraggingActive }) => (
+        <>
+          {!showTableHeadersForm ? (
+            <Button
+              className={styles.button}
+              ariaControls={id}
+              ariaExpanded={showTableHeadersForm}
+              onClick={toggleShowTableHeadersForm}
+            >
+              Move and reorder table headers
+            </Button>
+          ) : (
+            <div className={styles.formContainer} id={id}>
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-two-thirds">
+                  <h3>Move and reorder table headers</h3>
+                  <h4>Using a mouse, track pad, touch screen and a keyboard</h4>
+                  <p className="govuk-hint">
+                    Drag and drop or use the keyboard to reorder headers within
+                    or between columns and rows. Click the Reorder button on a
+                    header group to reorder the items within that group. Hold
+                    the Ctrl key and click to select multiple items to drag and
+                    drop.
+                  </p>
+                  <h4>Using only a keyboard</h4>
+                  <p className="govuk-hint">
+                    For keyboard users, use the Tab key to navigate to items or
+                    groups, select and deselect a draggable item with Space and
+                    use the arrow keys to move a selected item. To move multiple
+                    items, you can press Ctrl and Enter to add an item to your
+                    selected items.
+                  </p>
+                  <p className="govuk-visually-hidden">
+                    If you are using a screen reader disable scan mode.
+                  </p>
+                </div>
+              </div>
+
+              <FormProvider
+                enableReinitialize
+                initialValues={initialFormValues}
+                validationSchema={validationSchema}
+              >
+                {form => {
+                  return (
+                    <RHFForm
+                      id={`${id}-form`}
+                      showErrorSummary={false}
+                      onSubmit={handleSubmit}
                     >
-                      isDraggingGroup={isDraggingGroup}
-                      legend="Move column headers"
-                      name="columnGroups"
-                      readOnly={readOnly}
-                      onChangeReorderingType={handleSwitchReorderingType}
-                      onMoveGroupToOtherAxis={groupIndex =>
-                        handleMoveGroupToOtherAxis(
-                          'columnGroups',
-                          groupIndex,
-                          form,
-                        )
-                      }
-                      onReorderingList={toggleReadOnly}
-                    />
+                      <DragDropContext
+                        onDragEnd={result => {
+                          handleDragEnd({ result, form });
+                          toggleGroupDraggingActive(false);
+                        }}
+                        onDragStart={() => {
+                          toggleGroupDraggingActive(true);
+                        }}
+                      >
+                        <FormGroup className="govuk-!-margin-bottom-4">
+                          <TableHeadersAxis
+                            id="columnGroups"
+                            legend="Move column headers"
+                            name="columnGroups"
+                            onMoveGroupDown={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'columnGroups',
+                                form,
+                                direction: 'down',
+                              });
+                            }}
+                            onMoveGroupUp={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'columnGroups',
+                                form,
+                                direction: 'up',
+                              });
+                            }}
+                            onMoveGroupToOtherAxis={groupIndex => {
+                              handleMoveGroupToOtherAxis({
+                                groupIndex,
+                                sourceId: 'columnGroups',
+                                form,
+                              });
+                            }}
+                          />
 
-                    <FormFieldSortableListGroup<
-                      PickByType<TableHeadersConfig, Filter[][]>
-                    >
-                      isDraggingGroup={isDraggingGroup}
-                      legend="Move row headers"
-                      name="rowGroups"
-                      readOnly={readOnly}
-                      onChangeReorderingType={handleSwitchReorderingType}
-                      onMoveGroupToOtherAxis={groupIndex =>
-                        handleMoveGroupToOtherAxis(
-                          'rowGroups',
-                          groupIndex,
-                          form,
-                        )
-                      }
-                      onReorderingList={toggleReadOnly}
-                    />
-                  </FormGroup>
-                </DragDropContext>
+                          <TableHeadersAxis
+                            id="rowGroups"
+                            legend="Move row headers"
+                            name="rowGroups"
+                            onMoveGroupDown={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'rowGroups',
+                                form,
+                                direction: 'down',
+                              });
+                            }}
+                            onMoveGroupUp={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'rowGroups',
+                                form,
+                                direction: 'up',
+                              });
+                            }}
+                            onMoveGroupToOtherAxis={groupIndex => {
+                              handleMoveGroupToOtherAxis({
+                                groupIndex,
+                                sourceId: 'rowGroups',
+                                form,
+                              });
+                            }}
+                          />
+                        </FormGroup>
+                      </DragDropContext>
 
-                <Button
-                  ariaControls={id}
-                  ariaExpanded={showTableHeadersForm}
-                  className="govuk-!-margin-left-5 govuk-!-margin-top-3"
-                  type="submit"
-                >
-                  Update and view reordered table
-                </Button>
-              </Form>
-            );
-          }}
-        </Formik>
-      </div>
+                      <Button
+                        ariaControls={id}
+                        ariaExpanded
+                        className="govuk-!-margin-left-5 govuk-!-margin-top-3"
+                        type="submit"
+                      >
+                        Update and view reordered table
+                      </Button>
+                    </RHFForm>
+                  );
+                }}
+              </FormProvider>
+            </div>
+          )}
 
-      <div
-        aria-live="assertive"
-        aria-atomic="true"
-        aria-relevant="additions"
-        className="govuk-visually-hidden"
-      >
-        {screenReaderMessage}
-      </div>
-    </>
+          <ScreenReaderMessage message={screenReaderMessage} />
+        </>
+      )}
+    </TableHeadersContextProvider>
   );
-};
-
-export default TableHeadersForm;
+}
