@@ -121,6 +121,13 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.Local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
