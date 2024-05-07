@@ -14,39 +14,46 @@ public class LocationOptionMetaJsonConverter : JsonConverter<LocationOptionMetaV
     {
         if (!JsonDocument.TryParseValue(ref reader, out var doc))
         {
-            throw new JsonException("Failed to parse JsonDocument");
+            throw new JsonException();
         }
 
-        var rootElement = doc.RootElement.GetRawText();
-
-        var propertyNames = doc.RootElement
-            .EnumerateObject()
-            .Select(p => char.ToUpper(p.Name[0]) + p.Name[1..])
-            .ToHashSet();
-
-        if (propertyNames.Contains(nameof(LocationSchoolOptionMetaViewModel.Urn))
-            && propertyNames.Contains(nameof(LocationSchoolOptionMetaViewModel.LaEstab)))
+        try
         {
-            return JsonSerializer.Deserialize<LocationSchoolOptionMetaViewModel>(rootElement, options)!;
-        }
+            var rootElement = doc.RootElement.GetRawText();
 
-        if (propertyNames.Contains(nameof(LocationProviderOptionMetaViewModel.Ukprn)))
+            var propertyNames = doc.RootElement
+                .EnumerateObject()
+                .Select(p => char.ToUpper(p.Name[0]) + p.Name[1..])
+                .ToHashSet();
+
+            if (propertyNames.Contains(nameof(LocationSchoolOptionMetaViewModel.Urn))
+                && propertyNames.Contains(nameof(LocationSchoolOptionMetaViewModel.LaEstab)))
+            {
+                return JsonSerializer.Deserialize<LocationSchoolOptionMetaViewModel>(rootElement, options)!;
+            }
+
+            if (propertyNames.Contains(nameof(LocationProviderOptionMetaViewModel.Ukprn)))
+            {
+                return JsonSerializer.Deserialize<LocationProviderOptionMetaViewModel>(rootElement, options)!;
+            }
+
+            if (propertyNames.Contains(nameof(LocationLocalAuthorityOptionMetaViewModel.Code))
+                && propertyNames.Contains(nameof(LocationLocalAuthorityOptionMetaViewModel.OldCode)))
+            {
+                return JsonSerializer.Deserialize<LocationLocalAuthorityOptionMetaViewModel>(rootElement, options)!;
+            }
+
+            if (propertyNames.Contains(nameof(LocationCodedOptionMetaViewModel.Code)))
+            {
+                return JsonSerializer.Deserialize<LocationCodedOptionMetaViewModel>(rootElement, options)!;
+            }
+
+            return JsonSerializer.Deserialize<LocationRscRegionOptionMetaViewModel>(rootElement, options)!;
+        }
+        catch (JsonException exception)
         {
-            return JsonSerializer.Deserialize<LocationProviderOptionMetaViewModel>(rootElement, options)!;
+            throw new JsonException(message: null, exception);
         }
-
-        if (propertyNames.Contains(nameof(LocationLocalAuthorityOptionMetaViewModel.Code))
-            && propertyNames.Contains(nameof(LocationLocalAuthorityOptionMetaViewModel.OldCode)))
-        {
-            return JsonSerializer.Deserialize<LocationLocalAuthorityOptionMetaViewModel>(rootElement, options)!;
-        }
-
-        if (propertyNames.Contains(nameof(LocationCodedOptionMetaViewModel.Code)))
-        {
-            return JsonSerializer.Deserialize<LocationCodedOptionMetaViewModel>(rootElement, options)!;
-        }
-
-        return JsonSerializer.Deserialize<LocationRscRegionOptionMetaViewModel>(rootElement, options)!;
     }
 
     public override void Write(Utf8JsonWriter writer, LocationOptionMetaViewModel? value, JsonSerializerOptions options)
@@ -57,30 +64,30 @@ public class LocationOptionMetaJsonConverter : JsonConverter<LocationOptionMetaV
             return;
         }
 
-        var jsonSerializerOptions = new JsonSerializerOptions(options)
+        try
         {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        switch (value)
+            switch (value)
+            {
+                case LocationSchoolOptionMetaViewModel:
+                    JsonSerializer.Serialize(writer, value, typeof(LocationSchoolOptionMetaViewModel), options);
+                    break;
+                case LocationRscRegionOptionMetaViewModel:
+                    JsonSerializer.Serialize(writer, value, typeof(LocationRscRegionOptionMetaViewModel), options);
+                    break;
+                case LocationProviderOptionMetaViewModel:
+                    JsonSerializer.Serialize(writer, value, typeof(LocationProviderOptionMetaViewModel), options);
+                    break;
+                case LocationLocalAuthorityOptionMetaViewModel:
+                    JsonSerializer.Serialize(writer, value, typeof(LocationLocalAuthorityOptionMetaViewModel), options);
+                    break;
+                case LocationCodedOptionMetaViewModel:
+                    JsonSerializer.Serialize(writer, value, typeof(LocationCodedOptionMetaViewModel), options);
+                    break;
+            }
+        }
+        catch (JsonException exception)
         {
-            case LocationSchoolOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationSchoolOptionMetaViewModel), jsonSerializerOptions);
-                break;
-            case LocationRscRegionOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationRscRegionOptionMetaViewModel), jsonSerializerOptions);
-                break;
-            case LocationProviderOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationProviderOptionMetaViewModel), jsonSerializerOptions);
-                break;
-            case LocationLocalAuthorityOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationLocalAuthorityOptionMetaViewModel), jsonSerializerOptions);
-                break;
-            case LocationCodedOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationCodedOptionMetaViewModel), jsonSerializerOptions);
-                break;
-            default:
-                throw new JsonException();
+            throw new JsonException(message: null, exception);
         }
     }
 }
