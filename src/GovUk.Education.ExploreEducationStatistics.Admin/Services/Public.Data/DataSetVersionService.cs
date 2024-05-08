@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
@@ -16,7 +17,8 @@ public class DataSetVersionService(
     PublicDataDbContext publicDataDbContext) 
     : IDataSetVersionService
 {
-    public async Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(Guid releaseVersionId)
+    public async Task<Either<ActionResult, List<DataSetVersionStatusViewModel>>> ListStatusesForReleaseVersion(
+        Guid releaseVersionId)
     {
         var releaseFileIds = await contentDbContext
             .ReleaseFiles
@@ -28,7 +30,7 @@ public class DataSetVersionService(
             .DataSetVersions
             .Where(dataSetVersion => releaseFileIds.Contains(dataSetVersion.ReleaseFileId))
             .Include(dataSetVersion => dataSetVersion.DataSet)
-            .Select(dataSetVersion => new DataSetVersionStatusSummary(
+            .Select(dataSetVersion => new DataSetVersionStatusViewModel(
                 dataSetVersion.Id,
                 dataSetVersion.DataSet.Title,
                 dataSetVersion.Status)
@@ -37,4 +39,4 @@ public class DataSetVersionService(
     }
 }
 
-public record DataSetVersionStatusSummary(Guid Id, string Title, DataSetVersionStatus Status);
+public record DataSetVersionStatusViewModel(Guid Id, string Title, DataSetVersionStatus Status);

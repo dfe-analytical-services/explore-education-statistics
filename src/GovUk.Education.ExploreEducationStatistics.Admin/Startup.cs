@@ -71,6 +71,8 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Mvc;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -755,9 +757,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
     internal class NoOpDataSetVersionService : IDataSetVersionService
     {
-        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(Guid releaseVersionId)
+        public Task<List<DataSetVersionStatusViewModel>> GetStatusesForReleaseVersion(Guid _)
         {
-            return Task.FromResult(new List<DataSetVersionStatusSummary>());
-        } 
+            return Task.FromResult(new List<DataSetVersionStatusViewModel>());
+        }
+
+        public async Task<Either<ActionResult, List<DataSetVersionStatusViewModel>>> ListStatusesForReleaseVersion(Guid _)
+        {
+            return await Task.FromResult(new List<DataSetVersionStatusViewModel>());
+        }
     }
 }

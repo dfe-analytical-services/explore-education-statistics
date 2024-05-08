@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion)
+        public async Task<Either<ActionResult, List<ReleaseChecklistIssue>>> GetErrors(ReleaseVersion releaseVersion)
         {
             var errors = new List<ReleaseChecklistIssue>();
 
@@ -131,35 +131,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
             }
-            
-            var dataSetVersionStatuses = 
-                await _dataSetVersionService.GetStatusesForReleaseVersion(releaseVersion.Id);
-            
-            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Processing))
-            {
-                errors.Add(new ReleaseChecklistIssue(
-                    ValidationErrorMessages.PublicApiDataSetImportsMustBeCompleted));
-            }
-            
-            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Cancelled))
-            {
-                errors.Add(new ReleaseChecklistIssue(
-                    ValidationErrorMessages.PublicApiDataSetCancellationsMustBeResolved));
-            }
-            
-            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Failed))
-            {
-                errors.Add(new ReleaseChecklistIssue(
-                    ValidationErrorMessages.PublicApiDataSetFailuresMustBeResolved));
-            }
-            
-            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Mapping))
-            {
-                errors.Add(new ReleaseChecklistIssue(
-                    ValidationErrorMessages.PublicApiDataSetMappingsMustBeCompleted));
-            }
 
-            return errors;
+            return (await _dataSetVersionService
+                    .ListStatusesForReleaseVersion(releaseVersion.Id))
+                .OnSuccess(dataSetVersionStatuses =>
+                {
+                    if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Processing))
+                    {
+                        errors.Add(new ReleaseChecklistIssue(
+                            ValidationErrorMessages.PublicApiDataSetImportsMustBeCompleted));
+                    }
+
+                    if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Cancelled))
+                    {
+                        errors.Add(new ReleaseChecklistIssue(
+                            ValidationErrorMessages.PublicApiDataSetCancellationsMustBeResolved));
+                    }
+
+                    if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Failed))
+                    {
+                        errors.Add(new ReleaseChecklistIssue(
+                            ValidationErrorMessages.PublicApiDataSetFailuresMustBeResolved));
+                    }
+
+                    if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Mapping))
+                    {
+                        errors.Add(new ReleaseChecklistIssue(
+                            ValidationErrorMessages.PublicApiDataSetMappingsMustBeCompleted));
+                    }
+
+                    return errors;
+                });
         }
 
         private async Task<bool> ReleaseHasKeyStatistic(Guid releaseVersionId)

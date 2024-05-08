@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -68,7 +69,9 @@ public class DataSetVersionServiceTests(TestApplicationFactory testApp) : Integr
 
             var service = testApp.Services.GetRequiredService<IDataSetVersionService>();
 
-            Assert.Empty(await service.GetStatusesForReleaseVersion(unrelatedReleaseVersion));
+            var result = await service.ListStatusesForReleaseVersion(unrelatedReleaseVersion);
+            
+            Assert.Empty(result.AssertRight());
         }
 
         private async Task AssertDataSetVersionStatusReturnedOk(DataSetVersionStatus status)
@@ -102,7 +105,9 @@ public class DataSetVersionServiceTests(TestApplicationFactory testApp) : Integr
 
             var service = testApp.Services.GetRequiredService<IDataSetVersionService>();
 
-            var statusSummary = Assert.Single(await service.GetStatusesForReleaseVersion(dataFile.ReleaseVersionId));
+            var result = await service.ListStatusesForReleaseVersion(dataFile.ReleaseVersionId);
+            
+            var statusSummary = Assert.Single(result.AssertRight());
             Assert.Equal(dataSetVersion.Id, statusSummary.Id);
             Assert.Equal(dataSetVersion.DataSet.Title, statusSummary.Title);
             Assert.Equal(status, statusSummary.Status);

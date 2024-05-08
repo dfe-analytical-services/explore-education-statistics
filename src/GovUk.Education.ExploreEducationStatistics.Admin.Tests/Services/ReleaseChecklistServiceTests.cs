@@ -155,21 +155,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
                     .ReturnsAsync([
-                        new DataSetVersionStatusSummary(
+                        new DataSetVersionStatusViewModel(
                             Id: Guid.NewGuid(),
                             Title: "Data set 1",
                             Status: DataSetVersionStatus.Cancelled),
-                        new DataSetVersionStatusSummary(
+                        new DataSetVersionStatusViewModel(
                             Id: Guid.NewGuid(),
                             Title: "Data set 2",
                             Status: DataSetVersionStatus.Mapping),
-                        new DataSetVersionStatusSummary(
+                        new DataSetVersionStatusViewModel(
                             Id: Guid.NewGuid(),
                             Title: "Data set 3",
                             Status: DataSetVersionStatus.Processing),
-                        new DataSetVersionStatusSummary(
+                        new DataSetVersionStatusViewModel(
                             Id: Guid.NewGuid(),
                             Title: "Data set 4",
                             Status: DataSetVersionStatus.Failed),
@@ -258,7 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
                 
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
                     .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
@@ -376,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
                 
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
                     .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
                 
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
                     .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
@@ -670,7 +670,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
                     .ReturnsAsync(new[]
                         {
                             DataSetVersionStatus.Draft, 
@@ -678,7 +678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             DataSetVersionStatus.Published, 
                             DataSetVersionStatus.Deprecated
                         }
-                        .Select(status => new DataSetVersionStatusSummary(
+                        .Select(status => new DataSetVersionStatusViewModel(
                             Id: Guid.NewGuid(),
                             Title: "",
                             Status: status))
