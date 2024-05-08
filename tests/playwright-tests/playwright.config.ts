@@ -20,7 +20,7 @@ function appendBasicAuthCredentialsToPublic(pubUrl: string) {
     return { username, password };
   }
 
-  return null;
+  return undefined;
 }
 
 /**
