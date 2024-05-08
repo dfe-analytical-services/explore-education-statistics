@@ -10,14 +10,14 @@ public class DuckDbConnection(string connectionString = DuckDBConnectionStringBu
         return new DuckDbConnection($"DataSource={filename}");
     }
 
-    public override DuckDBCommand CreateCommand()
+    public override DuckDbCommand CreateCommand()
     {
         // Bit rubbish to do this but we don't have access to the
         // underlying `Transaction` so we need to get a reference
         // to it through by creating a base command object first.
         var wrappedCommand = base.CreateCommand();
 
-        return new DuckDBCommand
+        return new DuckDbCommand
         {
             Connection = this,
             Transaction = wrappedCommand.Transaction
