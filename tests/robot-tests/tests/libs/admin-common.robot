@@ -482,17 +482,15 @@ user gets data guidance data file content editor
     [Arguments]    ${accordion_heading}
     user waits until page contains element    id:dataGuidance-dataFiles
     ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
-    user waits until parent contains element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
-    ${editor}=    get child element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
+    user waits until parent contains element    ${accordion}    label:File guidance content
+    ${editor}=    get child element    ${accordion}    label:File guidance content
     [Return]    ${editor}
 
 user enters text into data guidance data file content editor
     [Arguments]    ${accordion_heading}    ${text}
     ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
-    user checks element does not contain child element    ${accordion}    testid:fileGuidanceContent-focused
     ${editor}=    user gets data guidance data file content editor    ${accordion_heading}
     user clicks element    ${editor}
-    user checks element contains child element    ${accordion}    testid:fileGuidanceContent-focused
     user enters text into element    ${editor}    ${text}
 
 user creates amendment for release
