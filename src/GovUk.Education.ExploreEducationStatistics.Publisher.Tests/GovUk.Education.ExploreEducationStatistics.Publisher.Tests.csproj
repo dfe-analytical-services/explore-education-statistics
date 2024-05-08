@@ -34,4 +34,10 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="appsettings.IntegrationTest.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>
