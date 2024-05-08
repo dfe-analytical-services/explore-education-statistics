@@ -12,11 +12,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -922,10 +923,10 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             var processorClient = new Mock<IProcessorClient>();
             processorClient
-                .Setup(c => c.Process(
+                .Setup(c => c.CreateInitialDataSetVersion(
                     releaseFileId,
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new ProcessorTriggerResponseViewModel
+                .ReturnsAsync(new CreateInitialDataSetVersionResponseViewModel
                 {
                     DataSetVersionId = dataSetVersionId,
                     InstanceId = Guid.NewGuid()
@@ -964,11 +965,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(
-                    filters: 1,
-                    indicators: 1,
-                    locations: 1,
-                    timePeriods: 2)
+                .DefaultDataSetVersion()
                 .WithStatus(dataSetVersionStatus)
                 .WithReleaseFileId(releaseFileId)
                 .WithDataSet(dataSet);
@@ -988,6 +985,16 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
 
             Assert.Equal(releaseFileId.ToString(), errorDetail["value"].GetString());
+        }
+
+        [Fact]
+        public async Task ReleaseFileIdIsEmpty_Returns400()
+        {
+            var response = await CreateDataSetVersion(Guid.Empty);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = validationProblem.AssertHasNotEmptyError("releaseFileId");
         }
 
         private WebApplicationFactory<TestStartup> BuildApp(

@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -8,6 +9,7 @@ using RichardSzalay.MockHttp;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Public.Data;
@@ -26,14 +28,14 @@ public class ProcessorClientTests
         _processorClient = new ProcessorClient(Mock.Of<ILogger<ProcessorClient>>(), client);
     }
 
-    public class ProcessTests : ProcessorClientTests
+    public class CreateInitialDataSetVersionTests : ProcessorClientTests
     {
-        private static readonly Uri Uri = new(BaseUri, "api/orchestrators/processor");
+        private static readonly Uri Uri = new(BaseUri, "api/CreateInitialDataSetVersion");
 
         [Fact]
-        public async Task HttpClientAccepted_ReturnsPublications()
+        public async Task HttpClientSuccess()
         {
-            var responseBody = new ProcessorTriggerResponseViewModel
+            var responseBody = new CreateInitialDataSetVersionResponseViewModel
             {
                 DataSetVersionId = Guid.NewGuid(),
                 InstanceId = Guid.NewGuid()
@@ -42,13 +44,51 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
 
-            var response = await _processorClient.Process(releaseFileId: It.IsAny<Guid>());
+            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var right = response.AssertRight();
             Assert.Equal(responseBody.DataSetVersionId, right.DataSetVersionId);
             Assert.Equal(responseBody.InstanceId, right.InstanceId);
+        }
+
+        [Fact]
+        public async Task HttpClientBadRequest_ReturnsBadRequest()
+        {
+            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
+                .Respond(
+                    HttpStatusCode.BadRequest,
+                    JsonContent.Create(new ValidationProblemViewModel
+                    {
+                        Errors = new ErrorViewModel[]
+                        {
+                            new() {
+                               Code = Errors.Error1.ToString()
+                            }
+                        }
+                    }));
+
+            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            left.AssertValidationProblem(Errors.Error1);
+        }
+
+        [Fact]
+        public async Task HttpClientNotFound_ReturnsNotFound()
+        {
+            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
+                .Respond(HttpStatusCode.NotFound);
+
+            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            left.AssertNotFoundResult();
         }
 
         [Theory]
@@ -60,7 +100,6 @@ public class ProcessorClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        [InlineData(HttpStatusCode.BadRequest)]
         public async Task HttpClientFailureStatusCode_ThrowsException(
             HttpStatusCode responseStatusCode)
         {
@@ -69,10 +108,15 @@ public class ProcessorClientTests
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _processorClient.Process(releaseFileId: It.IsAny<Guid>());
+                await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        private enum Errors
+        {
+            Error1,
         }
     }
 }

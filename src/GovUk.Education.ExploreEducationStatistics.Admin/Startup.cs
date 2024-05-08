@@ -69,6 +69,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
@@ -105,6 +106,7 @@ using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Serv
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
@@ -464,8 +466,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
             services.AddTransient<Services.Interfaces.Public.Data.IReleaseService, Services.Public.Data.ReleaseService>();
-
-            services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
 
             services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
             {

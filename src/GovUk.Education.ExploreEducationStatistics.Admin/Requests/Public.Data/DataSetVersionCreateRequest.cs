@@ -2,7 +2,6 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
@@ -13,13 +12,15 @@ public record DataSetVersionCreateRequest
 
     public class Validator : AbstractValidator<DataSetVersionCreateRequest>
     {
-        public Validator(IDataSetVersionRepository dataSetVersionRepository)
+        public Validator(IDataSetVersionService dataSetVersionService)
         {
-            RuleFor(request => request.ReleaseFileId).MustAsync(async (releaseFileId, cancellationToken) => 
-                    await dataSetVersionRepository.GetByReleaseFileId(
+            RuleFor(request => request.ReleaseFileId)
+                .NotEmpty()
+                .MustAsync(async (releaseFileId, cancellationToken) => 
+                    await dataSetVersionService.HasExistingVersion(
                         releaseFileId: releaseFileId,
                         cancellationToken: cancellationToken)
-                    is null)
+                    is false)
                 .WithErrorCode(ValidationMessages.HasExistingApiDataSetVersion.Code)
                 .WithMessage(ValidationMessages.HasExistingApiDataSetVersion.Message);
         }

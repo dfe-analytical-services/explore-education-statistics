@@ -2,11 +2,13 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
@@ -16,22 +18,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
 internal class ProcessorClient(ILogger<ProcessorClient> logger, HttpClient httpClient) : IProcessorClient
 {
-    public async Task<Either<ActionResult, ProcessorTriggerResponseViewModel>> Process(
+    public async Task<Either<ActionResult, CreateInitialDataSetVersionResponseViewModel>> CreateInitialDataSetVersion(
         Guid releaseFileId, 
         CancellationToken cancellationToken = default)
     {
-        var request = new ProcessorTriggerRequest
+        var request = new InitialDataSetVersionCreateRequest
         {
             ReleaseFileId = releaseFileId,
         };
 
         var response = await httpClient
-            .PostAsJsonAsync("api/orchestrators/processor", request, cancellationToken: cancellationToken);
+            .PostAsJsonAsync("api/CreateInitialDataSetVersion", request, cancellationToken: cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
             switch (response.StatusCode)
             {
+                case HttpStatusCode.BadRequest:
+                    return new BadRequestObjectResult(
+                        await response.Content
+                            .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
+                    );
+                case HttpStatusCode.NotFound:
+                    return new NotFoundResult();
                 default:
                     var message = await response.Content.ReadAsStringAsync(cancellationToken);
                     logger.LogError(
@@ -45,7 +54,7 @@ internal class ProcessorClient(ILogger<ProcessorClient> logger, HttpClient httpC
             }
         }
 
-        var content = await response.Content.ReadFromJsonAsync<ProcessorTriggerResponseViewModel>(
+        var content = await response.Content.ReadFromJsonAsync<CreateInitialDataSetVersionResponseViewModel>(
                 cancellationToken: cancellationToken
             );
 
