@@ -53,6 +53,32 @@ public record DataSetQueryCriteriaLocations
             .ToHashSet();
     }
 
+    public static DataSetQueryCriteriaLocations Create(
+        string comparator,
+        IList<DataSetQueryLocation> locations)
+    {
+        return comparator switch
+        {
+            nameof(Eq) => new DataSetQueryCriteriaLocations
+            {
+                Eq = locations.Count > 0 ? locations[0] : null
+            },
+            nameof(NotEq) => new DataSetQueryCriteriaLocations
+            {
+                NotEq = locations.Count > 0 ? locations[0] : null
+            },
+            nameof(In) => new DataSetQueryCriteriaLocations
+            {
+                In = locations.ToList()
+            },
+            nameof(NotIn) => new DataSetQueryCriteriaLocations
+            {
+                NotIn = locations.ToList()
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+        };
+    }
+
     public class Validator : AbstractValidator<DataSetQueryCriteriaLocations>
     {
         public Validator()

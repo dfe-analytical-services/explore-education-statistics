@@ -70,6 +70,48 @@ public record DataSetQueryCriteriaTimePeriods
             .ToHashSet();
     }
 
+    public static DataSetQueryCriteriaTimePeriods Create(
+        string comparator,
+        IList<DataSetQueryTimePeriod> timePeriods)
+    {
+        return comparator switch
+        {
+            nameof(Eq) => new DataSetQueryCriteriaTimePeriods
+            {
+                Eq = timePeriods.Count > 0 ? timePeriods[0] : null
+            },
+            nameof(NotEq) => new DataSetQueryCriteriaTimePeriods
+            {
+                NotEq = timePeriods.Count > 0 ? timePeriods[0] : null
+            },
+            nameof(In) => new DataSetQueryCriteriaTimePeriods
+            {
+                In = timePeriods.ToList()
+            },
+            nameof(NotIn) => new DataSetQueryCriteriaTimePeriods
+            {
+                NotIn = timePeriods.ToList()
+            },
+            nameof(Gt) => new DataSetQueryCriteriaTimePeriods
+            {
+                Gt = timePeriods.Count > 0 ? timePeriods[0] : null
+            },
+            nameof(Gte) => new DataSetQueryCriteriaTimePeriods
+            {
+                Gte = timePeriods.Count > 0 ? timePeriods[0] : null
+            },
+            nameof(Lt) => new DataSetQueryCriteriaTimePeriods
+            {
+                Lt = timePeriods.Count > 0 ? timePeriods[0] : null
+            },
+            nameof(Lte) => new DataSetQueryCriteriaTimePeriods
+            {
+                Lte = timePeriods.Count > 0 ? timePeriods[0] : null
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+        };
+    }
+
     public class Validator : AbstractValidator<DataSetQueryCriteriaTimePeriods>
     {
         public Validator()

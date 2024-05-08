@@ -42,6 +42,32 @@ public record DataSetQueryCriteriaFilters
             .ToHashSet();
     }
 
+    public static DataSetQueryCriteriaFilters Create(
+        string comparator,
+        IList<string> optionIds)
+    {
+        return comparator switch
+        {
+            nameof(Eq) => new DataSetQueryCriteriaFilters
+            {
+                Eq = optionIds.Count > 0 ? optionIds[0] : null
+            },
+            nameof(NotEq) => new DataSetQueryCriteriaFilters
+            {
+                NotEq = optionIds.Count > 0 ? optionIds[0] : null
+            },
+            nameof(In) => new DataSetQueryCriteriaFilters
+            {
+                In = optionIds.ToList()
+            },
+            nameof(NotIn) => new DataSetQueryCriteriaFilters
+            {
+                NotIn = optionIds.ToList()
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+        };
+    }
+
     public class Validator : AbstractValidator<DataSetQueryCriteriaFilters>
     {
         public Validator()

@@ -59,7 +59,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, [])
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, [])
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -96,7 +96,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -128,7 +128,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -171,7 +171,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -222,7 +222,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -274,7 +274,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -313,7 +313,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -371,7 +371,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, [])
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, Array.Empty<string>())
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -399,7 +399,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -426,7 +426,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -465,7 +465,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -500,7 +500,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -541,7 +541,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -596,7 +596,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, [])
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, [])
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -651,7 +651,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocation)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocation)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -689,7 +689,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocation),
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocation),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -742,7 +742,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -796,7 +796,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
 
@@ -849,7 +849,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -897,7 +897,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -956,7 +956,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, [])
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, [])
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -994,7 +994,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1032,7 +1032,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1078,7 +1078,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1120,7 +1120,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1171,7 +1171,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1251,10 +1251,10 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters("Eq", []),
-                GeographicLevels = CreateCriteriaGeographicLevels("In", []),
-                Locations = CreateCriteriaLocations("NotEq", []),
-                TimePeriods = CreateCriteriaTimePeriods("Gt", []),
+                Filters = DataSetQueryCriteriaFilters.Create("Eq", []),
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create("In", Array.Empty<string>()),
+                Locations = DataSetQueryCriteriaLocations.Create("NotEq", []),
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create("Gt", []),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1325,10 +1325,10 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters("Eq", queryFilterOptionIds),
-                GeographicLevels = CreateCriteriaGeographicLevels("In", geographicLevels),
-                Locations = CreateCriteriaLocations("NotEq", queryLocations),
-                TimePeriods = CreateCriteriaTimePeriods("Gt", queryTimePeriods),
+                Filters = DataSetQueryCriteriaFilters.Create("Eq", queryFilterOptionIds),
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create("In", geographicLevels),
+                Locations = DataSetQueryCriteriaLocations.Create("NotEq", queryLocations),
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create("Gt", queryTimePeriods),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1415,10 +1415,10 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters("NotIn", queryFilterOptionIds),
-                GeographicLevels = CreateCriteriaGeographicLevels("NotIn", geographicLevels),
-                Locations = CreateCriteriaLocations("In", queryLocations),
-                TimePeriods = CreateCriteriaTimePeriods("In", queryTimePeriods),
+                Filters = DataSetQueryCriteriaFilters.Create("NotIn", queryFilterOptionIds),
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create("NotIn", geographicLevels),
+                Locations = DataSetQueryCriteriaLocations.Create("In", queryLocations),
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create("In", queryTimePeriods),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -2238,14 +2238,14 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters("In", ["invalidFilter"]),
-                Locations = CreateCriteriaLocations(
+                Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                Locations = DataSetQueryCriteriaLocations.Create(
                     "In",
                     [
                         new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
                     ]
                 ),
-                TimePeriods = CreateCriteriaTimePeriods(
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
                     "In",
                     [
                         new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
@@ -2276,14 +2276,14 @@ public abstract class DataSetQueryParserTests
                 [
                     new DataSetQueryCriteriaFacets
                     {
-                        Filters = CreateCriteriaFilters("In", ["invalidFilter"]),
-                        Locations = CreateCriteriaLocations(
+                        Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                        Locations = DataSetQueryCriteriaLocations.Create(
                             "In",
                             [
                                 new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
                             ]
                         ),
-                        TimePeriods = CreateCriteriaTimePeriods(
+                        TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
                             "In",
                             [
                                 new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
@@ -2316,14 +2316,14 @@ public abstract class DataSetQueryParserTests
                 [
                     new DataSetQueryCriteriaFacets
                     {
-                        Filters = CreateCriteriaFilters("In", ["invalidFilter"]),
-                        Locations = CreateCriteriaLocations(
+                        Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                        Locations = DataSetQueryCriteriaLocations.Create(
                             "In",
                             [
                                 new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
                             ]
                         ),
-                        TimePeriods = CreateCriteriaTimePeriods(
+                        TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
                             "In",
                             [
                                 new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
@@ -2354,14 +2354,14 @@ public abstract class DataSetQueryParserTests
             {
                 Not = new DataSetQueryCriteriaFacets
                 {
-                    Filters = CreateCriteriaFilters("In", ["invalidFilter"]),
-                    Locations = CreateCriteriaLocations(
+                    Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                    Locations = DataSetQueryCriteriaLocations.Create(
                         "In",
                         [
                             new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
                         ]
                     ),
-                    TimePeriods = CreateCriteriaTimePeriods(
+                    TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
                         "In",
                         [
                             new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
@@ -2395,14 +2395,14 @@ public abstract class DataSetQueryParserTests
                     {
                         Not = new DataSetQueryCriteriaFacets
                         {
-                            Filters = CreateCriteriaFilters("In", ["invalidFilter"]),
-                            Locations = CreateCriteriaLocations(
+                            Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                            Locations = DataSetQueryCriteriaLocations.Create(
                                 "In",
                                 [
                                     new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
                                 ]
                             ),
-                            TimePeriods = CreateCriteriaTimePeriods(
+                            TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
                                 "In",
                                 [
                                     new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
@@ -2416,14 +2416,14 @@ public abstract class DataSetQueryParserTests
                         [
                             new DataSetQueryCriteriaFacets
                             {
-                                Filters = CreateCriteriaFilters("In", ["invalidFilter"]),
-                                Locations = CreateCriteriaLocations(
+                                Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                                Locations = DataSetQueryCriteriaLocations.Create(
                                     "In",
                                     [
                                         new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
                                     ]
                                 ),
-                                TimePeriods = CreateCriteriaTimePeriods(
+                                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
                                     "In",
                                     [
                                         new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
@@ -2455,94 +2455,6 @@ public abstract class DataSetQueryParserTests
             _dataFixture.DefaultDataSetVersionMetaSummary()
                 .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.Region])
         );
-
-    private static DataSetQueryCriteriaFilters CreateCriteriaFilters(
-        string comparator,
-        IReadOnlyList<string> filterOptionIds)
-    {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaFilters.Eq) =>
-                new DataSetQueryCriteriaFilters { Eq = filterOptionIds.Count > 0 ? filterOptionIds[0] : null },
-            nameof(DataSetQueryCriteriaFilters.NotEq) =>
-                new DataSetQueryCriteriaFilters { NotEq = filterOptionIds.Count > 0 ? filterOptionIds[0] : null },
-            nameof(DataSetQueryCriteriaFilters.In) =>
-                new DataSetQueryCriteriaFilters { In = filterOptionIds },
-            nameof(DataSetQueryCriteriaFilters.NotIn) =>
-                new DataSetQueryCriteriaFilters { NotIn = filterOptionIds },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
-
-    private static DataSetQueryCriteriaGeographicLevels CreateCriteriaGeographicLevels(
-        string comparator,
-        IReadOnlyList<GeographicLevel> geographicLevels)
-    {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaGeographicLevels.Eq) => new DataSetQueryCriteriaGeographicLevels
-            {
-                Eq = geographicLevels.Count > 0 ? geographicLevels[0].GetEnumValue() : null
-            },
-            nameof(DataSetQueryCriteriaGeographicLevels.NotEq) => new DataSetQueryCriteriaGeographicLevels
-            {
-                NotEq = geographicLevels.Count > 0 ? geographicLevels[0].GetEnumValue() : null
-            },
-            nameof(DataSetQueryCriteriaGeographicLevels.In) => new DataSetQueryCriteriaGeographicLevels
-            {
-                In = geographicLevels.Select(l => l.GetEnumValue()).ToList()
-            },
-            nameof(DataSetQueryCriteriaGeographicLevels.NotIn) => new DataSetQueryCriteriaGeographicLevels
-            {
-                NotIn = geographicLevels.Select(l => l.GetEnumValue()).ToList()
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
-
-    private static DataSetQueryCriteriaLocations CreateCriteriaLocations(
-        string comparator,
-        IReadOnlyList<DataSetQueryLocation> locations)
-    {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaLocations.Eq) =>
-                new DataSetQueryCriteriaLocations { Eq = locations.Count > 0 ? locations[0] : null },
-            nameof(DataSetQueryCriteriaLocations.NotEq) =>
-                new DataSetQueryCriteriaLocations { NotEq = locations.Count > 0 ? locations[0] : null },
-            nameof(DataSetQueryCriteriaLocations.In) =>
-                new DataSetQueryCriteriaLocations { In = locations },
-            nameof(DataSetQueryCriteriaLocations.NotIn) =>
-                new DataSetQueryCriteriaLocations { NotIn = locations },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
-
-    private static DataSetQueryCriteriaTimePeriods CreateCriteriaTimePeriods(
-        string comparator,
-        IReadOnlyList<DataSetQueryTimePeriod> timePeriods)
-    {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaTimePeriods.Eq) =>
-                new DataSetQueryCriteriaTimePeriods { Eq = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.NotEq) =>
-                new DataSetQueryCriteriaTimePeriods { NotEq = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.In) =>
-                new DataSetQueryCriteriaTimePeriods { In = timePeriods },
-            nameof(DataSetQueryCriteriaTimePeriods.NotIn) =>
-                new DataSetQueryCriteriaTimePeriods { NotIn = timePeriods },
-            nameof(DataSetQueryCriteriaTimePeriods.Gt) =>
-                new DataSetQueryCriteriaTimePeriods { Gt = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.Gte) =>
-                new DataSetQueryCriteriaTimePeriods { Gte = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.Lt) =>
-                new DataSetQueryCriteriaTimePeriods { Lt = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.Lte) =>
-                new DataSetQueryCriteriaTimePeriods { Lte = timePeriods.Count > 0 ? timePeriods[0] : null },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
 
     private static DataSetQueryLocation MapOptionToQueryLocation(ParquetLocationOption option)
     {

@@ -1,4 +1,5 @@
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
@@ -60,6 +61,37 @@ public record DataSetQueryCriteriaGeographicLevels
         return options
             .OfType<GeographicLevel>()
             .ToHashSet();
+    }
+
+    public static DataSetQueryCriteriaGeographicLevels Create(
+        string comparator,
+        IList<GeographicLevel> geographicLevels)
+        => Create(comparator, geographicLevels.Select(l => l.GetEnumValue()).ToList());
+
+    public static DataSetQueryCriteriaGeographicLevels Create(
+        string comparator,
+        IList<string> geographicLevels)
+    {
+        return comparator switch
+        {
+            nameof(Eq) => new DataSetQueryCriteriaGeographicLevels
+            {
+                Eq = geographicLevels.Count > 0 ? geographicLevels[0] : null
+            },
+            nameof(NotEq) => new DataSetQueryCriteriaGeographicLevels
+            {
+                NotEq = geographicLevels.Count > 0 ? geographicLevels[0] : null
+            },
+            nameof(In) => new DataSetQueryCriteriaGeographicLevels
+            {
+                In = geographicLevels.ToList()
+            },
+            nameof(NotIn) => new DataSetQueryCriteriaGeographicLevels
+            {
+                NotIn = geographicLevels.ToList()
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+        };
     }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaGeographicLevels>
