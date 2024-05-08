@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Testcontainers.PostgreSql;
@@ -47,6 +48,9 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         return base
             .ConfigureTestHostBuilder()
             .ConfigurePublisherHostBuilder()
+            .ConfigureAppConfiguration((hostBuilderContext, configBuilder) =>
+                configBuilder
+                    .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false))
             .ConfigureServices(services =>
             {
                 services.UseInMemoryDbContext<ContentDbContext>();
