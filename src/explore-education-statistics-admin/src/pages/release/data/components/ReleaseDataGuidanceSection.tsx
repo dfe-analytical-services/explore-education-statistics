@@ -1,4 +1,5 @@
 import releaseDataGuidanceService from '@admin/services/releaseDataGuidanceService';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
@@ -137,10 +138,9 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                   return (
                     <RHFForm id={formId} onSubmit={handleSubmit}>
                       {isEditing ? (
-                        <RHFFormFieldTextArea<DataGuidanceFormValues>
-                          label="Main guidance content"
+                        <RHFFormFieldEditor<DataGuidanceFormValues>
                           name="content"
-                          rows={3}
+                          label="Main guidance content"
                         />
                       ) : (
                         <>
