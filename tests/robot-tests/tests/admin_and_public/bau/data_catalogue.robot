@@ -183,7 +183,7 @@ Validate Related information section and links exist
     ...    ${relatedInformation}
 
 Validate data sets list
-    user checks list has x items    testid:data-set-file-list    10
+    user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    10
 
     ${dataSet}=    user gets testid element    data-set-file-summary-${SUBJECT_NAME_3}
 

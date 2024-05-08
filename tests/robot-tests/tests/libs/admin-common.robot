@@ -899,8 +899,7 @@ user updates free text key stat
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
     ...    ${guidance_title}
 
-    user clears element text    xpath://*[@data-testid="keyStat"][${tile_num}]//*[contains(@class, "ck-content")]
-    user presses keys    ${guidance_text}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]    ${guidance_text}
 
     user clicks button    Save
     user waits until page does not contain button    Save
@@ -941,9 +940,7 @@ user adds key statistic from data block
     user clicks element    xpath://*[@data-testid="keyStat"][last()]//button[contains(text(), "Edit")]
     user enters text into element    xpath://input[@name="trend"]    ${trend}
     user enters text into element    xpath://input[@name="guidanceTitle"]    ${guidance_title}
-
-    user clears element text    xpath://*[@data-testid="keyStat"][last()]//*[contains(@class, "ck-content")]
-    user presses keys    ${guidance_text}
+    user enters text into element    xpath://textarea[@name="guidanceText"]    ${guidance_text}
 
     user clicks button    Save
     user waits until page does not contain button    Save
