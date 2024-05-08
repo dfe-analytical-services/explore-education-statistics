@@ -9,17 +9,12 @@ function appendBasicAuthCredentialsToPublic(pubUrl: string) {
     return null;
   }
 
-  console.log(pubUrl);
-  console.log(PUBLIC_USERNAME);
-  console.log(PUBLIC_PASSWORD);
-
   const username = PUBLIC_USERNAME;
   const password = PUBLIC_PASSWORD;
 
   if (username && password) {
     return { username, password };
   }
-
   return undefined;
 }
 
