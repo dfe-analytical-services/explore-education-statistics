@@ -1,24 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Testcontainers.PostgreSql;
-using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 
-public abstract class PublisherFunctionsIntegrationTest
-    : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>
+public abstract class ProcessorFunctionsIntegrationTest : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>
 {
-    protected PublisherFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
+    protected ProcessorFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
     {
         ResetDbContext<ContentDbContext>();
         ClearTestData<PublicDataDbContext>();
@@ -26,7 +20,7 @@ public abstract class PublisherFunctionsIntegrationTest
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
+public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
@@ -46,10 +40,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
     {
         return base
             .ConfigureTestHostBuilder()
-            .ConfigurePublisherHostBuilder()
-            .ConfigureAppConfiguration((hostBuilderContext, configBuilder) =>
-                configBuilder
-                    .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false))
+            .ConfigureProcessorHostBuilder()
             .ConfigureServices(services =>
             {
                 services.UseInMemoryDbContext<ContentDbContext>();
@@ -68,16 +59,12 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
 
     protected override IEnumerable<Type> GetFunctionTypes()
     {
-        return [
-            typeof(NotifyChangeFunction),
-            typeof(PublishImmediateReleaseContentFunction),
-            typeof(PublishMethodologyFilesFunction),
-            typeof(PublishReleaseFilesFunction),
-            typeof(PublishScheduledReleasesFunction),
-            typeof(PublishTaxonomyFunction),
-            typeof(RetryReleasePublishingFunction),
-            typeof(StageReleaseContentFunction),
-            typeof(StageScheduledReleasesFunction)
+        return
+        [
+            typeof(CompleteProcessingFunction),
+            typeof(CreateInitialDataSetVersionFunction),
+            typeof(HandleProcessingFailureFunction),
+            typeof(ProcessInitialDataSetVersionFunction),
         ];
     }
 }

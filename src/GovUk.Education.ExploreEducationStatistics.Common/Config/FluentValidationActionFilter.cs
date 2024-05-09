@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
-using FluentValidation.Results;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -26,14 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Config;
 /// </summary>
 public class FluentValidationActionFilter : IAsyncActionFilter
 {
-    private static readonly HashSet<string> IgnoredMessagePlaceholders = new()
-    {
-        "PropertyName",
-        "PropertyPath",
-        "PropertyValue",
-        "CollectionIndex"
-    };
-
     public async Task OnActionExecutionAsync(
         ActionExecutingContext context,
         ActionExecutionDelegate next)
@@ -76,9 +66,7 @@ public class FluentValidationActionFilter : IAsyncActionFilter
                 continue;
             }
 
-            errors.AddRange(
-                validationResult.Errors.Select(failure => CreateErrorViewModel(failure))
-            );
+            errors.AddRange(validationResult.Errors.Select(ErrorViewModel.Create));
         }
 
         if (errors.Count != 0)
@@ -115,58 +103,5 @@ public class FluentValidationActionFilter : IAsyncActionFilter
         return bindingSource == BindingSource.Body ||
                bindingSource == BindingSource.Form ||
                bindingSource == BindingSource.Query;
-    }
-
-    private static ErrorViewModel CreateErrorViewModel(ValidationFailure failure)
-    {
-        var detail = GetErrorDetail(failure);
-
-        return new ErrorViewModel
-        {
-            Path = failure.PropertyName,
-            Code = failure.ErrorCode.Replace("Validator", ""),
-            Message = failure.ErrorMessage,
-            Detail = detail.Count > 0 ? detail : null
-        };
-    }
-
-    private static IDictionary<string, object?> GetErrorDetail(ValidationFailure failure)
-    {
-        var detail = (failure.FormattedMessagePlaceholderValues ?? [])
-            .Where(kv => !IgnoredMessagePlaceholders.Contains(kv.Key))
-            .ToDictionary(kv => kv.Key.ToLowerFirst(), kv => kv.Value)
-            as Dictionary<string, object?>;
-
-        if (!detail.ContainsKey("value"))
-        {
-            detail["value"] = failure.AttemptedValue;
-        }
-
-        if (failure.CustomState is null)
-        {
-            return detail;
-        }
-
-        var type = failure.CustomState.GetType();
-
-        if (type is { IsClass: true, IsPrimitive: false, IsEnum: false, IsValueType: false })
-        {
-            var customKeyValues = failure.CustomState
-                .ToDictionary()
-                .ToDictionary(
-                    kv => kv.Key.CamelCase(),
-                    kv => kv.Value);
-
-            foreach (var keyValue in customKeyValues)
-            {
-                detail[keyValue.Key] = keyValue.Value;
-            }
-        }
-        else
-        {
-            detail["state"] = failure.CustomState;
-        }
-
-        return detail;
     }
 }

@@ -185,7 +185,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    InstanceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Stage = table.Column<string>(type: "text", nullable: false),
+                    Completed = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -411,6 +413,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "IX_DataSetVersionImports_DataSetVersionId",
                 table: "DataSetVersionImports",
                 column: "DataSetVersionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSetVersionImports_InstanceId",
+                table: "DataSetVersionImports",
+                column: "InstanceId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataSetVersions_DataSetId_VersionNumber",
