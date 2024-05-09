@@ -66,6 +66,25 @@ param managedIdentityName string
 @description('Id of the owning Container App Environment')
 param managedEnvironmentId string
 
+@description('Volumes to mount within Containers - used in conjunction with "volumeMounts"')
+param volumes {
+  name: string
+  storageType: string
+  storageName: string
+  mountOptions: string?
+  secrets: {
+    path: string
+    secretRef: string
+  }[]?
+}[] = []
+
+@description('Volume mount points within Containers - used in conjunction with "volumes"')
+param volumeMounts {
+  mountPath: string
+  volumeName: string
+}[] = []
+
+
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 
@@ -115,6 +134,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             cpu: json(cpuCore)
             memory: '${memorySize}Gi'
           }
+          volumeMounts: volumeMounts
         }
       ]
       scale: {
@@ -131,6 +151,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           }
         ]
       }
+      volumes: volumes
     }
     workloadProfileName: 'Consumption'
   }

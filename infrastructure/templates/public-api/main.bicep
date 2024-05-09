@@ -86,6 +86,9 @@ var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
+var parquetFileShareMountName = 'parquet-fileshare-mount'
+var parquetFileShareMountPath = '/data/public-api-parquet'
+var parquetFileShareStorageName = 'parquet-fileshare-storage'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -98,13 +101,13 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' e
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: coreStorageAccountName
   scope: resourceGroup(resourceGroup().name)
 }
-var storageAccountKey = storageAccount.listKeys().keys[0].value
+var coreStorageAccountKey = coreStorageAccount.listKeys().keys[0].value
 var endpointSuffix = environment().suffixes.storage
-var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${storageAccountKey}'
+var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${coreStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${coreStorageAccountKey}'
 
 // Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
 module vNetModule 'application/virtualNetwork.bicep' = {
@@ -138,22 +141,8 @@ module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
   }
 }
 
-// Create a generic Container App Environment for any Container Apps to use.
-module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' = {
-  name: 'containerAppEnvironmentDeploy'
-  params: {
-    subscription: subscription
-    location: location
-    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
-    subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
-    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
-    tagValues: tagValues
-  }
-}
-
 // Deploy File Share.
-module fileShareModule 'components/fileShares.bicep' = {
+module parquetFileShareModule 'components/fileShares.bicep' = {
   name: 'fileShareDeploy'
   params: {
     resourcePrefix: resourcePrefix
@@ -196,17 +185,53 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
   name: apiContainerAppManagedIdentityName
 }
 
+// Create a generic Container App Environment for any Container Apps to use.
+module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' = {
+  name: 'containerAppEnvironmentDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
+    subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
+    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    tagValues: tagValues
+    azureFileStorages: [
+      {
+        storageName: parquetFileShareStorageName
+        storageAccountName: coreStorageAccountName
+        storageAccountKey: coreStorageAccountKey
+        fileShareName: parquetFileShareModule.outputs.fileShareName
+        accessMode: 'ReadWrite'
+      }
+    ]
+  }
+}
+
 // Deploy main Public API Container App.
 module apiContainerAppModule 'components/containerApp.bicep' = if (deployContainerApp) {
   name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    containerAppName: apiContainerAppName
+    containerAppName: apiContainerAppName 
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     managedIdentityName: apiContainerAppManagedIdentity.name
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+    volumeMounts: [
+      {
+        volumeName: parquetFileShareMountName
+        mountPath: parquetFileShareMountPath
+      }
+    ]
+    volumes: [
+      {
+        name: parquetFileShareMountName
+        storageType: 'AzureFile'
+        storageName: parquetFileShareStorageName
+      }
+    ]
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'
@@ -231,7 +256,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       }
       {
         name: 'ParquetFiles__BasePath'
-        value: 'data/public-api-parquet'
+        value: parquetFileShareMountPath
       }
       {
         // This property informs the Container App of the name of the Admin's system-assigned identity.
@@ -282,6 +307,13 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
+    additionalAzureFileStorage: {
+      storageName: parquetFileShareStorageName
+      storageAccountKey: coreStorageAccountKey
+      storageAccountName: coreStorageAccountName
+      fileShareName: parquetFileShareModule.outputs.fileShareName
+      mountPath: parquetFileShareMountPath
+    }
   }
 }
 
@@ -324,7 +356,7 @@ module storeAdminPsqlConnectionString 'components/keyVaultSecret.bicep' = {
   }
 }
 
-var coreStorageConnectionStringSecretKey = 'coreStorageConnectionString'
+var coreStorageConnectionStringSecretKey = 'ees-core-storage-connectionstring'
 
 module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
   name: 'storeCoreStorageConnectionString'
