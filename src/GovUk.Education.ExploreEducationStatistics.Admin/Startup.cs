@@ -215,19 +215,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
                 if (hostEnvironment.IsDevelopment())
                 {
-                    var dataSourceBuilder = new NpgsqlDataSourceBuilder(publicDataDbConnectionString);
-
-                    // Set up the data source outside the `AddDbContext` action as this
-                    // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                    // creating over 20 `IServiceProvider` instances.
-                    var dbDataSource = dataSourceBuilder.Build();
-
-                    services.AddDbContext<PublicDataDbContext>(options =>
+                    // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
+                    if (publicDataDbExists)
                     {
-                        options
-                            .UseNpgsql(dbDataSource)
-                            .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
-                    });
+                        var dataSourceBuilder = new NpgsqlDataSourceBuilder(publicDataDbConnectionString);
+
+                        // Set up the data source outside the `AddDbContext` action as this
+                        // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+                        // creating over 20 `IServiceProvider` instances.
+                        var dbDataSource = dataSourceBuilder.Build();
+
+                        services.AddDbContext<PublicDataDbContext>(options =>
+                        {
+                            options
+                                .UseNpgsql(dbDataSource)
+                                .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
+                        });
+                    }
                 }
                 else
                 {
