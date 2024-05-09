@@ -54,6 +54,15 @@ param preWarmedInstanceCount int?
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan')
 param alwaysOn bool?
 
+@description('Specifies additional Azure Storage Accounts to make available to this Function App')
+param additionalAzureFileStorage {
+  storageName: string
+  storageAccountKey: string
+  storageAccountName: string
+  fileShareName: string
+  mountPath: string
+}?
+
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux'
 var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
@@ -146,6 +155,20 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     }
   }
   tags: tagValues
+}
+
+resource azureStorageAccount 'Microsoft.Web/sites/config@2021-01-15' = if (additionalAzureFileStorage != null) {
+   name: 'azurestorageaccounts'
+   parent: functionApp
+   properties: {
+     '${additionalAzureFileStorage!.storageName}': {
+       type: 'AzureFiles'
+       shareName: additionalAzureFileStorage!.fileShareName
+       mountPath: additionalAzureFileStorage!.mountPath
+       accountName: additionalAzureFileStorage!.storageAccountName
+       accessKey: additionalAzureFileStorage!.storageAccountKey
+     }
+   }
 }
 
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure

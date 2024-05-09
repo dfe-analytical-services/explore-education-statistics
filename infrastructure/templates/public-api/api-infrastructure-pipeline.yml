@@ -1,11 +1,5 @@
 trigger: none
 
-resources:
-  pipelines:
-    - pipeline: EESBuildPipeline
-      source: Explore Education Statistics
-      trigger: none
-
 parameters:
   - name: deployContainerApp
     displayName: Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.
@@ -13,11 +7,14 @@ parameters:
   - name: updatePsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
     default: false
-
+  - name: buildBranchToDeploy
+    displayName: Build branch to deploy.
+    default: 'refs/heads/dev'
+      
 variables:
   - group: Public API Infrastructure - common
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-5127-add-parquet-file-share-mounts')]
   - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
@@ -44,6 +41,13 @@ variables:
     value: ${{parameters.deployContainerApp}}
   - name: updatePsqlFlexibleServer
     value: ${{parameters.updatePsqlFlexibleServer}}
+
+resources:
+  pipelines:
+    - pipeline: EESBuildPipeline
+      source: Explore Education Statistics
+      trigger: none
+      branch: ${{parameters.buildBranchToDeploy}}
 
 pool:
   vmImage: $(vmImageName)

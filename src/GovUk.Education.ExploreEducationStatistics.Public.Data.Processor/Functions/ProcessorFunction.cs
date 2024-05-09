@@ -16,7 +16,7 @@ public class ProcessorFunction
 
         logger.LogInformation("Running orchestration (Id={InstanceId})", context.InstanceId);
 
-        return await context.CallActivityAsync<string>(nameof(CountDataSetsFunction.CountDataSets));
+        return await context.CallActivityAsync<string>(nameof(HealthCheckFunctions.CountDataSets));
     }
 
     [Function(nameof(ProcessorTrigger))]
