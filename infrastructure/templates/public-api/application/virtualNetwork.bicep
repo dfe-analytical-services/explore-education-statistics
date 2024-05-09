@@ -17,27 +17,27 @@ resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: vNetName
 }
 
-resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: '${subscription}-snet-ees-admin'
   parent: vNet
 }
 
-resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: '${subscription}-snet-ees-publisher'
   parent: vNet
 }
 
-resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}'
   parent: vNet
 }
 
-resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: '${subscription}-ees-snet-cae-${containerAppEnvironmentNameSuffix}'
   parent: vNet
 }
 
-resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: '${subscription}-ees-snet-psql-flexibleserver'
   parent: vNet
 }
