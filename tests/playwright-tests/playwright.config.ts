@@ -4,11 +4,7 @@ import environment from '@util/env';
 const { PUBLIC_USERNAME, PUBLIC_PASSWORD, PUBLIC_URL } = environment;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-function appendBasicAuthCredentialsToPublic(pubUrl: string) {
-  if (typeof pubUrl !== 'string') {
-    return null;
-  }
-
+function appendBasicAuthCredentialsToPublic() {
   const username = PUBLIC_USERNAME;
   const password = PUBLIC_PASSWORD;
 
@@ -22,8 +18,6 @@ function appendBasicAuthCredentialsToPublic(pubUrl: string) {
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  // testDir: './tests',
-
   timeout: 15 * 60 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -47,7 +41,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: ' ',
     ignoreHTTPSErrors: true,
-    httpCredentials: appendBasicAuthCredentialsToPublic(PUBLIC_URL),
+    httpCredentials: appendBasicAuthCredentialsToPublic(),
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
     video: 'retain-on-failure',
