@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships",
-    "published": "11 Apr 2024",
+    "published": "9 May 2024",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -380,7 +380,7 @@
   {
     "publication_summary": "Sustained education, apprenticeship or employment destinations 1, 3 and 5 years after GCSEs. Includes disadvantage and gender breakdowns.",
     "publication_title": "Longer term destinations",
-    "published": "20 Jul 2023",
+    "published": "9 May 2024",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -621,6 +621,13 @@
     "published": "29 Jun 2023",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
+  },
+  {
+    "publication_summary": "Employment estimates and education pathways into science and technology jobs, including science, technology, engineering and mathematics (STEM).",
+    "publication_title": "Supply of skills for jobs in science and technology",
+    "published": "9 May 2024",
+    "release_type": "Ad hoc statistics",
+    "theme": "Further education"
   },
   {
     "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
