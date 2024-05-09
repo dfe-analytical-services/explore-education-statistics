@@ -59,6 +59,6 @@ public class EnumToEnumLabelJsonConverterTests
     {
         const string jsonText = "{\"SampleField\":\"Invalid label\"}";
 
-        Assert.Throws<ArgumentException>(() => JsonSerializer.Deserialize<SampleClass>(jsonText));
+        Assert.Throws<ArgumentOutOfRangeException>(() => JsonSerializer.Deserialize<SampleClass>(jsonText));
     }
 }

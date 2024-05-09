@@ -38,10 +38,15 @@ public static class ValidationMessages
         Code: "LocationAllowedProperty",
         Message: "Must be a location with an allowed identifying property."
     );
+    
+    public static readonly LocalizableMessage LocationValueNotEmpty = new(
+        Code: "LocationValueNotEmpty",
+        Message: "Must be a location with '{Property}' that is not empty."
+    );
 
-    public static readonly LocalizableMessage LocationMaxValueLength = new(
-        Code: "LocationMaxLengthValue",
-        Message: "Must be a location with an identifying value that is {MaxValueLength} characters or fewer."
+    public static readonly LocalizableMessage LocationValueMaxLength = new(
+        Code: "LocationValueMaxLength",
+        Message: "Must be a location with '{Property}' that is {MaxLength} characters or fewer."
     );
 
     public static readonly LocalizableMessage LocationsNotFound = new(
@@ -54,8 +59,13 @@ public static class ValidationMessages
         Message: "Must be a time period in the correct format."
     );
 
-    public static readonly LocalizableMessage TimePeriodYearRange = new(
-        Code: "TimePeriodYearRange",
+    public static readonly LocalizableMessage TimePeriodInvalidYear = new(
+        Code: "TimePeriodInvalidYear",
+        Message: "Must be a time period for a valid year."
+    );
+
+    public static readonly LocalizableMessage TimePeriodInvalidYearRange = new(
+        Code: "TimePeriodInvalidYearRange",
         Message: "Must be a valid time period range where the start year is one year before the end year."
     );
 
@@ -79,9 +89,14 @@ public static class ValidationMessages
         Message: "Must be a sort in the correct format."
     );
 
-    public static readonly LocalizableMessage SortMaxFieldLength = new(
-        Code: "SortMaxFieldLength",
-        Message: "Must be a sort with a field that is {MaxFieldLength} characters or fewer."
+    public static readonly LocalizableMessage SortFieldNotEmpty = new(
+        Code: "SortFieldNotEmpty",
+        Message: "Must be a sort with a field that is not empty."
+    );
+
+    public static readonly LocalizableMessage SortFieldMaxLength = new(
+        Code: "SortFieldMaxLength",
+        Message: "Must be a sort with a field that is {MaxLength} characters or fewer."
     );
 
     public static readonly LocalizableMessage SortDirection = new(

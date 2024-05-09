@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -24,10 +26,21 @@ public abstract record DataSetQueryLocation
     /// </summary>
     public virtual string Level { get; init; } = string.Empty;
 
-    [JsonIgnore]
-    public GeographicLevel ParsedLevel => EnumUtil.GetFromEnumValue<GeographicLevel>(Level);
+    public GeographicLevel ParsedLevel() => EnumUtil.GetFromEnumValue<GeographicLevel>(Level);
 
-    public abstract string ToLocationString();
+    /// <summary>
+    /// The name of the key property for this location.
+    /// </summary>
+    [JsonIgnore]
+    public abstract string KeyProperty { get; }
+
+    /// <summary>
+    /// The value of the key property for this location.
+    /// </summary>
+    [JsonIgnore]
+    public abstract string KeyValue { get; }
+
+    public string ToLocationString() => $"{Level}|{KeyProperty.ToLowerFirst()}|{KeyValue}";
 
     public static DataSetQueryLocation Parse(string location)
     {
@@ -35,6 +48,8 @@ public abstract record DataSetQueryLocation
         var level = parts[0];
         var property = parts[1].ToUpperFirst();
         var value = parts[2];
+
+        var parsedLevel = EnumUtil.GetFromEnumValue<GeographicLevel>(level);
 
         if (property == nameof(DataSetQueryLocationId.Id))
         {
@@ -44,8 +59,6 @@ public abstract record DataSetQueryLocation
                 Level = level
             };
         }
-
-        var parsedLevel = EnumUtil.GetFromEnumValue<GeographicLevel>(parts[0]);
 
         return parsedLevel switch
         {
@@ -93,6 +106,18 @@ public abstract record DataSetQueryLocation
             }
         };
     }
+
+    public abstract IValidator CreateValidator();
+
+    public class BaseValidator<T> : AbstractValidator<T> where T : DataSetQueryLocation
+    {
+        protected BaseValidator()
+        {
+            RuleFor(l => l.Level)
+                .NotEmpty()
+                .AllowedValue(GeographicLevelUtils.OrderedCodes);
+        }
+    }
 }
 
 public record DataSetQueryLocationId : DataSetQueryLocation
@@ -108,7 +133,21 @@ public record DataSetQueryLocationId : DataSetQueryLocation
 
     public override required string Level { get; init; }
 
-    public override string ToLocationString() => $"{Level}|id|{Id}";
+    public override string KeyProperty => nameof(Id);
+
+    public override string KeyValue => Id;
+
+    public override IValidator CreateValidator() => new Validator();
+
+    public class Validator : BaseValidator<DataSetQueryLocationId>
+    {
+        public Validator()
+        {
+            RuleFor(l => l.Id)
+                .NotEmpty()
+                .MaximumLength(10);
+        }
+    }
 }
 
 public record DataSetQueryLocationCode : DataSetQueryLocation
@@ -124,7 +163,21 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
 
     public override required string Level { get; init; }
 
-    public override string ToLocationString() => $"{Level}|code|{Code}";
+    public override string KeyProperty => nameof(Code);
+
+    public override string KeyValue => Code;
+
+    public override IValidator CreateValidator() => new Validator();
+
+    public class Validator : BaseValidator<DataSetQueryLocationCode>
+    {
+        public Validator()
+        {
+            RuleFor(l => l.Code)
+                .NotEmpty()
+                .MaximumLength(25);
+        }
+    }
 }
 
 public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
@@ -138,7 +191,21 @@ public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
 
     public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
 
-    public override string ToLocationString() => $"{Level}|code|{Code}";
+    public override string KeyProperty => nameof(Code);
+
+    public override string KeyValue => Code;
+
+    public override IValidator CreateValidator() => new Validator();
+
+    public class Validator : BaseValidator<DataSetQueryLocationLocalAuthorityCode>
+    {
+        public Validator()
+        {
+            RuleFor(l => l.Code)
+                .NotEmpty()
+                .MaximumLength(25);
+        }
+    }
 }
 
 public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
@@ -152,7 +219,21 @@ public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
 
     public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
 
-    public override string ToLocationString() => $"{Level}|oldCode|{OldCode}";
+    public override string KeyProperty => nameof(OldCode);
+
+    public override string KeyValue => OldCode;
+
+    public override IValidator CreateValidator() => new Validator();
+
+    public class Validator : BaseValidator<DataSetQueryLocationLocalAuthorityOldCode>
+    {
+        public Validator()
+        {
+            RuleFor(l => l.OldCode)
+                .NotEmpty()
+                .MaximumLength(10);
+        }
+    }
 }
 
 public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
@@ -165,7 +246,21 @@ public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
 
     public override string Level => GeographicLevel.Provider.GetEnumValue();
 
-    public override string ToLocationString() => $"{Level}|ukprn|{Ukprn}";
+    public override string KeyProperty => nameof(Ukprn);
+
+    public override string KeyValue => Ukprn;
+
+    public override IValidator CreateValidator() => new Validator();
+
+    public class Validator : BaseValidator<DataSetQueryLocationProviderUkprn>
+    {
+        public Validator()
+        {
+            RuleFor(l => l.Ukprn)
+                .NotEmpty()
+                .MaximumLength(8);
+        }
+    }
 }
 
 public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
@@ -178,7 +273,21 @@ public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
 
     public override string Level => GeographicLevel.School.GetEnumValue();
 
-    public override string ToLocationString() => $"{Level}|urn|{Urn}";
+    public override string KeyProperty => nameof(Urn);
+
+    public override string KeyValue => Urn;
+
+    public override IValidator CreateValidator() => new Validator();
+
+    public class Validator : BaseValidator<DataSetQueryLocationSchoolUrn>
+    {
+        public Validator()
+        {
+            RuleFor(l => l.Urn)
+                .NotEmpty()
+                .MaximumLength(6);
+        }
+    }
 }
 
 public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
@@ -191,5 +300,19 @@ public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
 
     public override string Level => GeographicLevel.School.GetEnumValue();
 
-    public override string ToLocationString() => $"{Level}|laEstab|{LaEstab}";
+    public override string KeyProperty => nameof(LaEstab);
+
+    public override string KeyValue => LaEstab;
+
+    public override IValidator CreateValidator() => new Validator();
+
+    public class Validator : BaseValidator<DataSetQueryLocationSchoolLaEstab>
+    {
+        public Validator()
+        {
+            RuleFor(l => l.LaEstab)
+                .NotEmpty()
+                .MaximumLength(7);
+        }
+    }
 }

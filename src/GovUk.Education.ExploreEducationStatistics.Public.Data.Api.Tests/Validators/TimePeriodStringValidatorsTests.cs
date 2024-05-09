@@ -3,10 +3,13 @@ using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Validators;
@@ -30,35 +33,14 @@ public class TimePeriodStringValidatorsTests
 
         private readonly Validator _validator = new();
 
+        public static readonly TheoryData<string, string> ValidTimePeriods =
+            DataSetQueryTimePeriodValidatorTests.ValidTimePeriods;
+
         [Theory]
-        [InlineData("2020|AY")]
-        [InlineData("2020/2021|AY")]
-        [InlineData("2020/2021|AYQ1")]
-        [InlineData("2020/2021|AYQ3")]
-        [InlineData("2020|FY")]
-        [InlineData("2021|CY")]
-        [InlineData("2021|CYQ1")]
-        [InlineData("2021|CYQ2")]
-        [InlineData("2021|RY")]
-        [InlineData("2021|M1")]
-        [InlineData("2021|M12")]
-        [InlineData("2021|W20")]
-        [InlineData("2021|W40")]
-        [InlineData("2021|T1")]
-        [InlineData("2021|T1T2")]
-        [InlineData("2021|T3")]
-        [InlineData("2021/2022|T1")]
-        [InlineData("2021/2022|T1T2")]
-        [InlineData("2021/2022|T3")]
-        [InlineData("2021|P1")]
-        [InlineData("2021|P2")]
-        [InlineData("2021/2022|P1")]
-        [InlineData("2021/2022|P2")]
-        [InlineData("2019|FYQ4")]
-        [InlineData("2019/2020|FYQ4")]
-        public void Success(string timePeriod)
+        [MemberData(nameof(ValidTimePeriods))]
+        public void Success(string period, string code)
         {
-            var testObj = new TestClass { TimePeriod = timePeriod };
+            var testObj = new TestClass { TimePeriod = $"{period}|{code}" };
 
             _validator.TestValidate(testObj).ShouldNotHaveAnyValidationErrors();
         }
@@ -71,139 +53,131 @@ public class TimePeriodStringValidatorsTests
         {
             var testObj = new TestClass { TimePeriod = timePeriod! };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.TimePeriod), error.PropertyName);
-            Assert.Equal(FluentValidationKeys.NotEmptyValidator, error.ErrorCode);
+            result
+                .ShouldHaveValidationErrorFor(t => t.TimePeriod)
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
+                .Only();
         }
 
         [Theory]
         [InlineData("Invalid")]
         [InlineData("2022")]
-        [InlineData("2022/2023")]
         [InlineData("20222")]
-        [InlineData("20222|AY")]
-        [InlineData("2022 | AY")]
-        [InlineData("2022| AY")]
-        [InlineData("2022 |AY")]
-        [InlineData(" 2022|AY ")]
-        [InlineData(" 2022 | AY ")]
-        [InlineData("2022|ay")]
-        [InlineData("2022/2023|ay")]
-        [InlineData("2022/20233|AY")]
-        [InlineData("2022/202|AY")]
-        [InlineData("202/2023|AY")]
+        [InlineData("2022/2023")]
+        [InlineData("2022|AY|blah")]
+        [InlineData("2022|AY|")]
+        [InlineData("|2022|AY")]
+        [InlineData("|2022|AY|")]
         public void Failure_InvalidFormat(string timePeriod)
         {
             var testObj = new TestClass { TimePeriod = timePeriod };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.TimePeriod), error.PropertyName);
-            Assert.Equal(ValidationMessages.TimePeriodFormat.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.TimePeriodFormat.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<FormatErrorDetail>(error.CustomState);
-
-            Assert.Equal(timePeriod, state.Value);
-            Assert.Equal("{period}|{code}", state.ExpectedFormat);
+            result
+                .ShouldHaveValidationErrorFor(t => t.TimePeriod)
+                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code)
+                .WithErrorMessage(ValidationMessages.TimePeriodFormat.Message)
+                .WithCustomState<FormatErrorDetail>(d => d.Value == timePeriod)
+                .WithCustomState<FormatErrorDetail>(d => d.ExpectedFormat == "{period}|{code}")
+                .Only();
         }
 
+        public static readonly TheoryData<string, string> InvalidTimePeriodYears =
+            DataSetQueryTimePeriodValidatorTests.InvalidTimePeriodYears;
+
         [Theory]
-        [InlineData("2022/2020|AY")]
-        [InlineData("2000/1999|AY")]
-        [InlineData("2000/2002|AY")]
-        public void Failure_InvalidYearRange(string timePeriod)
+        [MemberData(nameof(InvalidTimePeriodYears))]
+        public void Failure_InvalidYear(string period, string code)
         {
-            var testObj = new TestClass { TimePeriod = timePeriod };
+            var testObj = new TestClass { TimePeriod = $"{period}|{code}" };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.TimePeriod), error.PropertyName);
-            Assert.Equal(ValidationMessages.TimePeriodYearRange.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.TimePeriodYearRange.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<TimePeriodStringValidators.RangeErrorDetail>(error.CustomState);
-
-            Assert.Equal(timePeriod, $"{state.Value.Period}|{state.Value.Code}");
+            result
+                .ShouldHaveValidationErrorFor(t => t.TimePeriod)
+                .WithErrorCode(ValidationMessages.TimePeriodInvalidYear.Code)
+                .WithErrorMessage(ValidationMessages.TimePeriodInvalidYear.Message)
+                .WithMessageArgument("Property", "period")
+                .WithCustomState<InvalidErrorDetail<string>>(d => d.Value == period)
+                .Only();
         }
 
+        public static readonly TheoryData<string, string> InvalidTimePeriodYearRanges =
+            DataSetQueryTimePeriodValidatorTests.InvalidTimePeriodYearRanges;
+
         [Theory]
-        [InlineData("2022|INVALID")]
-        [InlineData("2022|YY")]
-        [InlineData("2022|WEEK12")]
-        [InlineData("2022|JANUARY")]
-        public void Failure_InvalidCode(string timePeriod)
+        [MemberData(nameof(InvalidTimePeriodYearRanges))]
+        public void Failure_InvalidYearRange(string period, string code)
         {
-            var testObj = new TestClass { TimePeriod = timePeriod };
+            var testObj = new TestClass { TimePeriod = $"{period}|{code}" };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.TimePeriod), error.PropertyName);
-            Assert.Equal(ValidationMessages.TimePeriodAllowedCode.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.TimePeriodAllowedCode.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<TimePeriodStringValidators.AllowedCodeErrorDetail>(error.CustomState);
-
-            Assert.Equal(timePeriod, $"{state.Value.Period}|{state.Value.Code}");
-            Assert.Equal(TimeIdentifierUtils.DataCodes.Order(), state.AllowedCodes);
+            result
+                .ShouldHaveValidationErrorFor(t => t.TimePeriod)
+                .WithErrorCode(ValidationMessages.TimePeriodInvalidYearRange.Code)
+                .WithErrorMessage(ValidationMessages.TimePeriodInvalidYearRange.Message)
+                .WithMessageArgument("Property", "period")
+                .WithCustomState<InvalidErrorDetail<string>>(d => d.Value == period)
+                .Only();
         }
 
+        public static readonly TheoryData<string, string> InvalidTimePeriodCodes =
+            DataSetQueryTimePeriodValidatorTests.InvalidTimePeriodCodes;
+
         [Theory]
-        [InlineData("2022/2023|INVALID")]
-        [InlineData("2022/2023|AY1")]
-        [InlineData("2022/2023|ZZ")]
-        [InlineData("2022/2023|CY")]
-        [InlineData("2022/2023|CYQ1")]
-        [InlineData("2022/2023|CYQ3")]
-        [InlineData("2022/2023|RY")]
-        [InlineData("2022/2023|W12")]
-        [InlineData("2022/2023|W40")]
-        [InlineData("2022/2023|M1")]
-        [InlineData("2022/2023|M12")]
-        public void Failure_InvalidCodeForRange(string timePeriod)
+        [MemberData(nameof(InvalidTimePeriodCodes))]
+        public void Failure_InvalidCode(string period, string code)
         {
-            var testObj = new TestClass { TimePeriod = timePeriod };
+            var testObj = new TestClass { TimePeriod = $"{period}|{code}" };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
+            result
+                .ShouldHaveValidationErrorFor(t => t.TimePeriod)
+                .WithErrorCode(ValidationMessages.TimePeriodAllowedCode.Code)
+                .WithErrorMessage(ValidationMessages.TimePeriodAllowedCode.Message)
+                .WithMessageArgument("Property", "code")
+                .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d => d.Value == code)
+                .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d =>
+                    d.AllowedCodes.SequenceEqual(TimeIdentifierUtils.DataCodes.Order()))
+                .Only();
+        }
 
-            var error = Assert.Single(result.Errors);
+        public static readonly TheoryData<string, string> InvalidTimePeriodRangeCodes =
+            DataSetQueryTimePeriodValidatorTests.InvalidTimePeriodRangeCodes;
 
-            Assert.Equal(nameof(TestClass.TimePeriod), error.PropertyName);
-            Assert.Equal(ValidationMessages.TimePeriodAllowedCode.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.TimePeriodAllowedCode.Message, error.ErrorMessage);
+        [Theory]
+        [MemberData(nameof(InvalidTimePeriodRangeCodes))]
+        public void Failure_InvalidCodeForRange(string period, string code)
+        {
+            var testObj = new TestClass { TimePeriod = $"{period}|{code}" };
 
-            var state = Assert.IsType<TimePeriodStringValidators.AllowedCodeErrorDetail>(error.CustomState);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.Equal(timePeriod, $"{state.Value.Period}|{state.Value.Code}");
+            result
+                .ShouldHaveValidationErrorFor(t => t.TimePeriod)
+                .WithErrorCode(ValidationMessages.TimePeriodAllowedCode.Code)
+                .WithErrorMessage(ValidationMessages.TimePeriodAllowedCode.Message)
+                .WithMessageArgument("Property", "code")
+                .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d => d.Value == code)
+                .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d => d.AllowedCodes.All(allowedCode =>
+                {
+                    var yearFormat = EnumUtil
+                        .GetFromEnumValue<TimeIdentifier>(allowedCode)
+                        .GetEnumAttribute<TimeIdentifierMetaAttribute>()
+                        .YearFormat;
 
-            Assert.All(state.AllowedCodes, code =>
-            {
-                var yearFormat = EnumUtil
-                    .GetFromEnumValue<TimeIdentifier>(code)
-                    .GetEnumAttribute<TimeIdentifierMetaAttribute>()
-                    .YearFormat;
+                    var isValidYearFormat = yearFormat is TimePeriodYearFormat.Academic or TimePeriodYearFormat.Fiscal;
 
-                Assert.True(yearFormat is TimePeriodYearFormat.Academic or TimePeriodYearFormat.Fiscal);
-            });
+                    Assert.True(isValidYearFormat);
+
+                    return isValidYearFormat;
+                }))
+                .Only();
         }
     }
 }

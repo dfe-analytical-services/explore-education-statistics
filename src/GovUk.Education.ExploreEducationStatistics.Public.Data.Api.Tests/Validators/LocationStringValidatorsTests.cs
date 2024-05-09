@@ -1,10 +1,15 @@
 using FluentValidation;
 using FluentValidation.TestHelper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Validators;
@@ -58,14 +63,10 @@ public class LocationStringValidatorsTests
         {
             var testObj = new TestClass { Location = location! };
 
-            var result = _validator.Validate(testObj);
-
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.Location), error.PropertyName);
-            Assert.Equal(FluentValidationKeys.NotEmptyValidator, error.ErrorCode);
+            _validator.TestValidate(testObj)
+                .ShouldHaveValidationErrorFor(t => t.Location)
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
+                .Only();
         }
 
         [Theory]
@@ -75,124 +76,112 @@ public class LocationStringValidatorsTests
         [InlineData("code")]
         [InlineData("NAT|id")]
         [InlineData("NAT|code")]
-        [InlineData("NAT |code|")]
-        [InlineData("|NAT|code")]
-        [InlineData("NAT | code | 12345")]
-        [InlineData(" NAT | code | 12345 ")]
-        [InlineData("NAT|code | 12345")]
-        [InlineData("NAT | code|12345")]
-        [InlineData(" NAT|code|12345 ")]
-        [InlineData(" NAT|code|12345")]
-        [InlineData("NAT|code|12345 ")]
-        [InlineData("nat|code|12345")]
-        [InlineData("la|code|12345")]
-        [InlineData("LA|code|E09000021  / E09000027")]
-        [InlineData("LA|code|E09000021 /  E09000027")]
         public void Failure_InvalidFormat(string location)
         {
             var testObj = new TestClass { Location = location };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.Location), error.PropertyName);
-            Assert.Equal(ValidationMessages.LocationFormat.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.LocationFormat.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<FormatErrorDetail>(error.CustomState);
-
-            Assert.Equal(location, state.Value);
-            Assert.Equal("{level}|{property}|{value}", state.ExpectedFormat);
+            result.ShouldHaveValidationErrorFor(t => t.Location)
+                .WithErrorCode(ValidationMessages.LocationFormat.Code)
+                .WithErrorMessage(ValidationMessages.LocationFormat.Message)
+                .WithCustomState<FormatErrorDetail>(s => s.Value == location)
+                .WithCustomState<FormatErrorDetail>(s => s.ExpectedFormat == "{level}|{property}|{value}")
+                .Only();
         }
 
         [Theory]
-        [InlineData("NA|id|12345")]
-        [InlineData("NA|code|12345")]
-        [InlineData("NT|id|12345")]
-        [InlineData("LAA|code|12345")]
-        [InlineData("LADD|code|12345")]
-        public void Failure_InvalidLevel(string location)
+        [InlineData("Invalid")]
+        [InlineData("NA")]
+        [InlineData("NT")]
+        [InlineData("LAA")]
+        [InlineData("LADD")]
+        [InlineData("nat")]
+        [InlineData("lad")]
+        [InlineData("0")]
+        [InlineData("1")]
+        public void Failure_InvalidLevel(string invalidLevel)
         {
-            var testObj = new TestClass { Location = location };
+            var testObj = new TestClass { Location = $"{invalidLevel}|id|12345" };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.Location), error.PropertyName);
-            Assert.Equal(ValidationMessages.LocationAllowedLevel.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.LocationAllowedLevel.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<LocationStringValidators.AllowedLevelErrorDetail>(error.CustomState);
-
-            Assert.Equal(location, $"{state.Value.Level}|{state.Value.Property}|{state.Value.Value}");
-            Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>().Order(), state.AllowedLevels);
+            result.ShouldHaveValidationErrorFor(t => t.Location)
+                .WithErrorCode(ValidationMessages.LocationAllowedLevel.Code)
+                .WithErrorMessage(ValidationMessages.LocationAllowedLevel.Message)
+                .WithCustomState<LocationAllowedLevelErrorDetail>(s => s.Value == invalidLevel)
+                .WithCustomState<LocationAllowedLevelErrorDetail>(s =>
+                    s.AllowedLevels.SequenceEqual(EnumUtil.GetEnumValues<GeographicLevel>().Order()))
+                .Only();
         }
 
         [Theory]
-        [InlineData("NAT|urn|12345", "id", "code")]
-        [InlineData("REG|ukprn|12345", "id", "code")]
-        [InlineData("RSC|code|12345", "id")]
-        [InlineData("SCH|code|12345", "id", "urn", "laEstab")]
-        [InlineData("SCH|ukprn|12345", "id", "urn", "laEstab")]
-        [InlineData("PROV|urn|12345", "id", "ukprn")]
-        [InlineData("PROV|code|12345", "id", "ukprn")]
-        public void Failure_InvalidProperty(string location, params string[] allowedProperties)
+        [InlineData("NAT", "invalid", "id", "code")]
+        [InlineData("NAT", "urn", "id", "code")]
+        [InlineData("REG", "invalid", "id", "code")]
+        [InlineData("REG", "ukprn", "id", "code")]
+        [InlineData("RSC", "invalid", "id")]
+        [InlineData("RSC", "code", "id")]
+        [InlineData("SCH", "invalid", "id", "urn", "laEstab")]
+        [InlineData("SCH", "code", "id", "urn", "laEstab")]
+        [InlineData("SCH", "ukprn", "id", "urn", "laEstab")]
+        [InlineData("PROV", "invalid", "id", "ukprn")]
+        [InlineData("PROV", "urn", "id", "ukprn")]
+        [InlineData("PROV", "code", "id", "ukprn")]
+        public void Failure_InvalidProperty(string level, string invalidProperty, params string[] allowedProperties)
         {
-            var testObj = new TestClass { Location = location };
+            var testObj = new TestClass { Location = $"{level}|{invalidProperty}|12345" };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(TestClass.Location), error.PropertyName);
-            Assert.Equal(ValidationMessages.LocationAllowedProperty.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.LocationAllowedProperty.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<LocationStringValidators.AllowedPropertyErrorDetail>(error.CustomState);
-
-            Assert.Equal(location, $"{state.Value.Level}|{state.Value.Property}|{state.Value.Value}");
-            Assert.Equal(allowedProperties, state.AllowedProperties);
+            result.ShouldHaveValidationErrorFor(t => t.Location)
+                .WithErrorCode(ValidationMessages.LocationAllowedProperty.Code)
+                .WithErrorMessage(ValidationMessages.LocationAllowedProperty.Message)
+                .WithCustomState<LocationAllowedPropertyErrorDetail>(s => s.Value == invalidProperty)
+                .WithCustomState<LocationAllowedPropertyErrorDetail>(s =>
+                    s.AllowedProperties.SequenceEqual(allowedProperties))
+                .Only();
         }
 
         [Theory]
-        [InlineData("NAT|id", 10)]
-        [InlineData("NAT|code", 25)]
-        [InlineData("LA|id", 10)]
-        [InlineData("LA|code", 25)]
-        [InlineData("LA|oldCode", 10)]
-        [InlineData("RSC|id", 10)]
-        [InlineData("SCH|id", 10)]
-        [InlineData("SCH|urn", 6)]
-        [InlineData("SCH|laEstab", 7)]
-        [InlineData("PROV|id", 10)]
-        [InlineData("PROV|ukprn", 8)]
-        public void Failure_InvalidValueLength(string levelProperty, int expectedMaxLength)
+        [InlineData("NAT", "id", " ")]
+        [InlineData("REG", "code", "  ")]
+        [InlineData("REG", "code", "\n")]
+        [InlineData("LA", "code", " ")]
+        [InlineData("LA", "oldCode", " ")]
+        [InlineData("SCH", "urn", " ")]
+        [InlineData("SCH", "laEstab", " ")]
+        [InlineData("PROV", "ukprn", " ")]
+        public void Failure_NotEmptyValue(string level, string property, string value)
         {
-            var location = $"{levelProperty}|{new string('X', expectedMaxLength + 1)}";
-            var testObj = new TestClass { Location = location };
+            var testObj = new TestClass { Location = $"{level}|{property}|{value}" };
 
-            var result = _validator.Validate(testObj);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.False(result.IsValid);
+            result.ShouldHaveValidationErrorFor(t => t.Location)
+                .WithErrorCode(ValidationMessages.LocationValueNotEmpty.Code)
+                .WithAttemptedValue(value)
+                .WithMessageArgument("Property", property)
+                .Only();
+        }
 
-            var error = Assert.Single(result.Errors);
+        public static readonly TheoryData<DataSetQueryLocation> InvalidLocationValueLengths =
+            DataSetQueryLocationValidatorTests.InvalidLocationValueLengths;
 
-            Assert.Equal(nameof(TestClass.Location), error.PropertyName);
-            Assert.Equal(ValidationMessages.LocationMaxValueLength.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.LocationMaxValueLength.Message, error.ErrorMessage);
+        [Theory]
+        [MemberData(nameof(InvalidLocationValueLengths))]
+        public void Failure_InvalidValueLength(DataSetQueryLocation location)
+        {
+            var testObj = new TestClass { Location = location.ToLocationString() };
 
-            var state = Assert.IsType<LocationStringValidators.MaxValueLengthErrorDetail>(error.CustomState);
+            var result = _validator.TestValidate(testObj);
 
-            Assert.Equal(location, $"{state.Value.Level}|{state.Value.Property}|{state.Value.Value}");
-            Assert.Equal(expectedMaxLength, state.MaxValueLength);
+            result.ShouldHaveValidationErrorFor(t => t.Location)
+                .WithErrorCode(ValidationMessages.LocationValueMaxLength.Code)
+                .WithAttemptedValue(location.KeyValue)
+                .WithMessageArgument("Property", location.KeyProperty.ToLowerFirst())
+                .WithMessageArgument("MaxLength", location.KeyValue.Length - 1)
+                .Only();
         }
     }
 }

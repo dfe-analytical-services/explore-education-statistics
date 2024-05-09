@@ -1,10 +1,8 @@
 using System.Text.RegularExpressions;
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 
@@ -12,7 +10,8 @@ public static partial class TimePeriodStringValidators
 {
     private const string ExpectedFormat = "{period}|{code}";
 
-    public static IRuleBuilderOptionsConditions<T, string> TimePeriodString<T>(this IRuleBuilder<T, string> rule)
+    public static IRuleBuilderOptionsConditions<T, string> TimePeriodString<T>(
+        this IRuleBuilder<T, string> rule)
     {
         return rule.NotEmpty().Custom((value, context) =>
         {
@@ -30,109 +29,30 @@ public static partial class TimePeriodStringValidators
                 return;
             }
 
-            var timePeriod = ParsedTimePeriod.Parse(value);
+            var validator = new DataSetQueryTimePeriod.Validator();
+            var result = validator.Validate(DataSetQueryTimePeriod.Parse(value));
 
-            if (!HasValidYearRange(timePeriod))
+            if (result.IsValid)
             {
-                context.AddFailure(
-                    message: ValidationMessages.TimePeriodYearRange,
-                    detail: new RangeErrorDetail(timePeriod)
-                );
+                return;
             }
 
-            if (!HasAllowedCode(timePeriod))
+            foreach (var error in result.Errors)
             {
-                context.AddFailure(
-                    message: ValidationMessages.TimePeriodAllowedCode,
-                    detail: new AllowedCodeErrorDetail(
-                        Value: timePeriod,
-                        AllowedCodes: timePeriod.HasRangePeriod() ? AllowedRangeCodes : AllowedCodes
-                    )
-                );
+                error.FormattedMessagePlaceholderValues["Property"] = error.PropertyName.ToLowerFirst();
+                error.PropertyName = context.PropertyPath;
+                
+                context.AddFailure(error);
             }
         });
     }
 
-    private static readonly IReadOnlySet<TimeIdentifier> AllowedTimeIdentifiers =
-        TimeIdentifierUtils.DataEnums.ToHashSet();
-
-    private static readonly IReadOnlySet<TimeIdentifier> AllowedRangeTimeIdentifiers =
-        AllowedTimeIdentifiers
-            .Where(
-                identifier => identifier.GetEnumAttribute<TimeIdentifierMetaAttribute>().YearFormat
-                    is TimePeriodYearFormat.Academic or TimePeriodYearFormat.Fiscal
-            )
-            .ToHashSet();
-
-    private static readonly IReadOnlyList<string> AllowedCodes =
-        TimeIdentifierUtils.DataCodes
-            .Order()
-            .ToList();
-
-    private static readonly IReadOnlyList<string> AllowedRangeCodes =
-        AllowedRangeTimeIdentifiers
-            .Select(identifier => identifier.GetEnumValue())
-            .Order()
-            .ToList();
-
-    [GeneratedRegex(@"^[0-9]{4}(\/[0-9]{4})?\|[A-Z0-9]+$", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
+    // Note this regex only does basic checks on the delimiter to allow
+    // other validations to provide more detailed error messages.
+    [GeneratedRegex(@"^[^\|]*\|[^\|]*$", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
     private static partial Regex FormatRegexGenerated();
 
     private static readonly Regex FormatRegex = FormatRegexGenerated();
 
     private static bool HasValidFormat(string value) => FormatRegex.IsMatch(value);
-
-    private static bool HasValidYearRange(ParsedTimePeriod timePeriod)
-    {
-        // The period is not a range.
-        if (!timePeriod.HasRangePeriod())
-        {
-            return true;
-        }
-
-        var rangeParts = timePeriod.Period.Split('/');
-        var start = rangeParts[0];
-        var end = rangeParts[1];
-
-        return int.TryParse(start, out var startYear)
-               && int.TryParse(end, out var endYear)
-               && endYear == startYear + 1;
-    }
-
-    private static bool HasAllowedCode(ParsedTimePeriod timePeriod)
-    {
-        if (!EnumUtil.TryGetFromEnumValue<TimeIdentifier>(timePeriod.Code, out var code))
-        {
-            return false;
-        }
-
-        return timePeriod.HasRangePeriod()
-            ? AllowedRangeTimeIdentifiers.Contains(code)
-            : AllowedTimeIdentifiers.Contains(code);
-    }
-
-    public record RangeErrorDetail(ParsedTimePeriod Value) : InvalidErrorDetail<ParsedTimePeriod>(Value);
-
-    public record AllowedCodeErrorDetail(ParsedTimePeriod Value, IReadOnlyList<string> AllowedCodes)
-        : InvalidErrorDetail<ParsedTimePeriod>(Value);
-
-    public record ParsedTimePeriod
-    {
-        public string Period { get; init; }
-        
-        public string Code { get; init; }
-
-        public static ParsedTimePeriod Parse(string value)
-        {
-            var parts = value.Split('|');
-
-            return new ParsedTimePeriod
-            {
-                Period = parts[0],
-                Code = parts[1]
-            };
-        }
-
-        public bool HasRangePeriod() => Period.Contains('/');
-    }
 }
