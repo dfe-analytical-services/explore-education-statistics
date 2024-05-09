@@ -9,17 +9,19 @@ using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -63,20 +65,21 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // MVC
 
-        services.AddMvcCore(options =>
-        {
-            options.Filters.Add(new OperationCancelledExceptionFilter());
-            options.RespectBrowserAcceptHeader = true;
-            options.ReturnHttpNotAcceptable = true;
-            options.EnableEndpointRouting = false;
-        });
-
         services
             .AddControllers(options =>
             {
-                options.Filters.Add(new ProblemDetailsResultFilter());
+                options.RespectBrowserAcceptHeader = true;
+                options.ReturnHttpNotAcceptable = true;
+                options.EnableEndpointRouting = false;
+
+                options.Filters.Add<OperationCancelledExceptionFilter>();
+                options.Filters.Add<ProblemDetailsResultFilter>();
+                options.AddInvalidRequestInputResultFilter();
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
+
+                // Adds correct camelCased paths for model errors
+                options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
             })
             .ConfigureApiBehaviorOptions(options =>
             {
@@ -86,6 +89,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+
+                // This must be false to allow `JsonExceptionResultFilter` to work correctly,
+                // otherwise, JsonExceptions can't be identified. Also, this prevents
+                // error messages from accidentally leaking internals to users.
+                options.AllowInputFormatterExceptionMessages = false;
             });
 
         services.AddProblemDetails();
