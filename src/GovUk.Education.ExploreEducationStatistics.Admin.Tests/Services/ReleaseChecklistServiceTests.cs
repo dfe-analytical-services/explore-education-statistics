@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -156,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 dataSetVersionService
                     .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
-                    .ReturnsAsync([
+                    .ReturnsAsync(new Either<ActionResult, List<DataSetVersionStatusViewModel>>([
                         new DataSetVersionStatusViewModel(
                             Id: Guid.NewGuid(),
                             Title: "Data set 1",
@@ -173,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Id: Guid.NewGuid(),
                             Title: "Data set 4",
                             Status: DataSetVersionStatus.Failed),
-                    ]);
+                    ]));
 
                 var service = BuildReleaseChecklistService(
                     context,
@@ -259,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 dataSetVersionService
                     .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
-                    .ReturnsAsync([]);
+                    .ReturnsAsync(new Either<ActionResult, List<DataSetVersionStatusViewModel>>([]));
 
                 var service = BuildReleaseChecklistService(
                     context,
@@ -377,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 dataSetVersionService
                     .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
-                    .ReturnsAsync([]);
+                    .ReturnsAsync(new Either<ActionResult, List<DataSetVersionStatusViewModel>>([]));
 
                 var service = BuildReleaseChecklistService(
                     context,
@@ -461,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 dataSetVersionService
                     .Setup(s => s.ListStatusesForReleaseVersion(releaseVersion.Id))
-                    .ReturnsAsync([]);
+                    .ReturnsAsync(new Either<ActionResult, List<DataSetVersionStatusViewModel>>([]));
 
                 var service = BuildReleaseChecklistService(
                     context,

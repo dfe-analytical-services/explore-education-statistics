@@ -374,16 +374,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return Unit.Instance;
             }
 
-            var errors = (await _releaseChecklistService.GetErrors(releaseVersion))
-                .Select(error => error.Code)
-                .ToList();
-
-            if (!errors.Any())
-            {
-                return Unit.Instance;
-            }
-
-            return ValidationActionResult(errors);
+            return await _releaseChecklistService
+                .GetErrors(releaseVersion)
+                .OnSuccess(errors =>
+                {
+                    return !errors.Any() 
+                        ? new Either<ActionResult, Unit>(Unit.Instance) 
+                        : ValidationActionResult(errors.Select(e => e.Code));
+                });
         }
     }
 

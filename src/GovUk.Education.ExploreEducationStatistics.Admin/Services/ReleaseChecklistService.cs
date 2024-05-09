@@ -64,12 +64,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .HydrateReleaseForChecklist()
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
-                .OnSuccess(
-                    async release => new ReleaseChecklistViewModel(
-                        await GetErrors(release),
-                        await GetWarnings(release)
-                    )
-                );
+                .OnSuccess(release => 
+                    GetErrors(release)
+                    .OnSuccessCombineWith(_ => GetWarnings(release))
+                    .OnSuccess(errorsAndWarnings => 
+                        new ReleaseChecklistViewModel(errorsAndWarnings.Item1, errorsAndWarnings.Item2)));
         }
 
         public async Task<Either<ActionResult, List<ReleaseChecklistIssue>>> GetErrors(ReleaseVersion releaseVersion)
@@ -200,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
         }
 
-        public async Task<List<ReleaseChecklistIssue>> GetWarnings(ReleaseVersion releaseVersion)
+        private async Task<Either<ActionResult, List<ReleaseChecklistIssue>>> GetWarnings(ReleaseVersion releaseVersion)
         {
             var warnings = new List<ReleaseChecklistIssue>();
 

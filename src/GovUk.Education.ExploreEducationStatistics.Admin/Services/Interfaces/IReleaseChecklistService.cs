@@ -13,7 +13,5 @@ public interface IReleaseChecklistService
 {
     Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId);
 
-    Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion);
-
-    Task<List<ReleaseChecklistIssue>> GetWarnings(ReleaseVersion releaseVersion);
+    Task<Either<ActionResult, List<ReleaseChecklistIssue>>> GetErrors(ReleaseVersion releaseVersion);
 }

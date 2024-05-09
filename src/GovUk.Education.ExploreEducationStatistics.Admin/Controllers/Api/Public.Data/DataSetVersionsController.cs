@@ -15,10 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 [Route("api/public-data/data-set-versions")]
 public class DataSetVersionsController(IDataSetVersionService dataSetVersionService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("statuses")]
     [Produces("application/json")]
-    public async Task<ActionResult<List<DataSetVersionStatusViewModel>>> ListDataSetVersionStatuses(
-        Guid releaseVersionId)
+    public async Task<ActionResult<List<DataSetVersionStatusViewModel>>> ListStatusesForReleaseVersion(
+        [FromQuery] Guid releaseVersionId)
     {
         return await dataSetVersionService
             .ListStatusesForReleaseVersion(releaseVersionId)
