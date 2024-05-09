@@ -103,8 +103,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
             if (hostEnvironment.IsDevelopment())
             {
-                var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb"));
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 
                 // Set up the data source outside the `AddDbContext` action as this
                 // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF

@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
                     ConnectionTypes.AZURE_SQL, "SQLAZURECONNSTR"
                 },
                 {
-                    ConnectionTypes.AZURE_POSTGRESQL, "CUSTOMCONNSTR"
+                    ConnectionTypes.AZURE_POSTGRESQL, "POSTGRESQLCONNSTR"
                 }
             }; 
     }

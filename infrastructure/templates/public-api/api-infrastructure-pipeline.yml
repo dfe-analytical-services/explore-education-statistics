@@ -17,7 +17,7 @@ parameters:
 variables:
   - group: Public API Infrastructure - common
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-5052-add-private-endpoint-to-connect-psql-to-vnet')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
   - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster

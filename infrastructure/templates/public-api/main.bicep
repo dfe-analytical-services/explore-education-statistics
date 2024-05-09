@@ -169,13 +169,6 @@ var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   endIpAddress: rule.endIpAddress
 })
 
-// TODO EES-5128 - if keeping the flag for the future, move this conditional logic into the postgresqlDatabase.bicep 
-// module itself so that we always have a set of outputs that we can use. This will in turn allow us to move 
-// psqlManagedIdentityConnectionStringTemplate into the module's outputs.
-resource postgreSqlServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' existing = if (!updatePsqlFlexibleServer) {
-  name: psqlServerFullName
-}
-
 // Deploy PostgreSQL Database.
 module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (updatePsqlFlexibleServer) {
   name: 'postgreSQLDatabaseDeploy'
@@ -192,77 +185,13 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
     tagValues: tagValues
     firewallRules: formattedPostgreSqlFirewallRules
     databaseNames: ['public_data']
+    vnetId: vNetModule.outputs.vNetRef
+    subnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
   }
 }
 
-var psqlDomainName = '${psqlServerFullName}.postgres.database.azure.com'
+var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
 
-var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlDomainName};Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
-
-var psqlPrivateLinkDnsZoneName = 'privatelink.postgres.database.azure.com'
-
-var psqlPrivateEndpointName = '${psqlServerFullName}-plink'
-
-var psqlPrivateEndpointNetworkInterfaceName = '${psqlPrivateEndpointName}-nic'
-
-resource psqlPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
-  name: psqlPrivateEndpointName
-  location: location
-  properties: {
-    subnet: {
-      id: vNetModule.outputs.psqlFlexibleServerSubnetRef
-    }
-    privateLinkServiceConnections: [
-      {
-        name: psqlPrivateEndpointName
-        properties: {
-          privateLinkServiceId: updatePsqlFlexibleServer ? postgreSqlServerModule.outputs.databaseRef : postgreSqlServer.id
-          groupIds: [
-            'postgresqlServer'
-          ]
-        }
-      }
-    ]
-  }
-}
-
-resource psqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: psqlPrivateLinkDnsZoneName
-  location: 'global'
-  properties: {}
-  dependsOn: [
-    vNetModule
-  ]
-}
-
-resource psqlPrivateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: psqlPrivateDnsZone
-  name: '${psqlPrivateLinkDnsZoneName}-link'
-  location: 'global'
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: vNetModule.outputs.vNetRef
-    }
-  }
-}
-
-resource psqlPrivateEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-05-01' = {
-  name: 'default'
-  parent: psqlPrivateEndpoint
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: replace(psqlPrivateLinkDnsZoneName, '.', '-')
-        properties: {
-          privateDnsZoneId: psqlPrivateDnsZone.id
-        }
-      }
-    ]
-  }
-}
-
-// TODO EES-5128 - move into the Container App module?
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
 }

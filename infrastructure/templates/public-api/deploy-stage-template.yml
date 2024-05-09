@@ -93,7 +93,7 @@ stages:
                   --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
-                  --connection-string-type=PostgreSQL \
+                  --connection-string-type 'PostgreSQL' \
                   --settings \
                     "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
