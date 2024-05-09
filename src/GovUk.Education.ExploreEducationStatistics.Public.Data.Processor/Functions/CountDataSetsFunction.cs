@@ -14,7 +14,8 @@ public class CountDataSetsFunction(
         [ActivityTrigger] object? input,
         FunctionContext executionContext)
     {
-        logger.LogInformation("Counting datasets.");
-        return $"Found {await publicDataDbContext.DataSets.CountAsync()} datasets.";
+        var message = $"Found {await publicDataDbContext.DataSets.CountAsync()} datasets.";
+        logger.LogInformation(message);
+        return message;
     }
 }

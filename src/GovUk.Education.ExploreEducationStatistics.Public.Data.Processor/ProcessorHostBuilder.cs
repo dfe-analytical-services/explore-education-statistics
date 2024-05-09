@@ -2,6 +2,7 @@ using Azure.Core;
 using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.Azure.Functions.Worker;
@@ -41,7 +42,7 @@ public static class ProcessorHostBuilder
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = configuration.GetConnectionString("PublicDataDb")!;
+                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb");
 
                     if (hostEnvironment.IsDevelopment())
                     {

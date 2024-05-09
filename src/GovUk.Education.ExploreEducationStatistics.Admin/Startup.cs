@@ -24,6 +24,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -210,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // cause the data source builder to throw a host exception.
             if (!hostEnvironment.IsIntegrationTest())
             {
-                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
+                var publicDataDbConnectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
 
                 if (hostEnvironment.IsDevelopment())
                 {

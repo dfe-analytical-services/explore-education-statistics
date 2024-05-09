@@ -37,6 +37,11 @@ resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnet
   parent: vNet
 }
 
+resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+  name: '${subscription}-ees-snet-psql-flexibleserver'
+  parent: vNet
+}
+
 @description('The fully qualified Azure resource ID of the Network.')
 output vNetRef string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
 
@@ -69,3 +74,12 @@ output publisherFunctionAppSubnetStartIpAddress string = parseCidr(publisherSubn
 
 @description('The last usable IP address for the Publisher Function App Subnet.')
 output publisherFunctionAppSubnetEndIpAddress string = parseCidr(publisherSubnet.properties.addressPrefix).lastUsable
+
+@description('The fully qualified Azure resource ID of the PSQL Flexible Server Subnet.')
+output psqlFlexibleServerSubnetRef string = psqlFlexibleServerSubnet.id
+
+@description('The first usable IP address for the PSQL Flexible Server Subnet.')
+output psqlFlexibleServerSubnetStartIpAddress string = parseCidr(psqlFlexibleServerSubnet.properties.addressPrefix).firstUsable
+
+@description('The last usable IP address for the PSQL Flexible Server Subnet.')
+output psqlFlexibleServerSubnetEndIpAddress string = parseCidr(psqlFlexibleServerSubnet.properties.addressPrefix).lastUsable

@@ -169,13 +169,6 @@ var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   endIpAddress: rule.endIpAddress
 })
 
-// TODO EES-5128 - if keeping the flag for the future, move this conditional logic into the postgresqlDatabase.bicep 
-// module itself so that we always have a set of outputs that we can use. This will in turn allow us to move 
-// psqlManagedIdentityConnectionStringTemplate into the module's outputs.
-resource postgreSqlServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' existing = if (!updatePsqlFlexibleServer) {
-  name: psqlServerFullName
-}
-
 // Deploy PostgreSQL Database.
 module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (updatePsqlFlexibleServer) {
   name: 'postgreSQLDatabaseDeploy'
@@ -192,12 +185,13 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
     tagValues: tagValues
     firewallRules: formattedPostgreSqlFirewallRules
     databaseNames: ['public_data']
+    vnetId: vNetModule.outputs.vNetRef
+    subnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
   }
 }
 
 var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
 
-// TODO EES-5128 - move into the Container App module?
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
 }
@@ -345,3 +339,4 @@ module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
 
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
+output keyVaultName string = keyVaultName

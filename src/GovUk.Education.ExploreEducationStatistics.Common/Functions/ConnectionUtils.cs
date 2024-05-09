@@ -7,7 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
     public enum ConnectionTypes
     {
         AZURE_STORAGE,
-        AZURE_SQL
+        AZURE_SQL,
+        AZURE_POSTGRESQL
     }
 
     public static class ConnectionUtils
@@ -23,6 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
         {
             return GetConnectionString(name,
                 $"{ConnectionTypeValues[ConnectionTypes.AZURE_SQL]}");
+        }
+        
+        public static string GetPostgreSqlConnectionString(string name)
+        {
+            return GetConnectionString(name,
+                $"{ConnectionTypeValues[ConnectionTypes.AZURE_POSTGRESQL]}");
         }
         
         private static string GetConnectionString(string name, string connectionTypeValue)
@@ -50,6 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
                 },
                 {
                     ConnectionTypes.AZURE_SQL, "SQLAZURECONNSTR"
+                },
+                {
+                    ConnectionTypes.AZURE_POSTGRESQL, "POSTGRESQLCONNSTR"
                 }
             }; 
     }
