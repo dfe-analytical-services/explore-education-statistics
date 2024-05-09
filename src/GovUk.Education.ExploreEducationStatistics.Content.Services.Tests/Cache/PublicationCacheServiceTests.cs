@@ -469,7 +469,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         converted.AssertDeepEqualTo(publicationTree);
     }
 
-    private static async Task AssertPublicationTreeUnfiltered(
+    private async Task AssertPublicationTreeUnfiltered(
         PublicationTreeThemeViewModel publicationTree,
         PublicationTreeFilter filter)
     {
@@ -488,7 +488,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
     }
 
-    private static async Task AssertPublicationTreeEmpty(
+    private async Task AssertPublicationTreeEmpty(
         PublicationTreeThemeViewModel publicationTree,
         PublicationTreeFilter filter)
     {

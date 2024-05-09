@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
@@ -16,8 +15,8 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests;
 
-[Collection(CacheTestFixture.CollectionName)]
-public class PublisherFunctionsIntegrationTest : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>
+public abstract class PublisherFunctionsIntegrationTest
+    : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>
 {
     protected PublisherFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
     {
@@ -42,7 +41,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
     {
         await _postgreSqlContainer.StartAsync();
     }
-    
+
     public override IHostBuilder ConfigureTestHostBuilder()
     {
         return base

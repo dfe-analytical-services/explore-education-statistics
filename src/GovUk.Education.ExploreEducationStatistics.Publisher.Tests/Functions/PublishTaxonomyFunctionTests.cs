@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -14,11 +15,14 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Functions;
 
+[Collection(CacheTestFixture.CollectionName)]
 public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixture fixture)
     : PublisherFunctionsIntegrationTest(fixture)
 {
-    public class PublishTaxonomyTests(PublisherFunctionsIntegrationTestFixture fixture)
-        : PublishTaxonomyFunctionTests(fixture)
+    public class PublishTaxonomyTests(
+        PublisherFunctionsIntegrationTestFixture fixture,
+        CacheServiceTestFixture cacheFixture)
+        : PublishTaxonomyFunctionTests(fixture), IClassFixture<CacheServiceTestFixture>
     {
         [Fact]
         public async Task MethodologyTree()
@@ -31,7 +35,7 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
             Publication publication = DataFixture
                 .DefaultPublication()
                 .WithTopic(topic);
-            
+
             Methodology methodology = DataFixture
                 .DefaultMethodology()
                 .WithMethodologyVersions(DataFixture
@@ -39,13 +43,13 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
                     .Generate(1))
                 .FinishWith(methodology => methodology.LatestPublishedVersion = methodology.Versions[0])
                 .WithOwningPublication(publication);
-            
+
             await AddTestData<ContentDbContext>(context =>
             {
                 context.Methodologies.Add(methodology);
             });
 
-            List<AllMethodologiesThemeViewModel> expectedMethodologyTree = 
+            List<AllMethodologiesThemeViewModel> expectedMethodologyTree =
             [
                 new AllMethodologiesThemeViewModel()
                 {
@@ -78,19 +82,21 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
                     ]
                 }
             ];
-            
-            PublicBlobCacheService
-                .Setup(s => s.SetItemAsync<object>(new AllMethodologiesCacheKey(), ItIs.DeepEqualTo(expectedMethodologyTree)))
+
+            cacheFixture.PublicBlobCacheService
+                .Setup(s => s.SetItemAsync<object>(new AllMethodologiesCacheKey(),
+                    ItIs.DeepEqualTo(expectedMethodologyTree)))
                 .Returns(Task.CompletedTask);
-            
-            PublicBlobCacheService
-                .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(), new List<PublicationTreeThemeViewModel>()))
+
+            cacheFixture.PublicBlobCacheService
+                .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(),
+                    new List<PublicationTreeThemeViewModel>()))
                 .Returns(Task.CompletedTask);
-            
+
             var function = GetRequiredService<PublishTaxonomyFunction>();
             await function.PublishTaxonomy(new PublishTaxonomyMessage(), new TestFunctionContext());
-            
-            VerifyAllMocks(PublicBlobCacheService);
+
+            VerifyAllMocks(cacheFixture.PublicBlobCacheService);
         }
     }
 }

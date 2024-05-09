@@ -12,10 +12,8 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests;
 
-[Collection(CacheTestFixture.CollectionName)]
 public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>(
     FunctionsIntegrationTestFixture fixture) :
-    CacheServiceTestFixture,
     IClassFixture<TFunctionsIntegrationTestFixture>
     where TFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture
 {
@@ -43,7 +41,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         var scope = _host.Services.CreateScope();
         return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
-    
+
     protected void ClearTestData<TDbContext>() where TDbContext : DbContext
     {
         using var context = GetDbContext<TDbContext>();
@@ -77,7 +75,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class FunctionsIntegrationTestFixture : IClassFixture<CacheTestFixture>
+public abstract class FunctionsIntegrationTestFixture
 {
     public virtual IHostBuilder ConfigureTestHostBuilder()
     {
