@@ -3,23 +3,20 @@ import environment from '@util/env';
 
 const { PUBLIC_USERNAME, PUBLIC_PASSWORD } = environment;
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config();
+function appendBasicAuthCredentialsToPublic() {
+  const username = PUBLIC_USERNAME;
+  const password = PUBLIC_PASSWORD;
 
-const encodeBasicAuth = (username: string, password: string) => {
-  const unencodedString = `${username}:${password}`;
-  return `Basic ${btoa(unencodedString)}`;
-};
+  if (username && password) {
+    return { username, password };
+  }
+  return undefined;
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './tests',
   timeout: 15 * 60 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -30,23 +27,40 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: process.env.CI
+    ? [
+        ['html', { outputFolder: 'test-results/playwright-testreport' }],
+        ['github'],
+        ['list'],
+        ['junit', { outputFile: 'test-results/playwright-results.xml' }],
+      ]
+    : [['html']],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    extraHTTPHeaders: {
-      Authorization: encodeBasicAuth(PUBLIC_USERNAME, PUBLIC_PASSWORD),
-    },
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: ' ',
-
+    ignoreHTTPSErrors: true,
+    httpCredentials: appendBasicAuthCredentialsToPublic(),
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
+    video: 'retain-on-failure',
   },
 
-  /* Configure projects for major browsers */
+  /* Configure different test suites and running against chrome browser */
   projects: [
     {
-      name: 'chromium',
+      name: 'admin',
+      testDir: './tests/admin',
+    },
+    {
+      name: 'adminandpublic',
+      testDir: './tests/admin-and-public',
+    },
+    {
+      name: 'public',
+      testDir: './tests/public',
+    },
+    {
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
