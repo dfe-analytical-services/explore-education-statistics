@@ -10,5 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 public interface IDataSetVersionService
 {
     Task<Either<ActionResult, List<DataSetVersionStatusViewModel>>> ListStatusesForReleaseVersion(
-        Guid releaseVersionId);
+        Guid releaseVersionId,
+        bool includePreviousReleaseVersion = false);
 }
