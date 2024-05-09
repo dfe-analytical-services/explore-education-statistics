@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import environment from '@util/env';
 
-const { PUBLIC_USERNAME, PUBLIC_PASSWORD, PUBLIC_URL } = environment;
+const { PUBLIC_USERNAME, PUBLIC_PASSWORD } = environment;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 function appendBasicAuthCredentialsToPublic() {
