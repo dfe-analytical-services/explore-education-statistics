@@ -1,7 +1,7 @@
 import ButtonLink from '@frontend/components/ButtonLink';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
 import React from 'react';
-import Link from '../components/Link';
-import Page from '../components/Page';
 
 function HomePage() {
   return (
