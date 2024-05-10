@@ -25,7 +25,7 @@ parameters:
 variables:
   - group: Public API Infrastructure - common
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-5127-add-parquet-file-share-mounts')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-5127-add-parquet-file-share-mounts-remove-existing-fileshares')]
   - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster

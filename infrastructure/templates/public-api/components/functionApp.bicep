@@ -94,42 +94,10 @@ resource dedicatedStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' 
   properties: {
     supportsHttpsTrafficOnly: true
     defaultToOAuthAuthentication: true
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Deny'
-      virtualNetworkRules: [
-        {
-          action: 'Allow'
-          id: subnetId
-        }
-      ]
-    }
   }
 }
 
 var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${dedicatedStorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${dedicatedStorageAccount.listKeys().keys[0].value}'
-
-// When deploying to a Function App utilising a secured VNet to store its deployment files,
-// unique file shares must be pre-generated and unique to each slot prior to deploying the
-// Function App itself if we wish to use slot swapping.
-//
-// See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
-var fileShareName1 = '${toLower(fullFunctionAppName)}-1'
-var fileShareName2 = '${toLower(fullFunctionAppName)}-2'
-
-resource fileShare1 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${dedicatedStorageAccountName}/default/${fileShareName1}'
-  dependsOn: [
-    dedicatedStorageAccount
-  ]
-}
-
-resource fileShare2 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${dedicatedStorageAccountName}/default/${fileShareName2}'
-  dependsOn: [
-    dedicatedStorageAccount
-  ]
-}
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: fullFunctionAppName
@@ -202,10 +170,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // This property tells the Function App that the deployment code resides in this Storage account.
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
 
-      // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
-      // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
-      WEBSITE_CONTENTOVERVNET: 1
-      vnetContentShareEnabled: true
+      WEBSITE_CONTENTSHARE: fullFunctionAppName
 
       // This setting is necessary in order to allow slot swapping to work without complaining that
       // "Storage volume is currently in R/O mode".
@@ -225,32 +190,12 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
-      // When deploying to a Function App utilising a secured VNet to store its deployment files,
-      // unique file shares must be pre-generated and unique to each slot prior to deploying the
-      // Function App itself if we wish to use slot swapping.
-      //
-      // In conjunction with WEBSITE_CONTENTAZUREFILECONNECTIONSTRING, this property tells the
-      // Function App that the deployment code resides in this Storage account and within *this*
-      // file share.
-      //
-      // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
-      //
-      // When slots are swapped, this fileshare configuration value will swap with the slots and thereby make the new
-      // code deployment location available to the other slot.
-      WEBSITE_CONTENTSHARE: fileShareName2
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
-      // As above, this value is distinct from the initial staging slot equivalent and will swap to the other slot upon
-      // a slot swap operation.
-      WEBSITE_CONTENTSHARE: fileShareName1
     }
     tagValues: tagValues
   }
-  dependsOn: [
-    fileShare1
-    fileShare2
-  ]
 }
 
 // Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.

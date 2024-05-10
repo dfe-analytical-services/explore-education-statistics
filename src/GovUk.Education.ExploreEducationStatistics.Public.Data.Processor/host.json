@@ -3,6 +3,7 @@
   "extensions": {
     "durableTask": {
       "storageProvider": {
+        "hubName": "DataProcessorTaskHub",
         "type": "AzureStorage"
       }
     }

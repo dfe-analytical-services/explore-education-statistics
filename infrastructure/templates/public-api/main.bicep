@@ -87,7 +87,7 @@ var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
 var parquetFileShareMountName = 'parquet-fileshare-mount'
-var parquetFileShareMountPath = '/home/public-api-parquet'
+var parquetFileShareMountPath = '/data/public-api-parquet'
 var parquetFileShareStorageName = 'parquet-fileshare-storage'
 
 var tagValues = union(resourceTags ?? {}, {

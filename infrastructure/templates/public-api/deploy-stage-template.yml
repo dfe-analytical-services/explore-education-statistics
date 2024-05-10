@@ -133,21 +133,21 @@ stages:
                   --slot 'staging' \
                   --target-slot 'production'
 
-          - task: AzureCLI@2
-            displayName: 'Deploy Data Processor Function App - attach Parquet Fileshare'
-            inputs:
-              azureSubscription: ${{parameters.serviceConnection}}
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                
-                az webapp config storage-account add \
-                  --name '$(dataProcessorFunctionAppName)' \
-                  --resource-group '$(resourceGroupName)' \
-                  --custom-id '$(parquetFileShareStorageName)' \
-                  --storage-type AzureFiles \
-                  --account-name '$(coreStorageAccountName)' \
-                  --share-name '$(parquetFileShareStorageName)' \
-                  --access-key '`az keyvault secret show --name $(coreStorageAccessKeySecretKey) --vault-name $(keyVaultName) --query value --output tsv`' \
-                  --mount-path '$(parquetFileShareMountPath)'
+#          - task: AzureCLI@2
+#            displayName: 'Deploy Data Processor Function App - attach Parquet Fileshare'
+#            inputs:
+#              azureSubscription: ${{parameters.serviceConnection}}
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                set -e
+#
+#                az webapp config storage-account add \
+#                  --name '$(dataProcessorFunctionAppName)' \
+#                  --resource-group '$(resourceGroupName)' \
+#                  --custom-id '$(parquetFileShareStorageName)' \
+#                  --storage-type AzureFiles \
+#                  --account-name '$(coreStorageAccountName)' \
+#                  --share-name '$(parquetFileShareStorageName)' \
+#                  --access-key '@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageAccessKeySecretKey))' \
+#                  --mount-path '$(parquetFileShareMountPath)'
