@@ -77,15 +77,20 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   }
 }
 
-var dedicatedStorageAccountName = replace('${subscription}eessa${functionAppName}', '-', '')
+// Configuring a single shared storage account for task management, and 2 individual storage accounts to be split
+// between the production slot and staging slot. See
+// https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-zero-downtime-deployment#status-check-with-slot
+var durableManagementStorageAccountName = replace('${subscription}eessa${functionAppName}mg', '-', '')
+var slot1StorageAccountName = replace('${subscription}eessa${functionAppName}s1', '-', '')
+var slot2StorageAccountName = replace('${subscription}eessa${functionAppName}s2', '-', '')
 
 // Create a dedicated Storage Account for this Function App for it to store its deployment code and jobs in.
 // Grant the Function App access by whitelisting its subnet for inbound traffic.
 //
 // For performance, it is considered good practice for each Function App to have its own dedicated Storage Account. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
-resource dedicatedStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: dedicatedStorageAccountName
+resource durableManagementStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: durableManagementStorageAccountName
   location: location
   sku: {
     name: 'Standard_LRS'
@@ -94,10 +99,70 @@ resource dedicatedStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' 
   properties: {
     supportsHttpsTrafficOnly: true
     defaultToOAuthAuthentication: true
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+      virtualNetworkRules: [
+        {
+          action: 'Allow'
+          id: subnetId
+        }
+      ]
+    }
   }
 }
 
-var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${dedicatedStorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${dedicatedStorageAccount.listKeys().keys[0].value}'
+var durableManagementStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${durableManagementStorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${durableManagementStorageAccount.listKeys().keys[0].value}'
+
+resource slot1StorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: slot1StorageAccountName
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'Storage'
+  properties: {
+    supportsHttpsTrafficOnly: true
+    defaultToOAuthAuthentication: true
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+      virtualNetworkRules: [
+        {
+          action: 'Allow'
+          id: subnetId
+        }
+      ]
+    }
+  }
+}
+
+var slot1StorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${slot1StorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${slot1StorageAccount.listKeys().keys[0].value}'
+
+resource slot2StorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: slot2StorageAccountName
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'Storage'
+  properties: {
+    supportsHttpsTrafficOnly: true
+    defaultToOAuthAuthentication: true
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+      virtualNetworkRules: [
+        {
+          action: 'Allow'
+          id: subnetId
+        }
+      ]
+    }
+  }
+}
+
+var slot2StorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${slot2StorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${slot2StorageAccount.listKeys().keys[0].value}'
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: fullFunctionAppName
@@ -139,6 +204,20 @@ resource azureStorageAccount 'Microsoft.Web/sites/config@2021-01-15' = if (addit
    }
 }
 
+resource slot1StorageAccountFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+  name: '${durableManagementStorageAccountName}/default/${fullFunctionAppName}1'
+  dependsOn: [
+    durableManagementStorageAccount
+  ]
+}
+
+resource slot2StorageAccountFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+  name: '${durableManagementStorageAccountName}/default/${fullFunctionAppName}2'
+    dependsOn: [
+      durableManagementStorageAccount
+    ]
+}
+
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
 // deploy and supply them as the most important appsettings. This prevents infrastructure deploys from overriding any
 // appsettings back to their original values by allowing existing ones to take precedence.
@@ -165,12 +244,16 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     commonSettings: union(settings, {
 
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
-      AzureWebJobsStorage: dedicatedStorageAccountString
+      AzureWebJobsStorage: durableManagementStorageAccountString
 
       // This property tells the Function App that the deployment code resides in this Storage account.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: durableManagementStorageAccountString
 
-      WEBSITE_CONTENTSHARE: fullFunctionAppName
+      // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
+      // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
+      WEBSITE_CONTENTOVERVNET: 1
+//       vnetContentShareEnabled: true
+      // WEBSITE_VNET_ROUTE_ALL: 1
 
       // This setting is necessary in order to allow slot swapping to work without complaining that
       // "Storage volume is currently in R/O mode".
@@ -190,9 +273,13 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
+      DurableManagementStorage: slot1StorageAccountString
+      WEBSITE_CONTENTSHARE: '${fullFunctionAppName}1'
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
+      DurableManagementStorage: slot2StorageAccountString
+      WEBSITE_CONTENTSHARE: '${fullFunctionAppName}2'
     }
     tagValues: tagValues
   }

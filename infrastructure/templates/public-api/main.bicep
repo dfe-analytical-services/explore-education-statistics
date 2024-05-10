@@ -198,7 +198,7 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     tagValues: tagValues
     azureFileStorages: [
       {
-        storageName: parquetFileShareStorageName
+        storageName: parquetFileShareModule.outputs.fileShareName
         storageAccountName: coreStorageAccountName
         storageAccountKey: coreStorageAccountKey
         fileShareName: parquetFileShareModule.outputs.fileShareName
@@ -229,7 +229,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       {
         name: parquetFileShareMountName
         storageType: 'AzureFile'
-        storageName: parquetFileShareStorageName
+        storageName: parquetFileShareModule.outputs.fileShareName
       }
     ]
     appSettings: [
@@ -307,13 +307,13 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
-    additionalAzureFileStorage: {
-      storageName: parquetFileShareStorageName
-      storageAccountKey: coreStorageAccountKey
-      storageAccountName: coreStorageAccountName
-      fileShareName: parquetFileShareModule.outputs.fileShareName
-      mountPath: parquetFileShareMountPath
-    }
+//     additionalAzureFileStorage: {
+//       storageName: parquetFileShareModule.outputs.fileShareName
+//       storageAccountKey: coreStorageAccountKey
+//       storageAccountName: coreStorageAccountName
+//       fileShareName: parquetFileShareModule.outputs.fileShareName
+//       mountPath: parquetFileShareMountPath
+//     }
   }
 }
 
@@ -386,7 +386,7 @@ output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-d
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
-output parquetFileShareStorageName string = parquetFileShareStorageName
 output coreStorageAccountName string = coreStorageAccountName
 output coreStorageAccessKeySecretKey string = coreStorageAccessKeySecretKey
+output parquetFileShareName string = parquetFileShareModule.outputs.fileShareName
 output parquetFileShareMountPath string = parquetFileShareMountPath

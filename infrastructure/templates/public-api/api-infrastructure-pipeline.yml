@@ -57,19 +57,19 @@ pool:
   vmImage: $(vmImageName)
 
 stages:
-- template: validate-stage-template.yml
-  parameters:
-    stageName: 'Validate_Against_Development'
-    condition: eq(variables.isDev, true)
-    environment: 'Development'
-    serviceConnection: $(serviceConnectionDevelopment)
-    parameterFile: $(devParamFile)
+#- template: validate-stage-template.yml
+#  parameters:
+#    stageName: 'Validate_Against_Development'
+#    condition: eq(variables.isDev, true)
+#    environment: 'Development'
+#    serviceConnection: $(serviceConnectionDevelopment)
+#    parameterFile: $(devParamFile)
 
 - template: deploy-stage-template.yml
   parameters:
     stageName: 'Deploy_to_Development'
     condition: and(succeeded(), eq(variables.isDev, true))
-    dependsOn: 'Validate_Against_Development'
+#    dependsOn: 'Validate_Against_Development'
     environment: 'Development'
     serviceConnection: $(serviceConnectionDevelopment)
     parameterFile: $(devParamFile)

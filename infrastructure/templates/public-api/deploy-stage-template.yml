@@ -145,9 +145,23 @@ stages:
 #                az webapp config storage-account add \
 #                  --name '$(dataProcessorFunctionAppName)' \
 #                  --resource-group '$(resourceGroupName)' \
-#                  --custom-id '$(parquetFileShareStorageName)' \
+#                  --custom-id '$(parquetFileShareName)' \
 #                  --storage-type AzureFiles \
 #                  --account-name '$(coreStorageAccountName)' \
-#                  --share-name '$(parquetFileShareStorageName)' \
 #                  --access-key '@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageAccessKeySecretKey))' \
+#                  --share-name '$(parquetFileShareName)' \
 #                  --mount-path '$(parquetFileShareMountPath)'
+#
+#          - task: AzureCLI@2
+#            displayName: 'Deploy Data Processor Function App - list storage'
+#            inputs:
+#              azureSubscription: ${{parameters.serviceConnection}}
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                set -e
+#
+#                az webapp config storage-account list \
+#                  --name '$(dataProcessorFunctionAppName)' \
+#                  --resource-group '$(resourceGroupName)'
+
