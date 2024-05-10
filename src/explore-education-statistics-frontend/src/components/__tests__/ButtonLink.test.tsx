@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import ButtonLink from '../ButtonLink';
+import ButtonLink from '@frontend/components/ButtonLink';
 
 describe('ButtonLink', () => {
   test('renders correctly with required props', () => {
