@@ -87,7 +87,7 @@ var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
 var parquetFileShareMountName = 'parquet-fileshare-mount'
-var parquetFileShareMountPath = '/data/public-api-parquet'
+var parquetFileShareMountPath = '/home/public-api-parquet'
 var parquetFileShareStorageName = 'parquet-fileshare-storage'
 
 var tagValues = union(resourceTags ?? {}, {
@@ -369,7 +369,24 @@ module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
   }
 }
 
+var coreStorageAccessKeySecretKey = 'ees-core-storage-access-key'
+
+module storeCoreStorageAccessKey 'components/keyVaultSecret.bicep' = {
+  name: 'storeCoreStorageAccessKey'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: coreStorageAccessKeySecretKey
+    secretValue: coreStorageAccountKey
+    contentType: 'text/plain'
+  }
+}
+
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
+output parquetFileShareStorageName string = parquetFileShareStorageName
+output coreStorageAccountName string = coreStorageAccountName
+output coreStorageAccessKeySecretKey string = coreStorageAccessKeySecretKey
+output parquetFileShareMountPath string = parquetFileShareMountPath
