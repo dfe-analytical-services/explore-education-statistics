@@ -7,7 +7,6 @@ using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
@@ -107,7 +106,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // cause the data source builder to throw a host exception.
         if (!hostEnvironment.IsIntegrationTest())
         {
-            var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
+            var connectionString = configuration.GetConnectionString("PublicDataDb");
 
             if (hostEnvironment.IsDevelopment())
             {
