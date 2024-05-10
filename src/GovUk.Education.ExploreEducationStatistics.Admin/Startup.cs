@@ -1,4 +1,7 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
@@ -24,7 +27,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -69,9 +71,6 @@ using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
 using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -211,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // cause the data source builder to throw a host exception.
             if (!hostEnvironment.IsIntegrationTest())
             {
-                var publicDataDbConnectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
+                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb");
 
                 if (hostEnvironment.IsDevelopment())
                 {
