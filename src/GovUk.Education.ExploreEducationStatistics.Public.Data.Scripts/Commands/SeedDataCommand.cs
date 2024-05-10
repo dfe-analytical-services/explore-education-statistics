@@ -49,9 +49,11 @@ public class SeedDataCommand : ICommand
 
         var dataSetSeeds = new List<DataSetSeed>
         {
+            DataSetSeed.AbsenceByCharacteristic2016,
             DataSetSeed.AbsenceRatesCharacteristic,
             DataSetSeed.AbsenceRatesGeographicLevel,
             DataSetSeed.AbsenceRatesGeographicLevelSchool,
+            DataSetSeed.ExclusionsByGeographicLevel,
             DataSetSeed.SpcEthnicityLanguage,
             DataSetSeed.SpcYearGroupGender,
             DataSetSeed.Nat01,
@@ -309,7 +311,7 @@ public class SeedDataCommand : ICommand
                 VersionMinor = 0,
                 Status = DataSetVersionStatus.Published,
                 Notes = string.Empty,
-                ReleaseFileId = Guid.NewGuid(),
+                ReleaseFileId = _seed.ReleaseFileId ?? Guid.NewGuid(),
                 DataSetId = _seed.DataSet.Id,
                 TotalResults = totalResults,
                 MetaSummary = new DataSetVersionMetaSummary
