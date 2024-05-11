@@ -11,13 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 
 public interface IDataSetService
 {
-    Task<Either<ActionResult, PaginatedListViewModel<DataSetViewModel>>> ListDataSets(
+    Task<Either<ActionResult, PaginatedListViewModel<DataSetSummaryViewModel>>> ListDataSets(
         int page,
         int pageSize,
         Guid publicationId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetSummaryViewModel>> GetDataSet(
+    Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken = default);
 }

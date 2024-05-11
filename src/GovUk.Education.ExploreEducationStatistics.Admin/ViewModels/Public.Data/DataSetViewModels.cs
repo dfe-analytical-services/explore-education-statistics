@@ -17,11 +17,11 @@ public record DataSetViewModel
     [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetStatus Status { get; init; }
 
+    public Guid? SupersedingDataSetId { get; init; }
+
     public required DataSetVersionViewModel? DraftVersion { get; init; }
 
     public required DataSetLiveVersionViewModel? LatestLiveVersion { get; init; }
-
-    public Guid? SupersedingDataSetId { get; init; }
 }
 
 public record DataSetSummaryViewModel
@@ -35,7 +35,9 @@ public record DataSetSummaryViewModel
     [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetStatus Status { get; init; }
 
+    public Guid? SupersedingDataSetId { get; init; }
+
     public required DataSetVersionSummaryViewModel? DraftVersion { get; init; }
 
-    public required DataSetVersionSummaryViewModel? LatestLiveVersion { get; init; }
+    public required DataSetLiveVersionSummaryViewModel? LatestLiveVersion { get; init; }
 }

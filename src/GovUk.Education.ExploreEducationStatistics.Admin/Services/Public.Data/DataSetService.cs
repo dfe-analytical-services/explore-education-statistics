@@ -26,7 +26,7 @@ public class DataSetService(
     IUserService userService)
     : IDataSetService
 {
-    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetViewModel>>> ListDataSets(
+    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetSummaryViewModel>>> ListDataSets(
         int page,
         int pageSize,
         Guid publicationId,
@@ -50,10 +50,10 @@ public class DataSetService(
                         .Paginate(page: page, pageSize: pageSize)
                         .ToListAsync(cancellationToken: cancellationToken)
                     )
-                    .Select(MapDataSet)
+                    .Select(MapDataSetSummary)
                     .ToList();
 
-                return new PaginatedListViewModel<DataSetViewModel>(
+                return new PaginatedListViewModel<DataSetSummaryViewModel>(
                     dataSets,
                     totalResults: await dataSetsQueryable.CountAsync(cancellationToken: cancellationToken),
                     page: page,
@@ -61,41 +61,41 @@ public class DataSetService(
             });
     }
 
-    public async Task<Either<ActionResult, DataSetSummaryViewModel>> GetDataSet(
+    public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken = default)
     {
         return await CheckDataSetExists(dataSetId, cancellationToken)
             .OnSuccessDo(dataSet => CheckPublicationExists(dataSet.PublicationId, cancellationToken)
-                    .OnSuccess(userService.CheckCanViewPublication)
+                .OnSuccess(userService.CheckCanViewPublication)
             )
-            .OnSuccessCombineWith(async dataSet => await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken))
-            .OnSuccess(combinedDataSetAndReleaseFiles =>
+            .OnSuccess(async dataSet =>
             {
-                var (dataSet, releaseFilesByDataSetVersionId) = combinedDataSetAndReleaseFiles;
+                var releaseFilesByDataSetVersionId =
+                    await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken);
 
                 return MapDataSet(dataSet, releaseFilesByDataSetVersionId);
             });
     }
 
-    private static DataSetViewModel MapDataSet(DataSet dataSet)
+    private static DataSetSummaryViewModel MapDataSetSummary(DataSet dataSet)
     {
-        return new DataSetViewModel
+        return new DataSetSummaryViewModel
         {
             Id = dataSet.Id,
             Title = dataSet.Title,
             Summary = dataSet.Summary,
             Status = dataSet.Status,
-            DraftVersion = MapDraftVersion(dataSet.LatestDraftVersion),
-            LatestLiveVersion = MapLiveVersion(dataSet.LatestLiveVersion),
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
+            DraftVersion = MapDraftSummaryVersion(dataSet.LatestDraftVersion),
+            LatestLiveVersion = MapLiveSummaryVersion(dataSet.LatestLiveVersion),
         };
     }
 
-    private static DataSetVersionViewModel? MapDraftVersion(DataSetVersion? dataSetVersion)
+    private static DataSetVersionSummaryViewModel? MapDraftSummaryVersion(DataSetVersion? dataSetVersion)
     {
         return dataSetVersion != null
-            ? new DataSetVersionViewModel
+            ? new DataSetVersionSummaryViewModel
             {
                 Id = dataSetVersion.Id,
                 Version = dataSetVersion.Version,
@@ -105,10 +105,10 @@ public class DataSetService(
             : null;
     }
 
-    private static DataSetLiveVersionViewModel? MapLiveVersion(DataSetVersion? dataSetVersion)
+    private static DataSetLiveVersionSummaryViewModel? MapLiveSummaryVersion(DataSetVersion? dataSetVersion)
     {
         return dataSetVersion != null
-            ? new DataSetLiveVersionViewModel
+            ? new DataSetLiveVersionSummaryViewModel
             {
                 Id = dataSetVersion.Id,
                 Version = dataSetVersion.Version,
@@ -119,30 +119,41 @@ public class DataSetService(
             : null;
     }
 
-    private static DataSetSummaryViewModel MapDataSet(DataSet dataSet, IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByDataSetVersionId)
+    private static DataSetViewModel MapDataSet(
+        DataSet dataSet,
+        IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByDataSetVersionId)
     {
         var draftVersion = dataSet.LatestDraftVersion is null
             ? null
-            : MapDataSetVersion(dataSet.LatestDraftVersion, releaseFilesByDataSetVersionId[dataSet.LatestDraftVersionId!.Value]);
+            : MapDraftVersion(
+                dataSet.LatestDraftVersion,
+                releaseFilesByDataSetVersionId[dataSet.LatestDraftVersionId!.Value]
+            );
 
         var latestLiveVersion = dataSet.LatestLiveVersion is null
             ? null
-            : MapDataSetVersion(dataSet.LatestLiveVersion, releaseFilesByDataSetVersionId[dataSet.LatestLiveVersionId!.Value]);
+            : MapLiveVersion(
+                dataSet.LatestLiveVersion,
+                releaseFilesByDataSetVersionId[dataSet.LatestLiveVersionId!.Value]
+            );
 
-        return new DataSetSummaryViewModel
+        return new DataSetViewModel
         {
             Id = dataSet.Id,
             Title = dataSet.Title,
             Summary = dataSet.Summary,
             Status = dataSet.Status,
+            SupersedingDataSetId = dataSet.SupersedingDataSetId,
             DraftVersion = draftVersion,
             LatestLiveVersion = latestLiveVersion,
         };
     }
 
-    private static DataSetVersionSummaryViewModel MapDataSetVersion(DataSetVersion dataSetVersion, ReleaseFile releaseFile)
+    private static DataSetVersionViewModel MapDraftVersion(
+        DataSetVersion dataSetVersion,
+        ReleaseFile releaseFile)
     {
-        return new DataSetVersionSummaryViewModel
+        return new DataSetVersionViewModel
         {
             Id = dataSetVersion.Id,
             Version = dataSetVersion.Version,
@@ -150,6 +161,38 @@ public class DataSetService(
             Type = dataSetVersion.VersionType,
             DataSetFileId = releaseFile.File.DataSetFileId!.Value,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
+            TotalResults = dataSetVersion.TotalResults,
+            GeographicLevels = dataSetVersion.MetaSummary?.GeographicLevels
+                .Select(l => l.GetEnumLabel())
+                .ToList() ?? null,
+            TimePeriods = dataSetVersion.MetaSummary?.TimePeriodRange is not null
+                ? TimePeriodRangeViewModel.Create(dataSetVersion.MetaSummary.TimePeriodRange)
+                : null,
+            Filters = dataSetVersion.MetaSummary?.Filters ?? null,
+            Indicators = dataSetVersion.MetaSummary?.Indicators ?? null,
+        };
+    }
+    
+    private static DataSetLiveVersionViewModel MapLiveVersion(
+        DataSetVersion dataSetVersion,
+        ReleaseFile releaseFile)
+    {
+        return new DataSetLiveVersionViewModel
+        {
+            Id = dataSetVersion.Id,
+            Version = dataSetVersion.Version,
+            Status = dataSetVersion.Status,
+            Type = dataSetVersion.VersionType,
+            DataSetFileId = releaseFile.File.DataSetFileId!.Value,
+            Published = dataSetVersion.Published!.Value,
+            TotalResults = dataSetVersion.TotalResults,
+            ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
+            GeographicLevels = dataSetVersion.MetaSummary!.GeographicLevels
+                .Select(l => l.GetEnumLabel())
+                .ToList(),
+            TimePeriods = TimePeriodRangeViewModel.Create(dataSetVersion.MetaSummary.TimePeriodRange),
+            Filters = dataSetVersion.MetaSummary.Filters,
+            Indicators = dataSetVersion.MetaSummary.Indicators,
         };
     }
 
@@ -182,7 +225,7 @@ public class DataSetService(
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
-    private async Task<Either<ActionResult, IReadOnlyDictionary<Guid, ReleaseFile>>> GetReleaseFilesByDataSetVersionId(
+    private async Task<IReadOnlyDictionary<Guid, ReleaseFile>> GetReleaseFilesByDataSetVersionId(
         DataSet dataSet,
         CancellationToken cancellationToken)
     {
@@ -195,12 +238,18 @@ public class DataSetService(
 
         if (dataSet.LatestDraftVersion is not null)
         {
-            dataSetVersionIdsByReleaseFileId.Add(dataSet.LatestDraftVersion.ReleaseFileId, dataSet.LatestDraftVersionId!.Value);
+            dataSetVersionIdsByReleaseFileId.Add(
+                dataSet.LatestDraftVersion.ReleaseFileId,
+                dataSet.LatestDraftVersionId!.Value
+            );
         }
 
         if (dataSet.LatestLiveVersion is not null)
         {
-            dataSetVersionIdsByReleaseFileId.Add(dataSet.LatestLiveVersion.ReleaseFileId, dataSet.LatestLiveVersionId!.Value);
+            dataSetVersionIdsByReleaseFileId.Add(
+                dataSet.LatestLiveVersion.ReleaseFileId,
+                dataSet.LatestLiveVersionId!.Value
+            );
         }
 
         return await contentDbContext.ReleaseFiles
