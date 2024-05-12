@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
