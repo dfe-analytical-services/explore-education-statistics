@@ -45,7 +45,8 @@ public class CreateInitialDataSetVersionFunction(
 
                 return new CreateInitialDataSetVersionResponseViewModel
                 {
-                    DataSetVersionId = dataSetVersionId, InstanceId = instanceId
+                    DataSetVersionId = dataSetVersionId,
+                    InstanceId = instanceId
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
