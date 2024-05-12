@@ -137,7 +137,9 @@ public class DataSetService(
     {
         var dataSetVersionImport = new DataSetVersionImport
         {
-            DataSetVersionId = dataSetVersion.Id, InstanceId = instanceId, Stage = DataSetVersionImportStage.Pending
+            DataSetVersionId = dataSetVersion.Id,
+            InstanceId = instanceId,
+            Stage = DataSetVersionImportStage.Pending
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);

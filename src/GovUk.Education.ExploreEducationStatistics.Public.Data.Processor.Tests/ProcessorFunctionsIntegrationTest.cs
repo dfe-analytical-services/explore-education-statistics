@@ -61,9 +61,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
     {
         return
         [
-            typeof(CompleteProcessingFunction),
             typeof(CreateInitialDataSetVersionFunction),
-            typeof(HandleProcessingFailureFunction),
             typeof(ProcessInitialDataSetVersionFunction),
         ];
     }
