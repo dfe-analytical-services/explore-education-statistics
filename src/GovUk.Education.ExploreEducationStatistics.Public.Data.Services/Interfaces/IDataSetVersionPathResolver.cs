@@ -7,6 +7,12 @@ public interface IDataSetVersionPathResolver
 {
     string DirectoryPath(DataSetVersion dataSetVersion);
 
+    string CsvDataPath(DataSetVersion dataSetVersion)
+        => Path.Combine(DirectoryPath(dataSetVersion), "data.csv.gz");
+
+    string CsvMetadataPath(DataSetVersion dataSetVersion)
+        => Path.Combine(DirectoryPath(dataSetVersion), "metadata.csv.gz");
+
     string DataPath(DataSetVersion dataSetVersion)
         => Path.Combine(DirectoryPath(dataSetVersion), DataTable.ParquetFile);
 

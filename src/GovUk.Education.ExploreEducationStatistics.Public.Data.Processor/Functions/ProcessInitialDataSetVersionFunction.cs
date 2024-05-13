@@ -24,14 +24,22 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
 
         try
         {
+            await context.CallActivityAsync(nameof(CopyCsvFilesFunction.CopyCsvFiles),
+                input.DataSetVersionId);
+
+            logger.LogInformation(
+                "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
+                nameof(CopyCsvFilesFunction.CopyCsvFiles),
+                context.InstanceId,
+                input.DataSetVersionId);
+
             // Other activity function calls to be added here to cover the following stages:
-            // Move CSV files from Azure Blob Storage to Azure File Share
             // Create meta summary for the DataSetVersion
             // Import metadata to DuckDb
             // Import data to DuckDb
             // Export to Parquet files
 
-            await context.CallActivityAsync(nameof(CompleteProcessing), input);
+            await context.CallActivityAsync(nameof(CompleteProcessing), input.DataSetVersionId);
 
             logger.LogInformation(
                 "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
@@ -46,18 +54,18 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
                 context.InstanceId,
                 input.DataSetVersionId);
 
-            await context.CallActivityAsync(nameof(HandleProcessingFailure), input);
+            await context.CallActivityAsync(nameof(HandleProcessingFailure), input.DataSetVersionId);
         }
     }
 
     [Function(nameof(CompleteProcessing))]
     public async Task CompleteProcessing(
-        [ActivityTrigger] ProcessInitialDataSetVersionContext input,
+        [ActivityTrigger] Guid dataSetVersionId,
         Guid instanceId,
         CancellationToken cancellationToken)
     {
         var dataSetVersion = await GetDataSetVersion(
-            dataSetVersionId: input.DataSetVersionId,
+            dataSetVersionId: dataSetVersionId,
             instanceId: instanceId,
             cancellationToken);
 
@@ -75,12 +83,12 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
 
     [Function(nameof(HandleProcessingFailure))]
     public async Task HandleProcessingFailure(
-        [ActivityTrigger] ProcessInitialDataSetVersionContext input,
+        [ActivityTrigger] Guid dataSetVersionId,
         Guid instanceId,
         CancellationToken cancellationToken)
     {
         var dataSetVersion = await GetDataSetVersion(
-            dataSetVersionId: input.DataSetVersionId,
+            dataSetVersionId: dataSetVersionId,
             instanceId: instanceId,
             cancellationToken);
 

@@ -23,25 +23,37 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
         [Fact]
         public async Task Success()
         {
-            var processingContext = new ProcessInitialDataSetVersionContext
-            {
-                DataSetVersionId = Guid.NewGuid()
-            };
+            var dataSetVersionId = Guid.NewGuid();
 
             var mockOrchestrationContext = DefaultMockOrchestrationContext();
 
+            var activitySequence = new MockSequence();
+
             mockOrchestrationContext
+                .InSequence(activitySequence)
+                .Setup(context =>
+                    context.CallActivityAsync(
+                        nameof(CopyCsvFilesFunction.CopyCsvFiles),
+                        dataSetVersionId,
+                        null))
+                .Returns(Task.CompletedTask);
+
+            mockOrchestrationContext
+                .InSequence(activitySequence)
                 .Setup(context =>
                     context.CallActivityAsync(
                         nameof(ProcessInitialDataSetVersionFunction.CompleteProcessing),
-                        processingContext,
+                        dataSetVersionId,
                         null))
                 .Returns(Task.CompletedTask);
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.ProcessInitialDataSetVersion(
                 mockOrchestrationContext.Object,
-                processingContext);
+                new ProcessInitialDataSetVersionContext
+                {
+                    DataSetVersionId = dataSetVersionId
+                });
 
             VerifyAllMocks(mockOrchestrationContext);
         }
@@ -49,33 +61,37 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
         [Fact]
         public async Task ActivityFunctionThrowsException_CallsHandleFailureActivity()
         {
-            var processingContext = new ProcessInitialDataSetVersionContext
-            {
-                DataSetVersionId = Guid.NewGuid()
-            };
+            var dataSetVersionId = Guid.NewGuid();
 
             var mockOrchestrationContext = DefaultMockOrchestrationContext();
 
+            var activitySequence = new MockSequence();
+
             mockOrchestrationContext
+                .InSequence(activitySequence)
                 .Setup(context =>
                     context.CallActivityAsync(
-                        nameof(ProcessInitialDataSetVersionFunction.CompleteProcessing),
-                        processingContext,
+                        nameof(CopyCsvFilesFunction.CopyCsvFiles),
+                        dataSetVersionId,
                         null))
                 .Throws<Exception>();
 
             mockOrchestrationContext
+                .InSequence(activitySequence)
                 .Setup(context =>
                     context.CallActivityAsync(
                         nameof(ProcessInitialDataSetVersionFunction.HandleProcessingFailure),
-                        processingContext,
+                        dataSetVersionId,
                         null))
                 .Returns(Task.CompletedTask);
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.ProcessInitialDataSetVersion(
                 mockOrchestrationContext.Object,
-                processingContext);
+                new ProcessInitialDataSetVersionContext
+                {
+                    DataSetVersionId = dataSetVersionId
+                });
 
             VerifyAllMocks(mockOrchestrationContext);
         }
@@ -84,7 +100,7 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
             Guid? instanceId = null,
             bool isReplaying = false)
         {
-            var mock = new Mock<TaskOrchestrationContext>();
+            var mock = new Mock<TaskOrchestrationContext>(MockBehavior.Strict);
 
             mock
                 .Protected()
@@ -138,10 +154,7 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.HandleProcessingFailure(
-                new ProcessInitialDataSetVersionContext
-                {
-                    DataSetVersionId = dataSetVersion.Id
-                },
+                dataSetVersion.Id,
                 instanceId,
                 CancellationToken.None
             );
@@ -191,10 +204,8 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
             });
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.CompleteProcessing(new ProcessInitialDataSetVersionContext
-                {
-                    DataSetVersionId = dataSetVersion.Id
-                },
+            await function.CompleteProcessing(
+                dataSetVersion.Id,
                 instanceId,
                 CancellationToken.None);
 
