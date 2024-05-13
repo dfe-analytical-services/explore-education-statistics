@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -22,9 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int? DataSetFileVersion { get; set; }
 
-        public DataSetFileMeta?  DataSetFileMeta { get; set; }
+        public DataSetFileMeta? DataSetFileMeta { get; set; }
 
-        public Guid? PublicDataSetVersionId { get; set; }
+        public Guid? PublicApiDataSetId { get; set; }
+
+        public SemVersion? PublicApiDataSetVersion { get; set; }
 
         public Guid? ReplacedById { get; set; }
 

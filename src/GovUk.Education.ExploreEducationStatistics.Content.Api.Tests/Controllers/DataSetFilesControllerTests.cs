@@ -698,8 +698,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFiles(_fixture.DefaultFile()
-                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
-                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(0, s => s.SetPublicApiDataSetId(Guid.NewGuid()))
+                        .ForIndex(1, s => s.SetPublicApiDataSetId(Guid.NewGuid()))
                         .GenerateList(5))
                     .GenerateList();
 
@@ -722,7 +722,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = releaseVersionFiles
-                    .Where(rf => rf.File.PublicDataSetVersionId.HasValue)
+                    .Where(rf => rf.File.PublicApiDataSetId.HasValue)
                     .OrderBy(rf => rf.Name)
                     .ToList();
 
@@ -746,8 +746,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFiles(_fixture.DefaultFile()
-                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
-                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(0, s => s.SetPublicApiDataSetId(Guid.NewGuid()))
+                        .ForIndex(1, s => s.SetPublicApiDataSetId(Guid.NewGuid()))
                         .GenerateList(5))
                     .GenerateList();
 
@@ -1782,8 +1782,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
                         viewModel.LatestData),
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
-                    () => Assert.Equal(releaseFile.File.PublicDataSetVersionId.HasValue,
-                        viewModel.HasApiDataSet)
+                    () => Assert.Equal(releaseFile.File.PublicApiDataSetId.HasValue, viewModel.HasApiDataSet)
                 );
             });
         }

@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
@@ -66,6 +67,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     public DateTimeOffset? Updated { get; set; }
 
     public string Version => $"{VersionMajor}.{VersionMinor}";
+
+    public SemVersion FullSemanticVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
     public DataSetVersionType VersionType
         => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;

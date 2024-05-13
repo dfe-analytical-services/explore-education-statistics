@@ -118,7 +118,7 @@ public class DataSetFileService : IDataSetFileService
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
                 Published = result.Value.ReleaseVersion.Published!.Value,
-                HasApiDataSet = result.Value.File.PublicDataSetVersionId.HasValue,
+                HasApiDataSet = result.Value.File.PublicApiDataSetId.HasValue,
                 Meta = BuildDataSetFileMetaViewModel(
                     result.Value.File.DataSetFileMeta,
                     result.Value.FilterSequence,
@@ -343,7 +343,7 @@ internal static class ReleaseFileQueryableExtensions
         return dataSetType switch
         {
             DataSetType.All => query,
-            DataSetType.Api => query.Where(rf => rf.File.PublicDataSetVersionId.HasValue),
+            DataSetType.Api => query.Where(rf => rf.File.PublicApiDataSetId.HasValue),
             _ => throw new ArgumentOutOfRangeException(nameof(dataSetType)),
         };
     }
