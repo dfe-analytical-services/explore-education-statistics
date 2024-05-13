@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,6 +56,13 @@ public class DataSetFilesController : ControllerBase
     {
         return await _dataSetFileService
             .GetDataSetFile(dataSetFileId)
+            .HandleFailuresOrOk();
+    }
+    
+    [HttpGet("data-set-files/sitemap-summaries")]
+    public async Task<ActionResult<List<DataSetSitemapSummaryViewModel>>> GetSitemapSummaries()
+    {
+        return await _dataSetFileService.GetSitemapSummaries()
             .HandleFailuresOrOk();
     }
 }

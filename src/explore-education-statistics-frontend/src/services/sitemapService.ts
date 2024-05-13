@@ -4,15 +4,19 @@ import methodologyService, {
 import publicationService, {
   PublicationSitemapSummary,
 } from '@common/services/publicationService';
+import dataSetService, {
+  DataSetSitemapSummary,
+} from '@common/services/dataSetService';
 import { ISitemapField } from 'next-sitemap';
 
 export default async function getSitemapFields(): Promise<ISitemapField[]> {
   const methodologies = await methodologyService.getSitemapSummaries();
   const publications = await publicationService.getSitemapSummaries();
+  const dataSets = await dataSetService.getSitemapSummaries();
 
   const sitemapFields: ISitemapField[] = [
     // matches dynamic routes following the patterns:
-    // methodology/[methodology]
+    //  methodology/[methodology]
     ...buildMethodologyRoutes(methodologies),
 
     // matches dynamic routes following the patterns:
@@ -28,10 +32,14 @@ export default async function getSitemapFields(): Promise<ISitemapField[]> {
     //  find-statistics/[publication]/[release]
     ...buildPublicationRoutes(publications),
 
+    // matches dynamic routes following the patterns:
+    //  data-catalogue/data-set/[dataSetFieldId]
+    ...buildDataSetRoutes(dataSets),
+
     // Other routes which exist on the site but are excluded from the sitemap by config:
     //  data-tables/fast-track/[dataBlockParentId]
     //  data-tables/permalink/[publicationSlug]
-    //  data-catalogue/data-set/[dataSetFieldId]
+    //
   ];
 
   return sitemapFields;
@@ -125,27 +133,13 @@ function buildPublicationRoutes(
   return fields;
 }
 
-// Matches routes:
-// methodology/[methodology]
-export async function getMethodologySitemapFields(): Promise<ISitemapField[]> {
-  try {
-    const methodologySummaries = await methodologyService.getSitemapSummaries();
-
-    const routes: ISitemapField[] = methodologySummaries.map(methodology => ({
-      loc: `${process.env.PUBLIC_URL}methodology/${methodology.slug}`,
-      lastmod: `${methodology.lastModified}`,
-      changefreq: 'monthly',
-      priority: 0.6,
-    }));
-    return routes;
-  } catch (err) {
-    if (process.env.APP_ENV === 'Local') {
-      // eslint-disable-next-line no-console
-      console.error(
-        'Encountered an error whilst trying to fetch methodologies to build the sitemap. This step requires that the Content API be running.',
-      );
-      return [];
-    }
-    throw err;
-  }
+function buildDataSetRoutes(
+  dataSets: DataSetSitemapSummary[],
+): ISitemapField[] {
+  return dataSets.map(dataSet => ({
+    loc: `${process.env.PUBLIC_URL}data-catalogue/data-set/${dataSet.id}`,
+    lastmod: `${dataSet.lastModified}`,
+    changefreq: 'monthly',
+    priority: 0.6,
+  }));
 }

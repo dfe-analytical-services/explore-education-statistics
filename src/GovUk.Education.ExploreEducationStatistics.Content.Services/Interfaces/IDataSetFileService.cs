@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -27,4 +28,6 @@ public interface IDataSetFileService
 
     Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetId);
+    
+    Task<Either<ActionResult, List<DataSetSitemapSummaryViewModel>>> GetSitemapSummaries();
 }

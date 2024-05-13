@@ -140,6 +140,17 @@ public class DataSetFileService : IDataSetFileService
             };
     }
 
+    public async Task<Either<ActionResult, List<DataSetSitemapSummaryViewModel>>> GetSitemapSummaries()
+    {
+        return await _contentDbContext.ReleaseFiles
+            .Where(rf => rf.File.DataSetFileId.HasValue)
+            .Select(rf => new DataSetSitemapSummaryViewModel()
+            {
+                Id = rf.File.DataSetFileId!.Value.ToString(), LastModified = rf.File.Created
+            })
+            .ToListAsync();
+    }
+    
     private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
         IList<DataSetFileSummaryViewModel> results)
     {

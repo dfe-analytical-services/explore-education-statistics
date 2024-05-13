@@ -1,6 +1,7 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
   siteUrl: process.env.PUBLIC_URL,
+  sitemapSize: 5000,
   exclude: [
     '/subscriptions',
     '/subscriptions/verification-error',
