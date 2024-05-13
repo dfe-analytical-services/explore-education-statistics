@@ -14,6 +14,5 @@ public static class LocationRscRegionOptionMetaGeneratorExtensions
 
     public static InstanceSetters<LocationRscRegionOptionMeta> SetDefaults(
         this InstanceSetters<LocationRscRegionOptionMeta> setters)
-        => setters
-            .SetDefault(m => m.Label);
+        => setters.SetBaseDefaults();
 }

@@ -62,6 +62,11 @@ npx playwright test
 npx playwright test <spec-filename.ts>
 ```
 
+### Running the test in a folder level
+```bash
+npx playwright test --project "foldername"
+```
+
 ### Running the test in debug mode:
 ```bash
 npx playwright test <spec-filename.ts>  --debug

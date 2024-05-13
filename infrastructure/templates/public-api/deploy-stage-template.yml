@@ -13,14 +13,16 @@ parameters:
     default: ''
   - name: parameterFile
     type: string
+  - name: condition
+    type: string
 
 stages:
 - stage: ${{parameters.stageName}}
+  displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
+  condition: ${{parameters.condition}}
   variables:
     - group: Public API Infrastructure - ${{parameters.environment}}
     - group: Public API Infrastructure - ${{parameters.environment}} secrets
-  displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
-  condition: succeeded()
   ${{ if not(eq(parameters.dependsOn, '')) }}:
     dependsOn: ${{parameters.dependsOn}}
   jobs:
@@ -61,8 +63,10 @@ stages:
                       publicUrls='$(publicUrls)' \
                       postgreSqlAdminName='$(postgreSqlAdminName)' \
                       postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                      postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
                       dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-                      psqlDbUsersAdded='$(psqlDbUsersAdded)' \
+                      deployContainerApp=$(deployContainerApp) \
+                      updatePsqlFlexibleServer=$(updatePsqlFlexibleServer)
                       dataProcessorFunctionAppExists=$dataProcessorExists
 
           - template: pipeline-variables-from-bicep-outputs-template.yml
@@ -77,13 +81,21 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
+                
                 az functionapp config appsettings set \
                   --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
                   --settings \
-                    "ConnectionStrings__PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))" \
                     "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))"
+                
+                az webapp config connection-string set \
+                  --name '$(dataProcessorFunctionAppName)' \
+                  --resource-group '$(resourceGroupName)' \
+                  --slot 'staging' \
+                  --connection-string-type 'PostgreSQL' \
+                  --settings \
+                    "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - deploy to staging slot'

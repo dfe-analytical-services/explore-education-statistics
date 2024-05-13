@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -45,6 +46,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     indicators: 1,
                     locations: 1,
                     timePeriods: 2)
+                .WithVersionNumber(1, 1)
                 .WithStatusDraft()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
@@ -89,8 +91,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 () => Assert.Equal(liveDataSetVersion.Version, dataSetViewModel.LatestLiveVersion.Version),
                 () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
-                () => Assert.Equal(liveDataSetVersion.Published?.ToUnixTimeSeconds(),
-                    dataSetViewModel.LatestLiveVersion?.Published.ToUnixTimeSeconds())
+                () => Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(),
+                    dataSetViewModel.LatestLiveVersion?.Published)
             );
         }
 
@@ -549,6 +551,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     locations: 1,
                     timePeriods: 2)
                 .WithStatusDraft()
+                .WithVersionNumber(1, 1)
                 .WithReleaseFileId(draftReleaseFile.Id)
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
@@ -643,6 +646,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     locations: 1,
                     timePeriods: 2)
                 .WithStatusDraft()
+                .WithVersionNumber(1, 1)
                 .WithReleaseFileId(draftReleaseFile.Id)
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);

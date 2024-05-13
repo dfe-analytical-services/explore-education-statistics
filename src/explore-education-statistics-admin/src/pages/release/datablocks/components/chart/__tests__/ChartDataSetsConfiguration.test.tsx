@@ -3,13 +3,13 @@ import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import render from '@common-test/render';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTableMeta from '@common/modules/table-tool/utils/mapFullTableMeta';
 import { TableDataSubjectMeta } from '@common/services/tableBuilderService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -184,7 +184,7 @@ describe('ChartDataSetsConfiguration', () => {
   });
 
   test('submitting fails if another form is invalid', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider
         initialForms={{
           ...testFormState,
@@ -207,7 +207,7 @@ describe('ChartDataSetsConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -218,13 +218,13 @@ describe('ChartDataSetsConfiguration', () => {
   });
 
   test('submitting fails if there are no data sets', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartDataSetsConfiguration meta={testSubjectMeta} onChange={noop} />
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -299,7 +299,7 @@ describe('ChartDataSetsConfiguration', () => {
   });
 
   test('clicking the reorder button toggles reordering on and off', async () => {
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartDataSetsConfiguration
           meta={testSubjectMeta}
@@ -331,7 +331,7 @@ describe('ChartDataSetsConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
         name: 'Reorder data sets',
       }),
@@ -498,7 +498,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('shows submit error if data set already exists', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -513,20 +513,15 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
-        screen.getByLabelText('Characteristic'),
-        'male',
-      );
-      await userEvent.selectOptions(
+      await user.selectOptions(screen.getByLabelText('Characteristic'), 'male');
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'unauthorised-absence-sessions',
       );
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         expect(
@@ -542,7 +537,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('successfully submits by selecting only indicator and filter', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -551,20 +546,15 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
-        screen.getByLabelText('Characteristic'),
-        'male',
-      );
-      await userEvent.selectOptions(
+      await user.selectOptions(screen.getByLabelText('Characteristic'), 'male');
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'unauthorised-absence-sessions',
       );
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expected: DataSet[] = [
@@ -582,7 +572,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('successfully submits by selecting all options', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -591,31 +581,23 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
-        screen.getByLabelText('Characteristic'),
-        'male',
-      );
-      await userEvent.selectOptions(
+      await user.selectOptions(screen.getByLabelText('Characteristic'), 'male');
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'unauthorised-absence-sessions',
       );
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Location'),
         LocationFilter.createId({
           value: 'barnsley',
           level: 'localAuthority',
         }),
       );
-      await userEvent.selectOptions(
-        screen.getByLabelText('Time period'),
-        '2020_AY',
-      );
+      await user.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expected: DataSet[] = [
@@ -638,7 +620,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('successfully submits by selecting only indicator when there are no filters', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={{
@@ -650,16 +632,14 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'unauthorised-absence-sessions',
       );
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expected: DataSet[] = [
@@ -677,7 +657,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('successfully submits when select all indicators', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -686,27 +666,19 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
-        screen.getByLabelText('Characteristic'),
-        'male',
-      );
-      await userEvent.selectOptions(
+      await user.selectOptions(screen.getByLabelText('Characteristic'), 'male');
+      await user.selectOptions(
         screen.getByLabelText('Location'),
         LocationFilter.createId({
           value: 'barnsley',
           level: 'localAuthority',
         }),
       );
-      await userEvent.selectOptions(
-        screen.getByLabelText('Time period'),
-        '2020_AY',
-      );
+      await user.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expected: DataSet[] = [
@@ -739,7 +711,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('successfully submits when select all filters', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -748,27 +720,22 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'unauthorised-absence-sessions',
       );
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Location'),
         LocationFilter.createId({
           value: 'barnsley',
           level: 'localAuthority',
         }),
       );
-      await userEvent.selectOptions(
-        screen.getByLabelText('Time period'),
-        '2020_AY',
-      );
+      await user.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expected: DataSet[] = [
@@ -801,7 +768,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('successfully submits when select all filters of multiple filters', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMetaMultipleFilters}
@@ -810,27 +777,22 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'unauthorised-absence-sessions',
       );
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Location'),
         LocationFilter.createId({
           value: 'barnsley',
           level: 'localAuthority',
         }),
       );
-      await userEvent.selectOptions(
-        screen.getByLabelText('Time period'),
-        '2020_AY',
-      );
+      await user.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expected: DataSet[] = [
@@ -903,7 +865,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('successfully submits when select all indicators and filters', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -912,23 +874,18 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Location'),
         LocationFilter.createId({
           value: 'barnsley',
           level: 'localAuthority',
         }),
       );
-      await userEvent.selectOptions(
-        screen.getByLabelText('Time period'),
-        '2020_AY',
-      );
+      await user.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Add data set' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expected: DataSet[] = [
@@ -983,7 +940,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('calls `onChange` with only data set removed', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -1000,7 +957,7 @@ describe('ChartDataSetsConfiguration', () => {
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+      await user.click(screen.getByRole('button', { name: 'Remove' }));
 
       expect(handleChange).toHaveBeenCalledWith([]);
     });
@@ -1008,7 +965,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('calls `onChange` with correct data set removed from multiple data sets', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -1032,9 +989,7 @@ describe('ChartDataSetsConfiguration', () => {
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        within(rows[1]).getByRole('button', { name: 'Remove' }),
-      );
+      await user.click(within(rows[1]).getByRole('button', { name: 'Remove' }));
 
       expect(handleChange).toHaveBeenCalledWith([
         {
@@ -1047,7 +1002,7 @@ describe('ChartDataSetsConfiguration', () => {
     test('removing all data sets', async () => {
       const handleChange = jest.fn();
 
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
             meta={testSubjectMeta}
@@ -1070,7 +1025,7 @@ describe('ChartDataSetsConfiguration', () => {
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Remove all data sets' }),
       );
 
@@ -1080,7 +1035,7 @@ describe('ChartDataSetsConfiguration', () => {
         modal.getByText('Are you sure you want to remove all data sets?'),
       ).toBeInTheDocument();
 
-      await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      await user.click(modal.getByRole('button', { name: 'Confirm' }));
 
       expect(handleChange).toHaveBeenCalledWith([]);
     });

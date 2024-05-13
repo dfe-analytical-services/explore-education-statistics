@@ -525,12 +525,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FilterSequence")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IndicatorSequence")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
 

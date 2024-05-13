@@ -55,7 +55,7 @@ describe('EditableKeyStatTextForm', () => {
     expect(screen.getByLabelText('Guidance title')).toHaveValue(
       'Text guidance title',
     );
-    expect(screen.getByLabelText('Guidance text')).toHaveTextContent(
+    expect(screen.getByLabelText('Guidance text')).toHaveValue(
       'Text guidance text',
     );
 

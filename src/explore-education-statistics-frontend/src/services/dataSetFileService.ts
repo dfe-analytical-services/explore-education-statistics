@@ -5,7 +5,10 @@ import { SortDirection } from '@common/services/types/sort';
 
 export interface DataSetFile {
   id: string;
+  title: string;
+  summary: string;
   file: { id: string; name: string; size: string };
+  hasApiDataSet?: boolean;
   release: {
     id: string;
     isLatestPublishedRelease: boolean;
@@ -20,26 +23,27 @@ export interface DataSetFile {
     title: string;
     type: ReleaseType;
   };
-  summary: string;
-  title: string;
-  // These aren't in the backend yet, so may change.
-  filters: string[];
-  geographicLevels: string[];
-  indicators: string[];
-  timePeriods: {
-    from?: string;
-    to?: string;
+  meta: {
+    geographicLevels: string[];
+    timePeriod: {
+      timeIdentifier: string;
+      from: string;
+      to: string;
+    };
+    filters: string[];
+    indicators: string[];
   };
 }
 
 export interface DataSetFileSummary {
   id: string;
-  content: string;
   fileId: string;
   filename: string;
   fileSize: string;
   fileExtension: string;
+  hasApiDataSet?: boolean;
   title: string;
+  content: string;
   theme: {
     id: string;
     title: string;
@@ -54,14 +58,16 @@ export interface DataSetFileSummary {
   };
   latestData: boolean;
   published: Date;
-  // These aren't in the backend yet, so may change.
-  timePeriods: {
-    from?: string;
-    to?: string;
+  meta: {
+    geographicLevels: string[];
+    timePeriod: {
+      timeIdentifier: string;
+      from: string;
+      to: string;
+    };
+    filters: string[];
+    indicators: string[];
   };
-  geographicLevels: string[];
-  filters: string[];
-  indicators: string[];
 }
 
 export const dataSetFileSortOptions = [
@@ -76,6 +82,7 @@ export type DataSetFileSortOption = (typeof dataSetFileSortOptions)[number];
 export type DataSetFileSortParam = 'published' | 'title' | 'relevance';
 
 export const dataSetFileFilters = [
+  'dataSetType',
   'latest',
   'publicationId',
   'releaseId',
@@ -85,7 +92,10 @@ export const dataSetFileFilters = [
 
 export type DataSetFileFilter = (typeof dataSetFileFilters)[number];
 
+export type DataSetType = 'all' | 'api';
+
 export interface DataSetFileListRequest {
+  dataSetType?: DataSetType;
   latestOnly?: 'true' | 'false';
   page?: number;
   pageSize?: number;

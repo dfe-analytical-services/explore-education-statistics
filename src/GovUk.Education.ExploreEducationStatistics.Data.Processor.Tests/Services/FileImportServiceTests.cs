@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             .ToList();
 
         [Fact]
-        public async Task CheckComplete()
+        public async Task CompleteImport()
         {
             var file = new File
             {
@@ -56,6 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             dataImportService
                 .Setup(s => s.UpdateStatus(
                     import.Id, COMPLETE, 100))
+                .Returns(Task.CompletedTask);
+
+            dataImportService
+                .Setup(s => s.WriteDataSetFileMeta(
+                    import.SubjectId))
                 .Returns(Task.CompletedTask);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -82,14 +87,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                await service.CheckComplete(import, statisticsDbContext);
+                await service.CompleteImport(import, statisticsDbContext);
             }
 
             VerifyAllMocks(dataImportService);
         }
 
         [Fact]
-        public async Task CheckComplete_Errors()
+        public async Task CompleteImport_Errors()
         {
             var file = new File
             {
@@ -135,14 +140,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                await service.CheckComplete(import, statisticsDbContext);
+                await service.CompleteImport(import, statisticsDbContext);
             }
 
             VerifyAllMocks(dataImportService);
         }
 
         [Fact]
-        public async Task CheckComplete_IncorrectObservationCount()
+        public async Task CompleteImport_IncorrectObservationCount()
         {
             var file = new File
             {
@@ -188,14 +193,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                await service.CheckComplete(import, statisticsDbContext);
+                await service.CompleteImport(import, statisticsDbContext);
             }
 
             VerifyAllMocks(dataImportService);
         }
 
         [Fact]
-        public async Task CheckComplete_AlreadyFinished()
+        public async Task CompleteImport_AlreadyFinished()
         {
             // We don't expect to see any further import status updates if the current status is in
             // any "finished" state  
@@ -206,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     var file = new File
                     {
                         Id = Guid.NewGuid(),
-                        Filename = "my_data_file.csv"
+                        Filename = "my_data_file.csv",
                     };
 
                     var import = new DataImport
@@ -220,16 +225,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         ExpectedImportedRows = 2
                     };
 
-                    var statisticsDbContextId = Guid.NewGuid().ToString();
+                    var dataImportService = new Mock<IDataImportService>(Strict);
+                    if (finishedStatus == COMPLETE)
+                    {
+                        dataImportService.Setup(mock => mock.WriteDataSetFileMeta(import.SubjectId))
+                            .Returns(Task.CompletedTask);
+                    }
 
+                    var statisticsDbContextId = Guid.NewGuid().ToString();
                     await using var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId);
-                    var service = BuildFileImportService();
-                    await service.CheckComplete(import, statisticsDbContext);
+                    {
+                        var service = BuildFileImportService(dataImportService: dataImportService.Object);
+                        await service.CompleteImport(import, statisticsDbContext);
+                    }
+
+                    VerifyAllMocks(dataImportService);
                 });
         }
 
         [Fact]
-        public async Task CheckComplete_Aborting()
+        public async Task CompleteImport_Aborting()
         {
             // We expect to see a final import status update if the current status is in an
             // "aborting" state, updating the import status to be in the associated final
@@ -267,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                     {
                         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                        await service.CheckComplete(import, statisticsDbContext);
+                        await service.CompleteImport(import, statisticsDbContext);
                     }
 
                     VerifyAllMocks(dataImportService);

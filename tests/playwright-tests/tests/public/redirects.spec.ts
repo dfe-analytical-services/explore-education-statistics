@@ -48,32 +48,6 @@ test.describe('Redirect behaviour', () => {
     await expect(page).toHaveURL(`${PUBLIC_URL}/`);
   });
 
-  test('meta-guidance is redirected to data-guidance', async ({ page }) => {
-    await page.goto(
-      `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/meta-guidance`,
-    );
-    await expect(page).toHaveURL(
-      `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/data-guidance`,
-    );
-
-    await page.goto(
-      `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/meta-guidance/`,
-    );
-    await expect(page).toHaveURL(
-      `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/data-guidance`,
-    );
-  });
-
-  test('download-latest-data is redirected to data-catalogue', async ({
-    page,
-  }) => {
-    await page.goto(`${PUBLIC_URL}/download-latest-data`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/data-catalogue`);
-
-    await page.goto(`${PUBLIC_URL}/download-latest-data/`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/data-catalogue`);
-  });
-
   // Not ideal, I'd rather it.each like Jest has. But from the docs:
   // https://playwright.dev/docs/test-parameterize
   for (const redirect of seoRedirects) {

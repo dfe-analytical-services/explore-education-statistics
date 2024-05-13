@@ -1,14 +1,11 @@
-import {
-  pluginsConfigSimple,
-  toolbarConfigSimple,
-} from '@admin/config/ckEditorConfig';
 import releaseDataGuidanceService from '@admin/services/releaseDataGuidanceService';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
 import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
 import InsetText from '@common/components/InsetText';
@@ -178,12 +175,10 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                   dataSet={dataSet}
                                   renderContent={() =>
                                     isEditing ? (
-                                      <RHFFormFieldEditor<DataGuidanceFormValues>
-                                        includePlugins={pluginsConfigSimple}
-                                        toolbarConfig={toolbarConfigSimple}
-                                        name={`dataSets.${index}.content`}
+                                      <RHFFormFieldTextArea<DataGuidanceFormValues>
                                         label="File guidance content"
-                                        testId="fileGuidanceContent"
+                                        name={`dataSets.${index}.content`}
+                                        rows={3}
                                       />
                                     ) : (
                                       <ContentHtml

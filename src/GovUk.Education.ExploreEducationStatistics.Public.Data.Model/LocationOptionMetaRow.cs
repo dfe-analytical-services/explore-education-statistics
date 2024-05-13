@@ -13,6 +13,9 @@ public class LocationOptionMetaRow
     public int Id { get; set; }
 
     [Column(CanBeNull = false)]
+    public required string PublicId { get; set; }
+
+    [Column(CanBeNull = false)]
     public required string Type { get; set; }
 
     [Column(CanBeNull = false)]
@@ -27,4 +30,13 @@ public class LocationOptionMetaRow
     public string? LaEstab { get; set; }
 
     public string? Ukprn { get; set; }
+
+    public string GetRowKey() =>
+        Type + ',' +
+        Label + ',' +
+        (Code ?? "null") + ',' +
+        (OldCode ?? "null") + ',' +
+        (Urn ?? "null") + ',' +
+        (LaEstab ?? "null") + ',' +
+        (Ukprn ?? "null");
 }

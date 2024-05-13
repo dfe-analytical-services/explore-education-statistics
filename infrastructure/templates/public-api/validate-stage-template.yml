@@ -10,15 +10,18 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: condition
+    type: string
 
 stages:
   - stage: ${{parameters.stageName}}
     displayName: 'Validate ${{parameters.environment}} Infrastructure'
+    condition: ${{parameters.condition}}
+    variables:
+      - group: Public API Infrastructure - ${{parameters.environment}}
+      - group: Public API Infrastructure - ${{parameters.environment}} secrets
     jobs:
       - job: Validate_Infrastructure
-        variables:
-          - group: Public API Infrastructure - ${{parameters.environment}}
-          - group: Public API Infrastructure - ${{parameters.environment}} secrets
         steps:
           - checkout: self
 
@@ -48,6 +51,8 @@ stages:
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-                    psqlDbUsersAdded=true \
+                    deployContainerApp=true \
+                    updatePsqlFlexibleServer=true \
                     dataProcessorFunctionAppExists=true

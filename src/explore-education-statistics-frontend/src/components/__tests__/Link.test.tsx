@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import Link from '../Link';
+import Link from '@frontend/components/Link';
 
 describe('Link', () => {
   test('renders correctly without `unvisited` state', () => {

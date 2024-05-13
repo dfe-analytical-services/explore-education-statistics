@@ -1,8 +1,6 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -15,10 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
         public Guid ReleaseVersionId { get; set; }
-
-        public List<FilterSequenceEntry>? FilterSequence { get; set; }
-
-        public List<IndicatorGroupSequenceEntry>? IndicatorSequence { get; set; }
 
         public DateTime? Created { get; set; }
 

@@ -38,9 +38,10 @@ describe('DataSetFileSummary', () => {
   });
 
   test('renders the expanded view when show more details is clicked', async () => {
+    const user = userEvent.setup();
     render(<DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />);
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
         name: 'Show more details about Data set 1',
       }),
@@ -153,5 +154,21 @@ describe('DataSetFileSummary', () => {
     expect(
       screen.queryByText('This is the latest data'),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders the `Available by API` tag when it is available by API', () => {
+    render(
+      <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} expanded />,
+    );
+
+    expect(screen.getByText('Available by API')).toBeInTheDocument();
+  });
+
+  test('does not render the `Available by API` tag when it is not available by API', () => {
+    render(
+      <DataSetFileSummary dataSetFile={testDataSetFileSummaries[1]} expanded />,
+    );
+
+    expect(screen.queryByText('Available by API')).not.toBeInTheDocument();
   });
 });

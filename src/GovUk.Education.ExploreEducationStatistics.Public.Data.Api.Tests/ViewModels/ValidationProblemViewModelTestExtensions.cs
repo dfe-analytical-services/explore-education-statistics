@@ -1,8 +1,12 @@
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 
@@ -52,9 +56,9 @@ public static class ValidationProblemViewModelTestExtensions
             expectedCode: ValidationMessages.LocationAllowedLevel.Code
         );
 
-        var errorDetail = error.GetDetail<LocationStringValidators.AllowedLevelErrorDetail>();
+        var errorDetail = error.GetDetail<LocationAllowedLevelErrorDetail>();
 
-        Assert.Equal(level, errorDetail.Value.Level);
+        Assert.Equal(level, errorDetail.Value);
 
         return error;
     }
@@ -70,29 +74,46 @@ public static class ValidationProblemViewModelTestExtensions
             expectedCode: ValidationMessages.LocationAllowedProperty.Code
         );
 
-        var errorDetail = error.GetDetail<LocationStringValidators.AllowedPropertyErrorDetail>();
+        var errorDetail = error.GetDetail<LocationAllowedPropertyErrorDetail>();
 
-        Assert.Equal(property, errorDetail.Value.Property);
+        Assert.Equal(property, errorDetail.Value);
         Assert.Equal(allowedProperties, errorDetail.AllowedProperties);
 
         return error;
     }
 
-    public static ErrorViewModel AssertHasLocationMaxValueLengthError(
+    public static ErrorViewModel AssertHasLocationValueNotEmptyError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string value,
-        int maxValueLength)
+        string property)
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.LocationMaxValueLength.Code
+            expectedCode: ValidationMessages.LocationValueNotEmpty.Code
         );
 
-        var errorDetail = error.GetDetail<LocationStringValidators.MaxValueLengthErrorDetail>();
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
 
-        Assert.Equal(value, errorDetail.Value.Value);
-        Assert.Equal(maxValueLength, errorDetail.MaxValueLength);
+        Assert.Equal(property, errorDetail["property"].GetString());
+
+        return error;
+    }
+
+    public static ErrorViewModel AssertHasLocationValueMaxLengthError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath,
+        string property,
+        int maxLength)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.LocationValueMaxLength.Code
+        );
+
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(property, errorDetail["property"].GetString());
+        Assert.Equal(maxLength, errorDetail["maxLength"].GetInt32());
 
         return error;
     }
@@ -114,21 +135,38 @@ public static class ValidationProblemViewModelTestExtensions
         return error;
     }
 
-    public static ErrorViewModel AssertHasSortMaxFieldLengthError(
+    public static ErrorViewModel AssertHasSortFieldNotEmptyError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath,
-        string field,
-        int maxFieldLength = 40)
+        string expectedPath)
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.SortMaxFieldLength.Code
+            expectedCode: ValidationMessages.SortFieldNotEmpty.Code
         );
 
-        var errorDetail = error.GetDetail<SortStringValidators.MaxFieldLengthErrorDetail>();
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
 
-        Assert.Equal(field, errorDetail.Value.Field);
-        Assert.Equal(maxFieldLength, errorDetail.MaxFieldLength);
+        Assert.Equal("field", errorDetail["property"].GetString());
+
+        return error;
+    }
+    
+    public static ErrorViewModel AssertHasSortFieldMaxLengthError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath,
+        string field,
+        int maxLength = 40)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.SortFieldMaxLength.Code
+        );
+
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal("field", errorDetail["property"].GetString());
+        Assert.Equal(field, errorDetail["value"].GetString());
+        Assert.Equal(maxLength, errorDetail["maxLength"].GetInt32());
 
         return error;
     }
@@ -143,9 +181,9 @@ public static class ValidationProblemViewModelTestExtensions
             expectedCode: ValidationMessages.SortDirection.Code
         );
 
-        var errorDetail = error.GetDetail<SortStringValidators.DirectionErrorDetail>();
+        var errorDetail = error.GetDetail<AllowedValueValidator.AllowedErrorDetail<string>>();
 
-        Assert.Equal(direction, errorDetail.Value.Direction);
+        Assert.Equal(direction, errorDetail.Value);
 
         return error;
     }
@@ -201,6 +239,23 @@ public static class ValidationProblemViewModelTestExtensions
         return error;
     }
 
+    public static ErrorViewModel AssertHasTimePeriodInvalidYearError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath,
+        string period)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.TimePeriodInvalidYear.Code
+        );
+
+        var errorDetail = error.GetDetail<InvalidErrorDetail<string>>();
+
+        Assert.Equal(period, errorDetail.Value);
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasTimePeriodYearRangeError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
@@ -208,12 +263,12 @@ public static class ValidationProblemViewModelTestExtensions
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.TimePeriodYearRange.Code
+            expectedCode: ValidationMessages.TimePeriodInvalidYearRange.Code
         );
 
-        var errorDetail = error.GetDetail<TimePeriodStringValidators.RangeErrorDetail>();
+        var errorDetail = error.GetDetail<InvalidErrorDetail<string>>();
 
-        Assert.Equal(period, errorDetail.Value.Period);
+        Assert.Equal(period, errorDetail.Value);
 
         return error;
     }
@@ -228,9 +283,9 @@ public static class ValidationProblemViewModelTestExtensions
             expectedCode: ValidationMessages.TimePeriodAllowedCode.Code
         );
 
-        var errorDetail = error.GetDetail<TimePeriodStringValidators.AllowedCodeErrorDetail>();
+        var errorDetail = error.GetDetail<TimePeriodAllowedCodeErrorDetail>();
 
-        Assert.Equal(code, errorDetail.Value.Code);
+        Assert.Equal(code, errorDetail.Value);
 
         return error;
     }

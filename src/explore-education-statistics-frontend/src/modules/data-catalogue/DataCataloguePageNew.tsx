@@ -9,6 +9,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import Button from '@common/components/Button';
+import NotificationBanner from '@common/components/NotificationBanner';
 import { releaseTypes } from '@common/services/types/releaseType';
 import downloadService from '@common/services/downloadService';
 import { Theme } from '@common/services/publicationService';
@@ -23,6 +24,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import {
   DataSetFileFilter,
   DataSetFileSortOption,
+  DataSetType,
   dataSetFileFilters,
 } from '@frontend/services/dataSetFileService';
 import Filters from '@frontend/modules/data-catalogue/components/Filters';
@@ -42,6 +44,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 
 export interface DataCataloguePageQuery {
+  dataSetType?: DataSetType;
   latestOnly?: string;
   page?: number;
   publicationId?: string;
@@ -57,8 +60,15 @@ export default function DataCataloguePageNew() {
   const queryClient = useQueryClient();
   const { isMedia: isMobileMedia } = useMobileMedia();
 
-  const { latestOnly, sortBy, publicationId, releaseId, searchTerm, themeId } =
-    getParamsFromQuery(router.query);
+  const {
+    dataSetType,
+    latestOnly,
+    sortBy,
+    publicationId,
+    releaseId,
+    searchTerm,
+    themeId,
+  } = getParamsFromQuery(router.query);
 
   const {
     data: dataSetsData,
@@ -252,6 +262,19 @@ export default function DataCataloguePageNew() {
           : undefined
       }
     >
+      <NotificationBanner title="This page has changed">
+        Following user feedback we've made some changes to this page to make our
+        publications easier to find, if you have any comments on the new design
+        please let us know via the{' '}
+        <a
+          href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          feedback survey
+        </a>
+        .
+      </NotificationBanner>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
@@ -288,24 +311,19 @@ export default function DataCataloguePageNew() {
           {!isMobileMedia && (
             <LoadingSpinner loading={isLoadingThemes}>
               <Filters
+                dataSetType={dataSetType}
                 latestOnly={latestOnly}
                 publicationId={publicationId}
                 publications={publications}
                 releaseId={releaseId}
                 releases={releases}
+                showClearFiltersButton={!isMobileMedia && isFiltered}
                 themeId={themeId}
                 themes={themes}
                 onChange={handleChangeFilter}
+                onClearFilters={() => handleClearFilter({ filterType: 'all' })}
               />
             </LoadingSpinner>
-          )}
-
-          {!isMobileMedia && isFiltered && (
-            <ButtonText
-              onClick={() => handleClearFilter({ filterType: 'all' })}
-            >
-              Clear filters
-            </ButtonText>
           )}
         </div>
         <div className="govuk-grid-column-two-thirds">
@@ -396,6 +414,7 @@ export default function DataCataloguePageNew() {
                 totalResults={totalResults}
               >
                 <Filters
+                  dataSetType={dataSetType}
                   latestOnly={latestOnly}
                   publicationId={publicationId}
                   publications={publications}
@@ -468,24 +487,21 @@ export default function DataCataloguePageNew() {
                           <h3>{`${selectedPublication.title} - ${selectedRelease?.title} downloads`}</h3>
                           {selectedRelease && (
                             <>
-                              <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap govuk-!-margin-bottom-6">
-                                <TagGroup className="govuk-!-margin-right-2">
-                                  <Tag>
-                                    {releaseTypes[selectedRelease.type]}
-                                  </Tag>
-                                  <Tag
-                                    colour={
-                                      selectedRelease.latestRelease
-                                        ? undefined
-                                        : 'orange'
-                                    }
-                                  >
-                                    {selectedRelease.latestRelease
-                                      ? 'This is the latest data'
-                                      : 'This is not the latest data'}
-                                  </Tag>
-                                </TagGroup>
-
+                              <TagGroup>
+                                <Tag>{releaseTypes[selectedRelease.type]}</Tag>
+                                <Tag
+                                  colour={
+                                    selectedRelease.latestRelease
+                                      ? undefined
+                                      : 'orange'
+                                  }
+                                >
+                                  {selectedRelease.latestRelease
+                                    ? 'This is the latest data'
+                                    : 'This is not the latest data'}
+                                </Tag>
+                              </TagGroup>
+                              <div className="govuk-!-margin-bottom-5 govuk-!-margin-top-3">
                                 <Link
                                   to={`/find-statistics/${selectedPublication.slug}/${selectedRelease.slug}`}
                                 >

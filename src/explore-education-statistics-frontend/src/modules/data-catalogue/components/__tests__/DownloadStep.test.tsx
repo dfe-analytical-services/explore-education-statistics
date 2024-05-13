@@ -276,10 +276,7 @@ describe('DownloadStep', () => {
     );
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith(
-        { files: ['file-1'] },
-        expect.anything(),
-      );
+      expect(handleSubmit).toHaveBeenCalledWith({ files: ['file-1'] });
     });
   });
 });

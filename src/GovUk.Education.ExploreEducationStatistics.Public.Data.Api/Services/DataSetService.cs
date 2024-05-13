@@ -104,7 +104,7 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(dataSetVersion => LoadMeta(dataSetVersion, types, cancellationToken))
+            .OnSuccessDo(dsv => LoadMeta(dsv, types, cancellationToken))
             .OnSuccess(MapVersionMeta);
     }
 
@@ -176,7 +176,7 @@ internal class DataSetService(
             Version = latestVersion.Version,
             Published = latestVersion.Published!.Value,
             TotalResults = latestVersion.TotalResults,
-            TimePeriods = MapTimePeriods(latestVersion.MetaSummary.TimePeriodRange),
+            TimePeriods = MapTimePeriods(latestVersion.MetaSummary!.TimePeriodRange),
             GeographicLevels = latestVersion.MetaSummary.GeographicLevels,
             Filters = latestVersion.MetaSummary.Filters,
             Indicators = latestVersion.MetaSummary.Indicators,
@@ -203,7 +203,7 @@ internal class DataSetService(
             Withdrawn = dataSetVersion.Withdrawn,
             Notes = dataSetVersion.Notes,
             TotalResults = dataSetVersion.TotalResults,
-            TimePeriods = MapTimePeriods(dataSetVersion.MetaSummary.TimePeriodRange),
+            TimePeriods = MapTimePeriods(dataSetVersion.MetaSummary!.TimePeriodRange),
             GeographicLevels = dataSetVersion.MetaSummary.GeographicLevels,
             Filters = dataSetVersion.MetaSummary.Filters,
             Indicators = dataSetVersion.MetaSummary.Indicators,
@@ -253,8 +253,7 @@ internal class DataSetService(
             dataSetVersion.LocationMetas = await publicDataDbContext.LocationMetas
                 .AsNoTracking()
                 .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-                .Include(lm => lm.OptionLinks)
-                .ThenInclude(lom => lom.Option)
+                .Include(lm => lm.Options)
                 .ToListAsync(cancellationToken: cancellationToken);
         }
 
@@ -275,7 +274,7 @@ internal class DataSetService(
         }
     }
 
-    private DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)
+    private static DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)
     {
         var filters = dataSetVersion.FilterMetas
             .Select(MapFilterMeta)
@@ -350,7 +349,7 @@ internal class DataSetService(
 
     private static LocationLevelMetaViewModel MapLocationMeta(LocationMeta locationMeta)
     {
-        var options = locationMeta.OptionLinks
+        var options = locationMeta.Options
             .Select(MapLocationOptionMeta)
             .OrderBy(lom => lom.Label)
             .ToList();
@@ -362,49 +361,43 @@ internal class DataSetService(
         };
     }
 
-    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationOptionMetaLink locationOptionMetaLink)
+    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationOptionMeta locationOptionMeta)
     {
-        switch (locationOptionMetaLink.Option)
+        return locationOptionMeta switch
         {
-            case LocationCodedOptionMeta locationCodedOptionMeta:
-                return new LocationCodedOptionMetaViewModel
-                {
-                    Id = locationOptionMetaLink.PublicId,
-                    Label = locationCodedOptionMeta.Label,
-                    Code = locationCodedOptionMeta.Code,
-                };
-            case LocationLocalAuthorityOptionMeta locationLocalAuthorityOptionMeta:
-                return new LocationLocalAuthorityOptionMetaViewModel
-                {
-                    Id = locationOptionMetaLink.PublicId,
-                    Label = locationLocalAuthorityOptionMeta.Label,
-                    Code = locationLocalAuthorityOptionMeta.Code,
-                    OldCode = locationLocalAuthorityOptionMeta.OldCode,
-                };
-            case LocationProviderOptionMeta locationProviderOptionMeta:
-                return new LocationProviderOptionMetaViewModel
-                {
-                    Id = locationOptionMetaLink.PublicId,
-                    Label = locationProviderOptionMeta.Label,
-                    Ukprn = locationProviderOptionMeta.Ukprn,
-                };
-            case LocationRscRegionOptionMeta locationRscRegionOptionMeta:
-                return new LocationRscRegionOptionMetaViewModel
-                {
-                    Id = locationOptionMetaLink.PublicId,
-                    Label = locationRscRegionOptionMeta.Label,
-                };
-            case LocationSchoolOptionMeta locationSchoolOptionMeta:
-                return new LocationSchoolOptionMetaViewModel
-                {
-                    Id = locationOptionMetaLink.PublicId,
-                    Label = locationSchoolOptionMeta.Label,
-                    Urn = locationSchoolOptionMeta.Urn,
-                    LaEstab = locationSchoolOptionMeta.LaEstab,
-                };
-            default:
-                throw new NotImplementedException();
-        }
+            LocationCodedOptionMeta codedOption => new LocationCodedOptionMetaViewModel
+            {
+                Id = codedOption.PublicId,
+                Label = codedOption.Label,
+                Code = codedOption.Code,
+            },
+            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionMetaViewModel
+            {
+                Id = localAuthorityOption.PublicId,
+                Label = localAuthorityOption.Label,
+                Code = localAuthorityOption.Code,
+                OldCode = localAuthorityOption.OldCode,
+            },
+            LocationProviderOptionMeta providerOption => new LocationProviderOptionMetaViewModel
+            {
+                Id = providerOption.PublicId,
+                Label = providerOption.Label,
+                Ukprn = providerOption.Ukprn,
+            },
+            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionMetaViewModel
+            {
+                Id = rscRegionOption.PublicId,
+                Label = rscRegionOption.Label,
+            },
+            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionMetaViewModel
+            {
+                Id = schoolOption.PublicId,
+                Label = schoolOption.Label,
+                Urn = schoolOption.Urn,
+                LaEstab = schoolOption.LaEstab,
+            },
+            _ => throw new NotImplementedException()
+        };
     }
 
     private static TimePeriodMetaViewModel MapTimePeriod(TimePeriodMeta timePeriodMeta)

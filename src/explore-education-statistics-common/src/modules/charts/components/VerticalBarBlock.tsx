@@ -274,7 +274,11 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   type: 'verticalbar',
   name: 'Vertical bar',
   capabilities: {
+    canIncludeNonNumericData: true,
     canPositionLegendInline: false,
+    canSetBarThickness: true,
+    canSetDataLabelPosition: false,
+    canShowDataLabels: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,
@@ -289,6 +293,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   options: {
     defaults: {
       height: 300,
+      includeNonNumericData: false,
+      showDataLabels: false,
+      stacked: false,
     },
   },
   legend: {
@@ -307,10 +314,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       },
       defaults: {
         groupBy: 'timePeriod',
+        groupByFilter: '',
         min: 0,
-        showGrid: true,
         size: 50,
-        sortAsc: true,
         sortBy: 'name',
         tickConfig: 'default',
         tickSpacing: 1,
@@ -329,7 +335,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
         canRotateLabel: true,
       },
       defaults: {
-        showGrid: true,
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',

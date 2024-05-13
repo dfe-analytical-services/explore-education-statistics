@@ -321,8 +321,8 @@ importers:
         specifier: ^4.6.4
         version: 4.6.4(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       react-lazyload:
-        specifier: github:twobin/react-lazyload#f1faffda816180f39d3ff8cf3d9c2060f8d9d623
-        version: github.com/twobin/react-lazyload/f1faffda816180f39d3ff8cf3d9c2060f8d9d623(react-dom@18.2.0)(react@18.2.0)
+        specifier: 3.2.1
+        version: 3.2.1(react-dom@18.2.0)(react@18.2.0)
       react-leaflet:
         specifier: ^4.2.1
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0)(react@18.2.0)
@@ -703,8 +703,8 @@ importers:
         specifier: 7.43.9
         version: 7.43.9(react@18.2.0)
       react-lazyload:
-        specifier: github:twobin/react-lazyload#f1faffda816180f39d3ff8cf3d9c2060f8d9d623
-        version: github.com/twobin/react-lazyload/f1faffda816180f39d3ff8cf3d9c2060f8d9d623(react-dom@18.2.0)(react@18.2.0)
+        specifier: 3.2.1
+        version: 3.2.1(react-dom@18.2.0)(react@18.2.0)
       react-leaflet:
         specifier: ^4.2.1
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0)(react@18.2.0)
@@ -15211,6 +15211,16 @@ packages:
   /react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
 
+  /react-lazyload@3.2.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-oDLlLOI/rRLY0fUh/HYFCy4CqCe7zdJXv6oTl2pC30tN3ezWxvwcdHYfD/ZkrGOMOOT5pO7hNLSvg7WsmAij1w==}
+    peerDependencies:
+      react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /react-leaflet@4.2.1(leaflet@1.9.4)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-p9chkvhcKrWn/H/1FFeVSqLdReGwn2qmiobOQGO3BifX+/vV/39qhY8dGqbdcPh1e6jxh/QHriLXr7a4eLFK4Q==}
     peerDependencies:
@@ -18631,17 +18641,4 @@ packages:
       tiny-case: 1.0.3
       toposort: 2.0.2
       type-fest: 2.19.0
-    dev: false
-
-  github.com/twobin/react-lazyload/f1faffda816180f39d3ff8cf3d9c2060f8d9d623(react-dom@18.2.0)(react@18.2.0):
-    resolution: {tarball: https://codeload.github.com/twobin/react-lazyload/tar.gz/f1faffda816180f39d3ff8cf3d9c2060f8d9d623}
-    id: github.com/twobin/react-lazyload/f1faffda816180f39d3ff8cf3d9c2060f8d9d623
-    name: react-lazyload
-    version: 3.2.0
-    peerDependencies:
-      react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false

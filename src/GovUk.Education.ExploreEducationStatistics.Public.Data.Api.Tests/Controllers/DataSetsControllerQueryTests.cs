@@ -1088,10 +1088,9 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: []
-            );
+            var client = BuildApp().CreateClient();
+
+            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query?indicators[]=");
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1508,6 +1507,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
                     "",
                     "invalid",
                     "|",
+                    "test|",
                     "test|invalid",
                     "test|asc",
                     "test|desc",
@@ -1520,22 +1520,25 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
 
             var validationProblem = response.AssertValidationProblem();
 
-            Assert.Equal(8, validationProblem.Errors.Count);
+            Assert.Equal(10, validationProblem.Errors.Count);
 
             validationProblem.AssertHasNotEmptyError(expectedPath: "sorts[0]");
             validationProblem.AssertHasSortFormatError(expectedPath: "sorts[1]", value: "invalid");
-            validationProblem.AssertHasSortFormatError(expectedPath: "sorts[2]", value: "|");
 
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[3]", direction: "invalid");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[4]", direction: "asc");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[5]", direction: "desc");
+            validationProblem.AssertHasSortFieldNotEmptyError(expectedPath: "sorts[2]");
 
-            validationProblem.AssertHasSortMaxFieldLengthError(
-                expectedPath: "sorts[6]",
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[2]", direction: "");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[3]", direction: "");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[4]", direction: "invalid");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[5]", direction: "asc");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[6]", direction: "desc");
+
+            validationProblem.AssertHasSortFieldMaxLengthError(
+                expectedPath: "sorts[7]",
                 field: new string('a', 41)
             );
-            validationProblem.AssertHasSortMaxFieldLengthError(
-                expectedPath: "sorts[7]",
+            validationProblem.AssertHasSortFieldMaxLengthError(
+                expectedPath: "sorts[8]",
                 field: new string('b', 41)
             );
         }
@@ -1614,6 +1617,8 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
                                 "SCH|code|12345",
                                 "PROV|oldCode|12345",
                                 "RSC|code|12345",
+                                "NAT|id| ",
+                                "LA|code| ",
                                 $"NAT|id|{new string('a', 11)}",
                                 $"LA|code|{new string('a', 26)}",
                                 $"SCH|urn|{new string('a', 7)}",
@@ -1627,7 +1632,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
 
             var validationProblem = response.AssertValidationProblem();
 
-            Assert.Equal(15, validationProblem.Errors.Count);
+            Assert.Equal(17, validationProblem.Errors.Count);
 
             validationProblem.AssertHasNotEmptyError(expectedPath: $"{path}[0]");
             validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[1]", value: "invalid");
@@ -1661,31 +1666,33 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
                 property: "code",
                 allowedProperties: ["id"]
             );
+            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[10]", property: "id");
+            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[11]", property: "code");
 
-            validationProblem.AssertHasLocationMaxValueLengthError(
-                expectedPath: $"{path}[10]",
-                value: new string('a', 11),
-                maxValueLength: 10
-            );
-            validationProblem.AssertHasLocationMaxValueLengthError(
-                expectedPath: $"{path}[11]",
-                value: new string('a', 26),
-                maxValueLength: 25
-            );
-            validationProblem.AssertHasLocationMaxValueLengthError(
+            validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[12]",
-                value: new string('a', 7),
-                maxValueLength: 6
+                property: "id",
+                maxLength: 10
             );
-            validationProblem.AssertHasLocationMaxValueLengthError(
+            validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[13]",
-                value: new string('a', 9),
-                maxValueLength: 8
+                property: "code",
+                maxLength: 25
             );
-            validationProblem.AssertHasLocationMaxValueLengthError(
+            validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[14]",
-                value: new string('a', 11),
-                maxValueLength: 10
+                property: "urn",
+                maxLength: 6
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[15]",
+                property: "ukprn",
+                maxLength: 8
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[16]",
+                property: "id",
+                maxLength: 10
             );
         }
 
@@ -1698,6 +1705,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
             [
                 "",
                 "||",
+                "NAT|id| ",
                 $"NAT|id|{new string('a', 11)}",
             ];
 
@@ -1723,7 +1731,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
 
             var validationProblem = response.AssertValidationProblem();
 
-            Assert.Equal(6, validationProblem.Errors.Count);
+            Assert.Equal(7, validationProblem.Errors.Count);
 
             validationProblem.AssertHasLocationAllowedLevelError(expectedPath: "locations.eq", level: "LADD");
             validationProblem.AssertHasLocationAllowedPropertyError(
@@ -1733,10 +1741,14 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
             );
             validationProblem.AssertHasNotEmptyError(expectedPath: "locations.in[0]");
             validationProblem.AssertHasLocationFormatError(expectedPath: "locations.in[1]", value: "||");
-            validationProblem.AssertHasLocationMaxValueLengthError(
+            validationProblem.AssertHasLocationValueNotEmptyError(
                 expectedPath: "locations.in[2]",
-                value: new string('a', 11),
-                maxValueLength: 10
+                property: "id"
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: "locations.in[3]",
+                property: "id",
+                maxLength: 10
             );
             validationProblem.AssertHasNotEmptyError("locations.notIn");
         }
@@ -1840,7 +1852,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
 
             validationProblem.AssertHasNotEmptyError($"{path}[0]");
             validationProblem.AssertHasTimePeriodFormatError(expectedPath: $"{path}[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: $"{path}[2]", value: "|");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[2]", code: "");
 
             validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[3]", period: "2020/2019");
             validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[4]", period: "2020/2022");
@@ -1893,7 +1905,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
             validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.notEq", code: "W10");
             validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.in[0]");
             validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[2]", value: "|");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.in[2]", code: "");
             validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.notIn");
         }
 

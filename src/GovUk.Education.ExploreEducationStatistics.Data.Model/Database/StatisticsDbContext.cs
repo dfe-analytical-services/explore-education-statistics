@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Thinktecture;
@@ -309,18 +308,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasOne(rs => rs.Subject)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<ReleaseSubject>()
-                .Property(rs => rs.FilterSequence)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<FilterSequenceEntry>>(v));
-
-            modelBuilder.Entity<ReleaseSubject>()
-                .Property(rs => rs.IndicatorSequence)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<IndicatorGroupSequenceEntry>>(v));
         }
 
         private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)

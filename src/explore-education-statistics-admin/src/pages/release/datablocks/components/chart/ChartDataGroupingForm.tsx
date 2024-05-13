@@ -1,14 +1,14 @@
 import ChartCustomDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartCustomDataGroupingsConfiguration';
 import styles from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingForm.module.scss';
+import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import {
-  Form,
-  FormFieldRadioGroup,
-  FormFieldSelect,
-} from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import {
   CustomDataGroup,
   DataGroupingConfig,
@@ -19,21 +19,21 @@ import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
-import generateDataSetLabel from './utils/generateDataSetLabel';
+import { ObjectSchema } from 'yup';
 
 const formId = 'chartDataGroupingForm';
 
 type GroupingType = DataGroupingType | 'CopyCustom';
 
-interface FormValues {
-  customGroups: CustomDataGroup[];
+export interface ChartDataGroupingFormValues {
+  customGroups?: CustomDataGroup[];
   numberOfGroups?: number;
   numberOfGroupsQuantiles?: number;
   copyCustomGroups?: string;
   type: GroupingType;
+  min?: number;
+  max?: number;
 }
 
 interface Props {
@@ -68,98 +68,149 @@ export default function ChartDataGroupingForm({
       .filter(grouping => grouping.value !== dataGroupingKey);
   }, [dataSetConfigs, dataSetConfig.dataSet, meta]);
 
+  const validationSchema = useMemo<
+    ObjectSchema<ChartDataGroupingFormValues>
+  >(() => {
+    return Yup.object({
+      customGroups: Yup.array()
+        .of(
+          Yup.object({
+            min: Yup.number().required(),
+            max: Yup.number().required(),
+          }),
+        )
+        .when('type', {
+          is: 'Custom',
+          then: s =>
+            s
+              .required('Add one or more custom groups')
+              .test(
+                'at-least-one',
+                'Add one or more custom groups',
+                function atLeastOne(value) {
+                  return value && value.length > 0;
+                },
+              ),
+        }),
+
+      numberOfGroups: Yup.number().when('type', {
+        is: 'EqualIntervals',
+        then: s => s.required('Enter a number of data groups'),
+        otherwise: s => s.notRequired(),
+      }),
+      numberOfGroupsQuantiles: Yup.number().when('type', {
+        is: 'Quantiles',
+        then: s => s.required('Enter a number of data groups'),
+        otherwise: s => s.notRequired(),
+      }),
+      copyCustomGroups: Yup.string().when('type', {
+        is: 'CopyCustom',
+        then: s => s.required('Select a data set to copy custom groups from'),
+        otherwise: s => s.notRequired(),
+      }),
+      type: Yup.string()
+        .oneOf<GroupingType>([
+          'EqualIntervals',
+          'Quantiles',
+          'Custom',
+          'CopyCustom',
+        ])
+        .required(),
+
+      min: Yup.number().test(
+        'noOverlap',
+        'Min cannot overlap another group',
+        function noOverlap(value?: number) {
+          // eslint-disable-next-line react/no-this-in-sfc
+          const groups: CustomDataGroup[] = this.parent.customGroups ?? [];
+
+          // Show error when the min is in an existing group
+          if (
+            value !== undefined &&
+            groups.some(group => value >= group.min && value <= group.max)
+          ) {
+            return false;
+          }
+
+          /* eslint-disable react/no-this-in-sfc */
+          // This group overlaps with an existing group
+          const overlaps =
+            value !== undefined &&
+            groups.some(
+              group => value <= group.max && group.min <= this.parent.max,
+            );
+
+          if (overlaps) {
+            // Check if the max is in an existing group,
+            // don't show the error here if it is as only want
+            // to show the error on the field(s) that require action.
+            return groups.some(
+              group =>
+                this.parent.max >= group.min && this.parent.max <= group.max,
+            );
+          }
+          /* eslint-enable react/no-this-in-sfc */
+          return true;
+        },
+      ),
+      max: Yup.number()
+        .moreThan(Yup.ref('min'), 'Must be greater than min')
+        .test(
+          'noOverlap',
+          'Max cannot overlap another group',
+          function noOverlap(value?: number) {
+            // eslint-disable-next-line react/no-this-in-sfc
+            const groups: CustomDataGroup[] = this.parent.customGroups ?? [];
+
+            // Show error when the max is in an existing group
+            if (
+              value !== undefined &&
+              groups.some(group => value >= group.min && value <= group.max)
+            ) {
+              return false;
+            }
+
+            /* eslint-disable react/no-this-in-sfc */
+            // This group overlaps with an existing group
+            const overlaps =
+              value !== undefined &&
+              groups.some(
+                group => this.parent.min <= group.max && group.min <= value,
+              );
+
+            if (overlaps) {
+              // Check if the min is in an existing group,
+              // don't show the error here if it is as only want
+              // to show the error on the field(s) that require action.
+              return groups.some(
+                group =>
+                  this.parent.min >= group.min && this.parent.min <= group.max,
+              );
+            }
+            /* eslint-enable react/no-this-in-sfc */
+            return true;
+          },
+        ),
+    });
+  }, []);
   return (
-    <Formik<FormValues>
+    <FormProvider
       initialValues={{
         ...dataSetConfig.dataGrouping,
         numberOfGroupsQuantiles: dataSetConfig.dataGrouping.numberOfGroups,
         copyCustomGroups: undefined,
       }}
-      validationSchema={Yup.object<FormValues>({
-        customGroups: Yup.array()
-          .of(
-            Yup.object<CustomDataGroup>({
-              min: Yup.number().required(),
-              max: Yup.number().required(),
-            }),
-          )
-          .when('type', {
-            is: 'Custom',
-            then: s =>
-              s
-                .required('Add one or more custom groups')
-                .test(
-                  'at-least-one',
-                  'Add one or more custom groups',
-                  function atLeastOne(value) {
-                    return value && value.length > 0;
-                  },
-                ),
-          }),
-        numberOfGroups: Yup.number().when('type', {
-          is: 'EqualIntervals',
-          then: s => s.required('Enter a number of data groups'),
-          otherwise: s => s.notRequired(),
-        }),
-        numberOfGroupsQuantiles: Yup.number().when('type', {
-          is: 'Quantiles',
-          then: s => s.required('Enter a number of data groups'),
-          otherwise: s => s.notRequired(),
-        }),
-        copyCustomGroups: Yup.string().when('type', {
-          is: 'CopyCustom',
-          then: s => s.required('Select a data set to copy custom groups from'),
-          otherwise: s => s.notRequired(),
-        }),
-        type: Yup.string()
-          .oneOf<GroupingType>([
-            'EqualIntervals',
-            'Quantiles',
-            'Custom',
-            'CopyCustom',
-          ])
-          .required(),
-      })}
-      onSubmit={values => {
-        const copiedCustomGroups: CustomDataGroup[] =
-          values.type === 'CopyCustom'
-            ? dataSetsWithCustomGroupsOptions.find(
-                grouping => grouping.value === values.copyCustomGroups,
-              )?.dataGrouping.customGroups ?? []
-            : [];
-
-        const updatedGrouping: DataGroupingConfig = {
-          customGroups:
-            values.type === 'CopyCustom'
-              ? copiedCustomGroups
-              : values.customGroups,
-          type: values.type === 'CopyCustom' ? 'Custom' : values.type,
-        };
-
-        onSubmit({
-          dataSet: dataSetConfig.dataSet,
-          dataGrouping:
-            updatedGrouping.type === 'Custom'
-              ? updatedGrouping
-              : {
-                  ...updatedGrouping,
-                  numberOfGroups:
-                    values.type === 'Quantiles' &&
-                    values.numberOfGroupsQuantiles
-                      ? values.numberOfGroupsQuantiles
-                      : values.numberOfGroups,
-                },
-        });
-      }}
+      validationSchema={validationSchema}
     >
-      {form => {
+      {({ resetField, setValue, watch }) => {
+        const values = watch();
         const defaultOptions: RadioOption<GroupingType>[] = [
           {
             label: 'Equal intervals',
             value: 'EqualIntervals',
             hint: 'Data is grouped into equal-sized ranges.',
             conditional: (
-              <FormFieldNumberInput<FormValues>
+              <RHFFormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroups"
                 label="Number of data groups"
                 width={3}
@@ -171,7 +222,7 @@ export default function ChartDataGroupingForm({
             value: 'Quantiles',
             hint: 'Data is grouped so that each group has a similar number of data points.',
             conditional: (
-              <FormFieldNumberInput<FormValues>
+              <RHFFormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroupsQuantiles"
                 label="Number of data groups"
                 width={3}
@@ -185,19 +236,30 @@ export default function ChartDataGroupingForm({
             hint: 'Define custom groups.',
             conditional: (
               <ChartCustomDataGroupingsConfiguration
-                groups={form.values.customGroups}
+                groups={values.customGroups}
                 id={`${formId}-customDataGroups`}
                 unit={unit}
-                onAddGroup={group => {
-                  form.setFieldValue(
-                    'customGroups',
-                    orderBy([...form.values.customGroups, group], g => g.min),
-                  );
+                onAddGroup={() => {
+                  if (values.min !== undefined && values.max !== undefined) {
+                    const currentGroups = values.customGroups ?? [];
+                    const group: CustomDataGroup = {
+                      min: values.min,
+                      max: values.max,
+                    };
+
+                    setValue('customGroups' as const, [
+                      ...currentGroups,
+                      group,
+                    ]);
+
+                    resetField('min');
+                    resetField('max');
+                  }
                 }}
                 onRemoveGroup={group => {
-                  form.setFieldValue(
-                    'customGroups',
-                    form.values.customGroups?.filter(
+                  setValue(
+                    'customGroups' as const,
+                    values.customGroups?.filter(
                       g => !(g.min === group.min && g.max === group.max),
                     ),
                   );
@@ -212,7 +274,7 @@ export default function ChartDataGroupingForm({
           value: 'CopyCustom',
           hint: 'Copy custom groups from another data set.',
           conditional: (
-            <FormFieldSelect<FormValues>
+            <RHFFormFieldSelect<ChartDataGroupingFormValues>
               name="copyCustomGroups"
               className={styles.selectContainer}
               label="Copy custom groups from another data set"
@@ -228,8 +290,41 @@ export default function ChartDataGroupingForm({
 
         return (
           <div className={styles.container}>
-            <Form id={formId}>
-              <FormFieldRadioGroup<FormValues>
+            <RHFForm
+              id={formId}
+              onSubmit={() => {
+                const copiedCustomGroups: CustomDataGroup[] =
+                  values.type === 'CopyCustom'
+                    ? dataSetsWithCustomGroupsOptions.find(
+                        grouping => grouping.value === values.copyCustomGroups,
+                      )?.dataGrouping.customGroups ?? []
+                    : [];
+
+                const updatedGrouping: DataGroupingConfig = {
+                  customGroups:
+                    values.type === 'CopyCustom'
+                      ? copiedCustomGroups
+                      : values.customGroups ?? [],
+                  type: values.type === 'CopyCustom' ? 'Custom' : values.type,
+                };
+
+                onSubmit({
+                  dataSet: dataSetConfig.dataSet,
+                  dataGrouping:
+                    updatedGrouping.type === 'Custom'
+                      ? updatedGrouping
+                      : {
+                          ...updatedGrouping,
+                          numberOfGroups:
+                            values.type === 'Quantiles' &&
+                            values.numberOfGroupsQuantiles
+                              ? values.numberOfGroupsQuantiles
+                              : values.numberOfGroups,
+                        },
+                });
+              }}
+            >
+              <RHFFormFieldRadioGroup<ChartDataGroupingFormValues>
                 legend="Select a grouping type"
                 legendSize="s"
                 name="type"
@@ -246,10 +341,10 @@ export default function ChartDataGroupingForm({
                   Cancel
                 </Button>
               </ButtonGroup>
-            </Form>
+            </RHFForm>
           </div>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 }

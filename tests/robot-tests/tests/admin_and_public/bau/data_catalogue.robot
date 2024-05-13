@@ -183,7 +183,7 @@ Validate Related information section and links exist
     ...    ${relatedInformation}
 
 Validate data sets list
-    user checks list has x items    testid:data-set-file-list    10
+    user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    10
 
     ${dataSet}=    user gets testid element    data-set-file-summary-${SUBJECT_NAME_3}
 
@@ -209,30 +209,30 @@ Validate sort controls exist
     user checks page contains radio    A to Z
 
 Validate theme filter exists
-    user checks select contains option    id:theme    All themes
-    user checks select contains option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks select contains option    id:theme    ${ROLE_PERMISSIONS_THEME_TITLE}
+    user checks select contains option    id:filters-form-theme    All themes
+    user checks select contains option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks select contains option    id:filters-form-theme    ${ROLE_PERMISSIONS_THEME_TITLE}
 
 Validate publication filter exists
-    user checks select contains option    id:publication    All publications
+    user checks select contains option    id:filters-form-publication    All publications
 
 Validate release filter exists
-    user checks select contains option    id:release    Latest releases
-    user checks select contains option    id:release    All releases
+    user checks select contains option    id:filters-form-release    Latest releases
+    user checks select contains option    id:filters-form-release    All releases
 
 Filter by theme
-    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Filter by publication
-    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Filter by all releases
-    user chooses select option    id:release    All releases
+    user chooses select option    id:filters-form-release    All releases
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
@@ -242,16 +242,16 @@ Remove theme filter
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Remove publication filter
-    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Remove release filter
-    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
@@ -261,7 +261,7 @@ Clear all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
     user checks page contains button    pupil
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}

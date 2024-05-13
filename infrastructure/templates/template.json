@@ -706,6 +706,7 @@
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
+    "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
 
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
@@ -1034,7 +1035,13 @@
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
+    "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
+    "containerAppEnvironmentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('containerAppEnvironmentSubnetName'))]",
+    "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
+    "applicationGatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('applicationGatewaySubnetName'))]",
+    "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
+    "psqlFlexibleServerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('psqlFlexibleServerSubnetName'))]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -1055,6 +1062,10 @@
       {
         "name": "data",
         "id": "[variables('dataSubnetRef')]"
+      },
+      {
+        "name": "publicApiDataProcessor",
+        "id": "[variables('publicApiDataProcessorSubnetRef')]"
       }
     ],
     "publicSqlAllowedSubnets": [
@@ -1726,7 +1737,8 @@
         "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
-        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]",
+        "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]"
       }
     },
     {
@@ -3145,6 +3157,11 @@
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "PublicDataDb",
+              "type": "PostgreSQL",
+              "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-publisher-connectionstring-publicdatadb)')]"
             }
           ]
         }
@@ -3178,7 +3195,8 @@
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
         "NotificationStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
-        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]"
+        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
     {
@@ -3457,6 +3475,9 @@
               "addressPrefix": "10.0.6.0/24",
               "serviceEndpoints": [
                 {
+                  "service": "Microsoft.Sql"
+                },
+                {
                   "service": "Microsoft.Storage"
                 }
               ],
@@ -3473,7 +3494,7 @@
           {
             "name": "[variables('containerAppEnvironmentSubnetName')]",
             "properties": {
-              "addressPrefix": "10.0.8.0/24",
+              "addressPrefix": "10.0.8.0/23",
               "delegations": [
                 {
                   "name": "environment",
@@ -3482,6 +3503,18 @@
                   }
                 }
               ]
+            }
+          },
+          {
+            "name": "[variables('applicationGatewaySubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.10.0/24"
+            }
+          },
+          {
+            "name": "[variables('psqlFlexibleServerSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.12.0/24"
             }
           }
         ]

@@ -95,8 +95,8 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
       return fs.existsSync(
         path.join(projectRoot, this.root, 'appsettings.Idp.json'),
       )
-        ? ['db', 'data-storage']
-        : ['db', 'data-storage', 'idp'];
+        ? ['db', 'data-storage', 'public-api-db']
+        : ['db', 'data-storage', 'public-api-db', 'idp'];
     },
   },
   content: {
@@ -145,7 +145,7 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.yellow,
     port: 7072,
     type: 'func',
-    dockerServices: ['db', 'data-storage'],
+    dockerServices: ['db', 'data-storage', 'public-api-db'],
   },
   notifier: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Notifier',
@@ -159,7 +159,7 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.blue,
     port: 7074,
     type: 'func',
-    dockerServices: ['data-storage'],
+    dockerServices: ['db', 'public-api-db', 'data-storage'],
   },
   idp: {
     service: 'idp',

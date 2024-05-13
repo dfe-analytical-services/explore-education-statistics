@@ -1,8 +1,13 @@
-using System.Text.Json.Serialization;
+using System.Globalization;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
+using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -57,18 +62,18 @@ public record DataSetQueryTimePeriod
     /// </summary>
     public required string Code { get; init; }
 
-    [JsonIgnore]
-    public string ParsedPeriod => GetParsedPeriod(Period, ParsedCode);
+    public string ParsedPeriod() => GetParsedPeriod(Period, ParsedCode());
 
-    [JsonIgnore]
-    public TimeIdentifier ParsedCode => EnumUtil.GetFromEnumValue<TimeIdentifier>(Code);
+    public TimeIdentifier ParsedCode() => EnumUtil.GetFromEnumValue<TimeIdentifier>(Code);
+
+    public bool HasRangePeriod() => Period.Contains('/');
 
     public string ToTimePeriodString()
     {
         return $"{Period}|{Code}";
     }
 
-    public static DataSetQueryTimePeriod FromString(string timePeriod)
+    public static DataSetQueryTimePeriod Parse(string timePeriod)
     {
         var parts = timePeriod.Split('|');
         var period = parts[0];
@@ -87,7 +92,11 @@ public record DataSetQueryTimePeriod
 
         if (metaAttribute.YearFormat == TimePeriodYearFormat.Default)
         {
-            return period;
+            return !period.Contains('/')
+                ? period
+                : throw new ArgumentOutOfRangeException(
+                    paramName: nameof(period),
+                    message: "Period should be a single year and not a range.");
         }
 
         if (period.Contains('/'))
@@ -95,8 +104,91 @@ public record DataSetQueryTimePeriod
             return period;
         }
 
-        var year = int.Parse(period);
+        return int.TryParse(period, out var year)
+            ? $"{year}/{year + 1}"
+            : throw new ArgumentOutOfRangeException(
+                paramName: nameof(period),
+                message: "Period should be a numeric year");
+    }
 
-        return $"{year}/{year + 1}";
+    private static bool TryParseYear(string year, out int parsedYear)
+        => int.TryParse(year, style: NumberStyles.None, provider: null, result: out parsedYear);
+
+    private static bool IsValidPeriodYear(string period) => TryParseYear(period, out _);
+
+    public class Validator : AbstractValidator<DataSetQueryTimePeriod>
+    {
+        public Validator()
+        {
+            RuleFor(tp => tp.Code)
+                .Must((tp, _) => IsAllowedCode(tp))
+                .WithErrorCode(ValidationMessages.TimePeriodAllowedCode.Code)
+                .WithMessage(ValidationMessages.TimePeriodAllowedCode.Message)
+                .WithState(tp => new TimePeriodAllowedCodeErrorDetail(
+                    Value: tp.Code,
+                    AllowedCodes: tp.HasRangePeriod() ? AllowedRangeCodes : AllowedCodes
+                ))
+                .DependentRules(() =>
+                {
+                    RuleFor(tp => tp.Period)
+                        .Must(IsValidPeriodYear)
+                        .WithErrorCode(ValidationMessages.TimePeriodInvalidYear.Code)
+                        .WithMessage(ValidationMessages.TimePeriodInvalidYear.Message)
+                        .WithState(tp => new InvalidErrorDetail<string>(tp.Period))
+                        .When(tp => !tp.HasRangePeriod());
+
+                    RuleFor(tp => tp.Period)
+                        .Must(IsValidPeriodYearRange)
+                        .WithErrorCode(ValidationMessages.TimePeriodInvalidYearRange.Code)
+                        .WithMessage(ValidationMessages.TimePeriodInvalidYearRange.Message)
+                        .WithState(tp => new InvalidErrorDetail<string>(tp.Period))
+                        .When(tp => tp.HasRangePeriod());
+                });
+        }
+
+        private static readonly HashSet<TimeIdentifier> AllowedTimeIdentifiers =
+            TimeIdentifierUtils.DataEnums.ToHashSet();
+
+        private static readonly HashSet<TimeIdentifier> AllowedRangeTimeIdentifiers =
+            AllowedTimeIdentifiers
+                .Where(
+                    identifier => identifier.GetEnumAttribute<TimeIdentifierMetaAttribute>().YearFormat
+                        is TimePeriodYearFormat.Academic or TimePeriodYearFormat.Fiscal
+                )
+                .ToHashSet();
+
+        private static readonly IReadOnlyList<string> AllowedCodes =
+            TimeIdentifierUtils.DataCodes
+                .Order()
+                .ToList();
+
+        private static readonly IReadOnlyList<string> AllowedRangeCodes =
+            AllowedRangeTimeIdentifiers
+                .Select(identifier => identifier.GetEnumValue())
+                .Order()
+                .ToList();
+
+        private static bool IsValidPeriodYearRange(string period)
+        {
+            var rangeParts = period.Split('/');
+            var start = rangeParts[0];
+            var end = rangeParts[1];
+
+            return TryParseYear(start, out var startYear)
+                   && TryParseYear(end, out var endYear)
+                   && endYear == startYear + 1;
+        }
+
+        private static bool IsAllowedCode(DataSetQueryTimePeriod timePeriod)
+        {
+            if (!EnumUtil.TryGetFromEnumValue<TimeIdentifier>(timePeriod.Code, out var code))
+            {
+                return false;
+            }
+
+            return timePeriod.HasRangePeriod()
+                ? AllowedRangeTimeIdentifiers.Contains(code)
+                : AllowedTimeIdentifiers.Contains(code);
+        }
     }
 }

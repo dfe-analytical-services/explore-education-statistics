@@ -58,13 +58,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
             Assert.Equal(dataSetVersion.Version, content.LatestVersion.Version);
             Assert.Equal(
-                dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
-                content.LatestVersion.Published.ToUnixTimeSeconds()
+                dataSetVersion.Published.TruncateNanoseconds(),
+                content.LatestVersion.Published
             );
             Assert.Equal(dataSetVersion.TotalResults, content.LatestVersion.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.LatestVersion.TimePeriods.Start);
             Assert.Equal(
@@ -265,18 +265,21 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSetVersion.VersionType, result.Type);
             Assert.Equal(dataSetVersion.Status, result.Status);
             Assert.Equal(
-                dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
-                result.Published.ToUnixTimeSeconds()
+                dataSetVersion.Published.TruncateNanoseconds(),
+                result.Published
             );
-            Assert.Equal(
-                dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
-                result.Withdrawn?.ToUnixTimeSeconds()
-            );
+            if (dataSetVersionStatus == DataSetVersionStatus.Withdrawn)
+            {
+                Assert.Equal(
+                    dataSetVersion.Withdrawn.TruncateNanoseconds(),
+                    result.Withdrawn
+                );
+            }
             Assert.Equal(dataSetVersion.Notes, result.Notes);
             Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 result.TimePeriods.Start);
             Assert.Equal(
@@ -543,7 +546,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            DataSetVersion dataSetVersion = DataFixture
+            var dataSetVersionGenerator = DataFixture
                 .DefaultDataSetVersion(
                     filters: 1,
                     indicators: 1,
@@ -552,6 +555,10 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 .WithStatus(dataSetVersionStatus)
                 .WithPublished(DateTimeOffset.UtcNow)
                 .WithDataSetId(dataSet.Id);
+            
+            DataSetVersion dataSetVersion = dataSetVersionStatus == DataSetVersionStatus.Withdrawn
+                ? dataSetVersionGenerator.WithWithdrawn(DateTimeOffset.UtcNow)
+                : dataSetVersionGenerator;
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
@@ -564,18 +571,21 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSetVersion.VersionType, content.Type);
             Assert.Equal(dataSetVersion.Status, content.Status);
             Assert.Equal(
-                dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
-                content.Published.ToUnixTimeSeconds()
+                dataSetVersion.Published.TruncateNanoseconds(),
+                content.Published
             );
-            Assert.Equal(
-                dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
-                content.Withdrawn?.ToUnixTimeSeconds()
-            );
+            if (dataSetVersionStatus == DataSetVersionStatus.Withdrawn)
+            {
+                Assert.Equal(
+                    dataSetVersion.Withdrawn.TruncateNanoseconds(),
+                    content.Withdrawn
+                );
+            }
             Assert.Equal(dataSetVersion.Notes, content.Notes);
             Assert.Equal(dataSetVersion.TotalResults, content.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.TimePeriods.Start);
             Assert.Equal(
@@ -800,19 +810,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         dataSetVersion.LocationMetas,
                         fm => fm.Level == locationMetaViewModel.Level);
 
-                    var allLocationMetaLinks = locationMeta.Options
-                        .SelectMany(o => o.MetaLinks)
-                        .ToList();
-
                     foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
                     {
-                        var locationOptionMetaLink = Assert.Single(
-                            allLocationMetaLinks,
-                            link => link.PublicId == locationOptionMetaViewModel.Id);
-
                         var locationOptionMeta = Assert.Single(
                             locationMeta.Options,
-                            o => o.Id == locationOptionMetaLink.OptionId);
+                            o => o.PublicId == locationOptionMetaViewModel.Id);
 
                         switch (locationOptionMeta)
                         {

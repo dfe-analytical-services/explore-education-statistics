@@ -1,9 +1,8 @@
-import {
-  Form,
-  FormFieldCheckboxGroup,
-  FormFieldset,
-} from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
 import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
+import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
@@ -12,14 +11,12 @@ import { ReleaseSummary } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import Details from '@common/components/Details';
 import { Subject } from '@common/services/tableBuilderService';
 import ContentHtml from '@common/components/ContentHtml';
 import Tag from '@common/components/Tag';
 import useMounted from '@common/hooks/useMounted';
 import React, { useMemo } from 'react';
-import { Formik } from 'formik';
 
 interface DownloadFormValues {
   files: string[];
@@ -125,34 +122,30 @@ const DownloadStep = ({
     [subjects],
   );
 
-  const handleSubmit = useFormSubmit<DownloadFormValues>(onSubmit);
-
   return (
-    <Formik<DownloadFormValues>
+    <FormProvider
       enableReinitialize
       initialValues={initialValues}
-      validateOnBlur={false}
       validationSchema={Yup.object<DownloadFormValues>({
         files: Yup.array()
           .of(Yup.string())
           .min(1, 'Choose a file')
           .required('Choose a file'),
       })}
-      onSubmit={handleSubmit}
     >
-      {form => {
-        // isMounted check required as Formik context can be undefined
+      {({ formState, reset }) => {
+        // isMounted check required as Form context can be undefined
         // if the step is active on page load.
         return isActive && isMounted ? (
-          <Form id="downloadForm">
+          <RHFForm id="downloadForm" onSubmit={onSubmit}>
             <FormFieldset id="downloadFiles" legend={stepHeading}>
               {checkboxOptions.length > 0 && (
-                <FormFieldCheckboxGroup<DownloadFormValues>
+                <RHFFormFieldCheckboxGroup<DownloadFormValues>
                   name="files"
                   order={[]}
                   legend="Choose files from the list below"
                   legendHidden
-                  disabled={form.isSubmitting}
+                  disabled={formState.isSubmitting}
                   selectAll
                   options={checkboxOptions}
                 />
@@ -162,23 +155,23 @@ const DownloadStep = ({
             {checkboxOptions.length > 0 ? (
               <WizardStepFormActions
                 {...stepProps}
-                isSubmitting={form.isSubmitting}
+                isSubmitting={formState.isSubmitting}
                 submitText="Download selected files"
                 submittingText="Downloading"
               />
             ) : (
               <p>No downloads available.</p>
             )}
-          </Form>
+          </RHFForm>
         ) : (
           <ResetFormOnPreviousStep
             currentStep={currentStep}
             stepNumber={stepNumber}
-            onReset={form.resetForm}
+            onReset={reset}
           />
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

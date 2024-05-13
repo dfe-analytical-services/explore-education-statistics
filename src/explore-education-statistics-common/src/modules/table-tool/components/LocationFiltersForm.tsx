@@ -180,6 +180,7 @@ const LocationFiltersForm = ({
 
                     return hasSubGroups && !searchOnly ? (
                       <RHFFormFieldCheckboxGroupsMenu
+                        id={`locations-${levelKey}`}
                         key={levelKey}
                         name={`locations.${levelKey}`}
                         disabled={formState.isSubmitting}
@@ -198,6 +199,7 @@ const LocationFiltersForm = ({
                       />
                     ) : (
                       <RHFFormFieldCheckboxMenu
+                        id={`locations-${levelKey}`}
                         key={levelKey}
                         name={`locations.${levelKey}`}
                         disabled={formState.isSubmitting}

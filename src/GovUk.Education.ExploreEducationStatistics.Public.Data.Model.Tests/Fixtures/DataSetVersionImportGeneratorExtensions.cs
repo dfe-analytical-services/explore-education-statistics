@@ -20,15 +20,22 @@ public static class DataSetVersionImportGeneratorExtensions
         Guid dataSetVersionId)
         => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
 
-    public static Generator<DataSetVersionImport> WithStatus(this Generator<DataSetVersionImport> generator,
-        DataSetVersionImportStatus status)
-        => generator.ForInstance(s => s.SetStatus(status));
+    public static Generator<DataSetVersionImport> WithInstanceId(
+        this Generator<DataSetVersionImport> generator,
+        Guid instanceId)
+        => generator.ForInstance(s => s.SetInstanceId(instanceId));
+
+    public static Generator<DataSetVersionImport> WithStage(
+        this Generator<DataSetVersionImport> generator,
+        DataSetVersionImportStage stage)
+        => generator.ForInstance(s => s.SetStage(stage));
 
     public static InstanceSetters<DataSetVersionImport> SetDefaults(this InstanceSetters<DataSetVersionImport> setters)
         => setters
             .SetDefault(i => i.Id)
             .SetDefault(i => i.DataSetVersionId)
-            .SetStatus(DataSetVersionImportStatus.Queued);
+            .SetDefault(i => i.InstanceId)
+            .SetStage(DataSetVersionImportStage.Pending);
 
     public static InstanceSetters<DataSetVersionImport> SetDataSetVersion(
         this InstanceSetters<DataSetVersionImport> instanceSetter,
@@ -42,8 +49,13 @@ public static class DataSetVersionImportGeneratorExtensions
         Guid dataSetVersionId)
         => instanceSetter.Set(i => i.DataSetVersionId, dataSetVersionId);
 
-    public static InstanceSetters<DataSetVersionImport> SetStatus(
+    public static InstanceSetters<DataSetVersionImport> SetInstanceId(
         this InstanceSetters<DataSetVersionImport> instanceSetter,
-        DataSetVersionImportStatus status)
-        => instanceSetter.Set(i => i.Status, status);
+        Guid instanceId)
+        => instanceSetter.Set(i => i.InstanceId, instanceId);
+
+    public static InstanceSetters<DataSetVersionImport> SetStage(
+        this InstanceSetters<DataSetVersionImport> instanceSetter,
+        DataSetVersionImportStage stage)
+        => instanceSetter.Set(i => i.Stage, stage);
 }

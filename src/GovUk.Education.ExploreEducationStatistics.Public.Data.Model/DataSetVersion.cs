@@ -23,13 +23,19 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required int VersionMinor { get; set; }
 
+    // Not using this currently, but it's being considered for
+    // data replacement version numbers in future functionality.
+    // We're including this now so that the column exists and is
+    // in the right position. Remove if not needed in the end.
+    public int VersionPatch { get; set; }
+
     public required string Notes { get; set; }
 
     public long TotalResults { get; set; }
 
-    public required DataSetVersionMetaSummary MetaSummary { get; set; }
+    public DataSetVersionMetaSummary? MetaSummary { get; set; }
 
-    public required GeographicLevelMeta GeographicLevelMeta { get; set; }
+    public GeographicLevelMeta? GeographicLevelMeta { get; set; }
 
     public List<DataSetVersionImport> Imports { get; set; } = [];
 
@@ -68,6 +74,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     {
         public void Configure(EntityTypeBuilder<DataSetVersion> builder)
         {
+            builder.Property(dsv => dsv.Status).HasConversion<string>();
+
             builder.OwnsOne(v => v.MetaSummary, ms =>
             {
                 ms.ToJson();
@@ -101,7 +109,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                     );
             });
 
-            builder.Property(dsv => dsv.Status).HasConversion<string>();
+            builder.HasIndex(dsv => new { dsv.DataSetId, dsv.VersionMajor, dsv.VersionMinor, dsv.VersionPatch })
+                .HasDatabaseName("IX_DataSetVersions_DataSetId_VersionNumber")
+                .IsUnique();
 
             builder.HasIndex(dsv => dsv.ReleaseFileId);
         }

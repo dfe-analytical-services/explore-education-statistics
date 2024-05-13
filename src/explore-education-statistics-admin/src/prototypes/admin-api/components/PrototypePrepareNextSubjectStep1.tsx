@@ -5,9 +5,11 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import { Form, FormFieldSelect, FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import { FormFieldset } from '@common/components/form';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React from 'react';
 import { subjectsForRelease2 } from '../PrototypePublicationSubjects';
 
@@ -36,7 +38,7 @@ const PrototypePrepareNextSubjectStep1 = ({
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <Formik<FormValues>
+          <FormProvider
             initialValues={{
               subjectId: '',
             }}
@@ -54,13 +56,15 @@ const PrototypePrepareNextSubjectStep1 = ({
                   },
                 }),
             })}
-            onSubmit={values => {
-              onSubmit(values.subjectId);
-              goToNextStep();
-            }}
           >
             {() => (
-              <Form id="form">
+              <RHFForm
+                id="form"
+                onSubmit={values => {
+                  onSubmit(values.subjectId);
+                  goToNextStep();
+                }}
+              >
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
                     <p>
@@ -80,7 +84,7 @@ const PrototypePrepareNextSubjectStep1 = ({
                         removed in the new data set
                       </li>
                     </ul>
-                    <FormFieldSelect<FormValues>
+                    <RHFFormFieldSelect<FormValues>
                       id="subjectId"
                       name="subjectId"
                       label="Available data sets"
@@ -96,9 +100,9 @@ const PrototypePrepareNextSubjectStep1 = ({
                   submitText="Next step - locations"
                   {...stepProps}
                 />
-              </Form>
+              </RHFForm>
             )}
-          </Formik>
+          </FormProvider>
         </div>
       </div>
     );

@@ -4,16 +4,14 @@ import {
   PrototypeSubject,
 } from '@admin/prototypes/admin-api/PrototypePublicationSubjects';
 import ButtonText from '@common/components/ButtonText';
-import {
-  Form,
-  FormFieldCheckboxGroup,
-  FormFieldTextArea,
-} from '@common/components/form';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Yup from '@common/validation/yup';
 import React, { useState } from 'react';
-import { Formik } from 'formik';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
 
 interface FormValues {
   summary: string;
@@ -68,60 +66,64 @@ const PrototypeNotificationCreate = ({
           the changes in this data set please complete the form below. Describe
           any expected breaking changes of updates in the next data set version.
         </p>
-        <Formik<FormValues>
+        <FormProvider
           initialValues={{
             channels: notification?.channels || ['banner', 'email'],
             summary: notification?.summary || '',
           }}
           validationSchema={Yup.object({
             subjectId: Yup.string().required('Enter a summary'),
+            channels: Yup.array().required(),
+            summary: Yup.string().required(),
           })}
-          onSubmit={() => {}}
         >
-          {form => (
-            <Form id="form">
-              <FormFieldTextArea
-                label={
-                  <span className="govuk-!-font-weight-bold">
-                    Summary of updates
-                  </span>
-                }
-                name="summary"
-                hint=" Describe any expected breaking changes of updates in the next data set version."
-              />
+          {({ watch }) => {
+            const values = watch();
+            return (
+              <RHFForm id="form" onSubmit={() => {}}>
+                <RHFFormFieldTextArea
+                  label={
+                    <span className="govuk-!-font-weight-bold">
+                      Summary of updates
+                    </span>
+                  }
+                  name="summary"
+                  hint=" Describe any expected breaking changes of updates in the next data set version."
+                />
 
-              <FormFieldCheckboxGroup
-                legend="Notification channels"
-                legendSize="s"
-                name="channels"
-                options={[
-                  {
-                    label: 'Banner in API guidance',
-                    value: 'banner',
-                  },
-                  {
-                    label: 'Email subscriber lists',
-                    value: 'email',
-                  },
-                ]}
-              />
-              <ButtonGroup>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setNotification(form.values);
-                    setPreview(form.values.summary);
-                  }}
-                >
-                  Preview and send notification
-                </Button>
-                <Button onClick={onClose} variant="secondary">
-                  Cancel
-                </Button>
-              </ButtonGroup>
-            </Form>
-          )}
-        </Formik>
+                <RHFFormFieldCheckboxGroup
+                  legend="Notification channels"
+                  legendSize="s"
+                  name="channels"
+                  options={[
+                    {
+                      label: 'Banner in API guidance',
+                      value: 'banner',
+                    },
+                    {
+                      label: 'Email subscriber lists',
+                      value: 'email',
+                    },
+                  ]}
+                />
+                <ButtonGroup>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setNotification(values);
+                      setPreview(values.summary);
+                    }}
+                  >
+                    Preview and send notification
+                  </Button>
+                  <Button onClick={onClose} variant="secondary">
+                    Cancel
+                  </Button>
+                </ButtonGroup>
+              </RHFForm>
+            );
+          }}
+        </FormProvider>
       </section>
     </>
   );

@@ -4,17 +4,30 @@ import {
   Theme,
 } from '@common/services/publicationService';
 import Button from '@common/components/Button';
-import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
-import { DataSetFileFilter } from '@frontend/services/dataSetFileService';
+import {
+  FormFieldset,
+  FormGroup,
+  FormRadioGroup,
+  FormSelect,
+} from '@common/components/form';
+import {
+  DataSetFileFilter,
+  DataSetType,
+} from '@frontend/services/dataSetFileService';
 import styles from '@frontend/modules/data-catalogue/components/Filters.module.scss';
 import React from 'react';
+import ButtonText from '@common/components/ButtonText';
+
+const formId = 'filters-form';
 
 interface Props {
+  dataSetType?: DataSetType;
   latestOnly?: string;
   publicationId?: string;
   publications?: PublicationTreeSummary[];
   releaseId?: string;
   releases?: ReleaseSummary[];
+  showClearFiltersButton?: boolean;
   themeId?: string;
   themes: Theme[];
   onChange: ({
@@ -24,23 +37,27 @@ interface Props {
     filterType: DataSetFileFilter;
     nextValue: string;
   }) => void;
+  onClearFilters?: () => void;
 }
 
 export default function Filters({
+  dataSetType = 'all',
   latestOnly = 'true',
   publications = [],
   publicationId,
   releaseId,
   releases = [],
+  showClearFiltersButton,
   themeId,
   themes,
   onChange,
+  onClearFilters,
 }: Props) {
   const latestValue = latestOnly === 'true' ? 'latest' : 'all';
   return (
-    <form className={styles.form} id="filters-form">
+    <form className={styles.form} id={formId}>
       <FormFieldset
-        id="filters"
+        id={`${formId}-filters`}
         legend="Filter data sets"
         legendSize="m"
         className="govuk-fieldset "
@@ -48,7 +65,7 @@ export default function Filters({
         <FormGroup>
           <FormSelect
             className="govuk-!-width-full"
-            id="theme"
+            id={`${formId}-theme`}
             label="Theme"
             name="themeId"
             options={[
@@ -70,7 +87,7 @@ export default function Filters({
           <FormSelect
             className="govuk-!-width-full"
             disabled={!themeId}
-            id="publication"
+            id={`${formId}-publication`}
             label="Publication"
             name="publicationId"
             options={[
@@ -94,7 +111,7 @@ export default function Filters({
         <FormGroup>
           <FormSelect
             className="govuk-!-width-full"
-            id="release"
+            id={`${formId}-release`}
             label="Releases"
             name="releaseId"
             options={[
@@ -116,6 +133,33 @@ export default function Filters({
             }}
           />
         </FormGroup>
+
+        {showClearFiltersButton && (
+          <ButtonText onClick={onClearFilters}>Clear filters</ButtonText>
+        )}
+
+        <FormRadioGroup<DataSetType>
+          formGroupClass="dfe-border-top govuk-!-padding-top-4 govuk-!-margin-top-2"
+          id={`${formId}-dataSetType`}
+          legend="Type of data"
+          legendSize="s"
+          name="dataSetType"
+          options={[
+            { label: 'All data', value: 'all' },
+            {
+              label: 'API data sets only',
+              value: 'api',
+            },
+          ]}
+          small
+          value={dataSetType}
+          onChange={e => {
+            onChange({
+              filterType: 'dataSetType',
+              nextValue: e.target.value,
+            });
+          }}
+        />
       </FormFieldset>
 
       <Button className="dfe-js-hidden" type="submit">

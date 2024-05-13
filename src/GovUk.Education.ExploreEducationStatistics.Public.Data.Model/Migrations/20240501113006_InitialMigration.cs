@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PublicId = table.Column<string>(type: "text", nullable: false),
                     Label = table.Column<string>(type: "text", nullable: false),
                     Type = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     Code = table.Column<string>(type: "text", nullable: true),
@@ -158,9 +159,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     ReleaseFileId = table.Column<Guid>(type: "uuid", nullable: false),
                     VersionMajor = table.Column<int>(type: "integer", nullable: false),
                     VersionMinor = table.Column<int>(type: "integer", nullable: false),
+                    VersionPatch = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),
                     TotalResults = table.Column<long>(type: "bigint", nullable: false),
-                    MetaSummary = table.Column<string>(type: "jsonb", nullable: false),
+                    MetaSummary = table.Column<string>(type: "jsonb", nullable: true),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Withdrawn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -183,7 +185,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    InstanceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Stage = table.Column<string>(type: "text", nullable: false),
+                    Completed = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -344,8 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 columns: table => new
                 {
                     MetaId = table.Column<int>(type: "integer", nullable: false),
-                    OptionId = table.Column<int>(type: "integer", nullable: false),
-                    PublicId = table.Column<string>(type: "text", nullable: false)
+                    OptionId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -412,9 +415,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSetVersions_DataSetId",
+                name: "IX_DataSetVersionImports_InstanceId",
+                table: "DataSetVersionImports",
+                column: "InstanceId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSetVersions_DataSetId_VersionNumber",
                 table: "DataSetVersions",
-                column: "DataSetId");
+                columns: new[] { "DataSetId", "VersionMajor", "VersionMinor", "VersionPatch" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataSetVersions_ReleaseFileId",
@@ -462,20 +472,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationOptionMetaLinks_MetaId_PublicId",
-                table: "LocationOptionMetaLinks",
-                columns: new[] { "MetaId", "PublicId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LocationOptionMetaLinks_OptionId",
                 table: "LocationOptionMetaLinks",
                 column: "OptionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LocationOptionMetaLinks_PublicId",
-                table: "LocationOptionMetaLinks",
-                column: "PublicId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LocationOptionMetas_All",
@@ -498,6 +497,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "IX_LocationOptionMetas_OldCode",
                 table: "LocationOptionMetas",
                 column: "OldCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetas_PublicId",
+                table: "LocationOptionMetas",
+                column: "PublicId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LocationOptionMetas_Type",
@@ -575,19 +580,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 principalColumn: "Id");
 
             // Grant permissions on database tables created by this resource's database user to the
-            // Admin App Service and Data Processor Function App users.
+            // Admin App Service user.
             var adminAppServiceIdentityName = Environment.GetEnvironmentVariable("AdminAppServiceIdentityName");
             if (adminAppServiceIdentityName != null)
             {
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{adminAppServiceIdentityName}\"");
+                migrationBuilder.Sql(
+                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{adminAppServiceIdentityName}\"");
             }
 
+            // Grant permissions on database tables created by this resource's database user to the
+            // Public API Data Processor Function App user.
             var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
             if (dataProcessorFunctionAppIdentityName != null)
             {
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+                migrationBuilder.Sql(
+                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{dataProcessorFunctionAppIdentityName}\"");
+            }
+
+            // Grant permissions on database tables created by this resource's database user to the
+            // Publisher Function App user.
+            var publisherFunctionAppIdentityName = Environment.GetEnvironmentVariable("PublisherFunctionAppIdentityName");
+            if (publisherFunctionAppIdentityName != null)
+            {
+                migrationBuilder.Sql(
+                    $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{publisherFunctionAppIdentityName}\"");
+                migrationBuilder.Sql(
+                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{publisherFunctionAppIdentityName}\"");
             }
         }
 

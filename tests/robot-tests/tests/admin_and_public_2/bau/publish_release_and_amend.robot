@@ -542,7 +542,7 @@ Verify existing data guidance for amendment
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
 
     ${editor}=    user gets data guidance data file content editor    Dates test subject
-    user waits until element contains    ${editor}    Dates test subject test data guidance content
+    user checks element value should be    ${editor}    Dates test subject test data guidance content
 
 Update existing data guidance for amendment
     user enters text into element    id:dataGuidanceForm-content    Amended test data guidance content

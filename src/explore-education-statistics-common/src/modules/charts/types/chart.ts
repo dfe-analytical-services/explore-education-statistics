@@ -65,7 +65,7 @@ export interface AxisConfiguration {
   sortAsc?: boolean;
   dataSets: DataSet[];
   referenceLines: ReferenceLine[];
-  visible: boolean;
+  visible?: boolean;
   unit?: string;
   showGrid?: boolean;
   label?: Label;
@@ -131,7 +131,11 @@ export interface StackedBarProps extends ChartProps {
 }
 
 export interface ChartCapabilities {
+  canIncludeNonNumericData: boolean;
   canPositionLegendInline: boolean;
+  canSetBarThickness: boolean;
+  canSetDataLabelPosition: boolean;
+  canShowDataLabels: boolean;
   canSize: boolean;
   canSort: boolean;
   hasGridLines: boolean;

@@ -431,6 +431,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("DataSetFileId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("DataSetFileMeta")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("DataSetFileVersion")
                         .HasColumnType("int");
 

@@ -22,6 +22,10 @@ describe('ReleaseStatusChecklist', () => {
               { code: 'GenericSectionsContainEmptyHtmlBlock' },
               { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
               { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
+              { code: 'PublicApiDataSetImportsMustBeCompleted' },
+              { code: 'PublicApiDataSetCancellationsMustBeResolved' },
+              { code: 'PublicApiDataSetFailuresMustBeResolved' },
+              { code: 'PublicApiDataSetMappingsMustBeCompleted' },
             ],
           }}
           release={testRelease}
@@ -37,7 +41,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('9 issues')).toBeInTheDocument();
+    expect(screen.getByText('13 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -118,6 +122,42 @@ describe('ReleaseStatusChecklist', () => {
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'All Public API data set imports must be completed',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#data-uploads',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'All cancelled Public API data set imports must be removed or completed',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#data-uploads',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'All failed Public API data set imports must be retried or removed',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#data-uploads',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'All Public API data set mappings must be completed',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#data-uploads',
     );
   });
 

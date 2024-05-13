@@ -482,17 +482,15 @@ user gets data guidance data file content editor
     [Arguments]    ${accordion_heading}
     user waits until page contains element    id:dataGuidance-dataFiles
     ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
-    user waits until parent contains element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
-    ${editor}=    get child element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
+    user waits until parent contains element    ${accordion}    label:File guidance content
+    ${editor}=    get child element    ${accordion}    label:File guidance content
     [Return]    ${editor}
 
 user enters text into data guidance data file content editor
     [Arguments]    ${accordion_heading}    ${text}
     ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
-    user checks element does not contain child element    ${accordion}    testid:fileGuidanceContent-focused
     ${editor}=    user gets data guidance data file content editor    ${accordion_heading}
     user clicks element    ${editor}
-    user checks element contains child element    ${accordion}    testid:fileGuidanceContent-focused
     user enters text into element    ${editor}    ${text}
 
 user creates amendment for release
@@ -901,8 +899,7 @@ user updates free text key stat
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
     ...    ${guidance_title}
 
-    user clears element text    xpath://*[@data-testid="keyStat"][${tile_num}]//*[contains(@class, "ck-content")]
-    user presses keys    ${guidance_text}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]    ${guidance_text}
 
     user clicks button    Save
     user waits until page does not contain button    Save
@@ -943,9 +940,7 @@ user adds key statistic from data block
     user clicks element    xpath://*[@data-testid="keyStat"][last()]//button[contains(text(), "Edit")]
     user enters text into element    xpath://input[@name="trend"]    ${trend}
     user enters text into element    xpath://input[@name="guidanceTitle"]    ${guidance_title}
-
-    user clears element text    xpath://*[@data-testid="keyStat"][last()]//*[contains(@class, "ck-content")]
-    user presses keys    ${guidance_text}
+    user enters text into element    xpath://textarea[@name="guidanceText"]    ${guidance_text}
 
     user clicks button    Save
     user waits until page does not contain button    Save

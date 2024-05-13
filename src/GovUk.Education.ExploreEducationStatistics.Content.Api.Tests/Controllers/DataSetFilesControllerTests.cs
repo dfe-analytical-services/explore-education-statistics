@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -30,6 +31,7 @@ using MockQueryable.Moq;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
@@ -680,6 +682,95 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterByDataSetType_Api_ReturnsOnlyDataSetsWithAssociatedApiDataSets()
+            {
+                Publication publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()));
+
+                var releaseVersionFiles = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication.ReleaseVersions[0])
+                    .WithFiles(_fixture.DefaultFile()
+                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .GenerateList(5))
+                    .GenerateList();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(releaseVersionFiles))
+                    .CreateClient();
+
+                var query = new DataSetFileListRequest
+                {
+                    DataSetType = DataSetType.Api
+                };
+
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var expectedReleaseFiles = releaseVersionFiles
+                    .Where(rf => rf.File.PublicDataSetVersionId.HasValue)
+                    .OrderBy(rf => rf.Name)
+                    .ToList();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Theory]
+            [InlineData(DataSetType.All)]
+            [InlineData(null)]
+            public async Task FilterByDataSetType_AllOrUnset_ReturnsAllDataSets(DataSetType? dataSetType)
+            {
+                Publication publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()));
+
+                var releaseVersionFiles = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication.ReleaseVersions[0])
+                    .WithFiles(_fixture.DefaultFile()
+                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .GenerateList(5))
+                    .GenerateList();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(releaseVersionFiles))
+                    .CreateClient();
+
+                var query = new DataSetFileListRequest
+                {
+                    DataSetType = dataSetType
+                };
+
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: releaseVersionFiles.Count);
+                AssertResultsForExpectedReleaseFiles(releaseVersionFiles, pagedResult.Results);
             }
 
             [Fact]
@@ -1504,6 +1595,83 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
+            public async Task DataSetFileMetaCorrectlyReturned_Success()
+            {
+                var publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()))
+                    .Generate();
+
+                var releaseFile = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication.ReleaseVersions[0])
+                    .WithFile(_fixture.DefaultFile()
+                        .WithType(FileType.Data)
+                        .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                            .WithGeographicLevels(["National", "Local authority"])
+                            .WithTimeIdentifier(TimeIdentifier.AcademicYear)
+                            .WithYears([2000, 2001, 2002])
+                            .WithFilters([
+                                new FilterMeta { Label = "Filter 1" },
+                                new FilterMeta { Label = "Filter 2" },
+                                new FilterMeta { Label = "Filter 3" },
+                            ])
+                            .WithIndicators([
+                                new IndicatorMeta { Label = "Indicator 1" },
+                                new IndicatorMeta { Label = "Indicator 2" },
+                                new IndicatorMeta { Label = "Indicator 3" },
+                            ])
+                        ))
+                    .Generate();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey,
+                        PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context =>
+                    {
+                        context.ReleaseFiles.Add(releaseFile);
+                    })
+                    .CreateClient();
+
+                var query = new DataSetFileListRequest();
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var dataSetFileSummaryViewModel = Assert.Single(pagedResult.Results);
+                var dataSetFileMetaViewModel = dataSetFileSummaryViewModel.Meta;
+
+                var originalMeta = releaseFile.File.DataSetFileMeta;
+
+                dataSetFileMetaViewModel.GeographicLevels
+                    .AssertDeepEqualTo(originalMeta!.GeographicLevels);
+
+                dataSetFileMetaViewModel.TimePeriod.AssertDeepEqualTo(
+                    new DataSetFileTimePeriodViewModel
+                    {
+                        TimeIdentifier = originalMeta.TimeIdentifier.GetEnumLabel(),
+                        From = TimePeriodLabelFormatter.Format(originalMeta.Years.First(), originalMeta.TimeIdentifier),
+                        To = TimePeriodLabelFormatter.Format(originalMeta.Years.Last(), originalMeta.TimeIdentifier),
+                    });
+
+                dataSetFileMetaViewModel.Filters
+                    .AssertDeepEqualTo(originalMeta.Filters
+                        .Select(f => f.Label)
+                        .ToList());
+
+                dataSetFileMetaViewModel.Indicators
+                    .AssertDeepEqualTo(originalMeta.Indicators
+                        .Select(i => i.Label)
+                        .ToList());
+            }
+
+            [Fact]
             public async Task NoPublishedDataSets_ReturnsEmpty()
             {
                 MemoryCacheService
@@ -1562,7 +1730,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        private static async Task<HttpResponseMessage> ListDataSets(HttpClient client,
+        private static async Task<HttpResponseMessage> ListDataSets(
+            HttpClient client,
             DataSetFileListRequest request)
         {
             var queryParams = new Dictionary<string, string?>
@@ -1575,7 +1744,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 { "sort", request.Sort?.ToString() },
                 { "sortDirection", request.SortDirection?.ToString() },
                 { "page", request.Page.ToString() },
-                { "pageSize", request.PageSize.ToString() }
+                { "pageSize", request.PageSize.ToString() },
+                { "dataSetType", request.DataSetType?.ToString() }
             };
 
             var uri = QueryHelpers.AddQueryString("/api/data-set-files", queryParams);
@@ -1609,18 +1779,23 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     () => Assert.Equal(publication.Title, viewModel.Publication.Title),
                     () => Assert.Equal(theme.Id, viewModel.Theme.Id),
                     () => Assert.Equal(theme.Title, viewModel.Theme.Title),
-                    () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId, viewModel.LatestData),
-                    () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published)
+                    () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
+                        viewModel.LatestData),
+                    () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
+                    () => Assert.Equal(releaseFile.File.PublicDataSetVersionId.HasValue,
+                        viewModel.HasApiDataSet)
                 );
             });
         }
 
-        private List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(ReleaseVersion releaseVersion,
+        private List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(
+            ReleaseVersion releaseVersion,
             int numberOfDataSets = 2)
         {
             return _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
                     .GenerateList(numberOfDataSets))
                 .GenerateList();
         }
@@ -1659,7 +1834,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
-                .WithFile(_fixture.DefaultFile());
+                .WithFile(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
 
             var client = BuildApp()
                 .AddContentDbTestData(context =>
@@ -1693,6 +1869,130 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             Assert.Equal(publication.Title, viewModel.Release.Publication.Title);
             Assert.Equal(publication.Slug, viewModel.Release.Publication.Slug);
             Assert.Equal(publication.Topic.Theme.Title, viewModel.Release.Publication.ThemeTitle);
+
+            var dataSetFileMeta = file.DataSetFileMeta;
+
+            viewModel.Meta.GeographicLevels
+                .AssertDeepEqualTo(dataSetFileMeta!.GeographicLevels);
+
+            viewModel.Meta.TimePeriod.AssertDeepEqualTo(
+                new DataSetFileTimePeriodViewModel
+                {
+                    TimeIdentifier = dataSetFileMeta.TimeIdentifier.GetEnumLabel(),
+                    From = TimePeriodLabelFormatter.Format(
+                        dataSetFileMeta.Years.First(), dataSetFileMeta.TimeIdentifier),
+                    To = TimePeriodLabelFormatter.Format(dataSetFileMeta.Years.Last(), dataSetFileMeta.TimeIdentifier),
+                });
+
+            viewModel.Meta.Filters
+                .AssertDeepEqualTo(dataSetFileMeta.Filters
+                    .Select(f => f.Label)
+                    .ToList());
+
+            viewModel.Meta.Indicators
+                .AssertDeepEqualTo(dataSetFileMeta.Indicators
+                    .Select(i => i.Label)
+                    .ToList());
+        }
+
+        [Fact]
+        public async Task FetchDataSetFiltersOrdered_Success()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            var filter1Id = Guid.NewGuid();
+            var filter2Id = Guid.NewGuid();
+            var filter3Id = Guid.NewGuid();
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFilterSequence([
+                    new FilterSequenceEntry(filter1Id, new List<FilterGroupSequenceEntry>()),
+                    new FilterSequenceEntry(filter2Id, new List<FilterGroupSequenceEntry>()),
+                    new FilterSequenceEntry(filter3Id, new List<FilterGroupSequenceEntry>()),
+                ])
+                .WithFile(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithFilters([
+                            new FilterMeta { Id = filter3Id, Label = "Filter 3", },
+                            new FilterMeta { Id = filter1Id, Label = "Filter 1", },
+                            new FilterMeta { Id = filter2Id, Label = "Filter 2", },
+                        ])));
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
+
+            var response = await client.GetAsync(uri);
+            var viewModel = response.AssertOk<DataSetFileViewModel>();
+
+            Assert.Equal(3, viewModel.Meta.Filters.Count);
+            Assert.Equal("Filter 1", viewModel.Meta.Filters[0]);
+            Assert.Equal("Filter 2", viewModel.Meta.Filters[1]);
+            Assert.Equal("Filter 3", viewModel.Meta.Filters[2]);
+        }
+
+        [Fact]
+        public async Task FetchDataSetIndicatorsOrdered_Success()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            var indicator1Id = Guid.NewGuid();
+            var indicator2Id = Guid.NewGuid();
+            var indicator3Id = Guid.NewGuid();
+            var indicator4Id = Guid.NewGuid();
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithIndicatorSequence([
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(),
+                        new List<Guid> { indicator1Id, }),
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(),
+                        new List<Guid> { indicator2Id, }),
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(),
+                        new List<Guid> { indicator3Id, indicator4Id })
+                ])
+                .WithFile(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithIndicators([
+                            new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", },
+                            new IndicatorMeta { Id = indicator2Id, Label = "Indicator 2", },
+                            new IndicatorMeta { Id = indicator1Id, Label = "Indicator 1", },
+                            new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", },
+                        ])));
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
+
+            var response = await client.GetAsync(uri);
+            var viewModel = response.AssertOk<DataSetFileViewModel>();
+
+            Assert.Equal(4, viewModel.Meta.Indicators.Count);
+            Assert.Equal("Indicator 1", viewModel.Meta.Indicators[0]);
+            Assert.Equal("Indicator 2", viewModel.Meta.Indicators[1]);
+            Assert.Equal("Indicator 3", viewModel.Meta.Indicators[2]);
+            Assert.Equal("Indicator 4", viewModel.Meta.Indicators[3]);
         }
 
         [Fact]
@@ -1761,7 +2061,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
 
-            File file = _fixture.DefaultFile();
+            File file = _fixture.DefaultFile()
+                .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta());
 
             ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0]) // the previous published version

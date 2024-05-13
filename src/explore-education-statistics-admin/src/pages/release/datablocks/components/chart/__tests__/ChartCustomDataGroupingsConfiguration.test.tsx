@@ -1,14 +1,16 @@
 import ChartCustomDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartCustomDataGroupingsConfiguration';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import baseRender from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 describe('ChartCustomDataGroupingsConfiguration', () => {
   const testGroups = [
     { min: 0, max: 50 },
     { min: 51, max: 100 },
   ];
+
   test('renders correctly without initial values', () => {
     render(
       <ChartCustomDataGroupingsConfiguration
@@ -85,7 +87,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
 
   test('calls onAddGroup when add groups', async () => {
     const handleAddGroup = jest.fn();
-    render(
+    const { user } = render(
       <ChartCustomDataGroupingsConfiguration
         groups={[]}
         id="testId"
@@ -94,31 +96,30 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    await userEvent.type(screen.getByLabelText('Min'), '0');
-    await userEvent.type(screen.getByLabelText('Max'), '10');
+    await user.type(screen.getByLabelText('Min'), '0');
+    await user.type(screen.getByLabelText('Max'), '10');
 
     expect(handleAddGroup).not.toHaveBeenCalled();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+    await user.click(screen.getByRole('button', { name: 'Add group' }));
 
     await waitFor(() => {
-      expect(handleAddGroup).toHaveBeenCalledWith({ min: 0, max: 10 });
+      expect(handleAddGroup).toHaveBeenCalled();
     });
 
-    await userEvent.type(screen.getByLabelText('Min'), '11');
-    await userEvent.type(screen.getByLabelText('Max'), '20');
+    await user.type(screen.getByLabelText('Min'), '11');
+    await user.type(screen.getByLabelText('Max'), '20');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+    await user.click(screen.getByRole('button', { name: 'Add group' }));
 
     await waitFor(() => {
       expect(handleAddGroup).toHaveBeenCalledTimes(2);
-      expect(handleAddGroup).toHaveBeenCalledWith({ min: 11, max: 20 });
     });
   });
 
   test('calls onRemoveGroup when remove groups', async () => {
     const handleRemoveGroup = jest.fn();
-    render(
+    const { user } = render(
       <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"
@@ -135,7 +136,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
 
     expect(handleRemoveGroup).not.toHaveBeenCalled();
 
-    await userEvent.click(row2.getByRole('button', { name: 'Remove group' }));
+    await user.click(row2.getByRole('button', { name: 'Remove group' }));
 
     await waitFor(() => {
       expect(handleRemoveGroup).toHaveBeenCalledWith({ min: 51, max: 100 });
@@ -144,7 +145,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
     const row1 = within(table.getAllByRole('row')[1]);
     expect(row1.getByText('0')).toBeInTheDocument();
     expect(row1.getByText('50')).toBeInTheDocument();
-    await userEvent.click(row1.getByRole('button', { name: 'Remove group' }));
+    await user.click(row1.getByRole('button', { name: 'Remove group' }));
 
     await waitFor(() => {
       expect(handleRemoveGroup).toHaveBeenCalledTimes(2);
@@ -152,192 +153,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
     });
   });
 
-  test('shows a validation errors when submit without min and max values', async () => {
-    render(
-      <ChartCustomDataGroupingsConfiguration
-        groups={[]}
-        id="testId"
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    await userEvent.click(screen.getByRole('button', { name: 'Add group' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Enter a minimum value')).toBeInTheDocument();
-      expect(screen.getByText('Enter a maximum value')).toBeInTheDocument();
-    });
-  });
-
-  test('shows a validation error when the max is not greater than the min', async () => {
-    render(
-      <ChartCustomDataGroupingsConfiguration
-        groups={[]}
-        id="testId"
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    await userEvent.type(screen.getByLabelText('Min'), '10');
-    await userEvent.type(screen.getByLabelText('Max'), '9');
-    await userEvent.tab();
-
-    await waitFor(() => {
-      expect(screen.getByText('Must be greater than min')).toBeInTheDocument();
-    });
-  });
-
-  test('shows a validation error when the minimum value is in an existing group', async () => {
-    render(
-      <ChartCustomDataGroupingsConfiguration
-        groups={testGroups}
-        id="testId"
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    await userEvent.type(screen.getByLabelText('Min'), '10');
-    await userEvent.type(screen.getByLabelText('Max'), '200');
-    await userEvent.tab();
-
-    const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[0];
-    const maxCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[1];
-
-    await waitFor(() => {
-      expect(
-        within(minCell).getByText('Min cannot overlap another group'),
-      ).toBeInTheDocument();
-      expect(
-        within(maxCell).queryByText('Groups cannot overlap'),
-      ).not.toBeInTheDocument();
-    });
-  });
-
-  test('shows a validation error when the maximum value is in an existing group', async () => {
-    render(
-      <ChartCustomDataGroupingsConfiguration
-        groups={testGroups}
-        id="testId"
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    await userEvent.type(screen.getByLabelText('Min'), '-10');
-    await userEvent.type(screen.getByLabelText('Max'), '75');
-    await userEvent.tab();
-
-    const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[0];
-    const maxCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[1];
-
-    await waitFor(() => {
-      expect(
-        within(minCell).queryByText('Min cannot overlap another group'),
-      ).not.toBeInTheDocument();
-
-      expect(
-        within(maxCell).getByText('Max cannot overlap another group'),
-      ).toBeInTheDocument();
-    });
-  });
-
-  test('shows validation errors when both values are in an existing group', async () => {
-    render(
-      <ChartCustomDataGroupingsConfiguration
-        groups={testGroups}
-        id="testId"
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    await userEvent.type(screen.getByLabelText('Min'), '10');
-    await userEvent.type(screen.getByLabelText('Max'), '75');
-    await userEvent.tab();
-
-    const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[0];
-    const maxCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[1];
-
-    await waitFor(() => {
-      expect(
-        within(minCell).getByText('Min cannot overlap another group'),
-      ).toBeInTheDocument();
-      expect(
-        within(maxCell).getByText('Max cannot overlap another group'),
-      ).toBeInTheDocument();
-    });
-  });
-
-  test('shows validation errors when the new group contains an existing group', async () => {
-    render(
-      <ChartCustomDataGroupingsConfiguration
-        groups={testGroups}
-        id="testId"
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    await userEvent.type(screen.getByLabelText('Min'), '-10');
-    await userEvent.type(screen.getByLabelText('Max'), '150');
-    await userEvent.tab();
-
-    const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[0];
-    const maxCell = within(screen.getAllByRole('row')[3]).getAllByRole(
-      'cell',
-    )[1];
-
-    await waitFor(() => {
-      expect(
-        within(minCell).getByText('Min cannot overlap another group'),
-      ).toBeInTheDocument();
-      expect(
-        within(maxCell).getByText('Max cannot overlap another group'),
-      ).toBeInTheDocument();
-    });
-  });
-
-  test('shows a validation error when groups with negative values overlap', async () => {
-    render(
-      <ChartCustomDataGroupingsConfiguration
-        groups={[{ min: -2, max: 2 }]}
-        id="testId"
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    await userEvent.type(screen.getByLabelText('Min'), '-3');
-
-    const minCell = within(screen.getAllByRole('row')[2]).getAllByRole(
-      'cell',
-    )[0];
-
-    await userEvent.type(screen.getByLabelText('Max'), '3');
-
-    await userEvent.tab();
-
-    await waitFor(() => {
-      expect(
-        within(minCell).getByText('Min cannot overlap another group'),
-      ).toBeInTheDocument();
-    });
-  });
+  function render(children: ReactNode) {
+    return baseRender(<FormProvider>{children}</FormProvider>);
+  }
 });

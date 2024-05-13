@@ -33,7 +33,7 @@ const ReleaseStep = ({
     </WizardStepHeading>
   );
 
-  // isMounted check required as Formik context can be
+  // isMounted check required as Form context can be
   // undefined if the step is active on page load.
   if (isActive && isMounted) {
     return (

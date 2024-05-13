@@ -2,17 +2,16 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
-import {
-  Form,
-  FormFieldRadioGroup,
-  FormFieldTextInput,
-  FormFieldSelect,
-} from '@common/components/form';
-import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
-import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
-import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormGroup from '@common/components/form/FormGroup';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
+import RHFFormFieldFileInput from '@common/components/form/rhf/RHFFormFieldFileInput';
+import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import {
   ChartDefinition,
   BarChartDataLabelPosition,
@@ -26,16 +25,22 @@ import {
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import parseNumber from '@common/utils/number/parseNumber';
 import {
-  convertServerFieldErrors,
   mapFieldErrors,
+  rhfConvertServerFieldErrors,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import capitalize from 'lodash/capitalize';
-import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
+import React, {
+  ChangeEvent,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
+import { Path } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
 
 type FormValues = Partial<ChartOptions>;
@@ -79,8 +84,7 @@ const ChartConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
-  const { hasSubmitted, updateForm, submitForms } =
-    useChartBuilderFormsContext();
+  const { updateForm, submitForms } = useChartBuilderFormsContext();
 
   const dataLabelPositionOptions = useMemo(() => {
     const options =
@@ -119,7 +123,6 @@ const ChartConfiguration = ({
         .required('Enter chart height')
         .positive('Chart height must be positive'),
       width: Yup.number().positive('Chart width must be positive'),
-      includeNonNumericData: Yup.boolean(),
       subtitle: Yup.string().max(
         160,
         'Subtitle must be 160 characters or less',
@@ -129,6 +132,12 @@ const ChartConfiguration = ({
     if (definition.capabilities.stackable) {
       schema = schema.shape({
         stacked: Yup.boolean(),
+      });
+    }
+
+    if (definition.capabilities.canIncludeNonNumericData) {
+      schema = schema.shape({
+        includeNonNumericData: Yup.boolean(),
       });
     }
 
@@ -144,10 +153,7 @@ const ChartConfiguration = ({
       });
     }
 
-    if (
-      definition.type === 'horizontalbar' ||
-      definition.type === 'verticalbar'
-    ) {
+    if (definition.capabilities.canSetBarThickness) {
       schema = schema.shape({
         barThickness: Yup.number().positive(
           'Chart bar thickness must be positive',
@@ -155,11 +161,7 @@ const ChartConfiguration = ({
       });
     }
 
-    if (
-      definition.type === 'horizontalbar' ||
-      definition.type === 'verticalbar' ||
-      definition.type === 'line'
-    ) {
+    if (definition.capabilities.canShowDataLabels) {
       schema = schema.shape({
         showDataLabels: Yup.boolean().test({
           name: 'noInlineWithDataLabels',
@@ -171,51 +173,76 @@ const ChartConfiguration = ({
       });
     }
 
-    if (definition.type === 'horizontalbar' || definition.type === 'line') {
+    if (definition.capabilities.canSetDataLabelPosition) {
       schema = schema.shape({
         dataLabelPosition:
           definition.type === 'line'
-            ? Yup.string().oneOf<LineChartDataLabelPosition>(['above', 'below'])
-            : Yup.string().oneOf<BarChartDataLabelPosition>([
-                'inside',
-                'outside',
-              ]),
+            ? Yup.string()
+                .oneOf<LineChartDataLabelPosition>(['above', 'below'])
+                .when('showDataLabels', {
+                  is: true,
+                  then: s => s.required(),
+                  otherwise: s => s.notRequired(),
+                })
+            : Yup.string()
+                .oneOf<BarChartDataLabelPosition>(['inside', 'outside'])
+                .when('showDataLabels', {
+                  is: true,
+                  then: s => s.required(),
+                  otherwise: s => s.notRequired(),
+                }),
       });
     }
 
     return schema;
-  }, [definition.capabilities.stackable, definition.type, legendPosition]);
-
-  const initialValues = useMemo<FormValues>(() => {
-    const getInitialDataLabelPosition = () => {
-      if (
-        chartOptions.dataLabelPosition &&
-        dataLabelPositionOptions.find(
-          position => position.value === chartOptions.dataLabelPosition,
-        )
-      ) {
-        return chartOptions.dataLabelPosition;
-      }
-      return definition.type === 'line' ? 'above' : 'outside';
-    };
-
-    return {
-      ...pick(chartOptions, Object.keys(validationSchema.fields)),
-      dataLabelPosition: getInitialDataLabelPosition(),
-    };
   }, [
-    chartOptions,
-    dataLabelPositionOptions,
+    definition.capabilities.canIncludeNonNumericData,
+    definition.capabilities.canSetBarThickness,
+    definition.capabilities.canSetDataLabelPosition,
+    definition.capabilities.canShowDataLabels,
+    definition.capabilities.stackable,
     definition.type,
-    validationSchema,
+    legendPosition,
   ]);
+
+  const getInitialValues = useCallback(
+    (values: ChartOptions): FormValues => {
+      const getInitialDataLabelPosition = () => {
+        if (
+          values.dataLabelPosition &&
+          dataLabelPositionOptions.find(
+            position => position.value === values.dataLabelPosition,
+          )
+        ) {
+          return values.dataLabelPosition;
+        }
+        return definition.type === 'line' ? 'above' : 'outside';
+      };
+
+      return {
+        ...pick(values, Object.keys(validationSchema.fields)),
+        dataLabelPosition: getInitialDataLabelPosition(),
+      };
+    },
+    [dataLabelPositionOptions, definition.type, validationSchema.fields],
+  );
+
+  const chartType = useRef(definition.type);
+  const initialChartOptions = useRef(getInitialValues(chartOptions));
+
+  // Update initial options if the chart definition changes
+  useEffect(() => {
+    if (definition.type !== chartType.current) {
+      initialChartOptions.current = getInitialValues(chartOptions);
+      chartType.current = definition.type;
+    }
+  }, [definition.type, chartOptions, getInitialValues]);
 
   const normalizeValues = useCallback(
     (values: FormValues): ChartOptions => {
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
       return merge({}, chartOptions, values, {
-        width: parseNumber(values.width),
         boundaryLevel: values.boundaryLevel
           ? parseNumber(values.boundaryLevel)
           : undefined,
@@ -232,36 +259,42 @@ const ChartConfiguration = ({
   );
 
   return (
-    <Formik<FormValues>
+    <FormProvider
       enableReinitialize
-      initialErrors={
-        submitError
-          ? convertServerFieldErrors<FormValues>(
-              submitError,
-              initialValues,
-              errorMappings,
-            )
-          : undefined
-      }
-      initialValues={initialValues}
-      initialTouched={
-        hasSubmitted
-          ? mapValues(validationSchema.fields, () => true)
-          : undefined
-      }
-      validateOnMount
+      errorMappings={errorMappings}
+      initialValues={initialChartOptions.current}
       validationSchema={validationSchema}
-      onSubmit={async values => {
-        onSubmit(normalizeValues(values));
-        await submitForms();
-      }}
     >
-      {form => {
+      {({ formState, setError, watch }) => {
+        const values = watch();
+
+        if (submitError) {
+          const fieldErrors = rhfConvertServerFieldErrors<FormValues>(
+            submitError,
+            initialChartOptions.current,
+            errorMappings,
+          );
+
+          Object.keys(fieldErrors).forEach(key => {
+            if (!formState.errors[key as Path<FormValues>]) {
+              setError(key, {
+                message: fieldErrors[key as Path<FormValues>]?.message,
+              });
+            }
+          });
+        }
+
         return (
-          <Form id={formId}>
+          <RHFForm
+            id={formId}
+            onSubmit={async v => {
+              onSubmit(normalizeValues(v));
+              await submitForms();
+            }}
+          >
             <Effect
               value={{
-                ...form.values,
+                ...values,
               }}
               onChange={handleChange}
             />
@@ -269,22 +302,22 @@ const ChartConfiguration = ({
             <Effect
               value={{
                 formKey: 'options',
-                isValid: form.isValid,
-                submitCount: form.submitCount,
+                isValid: formState.isValid,
+                submitCount: formState.submitCount,
               }}
               onChange={updateForm}
               onMount={updateForm}
             />
 
             {validationSchema.fields.file && (
-              <FormFieldFileInput<FormValues>
+              <RHFFormFieldFileInput<FormValues>
                 name="file"
                 label="Upload new infographic"
                 accept="image/*"
               />
             )}
             <div className="govuk-!-width-three-quarters">
-              <FormFieldRadioGroup<FormValues>
+              <RHFFormFieldRadioGroup<FormValues>
                 hint="Communicate the headline message of the chart. For example 'Increase in number of people living alone'."
                 legend="Chart title"
                 legendSize="s"
@@ -299,7 +332,7 @@ const ChartConfiguration = ({
                     label: 'Set an alternative title',
                     value: 'alternative',
                     conditional: (
-                      <FormFieldTextInput<FormValues>
+                      <RHFFormFieldTextInput<FormValues>
                         label="Enter chart title"
                         name="title"
                         hint="Use a concise descriptive title that summarises the main message in the chart."
@@ -309,7 +342,7 @@ const ChartConfiguration = ({
                 ]}
               />
 
-              <FormFieldTextInput<FormValues>
+              <RHFFormFieldTextInput<FormValues>
                 label="Subtitle"
                 name="subtitle"
                 hint="The statistical subtitle should say what the data is, the geography the data relates to and the time period shown.
@@ -318,7 +351,7 @@ const ChartConfiguration = ({
               />
             </div>
 
-            <FormFieldTextArea<FormValues>
+            <RHFFormFieldTextArea<FormValues>
               className="govuk-!-width-three-quarters"
               name="alt"
               label="Alt text"
@@ -328,14 +361,14 @@ const ChartConfiguration = ({
             />
 
             {validationSchema.fields.stacked && (
-              <FormFieldCheckbox<FormValues>
+              <RHFFormFieldCheckbox<FormValues>
                 name="stacked"
                 label="Stacked bars"
               />
             )}
 
             {validationSchema.fields.height && (
-              <FormFieldNumberInput<FormValues>
+              <RHFFormFieldNumberInput<FormValues>
                 name="height"
                 label="Height (pixels)"
                 width={5}
@@ -343,7 +376,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.width && (
-              <FormFieldNumberInput<FormValues>
+              <RHFFormFieldNumberInput<FormValues>
                 name="width"
                 label="Width (pixels)"
                 hint="Leave blank to set as full width"
@@ -352,16 +385,16 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.barThickness && (
-              <FormFieldNumberInput<FormValues>
+              <RHFFormFieldNumberInput<FormValues>
                 name="barThickness"
                 label="Bar thickness (pixels)"
                 width={5}
               />
             )}
 
-            {definition.type !== 'map' && (
+            {validationSchema.fields.includeNonNumericData && (
               <FormGroup>
-                <FormFieldCheckbox
+                <RHFFormFieldCheckbox<FormValues>
                   name="includeNonNumericData"
                   label="Include data sets with non-numerical values"
                 />
@@ -369,7 +402,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.showDataLabels && (
-              <FormFieldCheckbox<FormValues>
+              <RHFFormFieldCheckbox<FormValues>
                 name="showDataLabels"
                 hint={
                   legendPosition === 'inline'
@@ -377,10 +410,10 @@ const ChartConfiguration = ({
                     : undefined
                 }
                 label="Show data labels"
-                showError={!!form.errors.showDataLabels}
+                showError={!!formState.errors.showDataLabels}
                 conditional={
-                  definition.type !== 'verticalbar' && (
-                    <FormFieldSelect<FormValues>
+                  validationSchema.fields.dataLabelPosition && (
+                    <RHFFormFieldSelect<FormValues>
                       label="Data label position"
                       name="dataLabelPosition"
                       order={[]}
@@ -394,14 +427,14 @@ const ChartConfiguration = ({
             <ChartBuilderSaveActions
               formId={formId}
               formKey="options"
-              disabled={form.isSubmitting}
+              disabled={formState.isSubmitting}
             >
               {buttons}
             </ChartBuilderSaveActions>
-          </Form>
+          </RHFForm>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

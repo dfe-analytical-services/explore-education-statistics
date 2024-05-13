@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -21,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
@@ -42,6 +44,7 @@ public class DataSetFileService : IDataSetFileService
         Guid? publicationId,
         Guid? releaseVersionId,
         bool? latestOnly,
+        DataSetType? dataSetType,
         string? searchTerm,
         DataSetsListRequestSortBy? sort,
         SortDirection? sortDirection,
@@ -52,6 +55,8 @@ public class DataSetFileService : IDataSetFileService
         // If latestOnly is null default it to true except when a releaseVersionId is provided
         latestOnly ??= !releaseVersionId.HasValue;
 
+        dataSetType ??= DataSetType.All;
+
         sort ??= searchTerm == null ? Title : Relevance;
         sortDirection ??= sort is Title or Natural ? Asc : Desc;
 
@@ -59,18 +64,20 @@ public class DataSetFileService : IDataSetFileService
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
         var query = _contentDbContext.ReleaseFiles
+            .AsNoTracking()
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
+            .OfDataSetType(dataSetType.Value)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
         var results = await query
             .OrderBy(sort.Value, sortDirection.Value)
             .Paginate(page: page, pageSize: pageSize)
-            .Select(BuildResultViewModel())
+            .Select(BuildDataSetFileSummaryViewModel())
             .ToListAsync(cancellationToken: cancellationToken);
 
         return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
@@ -82,12 +89,12 @@ public class DataSetFileService : IDataSetFileService
     }
 
     private static Expression<Func<FreeTextValueResult<ReleaseFile>, DataSetFileSummaryViewModel>>
-        BuildResultViewModel()
+        BuildDataSetFileSummaryViewModel()
     {
         return result =>
             new DataSetFileSummaryViewModel
             {
-                Id = result.Value.File.DataSetFileId!.Value, // we fetch OfFileType(FileType.Data), so this must be set
+                Id = result.Value.File.DataSetFileId!.Value,
                 FileId = result.Value.FileId,
                 Filename = result.Value.File.Filename,
                 FileSize = result.Value.File.DisplaySize(),
@@ -110,7 +117,12 @@ public class DataSetFileService : IDataSetFileService
                 },
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
-                Published = result.Value.ReleaseVersion.Published!.Value
+                Published = result.Value.ReleaseVersion.Published!.Value,
+                HasApiDataSet = result.Value.File.PublicDataSetVersionId.HasValue,
+                Meta = BuildDataSetFileMetaViewModel(
+                    result.Value.File.DataSetFileMeta,
+                    result.Value.FilterSequence,
+                    result.Value.IndicatorSequence),
             };
     }
 
@@ -174,8 +186,64 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
-            }
+            },
+            Meta = BuildDataSetFileMetaViewModel(
+                releaseFile.File.DataSetFileMeta,
+                releaseFile.FilterSequence,
+                releaseFile.IndicatorSequence),
         };
+    }
+
+    private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
+        DataSetFileMeta? meta,
+        List<FilterSequenceEntry>? filterSequence,
+        List<IndicatorGroupSequenceEntry>? indicatorGroupSequence)
+    {
+        if (meta == null)
+        {
+            throw new InvalidDataException("DataSetMeta should not be null");
+        }
+
+        return new DataSetFileMetaViewModel
+        {
+            GeographicLevels = meta.GeographicLevels,
+            TimePeriod = new DataSetFileTimePeriodViewModel
+            {
+                TimeIdentifier = meta.TimeIdentifier.GetEnumLabel(),
+                From = TimePeriodLabelFormatter.Format(meta.Years.First(), meta.TimeIdentifier),
+                To = TimePeriodLabelFormatter.Format(meta.Years.Last(), meta.TimeIdentifier),
+            },
+            Filters = GetOrderedFilters(meta.Filters, filterSequence),
+            Indicators = GetOrderedIndicators(meta.Indicators, indicatorGroupSequence),
+        };
+    }
+
+    private static List<string> GetOrderedFilters(List<FilterMeta> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)
+    {
+        var filterSequence = filterSequenceEntries?
+            .Select(fs => fs.Id)
+            .ToArray();
+
+        var filters = filterSequence == null
+            ? metaFilters.OrderBy(f => f.Label)
+            : metaFilters
+                .OrderBy(f => Array.IndexOf(filterSequence, f.Id));
+
+        return filters.Select(f => f.Label).ToList();
+    }
+
+    private static List<string> GetOrderedIndicators(List<IndicatorMeta> metaIndicators, List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries)
+    {
+        var indicatorSequence = indicatorGroupSequenceEntries?
+            .SelectMany(seq => seq.ChildSequence)
+            .ToArray();
+
+        var indicators = indicatorSequence == null
+            ? metaIndicators.OrderBy(i => i.Label)
+            : metaIndicators
+                .OrderBy(i => Array.IndexOf(indicatorSequence, i.Id));
+
+        return indicators.Select(i => i.Label).ToList();
     }
 }
 
@@ -266,6 +334,18 @@ internal static class ReleaseFileQueryableExtensions
         Guid? releaseVersionId)
     {
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
+    }
+
+    internal static IQueryable<ReleaseFile> OfDataSetType(
+        this IQueryable<ReleaseFile> query,
+        DataSetType dataSetType)
+    {
+        return dataSetType switch
+        {
+            DataSetType.All => query,
+            DataSetType.Api => query.Where(rf => rf.File.PublicDataSetVersionId.HasValue),
+            _ => throw new ArgumentOutOfRangeException(nameof(dataSetType)),
+        };
     }
 
     internal static IQueryable<ReleaseFile> HavingLatestPublishedReleaseVersions(

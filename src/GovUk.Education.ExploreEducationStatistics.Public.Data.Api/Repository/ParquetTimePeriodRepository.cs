@@ -56,7 +56,7 @@ public class ParquetTimePeriodRepository(
             .AppendRange(
                 timePeriodsList.Select(
                     tp => (FormattableString)
-                        $"({TimePeriodFormatter.FormatToCsv(tp.ParsedPeriod)}, {tp.ParsedCode.GetEnumLabel()})"
+                        $"({TimePeriodFormatter.FormatToCsv(tp.ParsedPeriod())}, {tp.ParsedCode().GetEnumLabel()})"
                 ),
                 joinString: ", "
             );

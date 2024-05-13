@@ -7,6 +7,9 @@ param location string
 @description('Specifies the dedicated subnet created for the Container App Environment within the main VNet')
 param subnetId string
 
+@description('Specifies whether or not this Container App Environment is internal-only or will be provisioned with a Public IP address')
+param internal bool = true
+
 @description('Specifies the name of the Log Analytics workspace responsible for capturing logging from this resource')
 param logAnalyticsWorkspaceName string
 
@@ -25,7 +28,12 @@ param workloadProfiles {
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
 
-var containerAppEnvironmentName = '${subscription}-ees-cae'
+@description('Specifies a suffix to append to the full name of the Container App Environment')
+param containerAppEnvironmentNameSuffix string = ''
+
+var containerAppEnvironmentName = empty(containerAppEnvironmentNameSuffix)
+  ? '${subscription}-ees-cae'
+  : '${subscription}-ees-cae-${containerAppEnvironmentNameSuffix}'
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
   name: logAnalyticsWorkspaceName
@@ -37,6 +45,7 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' 
   properties: {
     vnetConfiguration: {
       infrastructureSubnetId: subnetId
+      internal: internal
     }
     daprAIInstrumentationKey: applicationInsightsKey
     appLogsConfiguration: {

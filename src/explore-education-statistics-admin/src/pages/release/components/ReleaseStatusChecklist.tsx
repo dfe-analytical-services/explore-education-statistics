@@ -46,23 +46,22 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
   );
 
   const errors = useMemo<ChecklistMessage[]>(() => {
+    const dataUploadsTabRoute = `${generatePath<ReleaseRouteParams>(
+      releaseDataRoute.path,
+      releaseRouteParams,
+    )}#${releaseDataPageTabIds.dataUploads}`;
+
     return checklist.errors.map(error => {
       switch (error.code) {
         case 'DataFileImportsMustBeCompleted':
           return {
             message: 'All data imports must be completed',
-            link: `${generatePath<ReleaseRouteParams>(
-              releaseDataRoute.path,
-              releaseRouteParams,
-            )}#${releaseDataPageTabIds.dataUploads}`,
+            link: dataUploadsTabRoute,
           };
         case 'DataFileReplacementsMustBeCompleted':
           return {
             message: 'All data file replacements must be completed',
-            link: `${generatePath<ReleaseRouteParams>(
-              releaseDataRoute.path,
-              releaseRouteParams,
-            )}#${releaseDataPageTabIds.dataUploads}`,
+            link: dataUploadsTabRoute,
           };
         case 'PublicDataGuidanceRequired':
           return {
@@ -124,6 +123,28 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseContentRoute.path,
               releaseRouteParams,
             ),
+          };
+        case 'PublicApiDataSetImportsMustBeCompleted':
+          return {
+            message: 'All Public API data set imports must be completed',
+            link: dataUploadsTabRoute,
+          };
+        case 'PublicApiDataSetCancellationsMustBeResolved':
+          return {
+            message:
+              'All cancelled Public API data set imports must be removed or completed',
+            link: dataUploadsTabRoute,
+          };
+        case 'PublicApiDataSetFailuresMustBeResolved':
+          return {
+            message:
+              'All failed Public API data set imports must be retried or removed',
+            link: dataUploadsTabRoute,
+          };
+        case 'PublicApiDataSetMappingsMustBeCompleted':
+          return {
+            message: 'All Public API data set mappings must be completed',
+            link: dataUploadsTabRoute,
           };
         default:
           // Show error code, even if there is no mapping,

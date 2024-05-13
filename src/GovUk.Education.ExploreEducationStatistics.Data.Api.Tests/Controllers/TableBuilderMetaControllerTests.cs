@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 releaseSubject.SubjectId);
         }
 
-        private static (TableBuilderMetaController controller, (
+        private (TableBuilderMetaController controller, (
             Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
             Mock<IReleaseSubjectService> releaseSubjectService,
             Mock<ISubjectMetaService> subjectMetaService,

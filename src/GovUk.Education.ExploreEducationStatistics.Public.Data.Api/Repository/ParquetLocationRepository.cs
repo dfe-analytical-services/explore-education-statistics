@@ -37,7 +37,7 @@ public class ParquetLocationRepository(
         CancellationToken cancellationToken = default)
     {
         var locationsByLevel = locations
-            .GroupBy(location => location.ParsedLevel)
+            .GroupBy(location => location.ParsedLevel())
             .ToList();
 
         var allOptions = new List<ParquetLocationOption>();

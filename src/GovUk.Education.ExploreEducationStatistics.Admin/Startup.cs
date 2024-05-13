@@ -1,4 +1,7 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
@@ -15,8 +18,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -66,7 +71,6 @@ using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
 using Npgsql;
-using System;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -206,23 +210,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // cause the data source builder to throw a host exception.
             if (!hostEnvironment.IsIntegrationTest())
             {
-                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
+                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb");
 
                 if (hostEnvironment.IsDevelopment())
                 {
-                    var dataSourceBuilder = new NpgsqlDataSourceBuilder(publicDataDbConnectionString);
-
-                    // Set up the data source outside the `AddDbContext` action as this
-                    // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                    // creating over 20 `IServiceProvider` instances.
-                    var dbDataSource = dataSourceBuilder.Build();
-
-                    services.AddDbContext<PublicDataDbContext>(options =>
+                    // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
+                    if (publicDataDbExists)
                     {
-                        options
-                            .UseNpgsql(dbDataSource)
-                            .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
-                    });
+                        var dataSourceBuilder = new NpgsqlDataSourceBuilder(publicDataDbConnectionString);
+
+                        // Set up the data source outside the `AddDbContext` action as this
+                        // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+                        // creating over 20 `IServiceProvider` instances.
+                        var dbDataSource = dataSourceBuilder.Build();
+
+                        services.AddDbContext<PublicDataDbContext>(options =>
+                        {
+                            options
+                                .UseNpgsql(dbDataSource)
+                                .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
+                        });
+                    }
                 }
                 else
                 {
@@ -456,6 +464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             if (publicDataDbExists)
             {
                 services.AddTransient<IDataSetService, DataSetService>();
+                services.AddTransient<IDataSetVersionService, DataSetVersionService>();
             }
             else
             {
@@ -465,6 +474,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
                         provider.GetService<PublicDataDbContext>(),
                         provider.GetRequiredService<IUserService>()));
+                
+                services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -744,5 +755,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 migration.Apply();
             }
         }
+    }
+
+    internal class NoOpDataSetVersionService : IDataSetVersionService
+    {
+        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(Guid releaseVersionId)
+        {
+            return Task.FromResult(new List<DataSetVersionStatusSummary>());
+        } 
     }
 }

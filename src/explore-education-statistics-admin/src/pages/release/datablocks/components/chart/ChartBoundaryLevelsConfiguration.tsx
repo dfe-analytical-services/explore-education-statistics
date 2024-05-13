@@ -2,11 +2,12 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
-import { Form, FormFieldSelect } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import merge from 'lodash/merge';
 import React, { ReactNode, useCallback } from 'react';
 
@@ -20,7 +21,6 @@ interface Props {
   buttons?: ReactNode;
   meta: FullTableMeta;
   options: ChartOptions;
-  onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (values: ChartOptions) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
@@ -29,7 +29,6 @@ export default function ChartBoundaryLevelsConfiguration({
   buttons,
   meta,
   options,
-  onBoundaryLevelChange,
   onChange,
   onSubmit,
 }: Props) {
@@ -56,61 +55,64 @@ export default function ChartBoundaryLevelsConfiguration({
   );
 
   return (
-    <Formik<FormValues>
+    <FormProvider
       enableReinitialize
       initialValues={{ boundaryLevel: options.boundaryLevel }}
-      validateOnMount
       validationSchema={Yup.object<FormValues>({
         boundaryLevel: Yup.number()
+          .transform(value => (Number.isNaN(value) ? undefined : value))
+          .nullable()
           .oneOf(meta.boundaryLevels.map(level => level.id))
           .required('Choose a boundary level'),
       })}
-      onSubmit={async values => {
-        onSubmit(normalizeValues(values));
-        await submitForms();
-      }}
     >
-      {form => (
-        <Form id={formId}>
-          <Effect value={form.values} onChange={handleChange} />
-          <Effect
-            value={{
-              formKey: 'boundaryLevels',
-              isValid: form.isValid,
-              submitCount: form.submitCount,
+      {({ formState, watch }) => {
+        const values = watch();
+        return (
+          <RHFForm
+            id={formId}
+            onSubmit={async () => {
+              onSubmit(normalizeValues(values));
+              await submitForms();
             }}
-            onChange={updateForm}
-            onMount={updateForm}
-          />
-          <FormFieldSelect<FormValues>
-            label="Boundary level"
-            hint="Select a version of geographical data to use"
-            name="boundaryLevel"
-            order={[]}
-            options={[
-              {
-                label: 'Please select',
-                value: '',
-              },
-              ...meta.boundaryLevels.map(({ id, label }) => ({
-                value: id,
-                label,
-              })),
-            ]}
-            onChange={e => {
-              onBoundaryLevelChange?.(e.target.value);
-            }}
-          />
-
-          <ChartBuilderSaveActions
-            formId={formId}
-            formKey="boundaryLevels"
-            disabled={form.isSubmitting}
           >
-            {buttons}
-          </ChartBuilderSaveActions>
-        </Form>
-      )}
-    </Formik>
+            <Effect value={values} onChange={handleChange} />
+            <Effect
+              value={{
+                formKey: 'boundaryLevels',
+                isValid: formState.isValid,
+                submitCount: formState.submitCount,
+              }}
+              onChange={updateForm}
+              onMount={updateForm}
+            />
+            <RHFFormFieldSelect<FormValues>
+              label="Boundary level"
+              hint="Select a version of geographical data to use"
+              name="boundaryLevel"
+              order={[]}
+              options={[
+                {
+                  label: 'Please select',
+                  value: '',
+                },
+                ...meta.boundaryLevels.map(({ id, label }) => ({
+                  value: id,
+                  label,
+                })),
+              ]}
+            />
+
+            <ChartBuilderSaveActions
+              formId={formId}
+              formKey="boundaryLevels"
+              disabled={formState.isSubmitting}
+            >
+              {buttons}
+            </ChartBuilderSaveActions>
+          </RHFForm>
+        );
+      }}
+    </FormProvider>
   );
 }

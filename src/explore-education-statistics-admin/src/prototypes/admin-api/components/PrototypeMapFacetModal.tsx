@@ -1,24 +1,18 @@
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Button from '@common/components/Button';
-import {
-  Form,
-  FormFieldCheckbox,
-  FormFieldRadioGroup,
-  FormTextSearchInput,
-} from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import { FormTextSearchInput } from '@common/components/form';
 import Yup from '@common/validation/yup';
 import Modal from '@common/components/Modal';
 import { groupBy } from 'lodash';
-import { Formik } from 'formik';
 import React, { useMemo, useState } from 'react';
 import ButtonText from '@common/components/ButtonText';
 import { MapItem } from '../PrototypePrepareNextSubjectPage';
 import styles from './PrototypeMapFacetModal.module.scss';
-
-interface FormValues {
-  selectedItem: string;
-}
 
 interface Props {
   itemToMap: MapItem;
@@ -59,18 +53,20 @@ const PrototypeMapFacetModal = ({
       title={`Map existing ${name}`}
       onExit={onClose}
     >
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           selectedItem: '',
         }}
         validationSchema={Yup.object({
           selectedItem: Yup.string().required(`Choose a ${name}`),
         })}
-        onSubmit={({ selectedItem }) => {
-          onSubmit(selectedItem);
-        }}
       >
-        <Form id="form">
+        <RHFForm
+          id="form"
+          onSubmit={({ selectedItem }) => {
+            onSubmit(selectedItem);
+          }}
+        >
           <div className={styles.inner}>
             <h3>Current data set {name}</h3>
             <SummaryList className="govuk-!-margin-bottom-5">
@@ -125,7 +121,7 @@ const PrototypeMapFacetModal = ({
             />
             {Object.entries(groupedNewItems).map(([key, items]) => {
               return (
-                <FormFieldRadioGroup
+                <RHFFormFieldRadioGroup
                   showError={false}
                   id="items"
                   key={key}
@@ -145,7 +141,7 @@ const PrototypeMapFacetModal = ({
           </div>
           <hr className="govuk-!-margin-0" />
           <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-            <FormFieldCheckbox
+            <RHFFormFieldCheckbox
               small
               name="no-mapping"
               label={`No ${name} mapping available`}
@@ -175,8 +171,8 @@ const PrototypeMapFacetModal = ({
             </Button>
             */}
           </div>
-        </Form>
-      </Formik>
+        </RHFForm>
+      </FormProvider>
     </Modal>
   );
 };

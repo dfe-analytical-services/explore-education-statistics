@@ -16,9 +16,8 @@ interface Props<TFormValues extends FieldValues>
 export default function RHFFormFieldCheckboxMenu<
   TFormValues extends FieldValues,
 >(props: Props<TFormValues>) {
-  const { name, open: defaultOpen = false, options, legend } = props;
+  const { name, open: defaultOpen = false, options, legend, id } = props;
   const [open, setOpen] = useState(defaultOpen);
-
   const {
     formState: { errors },
   } = useFormContext();
@@ -31,6 +30,7 @@ export default function RHFFormFieldCheckboxMenu<
 
   return (
     <DetailsMenu
+      id={`details-${id}`}
       open={open}
       jsRequired
       summary={legend}

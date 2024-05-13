@@ -29,7 +29,7 @@ public class DataSetFilesController : ControllerBase
 
     [HttpGet("data-set-files")]
     [MemoryCache(typeof(ListDataSetFilesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    public async Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSets(
+    public async Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
         [FromQuery] DataSetFileListRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -38,10 +38,11 @@ public class DataSetFilesController : ControllerBase
                 themeId: request.ThemeId,
                 publicationId: request.PublicationId,
                 releaseVersionId: request.ReleaseId,
-                request.LatestOnly,
-                request.SearchTerm,
-                request.Sort,
-                request.SortDirection,
+                latestOnly: request.LatestOnly,
+                dataSetType: request.DataSetType,
+                searchTerm: request.SearchTerm,
+                sort: request.Sort,
+                sortDirection: request.SortDirection,
                 page: request.Page,
                 pageSize: request.PageSize,
                 cancellationToken: cancellationToken)

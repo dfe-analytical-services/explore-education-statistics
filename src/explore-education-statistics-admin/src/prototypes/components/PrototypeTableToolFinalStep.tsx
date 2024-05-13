@@ -114,9 +114,7 @@ const TableToolFinalStep = ({
             )}
           </div>
           <TableHeadersForm
-            id={tableHeadersFormId}
             initialValues={currentTableHeaders}
-            showTableHeadersForm={showTableHeadersForm}
             onSubmit={tableHeaderConfig => {
               toggleShowTableHeadersForm.off();
               setCurrentTableHeaders(tableHeaderConfig);
