@@ -62,6 +62,14 @@ public abstract class DataSetVersionPathResolverTests
 
             Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
+                resolver.CsvDataPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
+                resolver.CsvMetadataPath(version)
+            );
+            Assert.Equal(
                 Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
@@ -107,6 +115,14 @@ public abstract class DataSetVersionPathResolverTests
 
             Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
+                resolver.CsvDataPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
+                resolver.CsvMetadataPath(version)
+            );
+            Assert.Equal(
                 Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
@@ -150,6 +166,14 @@ public abstract class DataSetVersionPathResolverTests
             );
 
             Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
+                resolver.CsvDataPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
+                resolver.CsvMetadataPath(version)
+            );
             Assert.Equal(
                 Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)

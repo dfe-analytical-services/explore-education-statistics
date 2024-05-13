@@ -24,14 +24,22 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
 
         try
         {
+            await context.CallActivityAsync(nameof(CopyCsvFilesFunction.CopyCsvFiles),
+                input.DataSetVersionId);
+
+            logger.LogInformation(
+                "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
+                nameof(CopyCsvFilesFunction.CopyCsvFiles),
+                context.InstanceId,
+                input.DataSetVersionId);
+
             // Other activity function calls to be added here to cover the following stages:
-            // Move CSV files from Azure Blob Storage to Azure File Share
             // Create meta summary for the DataSetVersion
             // Import metadata to DuckDb
             // Import data to DuckDb
             // Export to Parquet files
 
-            await context.CallActivityAsync(nameof(CompleteProcessing), input);
+            await context.CallActivityAsync(nameof(CompleteProcessing), input.DataSetVersionId);
 
             logger.LogInformation(
                 "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
@@ -46,7 +54,7 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
                 context.InstanceId,
                 input.DataSetVersionId);
 
-            await context.CallActivityAsync(nameof(HandleProcessingFailure), input);
+            await context.CallActivityAsync(nameof(HandleProcessingFailure), input.DataSetVersionId);
         }
     }
 

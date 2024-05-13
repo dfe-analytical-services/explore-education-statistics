@@ -34,6 +34,9 @@ public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrat
         [Fact]
         public async Task Success()
         {
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithPublication(_fixture.DefaultPublication());
+
             var (releaseFile, releaseMetaFile) = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(_fixture.DefaultReleaseVersion()
                     .WithPublication(_fixture.DefaultPublication()))
@@ -46,6 +49,7 @@ public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrat
 
             await AddTestData<ContentDbContext>(context =>
             {
+                context.ReleaseVersions.Add(releaseVersion);
                 context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
             });
 
@@ -160,9 +164,11 @@ public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrat
         [Fact]
         public async Task ReleaseVersionNotDraft_ReturnsValidationProblem()
         {
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved);
+
             var (releaseFile, releaseMetaFile) = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion()
-                    .WithApprovalStatus(ReleaseApprovalStatus.Approved))
+                .WithReleaseVersion(releaseVersion)
                 .WithFiles(_fixture.DefaultFile()
                     .ForIndex(0, s => s.SetType(FileType.Data))
                     .ForIndex(1, s => s.SetType(FileType.Metadata))
@@ -172,6 +178,7 @@ public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrat
 
             await AddTestData<ContentDbContext>(context =>
             {
+                context.ReleaseVersions.Add(releaseVersion);
                 context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
             });
 
@@ -194,13 +201,16 @@ public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrat
         [Fact]
         public async Task ReleaseFileTypeNotData_ReturnsValidationProblem()
         {
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
+
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion())
+                .WithReleaseVersion(releaseVersion)
                 .WithFile(_fixture.DefaultFile()
                     .WithType(FileType.Ancillary));
 
             await AddTestData<ContentDbContext>(context =>
             {
+                context.ReleaseVersions.Add(releaseVersion);
                 context.ReleaseFiles.Add(releaseFile);
             });
 
@@ -223,12 +233,15 @@ public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrat
         [Fact]
         public async Task ReleaseFileHasNoMetaFile_ReturnsValidationProblem()
         {
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
+
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion())
+                .WithReleaseVersion(releaseVersion)
                 .WithFile(_fixture.DefaultFile());
 
             await AddTestData<ContentDbContext>(context =>
             {
+                context.ReleaseVersions.Add(releaseVersion);
                 context.ReleaseFiles.Add(releaseFile);
             });
 

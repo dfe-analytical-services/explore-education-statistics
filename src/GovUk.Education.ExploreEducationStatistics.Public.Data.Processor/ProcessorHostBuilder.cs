@@ -4,11 +4,16 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -95,8 +100,12 @@ public static class ProcessorHostBuilder
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
                     .AddFluentValidation()
                     .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
+                    .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                     .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
-                        InitialDataSetVersionCreateRequest.Validator>();
+                        InitialDataSetVersionCreateRequest.Validator>()
+                    .Configure<ParquetFilesOptions>(
+                        hostBuilderContext.Configuration.GetSection(ParquetFilesOptions.Section));
             });
     }
 }

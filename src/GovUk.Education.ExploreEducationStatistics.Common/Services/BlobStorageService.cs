@@ -57,7 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
         }
 
-        protected BlobStorageService(string connectionString, BlobServiceClient client, ILogger<IBlobStorageService> logger, IStorageInstanceCreationUtil storageInstanceCreationUtil)
+        protected BlobStorageService(
+            string connectionString,
+            BlobServiceClient client,
+            ILogger<IBlobStorageService> logger,
+            IStorageInstanceCreationUtil storageInstanceCreationUtil)
         {
             _connectionString = connectionString;
             _client = client;
@@ -221,7 +225,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        public async Task<bool> MoveBlob(IBlobContainer containerName,
+        public async Task<bool> MoveBlob(
+            IBlobContainer containerName,
             string sourcePath,
             string destinationPath)
         {
@@ -569,8 +574,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             TransferEventArgs e,
             ICollection<BlobInfo> allFilesStream)
         {
-            var source = (CloudBlockBlob) e.Source;
-            var destination = (CloudBlockBlob) e.Destination;
+            var source = (CloudBlockBlob)e.Source;
+            var destination = (CloudBlockBlob)e.Destination;
 
             allFilesStream.Add(
                 new BlobInfo(
@@ -594,8 +599,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private void FileFailedCallback(object? sender, TransferEventArgs e)
         {
-            var source = (CloudBlockBlob) e.Source;
-            var destination = (CloudBlockBlob) e.Destination;
+            var source = (CloudBlockBlob)e.Source;
+            var destination = (CloudBlockBlob)e.Destination;
 
             _logger.LogInformation(
                 "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}. Error message: {errorMessage}",
@@ -609,8 +614,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private void FileSkippedCallback(object? sender, TransferEventArgs e)
         {
-            var source = (CloudBlockBlob) e.Source;
-            var destination = (CloudBlockBlob) e.Destination;
+            var source = (CloudBlockBlob)e.Source;
+            var destination = (CloudBlockBlob)e.Destination;
 
             _logger.LogInformation(
                 "Skipped transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
@@ -627,7 +632,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blobContainer.GetBlobClient(path);
         }
 
-        private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(IBlobContainer containerName,
+        private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
+            IBlobContainer containerName,
             string path)
         {
             var blobClient = await GetBlobClient(containerName, path);
