@@ -1,5 +1,6 @@
 using Azure.Core;
 using Azure.Identity;
+using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -90,6 +92,9 @@ public static class ProcessorHostBuilder
                     }
                 }
 
+                // Configure Dapper to match CSV columns with underscores
+                DefaultTypeMap.MatchNamesWithUnderscores = true;
+
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
@@ -98,9 +103,17 @@ public static class ProcessorHostBuilder
                             .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                                 providerOptions => providerOptions.EnableCustomRetryOnFailure())
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
+                    .AddScoped<IDuckDbConnection, DuckDbConnection>(_ =>
+                    {
+                        var connection = new DuckDbConnection();
+                        connection.Open();
+                        return connection;
+                    })
                     .AddFluentValidation()
                     .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
+                    .AddScoped<IParquetMetaService, ParquetMetaService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                     .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
                         InitialDataSetVersionCreateRequest.Validator>()

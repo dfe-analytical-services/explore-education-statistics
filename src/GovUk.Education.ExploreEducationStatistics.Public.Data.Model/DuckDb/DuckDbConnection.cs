@@ -5,6 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 public class DuckDbConnection(string connectionString = "DataSource=:memory:")
     : DuckDBConnection(connectionString), IDuckDbConnection
 {
+    // TODO EES-5097 Remove this
+    public readonly Guid InstanceId = Guid.NewGuid();
+
     public override DuckDbCommand CreateCommand()
     {
         // Bit rubbish to do this but we don't have access to the
