@@ -27,9 +27,17 @@ export interface Methodology {
   }[];
 }
 
+interface MethodologySitemapSummary {
+  slug: string;
+  lastModified: Date | undefined;
+}
+
 const methodologyService = {
   getMethodology(methodologySlug: string): Promise<Methodology> {
     return contentApi.get(`/methodologies/${methodologySlug}`);
+  },
+  getSitemapSummaries(): Promise<MethodologySitemapSummary[]> {
+    return contentApi.get('/methodologies/sitemap-summaries');
   },
 };
 

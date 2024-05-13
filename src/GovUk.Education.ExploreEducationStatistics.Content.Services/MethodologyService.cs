@@ -133,5 +133,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
             return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
         }
+
+        public async Task<Either<ActionResult, List<MethodologySitemapSummaryViewModel>>> GetSitemapSummaries()
+        {
+            return await _contentDbContext.MethodologyVersions
+                .Select(mv => new MethodologySitemapSummaryViewModel()
+            {
+                Slug = mv.AlternativeSlug ?? mv.Methodology.OwningPublicationSlug,
+                LastModified = mv.Updated ?? mv.Published ?? mv.Created
+            }).ToListAsync();
+        }
     }
 }

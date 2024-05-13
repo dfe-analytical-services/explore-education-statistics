@@ -4,7 +4,7 @@ module.exports = {
   exclude: [
     '/subscriptions',
     '/subscriptions/verification-error',
-    '/server-sitemap-index.xml',
+    '/server-sitemap.xml',
   ],
   generateRobotsTxt: true,
   robotsTxtOptions: {
@@ -15,6 +15,6 @@ module.exports = {
         disallow: ['/data-tables/fast-track/', '/data-tables/permalink/'],
       },
     ],
-    additionalSitemaps: [`${process.env.PUBLIC_URL}server-sitemap-index.xml`],
+    additionalSitemaps: [`${process.env.PUBLIC_URL}server-sitemap.xml`],
   },
 };

@@ -1,13 +1,12 @@
-// pages/server-sitemap-index.xml/index.tsx
 import { getServerSideSitemapLegacy, ISitemapField } from 'next-sitemap';
-import getPublicationSlugs from '@frontend/services/sitemapService';
+import getPublicationSlugs, {
+  getMethodologySitemapFields,
+} from '@frontend/services/sitemapService';
 import { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const publicationPages = await getPublicationSlugs();
-
-  // Method to source urls from cms
-  // const urls = await fetch('https//example.com/api')
+  const methodologyFields = await getMethodologySitemapFields();
 
   const fields: ISitemapField[] = [
     {
@@ -23,6 +22,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
       // priority
     },
     ...publicationPages,
+    ...methodologyFields,
   ];
 
   return getServerSideSitemapLegacy(ctx, fields);
