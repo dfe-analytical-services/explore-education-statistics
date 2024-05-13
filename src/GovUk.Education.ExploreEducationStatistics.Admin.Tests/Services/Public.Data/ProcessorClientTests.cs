@@ -44,7 +44,7 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
 
-            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
+            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -69,7 +69,7 @@ public class ProcessorClientTests
                         }
                     }));
 
-            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
+            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -82,8 +82,8 @@ public class ProcessorClientTests
         {
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.NotFound);
-
-            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
+            var x = Guid.Empty;
+            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -108,7 +108,7 @@ public class ProcessorClientTests
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _processorClient.CreateInitialDataSetVersion(releaseFileId: It.IsAny<Guid>());
+                await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();
