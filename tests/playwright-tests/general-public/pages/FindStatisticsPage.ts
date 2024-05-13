@@ -12,5 +12,6 @@ export default class FindStatisticsPage {
 
   async navigateToPublicReleasePage(publicationName: string) {
     await this.releaseLink(publicationName).click();
+    await this.page.waitForTimeout(2000);
   }
 }
