@@ -340,4 +340,19 @@ public class PublicationService : IPublicationService
             .Include(rf => rf.File)
             .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data);
     }
+    
+    public async Task<Either<ActionResult, List<PublicationSitemapSummaryViewModel>>> GetSitemapSummaries()
+    {
+        return await _contentDbContext.Publications
+            .Select(p => new PublicationSitemapSummaryViewModel()
+            {
+                Slug = p.Slug,
+                LastModified = p.Updated,
+                Releases = p.ReleaseVersions.Select(r => new ReleaseSitemapSummaryViewModel()
+                {
+                    Slug = r.Slug,
+                    LastModified = r.Published ?? r.Created
+                }).ToList()
+            }).ToListAsync();
+    }
 }

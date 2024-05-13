@@ -27,7 +27,7 @@ export interface Methodology {
   }[];
 }
 
-interface MethodologySitemapSummary {
+export interface MethodologySitemapSummary {
   slug: string;
   lastModified: Date | undefined;
 }

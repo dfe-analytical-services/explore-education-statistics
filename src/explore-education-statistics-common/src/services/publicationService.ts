@@ -237,6 +237,17 @@ export interface PublicationTreeOptions {
   publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
 }
 
+export interface PublicationSitemapSummary {
+  slug: string;
+  lastModified: Date | undefined;
+  releases: ReleaseSitemapSummary[];
+}
+
+export interface ReleaseSitemapSummary {
+  slug: string;
+  lastModified: Date | undefined;
+}
+
 const publicationService = {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`/publications/${publicationSlug}/title`);
@@ -298,6 +309,9 @@ const publicationService = {
     return contentApi.get(`/publications`, {
       params,
     });
+  },
+  getSitemapSummaries(): Promise<PublicationSitemapSummary[]> {
+    return contentApi.get('/publications/sitemap-summaries');
   },
 };
 export default publicationService;
