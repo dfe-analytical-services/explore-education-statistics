@@ -1,5 +1,4 @@
 #nullable enable
-using AngleSharp.Io;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -69,7 +68,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
@@ -108,6 +106,8 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
+using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
+using System.Threading;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -776,6 +776,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(Guid releaseVersionId)
         {
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
-        } 
+        }
+
+        public Task<bool> HasExistingVersion(Guid releaseFileId, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(false);
+        }
     }
 }
