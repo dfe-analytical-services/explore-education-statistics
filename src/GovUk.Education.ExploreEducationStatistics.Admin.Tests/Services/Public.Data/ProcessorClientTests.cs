@@ -82,7 +82,7 @@ public class ProcessorClientTests
         {
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.NotFound);
-            var x = Guid.Empty;
+
             var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
