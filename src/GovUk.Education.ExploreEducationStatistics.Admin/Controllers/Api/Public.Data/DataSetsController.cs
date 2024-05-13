@@ -19,7 +19,7 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
 {
     [HttpGet]
     [Produces("application/json")]
-    public async Task<ActionResult<PaginatedListViewModel<DataSetViewModel>>> ListDataSets(
+    public async Task<ActionResult<PaginatedListViewModel<DataSetSummaryViewModel>>> ListDataSets(
         [FromQuery] DataSetListRequest request,
         CancellationToken cancellationToken)
     {
@@ -34,7 +34,7 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
 
     [HttpGet("{dataSetId:guid}")]
     [Produces("application/json")]
-    public async Task<ActionResult<DataSetSummaryViewModel>> GetDataSet(
+    public async Task<ActionResult<DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken)
     {
