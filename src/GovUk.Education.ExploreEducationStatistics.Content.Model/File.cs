@@ -48,5 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public User? CreatedBy { get; set; }
 
         public Guid? CreatedById { get; set; }
+
+        public string? PublicApiVersionString => PublicApiDataSetVersion is not null
+                ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}"
+                : null;
     }
 }

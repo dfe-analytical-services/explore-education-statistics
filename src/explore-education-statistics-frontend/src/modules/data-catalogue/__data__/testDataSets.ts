@@ -5,7 +5,10 @@ import {
 
 export const testDataSetFileSummaries: DataSetFileSummary[] = [
   {
-    hasApiDataSet: true,
+    api: {
+      id: 'api-data-set-id-1',
+      version: '1.0',
+    },
     id: 'datasetfile-id-1',
     fileExtension: 'csv',
     fileId: 'file-id-1',
@@ -39,7 +42,6 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     title: 'Data set 1',
   },
   {
-    hasApiDataSet: false,
     id: 'datasetfile-id-2',
     fileExtension: 'csv',
     fileId: 'file-id-2',

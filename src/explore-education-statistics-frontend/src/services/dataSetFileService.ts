@@ -8,7 +8,6 @@ export interface DataSetFile {
   title: string;
   summary: string;
   file: { id: string; name: string; size: string };
-  hasApiDataSet?: boolean;
   release: {
     id: string;
     isLatestPublishedRelease: boolean;
@@ -23,6 +22,7 @@ export interface DataSetFile {
     title: string;
     type: ReleaseType;
   };
+  api?: DataSetFileApi;
   meta: {
     geographicLevels: string[];
     timePeriod: {
@@ -41,7 +41,6 @@ export interface DataSetFileSummary {
   filename: string;
   fileSize: string;
   fileExtension: string;
-  hasApiDataSet?: boolean;
   title: string;
   content: string;
   theme: {
@@ -58,6 +57,7 @@ export interface DataSetFileSummary {
   };
   latestData: boolean;
   published: Date;
+  api?: DataSetFileApi;
   meta: {
     geographicLevels: string[];
     timePeriod: {
@@ -68,6 +68,11 @@ export interface DataSetFileSummary {
     filters: string[];
     indicators: string[];
   };
+}
+
+export interface DataSetFileApi {
+  id: string;
+  version: string;
 }
 
 export const dataSetFileSortOptions = [

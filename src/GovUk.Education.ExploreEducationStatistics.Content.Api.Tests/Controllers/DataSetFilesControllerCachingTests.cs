@@ -22,7 +22,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class DataSetFilesControllerCachingTests
+public static class DataSetFilesControllerCachingTests
 {
     public class ListDataSetsTests : CacheServiceTestFixture
     {
@@ -44,6 +44,7 @@ public class DataSetFilesControllerCachingTests
             {
                 new()
                 {
+                    Id = Guid.NewGuid(),
                     FileId = Guid.NewGuid(),
                     Filename = "Filename.csv",
                     FileSize = "1 Mb",
@@ -64,9 +65,14 @@ public class DataSetFilesControllerCachingTests
                         Id = Guid.NewGuid(),
                         Title = "Academic year 2001/02"
                     },
+                    Api = new DataSetFileApiViewModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = "1.0.0"
+                    },
+                    Meta = new DataSetFileMetaViewModel(),
                     LatestData = true,
                     Published = DateTime.UtcNow,
-                    HasApiDataSet = true
                 }
             }, 1, 1, 10);
 
