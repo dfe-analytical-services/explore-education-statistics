@@ -88,7 +88,7 @@ var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
 var parquetFileShareMountName = 'parquet-fileshare-mount'
 var parquetFileShareMountPath = '/data/public-api-parquet'
-var parquetFileShareStorageName = 'parquet-fileshare-storage'
+var publicApiStorageAccountName = '${subscription}eespapisa'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -121,6 +121,51 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   }
 }
 
+resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: publicApiStorageAccountName
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'Storage'
+  properties: {
+    supportsHttpsTrafficOnly: true
+    defaultToOAuthAuthentication: true
+//     networkAcls: {
+//       bypass: 'AzureServices'
+//       defaultAction: 'Deny'
+//       virtualNetworkRules: [
+//         {
+//           action: 'Allow'
+//           id: vNetModule.outputs.dataProcessorSubnetRef
+//         }
+//         {
+//           action: 'Allow'
+//           id: vNetModule.outputs.containerAppEnvironmentSubnetRef
+//         }
+//       ]
+//     }
+  }
+}
+
+var publicApiStorageAccountKey = publicApiStorageAccount.listKeys().keys[0].value
+var publicApiStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${publicApiStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${publicApiStorageAccountKey}'
+
+// Deploy File Share.
+module parquetFileShareModule 'components/fileShares.bicep' = {
+  name: 'fileShareDeploy'
+  params: {
+    resourcePrefix: resourcePrefix
+    fileShareName: 'data'
+    fileShareQuota: fileShareQuota
+    storageAccountName: publicApiStorageAccountName
+    fileShareAccessTier: 'TransactionOptimized'
+  }
+  dependsOn: [
+    publicApiStorageAccount
+  ]
+}
+
 // Deploy a single shared Application Insights for all relevant Public API resources to use.
 module applicationInsightsModule 'components/appInsights.bicep' = {
   name: 'appInsightsDeploy'
@@ -138,17 +183,6 @@ module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
     subscription: subscription
     location: location
     tagValues: tagValues
-  }
-}
-
-// Deploy File Share.
-module parquetFileShareModule 'components/fileShares.bicep' = {
-  name: 'fileShareDeploy'
-  params: {
-    resourcePrefix: resourcePrefix
-    fileShareName: 'data'
-    fileShareQuota: fileShareQuota
-    storageAccountName: coreStorageAccountName
   }
 }
 
@@ -199,8 +233,8 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     azureFileStorages: [
       {
         storageName: parquetFileShareModule.outputs.fileShareName
-        storageAccountName: coreStorageAccountName
-        storageAccountKey: coreStorageAccountKey
+        storageAccountName: publicApiStorageAccountName
+        storageAccountKey: publicApiStorageAccountKey
         fileShareName: parquetFileShareModule.outputs.fileShareName
         accessMode: 'ReadWrite'
       }
@@ -309,8 +343,8 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     preWarmedInstanceCount: 1
 //     additionalAzureFileStorage: {
 //       storageName: parquetFileShareModule.outputs.fileShareName
-//       storageAccountKey: coreStorageAccountKey
-//       storageAccountName: coreStorageAccountName
+//       storageAccountKey: publicApiStorageAccountKey
+//       storageAccountName: publicApiStorageAccountName
 //       fileShareName: parquetFileShareModule.outputs.fileShareName
 //       mountPath: parquetFileShareMountPath
 //     }
@@ -382,11 +416,39 @@ module storeCoreStorageAccessKey 'components/keyVaultSecret.bicep' = {
   }
 }
 
+var publicApiStorageConnectionStringSecretKey = 'ees-core-storage-connectionstring'
+
+module storePublicApiStorageConnectionString 'components/keyVaultSecret.bicep' = {
+  name: 'storePublicApiStorageConnectionString'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: publicApiStorageConnectionStringSecretKey
+    secretValue: publicApiStorageConnectionString
+    contentType: 'text/plain'
+  }
+}
+
+var publicApiStorageAccessKeySecretKey = 'ees-publicapi-storage-access-key'
+
+module storePublicApiStorageAccessKey 'components/keyVaultSecret.bicep' = {
+  name: 'storePublicApiStorageAccessKey'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: publicApiStorageAccessKeySecretKey
+    secretValue: publicApiStorageAccountKey
+    contentType: 'text/plain'
+  }
+}
+
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
 output coreStorageAccountName string = coreStorageAccountName
 output coreStorageAccessKeySecretKey string = coreStorageAccessKeySecretKey
+output publicApiStorageAccountName string = publicApiStorageAccountName
+output publicApiStorageAccessKeySecretKey string = publicApiStorageAccessKeySecretKey
 output parquetFileShareName string = parquetFileShareModule.outputs.fileShareName
 output parquetFileShareMountPath string = parquetFileShareMountPath

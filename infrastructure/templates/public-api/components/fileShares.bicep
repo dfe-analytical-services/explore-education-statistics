@@ -29,10 +29,10 @@ resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2023-01-01'
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
   name:  shareName
   parent: fileService
-  properties: {
-    accessTier: fileShareAccessTier
-    shareQuota: fileShareQuota
-  }
+//   properties: {
+//     accessTier: fileShareAccessTier
+//     shareQuota: fileShareQuota
+//   }
 }
 
 output fileShareName string = fileShare.name
