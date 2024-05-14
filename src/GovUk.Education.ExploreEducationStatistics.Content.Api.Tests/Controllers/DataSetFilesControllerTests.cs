@@ -2086,6 +2086,73 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
         }
 
         [Fact]
+        public async Task FetchVariables_Success()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFile(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithFilters([
+                            new FilterMeta { Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
+                            new FilterMeta { Label = "Filter 2", ColumnName = "G_filter_2", },
+                            new FilterMeta { Label = "Filter 3", ColumnName = "C_filter_3", Hint = "Another hint", },
+                        ])
+                        .WithIndicators([
+                            new IndicatorMeta { Label = "Indicator 3", ColumnName = "B_indicator_3", },
+                            new IndicatorMeta { Label = "Indicator 2", ColumnName = "E_indicator_2", },
+                            new IndicatorMeta { Label = "Indicator 1", ColumnName = "D_indicator_1", },
+                            new IndicatorMeta { Label = "Indicator 4", ColumnName = "F_indicator_4", },
+                        ])));
+
+            var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: await CreateConfigurtionWithAzurite());
+
+            var formFile = CreateDataCsvFormFile(string.Empty);
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
+
+            var response = await client.GetAsync(uri);
+            var viewModel = response.AssertOk<DataSetFileViewModel>();
+
+            Assert.Equal(7, viewModel.Variables.Count);
+            Assert.Equal("A_filter_1", viewModel.Variables[0].Value);
+            Assert.Equal("Filter 1 - hint", viewModel.Variables[0].Label);
+            Assert.Equal("B_indicator_3", viewModel.Variables[1].Value);
+            Assert.Equal("Indicator 3", viewModel.Variables[1].Label);
+            Assert.Equal("C_filter_3", viewModel.Variables[2].Value);
+            Assert.Equal("Filter 3 - Another hint", viewModel.Variables[2].Label);
+            Assert.Equal("D_indicator_1", viewModel.Variables[3].Value);
+            Assert.Equal("Indicator 1", viewModel.Variables[3].Label);
+            Assert.Equal("E_indicator_2", viewModel.Variables[4].Value);
+            Assert.Equal("Indicator 2", viewModel.Variables[4].Label);
+            Assert.Equal("F_indicator_4", viewModel.Variables[5].Value);
+            Assert.Equal("Indicator 4", viewModel.Variables[5].Label);
+            Assert.Equal("G_filter_2", viewModel.Variables[6].Value);
+            Assert.Equal("Filter 2", viewModel.Variables[6].Label);
+        }
+
+        [Fact]
         public async Task FetchDataSetFootnotes_Success()
         {
             Publication publication = _fixture.DefaultPublication()

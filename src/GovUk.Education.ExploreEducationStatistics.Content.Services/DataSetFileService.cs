@@ -171,7 +171,7 @@ public class DataSetFileService : IDataSetFileService
 
         var dataCsvPreviewLines = await GetDataCsvPreviewLines(releaseFile);
 
-        // Fetch variable names and descriptions from DataSetFileMeta
+        var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
 
         var footnotes = await _footnoteRepository.GetFootnotes(
             releaseFile.ReleaseVersionId,
@@ -212,6 +212,7 @@ public class DataSetFileService : IDataSetFileService
                 releaseFile.File.DataSetFileMeta,
                 releaseFile.FilterSequence,
                 releaseFile.IndicatorSequence),
+            Variables = variables,
             Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes),
             Api = BuildDataSetFileApiViewModel(releaseFile.File)
         };
@@ -262,6 +263,20 @@ public class DataSetFileService : IDataSetFileService
         }
 
         return dataCsvPreviewLines;
+    }
+
+    private List<LabelValue> GetVariables(DataSetFileMeta meta)
+    {
+        var filterVariables = meta.Filters
+            .Select(filter => new LabelValue(
+                string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
+                filter.ColumnName))
+            .ToList();
+        var indicatorVariables = meta.Indicators
+            .Select(indicator => new LabelValue(indicator.Label, indicator.ColumnName));
+        return filterVariables.Concat(indicatorVariables)
+            .OrderBy(variable => variable.Value)
+            .ToList();
     }
 
     private static List<string> GetOrderedFilters(List<FilterMeta> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)

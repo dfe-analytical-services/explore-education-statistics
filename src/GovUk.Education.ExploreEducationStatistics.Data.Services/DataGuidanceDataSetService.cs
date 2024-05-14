@@ -98,7 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<List<LabelValue>> ListVariables(Guid subjectId,
             CancellationToken cancellationToken = default)
         {
-            // @MarkFix get these from DataSetFileMeta
             var filters = await _statisticsDbContext.Filter
                 .Where(filter => filter.SubjectId == subjectId)
                 .Select(filter =>
@@ -115,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
-        private async Task<List<FootnoteViewModel>> ListFootnotes(Guid releaseVersionId, Guid subjectId) // @MarkFix Get your footnotes here!
+        private async Task<List<FootnoteViewModel>> ListFootnotes(Guid releaseVersionId, Guid subjectId)
         {
             var footnotes = await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
                 subjectId: subjectId);
