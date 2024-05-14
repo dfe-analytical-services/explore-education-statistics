@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 
-public interface IReleaseService
+public interface IDataSetCandidateService
 {
-    Task<Either<ActionResult, IReadOnlyList<ApiDataSetCandidateViewModel>>> ListApiDataSetCandidates(
+    Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> ListCandidates(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default);
 }

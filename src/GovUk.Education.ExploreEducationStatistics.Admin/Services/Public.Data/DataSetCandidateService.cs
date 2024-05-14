@@ -17,18 +17,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-internal class ReleaseService(
+internal class DataSetCandidateService(
     ContentDbContext contentDbContext,
     IUserService userService)
-    : IReleaseService
+    : IDataSetCandidateService
 {
-    public async Task<Either<ActionResult, IReadOnlyList<ApiDataSetCandidateViewModel>>> ListApiDataSetCandidates(
+    public async Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> ListCandidates(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default)
     {
         return await CheckReleaseVersionExists(releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
-            .OnSuccess(async () => await GetApiDataSetCandidates(releaseVersionId));
+            .OnSuccess(async () => await DoListCandidates(releaseVersionId, cancellationToken));
     }
 
     private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(
@@ -40,8 +40,9 @@ internal class ReleaseService(
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
     }
 
-    private async Task<Either<ActionResult, IReadOnlyList<ApiDataSetCandidateViewModel>>> GetApiDataSetCandidates(
-        Guid releaseVersionId)
+    private async Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> DoListCandidates(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken)
     {
         return await contentDbContext.ReleaseFiles
             .AsNoTracking()
@@ -50,12 +51,12 @@ internal class ReleaseService(
             .Where(rf => rf.File.PublicApiDataSetId == null)
             .Where(rf => rf.File.ReplacedById == null)
             .Where(rf => rf.File.ReplacingId == null)
-            .Select(rf => new ApiDataSetCandidateViewModel
+            .Select(rf => new DataSetCandidateViewModel
             {
                 FileId = rf.FileId,
                 Title = rf.Name!,
             })
             .OrderBy(rf => rf.Title)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 }
