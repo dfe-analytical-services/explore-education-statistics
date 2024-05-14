@@ -52,6 +52,10 @@ stages:
                 set -e
                 dataProcessorExists=`az functionapp list --resource-group $(resourceGroupName) --query "[?name=='$(dataProcessorFunctionAppName)']" | jq '. != []'`
                 
+                if [[ "$dataProcessorExists" == "true" ]]; then
+                  echo "Data Processor Function App exists - combining existing appsettings with new ones"
+                fi
+                
                 az deployment group create \
                   --name 'DeployPublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
                   --resource-group $(resourceGroupName) \
@@ -66,7 +70,7 @@ stages:
                       postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
                       dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                       deployContainerApp=$(deployContainerApp) \
-                      updatePsqlFlexibleServer=$(updatePsqlFlexibleServer)
+                      updatePsqlFlexibleServer=$(updatePsqlFlexibleServer) \
                       dataProcessorFunctionAppExists=$dataProcessorExists
 
           - template: pipeline-variables-from-bicep-outputs-template.yml
@@ -81,14 +85,14 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
-                
+
                 az functionapp config appsettings set \
                   --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
                   --settings \
                     "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))"
-                
+
                 az webapp config connection-string set \
                   --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
@@ -114,16 +118,22 @@ stages:
               inlineScript: |
                 set -e
 
-                az webapp config storage-account add \
-                  --name $(dataProcessorFunctionAppName) \
-                  --resource-group $(resourceGroupName) \
-                  --custom-id $(parquetFileShareName) \
-                  --storage-type AzureFiles \
-                  --account-name $(publicApiStorageAccountName) \
-                  --access-key `az keyvault secret show --name $(publicApiStorageAccessKeySecretKey) --vault-name $(keyVaultName) --query value --output tsv` \
-                  --share-name $(parquetFileShareName) \
-                  --mount-path $(parquetFileShareMountPath) \
-                  --slot 'staging'
+                fileShareMountExists=`az webapp config storage-account list --resource-group $(resourceGroupName) --name $(dataProcessorFunctionAppName) --slot staging | jq '. != []'`
+
+                if [[ "$fileShareMountExists" == "false" ]]; then
+
+                  az webapp config storage-account add \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --custom-id $(parquetFileShareName) \
+                    --storage-type AzureFiles \
+                    --account-name $(publicApiStorageAccountName) \
+                    --access-key `az keyvault secret show --name $(publicApiStorageAccessKeySecretKey) --vault-name $(keyVaultName) --query value --output tsv` \
+                    --share-name $(parquetFileShareName) \
+                    --mount-path $(parquetFileShareMountPath) \
+                    --slot 'staging'
+
+                fi
 
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - deploy to staging slot'
@@ -165,4 +175,4 @@ stages:
 #                az webapp config storage-account list \
 #                  --name '$(dataProcessorFunctionAppName)' \
 #                  --resource-group '$(resourceGroupName)'
-
+#

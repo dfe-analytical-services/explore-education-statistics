@@ -52,6 +52,8 @@ resource functionSlotConfig 'Microsoft.Web/sites/config@2023-01-01' = {
 // infrastructure deploys do not reset appsettings back to original values and cause
 // unwanted updates to production appsettings prior to a slot swap deploy process being
 // ready to run.
+//
+// See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
 var combinedStagingSettings = union(commonSettings, stagingOnlySettings, existingStagingAppSettings)
 var combinedProductionSettings = union(commonSettings, prodOnlySettings, existingProductionAppSettings)
 

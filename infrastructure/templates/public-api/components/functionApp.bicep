@@ -221,6 +221,8 @@ resource slot2StorageAccountFileShare 'Microsoft.Storage/storageAccounts/fileSer
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
 // deploy and supply them as the most important appsettings. This prevents infrastructure deploys from overriding any
 // appsettings back to their original values by allowing existing ones to take precedence.
+//
+// See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
 var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
 var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
 
