@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -17,6 +18,8 @@ public record DataSetFileViewModel
     public required DataSetFileReleaseViewModel Release { get; init; }
 
     public required DataSetFileMetaViewModel Meta { get; init; }
+
+    public required List<FootnoteViewModel> Footnotes { get; init; } = [];
 
     public DataSetFileApiViewModel? Api { get; set; }
 }

@@ -1,5 +1,4 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;

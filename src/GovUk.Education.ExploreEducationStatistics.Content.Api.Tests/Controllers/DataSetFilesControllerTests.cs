@@ -29,6 +29,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
@@ -2080,6 +2086,77 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
         }
 
         [Fact]
+        public async Task FetchDataSetFootnotes_Success()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            var subject = _fixture.DefaultSubject()
+                .Generate();
+
+            var releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFile(_fixture.DefaultFile()
+                    .WithSubjectId(subject.Id))
+                .Generate();
+
+            var statsReleaseVersion = new Data.Model.ReleaseVersion { Id = releaseFile.ReleaseVersionId };
+
+            var releaseFootnote1 = _fixture.DefaultReleaseFootnote()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithFootnote(_fixture.DefaultFootnote()
+                    .WithSubjects(new List<Subject> { subject }))
+                .Generate();
+
+            var filter = _fixture.DefaultFilter()
+                .WithSubject(subject);
+
+            var releaseFootnote2 = _fixture.DefaultReleaseFootnote()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithFootnote(_fixture.DefaultFootnote()
+                    .WithFilters(new List<Filter> { filter }))
+                .Generate();
+
+        var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: await CreateConfigurtionWithAzurite());
+
+            var formFile = CreateDataCsvFormFile(string.Empty);
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .AddStatisticsDbTestData(context =>
+                {
+                    context.ReleaseFootnote.AddRange(releaseFootnote1, releaseFootnote2);
+                })
+                .CreateClient();
+
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
+
+            var response = await client.GetAsync(uri);
+            var viewModel = response.AssertOk<DataSetFileViewModel>();
+
+            var footnotes = viewModel.Footnotes;
+            Assert.Equal(2, footnotes.Count);
+
+            Assert.Equal("Footnote 0 :: Content", footnotes[0].Label);
+            Assert.Equal("Footnote 1 :: Content", footnotes[1].Label);
+        }
+
+        [Fact]
         public async Task NoDataSetFile_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
@@ -2225,7 +2302,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
     private WebApplicationFactory<TestStartup> BuildApp(
         ContentDbContext? contentDbContext = null,
-        //StatisticsDbContext? statisticsDbContext = null,
+        StatisticsDbContext? statisticsDbContext = null,
         IPublicBlobStorageService? publicBlobStorageService = null)
     {
         return TestApp
@@ -2245,13 +2322,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
                             .AddEnvironmentVariables()
                             .Build()));
-                //services.AddTransient<IFootnoteRepository>(s => new FootnoteRepository(
-                //    statisticsDbContext ?? s.GetRequiredService<StatisticsDbContext>()));
+               services.AddTransient<IFootnoteRepository>(s => new FootnoteRepository(
+                   statisticsDbContext ?? s.GetRequiredService<StatisticsDbContext>()));
                 services.AddTransient<IDataSetFileService>(
                     s => new DataSetFileService(
                         contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
                         s.GetRequiredService<IReleaseVersionRepository>(),
-                        s.GetRequiredService<IPublicBlobStorageService>()));
+                        s.GetRequiredService<IPublicBlobStorageService>(),
+                        s.GetRequiredService<IFootnoteRepository>()));
             });
     }
 

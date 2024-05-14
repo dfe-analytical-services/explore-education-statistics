@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
@@ -35,18 +36,18 @@ public class DataSetFileService : IDataSetFileService
     private readonly ContentDbContext _contentDbContext;
     private readonly IReleaseVersionRepository _releaseVersionRepository;
     private readonly IPublicBlobStorageService _publicBlobStorageService;
-    //private readonly IFootnoteRepository _footnoteRepository;
+    private readonly IFootnoteRepository _footnoteRepository;
 
     public DataSetFileService(
         ContentDbContext contentDbContext,
         IReleaseVersionRepository releaseVersionRepository,
-        IPublicBlobStorageService publicBlobStorageService)
-        //IFootnoteRepository footnoteRepository)
+        IPublicBlobStorageService publicBlobStorageService,
+        IFootnoteRepository footnoteRepository)
     {
         _contentDbContext = contentDbContext;
         _releaseVersionRepository = releaseVersionRepository;
         _publicBlobStorageService = publicBlobStorageService;
-        //_footnoteRepository = footnoteRepository;
+        _footnoteRepository = footnoteRepository;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
@@ -172,7 +173,9 @@ public class DataSetFileService : IDataSetFileService
 
         // Fetch variable names and descriptions from DataSetFileMeta
 
-        // Fetch footnotes
+        var footnotes = await _footnoteRepository.GetFootnotes(
+            releaseFile.ReleaseVersionId,
+            releaseFile.File.SubjectId);
 
         return new DataSetFileViewModel
         {
@@ -209,6 +212,7 @@ public class DataSetFileService : IDataSetFileService
                 releaseFile.File.DataSetFileMeta,
                 releaseFile.FilterSequence,
                 releaseFile.IndicatorSequence),
+            Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes),
             Api = BuildDataSetFileApiViewModel(releaseFile.File)
         };
     }
