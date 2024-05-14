@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 
-public class TestParquetPathResolver : IParquetPathResolver
+public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
 {
     public string BasePath { get; set; } = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),

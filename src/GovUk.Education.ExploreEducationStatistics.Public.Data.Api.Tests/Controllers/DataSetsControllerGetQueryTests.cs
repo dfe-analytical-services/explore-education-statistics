@@ -21,7 +21,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 {
     private const string BaseUrl = "api/v1/data-sets";
 
-    private readonly TestParquetPathResolver _parquetPathResolver = new()
+    private readonly TestDataSetVersionPathResolver _dataSetVersionPathResolver = new()
     {
         Directory = "AbsenceSchool"
     };
@@ -2133,7 +2133,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
     private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp.ConfigureServices(services =>
-            services.ReplaceService<IParquetPathResolver>(_parquetPathResolver));
+            services.ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver));
     }
 
     private static QueryResultsMeta GatherQueryResultsMeta(DataSetQueryPaginatedResultsViewModel viewModel)

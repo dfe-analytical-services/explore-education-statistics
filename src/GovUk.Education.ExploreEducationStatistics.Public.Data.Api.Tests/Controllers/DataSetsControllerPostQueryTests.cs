@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
@@ -23,7 +24,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 {
     private const string BaseUrl = "api/v1/data-sets";
 
-    private readonly TestParquetPathResolver _parquetPathResolver = new()
+    private readonly TestDataSetVersionPathResolver _dataSetVersionPathResolver = new()
     {
         Directory = "AbsenceSchool"
     };
@@ -1183,7 +1184,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                     break;
             }
         }
-        
+
         [Theory]
         [InlineData("In", 150)]
         [InlineData("NotIn", 66)]
@@ -2815,7 +2816,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp.ConfigureServices(services =>
-            services.ReplaceService<IParquetPathResolver>(_parquetPathResolver));
+            services.ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver));
     }
 
     private static QueryResultsMeta GatherQueryResultsMeta(DataSetQueryPaginatedResultsViewModel viewModel)
