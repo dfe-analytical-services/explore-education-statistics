@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import Button from '@common/components/Button';
 import Yup from '@common/validation/yup';
 import React from 'react';
@@ -49,7 +49,7 @@ const PrototypePreviewSubject = ({
           })}
         >
           {() => (
-            <RHFForm
+            <Form
               id="form"
               onSubmit={values => {
                 onSubmit({
@@ -58,7 +58,7 @@ const PrototypePreviewSubject = ({
                 });
               }}
             >
-              <RHFFormFieldSelect<FormValues>
+              <FormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
                 label="Available data sets"
@@ -69,7 +69,7 @@ const PrototypePreviewSubject = ({
                 placeholder="Choose a subject"
               />
               <Button type="submit">Save</Button>
-            </RHFForm>
+            </Form>
           )}
         </FormProvider>
       </section>

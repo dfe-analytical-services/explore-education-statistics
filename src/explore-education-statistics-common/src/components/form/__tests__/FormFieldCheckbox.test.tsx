@@ -1,22 +1,22 @@
-import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import { waitFor } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-describe('RHFFormFieldCheckbox', () => {
+describe('FormFieldCheckbox', () => {
   test('renders with correct defaults ids with form', () => {
     render(
       <FormProvider>
-        <RHFForm id="testForm" onSubmit={Promise.resolve}>
-          <RHFFormFieldCheckbox
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckbox
             name="test"
             label="Test checkbox"
             hint="Test hint"
           />
-        </RHFForm>
+        </Form>
       </FormProvider>,
     );
 
@@ -33,11 +33,7 @@ describe('RHFFormFieldCheckbox', () => {
   test('renders with correct defaults ids without form', () => {
     render(
       <FormProvider>
-        <RHFFormFieldCheckbox
-          name="test"
-          label="Test checkbox"
-          hint="Test hint"
-        />
+        <FormFieldCheckbox name="test" label="Test checkbox" hint="Test hint" />
       </FormProvider>,
     );
 
@@ -54,14 +50,14 @@ describe('RHFFormFieldCheckbox', () => {
   test('renders with correct custom ids with form', () => {
     render(
       <FormProvider>
-        <RHFForm id="testForm" onSubmit={Promise.resolve}>
-          <RHFFormFieldCheckbox
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckbox
             name="test"
             id="customId"
             label="Test checkbox"
             hint="Test hint"
           />
-        </RHFForm>
+        </Form>
       </FormProvider>,
     );
 
@@ -78,7 +74,7 @@ describe('RHFFormFieldCheckbox', () => {
   test('renders with correct custom ids without form', () => {
     render(
       <FormProvider>
-        <RHFFormFieldCheckbox
+        <FormFieldCheckbox
           name="test"
           id="customId"
           label="Test checkbox"
@@ -101,7 +97,7 @@ describe('RHFFormFieldCheckbox', () => {
     const user = userEvent.setup();
     render(
       <FormProvider>
-        <RHFFormFieldCheckbox name="test" id="select" label="Test checkbox" />
+        <FormFieldCheckbox name="test" id="select" label="Test checkbox" />
       </FormProvider>,
     );
 
@@ -125,7 +121,7 @@ describe('RHFFormFieldCheckbox', () => {
   test('checks the checkbox if initial value is true', async () => {
     render(
       <FormProvider initialValues={{ test: true }}>
-        <RHFFormFieldCheckbox name="test" id="select" label="Test checkbox" />
+        <FormFieldCheckbox name="test" id="select" label="Test checkbox" />
       </FormProvider>,
     );
 
@@ -135,7 +131,7 @@ describe('RHFFormFieldCheckbox', () => {
   test('does not check the checkbox if initial value is false', async () => {
     render(
       <FormProvider initialValues={{ test: false }}>
-        <RHFFormFieldCheckbox name="test" id="select" label="Test checkbox" />
+        <FormFieldCheckbox name="test" id="select" label="Test checkbox" />
       </FormProvider>,
     );
 
@@ -145,7 +141,7 @@ describe('RHFFormFieldCheckbox', () => {
   test('hides the conditional element when the checkbox is not checked', async () => {
     render(
       <FormProvider>
-        <RHFFormFieldCheckbox
+        <FormFieldCheckbox
           name="test"
           id="select"
           label="Test checkbox"
@@ -167,7 +163,7 @@ describe('RHFFormFieldCheckbox', () => {
     const user = userEvent.setup();
     render(
       <FormProvider>
-        <RHFFormFieldCheckbox
+        <FormFieldCheckbox
           name="test"
           id="select"
           label="Test checkbox"
@@ -198,7 +194,7 @@ describe('RHFFormFieldCheckbox', () => {
   test('hides the conditional element when the checkbox is initially checked', async () => {
     render(
       <FormProvider initialValues={{ test: true }}>
-        <RHFFormFieldCheckbox
+        <FormFieldCheckbox
           name="test"
           id="select"
           label="Test checkbox"

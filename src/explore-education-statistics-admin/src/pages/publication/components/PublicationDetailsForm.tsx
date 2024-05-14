@@ -5,11 +5,11 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
@@ -102,10 +102,10 @@ export default function PublicationDetailsForm({
         {form => {
           return (
             <>
-              <RHFForm id={id} onSubmit={async () => toggleConfirmModal.on()}>
+              <Form id={id} onSubmit={async () => toggleConfirmModal.on()}>
                 <FormFieldset id="details" legend="Publication details">
                   {canUpdatePublication && (
-                    <RHFFormFieldTextInput<FormValues>
+                    <FormFieldTextInput<FormValues>
                       name="title"
                       label="Publication title"
                       className="govuk-!-width-one-half"
@@ -113,7 +113,7 @@ export default function PublicationDetailsForm({
                   )}
 
                   {canUpdatePublicationSummary && (
-                    <RHFFormFieldTextArea<FormValues>
+                    <FormFieldTextArea<FormValues>
                       name="summary"
                       label="Publication summary"
                       className="govuk-!-width-one-half"
@@ -139,7 +139,7 @@ export default function PublicationDetailsForm({
                     legend="Archive this publication"
                     legendSize="s"
                   >
-                    <RHFFormFieldSelect<FormValues>
+                    <FormFieldSelect<FormValues>
                       className="govuk-!-width-one-half"
                       hint="If superseded by a publication with a live release, this will archive the current publication immediately"
                       label="Superseding publication"
@@ -157,7 +157,7 @@ export default function PublicationDetailsForm({
                   <Button type="submit">Update publication details</Button>
                   <ButtonText onClick={onCancel}>Cancel</ButtonText>
                 </ButtonGroup>
-              </RHFForm>
+              </Form>
 
               {showConfirmModal && (
                 <PublicationUpdateConfirmModal

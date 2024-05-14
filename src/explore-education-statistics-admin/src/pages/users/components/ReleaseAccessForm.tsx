@@ -6,9 +6,9 @@ import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
@@ -63,10 +63,7 @@ export default function ReleaseAccessForm({
     >
       {({ formState }) => {
         return (
-          <RHFForm
-            id={`${user.id}-releaseRole`}
-            onSubmit={handleAddReleaseRole}
-          >
+          <Form id={`${user.id}-releaseRole`} onSubmit={handleAddReleaseRole}>
             <FormFieldset
               id="role"
               legend="Release access"
@@ -75,7 +72,7 @@ export default function ReleaseAccessForm({
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half">
-                  <RHFFormFieldSelect<FormValues>
+                  <FormFieldSelect<FormValues>
                     label="Release"
                     name="releaseId"
                     options={releases?.map(release => ({
@@ -86,7 +83,7 @@ export default function ReleaseAccessForm({
                 </div>
 
                 <div className="govuk-grid-column-one-quarter">
-                  <RHFFormFieldSelect<FormValues>
+                  <FormFieldSelect<FormValues>
                     label="Release role"
                     name="releaseRole"
                     options={releaseRoles?.map(role => ({
@@ -151,7 +148,7 @@ export default function ReleaseAccessForm({
                 ))}
               </tbody>
             </table>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

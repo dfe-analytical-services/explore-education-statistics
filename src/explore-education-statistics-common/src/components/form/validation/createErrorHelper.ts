@@ -8,7 +8,7 @@ import {
   Path,
 } from 'react-hook-form';
 
-export default function createRHFErrorHelper<TFormValues extends FieldValues>({
+export default function createErrorHelper<TFormValues extends FieldValues>({
   errors,
   initialTouched = [],
   isSubmitted = false,

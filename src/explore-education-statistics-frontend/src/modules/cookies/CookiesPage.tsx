@@ -1,8 +1,8 @@
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
@@ -78,7 +78,7 @@ function CookiesPage({ cookies }: Props) {
                       We use cookies to store information about how you use the
                       GOV.UK website, such as the pages you visit.
                     </p>
-                    <RHFForm
+                    <Form
                       id="cookieSettingsForm"
                       onSubmit={async values => {
                         window.scrollTo(0, 0);
@@ -115,7 +115,7 @@ function CookiesPage({ cookies }: Props) {
                           We do not allow Google to use or share the data about
                           how you use this site.
                         </p>
-                        <RHFFormFieldRadioGroup<FormValues>
+                        <FormFieldRadioGroup<FormValues>
                           name="googleAnalytics"
                           legend="Allow Google Analytics cookies"
                           legendHidden
@@ -149,7 +149,7 @@ function CookiesPage({ cookies }: Props) {
                       </p>
 
                       <Button type="submit">Save changes</Button>
-                    </RHFForm>
+                    </Form>
                   </>
                 );
               }}

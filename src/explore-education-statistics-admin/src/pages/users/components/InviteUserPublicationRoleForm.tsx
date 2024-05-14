@@ -9,7 +9,7 @@ import ButtonText from '@common/components/ButtonText';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import { PublicationSummary } from '@common/services/publicationService';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { useFormContext } from 'react-hook-form';
 
 interface Props {
@@ -93,7 +93,7 @@ export default function InviteUserPublicationRoleForm({
       legendSize="m"
       hint="The user's publication roles within the service."
     >
-      <RHFFormFieldSelect<UserInviteFormValues>
+      <FormFieldSelect<UserInviteFormValues>
         label="Publication"
         name="publicationId"
         placeholder="Choose publication"
@@ -102,7 +102,7 @@ export default function InviteUserPublicationRoleForm({
           value: publication.id,
         }))}
       />
-      <RHFFormFieldSelect<UserInviteFormValues>
+      <FormFieldSelect<UserInviteFormValues>
         label="Publication role"
         name="publicationRole"
         placeholder="Choose publication role"

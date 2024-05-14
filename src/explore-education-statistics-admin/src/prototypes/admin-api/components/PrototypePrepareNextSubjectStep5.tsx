@@ -6,10 +6,10 @@ import WizardStepFormActions from '@common/modules/table-tool/components/WizardS
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import React, { useEffect, useState } from 'react';
 import ChangelogExample from './PrototypeChangelogExamples';
 import {
@@ -73,7 +73,7 @@ const PrototypePrepareNextSubjectStep5 = ({
             }}
           >
             {() => (
-              <RHFForm
+              <Form
                 id="form"
                 onSubmit={values => {
                   setVersionNotes(values.versionNotes);
@@ -83,7 +83,7 @@ const PrototypePrepareNextSubjectStep5 = ({
               >
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
-                    <RHFFormFieldTextArea<FormValues>
+                    <FormFieldTextArea<FormValues>
                       hint="Use the public guidance notes to highlight any extra information to your end users that may not
                       be apparent in the automated changelog below"
                       label="Public guidance notes"
@@ -92,7 +92,7 @@ const PrototypePrepareNextSubjectStep5 = ({
                     />
 
                     <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
-                      <RHFFormFieldRadioGroup<FormValues>
+                      <FormFieldRadioGroup<FormValues>
                         legend="Changes on current live version (version 1.0)"
                         name="versionType"
                         onChange={event =>
@@ -138,7 +138,7 @@ const PrototypePrepareNextSubjectStep5 = ({
                   submitText="Next step - complete this API data set version"
                   {...stepProps}
                 />
-              </RHFForm>
+              </Form>
             )}
           </FormProvider>
         </div>

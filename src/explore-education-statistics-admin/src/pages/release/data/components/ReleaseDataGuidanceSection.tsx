@@ -1,13 +1,13 @@
 import releaseDataGuidanceService from '@admin/services/releaseDataGuidanceService';
-import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
+import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContentHtml from '@common/components/ContentHtml';
@@ -136,9 +136,9 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
                   const values = getValues() as DataGuidanceFormValues;
                   return (
-                    <RHFForm id={formId} onSubmit={handleSubmit}>
+                    <Form id={formId} onSubmit={handleSubmit}>
                       {isEditing ? (
-                        <RHFFormFieldEditor<DataGuidanceFormValues>
+                        <FormFieldEditor<DataGuidanceFormValues>
                           name="content"
                           label="Main guidance content"
                         />
@@ -175,7 +175,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                   dataSet={dataSet}
                                   renderContent={() =>
                                     isEditing ? (
-                                      <RHFFormFieldTextArea<DataGuidanceFormValues>
+                                      <FormFieldTextArea<DataGuidanceFormValues>
                                         label="File guidance content"
                                         name={`dataSets.${index}.content`}
                                         rows={3}
@@ -219,7 +219,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                           )}
                         </ButtonGroup>
                       )}
-                    </RHFForm>
+                    </Form>
                   );
                 }}
               </FormProvider>

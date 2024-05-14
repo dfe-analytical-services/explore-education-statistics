@@ -1,3 +1,4 @@
+import { FieldError } from 'react-hook-form';
 import createErrorHelper from '../createErrorHelper';
 
 describe('createErrorHelper', () => {
@@ -5,9 +6,9 @@ describe('createErrorHelper', () => {
     test('gets touched error message', () => {
       const { getError, hasError } = createErrorHelper({
         errors: {
-          test: 'Please select',
+          test: { message: 'Please select' } as FieldError,
         },
-        touched: {
+        touchedFields: {
           test: true,
         },
       });
@@ -19,9 +20,9 @@ describe('createErrorHelper', () => {
     test('does not get untouched error message', () => {
       const { getError, hasError } = createErrorHelper({
         errors: {
-          test: 'Please select',
+          test: { message: 'Please select' } as FieldError,
         },
-        touched: {
+        touchedFields: {
           test: false,
         },
       });
@@ -33,12 +34,12 @@ describe('createErrorHelper', () => {
     test('gets untouched error message when the form is submitted', () => {
       const { getError, hasError } = createErrorHelper({
         errors: {
-          test: 'Please select',
+          test: { message: 'Please select' } as FieldError,
         },
-        touched: {
+        touchedFields: {
           test: false,
         },
-        submitCount: 1,
+        isSubmitted: true,
       });
 
       expect(getError('test')).toBe('Please select');
@@ -46,13 +47,15 @@ describe('createErrorHelper', () => {
     });
 
     test('gets nested touched error message', () => {
-      const { getError } = createErrorHelper<{ test: { something: string } }>({
+      const { getError } = createErrorHelper<{
+        test: { something: string };
+      }>({
         errors: {
           test: {
-            something: 'Please select',
+            something: { message: 'Please select' } as FieldError,
           },
         },
-        touched: {
+        touchedFields: {
           test: {
             something: true,
           },
@@ -68,10 +71,10 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           test: {
-            something: 'Please select',
+            something: { message: 'Please select' } as FieldError,
           },
         },
-        touched: {
+        touchedFields: {
           test: {
             something: false,
           },
@@ -88,10 +91,10 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           test: {
-            something: 'Please select',
+            something: { message: 'Please select' } as FieldError,
           },
         },
-        touched: {
+        touchedFields: {
           test: {
             something: true,
           },
@@ -108,10 +111,10 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           test: {
-            something: 'Please select',
+            something: { message: 'Please select' } as FieldError,
           },
         },
-        touched: {
+        touchedFields: {
           test: {
             something: true,
           },
@@ -127,9 +130,9 @@ describe('createErrorHelper', () => {
     test('gets touched errors', () => {
       const { getAllErrors } = createErrorHelper({
         errors: {
-          test: 'Please select',
+          test: { message: 'Please select' } as FieldError,
         },
-        touched: {
+        touchedFields: {
           test: true,
         },
       });
@@ -142,9 +145,9 @@ describe('createErrorHelper', () => {
     test('does not get untouched errors', () => {
       const { getAllErrors } = createErrorHelper({
         errors: {
-          test: 'Please select',
+          test: { message: 'Please select' } as FieldError,
         },
-        touched: {
+        touchedFields: {
           test: false,
         },
       });
@@ -155,12 +158,12 @@ describe('createErrorHelper', () => {
     test('gets untouched errors when the form is submitted', () => {
       const { getAllErrors } = createErrorHelper({
         errors: {
-          test: 'Please select',
+          test: { message: 'Please select' } as FieldError,
         },
-        touched: {
+        touchedFields: {
           test: false,
         },
-        submitCount: 1,
+        isSubmitted: true,
       });
 
       expect(getAllErrors()).toEqual({
@@ -174,10 +177,10 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           test: {
-            something: 'Please select',
+            something: { message: 'Please select' } as FieldError,
           },
         },
-        touched: {
+        touchedFields: {
           test: {
             something: true,
           },
@@ -195,10 +198,10 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           test: {
-            something: 'Please select',
+            something: { message: 'Please select' } as FieldError,
           },
         },
-        touched: {
+        touchedFields: {
           test: {
             something: false,
           },
@@ -222,12 +225,12 @@ describe('createErrorHelper', () => {
           a: {
             b: {
               c: {
-                d: 'Please select',
+                d: { message: 'Please select' } as FieldError,
               },
             },
           },
         },
-        touched: {
+        touchedFields: {
           a: {
             b: {
               c: {
@@ -254,13 +257,13 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           address: {
-            line1: 'Address 1 is required',
-            line2: 'Address 2 is required',
+            line1: { message: 'Address 1 is required' } as FieldError,
+            line2: { message: 'Address 2 is required' } as FieldError,
           },
-          firstName: 'First name is required',
-          lastName: 'Last name is required',
+          firstName: { message: 'First name is required' } as FieldError,
+          lastName: { message: 'Last name is required' } as FieldError,
         },
-        touched: {
+        touchedFields: {
           address: {
             line1: true,
             line2: false,
@@ -276,38 +279,39 @@ describe('createErrorHelper', () => {
       });
     });
 
-    test('handle single undefined, touched value in array in errors object', () => {
+    test('gets all error messages for mixed error bag when form is submitted', () => {
       const { getAllErrors } = createErrorHelper<{
-        subjects: undefined[];
+        address: {
+          line1: string;
+          line2: string;
+        };
+        firstName: string;
+        lastName: string;
       }>({
         errors: {
-          subjects: [undefined],
-        } as never,
-        touched: {
-          subjects: [true],
-        } as never,
+          address: {
+            line1: { message: 'Address 1 is required' } as FieldError,
+            line2: { message: 'Address 2 is required' } as FieldError,
+          },
+          firstName: { message: 'First name is required' } as FieldError,
+          lastName: { message: 'Last name is required' } as FieldError,
+        },
+        touchedFields: {
+          address: {
+            line1: true,
+            line2: false,
+          },
+          firstName: true,
+          lastName: false,
+        },
+        isSubmitted: true,
       });
-      expect(getAllErrors()).toEqual({});
-    });
 
-    test('handle undefined in array in errors object', () => {
-      const { getAllErrors } = createErrorHelper<{
-        subjects: ({ content: string } | undefined)[];
-      }>({
-        errors: {
-          subjects: [
-            undefined,
-            { content: 'Error two' },
-            { content: 'Error three' },
-          ],
-        } as never,
-        touched: {
-          subjects: [{ content: false }, { content: true }, { content: true }],
-        } as never,
-      });
       expect(getAllErrors()).toEqual({
-        'subjects.1.content': 'Error two',
-        'subjects.2.content': 'Error three',
+        'address.line1': 'Address 1 is required',
+        'address.line2': 'Address 2 is required',
+        firstName: 'First name is required',
+        lastName: 'Last name is required',
       });
     });
   });

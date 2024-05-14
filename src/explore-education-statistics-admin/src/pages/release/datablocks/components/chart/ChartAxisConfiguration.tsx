@@ -6,13 +6,13 @@ import Effect from '@common/components/Effect';
 import { FormFieldset } from '@common/components/form';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { SelectOption } from '@common/components/form/FormSelect';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
-import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import {
   AxesConfiguration,
   AxisConfiguration,
@@ -185,14 +185,14 @@ const ChartAxisConfiguration = ({
       value: 'filters',
       conditional: (
         <>
-          <RHFFormFieldSelect<AxisConfiguration>
+          <FormFieldSelect<AxisConfiguration>
             label="Select a filter"
             name="groupByFilter"
             options={categories}
             order={[]}
           />
           {isGroupedByFilterWithGroups && (
-            <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
+            <FormFieldCheckbox<ChartAxisConfigurationFormValues>
               name="groupByFilterGroups"
               label="Group by filter groups"
             />
@@ -542,7 +542,7 @@ const ChartAxisConfiguration = ({
         const values = watch();
 
         return (
-          <RHFForm id={id} onSubmit={handleSubmit}>
+          <Form id={id} onSubmit={handleSubmit}>
             <Effect
               value={{
                 ...omit(values, 'referenceLines'),
@@ -564,7 +564,7 @@ const ChartAxisConfiguration = ({
               <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
                 <FormFieldset id="general" legend="General" legendSize="s">
                   {validationSchema.fields.size && (
-                    <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                    <FormFieldNumberInput<ChartAxisConfigurationFormValues>
                       name="size"
                       min={0}
                       label="Size of axis (pixels)"
@@ -573,18 +573,18 @@ const ChartAxisConfiguration = ({
                   )}
 
                   {validationSchema.fields.showGrid && (
-                    <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
+                    <FormFieldCheckbox<ChartAxisConfigurationFormValues>
                       name="showGrid"
                       label="Show grid lines"
                     />
                   )}
 
                   {validationSchema.fields.visible && (
-                    <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
+                    <FormFieldCheckbox<ChartAxisConfigurationFormValues>
                       name="visible"
                       label="Show axis"
                       conditional={
-                        <RHFFormFieldTextInput<ChartAxisConfigurationFormValues>
+                        <FormFieldTextInput<ChartAxisConfigurationFormValues>
                           label="Displayed unit"
                           name="unit"
                           hint="Leave blank to set default from metadata"
@@ -595,7 +595,7 @@ const ChartAxisConfiguration = ({
                   )}
 
                   {validationSchema.fields.groupBy && (
-                    <RHFFormFieldRadioGroup<ChartAxisConfigurationFormValues>
+                    <FormFieldRadioGroup<ChartAxisConfigurationFormValues>
                       legend="Group data by"
                       legendSize="s"
                       name="groupBy"
@@ -609,9 +609,9 @@ const ChartAxisConfiguration = ({
                   )}
 
                   <FormFieldset id="labels" legend="Labels" legendSize="s">
-                    <RHFFormFieldTextInput label="Label" name="labelText" />
+                    <FormFieldTextInput label="Label" name="labelText" />
 
-                    <RHFFormFieldNumberInput
+                    <FormFieldNumberInput
                       label="Width (pixels)"
                       name="labelWidth"
                       width={5}
@@ -619,7 +619,7 @@ const ChartAxisConfiguration = ({
                     />
 
                     {validationSchema.fields.labelRotated && (
-                      <RHFFormFieldCheckbox
+                      <FormFieldCheckbox
                         name="labelRotated"
                         label="Rotate 90 degrees"
                       />
@@ -631,7 +631,7 @@ const ChartAxisConfiguration = ({
               <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
                 {validationSchema.fields.sortAsc && (
                   <FormFieldset id="sort" legend="Sorting" legendSize="s">
-                    <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
+                    <FormFieldCheckbox<ChartAxisConfigurationFormValues>
                       name="sortAsc"
                       label="Sort ascending"
                     />
@@ -639,7 +639,7 @@ const ChartAxisConfiguration = ({
                 )}
 
                 {validationSchema.fields.tickConfig && (
-                  <RHFFormFieldRadioGroup<ChartAxisConfigurationFormValues>
+                  <FormFieldRadioGroup<ChartAxisConfigurationFormValues>
                     name="tickConfig"
                     legend="Tick display type"
                     legendSize="s"
@@ -657,7 +657,7 @@ const ChartAxisConfiguration = ({
                         label: 'Custom',
                         value: 'custom',
                         conditional: (
-                          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                          <FormFieldNumberInput<ChartAxisConfigurationFormValues>
                             name="tickSpacing"
                             width={10}
                             label="Every nth value"
@@ -679,7 +679,7 @@ const ChartAxisConfiguration = ({
                     >
                       <div className={styles.axisRange}>
                         {validationSchema.fields.min && (
-                          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                          <FormFieldNumberInput<ChartAxisConfigurationFormValues>
                             name="min"
                             width={10}
                             label="Minimum value"
@@ -687,7 +687,7 @@ const ChartAxisConfiguration = ({
                           />
                         )}
                         {validationSchema.fields.max && (
-                          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                          <FormFieldNumberInput<ChartAxisConfigurationFormValues>
                             name="max"
                             width={10}
                             label="Maximum value"
@@ -706,7 +706,7 @@ const ChartAxisConfiguration = ({
                       legendSize="s"
                     >
                       {validationSchema.fields.min && (
-                        <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                        <FormFieldSelect<ChartAxisConfigurationFormValues>
                           isNumberField
                           label="Minimum"
                           name="min"
@@ -714,7 +714,7 @@ const ChartAxisConfiguration = ({
                         />
                       )}
                       {validationSchema.fields.max && (
-                        <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                        <FormFieldSelect<ChartAxisConfigurationFormValues>
                           isNumberField
                           label="Maximum"
                           name="max"
@@ -750,7 +750,7 @@ const ChartAxisConfiguration = ({
             >
               {buttons}
             </ChartBuilderSaveActions>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

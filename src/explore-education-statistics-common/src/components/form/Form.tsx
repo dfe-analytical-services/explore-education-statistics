@@ -2,10 +2,9 @@ import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
 import { FormIdContextProvider } from '@common/components/form/contexts/FormIdContext';
+import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
-import createErrorHelper from '@common/validation/createErrorHelper';
-import { useFormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
 import React, {
   FormEvent,
@@ -15,25 +14,28 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
-interface Props {
+interface Props<TFormValues extends FieldValues> {
   children: ReactNode;
   id: string;
+  initialTouched?: Path<TFormValues>[];
   submitId?: string;
   showErrorSummary?: boolean;
   visuallyHiddenErrorSummary?: boolean;
+  onSubmit: (values: TFormValues) => Promise<void> | void;
 }
 
 /**
- * Form wrapper to integrate with Formik.
+ * Form wrapper to integrate with React Hook Form.
  *
  * This provides a bunch of conveniences for displaying errors
  * and linking to them correctly (in error message hrefs) as
  * long as certain conventions are followed.
  *
  * Fields with errors should have ids which share the form's
- * id and camelCased value key in Formik
- * e.g. if form id is `timePeriodForm`, then a Formik value with a
+ * id and camelCased value key in the form
+ * e.g. if form id is `timePeriodForm`, then a form value with a
  * key of `startDate` should have a field with an id of
  * `timePeriodForm-startDate`.
  *
@@ -41,27 +43,32 @@ interface Props {
  * requests will also be added to the error summary. These
  * will link to the `submitId` prop.
  */
-const Form = ({
+export default function Form<TFormValues extends FieldValues>({
   children,
   id,
-  showErrorSummary = true,
+  initialTouched,
   submitId = `${id}-submit`,
+  showErrorSummary = true,
   visuallyHiddenErrorSummary = false,
-}: Props) => {
+  onSubmit,
+}: Props<TFormValues>) {
   const isMounted = useMountedRef();
 
-  const formik = useFormikContext();
-  const { errors, touched, values, submitCount, submitForm } = formik;
+  const {
+    formState: { errors, submitCount, touchedFields, isSubmitted },
+    handleSubmit: submit,
+  } = useFormContext<TFormValues>();
 
+  const values = useWatch();
   const previousValues = useRef(values);
   const previousSubmitCount = useRef(submitCount);
 
   const { getAllErrors } = createErrorHelper({
     errors,
-    touched,
-    submitCount,
+    initialTouched,
+    isSubmitted,
+    touchedFields,
   });
-
   const [hasSummaryFocus, toggleSummaryFocus] = useToggle(false);
 
   const allErrors = useMemo<ErrorSummaryMessage[]>(() => {
@@ -82,7 +89,7 @@ const Form = ({
     }
 
     previousValues.current = values;
-  }, [submitCount, values, isMounted]);
+  }, [isSubmitted, submitCount, values, isMounted]);
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -100,9 +107,9 @@ const Form = ({
       event.preventDefault();
       toggleSummaryFocus.off();
 
-      await submitForm();
+      await submit(async data => onSubmit(data))(event);
     },
-    [toggleSummaryFocus, submitForm],
+    [submit, toggleSummaryFocus, onSubmit],
   );
 
   return (
@@ -121,6 +128,4 @@ const Form = ({
       </form>
     </FormIdContextProvider>
   );
-};
-
-export default Form;
+}

@@ -2,9 +2,9 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
@@ -69,7 +69,7 @@ export default function ChartBoundaryLevelsConfiguration({
       {({ formState, watch }) => {
         const values = watch();
         return (
-          <RHFForm
+          <Form
             id={formId}
             onSubmit={async () => {
               onSubmit(normalizeValues(values));
@@ -86,7 +86,7 @@ export default function ChartBoundaryLevelsConfiguration({
               onChange={updateForm}
               onMount={updateForm}
             />
-            <RHFFormFieldSelect<FormValues>
+            <FormFieldSelect<FormValues>
               label="Boundary level"
               hint="Select a version of geographical data to use"
               name="boundaryLevel"
@@ -110,7 +110,7 @@ export default function ChartBoundaryLevelsConfiguration({
             >
               {buttons}
             </ChartBuilderSaveActions>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

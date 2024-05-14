@@ -1,9 +1,9 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { mapFieldErrors } from '@common/validation/serverValidations';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Yup from '@common/validation/yup';
 import React, { ReactNode, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
@@ -56,14 +56,14 @@ const ThemeForm = ({
     >
       {({ formState }) => {
         return (
-          <RHFForm id={id} onSubmit={onSubmit}>
-            <RHFFormFieldTextInput<ThemeFormValues>
+          <Form id={id} onSubmit={onSubmit}>
+            <FormFieldTextInput<ThemeFormValues>
               label="Title"
               name="title"
               className="govuk-!-width-two-thirds"
             />
 
-            <RHFFormFieldTextInput<ThemeFormValues>
+            <FormFieldTextInput<ThemeFormValues>
               label="Summary"
               name="summary"
               className="govuk-!-width-two-thirds"
@@ -75,7 +75,7 @@ const ThemeForm = ({
               </Button>
               {cancelButton}
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

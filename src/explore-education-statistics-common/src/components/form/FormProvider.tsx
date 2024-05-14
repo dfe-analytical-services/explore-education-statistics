@@ -11,7 +11,7 @@ import {
 import has from 'lodash/has';
 import {
   FieldValues,
-  FormProvider as RHFormProvider,
+  FormProvider as RHFFormProvider,
   useForm,
   UseFormHandleSubmit,
   UseFormProps,
@@ -152,8 +152,8 @@ export default function FormProvider<TFormValues extends FieldValues>({
   };
 
   return (
-    <RHFormProvider {...providerProps}>
+    <RHFFormProvider {...providerProps}>
       {typeof children === 'function' ? children(providerProps) : children}
-    </RHFormProvider>
+    </RHFFormProvider>
   );
 }

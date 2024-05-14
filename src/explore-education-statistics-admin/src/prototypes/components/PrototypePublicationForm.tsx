@@ -19,9 +19,9 @@ import styles from '@admin/prototypes/components/PrototypePublicationForm.module
 import PrototypeFormTextSearchInput from '@admin/prototypes/components/PrototypeFormTextSearchInput';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 
 export interface PublicationFormValues {
   publicationId: string;
@@ -103,7 +103,7 @@ const PrototypePublicationForm = ({
         const values = watch();
         if (isActive) {
           return (
-            <RHFForm id={formId} onSubmit={handleSubmit}>
+            <Form id={formId} onSubmit={handleSubmit}>
               <FormFieldset id="publicationForm" legend={stepHeading}>
                 <p>Search or select a theme to find publications</p>
                 <FormGroup className="govuk-!-margin-bottom-3">
@@ -158,7 +158,7 @@ const PrototypePublicationForm = ({
                   />
 
                   <div className={styles.publicationsList} id="publications">
-                    <RHFFormFieldRadioGroup<PublicationFormValues>
+                    <FormFieldRadioGroup<PublicationFormValues>
                       id={`${formId}-publications`}
                       legend={
                         <>
@@ -196,7 +196,7 @@ const PrototypePublicationForm = ({
                   </div>
                 </div>
               </FormFieldset>
-            </RHFForm>
+            </Form>
           );
         }
 

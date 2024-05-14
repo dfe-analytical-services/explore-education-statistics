@@ -6,12 +6,12 @@ import {
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import RHFFormFieldDateInput from '@common/components/form/rhf/RHFFormFieldDateInput';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
@@ -233,8 +233,8 @@ const ReleaseStatusForm = ({
         const approvalStatus = watch('approvalStatus');
         return (
           <>
-            <RHFForm id={formId} onSubmit={handleSubmitForm}>
-              <RHFFormFieldRadioGroup<ReleaseStatusFormValues>
+            <Form id={formId} onSubmit={handleSubmitForm}>
+              <FormFieldRadioGroup<ReleaseStatusFormValues>
                 legend="Status"
                 name="approvalStatus"
                 order={[]}
@@ -267,7 +267,7 @@ const ReleaseStatusForm = ({
                 }}
               />
 
-              <RHFFormFieldTextArea<ReleaseStatusFormValues>
+              <FormFieldTextArea<ReleaseStatusFormValues>
                 name="internalReleaseNote"
                 className="govuk-!-width-one-half"
                 label="Internal note"
@@ -277,12 +277,12 @@ const ReleaseStatusForm = ({
 
               {approvalStatus === 'Approved' && release.amendment && (
                 <>
-                  <RHFFormFieldCheckbox
+                  <FormFieldCheckbox
                     name="notifySubscribers"
                     label="Notify subscribers by email"
                   />
 
-                  <RHFFormFieldCheckbox<ReleaseStatusFormValues>
+                  <FormFieldCheckbox<ReleaseStatusFormValues>
                     name="updatePublishedDate"
                     label="Update published date"
                     conditional={
@@ -296,7 +296,7 @@ const ReleaseStatusForm = ({
               )}
 
               {approvalStatus === 'Approved' && (
-                <RHFFormFieldRadioGroup<ReleaseStatusFormValues>
+                <FormFieldRadioGroup<ReleaseStatusFormValues>
                   name="publishMethod"
                   legend="When to publish"
                   legendSize="m"
@@ -315,7 +315,7 @@ const ReleaseStatusForm = ({
                               date.
                             </WarningMessage>
                           )}
-                          <RHFFormFieldDateInput<ReleaseStatusFormValues>
+                          <FormFieldDateInput<ReleaseStatusFormValues>
                             name="publishScheduled"
                             legend="Publish date"
                             legendSize="s"
@@ -347,7 +347,7 @@ const ReleaseStatusForm = ({
                 />
               )}
 
-              <RHFFormFieldDateInput<ReleaseStatusFormValues>
+              <FormFieldDateInput<ReleaseStatusFormValues>
                 name="nextReleaseDate"
                 legend="Next release expected (optional)"
                 legendSize="m"
@@ -387,7 +387,7 @@ const ReleaseStatusForm = ({
                   Cancel
                 </ButtonText>
               </ButtonGroup>
-            </RHFForm>
+            </Form>
             <ModalConfirm
               title="Confirm publish date"
               open={showConfirmScheduleModal}

@@ -1,8 +1,8 @@
 import DetailsMenu from '@common/components/DetailsMenu';
-import RHFFormFieldCheckboxSearchSubGroups, {
-  RHFFormFieldCheckboxSearchSubGroupsProps,
-} from '@common/components/form/rhf/RHFFormFieldCheckboxSearchSubGroups';
-import RHFFormCheckboxSelectedCount from '@common/components/form/rhf/RHFFormCheckboxSelectedCount';
+import FormFieldCheckboxSearchSubGroups, {
+  FormFieldCheckboxSearchSubGroupsProps,
+} from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
 import { OmitStrict } from '@common/types';
 import React, { useEffect } from 'react';
 import { FieldValues, useFormContext } from 'react-hook-form';
@@ -10,7 +10,7 @@ import get from 'lodash/get';
 
 interface Props<TFormValues extends FieldValues>
   extends OmitStrict<
-    RHFFormFieldCheckboxSearchSubGroupsProps<TFormValues>,
+    FormFieldCheckboxSearchSubGroupsProps<TFormValues>,
     'legendHidden'
   > {
   hiddenText?: string;
@@ -19,7 +19,7 @@ interface Props<TFormValues extends FieldValues>
   onToggle?: (isOpen: boolean) => void;
 }
 
-export default function RHFFormFieldCheckboxGroupsMenu<
+export default function FormFieldCheckboxGroupsMenu<
   TFormValues extends FieldValues,
 >(props: Props<TFormValues>) {
   const { hiddenText, legend, name, open = false, id, onToggle } = props;
@@ -45,10 +45,10 @@ export default function RHFFormFieldCheckboxGroupsMenu<
       jsRequired
       preventToggle={!!get(errors, name)}
       summary={legend}
-      summaryAfter={<RHFFormCheckboxSelectedCount name={name} />}
+      summaryAfter={<FormCheckboxSelectedCount name={name} />}
       onToggle={onToggle}
     >
-      <RHFFormFieldCheckboxSearchSubGroups {...props} legendHidden />
+      <FormFieldCheckboxSearchSubGroups {...props} legendHidden />
     </DetailsMenu>
   );
 }

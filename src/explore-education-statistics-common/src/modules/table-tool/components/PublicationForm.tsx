@@ -3,9 +3,9 @@ import {
   FormGroup,
   FormTextSearchInput,
 } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -142,7 +142,7 @@ const PublicationForm = ({
       {({ formState, getValues, resetField }) => {
         if (isActive) {
           return (
-            <RHFForm id={formId} onSubmit={handleSubmit}>
+            <Form id={formId} onSubmit={handleSubmit}>
               <FormFieldset id="publicationForm" legend={stepHeading}>
                 <p>Search or select a theme to find publications</p>
                 <FormGroup className="govuk-!-margin-bottom-3">
@@ -179,7 +179,7 @@ const PublicationForm = ({
                 <p>or</p>
 
                 <div className={styles.optionsContainer}>
-                  <RHFFormFieldRadioGroup<FormValues>
+                  <FormFieldRadioGroup<FormValues>
                     legend="Select a theme"
                     legendSize="s"
                     name="themeId"
@@ -196,7 +196,7 @@ const PublicationForm = ({
                   />
 
                   <div className={styles.publicationsList}>
-                    <RHFFormFieldRadioGroup<FormValues>
+                    <FormFieldRadioGroup<FormValues>
                       id="publications"
                       legend={
                         <>
@@ -247,7 +247,7 @@ const PublicationForm = ({
                   </div>
                 </div>
               </FormFieldset>
-            </RHFForm>
+            </Form>
           );
         }
 

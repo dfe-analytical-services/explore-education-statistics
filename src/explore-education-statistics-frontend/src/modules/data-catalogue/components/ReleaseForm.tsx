@@ -1,8 +1,8 @@
-import RHFFormFieldRadioSearchGroup from '@common/components/form/rhf/RHFFormFieldRadioSearchGroup';
+import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import Tag from '@common/components/Tag';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
@@ -86,8 +86,8 @@ export default function ReleaseForm({
     >
       {({ formState, reset }) => {
         return isActive ? (
-          <RHFForm id={formId} onSubmit={handleSubmit}>
-            <RHFFormFieldRadioSearchGroup<ReleaseFormValues>
+          <Form id={formId} onSubmit={handleSubmit}>
+            <FormFieldRadioSearchGroup<ReleaseFormValues>
               name="releaseId"
               legend={legend}
               disabled={formState.isSubmitting}
@@ -103,7 +103,7 @@ export default function ReleaseForm({
             ) : (
               <p>No releases available.</p>
             )}
-          </RHFForm>
+          </Form>
         ) : (
           <ResetFormOnPreviousStep
             currentStep={currentStep}

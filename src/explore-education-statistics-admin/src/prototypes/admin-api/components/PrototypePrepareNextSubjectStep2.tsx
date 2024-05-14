@@ -6,8 +6,8 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import React, { useState } from 'react';
 import Yup from '@common/validation/yup';
 import capitalize from 'lodash/capitalize';
@@ -89,7 +89,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
               })}
             >
               {({ formState }) => (
-                <RHFForm
+                <Form
                   id="form"
                   onSubmit={() => {
                     goToNextStep();
@@ -267,7 +267,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                     {...stepProps}
                     submitText={`Next -  ${nextStep}`}
                   />
-                </RHFForm>
+                </Form>
               )}
             </FormProvider>
           </div>

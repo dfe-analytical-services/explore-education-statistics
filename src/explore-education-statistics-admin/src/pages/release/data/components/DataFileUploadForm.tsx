@@ -2,11 +2,11 @@ import { DataFile } from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldFileInput from '@common/components/form/rhf/RHFFormFieldFileInput';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import {
   FieldMessageMapper,
@@ -199,20 +199,20 @@ export default function DataFileUploadForm({
     >
       {({ formState, reset }) => {
         return (
-          <RHFForm id="dataFileUploadForm" onSubmit={onSubmit}>
+          <Form id="dataFileUploadForm" onSubmit={onSubmit}>
             <div style={{ position: 'relative' }}>
               {formState.isSubmitting && (
                 <LoadingSpinner text="Uploading files" overlay />
               )}
               {!isDataReplacement && (
-                <RHFFormFieldTextInput<DataFileUploadFormValues>
+                <FormFieldTextInput<DataFileUploadFormValues>
                   name="subjectTitle"
                   label="Subject title"
                   className="govuk-!-width-two-thirds"
                 />
               )}
 
-              <RHFFormFieldRadioGroup<DataFileUploadFormValues>
+              <FormFieldRadioGroup<DataFileUploadFormValues>
                 name="uploadType"
                 legend="Choose upload method"
                 hint={`Filenames must be under ${MAX_FILENAME_SIZE} characters in length`}
@@ -222,13 +222,13 @@ export default function DataFileUploadForm({
                     value: 'csv',
                     conditional: (
                       <>
-                        <RHFFormFieldFileInput<DataFileUploadFormValues>
+                        <FormFieldFileInput<DataFileUploadFormValues>
                           name="dataFile"
                           label="Upload data file"
                           accept=".csv"
                         />
 
-                        <RHFFormFieldFileInput<DataFileUploadFormValues>
+                        <FormFieldFileInput<DataFileUploadFormValues>
                           name="metadataFile"
                           label="Upload metadata file"
                           accept=".csv"
@@ -241,7 +241,7 @@ export default function DataFileUploadForm({
                     hint: 'Recommended for larger data files',
                     value: 'zip',
                     conditional: (
-                      <RHFFormFieldFileInput<DataFileUploadFormValues>
+                      <FormFieldFileInput<DataFileUploadFormValues>
                         hint="Must contain both the data and metadata CSV files"
                         name="zipFile"
                         label="Upload ZIP file"
@@ -270,7 +270,7 @@ export default function DataFileUploadForm({
                 </ButtonText>
               </ButtonGroup>
             </div>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

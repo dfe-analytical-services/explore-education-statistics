@@ -1,27 +1,23 @@
-import { Form } from '@common/components/form';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
 import Yup from '@common/validation/yup';
 import { waitFor } from '@testing-library/dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Formik } from 'formik';
+
 import noop from 'lodash/noop';
 import React from 'react';
-import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
 
 jest.mock('lodash/debounce');
 
 describe('FormFieldRadioSearchGroup', () => {
-  interface FormValues {
-    test: string;
-  }
-
   test('renders with correctly without form', () => {
     render(
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           test: '',
         }}
-        onSubmit={noop}
       >
         <FormFieldRadioSearchGroup
           id="test-group"
@@ -33,7 +29,7 @@ describe('FormFieldRadioSearchGroup', () => {
             { value: '3', label: 'Radio 3' },
           ]}
         />
-      </Formik>,
+      </FormProvider>,
     );
 
     expect(screen.getByRole('group')).toHaveAttribute('id', 'test-group');
@@ -53,13 +49,12 @@ describe('FormFieldRadioSearchGroup', () => {
 
   test('renders with correctly with form', () => {
     render(
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           test: '',
         }}
-        onSubmit={noop}
       >
-        <Form id="testForm">
+        <Form id="testForm" onSubmit={noop}>
           <FormFieldRadioSearchGroup
             id="test-group"
             name="test"
@@ -71,7 +66,7 @@ describe('FormFieldRadioSearchGroup', () => {
             ]}
           />
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     expect(screen.getByRole('group')).toHaveAttribute(
@@ -94,57 +89,51 @@ describe('FormFieldRadioSearchGroup', () => {
 
   test('checking an option checks it', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: '',
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldRadioSearchGroup
-            id="test-group"
-            name="test"
-            legend="Test radios"
-            options={[
-              { id: 'radio-1', value: '1', label: 'Radio 1' },
-              { id: 'radio-2', value: '2', label: 'Radio 2' },
-              { id: 'radio-3', value: '3', label: 'Radio 3' },
-            ]}
-          />
-        )}
-      </Formik>,
+        <FormFieldRadioSearchGroup
+          id="test-group"
+          name="test"
+          legend="Test radios"
+          options={[
+            { id: 'radio-1', value: '1', label: 'Radio 1' },
+            { id: 'radio-2', value: '2', label: 'Radio 2' },
+            { id: 'radio-3', value: '3', label: 'Radio 3' },
+          ]}
+        />
+      </FormProvider>,
     );
 
     const radio = screen.getByLabelText('Radio 1') as HTMLInputElement;
 
     expect(radio.checked).toBe(false);
 
-    fireEvent.click(radio);
+    await userEvent.click(radio);
 
     expect(radio.checked).toBe(true);
   });
 
   test('checking another option un-checks the currently checked option', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: '1',
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldRadioSearchGroup
-            id="test-group"
-            name="test"
-            legend="Test radios"
-            options={[
-              { id: 'radio-1', value: '1', label: 'Radio 1' },
-              { id: 'radio-2', value: '2', label: 'Radio 2' },
-              { id: 'radio-3', value: '3', label: 'Radio 3' },
-            ]}
-          />
-        )}
-      </Formik>,
+        <FormFieldRadioSearchGroup
+          id="test-group"
+          name="test"
+          legend="Test radios"
+          options={[
+            { id: 'radio-1', value: '1', label: 'Radio 1' },
+            { id: 'radio-2', value: '2', label: 'Radio 2' },
+            { id: 'radio-3', value: '3', label: 'Radio 3' },
+          ]}
+        />
+      </FormProvider>,
     );
 
     const radio1 = screen.getByLabelText('Radio 1') as HTMLInputElement;
@@ -155,7 +144,7 @@ describe('FormFieldRadioSearchGroup', () => {
     expect(radio2.checked).toBe(false);
     expect(radio3.checked).toBe(false);
 
-    fireEvent.click(radio2);
+    await userEvent.click(radio2);
 
     expect(radio1.checked).toBe(false);
     expect(radio2.checked).toBe(true);
@@ -165,57 +154,15 @@ describe('FormFieldRadioSearchGroup', () => {
   describe('error messages', () => {
     test('displays validation message when form is submitted', async () => {
       render(
-        <Formik
+        <FormProvider
           initialValues={{
             test: '',
           }}
-          onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.string().required('Select an option'),
           })}
         >
-          {props => (
-            <form onSubmit={props.handleSubmit}>
-              <FormFieldRadioSearchGroup
-                id="test-group"
-                name="test"
-                legend="Test radios"
-                options={[
-                  { id: 'radio-1', value: '1', label: 'Radio 1' },
-                  { id: 'radio-2', value: '2', label: 'Radio 2' },
-                  { id: 'radio-3', value: '3', label: 'Radio 3' },
-                ]}
-              />
-
-              <button type="submit">Submit</button>
-            </form>
-          )}
-        </Formik>,
-      );
-
-      expect(screen.queryByText('Select at least one option')).toBeNull();
-
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Select at least one option'),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('displays validation message when radios has been touched', async () => {
-      render(
-        <Formik
-          initialValues={{
-            test: '',
-          }}
-          onSubmit={noop}
-          validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
-          })}
-        >
-          {() => (
+          <Form id="testForm" onSubmit={noop}>
             <FormFieldRadioSearchGroup
               id="test-group"
               name="test"
@@ -226,8 +173,44 @@ describe('FormFieldRadioSearchGroup', () => {
                 { id: 'radio-3', value: '3', label: 'Radio 3' },
               ]}
             />
-          )}
-        </Formik>,
+
+            <button type="submit">Submit</button>
+          </Form>
+        </FormProvider>,
+      );
+
+      expect(screen.queryByText('Select an option')).toBeNull();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Select an option')).toBeInTheDocument();
+      });
+    });
+
+    test('displays validation message when radios have been touched', async () => {
+      render(
+        <FormProvider
+          initialValues={{
+            test: '',
+          }}
+          validationSchema={Yup.object({
+            test: Yup.string().required('Select an option'),
+          })}
+        >
+          <Form id="testForm" onSubmit={noop}>
+            <FormFieldRadioSearchGroup
+              id="test-group"
+              name="test"
+              legend="Test radios"
+              options={[
+                { id: 'radio-1', value: '1', label: 'Radio 1' },
+                { id: 'radio-2', value: '2', label: 'Radio 2' },
+                { id: 'radio-3', value: '3', label: 'Radio 3' },
+              ]}
+            />
+          </Form>
+        </FormProvider>,
       );
 
       await userEvent.tab();
@@ -235,116 +218,105 @@ describe('FormFieldRadioSearchGroup', () => {
       await userEvent.tab();
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Select at least one option'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Select an option')).toBeInTheDocument();
       });
     });
 
     test('does not display validation message when radios are untouched', async () => {
       render(
-        <Formik
+        <FormProvider
           initialValues={{
             test: '',
           }}
-          onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.string().required('Select an option'),
           })}
         >
-          {() => (
+          <FormFieldRadioSearchGroup
+            id="test-group"
+            name="test"
+            legend="Test radios"
+            options={[
+              { id: 'radio-1', value: '1', label: 'Radio 1' },
+              { id: 'radio-2', value: '2', label: 'Radio 2' },
+              { id: 'radio-3', value: '3', label: 'Radio 3' },
+            ]}
+          />
+        </FormProvider>,
+      );
+
+      expect(screen.queryByText('Select an option')).toBeNull();
+    });
+
+    test('does not display validation message when `showError` is false', async () => {
+      render(
+        <FormProvider
+          initialValues={{
+            test: '',
+          }}
+          validationSchema={Yup.object({
+            test: Yup.string().required('Select an option'),
+          })}
+        >
+          <Form id="testForm" showErrorSummary={false} onSubmit={noop}>
             <FormFieldRadioSearchGroup
               id="test-group"
               name="test"
               legend="Test radios"
+              showError={false}
               options={[
                 { id: 'radio-1', value: '1', label: 'Radio 1' },
                 { id: 'radio-2', value: '2', label: 'Radio 2' },
                 { id: 'radio-3', value: '3', label: 'Radio 3' },
               ]}
             />
-          )}
-        </Formik>,
-      );
 
-      expect(screen.queryByText('Select at least one option')).toBeNull();
-    });
-
-    test('does not display validation message when `showError` is false', async () => {
-      render(
-        <Formik
-          initialValues={{
-            test: '',
-          }}
-          onSubmit={noop}
-          validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
-          })}
-        >
-          {props => (
-            <form onSubmit={props.handleSubmit}>
-              <FormFieldRadioSearchGroup
-                id="test-group"
-                name="test"
-                legend="Test radios"
-                showError={false}
-                options={[
-                  { id: 'radio-1', value: '1', label: 'Radio 1' },
-                  { id: 'radio-2', value: '2', label: 'Radio 2' },
-                  { id: 'radio-3', value: '3', label: 'Radio 3' },
-                ]}
-              />
-
-              <button type="submit">Submit</button>
-            </form>
-          )}
-        </Formik>,
+            <button type="submit">Submit</button>
+          </Form>
+        </FormProvider>,
       );
 
       const radio = screen.getByLabelText('Radio 1') as HTMLInputElement;
 
       expect(radio.checked).toBe(false);
-      expect(screen.queryByText('Select at least one option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       expect(radio.checked).toBe(false);
-      expect(screen.queryByText('Select at least one option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
     });
   });
 
   describe('search', () => {
     test('providing a search term filters the radios', async () => {
       render(
-        <Formik
+        <FormProvider
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
         >
-          {() => (
-            <FormFieldRadioSearchGroup
-              name="test"
-              id="test-group"
-              legend="Test radios"
-              options={[
-                { id: 'radio-1', value: '1', label: 'Radio 1' },
-                { id: 'radio-2', value: '2', label: 'Radio 2' },
-                { id: 'radio-3', value: '3', label: 'Radio 3' },
-                { id: 'radio-22', value: '22', label: 'Radio 22' },
-              ]}
-            />
-          )}
-        </Formik>,
+          <FormFieldRadioSearchGroup
+            name="test"
+            id="test-group"
+            legend="Test radios"
+            options={[
+              { id: 'radio-1', value: '1', label: 'Radio 1' },
+              { id: 'radio-2', value: '2', label: 'Radio 2' },
+              { id: 'radio-3', value: '3', label: 'Radio 3' },
+              { id: 'radio-22', value: '22', label: 'Radio 22' },
+            ]}
+          />
+        </FormProvider>,
       );
 
       const searchInput = screen.getByLabelText('Search') as HTMLInputElement;
 
       await userEvent.type(searchInput, '2');
 
-      await waitFor(() => {
-        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument();
-      });
+      await waitFor(() =>
+        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument(),
+      );
 
       const radios = screen.getAllByRole('radio');
       expect(radios).toHaveLength(2);
@@ -354,25 +326,22 @@ describe('FormFieldRadioSearchGroup', () => {
 
     test('providing a search term does not remove a radio that has already been checked', async () => {
       render(
-        <Formik
+        <FormProvider
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
         >
-          {() => (
-            <FormFieldRadioSearchGroup
-              name="test"
-              id="test-group"
-              legend="Test radios"
-              options={[
-                { id: 'radio-1', value: '1', label: 'Radio 1' },
-                { id: 'radio-2', value: '2', label: 'Radio 2' },
-                { id: 'radio-3', value: '3', label: 'Radio 3' },
-              ]}
-            />
-          )}
-        </Formik>,
+          <FormFieldRadioSearchGroup
+            name="test"
+            id="test-group"
+            legend="Test radios"
+            options={[
+              { id: 'radio-1', value: '1', label: 'Radio 1' },
+              { id: 'radio-2', value: '2', label: 'Radio 2' },
+              { id: 'radio-3', value: '3', label: 'Radio 3' },
+            ]}
+          />
+        </FormProvider>,
       );
 
       const searchInput = screen.getByLabelText('Search') as HTMLInputElement;
@@ -380,14 +349,14 @@ describe('FormFieldRadioSearchGroup', () => {
       const radio1 = screen.getByLabelText('Radio 1') as HTMLInputElement;
       const radio2 = screen.getByLabelText('Radio 2') as HTMLInputElement;
 
-      fireEvent.click(radio1);
+      await userEvent.click(radio1);
       expect(radio1.checked).toBe(true);
 
       await userEvent.type(searchInput, '2');
 
-      await waitFor(() => {
-        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument();
-      });
+      await waitFor(() =>
+        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument(),
+      );
 
       expect(screen.getAllByRole('radio')).toHaveLength(2);
       expect(radio1.checked).toBe(true);

@@ -3,15 +3,15 @@ import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/com
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
 import FormGroup from '@common/components/form/FormGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
-import RHFFormFieldFileInput from '@common/components/form/rhf/RHFFormFieldFileInput';
-import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import {
   ChartDefinition,
   BarChartDataLabelPosition,
@@ -26,7 +26,7 @@ import { ValidationProblemDetails } from '@common/services/types/problemDetails'
 import parseNumber from '@common/utils/number/parseNumber';
 import {
   mapFieldErrors,
-  rhfConvertServerFieldErrors,
+  convertServerFieldErrors,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import capitalize from 'lodash/capitalize';
@@ -269,7 +269,7 @@ const ChartConfiguration = ({
         const values = watch();
 
         if (submitError) {
-          const fieldErrors = rhfConvertServerFieldErrors<FormValues>(
+          const fieldErrors = convertServerFieldErrors<FormValues>(
             submitError,
             initialChartOptions.current,
             errorMappings,
@@ -285,7 +285,7 @@ const ChartConfiguration = ({
         }
 
         return (
-          <RHFForm
+          <Form
             id={formId}
             onSubmit={async v => {
               onSubmit(normalizeValues(v));
@@ -310,14 +310,14 @@ const ChartConfiguration = ({
             />
 
             {validationSchema.fields.file && (
-              <RHFFormFieldFileInput<FormValues>
+              <FormFieldFileInput<FormValues>
                 name="file"
                 label="Upload new infographic"
                 accept="image/*"
               />
             )}
             <div className="govuk-!-width-three-quarters">
-              <RHFFormFieldRadioGroup<FormValues>
+              <FormFieldRadioGroup<FormValues>
                 hint="Communicate the headline message of the chart. For example 'Increase in number of people living alone'."
                 legend="Chart title"
                 legendSize="s"
@@ -332,7 +332,7 @@ const ChartConfiguration = ({
                     label: 'Set an alternative title',
                     value: 'alternative',
                     conditional: (
-                      <RHFFormFieldTextInput<FormValues>
+                      <FormFieldTextInput<FormValues>
                         label="Enter chart title"
                         name="title"
                         hint="Use a concise descriptive title that summarises the main message in the chart."
@@ -342,7 +342,7 @@ const ChartConfiguration = ({
                 ]}
               />
 
-              <RHFFormFieldTextInput<FormValues>
+              <FormFieldTextInput<FormValues>
                 label="Subtitle"
                 name="subtitle"
                 hint="The statistical subtitle should say what the data is, the geography the data relates to and the time period shown.
@@ -351,7 +351,7 @@ const ChartConfiguration = ({
               />
             </div>
 
-            <RHFFormFieldTextArea<FormValues>
+            <FormFieldTextArea<FormValues>
               className="govuk-!-width-three-quarters"
               name="alt"
               label="Alt text"
@@ -361,14 +361,14 @@ const ChartConfiguration = ({
             />
 
             {validationSchema.fields.stacked && (
-              <RHFFormFieldCheckbox<FormValues>
+              <FormFieldCheckbox<FormValues>
                 name="stacked"
                 label="Stacked bars"
               />
             )}
 
             {validationSchema.fields.height && (
-              <RHFFormFieldNumberInput<FormValues>
+              <FormFieldNumberInput<FormValues>
                 name="height"
                 label="Height (pixels)"
                 width={5}
@@ -376,7 +376,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.width && (
-              <RHFFormFieldNumberInput<FormValues>
+              <FormFieldNumberInput<FormValues>
                 name="width"
                 label="Width (pixels)"
                 hint="Leave blank to set as full width"
@@ -385,7 +385,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.barThickness && (
-              <RHFFormFieldNumberInput<FormValues>
+              <FormFieldNumberInput<FormValues>
                 name="barThickness"
                 label="Bar thickness (pixels)"
                 width={5}
@@ -394,7 +394,7 @@ const ChartConfiguration = ({
 
             {validationSchema.fields.includeNonNumericData && (
               <FormGroup>
-                <RHFFormFieldCheckbox<FormValues>
+                <FormFieldCheckbox<FormValues>
                   name="includeNonNumericData"
                   label="Include data sets with non-numerical values"
                 />
@@ -402,7 +402,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.showDataLabels && (
-              <RHFFormFieldCheckbox<FormValues>
+              <FormFieldCheckbox<FormValues>
                 name="showDataLabels"
                 hint={
                   legendPosition === 'inline'
@@ -413,7 +413,7 @@ const ChartConfiguration = ({
                 showError={!!formState.errors.showDataLabels}
                 conditional={
                   validationSchema.fields.dataLabelPosition && (
-                    <RHFFormFieldSelect<FormValues>
+                    <FormFieldSelect<FormValues>
                       label="Data label position"
                       name="dataLabelPosition"
                       order={[]}
@@ -431,7 +431,7 @@ const ChartConfiguration = ({
             >
               {buttons}
             </ChartBuilderSaveActions>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

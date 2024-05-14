@@ -1,7 +1,7 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
-import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
+import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import {
   Element,
   Node,
@@ -14,8 +14,8 @@ import {
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
@@ -198,12 +198,12 @@ const EditableContentForm = ({
           {({ formState }) => {
             const isSaving = formState.isSubmitting || isAutoSaving;
             return (
-              <RHFForm
+              <Form
                 id={`${id}-form`}
                 visuallyHiddenErrorSummary
                 onSubmit={handleSubmit}
               >
-                <RHFFormFieldEditor<FormValues>
+                <FormFieldEditor<FormValues>
                   allowComments={allowComments}
                   altTextError={altTextError}
                   error={
@@ -244,7 +244,7 @@ const EditableContentForm = ({
                     text="Saving"
                   />
                 </ButtonGroup>
-              </RHFForm>
+              </Form>
             );
           }}
         </FormProvider>

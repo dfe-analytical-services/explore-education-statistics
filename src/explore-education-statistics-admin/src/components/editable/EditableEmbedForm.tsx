@@ -3,9 +3,9 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import Yup from '@common/validation/yup';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 
@@ -66,14 +66,14 @@ const EditableEmbedForm = ({
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      <RHFForm id={formId} onSubmit={onSubmit}>
-        <RHFFormFieldTextInput<EditableEmbedFormValues>
+      <Form id={formId} onSubmit={onSubmit}>
+        <FormFieldTextInput<EditableEmbedFormValues>
           name="title"
           hint="This will show to users of assistive technology, it does not show on the release page"
           label="Title"
         />
 
-        <RHFFormFieldTextInput<EditableEmbedFormValues>
+        <FormFieldTextInput<EditableEmbedFormValues>
           name="url"
           hint="Embedded dashboards must be hosted on the DfE Shiny apps domain (https://department-for-education.shinyapps.io/)"
           label="URL"
@@ -84,7 +84,7 @@ const EditableEmbedForm = ({
           </Button>
           <Button type="submit">Save</Button>
         </ButtonGroup>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 };

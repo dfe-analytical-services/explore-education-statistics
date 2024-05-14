@@ -5,12 +5,12 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
-import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import { SelectOption } from '@common/components/form/FormSelect';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -129,19 +129,19 @@ export default function ReleaseSummaryForm({
             ?.category.label ?? '';
 
         return (
-          <RHFForm id={formId} onSubmit={onSubmit}>
+          <Form id={formId} onSubmit={onSubmit}>
             <FormFieldset
               hint="For 6 digit years, enter only the first four digits in this box e.g. for 2017/18, only enter 2017."
               id="timePeriodCoverage"
               legend="Select time period coverage"
               legendSize="m"
             >
-              <RHFFormFieldSelect<ReleaseSummaryFormValues>
+              <FormFieldSelect<ReleaseSummaryFormValues>
                 label="Type"
                 name="timePeriodCoverageCode"
                 optGroups={timePeriodOptions}
               />
-              <RHFFormFieldNumberInput<ReleaseSummaryFormValues>
+              <FormFieldNumberInput<ReleaseSummaryFormValues>
                 name="timePeriodCoverageStartYear"
                 label={`
                       ${
@@ -159,7 +159,7 @@ export default function ReleaseSummaryForm({
                 width={4}
               />
             </FormFieldset>
-            <RHFFormFieldRadioGroup<ReleaseSummaryFormValues>
+            <FormFieldRadioGroup<ReleaseSummaryFormValues>
               legend="Release type"
               name="releaseType"
               options={permittedReleaseTypes.map(type => ({
@@ -169,7 +169,7 @@ export default function ReleaseSummaryForm({
             />
 
             {templateRelease && (
-              <RHFFormFieldRadioGroup<ReleaseSummaryFormValues>
+              <FormFieldRadioGroup<ReleaseSummaryFormValues>
                 legend="Select template"
                 name="templateReleaseId"
                 options={[
@@ -188,7 +188,7 @@ export default function ReleaseSummaryForm({
               <Button type="submit">{submitText}</Button>
               <ButtonText onClick={onCancel}>Cancel</ButtonText>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

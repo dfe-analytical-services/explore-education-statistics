@@ -28,9 +28,9 @@ export interface FormCheckboxProps {
   name: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: CheckboxChangeEventHandler;
-  value: string;
   disabled?: boolean;
   inputRef?: Ref<HTMLInputElement>;
+  value?: string;
 }
 
 const FormCheckbox = ({
@@ -46,9 +46,9 @@ const FormCheckbox = ({
   name,
   onBlur,
   onChange,
-  value,
   disabled = false,
   inputRef,
+  value,
 }: FormCheckboxProps) => {
   const { onMounted } = useMounted(undefined, false);
 
@@ -76,9 +76,9 @@ const FormCheckbox = ({
             }
           }}
           type="checkbox"
-          value={value}
           disabled={disabled}
           ref={inputRef}
+          value={value}
         />
         <label
           className={classNames('govuk-label govuk-checkboxes__label', {

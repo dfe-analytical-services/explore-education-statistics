@@ -1,8 +1,8 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
 
@@ -37,14 +37,14 @@ const ReleaseSeriesLegacyLinkForm = ({
     >
       {({ formState }) => {
         return (
-          <RHFForm id={formId} onSubmit={onSubmit}>
-            <RHFFormFieldTextInput<FormValues>
+          <Form id={formId} onSubmit={onSubmit}>
+            <FormFieldTextInput<FormValues>
               name="description"
               label="Description"
               className="govuk-!-width-two-thirds"
             />
 
-            <RHFFormFieldTextInput<FormValues>
+            <FormFieldTextInput<FormValues>
               name="url"
               label="URL"
               className="govuk-!-width-two-thirds"
@@ -56,7 +56,7 @@ const ReleaseSeriesLegacyLinkForm = ({
               </Button>
               {cancelButton}
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

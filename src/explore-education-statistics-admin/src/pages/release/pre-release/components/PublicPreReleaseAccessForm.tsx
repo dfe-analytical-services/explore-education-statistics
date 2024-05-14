@@ -1,10 +1,10 @@
-import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
+import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import PreviewHtml from '@admin/components/PreviewHtml';
 import styles from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm.module.scss';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import InsetText from '@common/components/InsetText';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
@@ -69,8 +69,8 @@ export default function PublicPreReleaseAccessForm({
             preReleaseAccessList: preReleaseAccessList || defaultAccessListText,
           }}
         >
-          <RHFForm id={formId} showErrorSummary={false} onSubmit={handleSubmit}>
-            <RHFFormFieldEditor<FormValues>
+          <Form id={formId} showErrorSummary={false} onSubmit={handleSubmit}>
+            <FormFieldEditor<FormValues>
               name="preReleaseAccessList"
               label="Public access list"
               focusOnInit
@@ -83,7 +83,7 @@ export default function PublicPreReleaseAccessForm({
                 Cancel
               </Button>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         </FormProvider>
       ) : (
         <>
