@@ -2027,6 +2027,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
         }
 
+        public class GetSiteMapSummariesTests : PublicationServiceTests
+        {
+            [Fact]
+            public async Task GetSitemapSummaries()
+            {
+                var publicationUpdatedDate = new DateTime(2018, 04, 06, 13, 46, 11);
+                
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(ListOf<Release>(
+                        _dataFixture
+                            .DefaultRelease(publishedVersions: 1, year: 2020),
+                        _dataFixture
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture
+                            .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)));
+                publication.Updated = publicationUpdatedDate;
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+                    
+                    var result = (await service.GetSitemapSummaries()).AssertRight();
+
+                    Assert.Equal(publication.Slug, result.Single().Slug);
+                    Assert.Equal(publicationUpdatedDate, result.Single().LastModified);
+                    
+                    // TODO: Clarify SELECT query and write matching assertions. 
+                    // Should we filter out publications with a SuperSededBy ID?
+                    // Should we filter out Draft Releases? Why does the above generate a list of 5?
+                    // Should we de-dupe slugs? Why are duped slugs even found?
+                    Assert.NotEmpty(result.Single().Releases);
+                }
+            }
+        }
+        
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
             IPublicationRepository? publicationRepository = null,
