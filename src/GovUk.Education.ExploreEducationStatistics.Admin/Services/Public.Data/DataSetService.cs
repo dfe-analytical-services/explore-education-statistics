@@ -74,7 +74,7 @@ internal class DataSetService(
             .OnSuccess(async dataSet => await MapDataSet(dataSet, cancellationToken));
     }
 
-    public async Task<Either<ActionResult, DataSetViewModel>> CreateInitialDataSetVersion(
+    public async Task<Either<ActionResult, DataSetViewModel>> CreateInitialDataSet(
         Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
