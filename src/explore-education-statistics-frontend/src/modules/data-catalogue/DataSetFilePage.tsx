@@ -1,36 +1,28 @@
-import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import Button from '@common/components/Button';
-import { releaseTypes } from '@common/services/types/releaseType';
 import downloadService from '@common/services/downloadService';
 import { Dictionary } from '@common/types';
 import ContentHtml from '@common/components/ContentHtml';
-import CollapsibleList from '@common/components/CollapsibleList';
 import FormattedDate from '@common/components/FormattedDate';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
-import InfoIcon from '@common/components/InfoIcon';
-import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
-import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
-import getTimePeriodString from '@common/modules/table-tool/utils/getTimePeriodString';
-import ChevronGrid from '@common/components/ChevronGrid';
-import ChevronCard from '@common/components/ChevronCard';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
-import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
+import DataSetFileVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileVersionHistory';
 import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
+import DataSetFileQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileQuickStart';
+import DataSetFileUsingData from '@frontend/modules/data-catalogue/components/DataSetFileUsingData';
+import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
 import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
+import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import React, { useEffect, useState } from 'react';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
-import { orderBy } from 'lodash';
 import classNames from 'classnames';
 
 export const pageSections: Dictionary<string> = {
@@ -42,21 +34,60 @@ export const pageSections: Dictionary<string> = {
   // footnotes: 'Footnotes',
 };
 
+export const apiPageSections: Dictionary<string> = {
+  versionHistory: 'API data set version history',
+  quickStart: 'API data set endpoints quick start',
+};
+
 export type PageSection = keyof typeof pageSections & string;
+export type ApiPageSection = keyof typeof apiPageSections & string;
 
 interface Props {
   dataSetFileId: string;
 }
 
 export default function DataSetFilePage({ dataSetFileId }: Props) {
-  const { data: dataSetFile } = useQuery({
+  const { data: dataSetFile, isLoading: isLoadingDataSetFile } = useQuery({
     ...dataSetFileQueries.get(dataSetFileId),
     keepPreviousData: true,
     staleTime: 60000,
     retry: false,
   });
 
-  const [activeSection, setActiveSection] = useState<PageSection>('details');
+  const apiDataSetId = dataSetFile?.api?.id ?? '';
+
+  const { data: apiDataSetVersion, isLoading: isLoadingApiDataSetVersion } =
+    useQuery({
+      ...apiDataSetQueries.getDataSetVersion(
+        apiDataSetId,
+        dataSetFile?.api?.version ?? '',
+      ),
+      keepPreviousData: true,
+      staleTime: 60000,
+      retry: false,
+      enabled: !!dataSetFile?.api,
+    });
+
+  const { data: apiDataSet, isLoading: isLoadingApiDataSet } = useQuery({
+    ...apiDataSetQueries.getDataSet(apiDataSetId),
+    keepPreviousData: true,
+    staleTime: 60000,
+    retry: false,
+    enabled: !!dataSetFile?.api,
+  });
+
+  const { data: apiDataSetVersions, isLoading: isLoadingApiDataSetVersions } =
+    useQuery({
+      ...apiDataSetQueries.listDataSetVersions(apiDataSetId),
+      keepPreviousData: true,
+      staleTime: 60000,
+      retry: false,
+      enabled: !!dataSetFile?.api,
+    });
+
+  const [activeSection, setActiveSection] = useState<
+    PageSection | ApiPageSection
+  >('details');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
   const [showAllPreview, toggleShowAllPreview] = useToggle(false);
 
@@ -99,17 +130,22 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
     };
   }, [handleScroll]);
 
+  const isLoading = apiDataSet
+    ? isLoadingDataSetFile ||
+      isLoadingApiDataSetVersion ||
+      isLoadingApiDataSet ||
+      isLoadingApiDataSetVersions
+    : isLoadingDataSetFile;
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   if (!dataSetFile) {
     return <NotFoundPage />;
   }
 
-  const {
-    file,
-    release,
-    summary,
-    meta: { timePeriod, filters, geographicLevels, indicators },
-    title,
-  } = dataSetFile;
+  const { file, release, summary, title } = dataSetFile;
 
   return (
     <Page
@@ -127,7 +163,7 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
         />
       ) : (
         <>
-          <div className={styles.info}>
+          <div className={styles.info} data-testid="data-set-file-info">
             {release.isLatestPublishedRelease ? (
               <Tag className="govuk-!-margin-right-5">Latest data</Tag>
             ) : (
@@ -135,7 +171,12 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
                 Not the latest data
               </Tag>
             )}
-
+            {apiDataSetVersion && (
+              <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
+                <span className={styles.infoSectionHeading}>API version</span>{' '}
+                {apiDataSetVersion.version}
+              </div>
+            )}
             <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
               <span className={styles.infoSectionHeading}>Published</span>{' '}
               <FormattedDate format="d MMMM yyyy">
@@ -161,104 +202,16 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
           <div className="govuk-grid-row">
             <DataSetFilePageNav
               activeSection={activeSection}
+              sections={
+                apiDataSet
+                  ? { ...pageSections, ...apiPageSections }
+                  : pageSections
+              }
               onClickItem={setActiveSection}
             />
 
             <div className="govuk-grid-column-two-thirds">
-              <DataSetFilePageSection
-                heading={pageSections.details}
-                id="details"
-              >
-                <SummaryList
-                  ariaLabel={`Details list for ${title}`}
-                  className="govuk-!-margin-bottom-4 govuk-!-margin-top-4"
-                  noBorder
-                >
-                  <SummaryListItem term="Theme">
-                    {release.publication.themeTitle}
-                  </SummaryListItem>
-                  <SummaryListItem term="Publication">
-                    {release.publication.title}
-                  </SummaryListItem>
-                  <SummaryListItem term="Release">
-                    <Link
-                      to={`/find-statistics/${release.publication.slug}/${release.slug}`}
-                    >
-                      {release.title}
-                    </Link>
-                  </SummaryListItem>
-                  <SummaryListItem term="Release type">
-                    <Modal
-                      showClose
-                      title={releaseTypes[release.type]}
-                      triggerButton={
-                        <ButtonText>
-                          {releaseTypes[release.type]}{' '}
-                          <InfoIcon
-                            description={`Information on ${
-                              releaseTypes[release.type]
-                            }`}
-                          />
-                        </ButtonText>
-                      }
-                    >
-                      <ReleaseTypeSection
-                        showHeading={false}
-                        type={release.type}
-                      />
-                    </Modal>
-                  </SummaryListItem>
-
-                  {geographicLevels && geographicLevels.length > 0 && (
-                    <SummaryListItem term="Geographic levels">
-                      {orderBy(geographicLevels).join(', ')}
-                    </SummaryListItem>
-                  )}
-                  {indicators && indicators.length > 0 && (
-                    <SummaryListItem term="Indicators">
-                      <CollapsibleList
-                        buttonClassName="govuk-!-margin-bottom-1"
-                        buttonHiddenText={`for ${title}`}
-                        collapseAfter={3}
-                        id="indicators"
-                        itemName="indicator"
-                        itemNamePlural="indicators"
-                        listClassName="govuk-!-margin-top-0 govuk-!-margin-bottom-1"
-                        testId="indicators"
-                      >
-                        {indicators.map((indicator, index) => (
-                          <li key={`indicator-${index.toString()}`}>
-                            {indicator}
-                          </li>
-                        ))}
-                      </CollapsibleList>
-                    </SummaryListItem>
-                  )}
-                  {filters && filters.length > 0 && (
-                    <SummaryListItem term="Filters">
-                      <CollapsibleList
-                        buttonClassName="govuk-!-margin-bottom-1"
-                        buttonHiddenText={`for ${title}`}
-                        collapseAfter={3}
-                        id="filters"
-                        itemName="filter"
-                        itemNamePlural="filters"
-                        listClassName="govuk-!-margin-top-0 govuk-!-margin-bottom-1"
-                        testId="filters"
-                      >
-                        {filters.map((filter, index) => (
-                          <li key={`filter-${index.toString()}`}>{filter}</li>
-                        ))}
-                      </CollapsibleList>
-                    </SummaryListItem>
-                  )}
-                  {timePeriod && (timePeriod.from || timePeriod.to) && (
-                    <SummaryListItem term="Time period">
-                      {getTimePeriodString(timePeriod)}
-                    </SummaryListItem>
-                  )}
-                </SummaryList>
-              </DataSetFilePageSection>
+              <DataSetFileDetails dataSetFile={dataSetFile} />
 
               {/* TODO EES-4856 */}
               {/* <DataSetFilePreview
@@ -277,32 +230,26 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
               {/* TODO EES-4856 */}
               {/* <DataSetFileFootnotes /> */}
 
-              <DataSetFilePageSection heading={pageSections.using} id="using">
-                <ChevronGrid>
-                  <ChevronCard
-                    cardSize="l"
-                    description="Download the underlying data as a compressed ZIP file"
-                    link={
-                      <ButtonText onClick={handleDownload}>
-                        Download this data set (ZIP)
-                      </ButtonText>
-                    }
-                    noBorder
-                    noChevron
-                  />
-                  <ChevronCard
-                    cardSize="l"
-                    description="View tables that we have built for you, or create your own tables from open data using our table tool"
-                    link={
-                      <Link
-                        to={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
-                      >
-                        View or create your own tables
-                      </Link>
-                    }
-                  />
-                </ChevronGrid>
-              </DataSetFilePageSection>
+              <DataSetFileUsingData
+                hasApiDataSet={!!apiDataSet}
+                tableToolLink={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
+                onClickDownload={handleDownload}
+              />
+
+              {apiDataSetVersions && apiDataSetVersion && (
+                <DataSetFileVersionHistory
+                  currentVersion={apiDataSetVersion.version}
+                  dataSetFileId={dataSetFileId}
+                  dataSetVersions={apiDataSetVersions}
+                />
+              )}
+              {apiDataSet && apiDataSetVersion && (
+                <DataSetFileQuickStart
+                  id={apiDataSet.id}
+                  name={apiDataSet.title}
+                  version={apiDataSetVersion.version}
+                />
+              )}
             </div>
           </div>
         </>
@@ -313,10 +260,27 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async context => {
-    const { dataSetFileId = '' } = context.query as Dictionary<string>;
+    const { dataSetFileId, version } = context.query as Dictionary<string>;
 
     const queryClient = new QueryClient();
-    await queryClient.prefetchQuery(dataSetFileQueries.get(dataSetFileId));
+
+    const dataSet = await queryClient.fetchQuery(
+      dataSetFileQueries.get(dataSetFileId),
+    );
+
+    if (dataSet.api) {
+      const dataSetVersion = version ?? dataSet.api?.version;
+
+      await Promise.all([
+        queryClient.fetchQuery(apiDataSetQueries.getDataSet(dataSet.api.id)),
+        queryClient.fetchQuery(
+          apiDataSetQueries.getDataSetVersion(dataSet.api.id, dataSetVersion),
+        ),
+        queryClient.fetchQuery(
+          apiDataSetQueries.listDataSetVersions(dataSet.api.id),
+        ),
+      ]);
+    }
 
     const props: Props = {
       dataSetFileId,

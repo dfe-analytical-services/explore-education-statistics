@@ -73,20 +73,19 @@ const ReleasePreReleaseAccessPage = () => {
                   The <strong>pre-release</strong> will be accessible at:
                 </p>
 
-                <p>
-                  <UrlContainer
-                    data-testid="prerelease-url"
-                    url={`${
-                      window.location.origin
-                    }${generatePath<ReleaseRouteParams>(
-                      preReleaseContentRoute.path,
-                      {
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
-                      },
-                    )}`}
-                  />
-                </p>
+                <UrlContainer
+                  className="govuk-!-margin-bottom-4"
+                  testId="prerelease-url"
+                  url={`${
+                    window.location.origin
+                  }${generatePath<ReleaseRouteParams>(
+                    preReleaseContentRoute.path,
+                    {
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                    },
+                  )}`}
+                />
               </>
             )}
 

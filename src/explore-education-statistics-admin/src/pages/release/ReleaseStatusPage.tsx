@@ -94,12 +94,11 @@ const ReleaseStatusPage = () => {
         The <strong>public release</strong> will be accessible at:
       </p>
 
-      <p>
-        <UrlContainer
-          data-testid="public-release-url"
-          url={`${publicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
-        />
-      </p>
+      <UrlContainer
+        className="govuk-!-margin-bottom-4"
+        testId="public-release-url"
+        url={`${publicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
+      />
 
       <SummaryList>
         <SummaryListItem term="Current status">

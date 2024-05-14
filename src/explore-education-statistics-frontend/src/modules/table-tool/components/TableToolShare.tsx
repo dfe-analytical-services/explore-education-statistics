@@ -96,12 +96,11 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
             {linkInstructions}
           </div>
 
-          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
-            <UrlContainer
-              data-testid="permalink-generated-url"
-              url={permalinkUrl}
-            />
-          </p>
+          <UrlContainer
+            className="govuk-!-margin-top-0 govuk-!-margin-bottom-2"
+            testId="permalink-generated-url"
+            url={permalinkUrl}
+          />
 
           <ButtonGroup>
             <Button variant="secondary" onClick={handleCopyClick}>

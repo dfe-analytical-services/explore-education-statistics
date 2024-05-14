@@ -1,35 +1,49 @@
+import styles from '@common/components/UrlContainer.module.scss';
 import classNames from 'classnames';
-import React from 'react';
-import styles from './UrlContainer.module.scss';
+import React, { ReactNode } from 'react';
 
 interface Props {
-  'data-testid'?: string;
   className?: string;
+  label?: string | ReactNode;
+  labelHidden?: boolean;
+  testId?: string;
   url: string;
 }
 
 const UrlContainer = ({
-  'data-testid': dataTestId = 'url',
   className,
+  label = 'Url',
+  labelHidden = true,
+  testId = 'url',
   url,
 }: Props) => {
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
     event.target.select();
   return (
-    <>
-      <label htmlFor={dataTestId} className="govuk-visually-hidden">
-        Url
+    <div
+      className={classNames(className, {
+        'dfe-flex dfe-align-items--center': !labelHidden,
+      })}
+    >
+      <label
+        htmlFor={testId}
+        className={classNames({
+          'govuk-visually-hidden': labelHidden,
+          'govuk-!-margin-right-2': !labelHidden,
+        })}
+      >
+        {label}
       </label>
       <input
         type="text"
         value={url}
-        id={dataTestId}
-        className={classNames(styles.url, className)}
-        data-testid={dataTestId}
+        id={testId}
+        className={styles.url}
+        data-testid={testId}
         onFocus={handleFocus}
         readOnly
       />
-    </>
+    </div>
   );
 };
 

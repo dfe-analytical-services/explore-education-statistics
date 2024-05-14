@@ -1,3 +1,8 @@
+import { PaginatedList } from '@common/services/types/pagination';
+import {
+  ApiDataSet,
+  ApiDataSetVersion,
+} from '@frontend/services/apiDataSetService';
 import {
   DataSetFile,
   DataSetFileSummary,
@@ -109,8 +114,8 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
   },
 ];
 
-export const testDataSet: DataSetFile = {
-  id: 'datasetfile-id',
+export const testDataSetFile: DataSetFile = {
+  id: 'data-setfile-id',
   file: {
     id: 'file-id',
     name: 'file name',
@@ -142,5 +147,56 @@ export const testDataSet: DataSetFile = {
     filters: ['Filter 1', 'Filter 2'],
     geographicLevels: ['Local authority', 'National'],
     indicators: ['Indicator 1', 'Indicator 2'],
+  },
+};
+
+export const testDataSetWithApi: DataSetFile = {
+  ...testDataSetFile,
+  api: {
+    id: 'api-data-set-id',
+    version: '1.0',
+  },
+};
+
+export const testApiDataSetVersion: ApiDataSetVersion = {
+  version: '1.0',
+  type: 'Major',
+  status: 'Published',
+  published: '2024-05-13',
+  notes: 'Test notes',
+  totalResults: 1,
+  timePeriods: { start: '2019', end: '2020' },
+  geographicLevels: [],
+  filters: [],
+  indicators: [],
+};
+
+export const testApiDataSetVersions: PaginatedList<ApiDataSetVersion> = {
+  paging: {
+    page: 1,
+    pageSize: 10,
+    totalResults: 10,
+    totalPages: 1,
+  },
+  results: [
+    { ...testApiDataSetVersion, version: '2.0' },
+    { ...testApiDataSetVersion, version: '1.2', status: 'Deprecated' },
+    { ...testApiDataSetVersion, version: '1.0', status: 'Withdrawn' },
+  ],
+};
+
+export const testApiDataSet: ApiDataSet = {
+  id: 'api-data-set-id',
+  title: 'Test title',
+  summary: 'Test summary',
+  status: 'Published',
+  latestVersion: {
+    version: '1.0',
+    published: '2024-05-13',
+    totalResults: 1,
+    timePeriods: { start: '2019', end: '2020' },
+    geographicLevels: [],
+    filters: [],
+    indicators: [],
   },
 };
