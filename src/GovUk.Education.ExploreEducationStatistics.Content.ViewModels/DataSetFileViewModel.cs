@@ -64,7 +64,7 @@ public record DataSetFileFileViewModel
 
     public required string Size { get; init; } = string.Empty;
 
-    public required List<string> DataCsvPreviewLines { get; init; } = new();
+    public required DataSetFileCsvPreviewViewModel DataCsvPreview { get; init; } = new();
 
     public required Guid SubjectId { get; init; }
 }

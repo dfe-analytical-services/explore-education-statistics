@@ -1864,15 +1864,15 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
                 configuration: await CreateConfigurtionWithAzurite());
 
-            var formFile = CreateDataCsvFormFile("""
-                                                 Headers
-                                                 Line 1
-                                                 Line 2
-                                                 Line 3
-                                                 Line 4
-                                                 Line 5
-                                                 Line 6
-                                                 """);
+            var formFile = CreateDataCsvFormFile(""""
+                                                 column_1,column_2,column_3
+                                                 1,2,3
+                                                 2,"3,4",5
+                                                 3,"""4",5
+                                                 4,,6
+                                                 5,6,7
+                                                 6,7,8
+                                                 """");
 
             await publicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
@@ -1948,15 +1948,80 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .ToList(),
                 viewModel.Meta.Indicators);
 
-            viewModel.File.DataCsvPreviewLines // @MarkFix Assert.Equal here?
-                .AssertDeepEqualTo([
-                    "Headers",
-                    "Line 1",
-                    "Line 2",
-                    "Line 3",
-                    "Line 4",
-                    "Line 5",
-                ]);
+            Assert.Equal(3, viewModel.File.DataCsvPreview.Headers.Count);
+            viewModel.File.DataCsvPreview.Headers
+                .AssertDeepEqualTo(["column_1", "column_2", "column_3"]);
+
+            Assert.Equal(5, viewModel.File.DataCsvPreview.Rows.Count);
+
+            Assert.Equal(3, viewModel.File.DataCsvPreview.Rows[0].Count);
+            viewModel.File.DataCsvPreview.Rows[0].AssertDeepEqualTo(["1", "2", "3"]);
+
+            Assert.Equal(3, viewModel.File.DataCsvPreview.Rows[1].Count);
+            viewModel.File.DataCsvPreview.Rows[1].AssertDeepEqualTo(["2", "3,4", "5"]);
+
+            Assert.Equal(3, viewModel.File.DataCsvPreview.Rows[2].Count);
+            viewModel.File.DataCsvPreview.Rows[2].AssertDeepEqualTo(["3", "\"4", "5"]);
+
+            Assert.Equal(3, viewModel.File.DataCsvPreview.Rows[3].Count);
+            viewModel.File.DataCsvPreview.Rows[3].AssertDeepEqualTo(["4", "", "6"]);
+
+            Assert.Equal(3, viewModel.File.DataCsvPreview.Rows[4].Count);
+            viewModel.File.DataCsvPreview.Rows[4].AssertDeepEqualTo(["5", "6", "7"]);
+        }
+
+        [Fact]
+        public async Task FetchCsvWithSingleDataRow_Success()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFile(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
+
+            var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: await CreateConfigurtionWithAzurite());
+
+            var formFile = CreateDataCsvFormFile("""
+                                                 column_1,column_2,column_3
+                                                 1,2,3
+                                                 """);
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
+
+            var response = await client.GetAsync(uri);
+            var viewModel = response.AssertOk<DataSetFileViewModel>();
+
+            Assert.Equal(releaseFile.Name, viewModel.Title);
+            Assert.Equal(releaseFile.Summary, viewModel.Summary);
+
+            Assert.Equal(3, viewModel.File.DataCsvPreview.Headers.Count);
+            viewModel.File.DataCsvPreview.Headers
+                .AssertDeepEqualTo(["column_1", "column_2", "column_3"]);
+
+            var row = Assert.Single(viewModel.File.DataCsvPreview.Rows);
+            Assert.Equal(3, row.Count);
+            row.AssertDeepEqualTo(["1", "2", "3"]);
         }
 
         [Fact]
@@ -1993,7 +2058,10 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
                 configuration: await CreateConfigurtionWithAzurite());
 
-            var formFile = CreateDataCsvFormFile(string.Empty);
+            var formFile = CreateDataCsvFormFile("""
+                                                 column_1
+                                                 1
+                                                 """);
 
             await publicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
@@ -2058,7 +2126,10 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
                 configuration: await CreateConfigurtionWithAzurite());
 
-            var formFile = CreateDataCsvFormFile(string.Empty);
+            var formFile = CreateDataCsvFormFile("""
+                                                 column_1
+                                                 1
+                                                 """);
 
             await publicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
@@ -2100,22 +2171,25 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithFile(_fixture.DefaultFile()
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
-                            new FilterMeta { Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
-                            new FilterMeta { Label = "Filter 2", ColumnName = "G_filter_2", },
-                            new FilterMeta { Label = "Filter 3", ColumnName = "C_filter_3", Hint = "Another hint", },
+                            new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
+                            new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "G_filter_2", },
+                            new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "C_filter_3", Hint = "Another hint", },
                         ])
                         .WithIndicators([
-                            new IndicatorMeta { Label = "Indicator 3", ColumnName = "B_indicator_3", },
-                            new IndicatorMeta { Label = "Indicator 2", ColumnName = "E_indicator_2", },
-                            new IndicatorMeta { Label = "Indicator 1", ColumnName = "D_indicator_1", },
-                            new IndicatorMeta { Label = "Indicator 4", ColumnName = "F_indicator_4", },
+                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "B_indicator_3", },
+                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "E_indicator_2", },
+                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "D_indicator_1", },
+                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 4", ColumnName = "F_indicator_4", },
                         ])));
 
             var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
                 configuration: await CreateConfigurtionWithAzurite());
 
-            var formFile = CreateDataCsvFormFile(string.Empty);
+            var formFile = CreateDataCsvFormFile("""
+                                                 column_1
+                                                 1
+                                                 """);
 
             await publicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
@@ -2192,7 +2266,10 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
                 configuration: await CreateConfigurtionWithAzurite());
 
-            var formFile = CreateDataCsvFormFile(string.Empty);
+            var formFile = CreateDataCsvFormFile("""
+                                                 column_1
+                                                 1
+                                                 """);
 
             await publicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
@@ -2309,7 +2386,10 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
                 configuration: await CreateConfigurtionWithAzurite());
 
-            var formFile = CreateDataCsvFormFile(string.Empty);
+            var formFile = CreateDataCsvFormFile("""
+                                                 column_1
+                                                 1
+                                                 """);
 
             await publicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
@@ -2383,9 +2463,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             s.GetRequiredService<ILogger<IBlobStorageService>>(),
                         new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
-                             // Use appsettings.IntegrationTest.json to prevent passing due to data-storage docker
-                             // container running separately. appsettings.IntegrationTest.json doesn't use ports
-                             // 10000/10001 for blobs/queues
+                             // Use appsettings.IntegrationTest.json to prevent tests passing due to data-storage docker
+                             // container running separately: appsettings.IntegrationTest.json uses different ports
+                             // to those used by the data-storage docker container - i.e. not 10000/10001
                             .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
                             .AddEnvironmentVariables()
                             .Build()));

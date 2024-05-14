@@ -19,6 +19,7 @@ public static class FileGeneratorExtensions
             .SetDefault(f => f.Id)
             .SetDefault(f => f.RootPath)
             .SetDefault(f => f.DataSetFileId)
+            .SetDefault(f => f.SubjectId)
             .SetContentLength(1024 * 1024)
             .SetContentType("text/csv")
             .SetType(FileType.Data)

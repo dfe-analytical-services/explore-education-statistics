@@ -1,11 +1,13 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -169,7 +171,7 @@ public class DataSetFileService : IDataSetFileService
             return new NotFoundResult();
         }
 
-        var dataCsvPreviewLines = await GetDataCsvPreviewLines(releaseFile);
+        var dataCsvPreview = await GetDataCsvPreview(releaseFile);
 
         var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
 
@@ -205,7 +207,7 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
-                DataCsvPreviewLines = dataCsvPreviewLines,
+                DataCsvPreview = dataCsvPreview,
                 SubjectId = releaseFile.File.SubjectId!.Value,
             },
             Meta = BuildDataSetFileMetaViewModel(
@@ -247,22 +249,42 @@ public class DataSetFileService : IDataSetFileService
         };
     }
 
-    private async Task<List<string>> GetDataCsvPreviewLines(ReleaseFile releaseFile)
+    private async Task<DataSetFileCsvPreviewViewModel> GetDataCsvPreview(ReleaseFile releaseFile)
     {
-        List<string> dataCsvPreviewLines = new();
         var datafileStreamProvider = () => _publicBlobStorageService.StreamBlob(
             containerName: BlobContainers.PublicReleaseFiles,
             path: releaseFile.PublicPath());
-        using var dataFileReader = new StreamReader(await datafileStreamProvider.Invoke());
 
-        for (var i = 0; i < 6; i++)
+        using var dataFileReader = new StreamReader(await datafileStreamProvider.Invoke());
+        using var csvReader = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
+        await csvReader.ReadAsync();
+        csvReader.ReadHeader();
+        var headers = csvReader.HeaderRecord?.ToList() ?? new List<string>();
+
+        using var csvDataReader = new CsvDataReader(csvReader);
+        var rows = new List<List<string>>();
+        var lastLine = false; // assume one line of data in CSV
+
+        // Fetch first five data rows only. If there are less, fetch what you can
+        for (var i = 0; i < 5 && !lastLine; i++)
         {
-            var line = await dataFileReader.ReadLineAsync();
-            if (line == null) { break; }
-            dataCsvPreviewLines.Add(line);
+            var cellsPerRow = csvDataReader.FieldCount;
+
+            var row = Enumerable
+                .Range(0, cellsPerRow)
+                .Select(csvReader.GetField<string>)
+                .ToList();
+
+            rows.Add(row);
+
+            lastLine = !await csvReader.ReadAsync();
         }
 
-        return dataCsvPreviewLines;
+        return new DataSetFileCsvPreviewViewModel
+        {
+            Headers = headers,
+            Rows = rows,
+        };
     }
 
     private List<LabelValue> GetVariables(DataSetFileMeta meta)
