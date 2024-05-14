@@ -9,13 +9,27 @@ module.exports = {
   ],
   generateRobotsTxt: true,
   robotsTxtOptions: {
-    policies: [
+    policies: getRobotsRuleset(process.env.APP_ENV),
+    additionalSitemaps: [`${process.env.PUBLIC_URL}server-sitemap.xml`],
+  },
+};
+
+function getRobotsRuleset(environment) {
+  if (environment === 'Production' || environment === 'Local') {
+    return [
       {
         userAgent: '*',
         allow: '/',
         disallow: ['/data-tables/fast-track/', '/data-tables/permalink/'],
       },
-    ],
-    additionalSitemaps: [`${process.env.PUBLIC_URL}server-sitemap.xml`],
-  },
-};
+    ];
+  }
+
+  // Disallow any and all trawling of staging, dev, or pre-prod sites
+  return [
+    {
+      userAgent: '*',
+      disallow: '/',
+    },
+  ];
+}
