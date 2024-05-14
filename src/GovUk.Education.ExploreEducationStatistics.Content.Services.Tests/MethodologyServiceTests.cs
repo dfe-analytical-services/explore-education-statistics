@@ -691,7 +691,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             VerifyAllMocks(methodologyVersionRepository);
         }
+        
+        [Fact]
+        public async Task GetSitemapSummaries()
+        {
+            var methodologyVersionId = Guid.NewGuid();
+            var methodologyUpdatedDate = new DateTime(2017, 02, 03, 01, 04, 19);
+            
+            var methodology = new Methodology
+            {
+                OwningPublicationSlug = "publication-title",
+                OwningPublicationTitle = "Publication title",
+                LatestPublishedVersionId = methodologyVersionId,
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = methodologyVersionId,
+                        PublishingStrategy = Immediately,
+                        Published = DateTime.UtcNow,
+                        Updated = methodologyUpdatedDate,
+                        Status = Approved,
+                    }
+                }
+            };
 
+            var publication = new Publication
+            {
+                Slug = "publication-title",
+                Title = "Publication title",
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Methodology = methodology,
+                        Owner = true
+                    }
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Attach(methodology.Versions[0]);
+
+                var service = SetupMethodologyService(contentDbContext);
+                var result = (await service.GetSitemapSummaries()).AssertRight();
+
+                Assert.Equal(methodology.OwningPublicationSlug, result.Single().Slug);
+                Assert.Equal(methodologyUpdatedDate, result.Single().LastModified);
+            }
+        }
+        
+                [Fact]
+        public async Task GetSitemapSummaries_AlternativeSlugTakesPriority()
+        {
+            var methodologyVersionId = Guid.NewGuid();
+            var methodologyUpdatedDate = new DateTime(2017, 02, 03, 01, 04, 19);
+            
+            var methodology = new Methodology
+            {
+                OwningPublicationSlug = "publication-title",
+                OwningPublicationTitle = "Publication title",
+                LatestPublishedVersionId = methodologyVersionId,
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = methodologyVersionId,
+                        PublishingStrategy = Immediately,
+                        Published = DateTime.UtcNow,
+                        Updated = methodologyUpdatedDate,
+                        Status = Approved,
+                        AlternativeSlug = "alternative-title",
+                        AlternativeTitle = "Alternative title",
+                    }
+                }
+            };
+
+            var publication = new Publication
+            {
+                Slug = "publication-title",
+                Title = "Publication title",
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Methodology = methodology,
+                        Owner = true
+                    }
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Attach(methodology.Versions[0]);
+
+                var service = SetupMethodologyService(contentDbContext);
+                var result = (await service.GetSitemapSummaries()).AssertRight();
+
+                Assert.Equal("alternative-title", result.Single().Slug);
+                Assert.Equal(methodologyUpdatedDate, result.Single().LastModified);
+            }
+        }
+        
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,

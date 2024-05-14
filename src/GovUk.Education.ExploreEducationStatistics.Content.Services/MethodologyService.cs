@@ -140,6 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Select(mv => new MethodologySitemapSummaryViewModel()
             {
                 Slug = mv.AlternativeSlug ?? mv.Methodology.OwningPublicationSlug,
+                // TODO: Add tests for this priority ordering once it's been discussed in PR
                 LastModified = mv.Updated ?? mv.Published ?? mv.Created
             }).ToListAsync();
         }
