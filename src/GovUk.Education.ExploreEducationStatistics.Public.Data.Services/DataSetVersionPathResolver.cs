@@ -10,14 +10,14 @@ using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 
-public class ParquetPathResolver : IParquetPathResolver
+public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 {
     private readonly IOptions<ParquetFilesOptions> _options;
     private readonly IWebHostEnvironment _environment;
 
     private readonly string _basePath;
 
-    public ParquetPathResolver(IOptions<ParquetFilesOptions> options, IWebHostEnvironment environment)
+    public DataSetVersionPathResolver(IOptions<ParquetFilesOptions> options, IWebHostEnvironment environment)
     {
         _options = options;
         _environment = environment;

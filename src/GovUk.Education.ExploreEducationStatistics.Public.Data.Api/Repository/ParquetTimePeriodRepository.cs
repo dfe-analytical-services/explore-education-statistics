@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetTimePeriodRepository(
     IDuckDbConnection duckDbConnection,
-    IParquetPathResolver parquetPathResolver)
+    IDataSetVersionPathResolver dataSetVersionPathResolver)
     : IParquetTimePeriodRepository
 {
     public async Task<IList<ParquetTimePeriod>> List(
@@ -32,7 +32,7 @@ public class ParquetTimePeriodRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT *
-             FROM '{parquetPathResolver.TimePeriodsPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.TimePeriodsPath(dataSetVersion):raw}'
              WHERE {TimePeriodsTable.Cols.Id:raw} IN ({idsList})
              """
         );
@@ -64,7 +64,7 @@ public class ParquetTimePeriodRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT *
-             FROM '{parquetPathResolver.TimePeriodsPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.TimePeriodsPath(dataSetVersion):raw}'
              WHERE ({TimePeriodsTable.Cols.Period:raw}, {TimePeriodsTable.Cols.Identifier:raw})
                 IN ({inFragment})
              """

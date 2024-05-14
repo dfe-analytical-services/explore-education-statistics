@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetIndicatorRepository(
     IDuckDbConnection duckDbConnection,
-    IParquetPathResolver parquetPathResolver)
+    IDataSetVersionPathResolver dataSetVersionPathResolver)
     : IParquetIndicatorRepository
 {
     public async Task<ISet<string>> ListIds(
@@ -19,7 +19,7 @@ public class ParquetIndicatorRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT DISTINCT {IndicatorsTable.Cols.Id:raw}
-             FROM '{parquetPathResolver.IndicatorsPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.IndicatorsPath(dataSetVersion):raw}'
              """);
 
         var indicators = await command.QueryAsync<string>(cancellationToken: cancellationToken);

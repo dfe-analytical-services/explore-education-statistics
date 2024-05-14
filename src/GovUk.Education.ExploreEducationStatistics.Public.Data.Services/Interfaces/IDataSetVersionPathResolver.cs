@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Table
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 
-public interface IParquetPathResolver
+public interface IDataSetVersionPathResolver
 {
     string DirectoryPath(DataSetVersion dataSetVersion);
 

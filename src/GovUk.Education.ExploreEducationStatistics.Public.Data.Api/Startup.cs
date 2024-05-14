@@ -181,7 +181,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddSecurity();
 
-        services.AddSingleton<IParquetPathResolver, ParquetPathResolver>();
+        services.AddSingleton<IDataSetVersionPathResolver, DataSetVersionPathResolver>();
         services.AddScoped<IPublicationService, PublicationService>();
         services.AddScoped<IDataSetService, DataSetService>();
         services.AddScoped<IDataSetQueryService, DataSetQueryService>();
