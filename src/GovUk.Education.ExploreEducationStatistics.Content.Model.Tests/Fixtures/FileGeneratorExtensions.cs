@@ -29,7 +29,7 @@ public static class FileGeneratorExtensions
                 TimeIdentifier = TimeIdentifier.CalendarYear,
                 Years = [ 2000, 2001 ],
                 Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", }],
-                Indicators = [new() { Id = Guid.NewGuid(), }],
+                Indicators = [new() { Id = Guid.NewGuid(), Label = "Indicator 1" }],
             })
             .Set(f => f.Filename, (_, f) => $"{f.Filename}.csv");
 
