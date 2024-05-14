@@ -908,7 +908,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         }
     }
 
-    public class CreateInitialDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class CreateDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         public static IEnumerable<object[]> AllDataSetVersionStatuses =>
             EnumUtil.GetEnums<DataSetVersionStatus>()

@@ -47,12 +47,12 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
 
     [HttpPost]
     [Produces("application/json")]
-    public async Task<ActionResult<DataSetViewModel>> CreateInitialDataSet(
+    public async Task<ActionResult<DataSetViewModel>> CreateDataSet(
         [FromBody] DataSetVersionCreateRequest dataSetVersionCreateRequest,
         CancellationToken cancellationToken)
     {
         return await dataSetService
-            .CreateInitialDataSet(
+            .CreateDataSet(
                 releaseFileId: dataSetVersionCreateRequest.ReleaseFileId,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
