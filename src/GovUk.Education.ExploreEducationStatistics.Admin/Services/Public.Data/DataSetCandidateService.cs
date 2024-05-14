@@ -53,7 +53,7 @@ internal class DataSetCandidateService(
             .Where(rf => rf.File.ReplacingId == null)
             .Select(rf => new DataSetCandidateViewModel
             {
-                FileId = rf.FileId,
+                ReleaseFileId = rf.Id,
                 Title = rf.Name!,
             })
             .OrderBy(rf => rf.Title)

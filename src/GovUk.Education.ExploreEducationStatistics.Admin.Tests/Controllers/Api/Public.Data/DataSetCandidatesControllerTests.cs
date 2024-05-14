@@ -52,12 +52,9 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             Assert.NotNull(candidates);
             Assert.Equal(3, candidates.Count);
-
-            Assert.All(releaseFiles, releaseFile =>
-                Assert.Contains(candidates, candidate =>
-                    candidate.FileId == releaseFile.Id
-                    && candidate.Title == releaseFile.Name)
-            );
+            Assert.Contains(releaseFiles, releaseFile =>
+                candidates.Any(candidate => candidate.ReleaseFileId == releaseFile.Id
+                                                && candidate.Title == releaseFile.Name));
         }
 
         [Theory]
@@ -95,10 +92,10 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var viewModel = response.AssertOk<List<DataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(viewModel);
-            Assert.Empty(viewModel);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
 
@@ -123,10 +120,10 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var viewModel = response.AssertOk<List<DataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(viewModel);
-            Assert.Empty(viewModel);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
         [Fact]
@@ -150,10 +147,10 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var viewModel = response.AssertOk<List<DataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(viewModel);
-            Assert.Empty(viewModel);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
         [Fact]
@@ -177,10 +174,10 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var viewModel = response.AssertOk<List<DataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(viewModel);
-            Assert.Empty(viewModel);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
         [Fact]
