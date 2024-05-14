@@ -73,5 +73,5 @@ test('Validate that user is able to see the created release in public and title 
   await expect(releasePage.pageTitle(publicationName)).toHaveText(
     publicationName,
     { useInnerText: true },
-  ); 
+  );
 });
