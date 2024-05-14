@@ -17,12 +17,12 @@ public record DataSetVersionCreateRequest
             RuleFor(request => request.ReleaseFileId)
                 .NotEmpty()
                 .MustAsync(async (releaseFileId, cancellationToken) => 
-                    await dataSetVersionService.HasExistingVersion(
+                    await dataSetVersionService.FileHasVersion(
                         releaseFileId: releaseFileId,
                         cancellationToken: cancellationToken)
                     is false)
-                .WithErrorCode(ValidationMessages.HasExistingApiDataSetVersion.Code)
-                .WithMessage(ValidationMessages.HasExistingApiDataSetVersion.Message);
+                .WithErrorCode(ValidationMessages.FileHasApiDataSetVersion.Code)
+                .WithMessage(ValidationMessages.FileHasApiDataSetVersion.Message);
         }
     }
 }

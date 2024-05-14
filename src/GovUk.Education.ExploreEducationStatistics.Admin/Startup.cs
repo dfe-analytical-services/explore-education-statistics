@@ -778,7 +778,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
 
-        public Task<bool> HasExistingVersion(Guid releaseFileId, CancellationToken cancellationToken = default)
+        public Task<bool> FileHasVersion(Guid releaseFileId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(false);
         }

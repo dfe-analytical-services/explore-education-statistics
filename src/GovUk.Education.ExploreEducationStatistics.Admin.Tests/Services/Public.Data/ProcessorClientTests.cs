@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -37,6 +38,7 @@ public class ProcessorClientTests
         {
             var responseBody = new CreateInitialDataSetVersionResponseViewModel
             {
+                DataSetId = Guid.NewGuid(),
                 DataSetVersionId = Guid.NewGuid(),
                 InstanceId = Guid.NewGuid()
             };
@@ -49,6 +51,7 @@ public class ProcessorClientTests
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var right = response.AssertRight();
+            Assert.Equal(responseBody.DataSetId, right.DataSetId);
             Assert.Equal(responseBody.DataSetVersionId, right.DataSetVersionId);
             Assert.Equal(responseBody.InstanceId, right.InstanceId);
         }

@@ -41,8 +41,3 @@ public record DataSetSummaryViewModel
 
     public required DataSetLiveVersionSummaryViewModel? LatestLiveVersion { get; init; }
 }
-
-public record DataSetVersionCreateViewModel
-{
-    public required Guid DataSetVersionId { get; init; }
-}

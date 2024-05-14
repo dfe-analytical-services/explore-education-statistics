@@ -1,3 +1,4 @@
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Settings;
 
 internal class PublicDataProcessorOptions

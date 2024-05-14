@@ -21,7 +21,7 @@ public interface IDataSetService
         Guid dataSetId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetVersionCreateViewModel>> CreateDataSetVersion(
+    Task<Either<ActionResult, DataSetViewModel>> CreateInitialDataSetVersion(
         Guid releaseFileId,
         CancellationToken cancellationToken = default);
 }

@@ -20,7 +20,7 @@ public class DataSetService(
     PublicDataDbContext publicDataDbContext
 ) : IDataSetService
 {
-    public async Task<Either<ActionResult, Guid>> CreateDataSetVersion(
+    public async Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateDataSetVersion(
         InitialDataSetVersionCreateRequest request,
         Guid instanceId,
         CancellationToken cancellationToken = default)
@@ -34,7 +34,7 @@ public class DataSetService(
                     await CreateDataSetVersionImport(dataSetVersion, instanceId, cancellationToken))
                 .OnSuccessDo(async dataSetVersion =>
                     await UpdateFilePublicDataSetVersionId(releaseFile, dataSetVersion, cancellationToken))
-                .OnSuccess(dataSetVersion => dataSetVersion.Id));
+                .OnSuccess(dataSetVersion => (dataSetId: dataSetVersion.DataSetId, dataSetVersionId: dataSetVersion.Id)));
     }
 
     private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(

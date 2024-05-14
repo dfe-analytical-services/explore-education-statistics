@@ -35,17 +35,19 @@ public class CreateInitialDataSetVersionFunction(
                 instanceId,
                 cancellationToken: cancellationToken
             ))
-            .OnSuccess(async dataSetVersionId =>
+            .OnSuccess(async dataSetIdDataSetVersionIdPair =>
             {
                 await ProcessInitialDataSetVersion(
                     client,
-                    dataSetVersionId: dataSetVersionId,
+                    dataSetVersionId: dataSetIdDataSetVersionIdPair.dataSetVersionId,
                     instanceId: instanceId,
                     cancellationToken);
 
                 return new CreateInitialDataSetVersionResponseViewModel
                 {
-                    DataSetVersionId = dataSetVersionId, InstanceId = instanceId
+                    DataSetId = dataSetIdDataSetVersionIdPair.dataSetId,
+                    DataSetVersionId = dataSetIdDataSetVersionIdPair.dataSetVersionId, 
+                    InstanceId = instanceId
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));

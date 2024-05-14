@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ public class DataSetVersionService(
             .ToListAsync();
     }
 
-    public async Task<bool> HasExistingVersion(
+    public async Task<bool> FileHasVersion(
         Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {

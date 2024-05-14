@@ -43,12 +43,10 @@ internal class ProcessorClient(ILogger<ProcessorClient> logger, HttpClient httpC
                     return new NotFoundResult();
                 default:
                     var message = await response.Content.ReadAsStringAsync(cancellationToken);
-                    logger.LogError(
-                        StringExtensions.TrimIndent(
-                        $"""
+                    logger.LogError($"""
                          Failed to create data set version with status code: {response.StatusCode}. Message:
                          {message}
-                         """));
+                         """);
                     response.EnsureSuccessStatusCode();
                     break;
             }
