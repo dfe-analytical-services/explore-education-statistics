@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
@@ -98,6 +99,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var topic = Assert.Single(theme.Topics);
 
             Assert.Single(topic.Publications);
+        }
+
+        [Fact]
+        public async Task GetSitemapSummaries()
+        {
+            var publicationService = new Mock<IPublicationService>(Strict);
+
+            publicationService.Setup(mock => mock.GetSitemapSummaries())
+                .ReturnsAsync(new List<PublicationSitemapSummaryViewModel>()
+                {
+                    new()
+                    {
+                        Slug = "test-publication",
+                        LastModified = new DateTime(2024, 01, 03, 10, 14, 23),
+                        Releases = new List<ReleaseSitemapSummaryViewModel>()
+                        {
+                            new()
+                            {
+                                Slug = "test-release",
+                                LastModified = new DateTime(2024, 02, 05, 09, 36, 45)
+                            }
+                        }
+                    }
+                });
+
+            var controller = BuildPublicationController(publicationService: publicationService.Object);
+
+            var result = await controller.GetSitemapSummaries();
+            var sitemapSummaries = result.Value;
+
+            Assert.Equal("test-publication", sitemapSummaries?.Single().Slug);
+            Assert.Equal("test-release", sitemapSummaries?.Single().Releases.Single().Slug);
+
+            VerifyAllMocks(publicationService);
         }
 
         private static PublicationController BuildPublicationController(

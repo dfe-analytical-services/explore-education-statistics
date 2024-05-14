@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public class DataSetSitemapSummaryViewModel
+public record DataSetSitemapSummaryViewModel
 {
     public string Id { get; set; } = string.Empty;
 

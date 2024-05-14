@@ -637,7 +637,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .Concat(publication2Release2Version3Files)
                     .Concat(publication2Release3Version1Files)
                     .ToList();
-                
+
                 await TestApp.AddTestData<ContentDbContext>(context =>
                 {
                     context.ReleaseFiles.AddRange(publication1ReleaseFiles);
@@ -926,7 +926,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 {
                     context.ReleaseFiles.AddRange(release1Version1Files);
                 });
-                
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -973,7 +973,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 {
                     context.ReleaseFiles.AddRange(release1Version1Files);
                 });
-                
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1509,7 +1509,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     SearchTerm: null,
                     Sort: DataSetsListRequestSortBy.Relevance
                 );
-                var response = await ListDataSetFiles( query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1607,14 +1607,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     dataSetFileMetaViewModel.GeographicLevels);
 
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
-                    {
-                        From = TimePeriodLabelFormatter.Format(
+                {
+                    From = TimePeriodLabelFormatter.Format(
                             originalMeta.TimePeriodRange.Start.Period,
                             originalMeta.TimePeriodRange.Start.TimeIdentifier),
-                        To = TimePeriodLabelFormatter.Format(
+                    To = TimePeriodLabelFormatter.Format(
                             originalMeta.TimePeriodRange.End.Period,
                             originalMeta.TimePeriodRange.End.TimeIdentifier),
-                    },
+                },
                     dataSetFileMetaViewModel.TimePeriodRange);
 
                 Assert.Equal(originalMeta.Filters
@@ -1874,14 +1874,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 viewModel.File.Meta.GeographicLevels);
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
-                {
-                    From = TimePeriodLabelFormatter.Format(
+            {
+                From = TimePeriodLabelFormatter.Format(
                         "2000",
                         TimeIdentifier.CalendarYear),
-                    To = TimePeriodLabelFormatter.Format(
+                To = TimePeriodLabelFormatter.Format(
                         "2001",
                         TimeIdentifier.CalendarYear),
-                },
+            },
                 viewModel.File.Meta.TimePeriodRange);
 
             Assert.Equal(dataSetFileMeta.Filters
@@ -2056,7 +2056,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             new IndicatorMeta { Id = indicator1Id, Label = "Indicator 1", ColumnName = "indicator_1", },
                             new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
-            
+
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
                 context.ReleaseFiles.Add(releaseFile);

@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public class PublicationSitemapSummaryViewModel
+public record PublicationSitemapSummaryViewModel
 {
     public string Slug { get; set; } = string.Empty;
 
