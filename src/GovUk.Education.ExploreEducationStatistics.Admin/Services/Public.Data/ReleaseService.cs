@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-public class ReleaseService(
+internal class ReleaseService(
     ContentDbContext contentDbContext,
     IUserService userService)
     : IReleaseService
