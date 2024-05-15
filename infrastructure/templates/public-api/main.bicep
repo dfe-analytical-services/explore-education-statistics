@@ -342,7 +342,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
-    additionalAzureFileStorages: [{
+    azureFileShares: [{
       storageName: parquetFileShareModule.outputs.fileShareName
       storageAccountKey: publicApiStorageAccountKey
       storageAccountName: publicApiStorageAccountName

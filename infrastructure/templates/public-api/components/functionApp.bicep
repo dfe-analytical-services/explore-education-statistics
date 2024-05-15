@@ -55,7 +55,7 @@ param preWarmedInstanceCount int?
 param alwaysOn bool?
 
 @description('Specifies additional Azure Storage Accounts to make available to this Function App')
-param additionalAzureFileStorages {
+param azureFileShares {
   storageName: string
   storageAccountKey: string
   storageAccountName: string
@@ -185,15 +185,6 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       preWarmedInstanceCount: preWarmedInstanceCount ?? null
       netFrameworkVersion: '8.0'
       linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
-      azureStorageAccounts: reduce(additionalAzureFileStorages, {}, (cur, next) => union(cur, {
-        '${next.storageName}': {
-          type: 'AzureFiles'
-          shareName: next.fileShareName
-          mountPath: next.mountPath
-          accountName: next.storageAccountName
-          accessKey: next.storageAccountKey
-        }
-      }))
     }
   }
   tags: tagValues
@@ -267,6 +258,17 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       FUNCTIONS_EXTENSION_VERSION: '~4'
       FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
       APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
+      siteConfig: {
+        azureStorageAccounts: reduce(azureFileShares, {}, (cur, next) => union(cur, {
+          '${next.storageName}': {
+            type: 'AzureFiles'
+            shareName: next.fileShareName
+            mountPath: next.mountPath
+            accountName: next.storageAccountName
+            accessKey: next.storageAccountKey
+          }
+        }))
+      }
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
