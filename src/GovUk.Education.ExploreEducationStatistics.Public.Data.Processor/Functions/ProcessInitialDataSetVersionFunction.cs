@@ -60,12 +60,12 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
 
     [Function(nameof(CompleteProcessing))]
     public async Task CompleteProcessing(
-        [ActivityTrigger] ProcessInitialDataSetVersionContext input,
+        [ActivityTrigger] Guid dataSetVersionId,
         Guid instanceId,
         CancellationToken cancellationToken)
     {
         var dataSetVersion = await GetDataSetVersion(
-            dataSetVersionId: input.DataSetVersionId,
+            dataSetVersionId: dataSetVersionId,
             instanceId: instanceId,
             cancellationToken);
 
@@ -83,12 +83,12 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
 
     [Function(nameof(HandleProcessingFailure))]
     public async Task HandleProcessingFailure(
-        [ActivityTrigger] ProcessInitialDataSetVersionContext input,
+        [ActivityTrigger] Guid dataSetVersionId,
         Guid instanceId,
         CancellationToken cancellationToken)
     {
         var dataSetVersion = await GetDataSetVersion(
-            dataSetVersionId: input.DataSetVersionId,
+            dataSetVersionId: dataSetVersionId,
             instanceId: instanceId,
             cancellationToken);
 

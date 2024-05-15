@@ -154,10 +154,7 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.HandleProcessingFailure(
-                new ProcessInitialDataSetVersionContext
-                {
-                    DataSetVersionId = dataSetVersion.Id
-                },
+                dataSetVersion.Id,
                 instanceId,
                 CancellationToken.None
             );
@@ -207,10 +204,8 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
             });
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.CompleteProcessing(new ProcessInitialDataSetVersionContext
-                {
-                    DataSetVersionId = dataSetVersion.Id
-                },
+            await function.CompleteProcessing(
+                dataSetVersion.Id,
                 instanceId,
                 CancellationToken.None);
 
