@@ -221,6 +221,17 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseResponseCaching();
         app.UseResponseCompression();
 
+        // CORS
+
+        app.UseCors(options => options
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "https://localhost:3000",
+                "https://localhost:3001")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
         // Routing / endpoints
 
         app.UseRouting();
@@ -228,6 +239,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             builder.MapControllers();
         });
+
         app.UseHealthChecks("/api/health");
     }
 
