@@ -1,29 +1,45 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .group {
+  --horizontalSpacing: #{govuk-spacing(2)};
+  --verticalSpacing: #{govuk-spacing(2)};
+
   align-items: center;
   display: flex;
   flex-direction: column;
   margin-bottom: govuk-spacing(6);
 
-  > a,
-  > button {
-    margin-bottom: govuk-spacing(4);
-    margin-left: 0;
+  > * {
+    margin-bottom: 0;
   }
 
-  // stylelint-disable-next-line order/order
+  > * + * {
+    margin-left: 0;
+    margin-top: var(--verticalSpacing);
+  }
+
   @include govuk-media-query($from: tablet) {
     flex-direction: row;
 
-    > a,
-    > button {
-      margin-bottom: 0;
-      margin-left: govuk-spacing(2);
+    > * + * {
+      margin-left: var(--horizontalSpacing);
+      margin-top: 0;
     }
   }
+}
 
-  > :first-child {
-    margin-left: 0;
-  }
+.horizontalSpacing--m {
+  --horizontalSpacing: #{govuk-spacing(4)};
+}
+
+.verticalSpacing--m {
+  --verticalSpacing: #{govuk-spacing(4)};
+}
+
+.horizontalSpacing--l {
+  --horizontalSpacing: #{govuk-spacing(6)};
+}
+
+.verticalSpacing--l {
+  --verticalSpacing: #{govuk-spacing(6)};
 }
