@@ -79,6 +79,7 @@ var adminAppServiceFullName = '${subscription}-as-ees-admin'
 var publisherFunctionAppFullName = '${subscription}-fa-ees-publisher'
 var dataProcessorFunctionAppName = 'processor'
 var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
+var dataProcessorFunctionAppManagedIdentityName = '${resourcePrefix}-id-fa-${dataProcessorFunctionAppName}'
 var psqlServerName = 'psql-flexibleserver'
 var psqlServerFullName = '${subscription}-ees-${psqlServerName}'
 var coreStorageAccountName = '${subscription}saeescore'
@@ -320,6 +321,11 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   dependsOn: [
     postgreSqlServerModule
   ]
+}
+
+resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: dataProcessorFunctionAppManagedIdentityName
+  location: location
 }
 
 // Deploy Data Processor Function.

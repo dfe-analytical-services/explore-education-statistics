@@ -22,6 +22,15 @@ param existingStagingAppSettings object
 @description('Specifies any existing appsettings from the production slot')
 param existingProductionAppSettings object
 
+@description('Specifies additional Azure Storage Accounts to make available to the staging slot')
+param azureFileShares {
+  storageName: string
+  storageAccountKey: string
+  storageAccountName: string
+  fileShareName: string
+  mountPath: string
+}[] = []
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -62,6 +71,20 @@ resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-01-01' = 
   name: 'appsettings'
   parent: stagingSlot
   properties: combinedStagingSettings
+}
+
+resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2021-01-15' = {
+   name: 'azurestorageaccounts'
+   parent: stagingSlot
+   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
+     '${next.storageName}': {
+       type: 'AzureFiles'
+       shareName: next.fileShareName
+       mountPath: next.mountPath
+       accountName: next.storageAccountName
+       accessKey: next.storageAccountKey
+     }
+   }))
 }
 
 @description('Set appsettings on production slot')

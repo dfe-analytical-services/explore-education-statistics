@@ -190,6 +190,20 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   tags: tagValues
 }
 
+resource azureStorageAccounts 'Microsoft.Web/sites/config@2021-01-15' = {
+   name: 'azurestorageaccounts'
+   parent: functionApp
+   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
+     '${next.storageName}': {
+       type: 'AzureFiles'
+       shareName: next.fileShareName
+       mountPath: next.mountPath
+       accountName: next.storageAccountName
+       accessKey: next.storageAccountKey
+     }
+   }))
+}
+
 resource slot1StorageAccountFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
   name: '${durableManagementStorageAccountName}/default/${fullFunctionAppName}1'
   dependsOn: [
@@ -258,17 +272,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       FUNCTIONS_EXTENSION_VERSION: '~4'
       FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
       APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
-      siteConfig: {
-        azureStorageAccounts: reduce(azureFileShares, {}, (cur, next) => union(cur, {
-          '${next.storageName}': {
-            type: 'AzureFiles'
-            shareName: next.fileShareName
-            mountPath: next.mountPath
-            accountName: next.storageAccountName
-            accessKey: next.storageAccountKey
-          }
-        }))
-      }
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
@@ -280,6 +283,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       DurableManagementStorage: slot2StorageAccountString
       WEBSITE_CONTENTSHARE: '${fullFunctionAppName}2'
     }
+    azureFileShares: azureFileShares
     tagValues: tagValues
   }
 }
