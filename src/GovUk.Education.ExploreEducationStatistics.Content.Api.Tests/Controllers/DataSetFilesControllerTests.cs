@@ -49,12 +49,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
         {
         }
 
-        public class FilterTests : ListDataSetFilesTests
+        public class FilterTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public FilterTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task FilterByReleaseId_Success()
             {
@@ -698,8 +694,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFiles(_fixture.DefaultFile()
-                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
-                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(0, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 1, minor: 0))
+                        .ForIndex(1, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 2, minor: 0))
                         .GenerateList(5))
                     .GenerateList();
 
@@ -722,7 +722,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = releaseVersionFiles
-                    .Where(rf => rf.File.PublicDataSetVersionId.HasValue)
+                    .Where(rf => rf.File.PublicApiDataSetId.HasValue)
                     .OrderBy(rf => rf.Name)
                     .ToList();
 
@@ -746,8 +746,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFiles(_fixture.DefaultFile()
-                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
-                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(0, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 1, minor: 1))
+                        .ForIndex(1, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 2, minor: 0))
                         .GenerateList(5))
                     .GenerateList();
 
@@ -817,12 +821,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SortByTests : ListDataSetFilesTests
+        public class SortByTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public SortByTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Theory]
             [InlineData(SortDirection.Asc)]
             [InlineData(null)]
@@ -1238,12 +1238,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SupersededPublicationTests : ListDataSetFilesTests
+        public class SupersededPublicationTests(TestApplicationFactory<TestStartup> testApp)
+            : ListDataSetFilesTests(testApp)
         {
-            public SupersededPublicationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task PublicationIsSuperseded_DataSetsOfSupersededPublicationsAreExcluded()
             {
@@ -1386,12 +1383,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class ValidationTests : ListDataSetFilesTests
+        public class ValidationTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public ValidationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Theory]
             [InlineData(0)]
             [InlineData(-1)]
@@ -1588,12 +1581,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class MiscellaneousTests : ListDataSetFilesTests
+        public class MiscellaneousTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public MiscellaneousTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task DataSetFileMetaCorrectlyReturned_Success()
             {
@@ -1765,6 +1754,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersion = releaseFile.ReleaseVersion;
                 var publication = releaseVersion.Publication;
                 var theme = publication.Topic.Theme;
+                var publicApiDataSetVersion = releaseFile.File.PublicApiDataSetVersion;
 
                 Assert.Multiple(
                     () => Assert.Equal(releaseFile.FileId, viewModel.FileId),
@@ -1782,8 +1772,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
                         viewModel.LatestData),
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
-                    () => Assert.Equal(releaseFile.File.PublicDataSetVersionId.HasValue,
-                        viewModel.HasApiDataSet)
+                    () => Assert.Equal(releaseFile.File.PublicApiDataSetId, viewModel.Api?.Id),
+                    () => Assert.Equal(
+                        publicApiDataSetVersion is not null
+                            ? $"{publicApiDataSetVersion.Major}.{publicApiDataSetVersion.Minor}"
+                            : null,
+                        viewModel.Api?.Version)
                 );
             });
         }
@@ -1816,12 +1810,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    public class GetDataSetFileTests : DataSetFilesControllerTests
+    public class GetDataSetFileTests(TestApplicationFactory<TestStartup> testApp) : DataSetFilesControllerTests(testApp)
     {
-        public GetDataSetFileTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task FetchDataSetDetails_Success()
         {
@@ -1835,7 +1825,10 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile()
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
+                    .WithPublicApiDataSetId(Guid.NewGuid())
+                    .WithPublicApiDataSetVersion(major: 1, minor: 0)
+                );
 
             var client = BuildApp()
                 .AddContentDbTestData(context =>
@@ -1869,6 +1862,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             Assert.Equal(publication.Title, viewModel.Release.Publication.Title);
             Assert.Equal(publication.Slug, viewModel.Release.Publication.Slug);
             Assert.Equal(publication.Topic.Theme.Title, viewModel.Release.Publication.ThemeTitle);
+
+            Assert.NotNull(viewModel.Api);
+            Assert.Equal(file.PublicApiDataSetId, viewModel.Api.Id);
+            Assert.Equal(
+                $"{file.PublicApiDataSetVersion!.Major}.{file.PublicApiDataSetVersion.Minor}",
+                viewModel.Api.Version);
 
             var dataSetFileMeta = file.DataSetFileMeta;
 

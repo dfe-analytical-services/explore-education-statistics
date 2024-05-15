@@ -18,7 +18,7 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public class DataSetCandidatesControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetCandidatesControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-set-candidates";
 
@@ -161,7 +161,7 @@ public class DataSetCandidatesControllerTests(TestApplicationFactory testApp) : 
 
             File file = DataFixture
                 .DefaultFile()
-                .WithPublicDataSetVersionId(Guid.NewGuid());
+                .WithPublicApiDataSetId(Guid.NewGuid());
 
             var releaseVersion = release.Versions.Single();
 

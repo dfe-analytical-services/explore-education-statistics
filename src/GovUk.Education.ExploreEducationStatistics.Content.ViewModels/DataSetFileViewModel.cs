@@ -6,53 +6,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record DataSetFileViewModel
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public string Title { get; init; } = string.Empty;
+    public required string Title { get; init; }
 
-    public string Summary { get; init; } = string.Empty;
+    public required string Summary { get; init; }
 
-    public DataSetFileFileViewModel File { get; init; } = null!;
+    public required DataSetFileFileViewModel File { get; init; }
 
-    public DataSetFileReleaseViewModel Release { get; init; } = null!;
+    public required DataSetFileReleaseViewModel Release { get; init; }
 
-    public DataSetFileMetaViewModel Meta { get; init; } = null!;
+    public required DataSetFileMetaViewModel Meta { get; init; }
+
+    public DataSetFileApiViewModel? Api { get; set; }
 }
 
 public record DataSetFilePublicationViewModel
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public string Title { get; init; } = string.Empty;
+    public required string Title { get; init; }
 
-    public string Slug { get; init; } = string.Empty;
+    public required string Slug { get; init; }
 
-    public string ThemeTitle { get; init; } = string.Empty;
+    public required string ThemeTitle { get; init; }
 }
 
 public record DataSetFileReleaseViewModel
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public string Title { get; init; } = string.Empty;
+    public required string Title { get; init; }
 
-    public string Slug { get; init; } = string.Empty;
+    public required string Slug { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public ReleaseType Type { get; init; }
+    public required ReleaseType Type { get; init; }
 
-    public bool IsLatestPublishedRelease { get; init; }
+    public required bool IsLatestPublishedRelease { get; init; }
 
-    public DateTime Published { get; init; }
+    public required DateTime Published { get; init; }
 
-    public DataSetFilePublicationViewModel Publication { get; init; } = null!;
+    public required DataSetFilePublicationViewModel Publication { get; init; }
 }
 
 public record DataSetFileFileViewModel
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public string Name { get; init; } = string.Empty;
+    public required string Name { get; init; }
 
-    public string Size { get; init; } = string.Empty;
+    public required string Size { get; init; }
 }
