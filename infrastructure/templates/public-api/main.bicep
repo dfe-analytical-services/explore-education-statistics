@@ -110,6 +110,10 @@ var coreStorageAccountKey = coreStorageAccount.listKeys().keys[0].value
 var endpointSuffix = environment().suffixes.storage
 var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${coreStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${coreStorageAccountKey}'
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+
 // Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
 module vNetModule 'application/virtualNetwork.bicep' = {
   name: 'networkDeploy'
@@ -122,35 +126,20 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   }
 }
 
-resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: publicApiStorageAccountName
-  location: location
-  sku: {
-    name: 'Standard_LRS'
-  }
-  kind: 'Storage'
-  properties: {
-    supportsHttpsTrafficOnly: true
-    defaultToOAuthAuthentication: true
-//     networkAcls: {
-//       bypass: 'AzureServices'
-//       defaultAction: 'Deny'
-//       virtualNetworkRules: [
-//         {
-//           action: 'Allow'
-//           id: vNetModule.outputs.dataProcessorSubnetRef
-//         }
-//         {
-//           action: 'Allow'
-//           id: vNetModule.outputs.containerAppEnvironmentSubnetRef
-//         }
-//       ]
-//     }
+module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
+  name: 'publicApiStorageAccountDeploy'
+  params: {
+    location: location
+    storageAccountName: publicApiStorageAccountName
+    allowedSubnetIds: [
+      vNetModule.outputs.dataProcessorSubnetRef
+      vNetModule.outputs.containerAppEnvironmentSubnetRef
+    ]
+    skuStorageResource: 'Standard_LRS'
+    keyVaultName: keyVaultName
+    tagValues: tagValues
   }
 }
-
-var publicApiStorageAccountKey = publicApiStorageAccount.listKeys().keys[0].value
-var publicApiStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${publicApiStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${publicApiStorageAccountKey}'
 
 // Deploy File Share.
 module parquetFileShareModule 'components/fileShares.bicep' = {
@@ -163,7 +152,7 @@ module parquetFileShareModule 'components/fileShares.bicep' = {
     fileShareAccessTier: 'TransactionOptimized'
   }
   dependsOn: [
-    publicApiStorageAccount
+    publicApiStorageAccountModule
   ]
 }
 
@@ -236,7 +225,7 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
       {
         storageName: parquetFileShareModule.outputs.fileShareName
         storageAccountName: publicApiStorageAccountName
-        storageAccountKey: publicApiStorageAccountKey
+        storageAccountKey: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${publicApiStorageAccountModule.outputs.accessKeySecretName})'
         fileShareName: parquetFileShareModule.outputs.fileShareName
         accessMode: 'ReadWrite'
       }
@@ -351,7 +340,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     preWarmedInstanceCount: 1
     azureFileShares: [{
       storageName: parquetFileShareModule.outputs.fileShareName
-      storageAccountKey: publicApiStorageAccountKey
+      storageAccountKey: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${publicApiStorageAccountModule.outputs.accessKeySecretName})'
       storageAccountName: publicApiStorageAccountName
       fileShareName: parquetFileShareModule.outputs.fileShareName
       mountPath: parquetFileShareMountPath
@@ -411,52 +400,7 @@ module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
   }
 }
 
-var coreStorageAccessKeySecretKey = 'ees-core-storage-access-key'
-
-module storeCoreStorageAccessKey 'components/keyVaultSecret.bicep' = {
-  name: 'storeCoreStorageAccessKey'
-  params: {
-    keyVaultName: keyVaultName
-    isEnabled: true
-    secretName: coreStorageAccessKeySecretKey
-    secretValue: coreStorageAccountKey
-    contentType: 'text/plain'
-  }
-}
-
-var publicApiStorageConnectionStringSecretKey = 'ees-core-storage-connectionstring'
-
-module storePublicApiStorageConnectionString 'components/keyVaultSecret.bicep' = {
-  name: 'storePublicApiStorageConnectionString'
-  params: {
-    keyVaultName: keyVaultName
-    isEnabled: true
-    secretName: publicApiStorageConnectionStringSecretKey
-    secretValue: publicApiStorageConnectionString
-    contentType: 'text/plain'
-  }
-}
-
-var publicApiStorageAccessKeySecretKey = 'ees-publicapi-storage-access-key'
-
-module storePublicApiStorageAccessKey 'components/keyVaultSecret.bicep' = {
-  name: 'storePublicApiStorageAccessKey'
-  params: {
-    keyVaultName: keyVaultName
-    isEnabled: true
-    secretName: publicApiStorageAccessKeySecretKey
-    secretValue: publicApiStorageAccountKey
-    contentType: 'text/plain'
-  }
-}
-
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
-output coreStorageAccountName string = coreStorageAccountName
-output coreStorageAccessKeySecretKey string = coreStorageAccessKeySecretKey
-output publicApiStorageAccountName string = publicApiStorageAccountName
-output publicApiStorageAccessKeySecretKey string = publicApiStorageAccessKeySecretKey
-output parquetFileShareName string = parquetFileShareModule.outputs.fileShareName
-output parquetFileShareMountPath string = parquetFileShareMountPath

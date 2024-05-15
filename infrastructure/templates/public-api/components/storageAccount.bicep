@@ -1,6 +1,3 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
-
 @description('Specifies the location for all resources.')
 param location string
 
@@ -9,7 +6,7 @@ param location string
 param storageAccountName string
 
 @description('Storage Account Network Rules')
-param storageSubnetRules array = []
+param allowedSubnetIds string[] = []
 
 @description('Storage Account Network Firewall Rules')
 param storageFirewallRules array = []
@@ -27,17 +24,18 @@ param storageFirewallRules array = []
 ])
 param skuStorageResource string = 'Standard_LRS'
 
+@description('Storage Account Name')
+param keyVaultName string
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
 // Variables and created data
-var storageName = replace('${resourcePrefix}sa${storageAccountName}', '-', '')
-var connectionStringSecretName = '${resourcePrefix}-sa-${storageAccountName}-connectionString'
 var endpointSuffix = environment().suffixes.storage
 
 //Resources 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: storageName
+  name: storageAccountName
   location: location
   kind: 'StorageV2'
   sku: {
@@ -53,7 +51,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
         value: ipRule
         action: 'Allow'
       }]
-      virtualNetworkRules: [for ipRule in storageSubnetRules: {
+      virtualNetworkRules: [for ipRule in allowedSubnetIds: {
         id: ipRule
         action: 'Allow'
       }]
@@ -65,7 +63,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 var key = storageAccount.listKeys().keys[0].value
 var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
 
-//store connections string
+var connectionStringSecretName = '${storageAccountName}-connectionString'
+
 module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   name: 'saConnectionStringSecretDeploy'
   params: {
@@ -77,6 +76,20 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   }
 }
 
+var accessKeySecretName = '${storageAccountName}-connectionString'
+
+module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
+  name: 'saAccessKeySecretDeploy'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretValue: key
+    contentType: 'text/plain'
+    secretName: accessKeySecretName
+  }
+}
+
 //Outputs
 output storageAccountName string = storageAccount.name
 output connectionStringSecretName string = connectionStringSecretName
+output accessKeySecretName string = accessKeySecretName

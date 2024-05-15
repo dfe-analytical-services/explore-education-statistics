@@ -302,14 +302,16 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
 }
 
 // Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
+// Where the staging slot's managed identity differs from the main slot's managed identity, add its id to the list.
+var additionalStagingPrincipalId = userAssignedManagedIdentityId == null
+  ? [functionAppSlotSettings.outputs.stagingSlotPrincipalId]
+  : []
+
 module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
   name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
   params: {
     keyVaultName: keyVaultName
-    principalIds: [
-      functionApp.identity.principalId
-      functionAppSlotSettings.outputs.stagingSlotPrincipalId
-    ]
+    principalIds: union([functionApp.identity.principalId], additionalStagingPrincipalId)
   }
 }
 
