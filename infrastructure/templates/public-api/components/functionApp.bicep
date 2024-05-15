@@ -55,13 +55,13 @@ param preWarmedInstanceCount int?
 param alwaysOn bool?
 
 @description('Specifies additional Azure Storage Accounts to make available to this Function App')
-param additionalAzureFileStorage {
+param additionalAzureFileStorages {
   storageName: string
   storageAccountKey: string
   storageAccountName: string
   fileShareName: string
   mountPath: string
-}?
+}[] = []
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux'
@@ -185,23 +185,18 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       preWarmedInstanceCount: preWarmedInstanceCount ?? null
       netFrameworkVersion: '8.0'
       linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+      azureStorageAccounts: reduce(additionalAzureFileStorages, {}, (cur, next) => union(cur, {
+        '${next.storageName}': {
+          type: 'AzureFiles'
+          shareName: next.fileShareName
+          mountPath: next.mountPath
+          accountName: next.storageAccountName
+          accessKey: next.storageAccountKey
+        }
+      }))
     }
   }
   tags: tagValues
-}
-
-resource azureStorageAccount 'Microsoft.Web/sites/config@2021-01-15' = if (additionalAzureFileStorage != null) {
-   name: 'azurestorageaccounts'
-   parent: functionApp
-   properties: {
-     '${additionalAzureFileStorage!.storageName}': {
-       type: 'AzureFiles'
-       shareName: additionalAzureFileStorage!.fileShareName
-       mountPath: additionalAzureFileStorage!.mountPath
-       accountName: additionalAzureFileStorage!.storageAccountName
-       accessKey: additionalAzureFileStorage!.storageAccountKey
-     }
-   }
 }
 
 resource slot1StorageAccountFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
