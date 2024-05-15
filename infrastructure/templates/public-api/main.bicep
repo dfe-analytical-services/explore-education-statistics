@@ -253,7 +253,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     containerAppName: apiContainerAppName 
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
-    managedIdentityName: apiContainerAppManagedIdentity.name
+    userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     volumeMounts: [
       {
@@ -339,6 +339,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
+    userAssignedManagedIdentityId: dataProcessorFunctionAppManagedIdentity.id
     functionAppExists: dataProcessorFunctionAppExists
     keyVaultName: keyVaultName
     functionAppRuntime: 'dotnet-isolated'

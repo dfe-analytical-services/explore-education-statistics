@@ -4,6 +4,9 @@ param appName string
 @description('Specifies the location of the resources')
 param location string
 
+@description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
+param stagingSlotUserAssignedManagedIdentityId string?
+
 @description('Specifies the names of slot settings (settings that stick to their slots rather than swap)')
 param slotSpecificSettingKeys string[]
 
@@ -34,13 +37,22 @@ param azureFileShares {
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
+var identity = stagingSlotUserAssignedManagedIdentityId != null
+  ? {
+      type: 'UserAssigned'
+      userAssignedIdentities: {
+        '${stagingSlotUserAssignedManagedIdentityId}': {}
+      }
+    }
+  : {
+      type: 'SystemAssigned'
+    }
+
 @description('Create a staging slot')
 resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = {
   name: '${appName}/staging'
   location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
+  identity: identity
   properties: {
     enabled: true
     httpsOnly: true

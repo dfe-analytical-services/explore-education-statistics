@@ -61,7 +61,7 @@ param appSettings {
 param tagValues object
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Container App')
-param managedIdentityName string
+param userAssignedManagedIdentityId string
 
 @description('Id of the owning Container App Environment')
 param managedEnvironmentId string
@@ -88,17 +88,13 @@ param volumeMounts {
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 
-resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: managedIdentityName
-}
-
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: containerApplicationName
   location: location
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${containerAppIdentity.id}': {}
+      '${userAssignedManagedIdentityId}': {}
     }
   }
   properties: {
@@ -120,7 +116,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       registries: [
         {
           server: acrLoginServer
-          identity: containerAppIdentity.id
+          identity: userAssignedManagedIdentityId
         }
       ]
     }

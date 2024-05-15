@@ -39,6 +39,9 @@ param applicationInsightsKey string
 @description('Specifies the subnet id')
 param subnetId string
 
+@description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
+param userAssignedManagedIdentityId string?
+
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
@@ -66,6 +69,17 @@ param azureFileShares {
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux'
 var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
+
+var identity = userAssignedManagedIdentityId != null
+  ? {
+      type: 'UserAssigned'
+      userAssignedIdentities: {
+        '${userAssignedManagedIdentityId}': {}
+      }
+    }
+  : {
+      type: 'SystemAssigned'
+    }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: appServicePlanName
@@ -168,9 +182,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: fullFunctionAppName
   location: location
   kind: 'functionapp'
-  identity: {
-    type: 'SystemAssigned'
-  }
+  identity: identity
   properties: {
     httpsOnly: true
     serverFarmId: appServicePlan.id
@@ -235,6 +247,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   params: {
     appName: functionApp.name
     location: location
+    stagingSlotUserAssignedManagedIdentityId: userAssignedManagedIdentityId
     existingStagingAppSettings: existingStagingAppSettings
     existingProductionAppSettings: existingProductionAppSettings
     slotSpecificSettingKeys: [
