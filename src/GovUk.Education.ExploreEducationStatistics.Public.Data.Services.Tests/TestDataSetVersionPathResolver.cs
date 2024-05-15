@@ -3,11 +3,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 
 public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
 {
-    public string BasePath { get; set; } = Path.Combine(
+    private string BasePath { get; set; } = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "ParquetFiles"
