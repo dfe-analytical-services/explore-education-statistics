@@ -105,4 +105,4 @@ resource appProductionSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   properties: combinedProductionSettings
 }
 
-output stagingSlotPrincipalId string = stagingSlot.identity.principalId
+output stagingSlotPrincipalId string = stagingSlotUserAssignedManagedIdentityId ?? stagingSlot.identity.principalId
