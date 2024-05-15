@@ -91,7 +91,8 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --slot staging \
                   --settings \
-                    "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))"
+                    "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                    "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)"
 
                 az webapp config connection-string set \
                   --name $(dataProcessorFunctionAppName) \

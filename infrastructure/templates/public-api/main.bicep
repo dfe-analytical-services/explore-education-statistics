@@ -78,7 +78,6 @@ var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerApp
 var adminAppServiceFullName = '${subscription}-as-ees-admin'
 var publisherFunctionAppFullName = '${subscription}-fa-ees-publisher'
 var dataProcessorFunctionAppName = 'processor'
-var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
 var dataProcessorFunctionAppManagedIdentityName = '${resourcePrefix}-id-fa-${dataProcessorFunctionAppName}'
 var psqlServerName = 'psql-flexibleserver'
 var psqlServerFullName = '${subscription}-ees-${psqlServerName}'
@@ -110,10 +109,6 @@ var coreStorageAccountKey = coreStorageAccount.listKeys().keys[0].value
 var endpointSuffix = environment().suffixes.storage
 var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${coreStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${coreStorageAccountKey}'
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: keyVaultName
-}
-
 // Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
 module vNetModule 'application/virtualNetwork.bicep' = {
   name: 'networkDeploy'
@@ -140,6 +135,18 @@ module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
     tagValues: tagValues
   }
 }
+
+// We need to look up the Public API Storage Account in order to get its access keys, as it's not possible to feed
+// Key Vault secret references into the "storageAccountKey" values for Azure File Storage mounts.
+//
+// It would be possible to use KV references if restructuring main.bicep to make the creation of the Container App
+// and Data Processortheir own sub-modules in the "application" folder.  Then, we could use @secure() params
+// and keyVaultResource.getSecret() to pass the secrets through.
+resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: publicApiStorageAccountName
+}
+
+var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
 
 // Deploy File Share.
 module parquetFileShareModule 'components/fileShares.bicep' = {
@@ -225,7 +232,7 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
       {
         storageName: parquetFileShareModule.outputs.fileShareName
         storageAccountName: publicApiStorageAccountName
-        storageAccountKey: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${publicApiStorageAccountModule.outputs.accessKeySecretName})'
+        storageAccountKey: publicApiStorageAccountAccessKey
         fileShareName: parquetFileShareModule.outputs.fileShareName
         accessMode: 'ReadWrite'
       }
@@ -295,7 +302,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         // It uses this to grant permissions to the Data Processor user in order for it to be able to access
         // tables in the "public_data" database successfully.
         name: 'DataProcessorFunctionAppIdentityName'
-        value: dataProcessorFunctionAppFullName
+        value: dataProcessorFunctionAppManagedIdentity.name
       }
       {
         // This property informs the Container App of the name of the Publisher's system-assigned identity.
@@ -328,7 +335,11 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
-    userAssignedManagedIdentityId: dataProcessorFunctionAppManagedIdentity.id
+    userAssignedManagedIdentityParams: {
+      id: dataProcessorFunctionAppManagedIdentity.id
+      name: dataProcessorFunctionAppManagedIdentity.name
+      principalId: dataProcessorFunctionAppManagedIdentity.properties.principalId
+    }
     functionAppExists: dataProcessorFunctionAppExists
     keyVaultName: keyVaultName
     functionAppRuntime: 'dotnet-isolated'
@@ -340,7 +351,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     preWarmedInstanceCount: 1
     azureFileShares: [{
       storageName: parquetFileShareModule.outputs.fileShareName
-      storageAccountKey: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${publicApiStorageAccountModule.outputs.accessKeySecretName})'
+      storageAccountKey: publicApiStorageAccountAccessKey
       storageAccountName: publicApiStorageAccountName
       fileShareName: parquetFileShareModule.outputs.fileShareName
       mountPath: parquetFileShareMountPath
@@ -356,7 +367,7 @@ module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' 
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
+    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppManagedIdentity.name)
     contentType: 'text/plain'
   }
 }
@@ -402,5 +413,7 @@ module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
+output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
+
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName

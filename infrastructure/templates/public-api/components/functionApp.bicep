@@ -40,7 +40,11 @@ param applicationInsightsKey string
 param subnetId string
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
-param userAssignedManagedIdentityId string?
+param userAssignedManagedIdentityParams {
+  id: string
+  name: string
+  principalId: string
+}?
 
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
@@ -70,11 +74,11 @@ var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux'
 var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
 
-var identity = userAssignedManagedIdentityId != null
+var identity = userAssignedManagedIdentityParams != null
   ? {
       type: 'UserAssigned'
       userAssignedIdentities: {
-        '${userAssignedManagedIdentityId}': {}
+        '${userAssignedManagedIdentityParams!.id}': {}
       }
     }
   : {
@@ -197,7 +201,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       preWarmedInstanceCount: preWarmedInstanceCount ?? null
       netFrameworkVersion: '8.0'
       linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+      keyVaultReferenceIdentity: userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
     }
+    keyVaultReferenceIdentity: userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
   }
   tags: tagValues
 }
@@ -247,7 +253,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   params: {
     appName: functionApp.name
     location: location
-    stagingSlotUserAssignedManagedIdentityId: userAssignedManagedIdentityId
+    stagingSlotUserAssignedManagedIdentityId: userAssignedManagedIdentityParams!.id
     existingStagingAppSettings: existingStagingAppSettings
     existingProductionAppSettings: existingProductionAppSettings
     slotSpecificSettingKeys: [
@@ -303,18 +309,16 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
 
 // Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
 // Where the staging slot's managed identity differs from the main slot's managed identity, add its id to the list.
-var additionalStagingPrincipalId = userAssignedManagedIdentityId == null
-  ? [functionAppSlotSettings.outputs.stagingSlotPrincipalId]
-  : []
+var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
+  ? [userAssignedManagedIdentityParams!.principalId]
+  : [functionApp.identity.principalId, functionAppSlotSettings.outputs.stagingSlotPrincipalId]
 
 module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
   name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
   params: {
     keyVaultName: keyVaultName
-    principalIds: union([functionApp.identity.principalId], additionalStagingPrincipalId)
+    principalIds: keyVaultPrincipalIds
   }
 }
 
 output functionAppName string = functionApp.name
-output principalId string = functionApp.identity.principalId
-output tenantId string = functionApp.identity.tenantId

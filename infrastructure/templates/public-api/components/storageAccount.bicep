@@ -1,7 +1,6 @@
 @description('Specifies the location for all resources.')
 param location string
 
-//Specific parameters for the resources
 @description('Storage Account Name')
 param storageAccountName string
 
@@ -30,10 +29,8 @@ param keyVaultName string
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-// Variables and created data
 var endpointSuffix = environment().suffixes.storage
 
-//Resources 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
@@ -63,7 +60,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 var key = storageAccount.listKeys().keys[0].value
 var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
 
-var connectionStringSecretName = '${storageAccountName}-connectionString'
+var connectionStringSecretName = '${storageAccountName}-connection-string'
 
 module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   name: 'saConnectionStringSecretDeploy'
@@ -76,7 +73,7 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   }
 }
 
-var accessKeySecretName = '${storageAccountName}-connectionString'
+var accessKeySecretName = '${storageAccountName}-access-key'
 
 module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
   name: 'saAccessKeySecretDeploy'
@@ -89,7 +86,6 @@ module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
   }
 }
 
-//Outputs
 output storageAccountName string = storageAccount.name
 output connectionStringSecretName string = connectionStringSecretName
 output accessKeySecretName string = accessKeySecretName

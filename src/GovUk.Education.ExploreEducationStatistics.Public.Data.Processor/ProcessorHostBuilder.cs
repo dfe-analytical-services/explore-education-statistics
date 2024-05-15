@@ -73,7 +73,11 @@ public static class ProcessorHostBuilder
                     {
                         services.AddDbContext<PublicDataDbContext>(options =>
                         {
-                            var sqlServerTokenProvider = new DefaultAzureCredential();
+                            var sqlServerTokenProvider = new DefaultAzureCredential(
+                                new DefaultAzureCredentialOptions
+                                {
+                                    ManagedIdentityClientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
+                                });
                             var accessToken = sqlServerTokenProvider.GetToken(
                                 new TokenRequestContext(scopes:
                                 [
@@ -83,6 +87,7 @@ public static class ProcessorHostBuilder
                             var connectionStringWithAccessToken =
                                 connectionString.Replace("[access_token]", accessToken);
 
+                            Console.WriteLine(connectionStringWithAccessToken);
                             var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
 
                             options.UseNpgsql(dbDataSource);
