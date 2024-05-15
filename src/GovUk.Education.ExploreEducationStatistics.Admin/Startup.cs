@@ -279,6 +279,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddRoleStore<RoleStore<IdentityRole, UsersAndRolesDbContext>>()
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>();
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Allow special characters such as apostrophes and @ symbols to be permitted in AspNetUsers'
+                // "Username" column.  This allows us to store email addresses as Usernames when newly invited users
+                // sign in.
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'";
+            });
             // This service helps to add additional information to the ClaimsPrincipal on the HttpContext after
             // Identity Framework has verified that the incoming JWTs are valid (and has created the basic
             // ClaimsPrincipal already from information in the JWT).
