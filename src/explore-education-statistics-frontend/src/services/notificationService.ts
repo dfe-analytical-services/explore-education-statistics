@@ -1,30 +1,29 @@
 import notificationApi from '@frontend/services/clients/notificationApi';
 
-export interface SubscriptionData {
+export interface Subscription {
+  slug: string;
+  title: string;
+  status: 'NotSubscribed' | 'SubscriptionPending' | 'Subscribed';
+}
+
+type SubscribeQuery = {
   email: string;
   slug: string;
   title: string;
-}
-
-type SubscribeQuery = SubscriptionData & {
   id: string;
 };
 
 const notificationService = {
-  subscribeToPublication(query: SubscribeQuery): Promise<SubscriptionData> {
+  requestPendingSubscription(query: SubscribeQuery): Promise<Subscription> {
     return notificationApi.post('/publication/subscribe', query);
   },
-  // Actually confirms the pending subscription
-  confirmPendingSubscription(
-    id: string,
-    token: string,
-  ): Promise<SubscriptionData> {
+  confirmPendingSubscription(id: string, token: string): Promise<Subscription> {
     return notificationApi.get(
-      `publication/${id}/verify-subscription-actual/${token}`,
+      `publication/${id}/verify-subscription/${token}`,
     );
   },
-  confirmUnsubscription(id: string, token: string): Promise<SubscriptionData> {
-    return notificationApi.get(`publication/${id}/unsubscribe-actual/${token}`);
+  confirmUnsubscription(id: string, token: string): Promise<Subscription> {
+    return notificationApi.get(`publication/${id}/unsubscribe/${token}`);
   },
 };
 export default notificationService;

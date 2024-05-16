@@ -1,14 +1,16 @@
+import React, { useState } from 'react';
+import { GetServerSideProps, NextPage } from 'next';
 import Button from '@common/components/Button';
 import publicationService, {
   PublicationTitle,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
-import notificationService from '@frontend/services/notificationService';
-import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import notificationService, {
+  Subscription,
+} from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
-import { redirect } from 'next/navigation';
+import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
 
 interface Props {
   slug: string;
@@ -17,12 +19,17 @@ interface Props {
 }
 
 const ConfirmUnsubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
-  const onConfirmClicked = async () => {
-    await notificationService.confirmUnsubscription(data.id, token);
+  const [subscriptionState, setSubscriptionState] = useState<
+    Subscription | undefined
+  >(undefined);
 
-    // Don't think we actually need this since the awaited request above returns a redirect.
-    // We could actually return a 200 and handle the UI logic here without redirects, but that's a bigger change...
-    redirect(`/subscriptions?slug=${slug}&unsubscribed=true`);
+  const onConfirmClicked = async () => {
+    const response = await notificationService.confirmPendingSubscription(
+      data.id,
+      token,
+    );
+
+    setSubscriptionState(response);
   };
 
   return (
@@ -35,11 +42,22 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
         { name: data.title, link: `/find-statistics/${slug}` },
       ]}
     >
-      <p>
-        Please confirm you wish to unsubscribe to notifications about this
-        publication.
-      </p>
-      <Button onClick={onConfirmClicked}>Confirm</Button>
+      {subscriptionState ? (
+        <SubscriptionStatusMessage
+          title="Unsubscribed"
+          message="You have successfully unsubscribed from these updates."
+          slug={subscriptionState.slug}
+        />
+      ) : (
+        <>
+          {' '}
+          <p>
+            Please confirm you wish to unsubscribe to notifications about this
+            publication.
+          </p>
+          <Button onClick={onConfirmClicked}>Confirm</Button>
+        </>
+      )}
     </Page>
   );
 };

@@ -1,4 +1,1 @@
-export {
-  default,
-  getServerSideProps,
-} from '@frontend/modules/subscriptions/SubscriptionPage';
+export { default } from '@frontend/modules/NotFoundPage';

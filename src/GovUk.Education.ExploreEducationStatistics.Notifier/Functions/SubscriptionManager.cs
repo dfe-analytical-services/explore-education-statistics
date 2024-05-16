@@ -152,10 +152,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 return new BadRequestResult();
             }
         }
+
         [Function("PublicationUnsubscribe")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationUnsubscribeFunc(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe-actual/{token}")]
             HttpRequest req,
             FunctionContext context,
             string id,

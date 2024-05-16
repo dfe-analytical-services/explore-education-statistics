@@ -149,7 +149,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               <Link
                 className="govuk-!-display-none-print govuk-!-font-weight-bold"
                 unvisited
-                to={`/subscriptions?slug=${release.publication.slug}`}
+                to={`/subscriptions/new-subscription/${release.publication.slug}`}
                 data-testid={`subscription-${release.publication.slug}`}
                 onClick={() => {
                   logEvent({
