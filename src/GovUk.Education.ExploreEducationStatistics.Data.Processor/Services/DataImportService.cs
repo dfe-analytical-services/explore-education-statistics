@@ -169,9 +169,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ToList();
 
             var timePeriods = observations
-                .Select(o => new TimePeriodMeta { Year = o.Year, TimeIdentifier = o.TimeIdentifier })
+                .Select(o => new TimePeriodRangeBoundMeta { Year = o.Year, TimeIdentifier = o.TimeIdentifier })
                 .Distinct()
                 .OrderBy(tp => tp.Year)
+                .ThenBy(tp => tp.TimeIdentifier)
                 .ToList();
 
             var filters = await statisticsDbContext.Filter
@@ -203,8 +204,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 GeographicLevels = geographicLevels
                     .Select(gl => gl.GetEnumLabel()).ToList(),
-                TimeIdentifier = timePeriods[0].TimeIdentifier,
-                Years = timePeriods.Select(tp => tp.Year).ToList(),
+                TimePeriodRange = new TimePeriodRangeMeta
+                {
+                    Start = timePeriods.First(),
+                    End = timePeriods.Last(),
+                },
                 Filters = filters,
                 Indicators = indicators,
             };

@@ -210,11 +210,14 @@ public class DataSetFileService : IDataSetFileService
         return new DataSetFileMetaViewModel
         {
             GeographicLevels = meta.GeographicLevels,
-            TimePeriod = new DataSetFileTimePeriodViewModel
+            TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
-                TimeIdentifier = meta.TimeIdentifier.GetEnumLabel(),
-                From = TimePeriodLabelFormatter.Format(meta.Years.First(), meta.TimeIdentifier),
-                To = TimePeriodLabelFormatter.Format(meta.Years.Last(), meta.TimeIdentifier),
+                From = TimePeriodLabelFormatter.Format(
+                    meta.TimePeriodRange.Start.Year,
+                    meta.TimePeriodRange.Start.TimeIdentifier),
+                To = TimePeriodLabelFormatter.Format(
+                    meta.TimePeriodRange.End.Year,
+                    meta.TimePeriodRange.End.TimeIdentifier),
             },
             Filters = GetOrderedFilters(meta.Filters, filterSequence),
             Indicators = GetOrderedIndicators(meta.Indicators, indicatorGroupSequence),

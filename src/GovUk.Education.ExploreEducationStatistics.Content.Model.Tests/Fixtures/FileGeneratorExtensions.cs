@@ -27,8 +27,11 @@ public static class FileGeneratorExtensions
             .SetDataSetFileMeta(new DataSetFileMeta
             {
                 GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
-                TimeIdentifier = TimeIdentifier.CalendarYear,
-                Years = [ 2000, 2001 ],
+                TimePeriodRange = new TimePeriodRangeMeta
+                {
+                    Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Year = 2000, },
+                    End = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Year = 2001, }
+                },
                 Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", }],
                 Indicators = [new() { Id = Guid.NewGuid(), }],
             })

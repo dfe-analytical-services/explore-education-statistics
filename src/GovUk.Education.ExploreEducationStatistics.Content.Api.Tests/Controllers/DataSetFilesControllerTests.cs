@@ -1600,8 +1600,19 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         .WithType(FileType.Data)
                         .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                             .WithGeographicLevels(["National", "Local authority"])
-                            .WithTimeIdentifier(TimeIdentifier.AcademicYear)
-                            .WithYears([2000, 2001, 2002])
+                            .WithTimePeriodRange(new TimePeriodRangeMeta
+                            {
+                                Start = new TimePeriodRangeBoundMeta
+                                {
+                                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                                    Year = 2000,
+                                },
+                                End = new TimePeriodRangeBoundMeta
+                                {
+                                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                                    Year = 2002,
+                                },
+                            })
                             .WithFilters([
                                 new FilterMeta { Label = "Filter 1" },
                                 new FilterMeta { Label = "Filter 2" },
@@ -1641,12 +1652,15 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 dataSetFileMetaViewModel.GeographicLevels
                     .AssertDeepEqualTo(originalMeta!.GeographicLevels);
 
-                dataSetFileMetaViewModel.TimePeriod.AssertDeepEqualTo(
-                    new DataSetFileTimePeriodViewModel
+                dataSetFileMetaViewModel.TimePeriodRange.AssertDeepEqualTo(
+                    new DataSetFileTimePeriodRangeViewModel
                     {
-                        TimeIdentifier = originalMeta.TimeIdentifier.GetEnumLabel(),
-                        From = TimePeriodLabelFormatter.Format(originalMeta.Years.First(), originalMeta.TimeIdentifier),
-                        To = TimePeriodLabelFormatter.Format(originalMeta.Years.Last(), originalMeta.TimeIdentifier),
+                        From = TimePeriodLabelFormatter.Format(
+                            originalMeta.TimePeriodRange.Start.Year,
+                            originalMeta.TimePeriodRange.Start.TimeIdentifier),
+                        To = TimePeriodLabelFormatter.Format(
+                            originalMeta.TimePeriodRange.End.Year,
+                            originalMeta.TimePeriodRange.End.TimeIdentifier),
                     });
 
                 dataSetFileMetaViewModel.Filters
@@ -1876,13 +1890,15 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             viewModel.Meta.GeographicLevels
                 .AssertDeepEqualTo(dataSetFileMeta!.GeographicLevels);
 
-            viewModel.Meta.TimePeriod.AssertDeepEqualTo(
-                new DataSetFileTimePeriodViewModel
+            viewModel.Meta.TimePeriodRange.AssertDeepEqualTo(
+                new DataSetFileTimePeriodRangeViewModel
                 {
-                    TimeIdentifier = dataSetFileMeta.TimeIdentifier.GetEnumLabel(),
                     From = TimePeriodLabelFormatter.Format(
-                        dataSetFileMeta.Years.First(), dataSetFileMeta.TimeIdentifier),
-                    To = TimePeriodLabelFormatter.Format(dataSetFileMeta.Years.Last(), dataSetFileMeta.TimeIdentifier),
+                        dataSetFileMeta.TimePeriodRange.Start.Year,
+                        dataSetFileMeta.TimePeriodRange.Start.TimeIdentifier),
+                    To = TimePeriodLabelFormatter.Format(
+                        dataSetFileMeta.TimePeriodRange.End.Year,
+                        dataSetFileMeta.TimePeriodRange.End.TimeIdentifier),
                 });
 
             viewModel.Meta.Filters

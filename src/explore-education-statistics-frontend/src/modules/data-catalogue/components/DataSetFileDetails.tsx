@@ -21,7 +21,7 @@ interface Props {
 export default function DataSetFileDetails({ dataSetFile }: Props) {
   const {
     release,
-    meta: { timePeriod, filters, geographicLevels, indicators },
+    meta: { timePeriodRange, filters, geographicLevels, indicators },
     title,
   } = dataSetFile;
 
@@ -100,9 +100,9 @@ export default function DataSetFileDetails({ dataSetFile }: Props) {
             </CollapsibleList>
           </SummaryListItem>
         )}
-        {timePeriod && (timePeriod.from || timePeriod.to) && (
+        {timePeriodRange && (timePeriodRange.from || timePeriodRange.to) && (
           <SummaryListItem term="Time period">
-            {getTimePeriodString(timePeriod)}
+            {getTimePeriodString(timePeriodRange)}
           </SummaryListItem>
         )}
       </SummaryList>
