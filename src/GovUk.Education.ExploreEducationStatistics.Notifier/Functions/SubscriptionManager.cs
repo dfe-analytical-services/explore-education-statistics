@@ -210,6 +210,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         
         /// <summary>
         /// Actually removes the subscription, redirects to the SubscriptionPage with a "You have unsubscribed" message.
+        /// Due to https://dfedigital.atlassian.net/browse/EES-5129, should currently be called from the Frontend confirmation page.
+        /// Name currently amended to add `-actual`, so the link given to users in the e-mail can remain the same.
+        /// After EES-5129, this should be reverted so this method is once again called directly by the user.
         /// </summary>
         /// <param name="req"></param>
         /// <param name="context"></param>

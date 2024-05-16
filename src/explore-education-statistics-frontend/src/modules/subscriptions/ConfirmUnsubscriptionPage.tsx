@@ -20,7 +20,8 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
   const onConfirmClicked = async () => {
     await notificationService.confirmUnsubscription(data.id, token);
 
-    // Don't think we actually need this since the awaited request above returns a redirect
+    // Don't think we actually need this since the awaited request above returns a redirect.
+    // We could actually return a 200 and handle the UI logic here without redirects, but that's a bigger change...
     redirect(`/subscriptions?slug=${slug}&unsubscribed=true`);
   };
 
