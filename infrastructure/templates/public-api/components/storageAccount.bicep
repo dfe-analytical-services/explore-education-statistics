@@ -63,7 +63,7 @@ var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName
 var connectionStringSecretName = '${storageAccountName}-connection-string'
 
 module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
-  name: 'saConnectionStringSecretDeploy'
+  name: '${storageAccountName}ConnectionStringSecretDeploy'
   params: {
     keyVaultName: keyVaultName
     isEnabled: true
@@ -76,7 +76,7 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
 var accessKeySecretName = '${storageAccountName}-access-key'
 
 module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
-  name: 'saAccessKeySecretDeploy'
+  name: '${storageAccountName}AccessKeySecretDeploy'
   params: {
     keyVaultName: keyVaultName
     isEnabled: true
