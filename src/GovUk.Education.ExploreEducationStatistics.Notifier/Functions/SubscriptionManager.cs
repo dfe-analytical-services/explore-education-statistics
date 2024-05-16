@@ -44,6 +44,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                                           throw new ArgumentNullException(nameof(notificationClientProvider));
         }
 
+        /// <summary>
+        /// Begins a pending subscription and sends a "Please verify your subscription" email. 
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         [Function("PublicationSubscribe")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationSubscribeFunc(
@@ -163,10 +169,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             }
         }
 
+        /// <summary>
+        /// Temporary wrapper for https://dfedigital.atlassian.net/browse/EES-5129.
+        /// Redirects the user to the ConfirmUnsubscriptionPage to await manual interaction before calling the actual unsubscribe function.
+        /// This will be reverted soon, so to avoid changing the e-mail templates this method uses the same HttpTrigger that the old ACTUAL unsubscribe function used to.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="context"></param>
+        /// <param name="id"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [Function("PublicationUnsubscribeVerification")]
+        // ReSharper disable once UnusedMember.Global
+        public async Task<IActionResult> PublicationUnsubscribeVerificationFunc(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
+            HttpRequest req,
+            FunctionContext context,
+            string id,
+            string token)
+        {
+            var email = _tokenService.GetEmailFromToken(token);
+
+            if (email != null)
+            {
+                var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
+
+                var sub = new SubscriptionEntity(id, email);
+                sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
+
+                if (sub != null)
+                {
+                    return new RedirectResult(
+                        $"{_appSettingOptions.PublicAppUrl}/subscriptions/confirm-subscribe?slug={sub.Slug}?token={token}",
+                        true);
+                }
+            }
+
+            return new BadRequestObjectResult("Unable to unsubscribe");
+        }
+        
+        /// <summary>
+        /// Actually removes the subscription, redirects to the SubscriptionPage with a "You have unsubscribed" message.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="context"></param>
+        /// <param name="id"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         [Function("PublicationUnsubscribe")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationUnsubscribeFunc(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe-actual/{token}")]
             HttpRequest req,
             FunctionContext context,
             string id,
@@ -195,10 +248,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             return new BadRequestObjectResult("Unable to unsubscribe");
         }
 
+        /// <summary>
+        /// Temporary wrapper for https://dfedigital.atlassian.net/browse/EES-5129.
+        /// Redirects the user to the ConfirmSubscriptionPage to await manual interaction before calling the actual verification function.
+        /// This will be reverted soon, so to avoid changing the e-mail templates this method uses the same HttpTrigger that the old ACTUAL verification function used to. 
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="context"></param>
+        /// <param name="id"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [Function("PublicationSubscriptionVerificationConfirmation")]
+        public async Task<IActionResult> PublicationSubscriptionVerificationConfirmationFunc(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription/{token}")]
+            HttpRequest req,
+            FunctionContext context,
+            string id,
+            string token)
+        {
+            var email = _tokenService.GetEmailFromToken(token);
+
+            if (email != null)
+            {
+                var pendingSubscriptionsTbl =
+                    await _storageTableService.GetTable(NotifierPendingSubscriptionsTableName);
+
+                var sub = _storageTableService
+                    .RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
+
+                if (sub != null)
+                {
+                    return new RedirectResult(
+                        $"{_appSettingOptions.PublicAppUrl}/subscriptions/confirm-subscribe?slug={sub.Slug}?token={token}",
+                        true);
+                }
+            }
+
+            return new RedirectResult(
+                $"{_appSettingOptions.PublicAppUrl}/subscriptions/verification-error",
+                true);
+        }
+        
+        
+        /// <summary>
+        /// Confirms a pending subscription and actually subscribes the user.
+        /// Due to https://dfedigital.atlassian.net/browse/EES-5129, should currently be called from the Frontend confirmation page.
+        /// Name currently amended to add `-actual`, so the link given to users in the e-mail can remain the same.
+        /// After EES-5129, this should be reverted so this method is once again called directly by the user.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="context"></param>
+        /// <param name="id"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         [Function("PublicationSubscriptionVerify")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationSubscriptionVerifyFunc(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription/{token}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription-actual/{token}")]
             HttpRequest req,
             FunctionContext context,
             string id,
