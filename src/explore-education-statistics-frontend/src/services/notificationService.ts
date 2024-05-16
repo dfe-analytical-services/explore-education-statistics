@@ -20,14 +20,12 @@ const notificationService = {
     id: string,
     token: string,
   ): Promise<SubscriptionData> {
-    return notificationApi.post(
+    return notificationApi.get(
       `publication/${id}/verify-subscription-actual/${token}`,
     );
   },
   confirmUnsubscription(id: string, token: string): Promise<SubscriptionData> {
-    return notificationApi.post(
-      `publication/${id}/unsubscribe-actual/${token}`,
-    );
+    return notificationApi.get(`publication/${id}/unsubscribe-actual/${token}`);
   },
 };
 export default notificationService;
