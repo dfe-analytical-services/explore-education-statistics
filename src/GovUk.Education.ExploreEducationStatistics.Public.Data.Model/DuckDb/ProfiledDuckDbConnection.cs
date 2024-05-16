@@ -7,7 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 /// <summary>
 /// DuckDB connection profiled using MiniProfiler.
 /// </summary>
-public class ProfiledDuckDbConnection(string connectionString = "DataSource=:memory:", IDbProfiler? profiler = null)
+public class ProfiledDuckDbConnection(
+    string connectionString = DuckDBConnectionStringBuilder.InMemoryConnectionString,
+    IDbProfiler? profiler = null)
     : ProfiledDbConnection(new DuckDbConnection(connectionString), profiler ?? MiniProfiler.Current), IDuckDbConnection
 {
     private DuckDbConnection WrappedDuckDbConnection => (DuckDbConnection)WrappedConnection;

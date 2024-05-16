@@ -2,7 +2,7 @@ using DuckDB.NET.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 
-public class DuckDbConnection(string connectionString = "DataSource=:memory:")
+public class DuckDbConnection(string connectionString = DuckDBConnectionStringBuilder.InMemoryConnectionString)
     : DuckDBConnection(connectionString), IDuckDbConnection
 {
     public override DuckDbCommand CreateCommand()
