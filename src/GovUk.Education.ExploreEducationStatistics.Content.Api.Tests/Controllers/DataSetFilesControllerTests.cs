@@ -1828,6 +1828,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
                     .WithPublicApiDataSetId(Guid.NewGuid())
                     .WithPublicApiDataSetVersion(major: 1, minor: 0)
+                    .WithSubjectId(Guid.NewGuid())
                 );
 
             var client = BuildApp()
@@ -1850,6 +1851,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             Assert.Equal(file.Id, viewModel.File.Id);
             Assert.Equal(file.Filename, viewModel.File.Name);
             Assert.Equal(file.DisplaySize(), viewModel.File.Size);
+            Assert.Equal(file.SubjectId, viewModel.File.SubjectId);
 
             Assert.Equal(releaseFile.ReleaseVersionId, viewModel.Release.Id);
             Assert.Equal(releaseFile.ReleaseVersion.Title, viewModel.Release.Title);
@@ -1916,6 +1918,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     new FilterSequenceEntry(filter3Id, new List<FilterGroupSequenceEntry>()),
                 ])
                 .WithFile(_fixture.DefaultFile()
+                    .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
                             new FilterMeta { Id = filter3Id, Label = "Filter 3", },
@@ -1967,6 +1970,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         new List<Guid> { indicator3Id, indicator4Id })
                 ])
                 .WithFile(_fixture.DefaultFile()
+                    .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithIndicators([
                             new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", },
@@ -2061,6 +2065,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithTheme(_fixture.DefaultTheme()));
 
             File file = _fixture.DefaultFile()
+                .WithSubjectId(Guid.NewGuid())
                 .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta());
 
             ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()

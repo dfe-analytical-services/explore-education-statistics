@@ -111,7 +111,12 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
 
 export const testDataSet: DataSetFile = {
   id: 'datasetfile-id',
-  file: { id: 'file-id', name: 'file name', size: 'file size' },
+  file: {
+    id: 'file-id',
+    name: 'file name',
+    size: 'file size',
+    subjectId: 'subject-id',
+  },
   release: {
     id: 'release-id',
     isLatestPublishedRelease: true,

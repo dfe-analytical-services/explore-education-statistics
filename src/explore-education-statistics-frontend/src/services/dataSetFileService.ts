@@ -7,7 +7,7 @@ export interface DataSetFile {
   id: string;
   title: string;
   summary: string;
-  file: { id: string; name: string; size: string };
+  file: { id: string; name: string; size: string; subjectId: string };
   release: {
     id: string;
     isLatestPublishedRelease: boolean;
