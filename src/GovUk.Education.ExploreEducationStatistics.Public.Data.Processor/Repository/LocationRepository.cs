@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -11,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Table
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using InterpolatedSql.Dapper;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
@@ -28,15 +28,13 @@ public class LocationRepository(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        var geographicLevels = (await duckDbConnection.QueryAsync<string>(
-                new CommandDefinition(
-                    $"""
-                     SELECT DISTINCT geographic_level
-                     FROM read_csv_auto('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion)}', ALL_VARCHAR = true)
-                     """,
-                    cancellationToken
-                )
-            ))
+        var geographicLevels =
+            (await duckDbConnection.SqlBuilder(
+                $"""
+                 SELECT DISTINCT geographic_level
+                 FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                 """
+            ).QueryAsync<string>(cancellationToken: cancellationToken))
             .Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider)
             .ToList();
 
@@ -77,18 +75,16 @@ public class LocationRepository(
             var codeCols = meta.Level.CsvCodeColumns();
             string[] cols = [..codeCols, nameCol];
 
-            var options = (await duckDbConnection.QueryAsync(
-                    new CommandDefinition(
+            var options = (await duckDbConnection.SqlBuilder(
                         $"""
-                         SELECT {cols.JoinToString(", ")}
-                         FROM read_csv_auto('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion)}', ALL_VARCHAR = true)
-                         WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND ")}
-                         GROUP BY {cols.JoinToString(", ")}
-                         ORDER BY {cols.JoinToString(", ")}
-                         """,
-                        cancellationToken
-                    )
-                ))
+                         SELECT {cols.JoinToString(", "):raw}
+                         FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                         WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
+                         GROUP BY {cols.JoinToString(", "):raw}
+                         ORDER BY {cols.JoinToString(", "):raw}
+                         """
+                    ).QueryAsync(cancellationToken: cancellationToken)
+                )
                 .Cast<IDictionary<string, object?>>()
                 .Select(row => row.ToDictionary(
                     kv => kv.Key,
@@ -198,21 +194,21 @@ public class LocationRepository(
             .Include(m => m.Options)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.ExecuteAsync(
+        await duckDbConnection.SqlBuilder(
             $"""
-             CREATE TABLE {LocationOptionsTable.TableName}(
-                 {LocationOptionsTable.Cols.Id} INTEGER PRIMARY KEY,
-                 {LocationOptionsTable.Cols.Label} VARCHAR,
-                 {LocationOptionsTable.Cols.Level} VARCHAR,
-                 {LocationOptionsTable.Cols.PublicId} VARCHAR,
-                 {LocationOptionsTable.Cols.Code} VARCHAR,
-                 {LocationOptionsTable.Cols.OldCode} VARCHAR,
-                 {LocationOptionsTable.Cols.Urn} VARCHAR,
-                 {LocationOptionsTable.Cols.LaEstab} VARCHAR,
-                 {LocationOptionsTable.Cols.Ukprn} VARCHAR
+             CREATE TABLE {LocationOptionsTable.TableName:raw}(
+                 {LocationOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
+                 {LocationOptionsTable.Cols.Label:raw} VARCHAR,
+                 {LocationOptionsTable.Cols.Level:raw} VARCHAR,
+                 {LocationOptionsTable.Cols.PublicId:raw} VARCHAR,
+                 {LocationOptionsTable.Cols.Code:raw} VARCHAR,
+                 {LocationOptionsTable.Cols.OldCode:raw} VARCHAR,
+                 {LocationOptionsTable.Cols.Urn:raw} VARCHAR,
+                 {LocationOptionsTable.Cols.LaEstab:raw} VARCHAR,
+                 {LocationOptionsTable.Cols.Ukprn:raw} VARCHAR
              )
              """
-        );
+        ).ExecuteAsync(cancellationToken: cancellationToken);
 
         var id = 1;
 

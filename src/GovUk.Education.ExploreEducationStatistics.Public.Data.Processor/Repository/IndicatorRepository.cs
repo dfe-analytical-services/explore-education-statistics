@@ -1,4 +1,3 @@
-using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -7,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Table
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using InterpolatedSql.Dapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
@@ -20,20 +20,16 @@ public class IndicatorRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        // TODO EES-5097 Limit this to only select rows that are needed
-        var metaFileRows = (await duckDbConnection.QueryAsync<MetaFileRow>(
-                new CommandDefinition(
-                    $"SELECT * FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion)}'",
-                    cancellationToken: cancellationToken
-                )
-            ))
-            .ToList();
-
-        var metas = metaFileRows
-            .Where(row => row.ColType == MetaFileRow.ColumnType.Indicator
-                          && allowedColumns.Contains(row.ColName))
+        var metas = (await duckDbConnection.SqlBuilder(
+                    $"""
+                     SELECT *
+                     FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
+                     WHERE "col_type" = {MetaFileRow.ColumnType.Indicator.ToString()}
+                     AND "col_name" IN ({allowedColumns})
+                     """)
+                .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
+            )
             .OrderBy(row => row.Label)
-            .ToList()
             .Select(
                 row => new IndicatorMeta
                 {
@@ -60,16 +56,16 @@ public class IndicatorRepository(
             .Collection(dsv => dsv.IndicatorMetas)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.ExecuteAsync(
+        await duckDbConnection.SqlBuilder(
             $"""
-             CREATE TABLE {IndicatorsTable.TableName}(
-                 {IndicatorsTable.Cols.Id} VARCHAR PRIMARY KEY,
-                 {IndicatorsTable.Cols.Label} VARCHAR,
-                 {IndicatorsTable.Cols.Unit} VARCHAR,
-                 {IndicatorsTable.Cols.DecimalPlaces} TINYINT,
+             CREATE TABLE {IndicatorsTable.TableName:raw}(
+                 {IndicatorsTable.Cols.Id:raw} VARCHAR PRIMARY KEY,
+                 {IndicatorsTable.Cols.Label:raw} VARCHAR,
+                 {IndicatorsTable.Cols.Unit:raw} VARCHAR,
+                 {IndicatorsTable.Cols.DecimalPlaces:raw} TINYINT,
              )
              """
-        );
+        ).ExecuteAsync(cancellationToken: cancellationToken);
 
         using var appender = duckDbConnection.CreateAppender(table: IndicatorsTable.TableName);
 

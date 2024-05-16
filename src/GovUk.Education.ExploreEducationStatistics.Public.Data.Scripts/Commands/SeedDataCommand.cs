@@ -290,8 +290,7 @@ public class SeedDataCommand : ICommand
                          FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true)
                          ORDER BY time_period
                          """
-                    ).QueryAsync<(string TimePeriod, string TimeIdentifier)>(cancellationToken: _cancellationToken)
-                )
+                    ).QueryAsync<(string TimePeriod, string TimeIdentifier)>(cancellationToken: _cancellationToken))
                 .Select(
                     row => (
                         Period: TimePeriodFormatter.FormatFromCsv(row.TimePeriod),
@@ -529,8 +528,7 @@ public class SeedDataCommand : ICommand
                              GROUP BY {cols.JoinToString(", "):raw}
                              ORDER BY {cols.JoinToString(", "):raw}
                              """
-                        ).QueryAsync(cancellationToken: _cancellationToken)
-                    )
+                        ).QueryAsync(cancellationToken: _cancellationToken))
                     .Cast<IDictionary<string, object?>>()
                     .Select(row => row.ToDictionary(
                         kv => kv.Key,
@@ -563,7 +561,7 @@ public class SeedDataCommand : ICommand
                         .Select(o => o.GetRowKey())
                         .ToHashSet();
 
-                    Expression<Func<LocationOptionMetaRow,bool>> hasBatchRowKey =
+                    Expression<Func<LocationOptionMetaRow, bool>> hasBatchRowKey =
                         o => o.Type == batch[0].Type &&
                              batchRowKeys.Contains(
                                  o.Type + ',' +
@@ -576,8 +574,8 @@ public class SeedDataCommand : ICommand
                              );
 
                     var existingRowKeys = (await optionTable
-                        .Where(hasBatchRowKey)
-                        .ToListAsync(token: _cancellationToken))
+                            .Where(hasBatchRowKey)
+                            .ToListAsync(token: _cancellationToken))
                         .Select(o => o.GetRowKey())
                         .ToHashSet();
 
@@ -786,10 +784,10 @@ public class SeedDataCommand : ICommand
                                """
                 ),
                 $"""
-                JOIN {TimePeriodsTable.TableName}
-                ON {TimePeriodsTable.Ref().Period} = {DataSourceTable.Ref.TimePeriod}
-                AND {TimePeriodsTable.Ref().Identifier} = {DataSourceTable.Ref.TimeIdentifier}
-                """
+                 JOIN {TimePeriodsTable.TableName}
+                 ON {TimePeriodsTable.Ref().Period} = {DataSourceTable.Ref.TimePeriod}
+                 AND {TimePeriodsTable.Ref().Identifier} = {DataSourceTable.Ref.TimeIdentifier}
+                 """
             ];
 
             await _duckDbConnection.SqlBuilder(

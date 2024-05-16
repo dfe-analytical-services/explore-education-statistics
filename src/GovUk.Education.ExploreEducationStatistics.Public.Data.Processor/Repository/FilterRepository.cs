@@ -1,4 +1,3 @@
-using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
@@ -7,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using InterpolatedSql.Dapper;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -23,19 +23,14 @@ public class FilterRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        // TODO EES-5097 Limit this to only select rows that are needed
-        var metaFileRows = (await duckDbConnection.QueryAsync<MetaFileRow>(
-                new CommandDefinition(
-                    $"SELECT * FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion)}'",
-                    cancellationToken: cancellationToken
-                )
-            ))
-            .ToList();
-
-        var metas = metaFileRows
-            .Where(
-                row => row.ColType == MetaFileRow.ColumnType.Filter
-                       && allowedColumns.Contains(row.ColName)
+        var metas = (await duckDbConnection.SqlBuilder(
+                    $"""
+                     SELECT *
+                     FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
+                     WHERE "col_type" = {MetaFileRow.ColumnType.Filter.ToString()}
+                     AND "col_name" IN ({allowedColumns})
+                     """)
+                .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
             )
             .OrderBy(row => row.Label)
             .Select(
@@ -54,17 +49,14 @@ public class FilterRepository(
 
         foreach (var meta in metas)
         {
-            var options = (await duckDbConnection.QueryAsync<string>(
-                    new CommandDefinition(
-                        $"""
-                         SELECT DISTINCT "{meta.PublicId}"
-                         FROM read_csv_auto('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion)}', ALL_VARCHAR = true) AS data
-                         WHERE "{meta.PublicId}" != ''
-                         ORDER BY "{meta.PublicId}"
-                         """,
-                        cancellationToken
-                    )
-                ))
+            var options = (await duckDbConnection.SqlBuilder(
+                    $"""
+                     SELECT DISTINCT "{meta.PublicId:raw}"
+                     FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true) AS data
+                     WHERE "{meta.PublicId:raw}" != ''
+                     ORDER BY "{meta.PublicId:raw}"
+                     """
+                ).QueryAsync<string>(cancellationToken: cancellationToken))
                 .Select(
                     label => new FilterOptionMeta
                     {
@@ -150,16 +142,16 @@ public class FilterRepository(
             .Include(m => m.Options)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.ExecuteAsync(
+        await duckDbConnection.SqlBuilder(
             $"""
-             CREATE TABLE {FilterOptionsTable.TableName}(
-                 {FilterOptionsTable.Cols.Id} INTEGER PRIMARY KEY,
-                 {FilterOptionsTable.Cols.Label} VARCHAR,
-                 {FilterOptionsTable.Cols.PublicId} VARCHAR,
-                 {FilterOptionsTable.Cols.FilterId} VARCHAR
+             CREATE TABLE {FilterOptionsTable.TableName:raw}(
+                 {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
+                 {FilterOptionsTable.Cols.Label:raw} VARCHAR,
+                 {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
+                 {FilterOptionsTable.Cols.FilterId:raw} VARCHAR
              )
              """
-        );
+        ).ExecuteAsync(cancellationToken: cancellationToken);
 
         var id = 1;
 

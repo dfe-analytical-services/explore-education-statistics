@@ -1,4 +1,3 @@
-using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -8,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using InterpolatedSql.Dapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
@@ -43,7 +43,8 @@ public class DataRepository(
             DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
         duckDbConnection.Open();
 
-        await duckDbConnection.ExecuteAsync("CREATE SEQUENCE data_seq START 1");
+        await duckDbConnection.SqlBuilder("CREATE SEQUENCE data_seq START 1")
+            .ExecuteAsync(cancellationToken: cancellationToken);
 
         string[] columns =
         [
@@ -57,7 +58,12 @@ public class DataRepository(
                 $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"),
         ];
 
-        await duckDbConnection.ExecuteAsync($"CREATE TABLE {DataTable.TableName}({columns.JoinToString(",\n")})");
+        await duckDbConnection.SqlBuilder(
+                $"""
+                 CREATE TABLE {DataTable.TableName:raw}
+                 ({columns.JoinToString(",\n"):raw})
+                 """)
+            .ExecuteAsync(cancellationToken: cancellationToken);
 
         string[] insertColumns =
         [
@@ -107,21 +113,18 @@ public class DataRepository(
 
         var dataFilePath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
 
-        await duckDbConnection.ExecuteAsync(
-            new CommandDefinition(
-                $"""
-                 INSERT INTO {DataTable.TableName}
-                 SELECT
-                    {insertColumns.JoinToString(",\n")}
-                 FROM read_csv_auto('{dataFilePath}', ALL_VARCHAR = true) AS {DataSourceTable.TableName}
-                 {insertJoins.JoinToString('\n')}
-                 ORDER BY
-                     {DataSourceTable.Ref.GeographicLevel} ASC,
-                     {DataSourceTable.Ref.TimePeriod} DESC
-                 """,
-                cancellationToken
-            )
-        );
+        await duckDbConnection.SqlBuilder(
+            $"""
+             INSERT INTO {DataTable.TableName:raw}
+             SELECT
+             {insertColumns.JoinToString(",\n"):raw}
+             FROM read_csv('{dataFilePath:raw}', ALL_VARCHAR = true) AS {DataSourceTable.TableName:raw}
+             {insertJoins.JoinToString('\n'):raw}
+             ORDER BY
+             {DataSourceTable.Ref.GeographicLevel:raw} ASC,
+             {DataSourceTable.Ref.TimePeriod:raw} DESC
+             """
+        ).ExecuteAsync(cancellationToken: cancellationToken);
     }
 
     private static LocationColumn[] GetLocationCodeColumns(GeographicLevel geographicLevel)

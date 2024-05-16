@@ -1,4 +1,3 @@
-using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Table
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using InterpolatedSql.Dapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
@@ -21,18 +21,14 @@ public class TimePeriodRepository(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        var metas = (await duckDbConnection.QueryAsync<(string TimePeriod, string TimeIdentifier)>(
-                new CommandDefinition(
-                    $"""
-                     SELECT DISTINCT time_period, time_identifier
-                     FROM read_csv_auto('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion)}', ALL_VARCHAR = true)
-                     ORDER BY time_period
-                     """,
-                    cancellationToken
-                )
-            ))
-            .Select(
-                tuple => new TimePeriodMeta
+        var metas = (await duckDbConnection.SqlBuilder(
+                $"""
+                 SELECT DISTINCT time_period, time_identifier
+                 FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                 ORDER BY time_period
+                 """
+            ).QueryAsync<(string TimePeriod, string TimeIdentifier)>(cancellationToken: cancellationToken))
+            .Select(tuple => new TimePeriodMeta
                 {
                     DataSetVersionId = dataSetVersion.Id,
                     Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
@@ -59,15 +55,15 @@ public class TimePeriodRepository(
             .Collection(dsv => dsv.TimePeriodMetas)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.ExecuteAsync(
+        await duckDbConnection.SqlBuilder(
             $"""
-             CREATE TABLE {TimePeriodsTable.TableName}(
-                 {TimePeriodsTable.Cols.Id} INTEGER PRIMARY KEY,
-                 {TimePeriodsTable.Cols.Period} VARCHAR,
-                 {TimePeriodsTable.Cols.Identifier} VARCHAR
+             CREATE TABLE {TimePeriodsTable.TableName:raw}(
+                 {TimePeriodsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
+                 {TimePeriodsTable.Cols.Period:raw} VARCHAR,
+                 {TimePeriodsTable.Cols.Identifier:raw} VARCHAR
              )
              """
-        );
+        ).ExecuteAsync(cancellationToken: cancellationToken);
 
         using var appender = duckDbConnection.CreateAppender(table: TimePeriodsTable.TableName);
 
