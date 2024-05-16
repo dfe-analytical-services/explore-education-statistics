@@ -1,5 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -16,16 +14,13 @@ public class HealthCheckFunctions(
         [ActivityTrigger] object? input,
         FunctionContext executionContext)
     {
-        var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb");
-        logger.LogInformation(connectionString);
-        
         var message = $"Found {await publicDataDbContext.DataSets.CountAsync()} datasets.";
         logger.LogInformation(message);
         return message;
     }
     
-    [Function(nameof(ListFileShareContents))]
-    public async Task<string> ListFileShareContents(
+    [Function(nameof(CheckForFileshareMount))]
+    public async Task CheckForFileshareMount(
         [ActivityTrigger] object? input,
         FunctionContext executionContext)
     {
@@ -33,14 +28,20 @@ public class HealthCheckFunctions(
         
         try
         {
-            var files = Directory.GetFiles("/data/public-api-parquet");
-            var message = $"Found the following files in the file share:\n\n{files.JoinToString('\n')}";
-            logger.LogInformation(message);
-            return message;
+            var fileShareMountExists = Directory.Exists("/data/public-api-parquet");
+
+            if (fileShareMountExists)
+            {
+                logger.LogInformation("Successfully found the file share mount");
+            }
+            else
+            {
+                logger.LogError("Unable to find the file share mount");
+            }
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error encountered when attempting to list files in the file share");
+            logger.LogError(e, "Error encountered when attempting to find the file share mount");
             throw;
         }
     }

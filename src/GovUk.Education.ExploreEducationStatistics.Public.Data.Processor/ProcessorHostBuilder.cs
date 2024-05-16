@@ -76,6 +76,9 @@ public static class ProcessorHostBuilder
                             var sqlServerTokenProvider = new DefaultAzureCredential(
                                 new DefaultAzureCredentialOptions
                                 {
+                                    // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
+                                    // the "AZURE_CLIENT_ID" environment variable automatically when operating within
+                                    // a Function App.  We therefore provide it manually.
                                     ManagedIdentityClientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
                                 });
                             var accessToken = sqlServerTokenProvider.GetToken(
@@ -87,7 +90,6 @@ public static class ProcessorHostBuilder
                             var connectionStringWithAccessToken =
                                 connectionString.Replace("[access_token]", accessToken);
 
-                            Console.WriteLine(connectionStringWithAccessToken);
                             var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
 
                             options.UseNpgsql(dbDataSource);
