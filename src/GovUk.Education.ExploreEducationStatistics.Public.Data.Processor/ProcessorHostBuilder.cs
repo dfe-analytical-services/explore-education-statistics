@@ -9,7 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -103,17 +104,16 @@ public static class ProcessorHostBuilder
                             .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                                 providerOptions => providerOptions.EnableCustomRetryOnFailure())
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
-                    .AddScoped<IDuckDbConnection, DuckDbConnection>(_ =>
-                    {
-                        var connection = new DuckDbConnection();
-                        connection.Open();
-                        return connection;
-                    })
                     .AddFluentValidation()
                     .AddScoped<IDataSetService, DataSetService>()
                     .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
-                    .AddScoped<IParquetMetaService, ParquetMetaService>()
+                    .AddScoped<IDataRepository, DataRepository>()
+                    .AddScoped<IFilterRepository, FilterRepository>()
+                    .AddScoped<IIndicatorRepository, IndicatorRepository>()
+                    .AddScoped<ILocationRepository, LocationRepository>()
+                    .AddScoped<ITimePeriodRepository, TimePeriodRepository>()
+                    .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                     .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
                         InitialDataSetVersionCreateRequest.Validator>()

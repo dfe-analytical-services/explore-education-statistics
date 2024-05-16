@@ -1,0 +1,17 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
+
+public interface ITimePeriodRepository
+{
+    Task<List<TimePeriodMeta>> CreateTimePeriodMetas(
+        DuckDbConnection duckDb,
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken = default);
+
+    Task CreateTimePeriodMetaTable(
+        DuckDbConnection duckDb,
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken = default);
+}

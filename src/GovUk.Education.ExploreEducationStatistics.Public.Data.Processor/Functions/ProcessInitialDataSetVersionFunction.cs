@@ -1,7 +1,10 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class ProcessInitialDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
     IDataSetMetaService dataSetMetaService,
-    IParquetMetaService parquetMetaService)
+    IDataRepository dataRepository,
+    IParquetService parquetService,
+    IDataSetVersionPathResolver dataSetVersionPathResolver)
 {
     [Function(nameof(ProcessInitialDataSetVersion))]
     public async Task ProcessInitialDataSetVersion(
@@ -45,9 +50,21 @@ public class ProcessInitialDataSetVersionFunction(
                 context.InstanceId,
                 input.DataSetVersionId);
 
-            // Other activity function calls to be added here to cover the following stages:
-            // Import data to DuckDb
-            // Export to Parquet files
+            await context.CallActivityAsync(nameof(ImportData), input.DataSetVersionId);
+
+            logger.LogInformation(
+                "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
+                nameof(ImportData),
+                context.InstanceId,
+                input.DataSetVersionId);
+
+            await context.CallActivityAsync(nameof(ExportData), input.DataSetVersionId);
+
+            logger.LogInformation(
+                "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
+                nameof(ExportData),
+                context.InstanceId,
+                input.DataSetVersionId);
 
             await context.CallActivityAsync(nameof(CompleteProcessing), input.DataSetVersionId);
 
@@ -84,8 +101,49 @@ public class ProcessInitialDataSetVersionFunction(
         dataSetVersionImport.Stage = DataSetVersionImportStage.ImportingMetadata;
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        await dataSetMetaService.CreateDataSetVersionMeta(dataSetVersionId, cancellationToken);
-        await parquetMetaService.CreateParquetDataSetMetaTables(dataSetVersionId, cancellationToken);
+        await dataSetMetaService.CreateDataSetVersionMeta(dataSetVersion, cancellationToken);
+    }
+
+    [Function(nameof(ImportData))]
+    public async Task ImportData(
+        [ActivityTrigger] Guid dataSetVersionId,
+        Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersion = await GetDataSetVersion(
+            dataSetVersionId: dataSetVersionId,
+            instanceId: instanceId,
+            cancellationToken);
+
+        var dataSetVersionImport = dataSetVersion.Imports.Single(i => i.InstanceId == instanceId);
+
+        dataSetVersionImport.Stage = DataSetVersionImportStage.ImportingData;
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        await using var duckDb =
+            DuckDbConnection.FileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
+        duckDb.Open();
+
+        await dataRepository.CreateDataTable(duckDb, dataSetVersion, cancellationToken);
+    }
+
+    [Function(nameof(ExportData))]
+    public async Task ExportData(
+        [ActivityTrigger] Guid dataSetVersionId,
+        Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersion = await GetDataSetVersion(
+            dataSetVersionId: dataSetVersionId,
+            instanceId: instanceId,
+            cancellationToken);
+
+        var dataSetVersionImport = dataSetVersion.Imports.Single(i => i.InstanceId == instanceId);
+
+        dataSetVersionImport.Stage = DataSetVersionImportStage.ExportingData;
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        await parquetService.WriteData(dataSetVersion, cancellationToken);
     }
 
     [Function(nameof(CompleteProcessing))]

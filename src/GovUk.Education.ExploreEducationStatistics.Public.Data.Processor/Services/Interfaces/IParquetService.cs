@@ -2,9 +2,9 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 
-public interface IDataSetMetaService
+public interface IParquetService
 {
-    Task CreateDataSetVersionMeta(
+    Task WriteData(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default);
 }
