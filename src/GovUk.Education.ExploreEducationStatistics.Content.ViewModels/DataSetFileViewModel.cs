@@ -18,8 +18,6 @@ public record DataSetFileViewModel
 
     public required DataSetFileReleaseViewModel Release { get; init; }
 
-    public required DataSetFileMetaViewModel Meta { get; init; }
-
     public required List<FootnoteViewModel> Footnotes { get; init; } = [];
 
     public DataSetFileApiViewModel? Api { get; set; }
@@ -61,6 +59,8 @@ public record DataSetFileFileViewModel
     public required string Name { get; init; }
 
     public required string Size { get; init; } = string.Empty;
+
+    public required DataSetFileMetaViewModel Meta { get; init; }
 
     public required DataSetFileCsvPreviewViewModel DataCsvPreview { get; init; } = new();
 

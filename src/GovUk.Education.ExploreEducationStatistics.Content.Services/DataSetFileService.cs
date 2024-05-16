@@ -207,14 +207,14 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
+                Meta = BuildDataSetFileMetaViewModel(
+                    releaseFile.File.DataSetFileMeta,
+                    releaseFile.FilterSequence,
+                    releaseFile.IndicatorSequence),
                 DataCsvPreview = dataCsvPreview,
                 Variables = variables,
                 SubjectId = releaseFile.File.SubjectId!.Value,
             },
-            Meta = BuildDataSetFileMetaViewModel(
-                releaseFile.File.DataSetFileMeta,
-                releaseFile.FilterSequence,
-                releaseFile.IndicatorSequence),
             Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes),
             Api = BuildDataSetFileApiViewModel(releaseFile.File)
         };

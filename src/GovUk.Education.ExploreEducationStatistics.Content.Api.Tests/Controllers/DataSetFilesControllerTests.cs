@@ -1925,7 +1925,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             Assert.Equal(dataSetFileMeta!.GeographicLevels
                     .Select(gl => gl.GetEnumLabel())
                     .ToList(),
-                viewModel.Meta.GeographicLevels);
+                viewModel.File.Meta.GeographicLevels);
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
@@ -1936,17 +1936,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         "2001",
                         TimeIdentifier.CalendarYear),
                 },
-                viewModel.Meta.TimePeriodRange);
+                viewModel.File.Meta.TimePeriodRange);
 
             Assert.Equal(dataSetFileMeta.Filters
                     .Select(f => f.Label)
                     .ToList(),
-                viewModel.Meta.Filters);
+                viewModel.File.Meta.Filters);
 
             Assert.Equal(dataSetFileMeta.Indicators
                 .Select(i => i.Label)
                 .ToList(),
-                viewModel.Meta.Indicators);
+                viewModel.File.Meta.Indicators);
 
             Assert.Equal(3, viewModel.File.DataCsvPreview.Headers.Count);
             viewModel.File.DataCsvPreview.Headers
@@ -2081,10 +2081,10 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             var response = await client.GetAsync(uri);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
-            Assert.Equal(3, viewModel.Meta.Filters.Count);
-            Assert.Equal("Filter 1", viewModel.Meta.Filters[0]);
-            Assert.Equal("Filter 2", viewModel.Meta.Filters[1]);
-            Assert.Equal("Filter 3", viewModel.Meta.Filters[2]);
+            Assert.Equal(3, viewModel.File.Meta.Filters.Count);
+            Assert.Equal("Filter 1", viewModel.File.Meta.Filters[0]);
+            Assert.Equal("Filter 2", viewModel.File.Meta.Filters[1]);
+            Assert.Equal("Filter 3", viewModel.File.Meta.Filters[2]);
         }
 
         [Fact]
@@ -2149,11 +2149,11 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             var response = await client.GetAsync(uri);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
-            Assert.Equal(4, viewModel.Meta.Indicators.Count);
-            Assert.Equal("Indicator 1", viewModel.Meta.Indicators[0]);
-            Assert.Equal("Indicator 2", viewModel.Meta.Indicators[1]);
-            Assert.Equal("Indicator 3", viewModel.Meta.Indicators[2]);
-            Assert.Equal("Indicator 4", viewModel.Meta.Indicators[3]);
+            Assert.Equal(4, viewModel.File.Meta.Indicators.Count);
+            Assert.Equal("Indicator 1", viewModel.File.Meta.Indicators[0]);
+            Assert.Equal("Indicator 2", viewModel.File.Meta.Indicators[1]);
+            Assert.Equal("Indicator 3", viewModel.File.Meta.Indicators[2]);
+            Assert.Equal("Indicator 4", viewModel.File.Meta.Indicators[3]);
         }
 
         [Fact]

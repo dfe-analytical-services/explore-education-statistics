@@ -11,6 +11,15 @@ export interface DataSetFile {
     id: string;
     name: string;
     size: string;
+    meta: {
+      geographicLevels: string[];
+      timePeriodRange: {
+        from: string;
+        to: string;
+      };
+      filters: string[];
+      indicators: string[];
+    };
     dataCsvPreview: {
       headers: string[];
       rows: string[][];
@@ -31,15 +40,6 @@ export interface DataSetFile {
     slug: string;
     title: string;
     type: ReleaseType;
-  };
-  meta: {
-    geographicLevels: string[];
-    timePeriodRange: {
-      from: string;
-      to: string;
-    };
-    filters: string[];
-    indicators: string[];
   };
   footnotes: { id: string; label: string }[];
   api?: DataSetFileApi;
