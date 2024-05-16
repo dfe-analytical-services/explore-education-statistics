@@ -138,11 +138,12 @@ module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
   }
 }
 
-// We need to look up the Public API Storage Account in order to get its access keys, as it's not possible to feed
-// Key Vault secret references into the "storageAccountKey" values for Azure File Storage mounts.
+// TODO EES-5128 - we're currently needing to look up the Public API Storage Account in order to get its access keys,
+// as it's not possible to feed Key Vault secret references into the "storageAccountKey" values for Azure File Storage
+// mounts.
 //
 // It would be possible to use KV references if restructuring main.bicep to make the creation of the Container App
-// and Data Processortheir own sub-modules in the "application" folder.  Then, we could use @secure() params
+// and Data Processor their own sub-modules in the "application" folder.  Then, we could use @secure() params
 // and keyVaultResource.getSecret() to pass the secrets through.
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: publicApiStorageAccountName
@@ -214,7 +215,6 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
 
 var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
 
-// TODO EES-5128 - move into the Container App module?
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
 }
@@ -267,6 +267,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       }
     ]
     appSettings: [
+      // TODO EES-5128 - replace this with a Key Vault reference string.
       {
         name: 'ConnectionStrings__PublicDataDb'
         value: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)

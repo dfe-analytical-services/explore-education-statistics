@@ -238,8 +238,10 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
       WEBSITE_CONTENTOVERVNET: 1
-//       vnetContentShareEnabled: true
-      // WEBSITE_VNET_ROUTE_ALL: 1
+      vnetContentShareEnabled: true
+
+      // This property instructs the Function App to direct all outbound traffic over the VNet.
+      WEBSITE_VNET_ROUTE_ALL: 1
 
       // This setting is necessary in order to allow slot swapping to work without complaining that
       // "Storage volume is currently in R/O mode".

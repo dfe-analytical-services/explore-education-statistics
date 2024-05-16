@@ -19,8 +19,8 @@ public class HealthCheckFunctions(
         return message;
     }
     
-    [Function(nameof(CheckForFileshareMount))]
-    public async Task CheckForFileshareMount(
+    [Function(nameof(CheckForFileShareMount))]
+    public async Task CheckForFileShareMount(
         [ActivityTrigger] object? input,
         FunctionContext executionContext)
     {

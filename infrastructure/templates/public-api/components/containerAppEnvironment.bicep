@@ -31,14 +31,14 @@ param tagValues object
 @description('Specifies a suffix to append to the full name of the Container App Environment')
 param containerAppEnvironmentNameSuffix string = ''
 
-@description('Specifies an array of Azure Fileshares to be available for Container Apps hosted within this Container App Environment')
+@description('Specifies an array of Azure File Shares to be available for Container Apps hosted within this Container App Environment')
 param azureFileStorages {
   storageName: string
   storageAccountKey: string
   storageAccountName: string
   fileShareName: string
   accessMode: 'ReadWrite' | 'ReadOnly'
-}[]
+}[] = []
 
 var containerAppEnvironmentName = empty(containerAppEnvironmentNameSuffix)
   ? '${subscription}-ees-cae'
