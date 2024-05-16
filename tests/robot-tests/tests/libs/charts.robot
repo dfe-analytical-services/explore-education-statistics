@@ -84,6 +84,7 @@ user checks chart y axis tick contains
     [Arguments]    ${locator}    ${tick}    ${text}
     user waits until parent contains element    ${locator}
     ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ...    timeout=5
     ${element}=    get child element    ${locator}
     ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     user waits until element contains    ${element}    ${text}
@@ -92,6 +93,7 @@ user checks chart x axis tick contains
     [Arguments]    ${locator}    ${tick}    ${text}
     user waits until parent contains element    ${locator}
     ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ...    timeout=5
     ${element}=    get child element    ${locator}
     ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     user waits until element contains    ${element}    ${text}
