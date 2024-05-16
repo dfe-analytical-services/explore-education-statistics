@@ -5,12 +5,10 @@ import publicationService, {
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import notificationService from '@frontend/services/notificationService';
-import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import { redirect } from 'next/navigation';
-import styles from './SubscriptionPage.module.scss';
 
 interface Props {
   slug: string;
