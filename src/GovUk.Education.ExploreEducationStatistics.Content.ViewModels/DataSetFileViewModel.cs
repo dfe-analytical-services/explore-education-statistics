@@ -22,8 +22,6 @@ public record DataSetFileViewModel
 
     public required List<FootnoteViewModel> Footnotes { get; init; } = [];
 
-    public required List<LabelValue> Variables { get; init; } = [];
-
     public DataSetFileApiViewModel? Api { get; set; }
 }
 
@@ -65,6 +63,8 @@ public record DataSetFileFileViewModel
     public required string Size { get; init; } = string.Empty;
 
     public required DataSetFileCsvPreviewViewModel DataCsvPreview { get; init; } = new();
+
+    public required List<LabelValue> Variables { get; init; } = [];
 
     public required Guid SubjectId { get; init; }
 }

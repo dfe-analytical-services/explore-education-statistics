@@ -208,13 +208,13 @@ public class DataSetFileService : IDataSetFileService
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
                 DataCsvPreview = dataCsvPreview,
+                Variables = variables,
                 SubjectId = releaseFile.File.SubjectId!.Value,
             },
             Meta = BuildDataSetFileMetaViewModel(
                 releaseFile.File.DataSetFileMeta,
                 releaseFile.FilterSequence,
                 releaseFile.IndicatorSequence),
-            Variables = variables,
             Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes),
             Api = BuildDataSetFileApiViewModel(releaseFile.File)
         };

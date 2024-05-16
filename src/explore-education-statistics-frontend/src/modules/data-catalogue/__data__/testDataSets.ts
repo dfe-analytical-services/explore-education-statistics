@@ -117,6 +117,8 @@ export const testDataSetFile: DataSetFile = {
     id: 'file-id',
     name: 'file name',
     size: 'file size',
+    dataCsvPreview: { headers: ['column_1'], rows: [['1']] },
+    variables: [{ value: 'column_1', label: 'Column 1 is for something' }],
     subjectId: 'subject-id',
   },
   release: {
@@ -144,6 +146,7 @@ export const testDataSetFile: DataSetFile = {
     geographicLevels: ['Local authority', 'National'],
     indicators: ['Indicator 1', 'Indicator 2'],
   },
+  footnotes: [{ id: 'footnote-1', label: 'Footnote 1' }],
 };
 
 export const testDataSetWithApi: DataSetFile = {

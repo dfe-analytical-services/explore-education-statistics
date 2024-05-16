@@ -7,7 +7,17 @@ export interface DataSetFile {
   id: string;
   title: string;
   summary: string;
-  file: { id: string; name: string; size: string; subjectId: string };
+  file: {
+    id: string;
+    name: string;
+    size: string;
+    dataCsvPreview: {
+      headers: string[];
+      rows: string[][];
+    };
+    variables: { label: string; value: string }[];
+    subjectId: string;
+  };
   release: {
     id: string;
     isLatestPublishedRelease: boolean;
@@ -22,7 +32,6 @@ export interface DataSetFile {
     title: string;
     type: ReleaseType;
   };
-  api?: DataSetFileApi;
   meta: {
     geographicLevels: string[];
     timePeriodRange: {
@@ -32,6 +41,8 @@ export interface DataSetFile {
     filters: string[];
     indicators: string[];
   };
+  footnotes: { id: string; label: string }[];
+  api?: DataSetFileApi;
 }
 
 export interface DataSetFileSummary {

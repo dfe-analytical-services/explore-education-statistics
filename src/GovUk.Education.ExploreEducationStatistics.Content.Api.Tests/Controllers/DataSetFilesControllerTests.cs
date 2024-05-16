@@ -2209,21 +2209,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             var response = await client.GetAsync(uri);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
-            Assert.Equal(7, viewModel.Variables.Count);
-            Assert.Equal("A_filter_1", viewModel.Variables[0].Value);
-            Assert.Equal("Filter 1 - hint", viewModel.Variables[0].Label);
-            Assert.Equal("B_indicator_3", viewModel.Variables[1].Value);
-            Assert.Equal("Indicator 3", viewModel.Variables[1].Label);
-            Assert.Equal("C_filter_3", viewModel.Variables[2].Value);
-            Assert.Equal("Filter 3 - Another hint", viewModel.Variables[2].Label);
-            Assert.Equal("D_indicator_1", viewModel.Variables[3].Value);
-            Assert.Equal("Indicator 1", viewModel.Variables[3].Label);
-            Assert.Equal("E_indicator_2", viewModel.Variables[4].Value);
-            Assert.Equal("Indicator 2", viewModel.Variables[4].Label);
-            Assert.Equal("F_indicator_4", viewModel.Variables[5].Value);
-            Assert.Equal("Indicator 4", viewModel.Variables[5].Label);
-            Assert.Equal("G_filter_2", viewModel.Variables[6].Value);
-            Assert.Equal("Filter 2", viewModel.Variables[6].Label);
+            Assert.Equal(7, viewModel.File.Variables.Count);
+            Assert.Equal("A_filter_1", viewModel.File.Variables[0].Value);
+            Assert.Equal("Filter 1 - hint", viewModel.File.Variables[0].Label);
+            Assert.Equal("B_indicator_3", viewModel.File.Variables[1].Value);
+            Assert.Equal("Indicator 3", viewModel.File.Variables[1].Label);
+            Assert.Equal("C_filter_3", viewModel.File.Variables[2].Value);
+            Assert.Equal("Filter 3 - Another hint", viewModel.File.Variables[2].Label);
+            Assert.Equal("D_indicator_1", viewModel.File.Variables[3].Value);
+            Assert.Equal("Indicator 1", viewModel.File.Variables[3].Label);
+            Assert.Equal("E_indicator_2", viewModel.File.Variables[4].Value);
+            Assert.Equal("Indicator 2", viewModel.File.Variables[4].Label);
+            Assert.Equal("F_indicator_4", viewModel.File.Variables[5].Value);
+            Assert.Equal("Indicator 4", viewModel.File.Variables[5].Label);
+            Assert.Equal("G_filter_2", viewModel.File.Variables[6].Value);
+            Assert.Equal("Filter 2", viewModel.File.Variables[6].Label);
         }
 
         [Fact]
