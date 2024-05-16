@@ -36,22 +36,11 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
         { name: data.title, link: `/find-statistics/${slug}` },
       ]}
     >
-      <div
-        className={classNames(
-          'govuk-panel',
-          'govuk-panel--confirmation',
-          styles.panelContainer,
-        )}
-      >
-        <h1 className="govuk-panel__title">{data.title}</h1>
-        <div className="govuk-panel__body">
-          Please confirm you wish to unsubscribe to notifications about this
-          publication
-        </div>
-        <Button type="submit" onClick={onConfirmClicked}>
-          Confirm
-        </Button>
-      </div>
+      <p>
+        Please confirm you wish to unsubscribe to notifications about this
+        publication.
+      </p>
+      <Button onClick={onConfirmClicked}>Confirm</Button>
     </Page>
   );
 };
