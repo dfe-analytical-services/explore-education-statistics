@@ -14,5 +14,17 @@ const notificationService = {
   subscribeToPublication(query: SubscribeQuery): Promise<SubscriptionData> {
     return notificationApi.post('/publication/subscribe', query);
   },
+  // Actually confirms the pending subscription
+  confirmPendingSubscription(
+    id: string,
+    token: string,
+  ): Promise<SubscriptionData> {
+    return notificationApi.get(
+      `publication/${id}/verify-subscription-actual/${token}`,
+    );
+  },
+  confirmUnsubscription(id: string, token: string): Promise<SubscriptionData> {
+    return notificationApi.get(`publication/${id}/unsubscribe-actual/${token}`);
+  },
 };
 export default notificationService;
