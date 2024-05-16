@@ -5,6 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 public class DuckDbConnection(string connectionString = DuckDBConnectionStringBuilder.InMemoryConnectionString)
     : DuckDBConnection(connectionString), IDuckDbConnection
 {
+    public static DuckDbConnection CreateFileConnection(string filename)
+    {
+        return new DuckDbConnection($"DataSource={filename}");
+    }
+
     public override DuckDbCommand CreateCommand()
     {
         // Bit rubbish to do this but we don't have access to the

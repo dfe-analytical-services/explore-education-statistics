@@ -847,7 +847,7 @@ public class SeedDataCommand : ICommand
             // Convert absolute paths in load.sql to relative paths otherwise
             // these refer to the machine that the script was run on.
 
-            var loadSqlFilePath = Path.Combine(versionDir, "load.sql");
+            var loadSqlFilePath = Path.Combine(versionDir, DataSetFilenames.DuckDbLoadSqlFile);
 
             var absolutePathToReplace = $"{versionDir.Replace('\\', '/')}/";
 

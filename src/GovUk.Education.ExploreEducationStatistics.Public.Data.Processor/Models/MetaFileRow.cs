@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Models;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 
 public record MetaFileRow
 {

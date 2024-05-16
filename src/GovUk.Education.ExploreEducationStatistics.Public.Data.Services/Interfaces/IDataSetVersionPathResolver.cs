@@ -10,10 +10,19 @@ public interface IDataSetVersionPathResolver
     string DirectoryPath(DataSetVersion dataSetVersion);
 
     string CsvDataPath(DataSetVersion dataSetVersion)
-        => Path.Combine(DirectoryPath(dataSetVersion), "data.csv.gz");
+        => Path.Combine(DirectoryPath(dataSetVersion), DataSetFilenames.CsvDataFile);
 
     string CsvMetadataPath(DataSetVersion dataSetVersion)
-        => Path.Combine(DirectoryPath(dataSetVersion), "metadata.csv.gz");
+        => Path.Combine(DirectoryPath(dataSetVersion), DataSetFilenames.CsvMetadataFile);
+
+    string DuckDbPath(DataSetVersion dataSetVersion)
+        => Path.Combine(DirectoryPath(dataSetVersion), DataSetFilenames.DuckDbDatabaseFile);
+
+    string DuckDbLoadSqlPath(DataSetVersion dataSetVersion)
+        => Path.Combine(DirectoryPath(dataSetVersion), DataSetFilenames.DuckDbLoadSqlFile);
+
+    string DuckDbSchemaSqlPath(DataSetVersion dataSetVersion)
+        => Path.Combine(DirectoryPath(dataSetVersion), DataSetFilenames.DuckDbSchemaSqlFile);
 
     string DataPath(DataSetVersion dataSetVersion)
         => Path.Combine(DirectoryPath(dataSetVersion), DataTable.ParquetFile);

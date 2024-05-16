@@ -1,5 +1,6 @@
 using Azure.Core;
 using Azure.Identity;
+using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -8,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -97,6 +100,9 @@ public static class ProcessorHostBuilder
                     }
                 }
 
+                // Configure Dapper to match CSV columns with underscores
+                DefaultTypeMap.MatchNamesWithUnderscores = true;
+
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
@@ -107,7 +113,14 @@ public static class ProcessorHostBuilder
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
                     .AddFluentValidation()
                     .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
+                    .AddScoped<IDataRepository, DataRepository>()
+                    .AddScoped<IFilterRepository, FilterRepository>()
+                    .AddScoped<IIndicatorRepository, IndicatorRepository>()
+                    .AddScoped<ILocationRepository, LocationRepository>()
+                    .AddScoped<ITimePeriodRepository, TimePeriodRepository>()
+                    .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                     .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
                         InitialDataSetVersionCreateRequest.Validator>()

@@ -49,7 +49,8 @@ public class DataSetService(
                     .OnSuccessDo(async dataSetVersion =>
                         await UpdateFilePublicDataSetVersionId(releaseFile, dataSetVersion, cancellationToken))
                     .OnSuccessDo(transactionScope.Complete)
-                    .OnSuccess(dataSetVersion => (dataSetId: dataSetVersion.DataSetId, dataSetVersionId: dataSetVersion.Id)));
+                    .OnSuccess(dataSetVersion =>
+                        (dataSetId: dataSetVersion.DataSetId, dataSetVersionId: dataSetVersion.Id)));
         });
     }
 

@@ -19,6 +19,8 @@
     },
     "logLevel": {
       "default": "Error",
+      "DurableTask.AzureStorage": "Warning",
+      "DurableTask.Core": "Warning",
       "Function": "Information"
     }
   }
