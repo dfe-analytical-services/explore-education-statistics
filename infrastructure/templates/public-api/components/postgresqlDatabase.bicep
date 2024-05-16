@@ -119,16 +119,18 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
       name: name
   }]
 
-  resource rules 'firewallRules' = [for rule in firewallRules: {
-    name: rule.name
-    properties: {
-      startIpAddress: rule.startIpAddress
-      endIpAddress: rule.endIpAddress
-    }
-  }]
-
   tags: tagValues
 }
+
+@batchSize(1)
+resource rules 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [for rule in firewallRules: {
+  name: rule.name
+  parent: postgreSQLDatabase
+  properties: {
+    startIpAddress: rule.startIpAddress
+    endIpAddress: rule.endIpAddress
+  }
+}]
 
 var privateLinkDnsZoneName = 'privatelink.postgres.database.azure.com'
 
