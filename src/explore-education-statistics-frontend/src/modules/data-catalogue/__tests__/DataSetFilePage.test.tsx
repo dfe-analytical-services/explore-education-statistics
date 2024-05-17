@@ -30,11 +30,10 @@ const downloadService = _downloadService as jest.Mocked<
 describe('DataSetFilePage', () => {
   test('renders the data set file heading, summary and info', async () => {
     dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-    await waitFor(() =>
-      expect(screen.getByText('On this page')).toBeInTheDocument(),
-    );
+    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'Data set 1' }),
@@ -52,11 +51,10 @@ describe('DataSetFilePage', () => {
 
   test('renders the `latest data` tag when it is the latest data', async () => {
     dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-    await waitFor(() =>
-      expect(screen.getByText('On this page')).toBeInTheDocument(),
-    );
+    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
 
     expect(screen.getByText('Latest data')).toBeInTheDocument();
     expect(screen.queryByText('Not the latest data')).not.toBeInTheDocument();
@@ -70,11 +68,10 @@ describe('DataSetFilePage', () => {
         isLatestPublishedRelease: false,
       },
     });
-    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-    await waitFor(() =>
-      expect(screen.getByText('On this page')).toBeInTheDocument(),
-    );
+    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
 
     expect(screen.getByText('Not the latest data')).toBeInTheDocument();
 
@@ -83,11 +80,12 @@ describe('DataSetFilePage', () => {
 
   test('calls the download service with the correct id when the download button is clicked', async () => {
     dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-    const { user } = render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-    await waitFor(() =>
-      expect(screen.getByText('On this page')).toBeInTheDocument(),
+    const { user } = render(
+      <DataSetFilePage dataSetFileId="data-set-file-id" />,
     );
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
 
     await user.click(
       screen.getByRole('button', { name: 'Download data set (ZIP)' }),
@@ -102,37 +100,34 @@ describe('DataSetFilePage', () => {
 
   test('renders the data set details', async () => {
     dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-    await waitFor(() =>
-      expect(screen.getByText('On this page')).toBeInTheDocument(),
-    );
+    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'Data set details' }),
     ).toBeInTheDocument();
   });
 
-  describe('non-api data set', () => {
-    test('does not render the version info', async () => {
+  describe('non-API data set', () => {
+    test('does not render API version info', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       const infoSection = within(screen.getByTestId('data-set-file-info'));
       expect(infoSection.queryByText('API version')).not.toBeInTheDocument();
     });
 
-    test('renders the page navigation', async () => {
+    test('renders the page navigation correctly', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       const nav = within(
         screen.getByRole('navigation', { name: 'On this page' }),
@@ -143,51 +138,44 @@ describe('DataSetFilePage', () => {
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetUsage');
     });
 
-    test('renders the using this data section', async () => {
+    test('renders the data set usage section', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('heading', {
-          name: 'Using this data',
-        }),
+        screen.getByRole('heading', { name: 'Using this data' }),
       ).toBeInTheDocument();
     });
 
-    test('does not render the version history section', async () => {
+    test('does not render the API version history section', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
         screen.queryByRole('heading', { name: 'API data set version history' }),
       ).not.toBeInTheDocument();
     });
 
-    test('does not render the quick start section', async () => {
+    test('does not render the API quick start section', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('heading', {
-          name: 'API data set endpoints quick start',
-        }),
+        screen.queryByRole('heading', { name: 'API data set quick start' }),
       ).not.toBeInTheDocument();
     });
   });
 
-  describe('api data set', () => {
+  describe('API data set', () => {
     test('renders the version info', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
       apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
@@ -197,18 +185,17 @@ describe('DataSetFilePage', () => {
       apiDataSetService.listDataSetVersions.mockResolvedValue(
         testApiDataSetVersions,
       );
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       const infoSection = within(screen.getByTestId('data-set-file-info'));
       expect(infoSection.getByText('API version')).toBeInTheDocument();
       expect(infoSection.getByText('1.0')).toBeInTheDocument();
     });
 
-    test('renders the page navigation', async () => {
+    test('renders the page navigation correctly', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
       apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
       apiDataSetService.getDataSetVersion.mockResolvedValue(
@@ -217,15 +204,15 @@ describe('DataSetFilePage', () => {
       apiDataSetService.listDataSetVersions.mockResolvedValue(
         testApiDataSetVersions,
       );
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       const nav = within(
         screen.getByRole('navigation', { name: 'On this page' }),
       );
+
       const navLinks = nav.getAllByRole('link');
       expect(navLinks).toHaveLength(4);
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
@@ -234,7 +221,7 @@ describe('DataSetFilePage', () => {
       expect(navLinks[3]).toHaveAttribute('href', '#apiQuickStart');
     });
 
-    test('renders the using this data section', async () => {
+    test('renders the data set usage section', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
       apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
       apiDataSetService.getDataSetVersion.mockResolvedValue(
@@ -243,16 +230,13 @@ describe('DataSetFilePage', () => {
       apiDataSetService.listDataSetVersions.mockResolvedValue(
         testApiDataSetVersions,
       );
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('heading', {
-          name: 'Using this data',
-        }),
+        screen.getByRole('heading', { name: 'Using this data' }),
       ).toBeInTheDocument();
 
       expect(
@@ -263,7 +247,7 @@ describe('DataSetFilePage', () => {
       );
     });
 
-    test('renders the version history section', async () => {
+    test('renders the API version history section', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
       apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
       apiDataSetService.getDataSetVersion.mockResolvedValue(
@@ -272,18 +256,17 @@ describe('DataSetFilePage', () => {
       apiDataSetService.listDataSetVersions.mockResolvedValue(
         testApiDataSetVersions,
       );
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
         screen.getByRole('heading', { name: 'API data set version history' }),
       ).toBeInTheDocument();
     });
 
-    test('renders the quick start section', async () => {
+    test('renders the API quick start section', async () => {
       dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
       apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
       apiDataSetService.getDataSetVersion.mockResolvedValue(
@@ -292,16 +275,13 @@ describe('DataSetFilePage', () => {
       apiDataSetService.listDataSetVersions.mockResolvedValue(
         testApiDataSetVersions,
       );
-      render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
-      await waitFor(() =>
-        expect(screen.getByText('On this page')).toBeInTheDocument(),
-      );
+      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('heading', {
-          name: 'API data set quick start',
-        }),
+        screen.getByRole('heading', { name: 'API data set quick start' }),
       ).toBeInTheDocument();
     });
   });

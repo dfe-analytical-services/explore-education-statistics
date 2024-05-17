@@ -80,7 +80,6 @@ export default function DataSetFileDetails({ dataSetFile }: Props) {
               itemName="indicator"
               itemNamePlural="indicators"
               listClassName="govuk-!-margin-top-0 govuk-!-margin-bottom-1"
-              testId="indicators"
             >
               {indicators.map((indicator, index) => (
                 <li key={`indicator-${index.toString()}`}>{indicator}</li>
@@ -98,7 +97,6 @@ export default function DataSetFileDetails({ dataSetFile }: Props) {
               itemName="filter"
               itemNamePlural="filters"
               listClassName="govuk-!-margin-top-0 govuk-!-margin-bottom-1"
-              testId="filters"
             >
               {filters.map((filter, index) => (
                 <li key={`filter-${index.toString()}`}>{filter}</li>

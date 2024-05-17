@@ -251,7 +251,7 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
               <DataSetFileUsage
                 hasApiDataSet={!!apiDataSet}
                 tableToolLink={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
-                onClickDownload={handleDownload}
+                onDownload={handleDownload}
               />
 
               {apiDataSetVersions && apiDataSetVersion && (

@@ -9,13 +9,13 @@ import React from 'react';
 interface Props {
   hasApiDataSet?: boolean;
   tableToolLink: string;
-  onClickDownload: () => void;
+  onDownload: () => void;
 }
 
 export default function DataSetFileUsage({
   hasApiDataSet = false,
   tableToolLink,
-  onClickDownload,
+  onDownload,
 }: Props) {
   return (
     <DataSetFilePageSection
@@ -27,7 +27,7 @@ export default function DataSetFileUsage({
           cardSize="l"
           description="Download the underlying data as a compressed ZIP file"
           link={
-            <ButtonText onClick={onClickDownload}>
+            <ButtonText onClick={onDownload}>
               Download this data set (ZIP)
             </ButtonText>
           }

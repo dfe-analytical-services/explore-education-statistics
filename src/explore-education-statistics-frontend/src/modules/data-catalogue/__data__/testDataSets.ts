@@ -14,7 +14,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       id: 'api-data-set-id-1',
       version: '1.0',
     },
-    id: 'datasetfile-id-1',
+    id: 'data-set-file-id-1',
     fileExtension: 'csv',
     fileId: 'file-id-1',
     filename: 'file-name-1',
@@ -47,7 +47,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     title: 'Data set 1',
   },
   {
-    id: 'datasetfile-id-2',
+    id: 'data-set-file-2',
     fileExtension: 'csv',
     fileId: 'file-id-2',
     filename: 'file-name-2',
@@ -80,7 +80,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     title: 'Data set 2',
   },
   {
-    id: 'datasetfile-id-3',
+    id: 'data-set-file-id-3',
     fileExtension: 'csv',
     fileId: 'file-id-3',
     filename: 'file-name-3',
@@ -115,7 +115,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
 ];
 
 export const testDataSetFile: DataSetFile = {
-  id: 'data-setfile-id',
+  id: 'data-set-file-id',
   file: {
     id: 'file-id',
     name: 'file name',

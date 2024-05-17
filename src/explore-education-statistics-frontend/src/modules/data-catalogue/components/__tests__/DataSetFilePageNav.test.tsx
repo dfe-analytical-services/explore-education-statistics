@@ -5,6 +5,7 @@ import noop from 'lodash/noop';
 import { Dictionary } from '@common/types';
 
 let mockIsMedia = false;
+
 jest.mock('@common/hooks/useMedia', () => ({
   useMobileMedia: () => {
     return {
@@ -59,6 +60,7 @@ describe('DataSetFilePageNav', () => {
 
   test('does not render the back to top link on mobile', () => {
     mockIsMedia = true;
+
     render(
       <DataSetFilePageNav
         activeSection="details"

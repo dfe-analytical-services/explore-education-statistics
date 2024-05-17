@@ -3,7 +3,7 @@ import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/component
 import { screen, within } from '@testing-library/react';
 import React from 'react';
 
-describe('DataSetFileQuickStart', () => {
+describe('DataSetFileApiQuickStart', () => {
   test('renders correctly', () => {
     render(
       <DataSetFileApiQuickStart
