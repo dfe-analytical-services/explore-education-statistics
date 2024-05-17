@@ -34,24 +34,26 @@ describe('DataSetFileQuickStart', () => {
       ),
     ).toBeInTheDocument();
     expect(
-      within(screen.getByTestId('Latest API version')).getByText('1.0'),
+      within(screen.getByTestId('API data set version')).getByText('1.0'),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('heading', { name: 'Data set summary' }),
+      screen.getByRole('heading', { name: 'Get data set summary' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('GET data set summary')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id/,
+    expect(
+      screen.getByLabelText('GET data set summary URL'),
+    ).toHaveDisplayValue(/data-sets\/api-data-set-id/);
+    expect(
+      screen.getByLabelText('GET data set metadata URL'),
+    ).toHaveDisplayValue(
+      /data-sets\/api-data-set-id\/meta\?dataSetVersion=1.0/,
     );
-    expect(screen.getByLabelText('GET data set meta data')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/meta/,
+    expect(screen.getByLabelText('GET data set query URL')).toHaveDisplayValue(
+      /data-sets\/api-data-set-id\/query\?dataSetVersion=1.0/,
     );
-    expect(screen.getByLabelText('GET data set')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/query/,
-    );
-    expect(screen.getByLabelText('POST data set')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/query/,
+    expect(screen.getByLabelText('POST data set query URL')).toHaveDisplayValue(
+      /data-sets\/api-data-set-id\/query\?dataSetVersion=1.0/,
     );
   });
 });
