@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -169,10 +168,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ToList();
 
             var timePeriods = observations
-                .Select(o => new TimePeriodRangeBoundMeta { Year = o.Year, TimeIdentifier = o.TimeIdentifier })
+                .Select(o => new { o.Year, o.TimeIdentifier, })
                 .Distinct()
-                .OrderBy(tp => tp.Year)
-                .ThenBy(tp => tp.TimeIdentifier)
+                .OrderBy(o => o.Year)
+                .ThenBy(o => o.TimeIdentifier)
+                .ToList()
+                .Select(tp => new TimePeriodRangeBoundMeta
+                {
+                    Period = tp.Year.ToString(),
+                    TimeIdentifier = tp.TimeIdentifier,
+                })
                 .ToList();
 
             var filters = await statisticsDbContext.Filter
@@ -202,8 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataSetFileMeta = new DataSetFileMeta
             {
-                GeographicLevels = geographicLevels
-                    .Select(gl => gl.GetEnumLabel()).ToList(),
+                GeographicLevels = geographicLevels,
                 TimePeriodRange = new TimePeriodRangeMeta
                 {
                     Start = timePeriods.First(),

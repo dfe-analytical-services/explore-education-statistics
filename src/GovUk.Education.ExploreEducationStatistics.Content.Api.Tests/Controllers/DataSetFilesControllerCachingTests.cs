@@ -2,7 +2,9 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -68,7 +70,17 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                         Id = Guid.NewGuid(),
                         Version = "1.0.0"
                     },
-                    Meta = new DataSetFileMetaViewModel(),
+                    Meta = new DataSetFileMetaViewModel
+                    {
+                        GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
+                        TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
+                        {
+                            From = "2000",
+                            To = "2001",
+                        },
+                        Filters = ["Filter 1"],
+                        Indicators = ["Indicator 1"],
+                    },
                     LatestData = true,
                     Published = DateTime.UtcNow,
                 }

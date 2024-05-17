@@ -26,14 +26,14 @@ public static class FileGeneratorExtensions
             .SetDefault(f => f.Filename)
             .SetDataSetFileMeta(new DataSetFileMeta
             {
-                GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
+                GeographicLevels = [GeographicLevel.Country],
                 TimePeriodRange = new TimePeriodRangeMeta
                 {
-                    Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Year = 2000, },
-                    End = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Year = 2001, }
+                    Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
+                    End = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2001", }
                 },
-                Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", }],
-                Indicators = [new() { Id = Guid.NewGuid(), }],
+                Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", }],
+                Indicators = [new() { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", }],
             })
             .Set(f => f.Filename, (_, f) => $"{f.Filename}.csv");
 

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -1599,29 +1600,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithFile(_fixture.DefaultFile()
                         .WithType(FileType.Data)
                         .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
-                            .WithGeographicLevels(["National", "Local authority"])
-                            .WithTimePeriodRange(new TimePeriodRangeMeta
-                            {
-                                Start = new TimePeriodRangeBoundMeta
-                                {
-                                    TimeIdentifier = TimeIdentifier.AcademicYear,
-                                    Year = 2000,
-                                },
-                                End = new TimePeriodRangeBoundMeta
-                                {
-                                    TimeIdentifier = TimeIdentifier.AcademicYear,
-                                    Year = 2002,
-                                },
-                            })
+                            .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
+                            .WithTimePeriodRange(
+                                _fixture.DefaultTimePeriodRangeMeta()
+                                    .WithStart("2000", TimeIdentifier.AcademicYear)
+                                    .WithEnd("2002", TimeIdentifier.AcademicYear)
+                            )
                             .WithFilters([
-                                new FilterMeta { Label = "Filter 1" },
-                                new FilterMeta { Label = "Filter 2" },
-                                new FilterMeta { Label = "Filter 3" },
+                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", },
+                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "filter_2", },
+                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "filter_3", },
                             ])
                             .WithIndicators([
-                                new IndicatorMeta { Label = "Indicator 1" },
-                                new IndicatorMeta { Label = "Indicator 2" },
-                                new IndicatorMeta { Label = "Indicator 3" },
+                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", },
+                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "indicator_2", },
+                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "indicator_3", },
                             ])
                         ))
                     .Generate();
@@ -1649,29 +1642,31 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
-                dataSetFileMetaViewModel.GeographicLevels
-                    .AssertDeepEqualTo(originalMeta!.GeographicLevels);
+                Assert.Equal(originalMeta!.GeographicLevels
+                        .Select(gl => gl.GetEnumLabel())
+                        .ToList(),
+                    dataSetFileMetaViewModel.GeographicLevels);
 
-                dataSetFileMetaViewModel.TimePeriodRange.AssertDeepEqualTo(
-                    new DataSetFileTimePeriodRangeViewModel
+                Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                     {
                         From = TimePeriodLabelFormatter.Format(
-                            originalMeta.TimePeriodRange.Start.Year,
+                            originalMeta.TimePeriodRange.Start.Period,
                             originalMeta.TimePeriodRange.Start.TimeIdentifier),
                         To = TimePeriodLabelFormatter.Format(
-                            originalMeta.TimePeriodRange.End.Year,
+                            originalMeta.TimePeriodRange.End.Period,
                             originalMeta.TimePeriodRange.End.TimeIdentifier),
-                    });
+                    },
+                    dataSetFileMetaViewModel.TimePeriodRange);
 
-                dataSetFileMetaViewModel.Filters
-                    .AssertDeepEqualTo(originalMeta.Filters
+                Assert.Equal(originalMeta.Filters
                         .Select(f => f.Label)
-                        .ToList());
+                        .ToList(),
+                    dataSetFileMetaViewModel.Filters);
 
-                dataSetFileMetaViewModel.Indicators
-                    .AssertDeepEqualTo(originalMeta.Indicators
+                Assert.Equal(originalMeta.Indicators
                         .Select(i => i.Label)
-                        .ToList());
+                        .ToList(),
+                    dataSetFileMetaViewModel.Indicators);
             }
 
             [Fact]
@@ -1839,7 +1834,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile()
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithTimePeriodRange(
+                        _fixture.DefaultTimePeriodRangeMeta()
+                            .WithStart("2000", TimeIdentifier.CalendarYear)
+                            .WithEnd("2001", TimeIdentifier.CalendarYear)
+                        ))
                     .WithPublicApiDataSetId(Guid.NewGuid())
                     .WithPublicApiDataSetVersion(major: 1, minor: 0)
                     .WithSubjectId(Guid.NewGuid())
@@ -1887,29 +1887,31 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
             var dataSetFileMeta = file.DataSetFileMeta;
 
-            viewModel.Meta.GeographicLevels
-                .AssertDeepEqualTo(dataSetFileMeta!.GeographicLevels);
+            Assert.Equal(dataSetFileMeta!.GeographicLevels
+                    .Select(gl => gl.GetEnumLabel())
+                    .ToList(),
+                viewModel.Meta.GeographicLevels);
 
-            viewModel.Meta.TimePeriodRange.AssertDeepEqualTo(
-                new DataSetFileTimePeriodRangeViewModel
+            Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
                     From = TimePeriodLabelFormatter.Format(
-                        dataSetFileMeta.TimePeriodRange.Start.Year,
-                        dataSetFileMeta.TimePeriodRange.Start.TimeIdentifier),
+                        "2000",
+                        TimeIdentifier.CalendarYear),
                     To = TimePeriodLabelFormatter.Format(
-                        dataSetFileMeta.TimePeriodRange.End.Year,
-                        dataSetFileMeta.TimePeriodRange.End.TimeIdentifier),
-                });
+                        "2001",
+                        TimeIdentifier.CalendarYear),
+                },
+                viewModel.Meta.TimePeriodRange);
 
-            viewModel.Meta.Filters
-                .AssertDeepEqualTo(dataSetFileMeta.Filters
+            Assert.Equal(dataSetFileMeta.Filters
                     .Select(f => f.Label)
-                    .ToList());
+                    .ToList(),
+                viewModel.Meta.Filters);
 
-            viewModel.Meta.Indicators
-                .AssertDeepEqualTo(dataSetFileMeta.Indicators
-                    .Select(i => i.Label)
-                    .ToList());
+            Assert.Equal(dataSetFileMeta.Indicators
+                .Select(i => i.Label)
+                .ToList(),
+                viewModel.Meta.Indicators);
         }
 
         [Fact]
@@ -1937,9 +1939,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
-                            new FilterMeta { Id = filter3Id, Label = "Filter 3", },
-                            new FilterMeta { Id = filter1Id, Label = "Filter 1", },
-                            new FilterMeta { Id = filter2Id, Label = "Filter 2", },
+                            new FilterMeta { Id = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
+                            new FilterMeta { Id = filter1Id, Label = "Filter 1", ColumnName = "filter_1", },
+                            new FilterMeta { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
                         ])));
 
             var client = BuildApp()
@@ -1989,10 +1991,10 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithIndicators([
-                            new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", },
-                            new IndicatorMeta { Id = indicator2Id, Label = "Indicator 2", },
-                            new IndicatorMeta { Id = indicator1Id, Label = "Indicator 1", },
-                            new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", },
+                            new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
+                            new IndicatorMeta { Id = indicator2Id, Label = "Indicator 2", ColumnName = "indicator_2", },
+                            new IndicatorMeta { Id = indicator1Id, Label = "Indicator 1", ColumnName = "indicator_1", },
+                            new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
 
             var client = BuildApp()

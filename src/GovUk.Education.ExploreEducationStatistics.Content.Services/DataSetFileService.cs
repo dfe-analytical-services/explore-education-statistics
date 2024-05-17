@@ -209,14 +209,16 @@ public class DataSetFileService : IDataSetFileService
 
         return new DataSetFileMetaViewModel
         {
-            GeographicLevels = meta.GeographicLevels,
+            GeographicLevels = meta.GeographicLevels
+                .Select(gl => gl.GetEnumLabel())
+                .ToList(),
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
                 From = TimePeriodLabelFormatter.Format(
-                    meta.TimePeriodRange.Start.Year,
+                    meta.TimePeriodRange.Start.Period,
                     meta.TimePeriodRange.Start.TimeIdentifier),
                 To = TimePeriodLabelFormatter.Format(
-                    meta.TimePeriodRange.End.Year,
+                    meta.TimePeriodRange.End.Period,
                     meta.TimePeriodRange.End.TimeIdentifier),
             },
             Filters = GetOrderedFilters(meta.Filters, filterSequence),

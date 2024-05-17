@@ -298,14 +298,14 @@ public class ProcessorStage3Tests
 
             // Checking against contents of small-csv.csv in Resources directory / _subject
             var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
-            Assert.Equal("Local authority", geographicLevel);
+            Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel);
 
             Assert.Equal(TimeIdentifier.CalendarYear,
                 file.DataSetFileMeta.TimePeriodRange.Start.TimeIdentifier);
             Assert.Equal(TimeIdentifier.CalendarYear,
                 file.DataSetFileMeta.TimePeriodRange.End.TimeIdentifier);
-            Assert.Equal(2018, file.DataSetFileMeta.TimePeriodRange.Start.Year);
-            Assert.Equal(2025, file.DataSetFileMeta.TimePeriodRange.End.Year);
+            Assert.Equal("2018", file.DataSetFileMeta.TimePeriodRange.Start.Period);
+            Assert.Equal("2025", file.DataSetFileMeta.TimePeriodRange.End.Period);
 
             // Checking against contents of small-csv.meta.csv / _subject
             file.DataSetFileMeta.Filters

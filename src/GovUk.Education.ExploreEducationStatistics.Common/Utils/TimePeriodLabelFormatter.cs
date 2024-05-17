@@ -22,6 +22,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
         }
 
         public static string Format(
+            string period,
+            TimeIdentifier timeIdentifier,
+            TimePeriodLabelFormat? overridingLabelFormat = null)
+        {
+            var year = int.Parse(period); // Will change in the future - see EES-3109
+            return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
+        }
+
+        public static string Format(
             int year,
             TimeIdentifier timeIdentifier,
             TimePeriodLabelFormat? overridingLabelFormat = null)

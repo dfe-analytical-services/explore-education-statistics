@@ -48,11 +48,13 @@ public class DataSetFileMetaMigrationController : ControllerBase
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default)
     {
-        var files = await _contentDbContext.Files
+        var files = (await _contentDbContext.Files
             .Where(f =>
                 f.DataSetFileMeta != null
                 && f.Type == FileType.Data)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken))
+            .Where(f => f.DataSetFileMeta.TimeIdentifier != null)
+            .ToList();
 
         var numTimePeriodRangeSet = 0;
         var errors = new List<string>();
@@ -63,12 +65,18 @@ public class DataSetFileMetaMigrationController : ControllerBase
                 .AsNoTracking()
                 .Where(o => o.SubjectId == file.SubjectId);
 
-            var timePeriods = await observations
-                .Select(o => new TimePeriodRangeBoundMeta{ Year = o.Year, TimeIdentifier = o.TimeIdentifier })
+            var timePeriods = (await observations
+                .Select(o => new { o.Year, o.TimeIdentifier, })
                 .Distinct()
                 .OrderBy(tp => tp.Year)
                 .ThenBy(tp => tp.TimeIdentifier)
-                .ToListAsync(cancellationToken: cancellationToken);
+                .ToListAsync(cancellationToken: cancellationToken))
+                .Select(tp => new TimePeriodRangeBoundMeta
+                {
+                    Period = tp.Year.ToString(),
+                    TimeIdentifier = tp.TimeIdentifier,
+                })
+                .ToList();
 
             if (timePeriods.Count == 0)
             {
