@@ -57,4 +57,6 @@ public record DataSetFileFileViewModel
     public required string Name { get; init; }
 
     public required string Size { get; init; }
+
+    public required Guid SubjectId { get; init; }
 }

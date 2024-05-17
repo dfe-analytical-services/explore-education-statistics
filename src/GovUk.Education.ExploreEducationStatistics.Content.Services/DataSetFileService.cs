@@ -187,6 +187,7 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
+                SubjectId = releaseFile.File.SubjectId!.Value,
             },
             Meta = BuildDataSetFileMetaViewModel(
                 releaseFile.File.DataSetFileMeta,

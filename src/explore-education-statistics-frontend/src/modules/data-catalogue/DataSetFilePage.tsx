@@ -295,7 +295,7 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
                     description="View tables that we have built for you, or create your own tables from open data using our table tool"
                     link={
                       <Link
-                        to={`/data-tables/${release.publication.slug}/${release.slug}`}
+                        to={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
                       >
                         View or create your own tables
                       </Link>
