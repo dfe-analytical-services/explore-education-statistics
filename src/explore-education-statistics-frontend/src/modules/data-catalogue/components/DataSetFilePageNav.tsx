@@ -1,23 +1,18 @@
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { Dictionary } from '@common/types';
 import styles from '@frontend/modules/data-catalogue/components/DataSetFilePageNav.module.scss';
-import {
-  ApiPageSection,
-  PageSection,
-} from '@frontend/modules/data-catalogue/DataSetFilePage';
 import classNames from 'classnames';
 import React from 'react';
 
-interface Props {
-  activeSection: PageSection | ApiPageSection;
-  sections: Dictionary<string>;
-  onClickItem: (id: PageSection) => void;
+interface Props<TSections extends Dictionary<string>> {
+  activeSection: string;
+  sections: TSections;
+  onClickItem: (id: keyof TSections) => void;
 }
-export default function DataSetFilePageNav({
-  activeSection,
-  sections,
-  onClickItem,
-}: Props) {
+
+export default function DataSetFilePageNav<
+  TSections extends Dictionary<string>,
+>({ activeSection, sections, onClickItem }: Props<TSections>) {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   return (
@@ -46,7 +41,7 @@ export default function DataSetFilePageNav({
               className="govuk-!-padding-top-4"
               hashId="main-content"
               text="Back to top"
-              onClick={() => onClickItem('details')}
+              onClick={() => onClickItem('dataSetDetails')}
             />
           )}
         </ul>
@@ -57,7 +52,7 @@ export default function DataSetFilePageNav({
 
 interface NavItemProps {
   className?: string;
-  hashId: PageSection | ApiPageSection | 'main-content';
+  hashId: string;
   isActive?: boolean;
   text: string;
   onClick: () => void;

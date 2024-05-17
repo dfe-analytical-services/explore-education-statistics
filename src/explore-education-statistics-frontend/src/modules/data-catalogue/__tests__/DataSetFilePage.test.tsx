@@ -139,8 +139,8 @@ describe('DataSetFilePage', () => {
       );
       const navLinks = nav.getAllByRole('link');
       expect(navLinks).toHaveLength(2);
-      expect(navLinks[0]).toHaveAttribute('href', '#details');
-      expect(navLinks[1]).toHaveAttribute('href', '#using');
+      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetUsage');
     });
 
     test('renders the using this data section', async () => {
@@ -228,10 +228,10 @@ describe('DataSetFilePage', () => {
       );
       const navLinks = nav.getAllByRole('link');
       expect(navLinks).toHaveLength(4);
-      expect(navLinks[0]).toHaveAttribute('href', '#details');
-      expect(navLinks[1]).toHaveAttribute('href', '#using');
-      expect(navLinks[2]).toHaveAttribute('href', '#versionHistory');
-      expect(navLinks[3]).toHaveAttribute('href', '#quickStart');
+      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[2]).toHaveAttribute('href', '#apiVersionHistory');
+      expect(navLinks[3]).toHaveAttribute('href', '#apiQuickStart');
     });
 
     test('renders the using this data section', async () => {
@@ -300,7 +300,7 @@ describe('DataSetFilePage', () => {
 
       expect(
         screen.getByRole('heading', {
-          name: 'API data set endpoints quick start',
+          name: 'API data set quick start',
         }),
       ).toBeInTheDocument();
     });

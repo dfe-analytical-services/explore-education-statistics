@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import DataSetFileVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileVersionHistory';
+import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
 import { testApiDataSetVersions } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
@@ -7,7 +7,7 @@ import React from 'react';
 describe('DataSetFileVersionHistory', () => {
   test('renders correctly', () => {
     render(
-      <DataSetFileVersionHistory
+      <DataSetFileApiVersionHistory
         currentVersion="2.0"
         dataSetFileId="data-set-file-id"
         dataSetVersions={testApiDataSetVersions}

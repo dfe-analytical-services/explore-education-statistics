@@ -1,13 +1,13 @@
 import render from '@common-test/render';
-import DataSetFileUsingData from '@frontend/modules/data-catalogue/components/DataSetFileUsingData';
+import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
 import { screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
-describe('DataSetFileUsingData', () => {
+describe('DataSetFileUsage', () => {
   test('renders correctly without api data set', () => {
     render(
-      <DataSetFileUsingData
+      <DataSetFileUsage
         hasApiDataSet={false}
         tableToolLink="test-table-tool-link"
         onClickDownload={noop}
@@ -41,7 +41,7 @@ describe('DataSetFileUsingData', () => {
 
   test('renders correctly with api data set', () => {
     render(
-      <DataSetFileUsingData
+      <DataSetFileUsage
         hasApiDataSet
         tableToolLink="test-table-tool-link"
         onClickDownload={noop}
@@ -76,7 +76,7 @@ describe('DataSetFileUsingData', () => {
   test('clicking the download button calls the onClick handler', async () => {
     const handleDownload = jest.fn();
     const { user } = render(
-      <DataSetFileUsingData
+      <DataSetFileUsage
         hasApiDataSet
         tableToolLink="test-table-tool-link"
         onClickDownload={handleDownload}

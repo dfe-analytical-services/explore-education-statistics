@@ -5,7 +5,7 @@ import UrlContainer from '@common/components/UrlContainer';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import Link from '@frontend/components/Link';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
-import { apiPageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
 const apiBaseUrl = `${process.env.PUBLIC_API_BASE_URL}/v${process.env.PUBLIC_API_VERSION}`;
@@ -17,12 +17,12 @@ interface Props {
   version: string;
 }
 
-export default function DataSetFileQuickStart({ id, name, version }: Props) {
+export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
   return (
     <DataSetFilePageSection
       className="govuk-!-padding-bottom-8"
-      heading={apiPageSections.quickStart}
-      id="quickStart"
+      heading={pageSections.apiQuickStart}
+      id="apiQuickStart"
     >
       <InsetText>
         <p>

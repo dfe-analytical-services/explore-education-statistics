@@ -2,7 +2,7 @@ import Tag from '@common/components/Tag';
 import { PaginatedList } from '@common/services/types/pagination';
 import Link from '@frontend/components/Link';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
-import { apiPageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageApiSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import { ApiDataSetVersion } from '@frontend/services/apiDataSetService';
 import React from 'react';
 
@@ -12,15 +12,15 @@ interface Props {
   dataSetVersions: PaginatedList<ApiDataSetVersion>;
 }
 
-export default function DataSetFileVersionHistory({
+export default function DataSetFileApiVersionHistory({
   currentVersion,
   dataSetFileId,
   dataSetVersions,
 }: Props) {
   return (
     <DataSetFilePageSection
-      heading={apiPageSections.versionHistory}
-      id="versionHistory"
+      heading={pageApiSections.apiVersionHistory}
+      id="apiVersionHistory"
     >
       <table className="govuk-!-margin-bottom-8">
         <thead>

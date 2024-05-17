@@ -1,12 +1,12 @@
 import render from '@common-test/render';
-import DataSetFileQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileQuickStart';
+import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileApiQuickStart';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('DataSetFileQuickStart', () => {
   test('renders correctly', () => {
     render(
-      <DataSetFileQuickStart
+      <DataSetFileApiQuickStart
         id="api-data-set-id"
         name="Test API data set name"
         version="1.0"
@@ -15,7 +15,7 @@ describe('DataSetFileQuickStart', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'API data set endpoints quick start',
+        name: 'API data set quick start',
       }),
     ).toBeInTheDocument();
 

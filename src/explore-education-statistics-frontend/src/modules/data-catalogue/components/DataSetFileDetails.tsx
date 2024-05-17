@@ -26,7 +26,10 @@ export default function DataSetFileDetails({ dataSetFile }: Props) {
   } = dataSetFile;
 
   return (
-    <DataSetFilePageSection heading={pageSections.details} id="details">
+    <DataSetFilePageSection
+      heading={pageSections.dataSetDetails}
+      id="dataSetDetails"
+    >
       <SummaryList
         ariaLabel={`Details list for ${title}`}
         className="govuk-!-margin-bottom-4 govuk-!-margin-top-4"

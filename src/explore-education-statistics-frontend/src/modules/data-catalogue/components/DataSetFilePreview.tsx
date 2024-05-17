@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import styles from '@frontend/modules/data-catalogue/components/DataSetFilePreview.module.scss';
-import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageHiddenSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
 // TODO EES-4856 replace with real data
@@ -137,7 +137,10 @@ export default function DataSetFilePreview({
   const displayRows = showAll ? tableRows : tableRows.slice(0, 4);
 
   return (
-    <DataSetFilePageSection heading={pageSections.preview} id="preview">
+    <DataSetFilePageSection
+      heading={pageHiddenSections.dataSetPreview}
+      id="dataSetPreview"
+    >
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
       <div className={styles.container} tabIndex={0}>
         <table id={tableId}>

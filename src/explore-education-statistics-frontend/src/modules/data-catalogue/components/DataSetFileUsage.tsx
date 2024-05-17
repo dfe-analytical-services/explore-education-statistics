@@ -2,7 +2,7 @@ import ButtonText from '@common/components/ButtonText';
 import ChevronGrid from '@common/components/ChevronGrid';
 import ChevronCard from '@common/components/ChevronCard';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
-import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageBaseSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import Link from '@frontend/components/Link';
 import React from 'react';
 
@@ -12,13 +12,16 @@ interface Props {
   onClickDownload: () => void;
 }
 
-export default function DataSetFileUsingData({
+export default function DataSetFileUsage({
   hasApiDataSet = false,
   tableToolLink,
   onClickDownload,
 }: Props) {
   return (
-    <DataSetFilePageSection heading={pageSections.using} id="using">
+    <DataSetFilePageSection
+      heading={pageBaseSections.dataSetUsage}
+      id="dataSetUsage"
+    >
       <ChevronGrid>
         <ChevronCard
           cardSize="l"

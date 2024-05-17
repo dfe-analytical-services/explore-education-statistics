@@ -1,5 +1,8 @@
 import { useMobileMedia } from '@common/hooks/useMedia';
-import { PageSection } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import {
+  PageHiddenSectionId,
+  PageSectionId,
+} from '@frontend/modules/data-catalogue/DataSetFilePage';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
@@ -7,9 +10,10 @@ interface Props {
   children: ReactNode;
   className?: string;
   heading: string;
-  id: PageSection;
+  id: PageSectionId | PageHiddenSectionId;
   testId?: string;
 }
+
 export default function DataSetFilePageSection({
   children,
   className,
@@ -26,7 +30,7 @@ export default function DataSetFilePageSection({
         className,
       )}
       id={id}
-      data-scroll
+      data-page-section=""
       data-testid={testId}
     >
       <h2>{heading}</h2>
