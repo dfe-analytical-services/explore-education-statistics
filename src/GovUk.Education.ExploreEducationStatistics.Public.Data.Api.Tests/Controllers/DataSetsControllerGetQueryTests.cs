@@ -1021,13 +1021,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
 
         [Theory]
-        [InlineData(1, 50, 5)]
-        [InlineData(2, 50, 5)]
-        [InlineData(3, 50, 5)]
-        [InlineData(1, 150, 2)]
-        [InlineData(2, 150, 2)]
-        [InlineData(1, 216, 1)]
-        public async Task MultiplePages_Returns200_PaginatedCorrectly(int page, int pageSize, int totalPages)
+        [InlineData(1, 50, 5, 50)]
+        [InlineData(2, 50, 5, 50)]
+        [InlineData(3, 50, 5, 50)]
+        [InlineData(1, 150, 2, 150)]
+        [InlineData(2, 150, 2, 66)]
+        [InlineData(1, 216, 1, 216)]
+        public async Task MultiplePages_Returns200_PaginatedCorrectly(
+            int page,
+            int pageSize,
+            int totalPages,
+            int pageResults)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -1040,6 +1044,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
 
+            Assert.Equal(pageResults, viewModel.Results.Count);
             Assert.Equal(page, viewModel.Paging.Page);
             Assert.Equal(pageSize, viewModel.Paging.PageSize);
             Assert.Equal(totalPages, viewModel.Paging.TotalPages);

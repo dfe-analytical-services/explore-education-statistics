@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Inte
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Query;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using InterpolatedSql;
@@ -20,6 +21,7 @@ internal class DataSetQueryParser(
         DataSetQueryCriteria criteria,
         DataSetVersion dataSetVersion,
         QueryState queryState,
+        string basePath = "",
         CancellationToken cancellationToken = default)
     {
         using var _ = MiniProfiler.Current
@@ -44,18 +46,32 @@ internal class DataSetQueryParser(
             new TimePeriodFacetsParser(queryState, timePeriodMetas.Result),
         ];
 
-        return ParseCriteriaFragment(criteria, parsers);
+        return ParseCriteriaFragment(criteria, parsers, basePath);
     }
 
-    private static Facets ExtractFacets(DataSetQueryCriteria criteria)
+    private static Facets ExtractFacets(DataSetQueryCriteria criteria, Facets? facets = null)
     {
-        var facets = new Facets();
+        facets ??= new Facets();
 
-        if (criteria is DataSetQueryCriteriaFacets criteriaFacets)
+        switch (criteria)
         {
-            facets.Filters.AddRange(criteriaFacets.Filters?.GetOptions() ?? []);
-            facets.Locations.AddRange(criteriaFacets.Locations?.GetOptions() ?? []);
-            facets.TimePeriods.AddRange(criteriaFacets.TimePeriods?.GetOptions() ?? []);
+            case DataSetQueryCriteriaFacets criteriaFacets:
+                facets.Filters.AddRange(criteriaFacets.Filters?.GetOptions() ?? []);
+                facets.Locations.AddRange(criteriaFacets.Locations?.GetOptions() ?? []);
+                facets.TimePeriods.AddRange(criteriaFacets.TimePeriods?.GetOptions() ?? []);
+                break;
+
+            case DataSetQueryCriteriaAnd andCriteria:
+                andCriteria.And.ForEach(subCriteria => ExtractFacets(subCriteria, facets));
+                break;
+
+            case DataSetQueryCriteriaOr orCriteria:
+                orCriteria.Or.ForEach(subCriteria => ExtractFacets(subCriteria, facets));
+                break;
+
+            case DataSetQueryCriteriaNot notCriteria:
+                ExtractFacets(notCriteria.Not, facets);
+                break;
         }
 
         return facets;
@@ -63,19 +79,91 @@ internal class DataSetQueryParser(
 
     private static IInterpolatedSql ParseCriteriaFragment(
         DataSetQueryCriteria criteria,
-        IEnumerable<IFacetsParser> facetParsers)
+        IEnumerable<IFacetsParser> facetParsers,
+        string path,
+        string facetJoinCondition = "AND")
     {
-        var path = "";
         var builder = new DuckDbSqlBuilder();
 
-        if (criteria is DataSetQueryCriteriaFacets criteriaFacets)
+        switch (criteria)
         {
-            var fragments = facetParsers
-                .Select(parser => parser.Parse(criteriaFacets, path))
-                .Where(fragment => !fragment.IsEmpty());
+            case DataSetQueryCriteriaFacets facetCriteria:
+                var facetFragments = facetParsers
+                    .Select(parser => parser.Parse(facetCriteria, path))
+                    .Where(fragment => !fragment.IsEmpty());
 
-            builder.AppendRange(fragments, joinString: "\nAND ");
+                builder.AppendRange(facetFragments, joinString: $"\n{facetJoinCondition} ");
+                break;
+
+            case DataSetQueryCriteriaAnd andCriteria:
+                var andFragments = andCriteria.And
+                    .Select(
+                        (fragment, index) => ParseCriteriaFragment(
+                            fragment,
+                            facetParsers,
+                            path: QueryUtils.Path(path, $"and[{index}]")
+                        )
+                    )
+                    .ToList();
+
+                if (andFragments.Count == 1)
+                {
+                    builder.Append(andFragments[0]);
+                }
+                else
+                {
+                    builder.AppendRange(andFragments.Select(WrapFragmentInParentheses), joinString: "\nAND ");
+                }
+
+                break;
+
+            case DataSetQueryCriteriaOr orCriteria:
+                var orFragments = orCriteria.Or
+                    .Select(
+                        (fragment, index) => ParseCriteriaFragment(
+                            fragment,
+                            facetParsers,
+                            path: QueryUtils.Path(path, $"or[{index}]")
+                        )
+                    )
+                    .ToList();
+
+                if (orFragments.Count == 1)
+                {
+                    builder.Append(orFragments[0]);
+                }
+                else
+                {
+                    builder.AppendRange(orFragments.Select(WrapFragmentInParentheses), joinString: "\nOR ");
+                }
+
+                break;
+
+            case DataSetQueryCriteriaNot notCriteria:
+                builder.AppendLiteral("NOT ");
+                builder.Append(
+                    WrapFragmentInParentheses(
+                        ParseCriteriaFragment(
+                            notCriteria.Not,
+                            facetParsers,
+                            path: QueryUtils.Path(path, "not"),
+                            facetJoinCondition: "OR"
+                        )
+                    )
+                );
+                break;
         }
+
+        return builder.Build();
+    }
+
+    private static IInterpolatedSql WrapFragmentInParentheses(IInterpolatedSql sql)
+    {
+        var builder = new DuckDbSqlBuilder();
+
+        builder.AppendLiteral("(");
+        builder.Append(sql);
+        builder.AppendLiteral(")");
 
         return builder.Build();
     }

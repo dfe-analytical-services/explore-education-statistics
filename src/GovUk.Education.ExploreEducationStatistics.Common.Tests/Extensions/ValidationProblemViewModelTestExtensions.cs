@@ -305,6 +305,23 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasAllowedValueError<TValue>(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
+        TValue? value)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.AllowedValue.Code
+        );
+
+        var errorDetail = error.GetDetail<AllowedErrorDetail<TValue>>();
+
+        Assert.Equal(value, errorDetail.Value);
+
+        return error;
+    }
+
+    public static ErrorViewModel AssertHasAllowedValueError<TValue>(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath,
         TValue? value,
         IEnumerable<TValue> allowed)
     {
