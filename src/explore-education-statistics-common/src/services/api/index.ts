@@ -17,7 +17,7 @@ export const dataApi = new Client({
 });
 
 export const publicApi = new Client({
-  baseURL: `${process.env.PUBLIC_API_BASE_URL}/v${process.env.PUBLIC_API_VERSION}`,
+  baseURL: process.env.PUBLIC_API_BASE_URL,
   requestInterceptors: [networkActivityRequestInterceptor],
   responseInterceptors: [networkActivityResponseInterceptor],
 });

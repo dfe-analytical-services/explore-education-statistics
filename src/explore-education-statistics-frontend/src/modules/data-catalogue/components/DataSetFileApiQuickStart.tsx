@@ -8,7 +8,7 @@ import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/
 import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
-const apiBaseUrl = `${process.env.PUBLIC_API_BASE_URL}/v${process.env.PUBLIC_API_VERSION}`;
+const apiBaseUrl = process.env.PUBLIC_API_BASE_URL;
 const apiDocsUrl = process.env.PUBLIC_API_DOCUMENTATION_URL;
 
 interface Props {
