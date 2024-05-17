@@ -48,7 +48,7 @@
     "@types/jest": "^29.5.3",
     "@types/leaflet": "^1.5.17",
     "@types/memoizee": "^0.4.4",
-    "@types/node": "^16.18.31",
+    "@types/node": "^18.19.33",
     "@types/qs": "^6.9.7",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
