@@ -25,7 +25,7 @@ describe('CopyLinkButton', () => {
     expect(
       modal.getByRole('heading', { name: 'Copy link to the clipboard' }),
     ).toBeInTheDocument();
-    expect(modal.getByLabelText('Url')).toHaveValue(testUrl);
+    expect(modal.getByLabelText('URL')).toHaveValue(testUrl);
     expect(modal.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
   });
 

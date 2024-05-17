@@ -96,7 +96,7 @@ const ReleaseStatusPage = () => {
 
       <UrlContainer
         className="govuk-!-margin-bottom-4"
-        testId="public-release-url"
+        id="public-release-url"
         url={`${publicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
       />
 

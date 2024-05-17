@@ -43,7 +43,7 @@ export default function DataSetFileQuickStart({ id, name, version }: Props) {
       <h3>Data set summary</h3>
       <UrlContainer
         className="govuk-!-margin-bottom-1"
-        testId="data-set-summary-endpoint"
+        id="data-set-summary-endpoint"
         label={
           <>
             GET<VisuallyHidden> data set summary</VisuallyHidden>
@@ -58,7 +58,7 @@ export default function DataSetFileQuickStart({ id, name, version }: Props) {
       <h3 className="govuk-!-margin-top-5">Data set meta data</h3>
       <UrlContainer
         className="govuk-!-margin-bottom-1"
-        testId="data-set-meta-endpoint"
+        id="data-set-meta-endpoint"
         label={
           <>
             GET<VisuallyHidden> data set meta data</VisuallyHidden>
@@ -74,7 +74,7 @@ export default function DataSetFileQuickStart({ id, name, version }: Props) {
       <h3 className="govuk-!-margin-top-5">Query data set using GET</h3>
       <UrlContainer
         className="govuk-!-margin-bottom-1"
-        testId="data-set-get-query-endpoint"
+        id="data-set-get-query-endpoint"
         label={
           <>
             GET<VisuallyHidden> data set</VisuallyHidden>
@@ -90,7 +90,7 @@ export default function DataSetFileQuickStart({ id, name, version }: Props) {
       <h3 className="govuk-!-margin-top-5">Query data set using POST</h3>
       <UrlContainer
         className="govuk-!-margin-bottom-1"
-        testId="data-set-post-query-endpoint"
+        id="data-set-post-query-endpoint"
         label={
           <>
             POST<VisuallyHidden> data set</VisuallyHidden>

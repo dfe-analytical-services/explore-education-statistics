@@ -75,7 +75,7 @@ const ReleasePreReleaseAccessPage = () => {
 
                 <UrlContainer
                   className="govuk-!-margin-bottom-4"
-                  testId="prerelease-url"
+                  id="prerelease-url"
                   url={`${
                     window.location.origin
                   }${generatePath<ReleaseRouteParams>(

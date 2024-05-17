@@ -98,7 +98,7 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
 
           <UrlContainer
             className="govuk-!-margin-top-0 govuk-!-margin-bottom-2"
-            testId="permalink-generated-url"
+            id="permalink-generated-url"
             url={permalinkUrl}
           />
 

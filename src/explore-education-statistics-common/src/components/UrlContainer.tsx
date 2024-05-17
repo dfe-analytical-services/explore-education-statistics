@@ -4,21 +4,21 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   className?: string;
+  id: string;
   label?: string | ReactNode;
   labelHidden?: boolean;
   testId?: string;
   url: string;
 }
 
-const UrlContainer = ({
+export default function UrlContainer({
   className,
-  label = 'Url',
+  id,
+  label = 'URL',
   labelHidden = true,
-  testId = 'url',
+  testId,
   url,
-}: Props) => {
-  const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
-    event.target.select();
+}: Props) {
   return (
     <div
       className={classNames(className, {
@@ -26,7 +26,7 @@ const UrlContainer = ({
       })}
     >
       <label
-        htmlFor={testId}
+        htmlFor={id}
         className={classNames({
           'govuk-visually-hidden': labelHidden,
           'govuk-!-margin-right-2': !labelHidden,
@@ -37,14 +37,12 @@ const UrlContainer = ({
       <input
         type="text"
         value={url}
-        id={testId}
+        id={id}
         className={styles.url}
         data-testid={testId}
-        onFocus={handleFocus}
+        onFocus={e => e.target.select()}
         readOnly
       />
     </div>
   );
-};
-
-export default UrlContainer;
+}

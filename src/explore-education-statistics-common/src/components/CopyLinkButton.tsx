@@ -30,7 +30,7 @@ const CopyLinkButton = ({ className, url }: Props) => {
       <div
         className={classNames('dfe-flex dfe-align-items-start', styles.modal)}
       >
-        <UrlContainer url={url} />
+        <UrlContainer id="copy-link-url" url={url} />
         <Button
           className="govuk-!-margin-bottom-0"
           onClick={async () => {

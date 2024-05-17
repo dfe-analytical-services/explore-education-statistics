@@ -51,7 +51,7 @@ describe('ReleasePreReleaseAccessPage', () => {
       screen.getByRole('tab', { name: 'Pre-release users' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Url')).toBeInTheDocument();
+    expect(screen.getByLabelText('URL')).toBeInTheDocument();
 
     expect(
       await screen.findByLabelText('Invite new users by email'),
@@ -69,10 +69,10 @@ describe('ReleasePreReleaseAccessPage', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(screen.queryByTestId('prerelease-url')).toBeInTheDocument();
+      expect(screen.getByLabelText('URL')).toBeInTheDocument();
     });
 
-    expect(screen.getByLabelText('Url')).toHaveValue(
+    expect(screen.getByLabelText('URL')).toHaveValue(
       'http://localhost/publication/publication-1/release/release-1/prerelease/content',
     );
   });

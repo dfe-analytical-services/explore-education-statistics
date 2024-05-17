@@ -95,7 +95,7 @@ const MethodologyStatusPage = () => {
 
               <UrlContainer
                 className="govuk-!-margin-bottom-4"
-                testId="public-methodology-url"
+                id="public-methodology-url"
                 url={`${publicAppUrl}/methodology/${currentMethodology.slug}`}
               />
 
