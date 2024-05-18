@@ -1,3 +1,4 @@
+import SectionBreak from '@common/components/SectionBreak';
 import Tag from '@common/components/Tag';
 import Button from '@common/components/Button';
 import downloadService from '@common/services/downloadService';
@@ -219,7 +220,7 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
 
           <ContentHtml html={summary} />
 
-          <hr className="govuk-!-margin-bottom-8 govuk-!-margin-top-6" />
+          <SectionBreak size="l" />
 
           <div className="govuk-grid-row">
             <DataSetFilePageNav

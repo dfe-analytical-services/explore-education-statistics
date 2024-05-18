@@ -148,9 +148,11 @@ export default function DataSetFilePreview({
             Table showing first 5 rows from underlying data
           </caption>
           <thead>
-            {tableHeaders.map(header => (
-              <th key={header}>{header}</th>
-            ))}
+            <tr>
+              {tableHeaders.map(header => (
+                <th key={header}>{header}</th>
+              ))}
+            </tr>
           </thead>
           <tbody>
             {displayRows.map((row, rowIndex) => (
@@ -163,19 +165,18 @@ export default function DataSetFilePreview({
           </tbody>
         </table>
       </div>
-      <div className="govuk-!-margin-bottom-6">
-        <ButtonText
-          ariaControls={tableId}
-          ariaExpanded={!showAll}
-          className="govuk-!-margin-right-3"
-          onClick={onToggleShowAll}
-        >
-          {showAll ? 'Show only 5 rows' : 'Show 5 more rows'}
-        </ButtonText>
-        <ButtonText onClick={onToggleFullScreen}>
-          {fullScreen ? 'Close full screen table' : 'Show full screen table'}
-        </ButtonText>
-      </div>
+
+      <ButtonText
+        ariaControls={tableId}
+        ariaExpanded={!showAll}
+        className="govuk-!-margin-right-3"
+        onClick={onToggleShowAll}
+      >
+        {showAll ? 'Show only 5 rows' : 'Show 5 more rows'}
+      </ButtonText>
+      <ButtonText onClick={onToggleFullScreen}>
+        {fullScreen ? 'Close full screen table' : 'Show full screen table'}
+      </ButtonText>
     </DataSetFilePageSection>
   );
 }

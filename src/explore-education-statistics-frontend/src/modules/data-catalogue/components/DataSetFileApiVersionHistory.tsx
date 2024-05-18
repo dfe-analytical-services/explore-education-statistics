@@ -22,7 +22,7 @@ export default function DataSetFileApiVersionHistory({
       heading={pageApiSections.apiVersionHistory}
       id="apiVersionHistory"
     >
-      <table className="govuk-!-margin-bottom-8">
+      <table>
         <thead>
           <tr>
             <th>Version</th>

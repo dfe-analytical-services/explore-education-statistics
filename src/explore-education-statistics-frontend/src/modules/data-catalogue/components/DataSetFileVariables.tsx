@@ -78,7 +78,6 @@ export default function DataSetFileVariables() {
 
       <ButtonText
         ariaControls={tableId}
-        className="govuk-!-margin-bottom-6"
         ariaExpanded={!showAll}
         onClick={toggleShowAll}
       >

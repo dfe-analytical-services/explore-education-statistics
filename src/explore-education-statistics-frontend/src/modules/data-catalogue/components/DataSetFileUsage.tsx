@@ -42,8 +42,7 @@ export default function DataSetFileUsage({
         {hasApiDataSet && (
           <ChevronCard
             cardSize="l"
-            description="This data set is also available via an API, follow the
-          link to get all the information to get started"
+            description="This data set is also available via an API, follow the link to get all the information to get started"
             link={
               <Link to={process.env.PUBLIC_API_DOCS_URL ?? ''}>
                 API documentation

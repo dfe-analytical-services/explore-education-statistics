@@ -20,7 +20,6 @@ interface Props {
 export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
   return (
     <DataSetFilePageSection
-      className="govuk-!-padding-bottom-8"
       heading={pageSections.apiQuickStart}
       id="apiQuickStart"
     >

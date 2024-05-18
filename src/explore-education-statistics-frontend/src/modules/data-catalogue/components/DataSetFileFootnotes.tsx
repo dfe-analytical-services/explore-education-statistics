@@ -22,7 +22,7 @@ export default function DataSetFileFootnotes() {
       heading={pageHiddenSections.footnotes}
       id="footnotes"
     >
-      <ol className="govuk-!-margin-bottom-6">
+      <ol>
         {footnotes.map(footnote => (
           <li key={footnote.id}>{footnote.label}</li>
         ))}
