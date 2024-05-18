@@ -1,37 +1,24 @@
 import _downloadService from '@common/services/downloadService';
 import render from '@common-test/render';
 import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
-import _apiDataSetService from '@frontend/services/apiDataSetService';
-import _dataSetFileService from '@frontend/services/dataSetFileService';
 import {
   testApiDataSet,
   testApiDataSetVersion,
   testApiDataSetVersions,
   testDataSetFile,
-  testDataSetWithApi,
 } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
-jest.mock('@frontend/services/apiDataSetService');
-jest.mock('@frontend/services/dataSetFileService');
 jest.mock('@common/services/downloadService');
 
-const apiDataSetService = _apiDataSetService as jest.Mocked<
-  typeof _apiDataSetService
->;
-const dataSetFileService = _dataSetFileService as jest.Mocked<
-  typeof _dataSetFileService
->;
 const downloadService = _downloadService as jest.Mocked<
   typeof _downloadService
 >;
 
 describe('DataSetFilePage', () => {
   test('renders the data set file heading, summary and info', async () => {
-    dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -50,9 +37,7 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the `latest data` tag when it is the latest data', async () => {
-    dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -61,15 +46,17 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the `not the latest data` tag when it is not the latest data', async () => {
-    dataSetFileService.getDataSetFile.mockResolvedValue({
-      ...testDataSetFile,
-      release: {
-        ...testDataSetFile.release,
-        isLatestPublishedRelease: false,
-      },
-    });
-
-    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+    render(
+      <DataSetFilePage
+        dataSetFile={{
+          ...testDataSetFile,
+          release: {
+            ...testDataSetFile.release,
+            isLatestPublishedRelease: false,
+          },
+        }}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -79,11 +66,7 @@ describe('DataSetFilePage', () => {
   });
 
   test('calls the download service with the correct id when the download button is clicked', async () => {
-    dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-    const { user } = render(
-      <DataSetFilePage dataSetFileId="data-set-file-id" />,
-    );
+    const { user } = render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -99,9 +82,7 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the data set details', async () => {
-    dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-    render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -112,9 +93,7 @@ describe('DataSetFilePage', () => {
 
   describe('non-API data set', () => {
     test('does not render API version info', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -123,9 +102,7 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the page navigation correctly', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -139,9 +116,7 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the data set usage section', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -151,9 +126,7 @@ describe('DataSetFilePage', () => {
     });
 
     test('does not render the API version history section', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -163,9 +136,7 @@ describe('DataSetFilePage', () => {
     });
 
     test('does not render the API quick start section', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetFile);
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
+      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -177,16 +148,14 @@ describe('DataSetFilePage', () => {
 
   describe('API data set', () => {
     test('renders the version info', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
-      apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
-      apiDataSetService.getDataSetVersion.mockResolvedValue(
-        testApiDataSetVersion,
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersions={testApiDataSetVersions}
+          dataSetFile={testDataSetFile}
+        />,
       );
-      apiDataSetService.listDataSetVersions.mockResolvedValue(
-        testApiDataSetVersions,
-      );
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -196,16 +165,14 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the page navigation correctly', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
-      apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
-      apiDataSetService.getDataSetVersion.mockResolvedValue(
-        testApiDataSetVersion,
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersions={testApiDataSetVersions}
+          dataSetFile={testDataSetFile}
+        />,
       );
-      apiDataSetService.listDataSetVersions.mockResolvedValue(
-        testApiDataSetVersions,
-      );
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -222,16 +189,14 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the data set usage section', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
-      apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
-      apiDataSetService.getDataSetVersion.mockResolvedValue(
-        testApiDataSetVersion,
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersions={testApiDataSetVersions}
+          dataSetFile={testDataSetFile}
+        />,
       );
-      apiDataSetService.listDataSetVersions.mockResolvedValue(
-        testApiDataSetVersions,
-      );
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -248,16 +213,14 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the API version history section', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
-      apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
-      apiDataSetService.getDataSetVersion.mockResolvedValue(
-        testApiDataSetVersion,
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersions={testApiDataSetVersions}
+          dataSetFile={testDataSetFile}
+        />,
       );
-      apiDataSetService.listDataSetVersions.mockResolvedValue(
-        testApiDataSetVersions,
-      );
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -267,16 +230,14 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the API quick start section', async () => {
-      dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
-      apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
-      apiDataSetService.getDataSetVersion.mockResolvedValue(
-        testApiDataSetVersion,
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersions={testApiDataSetVersions}
+          dataSetFile={testDataSetFile}
+        />,
       );
-      apiDataSetService.listDataSetVersions.mockResolvedValue(
-        testApiDataSetVersions,
-      );
-
-      render(<DataSetFilePage dataSetFileId="data-set-file-id" />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 

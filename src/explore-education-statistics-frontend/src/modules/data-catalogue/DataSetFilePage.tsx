@@ -1,30 +1,35 @@
-import SectionBreak from '@common/components/SectionBreak';
-import Tag from '@common/components/Tag';
 import Button from '@common/components/Button';
-import downloadService from '@common/services/downloadService';
-import { Dictionary } from '@common/types';
 import ContentHtml from '@common/components/ContentHtml';
 import FormattedDate from '@common/components/FormattedDate';
-import useToggle from '@common/hooks/useToggle';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+import SectionBreak from '@common/components/SectionBreak';
+import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import useToggle from '@common/hooks/useToggle';
+import downloadService from '@common/services/downloadService';
+import { PaginatedList } from '@common/services/types/pagination';
+import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
-import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
-import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
-import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileApiQuickStart';
-import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
+import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
 import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
+import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
+import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
+import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
 import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
-import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
 import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
+import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
+import {
+  ApiDataSet,
+  ApiDataSetVersion,
+} from '@frontend/services/apiDataSetService';
+import { DataSetFile } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
-import React, { useEffect, useState } from 'react';
-import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
-import { GetServerSideProps } from 'next';
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
+import { GetServerSideProps } from 'next';
+import React, { useEffect, useState } from 'react';
 
 // TODO EES-4856
 export const pageHiddenSections = {
@@ -59,48 +64,18 @@ export type PageHiddenSectionId = keyof PageHiddenSection;
 export type PageSectionId = keyof PageSection;
 
 interface Props {
-  dataSetFileId: string;
+  apiDataSet?: ApiDataSet;
+  apiDataSetVersion?: ApiDataSetVersion;
+  apiDataSetVersions?: PaginatedList<ApiDataSetVersion>;
+  dataSetFile: DataSetFile;
 }
 
-export default function DataSetFilePage({ dataSetFileId }: Props) {
-  const { data: dataSetFile, isLoading: isLoadingDataSetFile } = useQuery({
-    ...dataSetFileQueries.get(dataSetFileId),
-    keepPreviousData: true,
-    staleTime: 60000,
-    retry: false,
-  });
-
-  const apiDataSetId = dataSetFile?.api?.id ?? '';
-
-  const { data: apiDataSetVersion, isLoading: isLoadingApiDataSetVersion } =
-    useQuery({
-      ...apiDataSetQueries.getDataSetVersion(
-        apiDataSetId,
-        dataSetFile?.api?.version ?? '',
-      ),
-      keepPreviousData: true,
-      staleTime: 60000,
-      retry: false,
-      enabled: !!dataSetFile?.api,
-    });
-
-  const { data: apiDataSet, isLoading: isLoadingApiDataSet } = useQuery({
-    ...apiDataSetQueries.getDataSet(apiDataSetId),
-    keepPreviousData: true,
-    staleTime: 60000,
-    retry: false,
-    enabled: !!dataSetFile?.api,
-  });
-
-  const { data: apiDataSetVersions, isLoading: isLoadingApiDataSetVersions } =
-    useQuery({
-      ...apiDataSetQueries.listDataSetVersions(apiDataSetId),
-      keepPreviousData: true,
-      staleTime: 60000,
-      retry: false,
-      enabled: !!dataSetFile?.api,
-    });
-
+export default function DataSetFilePage({
+  apiDataSet,
+  apiDataSetVersion,
+  apiDataSetVersions,
+  dataSetFile,
+}: Props) {
   const [activeSection, setActiveSection] =
     useState<PageSectionId>('dataSetDetails');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
@@ -152,17 +127,6 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [handleScroll]);
-
-  const isLoading = apiDataSet
-    ? isLoadingDataSetFile ||
-      isLoadingApiDataSetVersion ||
-      isLoadingApiDataSet ||
-      isLoadingApiDataSetVersions
-    : isLoadingDataSetFile;
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
 
   if (!dataSetFile) {
     return <NotFoundPage />;
@@ -258,7 +222,7 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
               {apiDataSetVersions && apiDataSetVersion && (
                 <DataSetFileApiVersionHistory
                   currentVersion={apiDataSetVersion.version}
-                  dataSetFileId={dataSetFileId}
+                  dataSetFileId={dataSetFile.id}
                   dataSetVersions={apiDataSetVersions}
                 />
               )}
@@ -283,31 +247,41 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
 
     const queryClient = new QueryClient();
 
-    const dataSet = await queryClient.fetchQuery(
+    const dataSetFile = await queryClient.fetchQuery(
       dataSetFileQueries.get(dataSetFileId),
     );
 
-    if (dataSet.api) {
-      await Promise.all([
-        queryClient.prefetchQuery(apiDataSetQueries.getDataSet(dataSet.api.id)),
-        queryClient.prefetchQuery(
-          apiDataSetQueries.getDataSetVersion(
-            dataSet.api.id,
-            dataSet.api.version,
-          ),
-        ),
-        queryClient.prefetchQuery(
-          apiDataSetQueries.listDataSetVersions(dataSet.api.id),
-        ),
-      ]);
-    }
-
     const props: Props = {
-      dataSetFileId,
+      dataSetFile,
     };
 
+    if (dataSetFile.api) {
+      const [apiDataSet, apiDataSetVersion, apiDataSetVersions] =
+        await Promise.all([
+          await queryClient.fetchQuery(
+            apiDataSetQueries.getDataSet(dataSetFile.api.id),
+          ),
+          await queryClient.fetchQuery(
+            apiDataSetQueries.getDataSetVersion(
+              dataSetFile.api.id,
+              dataSetFile.api.version,
+            ),
+          ),
+          await queryClient.fetchQuery(
+            apiDataSetQueries.listDataSetVersions(dataSetFile.api.id),
+          ),
+        ]);
+
+      props.apiDataSet = apiDataSet;
+      props.apiDataSetVersion = apiDataSetVersion;
+      props.apiDataSetVersions = apiDataSetVersions;
+    }
+
     return {
-      props: { ...props, dehydratedState: dehydrate(queryClient) },
+      props: {
+        ...props,
+        dehydratedState: dehydrate(queryClient),
+      },
     };
   },
 );
