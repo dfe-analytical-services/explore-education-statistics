@@ -24,7 +24,7 @@ describe('DataSetFileApiVersionHistory', () => {
     expect(rows).toHaveLength(4);
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
-    expect(row1Cells[0]).toHaveTextContent('2.0');
+    expect(row1Cells[0]).toHaveTextContent('2.0 (current)');
     expect(within(row1Cells[0]).queryByRole('link')).not.toBeInTheDocument();
     expect(row1Cells[1]).toHaveTextContent('Published');
 

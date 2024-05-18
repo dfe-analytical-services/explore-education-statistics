@@ -279,7 +279,7 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async context => {
-    const { dataSetFileId, version } = context.query as Dictionary<string>;
+    const { dataSetFileId } = context.query as Dictionary<string>;
 
     const queryClient = new QueryClient();
 
@@ -288,14 +288,15 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     );
 
     if (dataSet.api) {
-      const dataSetVersion = version ?? dataSet.api?.version;
-
       await Promise.all([
-        queryClient.fetchQuery(apiDataSetQueries.getDataSet(dataSet.api.id)),
-        queryClient.fetchQuery(
-          apiDataSetQueries.getDataSetVersion(dataSet.api.id, dataSetVersion),
+        queryClient.prefetchQuery(apiDataSetQueries.getDataSet(dataSet.api.id)),
+        queryClient.prefetchQuery(
+          apiDataSetQueries.getDataSetVersion(
+            dataSet.api.id,
+            dataSet.api.version,
+          ),
         ),
-        queryClient.fetchQuery(
+        queryClient.prefetchQuery(
           apiDataSetQueries.listDataSetVersions(dataSet.api.id),
         ),
       ]);

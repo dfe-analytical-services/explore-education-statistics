@@ -40,7 +40,7 @@ export default function DataSetFileApiVersionHistory({
                     {version.version}
                   </Link>
                 ) : (
-                  <>{version.version}</>
+                  <strong>{version.version} (current)</strong>
                 )}
               </td>
 
