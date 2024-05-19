@@ -6,7 +6,6 @@ import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
 import downloadService from '@common/services/downloadService';
-import { PaginatedList } from '@common/services/types/pagination';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
@@ -66,14 +65,12 @@ export type PageSectionId = keyof PageSection;
 interface Props {
   apiDataSet?: ApiDataSet;
   apiDataSetVersion?: ApiDataSetVersion;
-  apiDataSetVersions?: PaginatedList<ApiDataSetVersion>;
   dataSetFile: DataSetFile;
 }
 
 export default function DataSetFilePage({
   apiDataSet,
   apiDataSetVersion,
-  apiDataSetVersions,
   dataSetFile,
 }: Props) {
   const [activeSection, setActiveSection] =
@@ -99,7 +96,7 @@ export default function DataSetFilePage({
     const scrollPosition = window.scrollY + buffer;
 
     sections.forEach(section => {
-      if (!section) {
+      if (!section || section.id === activeSection) {
         return;
       }
 
@@ -115,6 +112,7 @@ export default function DataSetFilePage({
         pageSections[pageSectionId]
       ) {
         setActiveSection(pageSectionId);
+
         window.history.pushState({}, '', `#${pageSectionId}`);
       }
     });
@@ -219,19 +217,19 @@ export default function DataSetFilePage({
                 onDownload={handleDownload}
               />
 
-              {apiDataSetVersions && apiDataSetVersion && (
-                <DataSetFileApiVersionHistory
-                  currentVersion={apiDataSetVersion.version}
-                  dataSetFileId={dataSetFile.id}
-                  dataSetVersions={apiDataSetVersions}
-                />
-              )}
               {apiDataSet && apiDataSetVersion && (
-                <DataSetFileApiQuickStart
-                  id={apiDataSet.id}
-                  name={apiDataSet.title}
-                  version={apiDataSetVersion.version}
-                />
+                <>
+                  <DataSetFileApiVersionHistory
+                    apiDataSetId={apiDataSet?.id}
+                    currentVersion={apiDataSetVersion.version}
+                  />
+
+                  <DataSetFileApiQuickStart
+                    id={apiDataSet.id}
+                    name={apiDataSet.title}
+                    version={apiDataSetVersion.version}
+                  />
+                </>
               )}
             </div>
           </div>
@@ -243,7 +241,7 @@ export default function DataSetFilePage({
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async context => {
-    const { dataSetFileId } = context.query as Dictionary<string>;
+    const { dataSetFileId, versionPage } = context.query as Dictionary<string>;
 
     const queryClient = new QueryClient();
 
@@ -256,25 +254,25 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     };
 
     if (dataSetFile.api) {
-      const [apiDataSet, apiDataSetVersion, apiDataSetVersions] =
-        await Promise.all([
-          await queryClient.fetchQuery(
-            apiDataSetQueries.getDataSet(dataSetFile.api.id),
+      const [apiDataSet, apiDataSetVersion] = await Promise.all([
+        await queryClient.fetchQuery(
+          apiDataSetQueries.getDataSet(dataSetFile.api.id),
+        ),
+        await queryClient.fetchQuery(
+          apiDataSetQueries.getDataSetVersion(
+            dataSetFile.api.id,
+            dataSetFile.api.version,
           ),
-          await queryClient.fetchQuery(
-            apiDataSetQueries.getDataSetVersion(
-              dataSetFile.api.id,
-              dataSetFile.api.version,
-            ),
-          ),
-          await queryClient.fetchQuery(
-            apiDataSetQueries.listDataSetVersions(dataSetFile.api.id),
-          ),
-        ]);
+        ),
+        await queryClient.fetchQuery(
+          apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
+            page: versionPage ? Number(versionPage) : 1,
+          }),
+        ),
+      ]);
 
       props.apiDataSet = apiDataSet;
       props.apiDataSetVersion = apiDataSetVersion;
-      props.apiDataSetVersions = apiDataSetVersions;
     }
 
     return {

@@ -28,7 +28,7 @@ const apiDataSetQueries = {
     params?: ApiDataSetVersionsListRequest,
   ): UseQueryOptions<PaginatedList<ApiDataSetVersion>> {
     return {
-      queryKey: ['listDataSetVersions', dataSetId],
+      queryKey: ['listDataSetVersions', dataSetId, params ?? null],
       queryFn: () => apiDataSetService.listDataSetVersions(dataSetId, params),
     };
   },

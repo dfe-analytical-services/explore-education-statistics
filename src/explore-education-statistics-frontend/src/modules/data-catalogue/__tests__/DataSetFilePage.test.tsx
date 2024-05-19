@@ -4,7 +4,6 @@ import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
 import {
   testApiDataSet,
   testApiDataSetVersion,
-  testApiDataSetVersions,
   testDataSetFile,
 } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -152,7 +151,6 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          apiDataSetVersions={testApiDataSetVersions}
           dataSetFile={testDataSetFile}
         />,
       );
@@ -169,7 +167,6 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          apiDataSetVersions={testApiDataSetVersions}
           dataSetFile={testDataSetFile}
         />,
       );
@@ -193,7 +190,6 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          apiDataSetVersions={testApiDataSetVersions}
           dataSetFile={testDataSetFile}
         />,
       );
@@ -217,7 +213,6 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          apiDataSetVersions={testApiDataSetVersions}
           dataSetFile={testDataSetFile}
         />,
       );
@@ -234,7 +229,6 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          apiDataSetVersions={testApiDataSetVersions}
           dataSetFile={testDataSetFile}
         />,
       );
