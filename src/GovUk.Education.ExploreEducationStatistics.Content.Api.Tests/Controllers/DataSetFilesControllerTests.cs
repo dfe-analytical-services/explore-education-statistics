@@ -1857,7 +1857,6 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         ))
                     .WithPublicApiDataSetId(Guid.NewGuid())
                     .WithPublicApiDataSetVersion(major: 1, minor: 0)
-                    .WithSubjectId(Guid.NewGuid())
                 );
 
             var publicBlobStorageService = new PublicBlobStorageService(
@@ -2046,7 +2045,6 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     new FilterSequenceEntry(filter3Id, new List<FilterGroupSequenceEntry>()),
                 ])
                 .WithFile(_fixture.DefaultFile()
-                    .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
                             new FilterMeta { Id = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
@@ -2113,7 +2111,6 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         new List<Guid> { indicator3Id, indicator4Id })
                 ])
                 .WithFile(_fixture.DefaultFile()
-                    .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithIndicators([
                             new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
@@ -2367,7 +2364,6 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithTheme(_fixture.DefaultTheme()));
 
             File file = _fixture.DefaultFile()
-                .WithSubjectId(Guid.NewGuid())
                 .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta());
 
             ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
