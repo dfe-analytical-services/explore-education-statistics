@@ -13,12 +13,16 @@ import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
 
 interface Props {
-  slug: string;
+  publicationSlug: string;
   data: PublicationTitle;
   token: string;
 }
 
-const ConfirmSubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
+const ConfirmSubscriptionPage: NextPage<Props> = ({
+  data,
+  publicationSlug,
+  token,
+}) => {
   const [subscriptionState, setSubscriptionState] = useState<
     Subscription | undefined
   >(undefined);
@@ -39,7 +43,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
       breadcrumbLabel="Notify me"
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
-        { name: data.title, link: `/find-statistics/${slug}` },
+        { name: data.title, link: `/find-statistics/${publicationSlug}` },
       ]}
     >
       {subscriptionState ? (
@@ -50,7 +54,6 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
         />
       ) : (
         <>
-          {' '}
           <p>
             Please confirm you wish to subscribe to notifications about this
             publication.
@@ -64,14 +67,16 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ data, slug, token }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
-    const { slug, token } = query as Dictionary<string>;
+    const { publicationSlug, token } = query as Dictionary<string>;
 
-    const data = await publicationService.getPublicationTitle(slug as string);
+    const data = await publicationService.getPublicationTitle(
+      publicationSlug as string,
+    );
 
     return {
       props: {
         data,
-        slug,
+        publicationSlug,
         token,
       },
     };

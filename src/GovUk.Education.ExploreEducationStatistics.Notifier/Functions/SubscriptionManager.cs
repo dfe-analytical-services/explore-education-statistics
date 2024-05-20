@@ -88,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                                 {
                                     "unsubscribe_link",
                                     $"{_appSettingOptions.PublicAppUrl}/subscriptions/{slug}/confirm-unsubscription/{unsubscribeToken}"
-                                    //$"{_appSettingOptions.BaseUrl}/publication/{subscription.Subscriber.PartitionKey}/unsubscribe/{unsubscribeToken}"
                                 }
                             };
 
@@ -156,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         [Function("PublicationUnsubscribe")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationUnsubscribeFunc(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe-actual/{token}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
             HttpRequest req,
             FunctionContext context,
             string id,
@@ -165,27 +164,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             var email = _tokenService.GetEmailFromToken(token);
-
-            if (email != null)
+            if (email is null)
             {
-                var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
-
-                var sub = new SubscriptionEntity(id, email);
-                sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
-
-                if (sub != null)
-                {
-                    await _storageTableService.RemoveSubscriber(table, sub);
-                    return new OkObjectResult(new SubscriptionStateDto()
-                    {
-                        Slug = sub.Slug,
-                        Title = sub.Title,
-                        Status = SubscriptionStatus.NotSubscribed
-                    });
-                }
+                return new BadRequestObjectResult("Unable to unsubscribe. A valid email address could not be parsed from the given token.");
             }
 
-            return new BadRequestObjectResult("Unable to unsubscribe");
+            var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
+            var sub = _storageTableService.RetrieveSubscriber(table, new SubscriptionEntity(id, email)).Result;
+            if (sub is null)
+            {
+                return new UnprocessableEntityObjectResult("Unable to unsubscribe. Given email is not currently subscribed.");
+            }
+
+            await _storageTableService.RemoveSubscriber(table, sub);
+            return new OkObjectResult(new SubscriptionStateDto()
+            {
+                Slug = sub.Slug,
+                Title = sub.Title,
+                Status = SubscriptionStatus.NotSubscribed
+            });
         }
 
 
@@ -233,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                         },
                         {
                             "unsubscribe_link",
-                            $"{_appSettingOptions.BaseUrl}/publication/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                            $"{_appSettingOptions.PublicAppUrl}/subscriptions/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
                         }
                     };
 
@@ -251,9 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 }
             }
 
-            return new RedirectResult(
-                $"{_appSettingOptions.PublicAppUrl}/subscriptions/verification-error",
-                true);
+            return new BadRequestObjectResult("Verification-Error");
         }
 
         [Function("RemoveNonVerifiedSubscriptions")]

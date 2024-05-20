@@ -15,7 +15,10 @@ type SubscribeQuery = {
 
 const notificationService = {
   requestPendingSubscription(query: SubscribeQuery): Promise<Subscription> {
-    return notificationApi.post('/publication/subscribe', query);
+    return notificationApi.post(
+      '/publication/request-pending-subscription',
+      query,
+    );
   },
   confirmPendingSubscription(id: string, token: string): Promise<Subscription> {
     return notificationApi.get(
