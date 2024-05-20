@@ -62,7 +62,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
+    [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -109,7 +109,7 @@ public record DataSetLatestVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
+    [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>

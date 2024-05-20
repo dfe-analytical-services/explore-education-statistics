@@ -810,6 +810,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         dataSetVersion.LocationMetas,
                         fm => fm.Level == locationMetaViewModel.Level);
 
+                    Assert.Equal(locationMeta.Level.GetEnumLabel(), locationMetaViewModel.Label);
+
                     foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
                     {
                         var locationOptionMeta = Assert.Single(
@@ -855,7 +857,10 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     }
                 }
 
-                Assert.Equal(dataSetVersion.LocationMetas.Select(lm => lm.Level), content.GeographicLevels);
+                Assert.All(
+                    content.GeographicLevels,
+                    level => Assert.Equal(level.Level.GetEnumLabel(), level.Label)
+                );
 
                 foreach (var indicator in content.Indicators)
                 {

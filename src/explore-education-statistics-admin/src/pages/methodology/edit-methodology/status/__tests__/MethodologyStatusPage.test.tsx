@@ -344,7 +344,7 @@ describe('MethodologyStatusPage', () => {
     renderPage(testMethodology);
 
     await waitFor(() => {
-      expect(screen.getByTestId('public-methodology-url')).toHaveValue(
+      expect(screen.getByLabelText('URL')).toHaveValue(
         'http://localhost/methodology/test-methodology',
       );
     });

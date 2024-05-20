@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
-import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageHiddenSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
 // TODO EES-4856 replace with real data
@@ -49,7 +49,10 @@ export default function DataSetFileVariables() {
   const totalVariables = variables.length;
 
   return (
-    <DataSetFilePageSection heading={pageSections.variables} id="variables">
+    <DataSetFilePageSection
+      heading={pageHiddenSections.dataSetVariables}
+      id="dataSetVariables"
+    >
       <table id={tableId}>
         <caption className="govuk-!-margin-bottom-3">
           {showAll
@@ -75,7 +78,6 @@ export default function DataSetFileVariables() {
 
       <ButtonText
         ariaControls={tableId}
-        className="govuk-!-margin-bottom-6"
         ariaExpanded={!showAll}
         onClick={toggleShowAll}
       >

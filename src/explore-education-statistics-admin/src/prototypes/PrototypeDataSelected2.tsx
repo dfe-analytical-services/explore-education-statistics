@@ -756,6 +756,7 @@ const PrototypeHomepage = () => {
                 <div className="govuk-!-margin-right-3">GET</div>
                 <UrlContainer
                   className="govuk-!-margin-bottom-2"
+                  id="data-set-summary-endpoint"
                   url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57"
                 />
               </div>
@@ -767,6 +768,7 @@ const PrototypeHomepage = () => {
                 <div className="govuk-!-margin-right-3">GET</div>
                 <UrlContainer
                   className="govuk-!-margin-bottom-2"
+                  id="data-set-meta-endpoint"
                   url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57/meta"
                 />
               </div>
@@ -780,6 +782,7 @@ const PrototypeHomepage = () => {
                 <div className="govuk-!-margin-right-3">GET</div>
                 <UrlContainer
                   className="govuk-!-margin-bottom-2"
+                  id="data-set-get-query-endpoint"
                   url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57/query"
                 />
               </div>
@@ -791,6 +794,7 @@ const PrototypeHomepage = () => {
                 <div className="govuk-!-margin-right-3">POST</div>
                 <UrlContainer
                   className="govuk-!-margin-bottom-2"
+                  id="data-set-post-query-endpoint"
                   url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57/query"
                 />
               </div>

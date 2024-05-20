@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import styles from '@frontend/modules/data-catalogue/components/DataSetFilePreview.module.scss';
-import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageHiddenSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
 // TODO EES-4856 replace with real data
@@ -137,7 +137,10 @@ export default function DataSetFilePreview({
   const displayRows = showAll ? tableRows : tableRows.slice(0, 4);
 
   return (
-    <DataSetFilePageSection heading={pageSections.preview} id="preview">
+    <DataSetFilePageSection
+      heading={pageHiddenSections.dataSetPreview}
+      id="dataSetPreview"
+    >
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
       <div className={styles.container} tabIndex={0}>
         <table id={tableId}>
@@ -145,9 +148,11 @@ export default function DataSetFilePreview({
             Table showing first 5 rows from underlying data
           </caption>
           <thead>
-            {tableHeaders.map(header => (
-              <th key={header}>{header}</th>
-            ))}
+            <tr>
+              {tableHeaders.map(header => (
+                <th key={header}>{header}</th>
+              ))}
+            </tr>
           </thead>
           <tbody>
             {displayRows.map((row, rowIndex) => (
@@ -160,19 +165,18 @@ export default function DataSetFilePreview({
           </tbody>
         </table>
       </div>
-      <div className="govuk-!-margin-bottom-6">
-        <ButtonText
-          ariaControls={tableId}
-          ariaExpanded={!showAll}
-          className="govuk-!-margin-right-3"
-          onClick={onToggleShowAll}
-        >
-          {showAll ? 'Show only 5 rows' : 'Show 5 more rows'}
-        </ButtonText>
-        <ButtonText onClick={onToggleFullScreen}>
-          {fullScreen ? 'Close full screen table' : 'Show full screen table'}
-        </ButtonText>
-      </div>
+
+      <ButtonText
+        ariaControls={tableId}
+        ariaExpanded={!showAll}
+        className="govuk-!-margin-right-3"
+        onClick={onToggleShowAll}
+      >
+        {showAll ? 'Show only 5 rows' : 'Show 5 more rows'}
+      </ButtonText>
+      <ButtonText onClick={onToggleFullScreen}>
+        {fullScreen ? 'Close full screen table' : 'Show full screen table'}
+      </ButtonText>
     </DataSetFilePageSection>
   );
 }

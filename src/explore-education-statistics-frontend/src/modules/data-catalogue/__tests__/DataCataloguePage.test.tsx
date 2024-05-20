@@ -524,19 +524,19 @@ describe('DataCataloguePage', () => {
       );
       expect(pagination.getByRole('link', { name: 'Page 1' })).toHaveAttribute(
         'href',
-        '/data-catalogue?page=1',
+        '?page=1',
       );
       expect(pagination.getByRole('link', { name: 'Page 2' })).toHaveAttribute(
         'href',
-        '/data-catalogue?page=2',
+        '?page=2',
       );
       expect(pagination.getByRole('link', { name: 'Page 3' })).toHaveAttribute(
         'href',
-        '/data-catalogue?page=3',
+        '?page=3',
       );
       expect(
         pagination.getByRole('link', { name: 'Next page' }),
-      ).toHaveAttribute('href', '/data-catalogue?page=2');
+      ).toHaveAttribute('href', '?page=2');
 
       expect(
         screen.queryByText('No data currently published.'),

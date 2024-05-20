@@ -1,20 +1,18 @@
 import { useMobileMedia } from '@common/hooks/useMedia';
+import { Dictionary } from '@common/types';
 import styles from '@frontend/modules/data-catalogue/components/DataSetFilePageNav.module.scss';
-import {
-  PageSection,
-  pageSections,
-} from '@frontend/modules/data-catalogue/DataSetFilePage';
 import classNames from 'classnames';
 import React from 'react';
 
-interface Props {
-  activeSection: PageSection;
-  onClickItem: (id: PageSection) => void;
+interface Props<TSections extends Dictionary<string>> {
+  activeSection: string;
+  sections: TSections;
+  onClickItem: (id: keyof TSections) => void;
 }
-export default function DataSetFilePageNav({
-  activeSection,
-  onClickItem,
-}: Props) {
+
+export default function DataSetFilePageNav<
+  TSections extends Dictionary<string>,
+>({ activeSection, sections, onClickItem }: Props<TSections>) {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   return (
@@ -26,11 +24,11 @@ export default function DataSetFilePageNav({
       </h2>
       <nav aria-labelledby="nav-heading" role="navigation">
         <ul className={classNames('govuk-list', styles.navList)}>
-          {Object.keys(pageSections).map(id => (
+          {Object.keys(sections).map(id => (
             <NavItem
               hashId={id}
               key={id}
-              text={pageSections[id]}
+              text={sections[id]}
               isActive={!isMobileMedia && activeSection === id}
               onClick={() => onClickItem(id)}
             />
@@ -43,7 +41,7 @@ export default function DataSetFilePageNav({
               className="govuk-!-padding-top-4"
               hashId="main-content"
               text="Back to top"
-              onClick={() => onClickItem('details')}
+              onClick={() => onClickItem('dataSetDetails')}
             />
           )}
         </ul>
@@ -54,7 +52,7 @@ export default function DataSetFilePageNav({
 
 interface NavItemProps {
   className?: string;
-  hashId: PageSection | 'main-content';
+  hashId: string;
   isActive?: boolean;
   text: string;
   onClick: () => void;

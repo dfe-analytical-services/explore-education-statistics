@@ -2,18 +2,12 @@ import { ArrowLeft, ArrowRight } from '@common/components/ArrowIcons';
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import appendQuery from '@common/utils/url/appendQuery';
-import { PublicationSortOption } from '@common/services/publicationService';
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import { ParsedUrlQueryInput } from 'querystring';
+import React, { MouseEvent, ReactNode } from 'react';
 import VisuallyHidden from './VisuallyHidden';
 
 const paginationLinkClassName = 'govuk-pagination__link';
-
-type Params = {
-  newDesign?: boolean;
-  page?: number;
-  sortBy?: PublicationSortOption;
-};
 
 interface LinkRenderProps {
   'aria-current'?: 'page';
@@ -23,14 +17,15 @@ interface LinkRenderProps {
   className: string;
   rel?: 'next' | 'prev';
   to: string;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export interface PaginationProps {
   baseUrl?: string;
   currentPage: number;
   label?: string;
-  queryParams?: Params;
+  queryParams?: ParsedUrlQueryInput;
+  pageParam?: string;
   renderLink: (props: LinkRenderProps) => ReactNode;
   totalPages: number;
   onClick?: (pageNumber: number) => void;
@@ -40,6 +35,7 @@ const Pagination = ({
   baseUrl = '',
   currentPage,
   label = 'Pagination',
+  pageParam = 'page',
   queryParams,
   renderLink,
   totalPages,
@@ -65,9 +61,9 @@ const Pagination = ({
             className: paginationLinkClassName,
             rel: 'prev',
             'data-testid': 'pagination-previous',
-            to: appendQuery<Params>(baseUrl, {
+            to: appendQuery(baseUrl, {
               ...queryParams,
-              page: currentPage - 1,
+              [pageParam]: currentPage - 1,
             }),
             children: (
               <>
@@ -108,9 +104,9 @@ const Pagination = ({
                 'aria-current': currentPage === pageNumber ? 'page' : undefined,
                 'aria-label': `Page ${pageNumber}`,
                 className: paginationLinkClassName,
-                to: appendQuery<Params>(baseUrl, {
+                to: appendQuery(baseUrl, {
                   ...queryParams,
-                  page: pageNumber,
+                  [pageParam]: pageNumber,
                 }),
                 children: <>{pageNumber}</>,
                 onClick: () => onClick?.(pageNumber),
@@ -126,9 +122,9 @@ const Pagination = ({
             className: paginationLinkClassName,
             rel: 'next',
             'data-testid': 'pagination-next',
-            to: appendQuery<Params>(baseUrl, {
+            to: appendQuery(baseUrl, {
               ...queryParams,
-              page: currentPage + 1,
+              [pageParam]: currentPage + 1,
             }),
             children: (
               <>

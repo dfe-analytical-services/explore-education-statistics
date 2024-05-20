@@ -48,12 +48,14 @@ export default function PublicationUpdateConfirmModal({
         <>
           <p>The URL for this publication will change from</p>
           <UrlContainer
-            data-testid="before-url"
+            id="before-url"
+            label="Before URL"
             url={`${publicAppUrl}/find-statistics/${initialPublicationSlug}`}
           />{' '}
           to{' '}
           <UrlContainer
-            data-testid="after-url"
+            id="after-url"
+            label="After URL"
             url={`${publicAppUrl}/find-statistics/${newPublicationSlug}`}
           />
         </>

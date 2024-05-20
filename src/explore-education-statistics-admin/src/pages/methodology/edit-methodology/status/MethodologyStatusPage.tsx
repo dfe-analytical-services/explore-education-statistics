@@ -93,12 +93,11 @@ const MethodologyStatusPage = () => {
                 The <strong>public methodology</strong> will be accessible at:
               </p>
 
-              <p>
-                <UrlContainer
-                  data-testid="public-methodology-url"
-                  url={`${publicAppUrl}/methodology/${currentMethodology.slug}`}
-                />
-              </p>
+              <UrlContainer
+                className="govuk-!-margin-bottom-4"
+                id="public-methodology-url"
+                url={`${publicAppUrl}/methodology/${currentMethodology.slug}`}
+              />
 
               <SummaryList>
                 <SummaryListItem term="Status">
