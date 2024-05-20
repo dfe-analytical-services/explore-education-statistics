@@ -5,7 +5,7 @@ import {
 } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
 import _apiDataSetService from '@frontend/services/apiDataSetService';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { times } from 'lodash';
 import { MemoryRouterProvider } from 'next-router-mock/MemoryRouterProvider';
 import React, { ReactElement } from 'react';
@@ -31,7 +31,9 @@ describe('DataSetFileApiVersionHistory', () => {
       screen.getByRole('heading', { name: 'API data set version history' }),
     ).toBeInTheDocument();
 
-    const table = within(await screen.findByRole('table'));
+    expect(await screen.findByText('Version')).toBeInTheDocument();
+
+    const table = within(screen.getByRole('table'));
 
     const rows = table.getAllByRole('row');
     expect(rows).toHaveLength(4);
@@ -81,7 +83,9 @@ describe('DataSetFileApiVersionHistory', () => {
       />,
     );
 
-    const table = within(await screen.findByRole('table'));
+    expect(await screen.findByText('Version')).toBeInTheDocument();
+
+    const table = within(screen.getByRole('table'));
 
     const rows = table.getAllByRole('row');
     expect(rows).toHaveLength(4);
@@ -130,7 +134,9 @@ describe('DataSetFileApiVersionHistory', () => {
       />,
     );
 
-    let table = within(await screen.findByRole('table'));
+    expect(await screen.findByText('Version')).toBeInTheDocument();
+
+    let table = within(screen.getByRole('table'));
 
     let rows = table.getAllByRole('row');
     expect(rows).toHaveLength(4);
@@ -148,7 +154,7 @@ describe('DataSetFileApiVersionHistory', () => {
     expect(within(rows[3]).getByText('2.0 (current)')).toBeInTheDocument();
 
     const pagination = within(
-      await screen.findByRole('navigation', {
+      screen.getByRole('navigation', {
         name: 'Version history pagination',
       }),
     );
@@ -170,9 +176,7 @@ describe('DataSetFileApiVersionHistory', () => {
 
     await user.click(pagination.getByRole('link', { name: 'Next page' }));
 
-    await waitFor(() => {
-      expect(screen.getByText('1.1')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('1.1')).toBeInTheDocument();
 
     table = within(screen.getByRole('table'));
 
