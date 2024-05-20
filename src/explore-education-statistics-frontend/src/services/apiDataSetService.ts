@@ -3,25 +3,6 @@ import { PaginatedList } from '@common/services/types/pagination';
 
 export type ApiDataSetType = 'Major' | 'Minor';
 export type ApiDataSetStatus = 'Published' | 'Deprecated' | 'Withdrawn';
-export type ApiGeographicLevels =
-  | 'EDA'
-  | 'INST'
-  | 'LA'
-  | 'LAD'
-  | 'LEP'
-  | 'LSIP'
-  | 'MAT'
-  | 'MCA'
-  | 'NAT'
-  | 'OA'
-  | 'PA'
-  | 'PCON'
-  | 'PROV'
-  | 'REG'
-  | 'RSC'
-  | 'SCH'
-  | 'SPON'
-  | 'WARD';
 
 export interface ApiDataSet {
   id: string;
@@ -36,7 +17,7 @@ export interface ApiDataSet {
       start: string;
       end: string;
     };
-    geographicLevels: ApiGeographicLevels[];
+    geographicLevels: string[];
     filters: string[];
     indicators: string[];
   };
@@ -54,7 +35,7 @@ export interface ApiDataSetVersion {
     start: string;
     end: string;
   };
-  geographicLevels: ApiGeographicLevels[];
+  geographicLevels: string[];
   filters: string[];
   indicators: string[];
 }
@@ -81,4 +62,5 @@ const apiDataSetService = {
     return publicApi.get(`/data-sets/${dataSetId}/versions`, { params });
   },
 };
+
 export default apiDataSetService;

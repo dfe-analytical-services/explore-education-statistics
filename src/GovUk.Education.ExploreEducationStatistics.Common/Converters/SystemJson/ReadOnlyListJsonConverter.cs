@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 
-public class ListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>> 
+public class ReadOnlyListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>>
     where TConverter : JsonConverter
 {
     public override IReadOnlyList<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

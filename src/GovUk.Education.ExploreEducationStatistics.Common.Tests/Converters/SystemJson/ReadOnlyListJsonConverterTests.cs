@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters.SystemJson;
 
-public class ListJsonConverterTests
+public class ReadOnlyListJsonConverterTests
 {
     private abstract class SampleClass<T>
     {
@@ -28,13 +28,13 @@ public class ListJsonConverterTests
 
     private class ClassWithObjectConverter : SampleClass<SampleObject>
     {
-        [JsonConverter(typeof(ListJsonConverter<SampleObject, SampleObjectJsonConverter>))]
+        [JsonConverter(typeof(ReadOnlyListJsonConverter<SampleObject, SampleObjectJsonConverter>))]
         public override IReadOnlyList<SampleObject>? SampleField { get; set; }
     }
 
     private class ClassWithEnumConverter : SampleClass<SampleEnum>
     {
-        [JsonConverter(typeof(ListJsonConverter<SampleEnum, JsonStringEnumConverter>))]
+        [JsonConverter(typeof(ReadOnlyListJsonConverter<SampleEnum, JsonStringEnumConverter>))]
         public override IReadOnlyList<SampleEnum>? SampleField { get; set; }
     }
 

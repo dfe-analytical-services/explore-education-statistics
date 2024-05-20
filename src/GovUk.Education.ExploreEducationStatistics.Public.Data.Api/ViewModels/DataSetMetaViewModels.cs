@@ -24,7 +24,7 @@ public record DataSetMetaViewModel
     /// <summary>
     /// All the geographic levels associated with the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
+    [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
