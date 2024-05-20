@@ -474,7 +474,7 @@ user checks element should not contain
 user checks input field contains
     [Arguments]    ${element}    ${text}
     page should contain textfield    ${element}
-    textfield value should be    ${element}    ${text}
+    textfield should contain     ${element}    ${text}
 
 user checks page contains
     [Arguments]    ${text}

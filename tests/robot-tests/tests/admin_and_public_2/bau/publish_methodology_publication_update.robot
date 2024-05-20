@@ -63,8 +63,8 @@ Update publication details
     user enters text into element    label:Publication title    ${PUBLICATION_NAME_UPDATED}
     user clicks button    Update publication details
     ${modal}=    user waits until modal is visible    Confirm publication changes
-    user checks url contains    id:before-url    ${PUBLIC_PUBLICATION_URL_ENDING}
-    user checks url contains    id:after-url     ${PUBLIC_PUBLICATION_URL_ENDING}-updated
+    user checks input field contains    id:before-url    ${PUBLIC_PUBLICATION_URL_ENDING}
+    user checks input field contains    id:after-url     ${PUBLIC_PUBLICATION_URL_ENDING}-updated
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
     user checks summary list contains    Publication title    ${PUBLICATION_NAME_UPDATED}
