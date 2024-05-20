@@ -42,7 +42,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
   if (confirmedSubscription === 'verification-error') {
     return (
       <Page title="Verification failed">
-        <VerificationErrorMessage />
+        <VerificationErrorMessage slug={publicationSlug} />
       </Page>
     );
   }
@@ -59,7 +59,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
     >
       {confirmedSubscription ? (
         <SubscriptionStatusMessage
-          title="Subscription verified"
+          title={data.title}
           message="You have successfully subscribed to these updates."
           slug={confirmedSubscription.slug}
         />

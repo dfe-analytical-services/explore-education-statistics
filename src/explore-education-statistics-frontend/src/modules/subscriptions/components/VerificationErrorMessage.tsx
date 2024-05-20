@@ -1,11 +1,17 @@
 import React from 'react';
+import Link from '@frontend/components/Link';
 
-const VerificationErrorMessage = () => {
+interface VerificationErrorMessageProps {
+  slug: string;
+}
+
+const VerificationErrorMessage = ({ slug }: VerificationErrorMessageProps) => {
   return (
     <div className="govuk-panel__body">
       <p>
         Your subscription verification token has expired. You can try again by
-        re-subscribing from the publication's main screen.
+        re-subscribing from the{' '}
+        <Link to={`/find-statistics/${slug}`}>publication's main screen.</Link>
       </p>
       <p>
         If this issue persists, please contact{' '}
