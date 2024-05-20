@@ -1,4 +1,5 @@
 import notificationApi from '@frontend/services/clients/notificationApi';
+import { AxiosError } from 'axios';
 
 export interface Subscription {
   slug: string;
@@ -20,10 +21,15 @@ const notificationService = {
       query,
     );
   },
-  confirmPendingSubscription(id: string, token: string): Promise<Subscription> {
-    return notificationApi.get(
-      `publication/${id}/verify-subscription/${token}`,
-    );
+  confirmPendingSubscription(
+    id: string,
+    token: string,
+  ): Promise<Subscription | undefined> {
+    return notificationApi
+      .get<Subscription>(`publication/${id}/verify-subscription/${token}`)
+      .catch(() => {
+        return undefined;
+      });
   },
   confirmUnsubscription(id: string, token: string): Promise<Subscription> {
     return notificationApi.get(`publication/${id}/unsubscribe/${token}`);
