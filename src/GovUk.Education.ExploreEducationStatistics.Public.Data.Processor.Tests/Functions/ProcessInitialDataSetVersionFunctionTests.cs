@@ -14,7 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     public class ProcessInitialDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture)
@@ -47,13 +47,7 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
                         null))
                 .Returns(Task.CompletedTask);
 
-            var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.ProcessInitialDataSetVersion(
-                mockOrchestrationContext.Object,
-                new ProcessInitialDataSetVersionContext
-                {
-                    DataSetVersionId = dataSetVersionId
-                });
+            await ProcessInitialDataSetVersion(mockOrchestrationContext.Object, dataSetVersionId);
 
             VerifyAllMocks(mockOrchestrationContext);
         }
@@ -85,15 +79,22 @@ public class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegra
                         null))
                 .Returns(Task.CompletedTask);
 
+            await ProcessInitialDataSetVersion(mockOrchestrationContext.Object, dataSetVersionId);
+
+            VerifyAllMocks(mockOrchestrationContext);
+        }
+
+        private async Task ProcessInitialDataSetVersion(
+            TaskOrchestrationContext orchestrationContext,
+            Guid dataSetVersionId)
+        {
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.ProcessInitialDataSetVersion(
-                mockOrchestrationContext.Object,
+                orchestrationContext,
                 new ProcessInitialDataSetVersionContext
                 {
                     DataSetVersionId = dataSetVersionId
                 });
-
-            VerifyAllMocks(mockOrchestrationContext);
         }
 
         private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(

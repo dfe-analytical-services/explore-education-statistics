@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -22,9 +21,9 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public static class DataSetFilesControllerCachingTests
+public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixture
 {
-    public class ListDataSetsTests : CacheServiceTestFixture
+    public class ListDataSetsTests : DataSetFilesControllerCachingTests
     {
         private readonly DataSetFileListRequest _query = new(
             ThemeId: Guid.NewGuid(),
@@ -40,9 +39,8 @@ public static class DataSetFilesControllerCachingTests
         );
 
         private readonly PaginatedListViewModel<DataSetFileSummaryViewModel> _dataSetFiles = new(
-            new List<DataSetFileSummaryViewModel>
-            {
-                new()
+            [
+                new DataSetFileSummaryViewModel
                 {
                     Id = Guid.NewGuid(),
                     FileId = Guid.NewGuid(),
@@ -74,7 +72,10 @@ public static class DataSetFilesControllerCachingTests
                     LatestData = true,
                     Published = DateTime.UtcNow,
                 }
-            }, 1, 1, 10);
+            ],
+            totalResults: 1,
+            page: 1,
+            pageSize: 10);
 
         [Fact]
         public async Task NoCachedEntryExists_CreatesCache()
@@ -85,7 +86,7 @@ public static class DataSetFilesControllerCachingTests
                 .Setup(s => s.GetItem(
                     new ListDataSetFilesCacheKey(_query),
                     typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
-                .Returns((object?) null);
+                .Returns((object?)null);
 
             var expectedCacheConfiguration = new MemoryCacheConfiguration(
                 10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
@@ -149,12 +150,8 @@ public static class DataSetFilesControllerCachingTests
         }
     }
 
-    private static DataSetFilesController BuildController(
-        IDataSetFileService? dataSetFileService = null
-    )
+    private static DataSetFilesController BuildController(IDataSetFileService? dataSetFileService = null)
     {
-        return new DataSetFilesController(
-            dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict)
-        );
+        return new DataSetFilesController(dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict));
     }
 }
