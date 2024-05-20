@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
@@ -250,6 +251,11 @@ internal class DataSetService(
 
         if (types.Contains(DataSetMetaType.Locations))
         {
+            dataSetVersion.GeographicLevelMeta = await publicDataDbContext.GeographicLevelMetas
+                .AsNoTracking()
+                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+
             dataSetVersion.LocationMetas = await publicDataDbContext.LocationMetas
                 .AsNoTracking()
                 .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
@@ -286,9 +292,9 @@ internal class DataSetService(
             .OrderBy(im => im.Label)
             .ToList();
 
-        var geographicLevels = dataSetVersion.LocationMetas
-            .Select(lm => lm.Level)
-            .ToList();
+        var geographicLevels = dataSetVersion.GeographicLevelMeta?.Levels
+            .Select(MapGeographicLevelMeta)
+            .ToList() ?? [];
 
         var locations = dataSetVersion.LocationMetas
             .Select(MapLocationMeta)
@@ -307,6 +313,15 @@ internal class DataSetService(
             GeographicLevels = geographicLevels,
             Locations = locations,
             TimePeriods = timePeriods,
+        };
+    }
+
+    private static GeographicLevelMetaViewModel MapGeographicLevelMeta(GeographicLevel level)
+    {
+        return new GeographicLevelMetaViewModel
+        {
+            Level = level,
+            Label = level.GetEnumLabel(),
         };
     }
 
@@ -357,6 +372,7 @@ internal class DataSetService(
         return new LocationLevelMetaViewModel
         {
             Level = locationMeta.Level,
+            Label = locationMeta.Level.GetEnumLabel(),
             Options = options,
         };
     }

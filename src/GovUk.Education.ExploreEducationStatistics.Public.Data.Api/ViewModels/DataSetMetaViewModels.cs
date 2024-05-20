@@ -24,8 +24,7 @@ public record DataSetMetaViewModel
     /// <summary>
     /// All the geographic levels associated with the data set.
     /// </summary>
-    [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
-    public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
+    public required IReadOnlyList<GeographicLevelMetaViewModel> GeographicLevels { get; init; }
 
     /// <summary>
     /// All the locations associated with the data set, grouped by level.
@@ -86,6 +85,20 @@ public record FilterOptionMetaViewModel
 }
 
 /// <summary>
+/// A geographic level that locations are grouped by in the data set.
+/// </summary>
+public record GeographicLevelMetaViewModel
+{
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
+    public required GeographicLevel Level { get; init; }
+
+    /// <summary>
+    /// The human-readable label for the geographic level.
+    /// </summary>
+    public required string Label { get; init; }
+}
+
+/// <summary>
 /// The type of measurement taken by a data point.
 /// </summary>
 public record IndicatorMetaViewModel
@@ -121,6 +134,11 @@ public record LocationLevelMetaViewModel
     public required GeographicLevel Level { get; init; }
 
     /// <summary>
+    /// The human-readable label of the geographic level.
+    /// </summary>
+    public required string Label { get; init; }
+
+    /// <summary>
     /// The locations belonging to this level.
     /// </summary>
     public required IReadOnlyList<LocationOptionMetaViewModel> Options { get; init; }
@@ -138,7 +156,7 @@ public abstract record LocationOptionMetaViewModel
     public required string Id { get; init; }
 
     /// <summary>
-    /// The label of the location.
+    /// The human-readable label of the location.
     /// </summary>
     public required string Label { get; init; }
 }
