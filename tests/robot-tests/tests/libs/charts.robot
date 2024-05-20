@@ -86,6 +86,8 @@ user checks chart y axis tick contains
     ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     ${element}=    get child element    ${locator}
     ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ${element_text}=   get text   ${element}
+    log to console  Y axis tick text: "${element_text}"
     user waits until element contains    ${element}    ${text}
 
 user checks chart x axis tick contains
@@ -94,6 +96,8 @@ user checks chart x axis tick contains
     ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     ${element}=    get child element    ${locator}
     ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ${element_text}=   get text   ${element}
+    log to console  X axis tick text: "${element_text}"
     user waits until element contains    ${element}    ${text}
 
 user checks chart y axis ticks
