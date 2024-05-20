@@ -23,7 +23,7 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
   publicationSlug,
   token,
 }) => {
-  const [subscriptionState, setSubscriptionState] = useState<
+  const [unsubscribedSubscription, setUnsubscribedSubscription] = useState<
     Subscription | undefined
   >(undefined);
 
@@ -33,7 +33,7 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
       token,
     );
 
-    setSubscriptionState(response);
+    setUnsubscribedSubscription(response);
   };
 
   return (
@@ -46,11 +46,11 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
         { name: data.title, link: `/find-statistics/${publicationSlug}` },
       ]}
     >
-      {subscriptionState ? (
+      {unsubscribedSubscription ? (
         <SubscriptionStatusMessage
-          title="Unsubscribed"
+          title={data.title}
           message="You have successfully unsubscribed from these updates."
-          slug={subscriptionState.slug}
+          slug={unsubscribedSubscription.slug}
         />
       ) : (
         <>

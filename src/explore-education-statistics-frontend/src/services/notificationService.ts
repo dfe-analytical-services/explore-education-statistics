@@ -1,5 +1,4 @@
 import notificationApi from '@frontend/services/clients/notificationApi';
-import { AxiosError } from 'axios';
 
 export interface Subscription {
   slug: string;
