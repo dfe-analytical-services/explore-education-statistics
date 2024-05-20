@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         private readonly IStorageTableService _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
         private readonly INotificationClientProvider _notificationClientProvider = notificationClientProvider ??
                                                                                    throw new ArgumentNullException(nameof(notificationClientProvider));
-        
+
         [Function("RequestPendingSubscription")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> RequestPendingSubscriptionFunc(
@@ -55,24 +55,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             {
                 return new BadRequestObjectResult("Please pass a valid email & publication");
             }
-            
+
             var notificationClient = _notificationClientProvider.Get();
-            
+
             var subscription = await storageTableService.GetSubscription(id, email);
             var pendingSubscriptionTable =
                 await _storageTableService.GetTable(NotifierPendingSubscriptionsTableName);
-            
+
             try
             {
                 logger.LogDebug("Pending subscription found?: {Status}", subscription.Status);
 
-                
+
                 switch (subscription.Status)
                 {
                     // If already existing and pending then don't send another one
                     case SubscriptionStatus.SubscriptionPending:
                         return new OkResult();
-                    
+
                     // Send confirmation email if user already subscribed
                     case SubscriptionStatus.Subscribed:
                         {
@@ -88,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                                 {
                                     "unsubscribe_link",
                                     $"{_appSettingOptions.PublicAppUrl}/subscriptions/{slug}/confirm-unsubscription/{unsubscribeToken}"
-                                    //$"{_appSettingOptions.BaseUrl}/publication/{subscription.Subscriber.PartitionKey}/unsubscribe/{unsubscribeToken}"
                                 }
                             };
 
@@ -99,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 
                             return new OkResult();
                         }
-                    
+
                     case SubscriptionStatus.NotSubscribed:
                         // Verification Token expires in 1 hour
                         var expiryDateTime = DateTime.UtcNow.AddHours(1);
@@ -152,11 +151,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 return new BadRequestResult();
             }
         }
-        
+
         [Function("PublicationUnsubscribe")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationUnsubscribeFunc(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe-actual/{token}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
             HttpRequest req,
             FunctionContext context,
             string id,
@@ -165,30 +164,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             var email = _tokenService.GetEmailFromToken(token);
-
-            if (email != null)
+            if (email is null)
             {
-                var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
-
-                var sub = new SubscriptionEntity(id, email);
-                sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
-
-                if (sub != null)
-                {
-                    await _storageTableService.RemoveSubscriber(table, sub);
-                    return new OkObjectResult(new SubscriptionStateDto()
-                    {
-                        Slug = sub.Slug,
-                        Title = sub.Title,
-                        Status = SubscriptionStatus.NotSubscribed
-                    });
-                }
+                return new BadRequestObjectResult("Unable to unsubscribe. A valid email address could not be parsed from the given token.");
             }
 
-            return new BadRequestObjectResult("Unable to unsubscribe");
+            var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
+            var sub = _storageTableService.RetrieveSubscriber(table, new SubscriptionEntity(id, email)).Result;
+            if (sub is null)
+            {
+                return new UnprocessableEntityObjectResult("Unable to unsubscribe. Given email is not currently subscribed.");
+            }
+
+            await _storageTableService.RemoveSubscriber(table, sub);
+            return new OkObjectResult(new SubscriptionStateDto()
+            {
+                Slug = sub.Slug,
+                Title = sub.Title,
+                Status = SubscriptionStatus.NotSubscribed
+            });
         }
-        
-        
+
+
         [Function("VerifySubscription")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> VerifySubscriptionFunc(
@@ -233,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                         },
                         {
                             "unsubscribe_link",
-                            $"{_appSettingOptions.BaseUrl}/publication/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                            $"{_appSettingOptions.PublicAppUrl}/subscriptions/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
                         }
                     };
 
@@ -251,9 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 }
             }
 
-            return new RedirectResult(
-                $"{_appSettingOptions.PublicAppUrl}/subscriptions/verification-error",
-                true);
+            return new BadRequestObjectResult("Verification-Error");
         }
 
         [Function("RemoveNonVerifiedSubscriptions")]
