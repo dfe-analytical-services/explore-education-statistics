@@ -21,7 +21,7 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private readonly DataFixture _fixture = new();

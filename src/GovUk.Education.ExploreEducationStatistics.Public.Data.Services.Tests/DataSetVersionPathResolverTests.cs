@@ -14,12 +14,12 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 
-public abstract class ParquetPathResolverTests
+public abstract class DataSetVersionPathResolverTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly Mock<IWebHostEnvironment> _webHostEnvironmentMock = new();
 
-    public class ConstructorTests : ParquetPathResolverTests
+    public class ConstructorTests : DataSetVersionPathResolverTests
     {
         [Theory]
         [InlineData("")]
@@ -36,7 +36,7 @@ public abstract class ParquetPathResolverTests
         }
     }
 
-    public class PathTests : ParquetPathResolverTests
+    public class PathTests : DataSetVersionPathResolverTests
     {
         [Fact]
         public void DevelopmentEnv_ValidBasePath_AllPathsCorrect()
@@ -61,6 +61,14 @@ public abstract class ParquetPathResolverTests
             );
 
             Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
+                resolver.CsvDataPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
+                resolver.CsvMetadataPath(version)
+            );
             Assert.Equal(
                 Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
@@ -107,6 +115,14 @@ public abstract class ParquetPathResolverTests
 
             Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
+                resolver.CsvDataPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
+                resolver.CsvMetadataPath(version)
+            );
+            Assert.Equal(
                 Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
@@ -151,6 +167,14 @@ public abstract class ParquetPathResolverTests
 
             Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
+                resolver.CsvDataPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
+                resolver.CsvMetadataPath(version)
+            );
+            Assert.Equal(
                 Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
@@ -173,11 +197,11 @@ public abstract class ParquetPathResolverTests
         }
     }
 
-    private IParquetPathResolver BuildService(
+    private IDataSetVersionPathResolver BuildService(
         ParquetFilesOptions options,
         IWebHostEnvironment? webHostEnvironment = null)
     {
-        return new ParquetPathResolver(
+        return new DataSetVersionPathResolver(
             new OptionsWrapper<ParquetFilesOptions>(options),
             webHostEnvironment ?? _webHostEnvironmentMock.Object
         );

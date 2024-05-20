@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ValidationMessages =
@@ -136,7 +137,9 @@ public class DataSetService(
     {
         var dataSetVersionImport = new DataSetVersionImport
         {
-            DataSetVersionId = dataSetVersion.Id, InstanceId = instanceId, Stage = DataSetVersionImportStage.Pending
+            DataSetVersionId = dataSetVersion.Id,
+            InstanceId = instanceId,
+            Stage = DataSetVersionImportStage.Pending
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);
