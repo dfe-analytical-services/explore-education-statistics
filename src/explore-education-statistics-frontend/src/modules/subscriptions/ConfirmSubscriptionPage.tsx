@@ -11,6 +11,7 @@ import notificationService, {
 } from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
+import VerificationErrorMessage from '@frontend/modules/subscriptions/components/VerificationErrorMessage';
 
 interface Props {
   publicationSlug: string;
@@ -23,8 +24,8 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
   publicationSlug,
   token,
 }) => {
-  const [subscriptionState, setSubscriptionState] = useState<
-    Subscription | undefined
+  const [confirmedSubscription, setConfirmedSubscription] = useState<
+    Subscription | 'verification-error' | undefined
   >(undefined);
 
   const onConfirmClicked = async () => {
@@ -33,8 +34,18 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
       token,
     );
 
-    setSubscriptionState(response);
+    setConfirmedSubscription(
+      response === undefined ? 'verification-error' : response,
+    );
   };
+
+  if (confirmedSubscription === 'verification-error') {
+    return (
+      <Page title="Verification failed">
+        <VerificationErrorMessage />
+      </Page>
+    );
+  }
 
   return (
     <Page
@@ -46,11 +57,11 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
         { name: data.title, link: `/find-statistics/${publicationSlug}` },
       ]}
     >
-      {subscriptionState ? (
+      {confirmedSubscription ? (
         <SubscriptionStatusMessage
           title="Subscription verified"
           message="You have successfully subscribed to these updates."
-          slug={subscriptionState.slug}
+          slug={confirmedSubscription.slug}
         />
       ) : (
         <>
