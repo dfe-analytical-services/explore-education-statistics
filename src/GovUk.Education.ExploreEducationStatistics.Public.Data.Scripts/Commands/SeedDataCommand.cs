@@ -854,12 +854,14 @@ public class SeedDataCommand : ICommand
             );
 
             // Convert absolute paths in load.sql to relative paths otherwise
-            // these refer to the machine that the script was ran on.
+            // these refer to the machine that the script was run on.
 
             var loadSqlFilePath = Path.Combine(versionDir, "load.sql");
 
+            var absolutePathToReplace = $"{versionDir.Replace('\\', '/')}/";
+
             var newLines = (await File.ReadAllLinesAsync(loadSqlFilePath, _cancellationToken))
-                .Select(line => line.Replace($"{versionDir}{Path.DirectorySeparatorChar}", ""));
+                .Select(line => line.Replace(absolutePathToReplace, ""));
 
             await File.WriteAllLinesAsync(loadSqlFilePath, newLines, _cancellationToken);
         }
