@@ -141,7 +141,7 @@ Navigate to sign-off page and approve the methodology immediately
     user clicks radio    Immediately
     user clicks button    Update status
     user waits until page contains    Approved
-    sleep    2    # Wait for methodology to be published
+    user waits for caches to expire
 
 Validate methodology re-directs works for the updated publication methodology
     user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
