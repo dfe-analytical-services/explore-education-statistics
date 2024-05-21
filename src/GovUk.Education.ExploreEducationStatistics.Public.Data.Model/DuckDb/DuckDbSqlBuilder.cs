@@ -34,6 +34,13 @@ public class DuckDbSqlBuilder : InterpolatedSqlBuilderBase<DuckDbSqlBuilder, IIn
         ResetAutoSpacing();
     }
 
+    public DuckDbSqlBuilder(string value, InterpolatedSqlBuilderOptions? options = null)
+        : this(options: options, format: null, arguments: null)
+    {
+        AppendLiteral(value);
+        ResetAutoSpacing();
+    }
+
     protected DuckDbSqlBuilder(
         InterpolatedSqlBuilderOptions? options = null,
         StringBuilder? format = null,
