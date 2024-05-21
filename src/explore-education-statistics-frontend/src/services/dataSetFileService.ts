@@ -25,8 +25,7 @@ export interface DataSetFile {
   api?: DataSetFileApi;
   meta: {
     geographicLevels: string[];
-    timePeriod: {
-      timeIdentifier: string;
+    timePeriodRange: {
       from: string;
       to: string;
     };
@@ -60,8 +59,7 @@ export interface DataSetFileSummary {
   api?: DataSetFileApi;
   meta: {
     geographicLevels: string[];
-    timePeriod: {
-      timeIdentifier: string;
+    timePeriodRange: {
       from: string;
       to: string;
     };

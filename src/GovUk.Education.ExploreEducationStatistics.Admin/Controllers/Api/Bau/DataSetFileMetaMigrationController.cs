@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -35,7 +34,6 @@ public class DataSetFileMetaMigrationController : ControllerBase
     {
         public bool IsDryRun;
         public int Processed;
-        public int LeftToProcess;
         public List<string> Errors;
     }
 
@@ -45,25 +43,20 @@ public class DataSetFileMetaMigrationController : ControllerBase
         public TimeIdentifier TimeIdentifier;
     }
 
-    [HttpPatch("bau/migrate-datasetfilemeta")]
+    [HttpPatch("bau/migrate-datasetfilemeta-timeperiodrange")]
     public async Task<DataSetFileMetaMigrationResult> MigrateReleaseSeries(
         [FromQuery] bool dryRun = true,
-        [FromQuery] int? num = null,
         CancellationToken cancellationToken = default)
     {
-        var filesQueryable = _contentDbContext.Files
+        var files = (await _contentDbContext.Files
             .Where(f =>
-                f.DataSetFileMeta == null
-                && f.Type == FileType.Data);
+                f.DataSetFileMeta != null
+                && f.Type == FileType.Data)
+            .ToListAsync(cancellationToken: cancellationToken))
+            .Where(f => f.DataSetFileMeta.TimeIdentifier != null)
+            .ToList();
 
-        if (num is > 0)
-        {
-            filesQueryable = filesQueryable.Take(num.Value);
-        }
-
-        var files = await filesQueryable.ToListAsync(cancellationToken: cancellationToken);
-
-        var numDataSetFileMetaSet = 0;
+        var numTimePeriodRangeSet = 0;
         var errors = new List<string>();
 
         foreach (var file in files)
@@ -72,11 +65,18 @@ public class DataSetFileMetaMigrationController : ControllerBase
                 .AsNoTracking()
                 .Where(o => o.SubjectId == file.SubjectId);
 
-            var timePeriods = await observations
-                .Select(o => new TimePeriod{ Year = o.Year, TimeIdentifier = o.TimeIdentifier })
+            var timePeriods = (await observations
+                .Select(o => new { o.Year, o.TimeIdentifier, })
                 .Distinct()
                 .OrderBy(tp => tp.Year)
-                .ToListAsync(cancellationToken: cancellationToken);
+                .ThenBy(tp => tp.TimeIdentifier)
+                .ToListAsync(cancellationToken: cancellationToken))
+                .Select(tp => new TimePeriodRangeBoundMeta
+                {
+                    Period = tp.Year.ToString(),
+                    TimeIdentifier = tp.TimeIdentifier,
+                })
+                .ToList();
 
             if (timePeriods.Count == 0)
             {
@@ -85,46 +85,17 @@ public class DataSetFileMetaMigrationController : ControllerBase
                 continue;
             }
 
-            var geographicLevels = await observations
-                .Select(o => o.Location.GeographicLevel)
-                .Distinct()
-                .OrderBy(gl => gl)
-                .ToListAsync(cancellationToken: cancellationToken);
+            _contentDbContext.Update(file);
 
-            var filters = await _statisticsDbContext.Filter
-                .Where(f => f.SubjectId == file.SubjectId)
-                .OrderBy(f => f.Label)
-                .Select(f => new FilterMeta
-                {
-                    Id = f.Id,
-                    Label = f.Label,
-                    Hint = f.Hint,
-                    ColumnName = f.Name,
-                })
-                .ToListAsync(cancellationToken: cancellationToken);
-
-            var indicators = await _statisticsDbContext.Indicator
-                .Where(i => i.IndicatorGroup.SubjectId == file.SubjectId)
-                .Select(i => new IndicatorMeta
-                {
-                    Id = i.Id,
-                    Label = i.Label,
-                    ColumnName = i.Name,
-                })
-                .OrderBy(i => i.Label)
-                .ToListAsync(cancellationToken: cancellationToken);
-
-            file.DataSetFileMeta = new DataSetFileMeta
+            file.DataSetFileMeta.TimePeriodRange = new TimePeriodRangeMeta
             {
-                GeographicLevels = geographicLevels
-                    .Select(gl => gl.GetEnumLabel()).ToList(),
-                TimeIdentifier = timePeriods[0].TimeIdentifier,
-                Years = timePeriods.Select(tp => tp.Year).ToList(),
-                Filters = filters,
-                Indicators = indicators,
+                Start = timePeriods.First(),
+                End = timePeriods.Last(),
             };
+            file.DataSetFileMeta.TimeIdentifier = null;
+            file.DataSetFileMeta.Years = null;
 
-            numDataSetFileMetaSet++;
+            numTimePeriodRangeSet++;
         }
 
         if (!dryRun)
@@ -135,11 +106,7 @@ public class DataSetFileMetaMigrationController : ControllerBase
         return new DataSetFileMetaMigrationResult
         {
             IsDryRun = dryRun,
-            Processed = numDataSetFileMetaSet,
-            LeftToProcess = _contentDbContext.Files
-                .Count(f =>
-                    f.DataSetFileMeta == null
-                    && f.Type == FileType.Data),
+            Processed = numTimePeriodRangeSet,
             Errors = errors,
         };
     }

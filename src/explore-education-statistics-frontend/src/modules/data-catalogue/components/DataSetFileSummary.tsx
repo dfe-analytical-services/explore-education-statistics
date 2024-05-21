@@ -39,8 +39,7 @@ export default function DataSetFileSummary({
     content,
     fileId,
     meta: {
-      timePeriod = {
-        timeIdentifier: undefined,
+      timePeriodRange = {
         from: undefined,
         to: undefined,
       },
@@ -189,14 +188,14 @@ export default function DataSetFileSummary({
             </CollapsibleList>
           </SummaryListItem>
         )}
-        {(timePeriod.from || timePeriod.to) && (
+        {(timePeriodRange.from || timePeriodRange.to) && (
           <SummaryListItem
             className={classNames({
               'dfe-js-hidden': !showDetails,
             })}
             term="Time period"
           >
-            {getTimePeriodString(timePeriod)}
+            {getTimePeriodString(timePeriodRange)}
           </SummaryListItem>
         )}
         <SummaryListItem

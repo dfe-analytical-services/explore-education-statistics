@@ -20,8 +20,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-1',
     fileSize: '100 kb',
     meta: {
-      timePeriod: {
-        timeIdentifier: 'Calendar year',
+      timePeriodRange: {
         from: '2010',
         to: '2020',
       },
@@ -53,8 +52,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-2',
     fileSize: '100 kb',
     meta: {
-      timePeriod: {
-        timeIdentifier: 'Calendar year',
+      timePeriodRange: {
         from: '2010',
         to: '2020',
       },
@@ -86,8 +84,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     filename: 'file-name-3',
     fileSize: '100 kb',
     meta: {
-      timePeriod: {
-        timeIdentifier: 'Calendar year',
+      timePeriodRange: {
         from: '2010',
         to: '2020',
       },
@@ -139,8 +136,7 @@ export const testDataSetFile: DataSetFile = {
   summary: 'Data set 1 summary',
   title: 'Data set 1',
   meta: {
-    timePeriod: {
-      timeIdentifier: 'Calendar year',
+    timePeriodRange: {
       from: '2023',
       to: '2024',
     },

@@ -2,15 +2,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record DataSetFileMetaViewModel
 {
-    public List<string> GeographicLevels { get; init; } = new();
-    public DataSetFileTimePeriodViewModel TimePeriod { get; init; } = new();
-    public List<string> Filters { get; init; } = new();
-    public List<string> Indicators { get; init; } = new();
+    public required List<string> GeographicLevels { get; init; }
+    public required DataSetFileTimePeriodRangeViewModel TimePeriodRange { get; init; }
+    public required List<string> Filters { get; init; }
+    public required List<string> Indicators { get; init; }
 }
 
-public record DataSetFileTimePeriodViewModel
+public record DataSetFileTimePeriodRangeViewModel
 {
-    public string TimeIdentifier { get; init; } = string.Empty;
-    public string From { get; init; } = string.Empty;
-    public string To { get; init; } = string.Empty;
+    public required string From { get; init; }
+    public required string To { get; init; }
 }
