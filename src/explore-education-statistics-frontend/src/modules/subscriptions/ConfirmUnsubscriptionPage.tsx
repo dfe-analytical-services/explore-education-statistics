@@ -11,6 +11,7 @@ import notificationService, {
 } from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
+import Head from 'next/head';
 
 interface Props {
   publicationSlug: string;
@@ -28,6 +29,8 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
   >(undefined);
 
   const onConfirmClicked = async () => {
+    // TODO: Currently we get a 400 if the token isn't valid, but aren't
+    // properly handling this like we are for verification errors.
     const response = await notificationService.confirmUnsubscription(
       data.id,
       token,
@@ -46,6 +49,10 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
         { name: data.title, link: `/find-statistics/${publicationSlug}` },
       ]}
     >
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="googlebot" content="noindex,nofollow" />
+      </Head>
       {unsubscribedSubscription ? (
         <SubscriptionStatusMessage
           title={data.title}

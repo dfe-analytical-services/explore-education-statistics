@@ -14,6 +14,7 @@ import Page from '@frontend/components/Page';
 import notificationService from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
+import Head from 'next/head';
 
 interface FormValues {
   email: string;
@@ -54,6 +55,10 @@ const SubscriptionPage: NextPage<Props> = ({ data, slug }) => {
         { name: data.title, link: `/find-statistics/${slug}` },
       ]}
     >
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="googlebot" content="noindex,nofollow" />
+      </Head>
       <FormProvider
         enableReinitialize
         initialValues={{
