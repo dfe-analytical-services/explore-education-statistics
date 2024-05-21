@@ -46,15 +46,22 @@ public class DataSetFileMetaMigrationController : ControllerBase
     [HttpPatch("bau/migrate-datasetfilemeta-timeperiodrange")]
     public async Task<DataSetFileMetaMigrationResult> MigrateReleaseSeries(
         [FromQuery] bool dryRun = true,
+        [FromQuery] int? num = null,
         CancellationToken cancellationToken = default)
     {
         var files = (await _contentDbContext.Files
-            .Where(f =>
-                f.DataSetFileMeta != null
-                && f.Type == FileType.Data)
-            .ToListAsync(cancellationToken: cancellationToken))
-            .Where(f => f.DataSetFileMeta.TimeIdentifier != null)
-            .ToList();
+                .Where(f =>
+                    f.DataSetFileMeta != null
+                    && f.Type == FileType.Data)
+                .ToListAsync(cancellationToken: cancellationToken))
+            .Where(f => f.DataSetFileMeta.TimeIdentifier != null);
+
+        if (num != null)
+        {
+            files = files.Take(num.Value);
+        }
+
+        files = files.ToList();
 
         var numTimePeriodRangeSet = 0;
         var errors = new List<string>();
