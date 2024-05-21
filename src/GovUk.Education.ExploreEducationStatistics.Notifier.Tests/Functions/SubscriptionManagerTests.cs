@@ -120,6 +120,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             storageTableService ?? Mock.Of<IStorageTableService>(MockBehavior.Strict),
-            notificationClientProvider ?? Mock.Of<INotificationClientProvider>(MockBehavior.Strict));
+            notificationClientProvider ?? Mock.Of<INotificationClientProvider>(MockBehavior.Strict),
+            new NewPendingSubscriptionRequest.Validator());
     }
 }

@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         ITokenService tokenService,
         IEmailService emailService,
         IStorageTableService storageTableService,
-        INotificationClientProvider notificationClientProvider)
+        INotificationClientProvider notificationClientProvider,
+        IValidator<NewPendingSubscriptionRequest> requestValidator)
     {
         private readonly AppSettingOptions _appSettingOptions = appSettingOptions.Value;
         private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -41,11 +42,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
-
-            // TODO: Hive this off to FluentValidation in the NewPendingSubscriptionRequest & add tests
-            if (req.Id == null || req.Email == null || req.Slug == null || req.Title == null)
+            logger.LogInformation(req?.Email);
+            
+            var validationResult = requestValidator.Validate(req);
+            if (!validationResult.IsValid)
             {
-                return new BadRequestObjectResult("Please pass a valid email & publication");
+                logger.LogError("Invalid model");
+                return new BadRequestObjectResult(validationResult.Errors);
             }
 
             var notificationClient = _notificationClientProvider.Get();
