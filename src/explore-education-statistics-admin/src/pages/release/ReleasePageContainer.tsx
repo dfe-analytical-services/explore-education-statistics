@@ -26,6 +26,7 @@ import {
   releaseSummaryEditRoute,
   releaseSummaryRoute,
   releaseTableToolRoute,
+  releaseApiDataSetsRoute,
 } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -44,6 +45,7 @@ const allNavRoutes = [
   releaseContentRoute,
   releaseStatusRoute,
   releasePreReleaseAccessRoute,
+  releaseApiDataSetsRoute,
 ];
 
 const routes = [

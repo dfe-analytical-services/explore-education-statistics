@@ -1,4 +1,5 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
+import ReleaseApiDataSetsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetsPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
@@ -40,6 +41,10 @@ export type ReleaseDataFileReplaceRouteParams = ReleaseRouteParams & {
 
 export type ReleaseFootnoteRouteParams = ReleaseRouteParams & {
   footnoteId: string;
+};
+
+export type ReleaseDataSetRouteParams = ReleaseRouteParams & {
+  dataSetId: string;
 };
 
 export interface ReleaseRouteProps extends ProtectedRouteProps {
@@ -153,4 +158,17 @@ export const releasePreReleaseAccessRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/prerelease-access',
   title: 'Pre-release access',
   component: ReleasePreReleaseAccessPage,
+};
+
+export const releaseApiDataSetsRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets',
+  title: 'API data sets',
+  component: ReleaseApiDataSetsPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId',
+  title: 'API data set details',
+  protectionAction: permissions => permissions.isBauUser,
 };
