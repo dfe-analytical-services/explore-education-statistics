@@ -44,12 +44,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
-      ipRules:  [for ipRule in storageFirewallRules: {
-        value: ipRule
+      ipRules:  [for firewallRule in storageFirewallRules: {
+        value: firewallRule
         action: 'Allow'
       }]
-      virtualNetworkRules: [for ipRule in allowedSubnetIds: {
-        id: ipRule
+      virtualNetworkRules: [for subnetId in allowedSubnetIds: {
+        id: subnetId
         action: 'Allow'
       }]
     }

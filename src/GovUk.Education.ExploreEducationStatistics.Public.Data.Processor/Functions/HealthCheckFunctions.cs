@@ -1,13 +1,16 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
 public class HealthCheckFunctions(
     ILogger<HealthCheckFunctions> logger,
-    PublicDataDbContext publicDataDbContext)
+    PublicDataDbContext publicDataDbContext,
+    IOptions<ParquetFilesOptions> parquetFileOptions)
 {
     [Function(nameof(CountDataSets))]
     public async Task<string> CountDataSets(
@@ -28,9 +31,7 @@ public class HealthCheckFunctions(
         
         try
         {
-            var fileShareMountExists = Directory.Exists("/data/public-api-parquet");
-
-            if (fileShareMountExists)
+            if (Directory.Exists(parquetFileOptions.Value.BasePath))
             {
                 logger.LogInformation("Successfully found the file share mount");
             }
