@@ -80,9 +80,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
                 new CancellationToken());
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.NotNull(okResult);
-        Assert.Equal(200, okResult.StatusCode);
+        Assert.IsType<OkObjectResult>(result);
 
         emailService.Verify(mock =>
             mock.SendEmail(notificationClient, "test1@test.com", "subscription-verification-id",
@@ -457,9 +455,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
                 "verification-code-4");
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.NotNull(okResult);
-        Assert.Equal(200, okResult.StatusCode);
+        Assert.IsType<OkObjectResult>(result);
 
         emailService.Verify(mock =>
             mock.SendEmail(notificationClient, "test4@test.com", "subscription-confirmation-id",
