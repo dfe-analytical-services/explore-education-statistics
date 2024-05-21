@@ -1859,9 +1859,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 );
 
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
             var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: await CreateConfigurtionWithAzurite());
+                configuration: configuration);
 
             var formFile = CreateDataCsvFormFile(""""
                                                  column_1,column_2,column_3
@@ -1984,9 +1989,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithFile(_fixture.DefaultFile()
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
 
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
             var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: await CreateConfigurtionWithAzurite());
+                configuration: configuration);
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1,column_2,column_3
@@ -2052,9 +2062,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new FilterMeta { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
                         ])));
 
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
             var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: await CreateConfigurtionWithAzurite());
+                configuration: configuration);
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2119,9 +2134,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
 
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
             var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: await CreateConfigurtionWithAzurite());
+                configuration: configuration);
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2179,9 +2199,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 4", ColumnName = "F_indicator_4", },
                         ])));
 
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
             var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: await CreateConfigurtionWithAzurite());
+                configuration: configuration);
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2259,9 +2284,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithFilters(new List<Filter> { filter }))
                 .Generate();
 
-        var publicBlobStorageService = new PublicBlobStorageService(
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
+            var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: await CreateConfigurtionWithAzurite());
+                configuration: configuration);
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2378,9 +2408,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithReleaseVersion(publication.ReleaseVersions[2]) // the draft version
                 .WithFile(file);
 
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
             var publicBlobStorageService = new PublicBlobStorageService(
                 logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: await CreateConfigurtionWithAzurite());
+                configuration: configuration);
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2476,20 +2511,23 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             });
     }
 
-    private async Task<IConfiguration> CreateConfigurtionWithAzurite()
+    private async Task<AzuriteContainer> GetAzuriteContainer()
     {
         var azuriteContainer = new AzuriteBuilder()
             .WithImage("mcr.microsoft.com/azure-storage/azurite:3.27.0")
             .WithHostname("data-storage-test")
             .Build();
         await azuriteContainer.StartAsync();
+        return azuriteContainer;
+    }
 
+    private IConfiguration CreateConfiguration()
+    {
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
             .AddEnvironmentVariables()
             .Build();
-        configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
 
         return configuration;
     }

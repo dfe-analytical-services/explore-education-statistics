@@ -54,7 +54,7 @@ public class DataSetFileMetaMigrationController : ControllerBase
                     f.DataSetFileMeta != null
                     && f.Type == FileType.Data)
                 .ToListAsync(cancellationToken: cancellationToken))
-            .Where(f => f.DataSetFileMeta.TimeIdentifier != null);
+            .Where(f => f.DataSetFileMeta.Years != null);
 
         if (num != null)
         {
