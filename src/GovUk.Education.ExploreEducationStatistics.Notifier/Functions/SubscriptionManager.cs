@@ -1,4 +1,5 @@
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Notify.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
@@ -40,15 +42,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         public async Task<IActionResult> RequestPendingSubscriptionFunc(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/request-pending-subscription/")]
             [FromBody] NewPendingSubscriptionRequest req,
-            FunctionContext context)
+            FunctionContext context,
+            CancellationToken cancellationToken)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var validationResult = requestValidator.Validate(req);
-            if (!validationResult.IsValid)
+            var validationResult = await requestValidator.Validate(req, cancellationToken);
+            if (validationResult.IsLeft) // If validation failed
             {
-                logger.LogError("Invalid model");
-                return new BadRequestObjectResult(validationResult.Errors);
+                logger.LogError("{FunctionName} failed because the {req} did not contain a valid JSON object.", context.FunctionDefinition.Name, req);
+                return validationResult.Left;
             }
 
             var notificationClient = _notificationClientProvider.Get();

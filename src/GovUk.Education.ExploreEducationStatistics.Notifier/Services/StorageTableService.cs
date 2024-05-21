@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             }
             
             var activeSubscriber = await RetrieveSubscriber(await GetTable(NotifierSubscriptionsTableName), new SubscriptionEntity(id, email));
-            if (pendingSub is not null)
+            if (activeSubscriber is not null)
             {
                 return new Subscription() { Subscriber = activeSubscriber, Status = SubscriptionStatus.Subscribed };
             }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,5 +36,15 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
     public string TableStorageConnectionString()
     {
         return _azuriteContainer.GetConnectionString();
+    }
+
+    public async Task AddTestSubscription(string tableName, SubscriptionEntity subscription)
+    {
+        var storageAccount = CloudStorageAccount.Parse(TableStorageConnectionString());
+        var tableClient = storageAccount.CreateCloudTableClient();
+        var table = tableClient.GetTableReference(tableName);
+        await table.CreateIfNotExistsAsync();
+        
+        await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
     }
 }
