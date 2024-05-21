@@ -6,9 +6,7 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import useMounted from '@common/hooks/useMounted';
-import publicationService, {
-  PublicationTitle,
-} from '@common/services/publicationService';
+import publicationService from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import Page from '@frontend/components/Page';
 import notificationService from '@frontend/services/notificationService';
@@ -21,11 +19,16 @@ interface FormValues {
 }
 
 interface Props {
-  slug: string;
-  data: PublicationTitle;
+  publicationSlug: string;
+  publicationTitle: string;
+  publicationId: string;
 }
 
-const SubscriptionPage: NextPage<Props> = ({ data, slug }) => {
+const SubscriptionPage: NextPage<Props> = ({
+  publicationSlug,
+  publicationTitle,
+  publicationId,
+}) => {
   const { isMounted } = useMounted();
 
   if (!isMounted) {
@@ -34,25 +37,26 @@ const SubscriptionPage: NextPage<Props> = ({ data, slug }) => {
 
   const handleFormSubmit = async ({ email }: FormValues) => {
     if (email !== '') {
-      const { id, title } = data;
-
       await notificationService.requestPendingSubscription({
         email,
-        id,
-        slug,
-        title,
+        id: publicationId,
+        slug: publicationSlug,
+        title: publicationTitle,
       });
     }
   };
 
   return (
     <Page
-      title={data.title}
+      title={publicationTitle}
       caption="Notify me"
       breadcrumbLabel="Notify me"
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
-        { name: data.title, link: `/find-statistics/${slug}` },
+        {
+          name: publicationTitle,
+          link: `/find-statistics/${publicationSlug}`,
+        },
       ]}
     >
       <Head>
@@ -115,14 +119,15 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
     const { publicationSlug } = query;
 
-    const data = await publicationService.getPublicationTitle(
+    const publication = await publicationService.getPublicationTitle(
       publicationSlug as string,
     );
 
     return {
       props: {
-        data,
-        slug: publicationSlug as string,
+        publicationSlug: publicationSlug as string,
+        publicationId: publication.id,
+        publicationTitle: publication.title,
       },
     };
   },

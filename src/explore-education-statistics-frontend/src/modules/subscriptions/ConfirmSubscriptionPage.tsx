@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import Button from '@common/components/Button';
-import publicationService, {
-  PublicationTitle,
-} from '@common/services/publicationService';
+import publicationService from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import notificationService, {
@@ -16,13 +14,15 @@ import Head from 'next/head';
 
 interface Props {
   publicationSlug: string;
-  data: PublicationTitle;
+  publicationTitle: string;
+  publicationId: string;
   token: string;
 }
 
 const ConfirmSubscriptionPage: NextPage<Props> = ({
-  data,
   publicationSlug,
+  publicationTitle,
+  publicationId,
   token,
 }) => {
   const [confirmedSubscription, setConfirmedSubscription] = useState<
@@ -31,7 +31,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
 
   const onConfirmClicked = async () => {
     const response = await notificationService.confirmPendingSubscription(
-      data.id,
+      publicationId,
       token,
     );
 
@@ -50,12 +50,15 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
 
   return (
     <Page
-      title={data.title}
+      title={publicationTitle}
       caption="Notify me"
       breadcrumbLabel="Notify me"
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
-        { name: data.title, link: `/find-statistics/${publicationSlug}` },
+        {
+          name: publicationTitle,
+          link: `/find-statistics/${publicationSlug}`,
+        },
       ]}
     >
       <Head>
@@ -64,7 +67,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
       </Head>
       {confirmedSubscription ? (
         <SubscriptionStatusMessage
-          title={data.title}
+          title={publicationTitle}
           message="You have successfully subscribed to these updates."
           slug={confirmedSubscription.slug}
         />
@@ -85,14 +88,15 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
     const { publicationSlug, token } = query as Dictionary<string>;
 
-    const data = await publicationService.getPublicationTitle(
+    const publication = await publicationService.getPublicationTitle(
       publicationSlug as string,
     );
 
     return {
       props: {
-        data,
-        publicationSlug,
+        publicationSlug: publicationSlug as string,
+        publicationId: publication.id,
+        publicationTitle: publication.title,
         token,
       },
     };
