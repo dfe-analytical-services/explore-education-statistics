@@ -11,6 +11,7 @@ using Notify.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
@@ -36,29 +37,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> RequestPendingSubscriptionFunc(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/request-pending-subscription/")]
-            HttpRequest req,
+            [FromBody] NewPendingSubscriptionRequest req,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            string? id = req.Query["id"];
-            string? email = req.Query["email"];
-            string? slug = req.Query["slug"];
-            string? title = req.Query["title"];
-            var data = await req.GetJsonBody();
-            id ??= data?.id;
-            email ??= data?.email;
-            slug ??= data?.slug;
-            title ??= data?.title;
-
-            if (id == null || email == null || slug == null || title == null)
+            // TODO: Hive this off to FluentValidation in the NewPendingSubscriptionRequest & add tests
+            if (req.Id == null || req.Email == null || req.Slug == null || req.Title == null)
             {
                 return new BadRequestObjectResult("Please pass a valid email & publication");
             }
 
             var notificationClient = _notificationClientProvider.Get();
 
-            var subscription = await storageTableService.GetSubscription(id, email);
+            var subscription = await storageTableService.GetSubscription(req.Id, req.Email);
             var pendingSubscriptionTable =
                 await _storageTableService.GetTable(NotifierPendingSubscriptionsTableName);
 
@@ -87,12 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                                 },
                                 {
                                     "unsubscribe_link",
-                                    $"{_appSettingOptions.PublicAppUrl}/subscriptions/{slug}/confirm-unsubscription/{unsubscribeToken}"
+                                    $"{_appSettingOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
                                 }
                             };
 
                             _emailService.SendEmail(notificationClient,
-                                email: email,
+                                email: req.Email,
                                 templateId: _emailTemplateOptions.SubscriptionConfirmationId,
                                 confirmationValues);
 
@@ -102,30 +94,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                     case SubscriptionStatus.NotSubscribed:
                         // Verification Token expires in 1 hour
                         var expiryDateTime = DateTime.UtcNow.AddHours(1);
-                        var activationCode = _tokenService.GenerateToken(email, expiryDateTime);
+                        var activationCode = _tokenService.GenerateToken(req.Email, expiryDateTime);
                         await _storageTableService.UpdateSubscriber(pendingSubscriptionTable,
-                            new SubscriptionEntity(id, email, title, slug, expiryDateTime));
+                            new SubscriptionEntity(req.Id, req.Email, req.Title, req.Slug, expiryDateTime));
 
                         var values = new Dictionary<string, dynamic>
                         {
                             {
-                                "publication_name", title
+                                "publication_name", req.Title
                             },
                             {
                                 "verification_link",
-                                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{slug}/confirm-subscription/{activationCode}"
+                                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
                             }
                         };
 
                         _emailService.SendEmail(notificationClient,
-                            email: email,
+                            email: req.Email,
                             templateId: _emailTemplateOptions.SubscriptionVerificationId,
                             values);
 
                         return new OkObjectResult(new SubscriptionStateDto()
                         {
-                            Slug = slug,
-                            Title = title,
+                            Slug = req.Slug,
+                            Title = req.Title,
                             Status = SubscriptionStatus.SubscriptionPending
                         });
                     default:
@@ -140,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 if (subscription.Status is not SubscriptionStatus.SubscriptionPending)
                 {
                     await _storageTableService.RemoveSubscriber(pendingSubscriptionTable,
-                        new SubscriptionEntity(id, email));
+                        new SubscriptionEntity(req.Id, req.Email));
                 }
 
                 return new BadRequestResult();
@@ -156,7 +148,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationUnsubscribeFunc(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
-            HttpRequest req,
             FunctionContext context,
             string id,
             string token)
