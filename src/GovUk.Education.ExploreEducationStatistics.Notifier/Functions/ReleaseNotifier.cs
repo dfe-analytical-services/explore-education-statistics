@@ -152,7 +152,7 @@ public class ReleaseNotifier
             },
             {
                 "unsubscribe_link",
-                $"{_appSettingOptions.BaseUrl}/publication/{msg.PublicationId}/unsubscribe/{unsubscribeToken}"
+                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
             }
         };
 
@@ -193,7 +193,7 @@ public class ReleaseNotifier
             },
             {
                 "unsubscribe_link",
-                $"{_appSettingOptions.BaseUrl}/publication/{supersededPublication.Id}/unsubscribe/{unsubscribeToken}"
+                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
             },
             {
                 "superseded_publication_title", supersededPublication.Title
