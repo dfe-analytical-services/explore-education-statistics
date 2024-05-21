@@ -187,7 +187,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> VerifySubscriptionFunc(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription/{token}")]
-            HttpRequest req,
             FunctionContext context,
             string id,
             string token)
