@@ -536,7 +536,7 @@ Edit reference line
 
 Remove reference line
     user clicks button containing text    Remove    testId:referenceLines
-    user waits until parent does not contain element    id:chartBuilderPreview    Edited reference line
+    user waits until parent does not contain    id:chartBuilderPreview    Edited reference line
 
 Save chart and validate marked as 'Has chart' in data blocks list
     user saves chart configuration
