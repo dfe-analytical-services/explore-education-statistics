@@ -30,10 +30,10 @@ if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
 
 const cspConnectSrc = [
   "'self'",
-  process.env.CONTENT_API_BASE_URL,
-  process.env.DATA_API_BASE_URL,
-  process.env.NOTIFICATION_API_BASE_URL,
-  process.env.PUBLIC_API_BASE_URL,
+  `${process.env.CONTENT_API_BASE_URL}/`,
+  `${process.env.DATA_API_BASE_URL}/`,
+  `${process.env.NOTIFICATION_API_BASE_URL}/`,
+  `${process.env.PUBLIC_API_BASE_URL}/`,
   'https://*.googletagmanager.com',
   'https://*.google-analytics.com',
   'https://*.analytics.google.com',

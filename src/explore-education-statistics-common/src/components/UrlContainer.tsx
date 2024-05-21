@@ -16,7 +16,7 @@ export default function UrlContainer({
   id,
   label = 'URL',
   labelHidden = true,
-  testId,
+  testId = id,
   url,
 }: Props) {
   return (
