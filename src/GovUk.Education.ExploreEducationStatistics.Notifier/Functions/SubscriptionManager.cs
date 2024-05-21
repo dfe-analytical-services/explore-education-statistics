@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
+using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
@@ -42,8 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
-            logger.LogInformation(req?.Email);
-            
+
             var validationResult = requestValidator.Validate(req);
             if (!validationResult.IsValid)
             {
