@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import Button from '@common/components/Button';
-import publicationService, {
-  PublicationTitle,
-} from '@common/services/publicationService';
+import publicationService from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import notificationService, {
@@ -15,13 +13,15 @@ import Head from 'next/head';
 
 interface Props {
   publicationSlug: string;
-  data: PublicationTitle;
+  publicationTitle: string;
+  publicationId: string;
   token: string;
 }
 
 const ConfirmUnsubscriptionPage: NextPage<Props> = ({
-  data,
   publicationSlug,
+  publicationTitle,
+  publicationId,
   token,
 }) => {
   const [unsubscribedSubscription, setUnsubscribedSubscription] = useState<
@@ -32,7 +32,7 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
     // TODO: Currently we get a 400 if the token isn't valid, but aren't
     // properly handling this like we are for verification errors.
     const response = await notificationService.confirmUnsubscription(
-      data.id,
+      publicationId,
       token,
     );
 
@@ -41,12 +41,15 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
 
   return (
     <Page
-      title={data.title}
+      title={publicationTitle}
       caption="Notify me"
       breadcrumbLabel="Notify me"
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
-        { name: data.title, link: `/find-statistics/${publicationSlug}` },
+        {
+          name: publicationTitle,
+          link: `/find-statistics/${publicationSlug}`,
+        },
       ]}
     >
       <Head>
@@ -55,7 +58,7 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
       </Head>
       {unsubscribedSubscription ? (
         <SubscriptionStatusMessage
-          title={data.title}
+          title={publicationTitle}
           message="You have successfully unsubscribed from these updates."
           slug={unsubscribedSubscription.slug}
         />
@@ -76,14 +79,15 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
     const { publicationSlug, token } = query as Dictionary<string>;
 
-    const data = await publicationService.getPublicationTitle(
+    const publication = await publicationService.getPublicationTitle(
       publicationSlug as string,
     );
 
     return {
       props: {
-        data,
-        publicationSlug,
+        publicationSlug: publicationSlug as string,
+        publicationId: publication.id,
+        publicationTitle: publication.title,
         token,
       },
     };
