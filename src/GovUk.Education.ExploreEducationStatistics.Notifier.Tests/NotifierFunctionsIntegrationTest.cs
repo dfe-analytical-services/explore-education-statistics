@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Testcontainers.Azurite;
 using Xunit;
 
@@ -44,7 +37,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
         var tableClient = storageAccount.CreateCloudTableClient();
         var table = tableClient.GetTableReference(tableName);
         await table.CreateIfNotExistsAsync();
-        
+
         await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
     }
 }
