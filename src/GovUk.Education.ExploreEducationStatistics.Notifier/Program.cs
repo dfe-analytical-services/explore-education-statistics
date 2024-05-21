@@ -1,4 +1,6 @@
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
@@ -24,6 +26,8 @@ var host = new HostBuilder()
             .AddTransient<INotificationClientProvider, NotificationClientProvider>()
             .AddTransient<IStorageTableService, StorageTableService>()
             .AddTransient<ITokenService, TokenService>()
+            .AddScoped<IValidator<NewPendingSubscriptionRequest>,
+                NewPendingSubscriptionRequest.Validator>()
             .Configure<AppSettingOptions>(hostContext.Configuration.GetSection(AppSettingOptions.AppSettings))
             .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.GovUkNotify));
     })
