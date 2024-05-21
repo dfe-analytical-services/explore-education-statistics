@@ -12,6 +12,7 @@ import notificationService, {
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
 import VerificationErrorMessage from '@frontend/modules/subscriptions/components/VerificationErrorMessage';
+import Head from 'next/head';
 
 interface Props {
   publicationSlug: string;
@@ -57,6 +58,10 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
         { name: data.title, link: `/find-statistics/${publicationSlug}` },
       ]}
     >
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="googlebot" content="noindex,nofollow" />
+      </Head>
       {confirmedSubscription ? (
         <SubscriptionStatusMessage
           title={data.title}

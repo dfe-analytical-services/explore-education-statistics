@@ -20,7 +20,7 @@ const notificationService = {
       query,
     );
   },
-  confirmPendingSubscription(
+  async confirmPendingSubscription(
     id: string,
     token: string,
   ): Promise<Subscription | undefined> {
