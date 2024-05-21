@@ -2,6 +2,7 @@ import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMo
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import SubmitError from '@common/components/form/util/SubmitError';
+import delay from '@common/utils/delay';
 import Yup from '@common/validation/yup';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -164,6 +165,39 @@ describe('Form', () => {
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
     });
+  });
+
+  test('prevents multiple `onSubmit` calls until submission completes', async () => {
+    const handleSubmit = jest.fn(() => delay(200));
+
+    render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        {({ formState }) => (
+          <Form id="test-form" onSubmit={handleSubmit}>
+            The form
+            <button type="submit">Submit</button>
+            {formState.isSubmitted && <p>Submitted</p>}
+          </Form>
+        )}
+      </FormProvider>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
+
+    expect(await screen.findByText('Submitted')).toBeInTheDocument();
+
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
 
   test('renders submit error with default message when error thrown', async () => {

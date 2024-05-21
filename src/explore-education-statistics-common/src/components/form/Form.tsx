@@ -55,7 +55,13 @@ export default function Form<TFormValues extends FieldValues>({
   const isMounted = useMountedRef();
 
   const {
-    formState: { errors, submitCount, touchedFields, isSubmitted },
+    formState: {
+      errors,
+      submitCount,
+      touchedFields,
+      isSubmitted,
+      isSubmitting,
+    },
     handleSubmit: submit,
   } = useFormContext<TFormValues>();
 
@@ -105,11 +111,16 @@ export default function Form<TFormValues extends FieldValues>({
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
       event.preventDefault();
+
+      if (isSubmitting) {
+        return;
+      }
+
       toggleSummaryFocus.off();
 
       await submit(async data => onSubmit(data))(event);
     },
-    [submit, toggleSummaryFocus, onSubmit],
+    [isSubmitting, toggleSummaryFocus, submit, onSubmit],
   );
 
   return (
