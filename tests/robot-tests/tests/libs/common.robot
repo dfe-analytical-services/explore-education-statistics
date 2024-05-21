@@ -553,6 +553,11 @@ user waits until parent does not contain button
     user waits until parent does not contain element    ${parent}
     ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
 
+user waits until parent does not contain
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    user waits until parent does not contain element    ${parent}
+    ...    .//*[contains(text(),"${text}")]    ${wait}
+
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
     user waits until parent contains button    ${parent}    ${text}
