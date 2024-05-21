@@ -2,7 +2,6 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Functions.Worker;
@@ -167,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             }
 
             var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
-            var sub = _storageTableService.RetrieveSubscriber(table, new SubscriptionEntity(id, email)).Result;
+            var sub = await _storageTableService.RetrieveSubscriber(table, new SubscriptionEntity(id, email));
             if (sub is null)
             {
                 return new UnprocessableEntityObjectResult("Unable to unsubscribe. Given email is not currently subscribed.");
