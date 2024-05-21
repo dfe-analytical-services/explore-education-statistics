@@ -2,6 +2,8 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
+import ProtectedRoute from '@admin/components/ProtectedRoute';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
@@ -29,12 +31,12 @@ import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
-import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import React, { useMemo } from 'react';
+import { generatePath, RouteComponentProps, Switch } from 'react-router';
 import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
 
-const navRoutes = [
+const allNavRoutes = [
   releaseSummaryRoute,
   releaseDataRoute,
   releaseFootnotesRoute,
@@ -45,7 +47,7 @@ const navRoutes = [
 ];
 
 const routes = [
-  ...navRoutes,
+  ...allNavRoutes,
   releaseAncillaryFilesRoute,
   releaseAncillaryFileRoute,
   releaseDataFileRoute,
@@ -69,6 +71,9 @@ const ReleasePageContainer = ({
   location,
 }: RouteComponentProps<MatchProps>) => {
   const { publicationId, releaseId } = match.params;
+
+  const { user } = useAuthContext();
+
   const {
     value: release,
     setState: setRelease,
@@ -77,6 +82,15 @@ const ReleasePageContainer = ({
     () => releaseService.getRelease(releaseId),
     [releaseId],
   );
+
+  const navRoutes = useMemo(() => {
+    return allNavRoutes.filter(route => {
+      return (
+        user?.permissions &&
+        (!route.protectionAction || route.protectionAction(user.permissions))
+      );
+    });
+  }, [user?.permissions]);
 
   const currentRouteIndex =
     navRoutes.findIndex(
@@ -157,11 +171,13 @@ const ReleasePageContainer = ({
               </RelatedInformation>
             </div> */}
           </div>
+
           <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
           {release.amendment && (
             <Tag className="govuk-!-margin-left-2">Amendment</Tag>
           )}
           {release.live && <Tag className="govuk-!-margin-left-2">Live</Tag>}
+
           <NavBar
             routes={navRoutes.map(route => ({
               title: route.title,
@@ -172,6 +188,7 @@ const ReleasePageContainer = ({
             }))}
             label="Release"
           />
+
           <ReleaseContextProvider
             release={release}
             onReleaseChange={nextRelease => {
@@ -180,10 +197,11 @@ const ReleasePageContainer = ({
           >
             <Switch>
               {routes.map(route => (
-                <Route exact key={route.path} {...route} />
+                <ProtectedRoute exact key={route.path} {...route} />
               ))}
             </Switch>
           </ReleaseContextProvider>
+
           {currentRouteIndex > -1 && (
             <PreviousNextLinks
               previousSection={previousSection}

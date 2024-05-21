@@ -1,3 +1,4 @@
+import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
@@ -15,7 +16,6 @@ import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/Releas
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
-import { RouteProps } from 'react-router';
 
 export type ReleaseRouteParams = {
   publicationId: string;
@@ -42,7 +42,7 @@ export type ReleaseFootnoteRouteParams = ReleaseRouteParams & {
   footnoteId: string;
 };
 
-export interface ReleaseRouteProps extends RouteProps {
+export interface ReleaseRouteProps extends ProtectedRouteProps {
   title: string;
   path: string;
 }
