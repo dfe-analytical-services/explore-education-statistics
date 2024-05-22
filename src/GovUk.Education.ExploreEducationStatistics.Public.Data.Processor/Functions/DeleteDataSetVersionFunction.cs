@@ -17,6 +17,6 @@ public class DeleteDataSetVersionFunction(IDataSetVersionService dataSetVersionS
         return await dataSetVersionService.DeleteVersion(
                 dataSetVersionId,
                 cancellationToken: cancellationToken)
-            .HandleFailuresOrNoContent();
+            .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
     }
 }
