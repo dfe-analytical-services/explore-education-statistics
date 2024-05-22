@@ -752,5 +752,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(false);
         }
+
+        public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
+        }
     }
 }
