@@ -33,9 +33,9 @@ internal class DataSetVersionService(
                 using var transactionScope = new TransactionScope(TransactionScopeOption.Required, transactionOptions, TransactionScopeAsyncFlowOption.Enabled);
 
                 return await GetDataSetVersion(dataSetVersionId, cancellationToken)
-                    .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
                     .OnSuccessDo(async dataSetVersion => await GetReleaseFile(dataSetVersion, cancellationToken)
                         .OnSuccessVoid(async releaseFile => await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken)))
+                    .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
                     .OnSuccessVoid(DeleteParquetFiles)
                     .OnSuccessVoid(transactionScope.Complete);
             });
