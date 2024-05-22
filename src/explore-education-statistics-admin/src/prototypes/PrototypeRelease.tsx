@@ -102,7 +102,7 @@ const PrototypeRelease = () => {
                   <strong>
                     <a
                       data-testid="subscription-children-looked-after-in-england-including-adoptions"
-                      href="/subscriptions?slug=children-looked-after-in-england-including-adoptions"
+                      href="/subscriptions/new-subscription/children-looked-after-in-england-including-adoptions"
                       className="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
                     >
                       Sign up for email alerts
