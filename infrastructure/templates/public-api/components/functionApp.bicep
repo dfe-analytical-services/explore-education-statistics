@@ -39,7 +39,7 @@ param applicationInsightsKey string
 @description('Specifies the subnet id')
 param subnetId string
 
-@description('Specifis whether this Function App is accessible from the public internet')
+@description('Specifies whether this Function App is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
@@ -98,25 +98,27 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   }
 }
 
-// Configuring a single shared storage account for task management, and 2 individual storage accounts to be split
-// between the production slot and staging slot. See
+// Configure a single shared storage account for access key storage, and 2 individual storage accounts to be split
+// between the production slot and staging slot for reliable execution. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-zero-downtime-deployment#status-check-with-slot
-var durableManagementStorageAccountName = replace('${subscription}eessa${functionAppName}mg', '-', '')
+var sharedStorageAccountName = replace('${subscription}eessa${functionAppName}mg', '-', '')
 var slot1StorageAccountName = replace('${subscription}eessa${functionAppName}s1', '-', '')
 var slot2StorageAccountName = replace('${subscription}eessa${functionAppName}s2', '-', '')
 
-// Create a dedicated Storage Account for this Function App for it to store its deployment code and jobs in.
-// Grant the Function App access by whitelisting its subnet for inbound traffic.
+// This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger 
+// management etc.
+//
+// The Durable Function App is granted access by whitelisting its subnet for inbound traffic.
 //
 // For performance, it is considered good practice for each Function App to have its own dedicated Storage Account. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
 
 // TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
-module durableManagementStorageAccountModule 'storageAccount.bicep' = {
-  name: '${durableManagementStorageAccountName}StorageAccountDeploy'
+module sharedStorageAccountModule 'storageAccount.bicep' = {
+  name: '${sharedStorageAccountName}StorageAccountDeploy'
   params: {
     location: location
-    storageAccountName: durableManagementStorageAccountName
+    storageAccountName: sharedStorageAccountName
     allowedSubnetIds: [subnetId]
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
@@ -124,6 +126,8 @@ module durableManagementStorageAccountModule 'storageAccount.bicep' = {
   }
 }
 
+// This is a storage account dedicated to slot 1. It uses this for its own reliable execution.
+// It also contains a file share where its slot-specific version of the code lives.
 // TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 module slot1StorageAccountModule 'storageAccount.bicep' = {
   name: '${slot1StorageAccountName}StorageAccountDeploy'
@@ -137,6 +141,16 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
   }
 }
 
+// This is the file share for slot 1 to use for its code storage.
+resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+  name: '${slot1StorageAccountName}/default/${fullFunctionAppName}1'
+  dependsOn: [
+    slot1StorageAccountModule
+  ]
+}
+
+// This is a storage account dedicated to slot 2. It uses this for its own reliable execution.
+// It also contains a file share where its slot-specific version of the code lives.
 // TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 module slot2StorageAccountModule 'storageAccount.bicep' = {
   name: '${slot2StorageAccountName}StorageAccountDeploy'
@@ -148,6 +162,14 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
     keyVaultName: keyVaultName
     tagValues: tagValues
   }
+}
+
+// This is the file share for slot 2 to use for its code storage.
+resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+  name: '${slot2StorageAccountModule}/default/${fullFunctionAppName}2'
+  dependsOn: [
+    slot2StorageAccountModule
+  ]
 }
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
@@ -177,7 +199,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   tags: tagValues
 }
 
-resource azureStorageAccounts 'Microsoft.Web/sites/config@2021-01-15' = {
+resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2021-01-15' = {
    name: 'azurestorageaccounts'
    parent: functionApp
    properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
@@ -189,20 +211,6 @@ resource azureStorageAccounts 'Microsoft.Web/sites/config@2021-01-15' = {
        accessKey: next.storageAccountKey
      }
    }))
-}
-
-resource slot1StorageAccountFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${durableManagementStorageAccountName}/default/${fullFunctionAppName}1'
-  dependsOn: [
-    durableManagementStorageAccountModule
-  ]
-}
-
-resource slot2StorageAccountFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${durableManagementStorageAccountName}/default/${fullFunctionAppName}2'
-    dependsOn: [
-      durableManagementStorageAccountModule
-    ]
 }
 
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
@@ -234,10 +242,8 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     commonSettings: union(settings, {
 
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
-      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${durableManagementStorageAccountModule.outputs.connectionStringSecretName})'
-
-      // This property tells the Function App that the deployment code resides in this Storage account.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${durableManagementStorageAccountModule.outputs.connectionStringSecretName})'
+      // Additionally it tells the Function App where
+      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
 
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
@@ -265,12 +271,21 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
+
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
+      DataProcessorTaskHubName: 'DataProcessorSlot1TaskHub'
+
+      // The following 2 properties tell the Function App slots that their deployment code resides in the specified Storage account and File share.
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
       WEBSITE_CONTENTSHARE: '${fullFunctionAppName}1'
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
+      DataProcessorTaskHubName: 'DataProcessorSlot2TaskHub'
+
+      // The following 2 properties tell the Function App slots that their deployment code resides in the specified Storage account and File share.
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
       WEBSITE_CONTENTSHARE: '${fullFunctionAppName}2'
     }
     azureFileShares: azureFileShares

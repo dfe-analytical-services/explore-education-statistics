@@ -23,7 +23,7 @@ public class CreateInitialDataSetVersionFunction(
     public async Task<IActionResult> CreateInitialDataSetVersion(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = nameof(CreateInitialDataSetVersion))] [FromBody]
         InitialDataSetVersionCreateRequest request,
-        [DurableClient] DurableTaskClient client,
+        [DurableClient(TaskHub = "%DataProcessorTaskHubName%")] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
         // Identifier of the scheduled processing orchestration instance
