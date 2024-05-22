@@ -42,7 +42,7 @@ Validate Next update date
 
 Validate Email alerts link
     user checks page contains link with text and url    Sign up for email alerts
-    ...    /subscriptions?slug=${PUPIL_ABSENCE_PUBLICATION_SLUG}
+    ...    /subscriptions/new-subscription/${PUPIL_ABSENCE_PUBLICATION_SLUG}
 
 Validate "About these statistics" -- Number of other releases
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
