@@ -39,6 +39,9 @@ param applicationInsightsKey string
 @description('Specifies the subnet id')
 param subnetId string
 
+@description('Specifis whether this Function App is accessible from the public internet')
+param publicNetworkAccessEnabled bool = false
+
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
 param userAssignedManagedIdentityParams {
   id: string
@@ -169,6 +172,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       keyVaultReferenceIdentity: userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
     }
     keyVaultReferenceIdentity: userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
   }
   tags: tagValues
 }
