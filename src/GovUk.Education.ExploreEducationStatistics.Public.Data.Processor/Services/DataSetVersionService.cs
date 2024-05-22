@@ -25,14 +25,20 @@ internal class DataSetVersionService(
             IsolationLevel = IsolationLevel.ReadCommitted
         };
 
-        using var transactionScope = new TransactionScope(TransactionScopeOption.Required, transactionOptions, TransactionScopeAsyncFlowOption.Enabled);
+        var strategy = contentDbContext.Database.CreateExecutionStrategy();
 
-        return await GetDataSetVersion(dataSetVersionId, cancellationToken)
-            .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
-            .OnSuccessDo(async dataSetVersion => await GetReleaseFile(dataSetVersion, cancellationToken)
-                .OnSuccessVoid(async releaseFile => await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken)))
-            .OnSuccessVoid(DeleteParquetFiles)
-            .OnSuccessVoid(transactionScope.Complete);
+        return await strategy.ExecuteAsync(
+            async () =>
+            {
+                using var transactionScope = new TransactionScope(TransactionScopeOption.Required, transactionOptions, TransactionScopeAsyncFlowOption.Enabled);
+
+                return await GetDataSetVersion(dataSetVersionId, cancellationToken)
+                    .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
+                    .OnSuccessDo(async dataSetVersion => await GetReleaseFile(dataSetVersion, cancellationToken)
+                        .OnSuccessVoid(async releaseFile => await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken)))
+                    .OnSuccessVoid(DeleteParquetFiles)
+                    .OnSuccessVoid(transactionScope.Complete);
+            });
     }
 
     private async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(Guid dataSetVersionId, CancellationToken cancellationToken)
