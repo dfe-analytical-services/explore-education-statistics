@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class HealthCheckFunctions(
     ILogger<HealthCheckFunctions> logger,
     PublicDataDbContext publicDataDbContext,
-    IOptions<ParquetFilesOptions> parquetFileOptions)
+    IOptions<DataFilesOptions> dataFilesOptions)
 {
     [Function(nameof(CountDataSets))]
     public async Task<string> CountDataSets(
@@ -22,7 +22,7 @@ public class HealthCheckFunctions(
     {
         try
         {
-            var message = $"Found {await publicDataDbContext.DataSets.CountAsync()} datasets.";
+            var message = $"Found {await publicDataDbContext.DataSets.CountAsync()} data sets.";
             logger.LogInformation(message);
             return message;
         }
@@ -32,7 +32,7 @@ public class HealthCheckFunctions(
             throw;
         }
     }
-    
+
     [Function(nameof(CheckForFileShareMount))]
     public Task CheckForFileShareMount(
 #pragma warning disable IDE0060
@@ -40,10 +40,10 @@ public class HealthCheckFunctions(
 #pragma warning restore IDE0060
     {
         logger.LogInformation("Attempting to read from file share");
-        
+
         try
         {
-            if (Directory.Exists(parquetFileOptions.Value.BasePath))
+            if (Directory.Exists(dataFilesOptions.Value.BasePath))
             {
                 logger.LogInformation("Successfully found the file share mount");
             }
@@ -57,7 +57,7 @@ public class HealthCheckFunctions(
             logger.LogError(e, "Error encountered when attempting to find the file share mount");
             throw;
         }
-        
+
         return Task.CompletedTask;
     }
 }

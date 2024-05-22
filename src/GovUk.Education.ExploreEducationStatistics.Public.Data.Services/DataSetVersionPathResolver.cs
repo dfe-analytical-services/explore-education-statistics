@@ -12,11 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 
 public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 {
-    private readonly IOptions<ParquetFilesOptions> _options;
+    private readonly IOptions<DataFilesOptions> _options;
     private readonly IWebHostEnvironment _environment;
     private readonly string _basePath;
 
-    public DataSetVersionPathResolver(IOptions<ParquetFilesOptions> options, IWebHostEnvironment environment)
+    public DataSetVersionPathResolver(IOptions<DataFilesOptions> options, IWebHostEnvironment environment)
     {
         _options = options;
         _environment = environment;
@@ -24,7 +24,7 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
         if (_options.Value.BasePath.IsNullOrWhitespace())
         {
             throw new ArgumentException(
-                message: $"'{nameof(ParquetFilesOptions.BasePath)}' must not be blank",
+                message: $"'{nameof(DataFilesOptions.BasePath)}' must not be blank",
                 paramName: nameof(options)
             );
         }

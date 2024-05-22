@@ -817,14 +817,14 @@ public class SeedDataCommand : ICommand
         private async Task OutputParquetFiles()
         {
             var projectRootPath = PathUtils.ProjectRootPath;
-            var parquetDir = Path.Combine(projectRootPath, "data", "public-api-parquet");
+            var dataDir = Path.Combine(projectRootPath, "data", "public-api-data");
 
-            if (!Path.Exists(parquetDir))
+            if (!Path.Exists(dataDir))
             {
-                Directory.CreateDirectory(parquetDir);
+                Directory.CreateDirectory(dataDir);
             }
 
-            var dataSetDir = Path.Combine(parquetDir, _seed.DataSet.Id.ToString());
+            var dataSetDir = Path.Combine(dataDir, _seed.DataSet.Id.ToString());
 
             if (Path.Exists(dataSetDir))
             {

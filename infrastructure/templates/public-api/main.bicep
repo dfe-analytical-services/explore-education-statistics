@@ -91,8 +91,8 @@ var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
-var parquetFileShareMountName = 'parquet-fileshare-mount'
-var parquetFileShareMountPath = '/data/public-api-parquet'
+var dataFilesFileShareMountName = 'data-files-fileshare-mount'
+var dataFilesFileShareMountPath = '/data/public-api-data'
 var publicApiStorageAccountName = '${subscription}eespapisa'
 
 var tagValues = union(resourceTags ?? {}, {
@@ -158,7 +158,7 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' 
 var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
 
 // Deploy File Share.
-module parquetFileShareModule 'components/fileShares.bicep' = {
+module fileShareModule 'components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     resourcePrefix: resourcePrefix
@@ -237,10 +237,10 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     tagValues: tagValues
     azureFileStorages: [
       {
-        storageName: parquetFileShareModule.outputs.fileShareName
+        storageName: fileShareModule.outputs.fileShareName
         storageAccountName: publicApiStorageAccountName
         storageAccountKey: publicApiStorageAccountAccessKey
-        fileShareName: parquetFileShareModule.outputs.fileShareName
+        fileShareName: fileShareModule.outputs.fileShareName
         accessMode: 'ReadWrite'
       }
     ]
@@ -260,15 +260,15 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     volumeMounts: [
       {
-        volumeName: parquetFileShareMountName
-        mountPath: parquetFileShareMountPath
+        volumeName: dataFilesFileShareMountName
+        mountPath: dataFilesFileShareMountPath
       }
     ]
     volumes: [
       {
-        name: parquetFileShareMountName
+        name: dataFilesFileShareMountName
         storageType: 'AzureFile'
-        storageName: parquetFileShareModule.outputs.fileShareName
+        storageName: fileShareModule.outputs.fileShareName
       }
     ]
     appSettings: [
@@ -295,8 +295,8 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         value: 'true'
       }
       {
-        name: 'ParquetFiles__BasePath'
-        value: parquetFileShareMountPath
+        name: 'DataFiles__BasePath'
+        value: dataFilesFileShareMountPath
       }
       {
         // This property informs the Container App of the name of the Admin's system-assigned identity.
@@ -358,11 +358,11 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     }
     preWarmedInstanceCount: 1
     azureFileShares: [{
-      storageName: parquetFileShareModule.outputs.fileShareName
+      storageName: fileShareModule.outputs.fileShareName
       storageAccountKey: publicApiStorageAccountAccessKey
       storageAccountName: publicApiStorageAccountName
-      fileShareName: parquetFileShareModule.outputs.fileShareName
-      mountPath: parquetFileShareMountPath
+      fileShareName: fileShareModule.outputs.fileShareName
+      mountPath: dataFilesFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
@@ -428,4 +428,4 @@ output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFun
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
 
-output parquetFileShareMountPath string = parquetFileShareMountPath
+output dataFilesFileShareMountPath string = dataFilesFileShareMountPath

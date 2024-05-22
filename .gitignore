@@ -13,7 +13,7 @@ bin
 obj
 /data/ees-mssql
 /data/public-api-db
-/data/public-api-parquet
+/data/public-api-data
 dfe-meta.db
 
 ## CSharp

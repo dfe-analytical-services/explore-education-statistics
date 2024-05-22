@@ -28,7 +28,7 @@ public abstract class DataSetVersionPathResolverTests
         public void EmptyBasePath_Throws(string basePath)
         {
             Assert.Throws<ArgumentException>(() =>
-                BuildService(options: new ParquetFilesOptions
+                BuildService(options: new DataFilesOptions
                 {
                     BasePath = basePath
                 })
@@ -58,16 +58,16 @@ public abstract class DataSetVersionPathResolverTests
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(Environments.Development);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
             Assert.Equal(
                 Path.Combine(
                     PathUtils.ProjectRootPath,
                     "data",
-                    "parquet-files"
+                    "data-files"
                 ),
                 resolver.BasePath());
         }
@@ -79,9 +79,9 @@ public abstract class DataSetVersionPathResolverTests
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(HostEnvironmentExtensions.IntegrationTestEnvironment);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
             var basePath = resolver.BasePath();
@@ -95,7 +95,7 @@ public abstract class DataSetVersionPathResolverTests
                 Path.Combine(
                     Assembly.GetExecutingAssembly().GetDirectoryPath(),
                     "data",
-                    "parquet-files",
+                    "data-files",
                     randomTestInstanceDir.ToString()
                 ),
                 basePath
@@ -109,15 +109,15 @@ public abstract class DataSetVersionPathResolverTests
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(Environments.Production);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
             Assert.Equal(
                 Path.Combine(
                     "data",
-                    "parquet-files"
+                    "data-files"
                 ),
                 resolver.BasePath());
         }
@@ -132,9 +132,9 @@ public abstract class DataSetVersionPathResolverTests
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(environmentName);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
             Assert.Equal(
@@ -156,9 +156,9 @@ public abstract class DataSetVersionPathResolverTests
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(environmentName);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
             var directoryPath = resolver.DirectoryPath(version);
@@ -195,11 +195,11 @@ public abstract class DataSetVersionPathResolverTests
     }
 
     private IDataSetVersionPathResolver BuildService(
-        ParquetFilesOptions options,
+        DataFilesOptions options,
         IWebHostEnvironment? webHostEnvironment = null)
     {
         return new DataSetVersionPathResolver(
-            new OptionsWrapper<ParquetFilesOptions>(options),
+            new OptionsWrapper<DataFilesOptions>(options),
             webHostEnvironment ?? _webHostEnvironmentMock.Object
         );
     }

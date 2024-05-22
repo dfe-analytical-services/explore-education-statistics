@@ -111,8 +111,8 @@ public static class ProcessorHostBuilder
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                     .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
                         InitialDataSetVersionCreateRequest.Validator>()
-                    .Configure<ParquetFilesOptions>(
-                        hostBuilderContext.Configuration.GetSection(ParquetFilesOptions.Section));
+                    .Configure<DataFilesOptions>(
+                        hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
             });
     }
 }
