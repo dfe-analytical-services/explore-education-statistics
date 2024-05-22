@@ -102,8 +102,8 @@ public static class ProcessorHostBuilder
                     .ConfigureFunctionsApplicationInsights()
                     .AddDbContext<ContentDbContext>(options =>
                         options
-                            .UseSqlServer(configuration.GetConnectionString("ContentDb"))
-                                //providerOptions => providerOptions.EnableCustomRetryOnFailure())
+                            .UseSqlServer(configuration.GetConnectionString("ContentDb"),
+                                providerOptions => providerOptions.EnableCustomRetryOnFailure())
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
                     .AddFluentValidation()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
