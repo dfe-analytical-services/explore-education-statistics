@@ -67,6 +67,7 @@ public static class ProcessorHostBuilder
                                 providerOptions => providerOptions.EnableCustomRetryOnFailure())
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
                     .AddFluentValidation()
+                    .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
                     .AddScoped<IDataSetService, DataSetService>()
                     .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()

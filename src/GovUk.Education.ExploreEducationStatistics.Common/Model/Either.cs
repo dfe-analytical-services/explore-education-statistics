@@ -244,6 +244,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
          */
         public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
             this Task<Either<TFailure, TSuccess>> task,
+            Action<TSuccess> action)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            action(firstResult.Right);
+
+            return Unit.Instance;
+        }
+
+        /**
+         * Convenience method so that the chained function can be
+         * void and doesn't have to explicitly return a Unit.
+         */
+        public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
             Action action)
         {
             var firstResult = await task;
