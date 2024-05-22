@@ -34,7 +34,8 @@ internal class DataSetVersionService(
 
                 return await GetDataSetVersion(dataSetVersionId, cancellationToken)
                     .OnSuccessDo(async dataSetVersion => await GetReleaseFile(dataSetVersion, cancellationToken)
-                        .OnSuccessVoid(async releaseFile => await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken)))
+                        .OnSuccessVoid(async releaseFile => await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken))
+                        .OnFailureDo(_ => throw new KeyNotFoundException($"Expected 'ReleaseFile' with ID '{dataSetVersion.ReleaseFileId}' not found.")))
                     .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
                     .OnSuccessVoid(DeleteParquetFiles)
                     .OnSuccessVoid(transactionScope.Complete);
