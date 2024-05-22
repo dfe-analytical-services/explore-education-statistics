@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Options;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
@@ -41,6 +43,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             var table = tableClient.GetTableReference(storageTableName);
             await table.CreateIfNotExistsAsync();
             return table;
+        }
+
+        public async Task<Subscription> GetSubscription(string id, string email)
+        {
+            var pendingSub =
+                await RetrieveSubscriber(await GetTable(NotifierPendingSubscriptionsTableName),
+                        new SubscriptionEntity(id, email));
+            if (pendingSub is not null)
+            {
+                return new Subscription() { Subscriber = pendingSub, Status = SubscriptionStatus.SubscriptionPending };
+            }
+            
+            var activeSubscriber = await RetrieveSubscriber(await GetTable(NotifierSubscriptionsTableName), new SubscriptionEntity(id, email));
+            if (activeSubscriber is not null)
+            {
+                return new Subscription() { Subscriber = activeSubscriber, Status = SubscriptionStatus.Subscribed };
+            }
+            
+            return new Subscription() { Status = SubscriptionStatus.NotSubscribed };
         }
     }
 }

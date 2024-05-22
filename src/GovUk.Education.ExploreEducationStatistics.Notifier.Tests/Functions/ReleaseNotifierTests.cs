@@ -612,7 +612,7 @@ public class ReleaseNotifierTests
         Assert.Equal(releaseName, values["release_name"]);
         Assert.Equal($"{AppSettingOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
             values["release_link"]);
-        Assert.Equal($"{AppSettingOptions.BaseUrl}/publication/{pubId}/unsubscribe/{unsubToken}", values["unsubscribe_link"]);
+        Assert.Equal($"{AppSettingOptions.PublicAppUrl}/subscriptions/{pubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
 
         if (updateNote != null)
         {

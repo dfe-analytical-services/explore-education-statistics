@@ -1,7 +1,7 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Functions.Worker;
@@ -10,155 +10,141 @@ using Microsoft.Extensions.Options;
 using Notify.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
+using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 {
-    public class SubscriptionManager
+    public class SubscriptionManager(ILogger<SubscriptionManager> logger,
+        IOptions<AppSettingOptions> appSettingOptions,
+        IOptions<GovUkNotifyOptions> govUkNotifyOptions,
+        ITokenService tokenService,
+        IEmailService emailService,
+        IStorageTableService storageTableService,
+        INotificationClientProvider notificationClientProvider,
+        IValidator<NewPendingSubscriptionRequest> requestValidator)
     {
-        private readonly ILogger<SubscriptionManager> _logger;
-        private readonly AppSettingOptions _appSettingOptions;
-        private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions;
-        private readonly ITokenService _tokenService;
-        private readonly IEmailService _emailService;
-        private readonly IStorageTableService _storageTableService;
-        private readonly INotificationClientProvider _notificationClientProvider;
+        private readonly AppSettingOptions _appSettingOptions = appSettingOptions.Value;
+        private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
+        private readonly ITokenService _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+        private readonly IEmailService _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+        private readonly IStorageTableService _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
+        private readonly INotificationClientProvider _notificationClientProvider = notificationClientProvider ??
+                                                                                   throw new ArgumentNullException(nameof(notificationClientProvider));
 
-        public SubscriptionManager(
-            ILogger<SubscriptionManager> logger,
-            IOptions<AppSettingOptions> appSettingOptions,
-            IOptions<GovUkNotifyOptions> govUkNotifyOptions,
-            ITokenService tokenService,
-            IEmailService emailService,
-            IStorageTableService storageTableService,
-            INotificationClientProvider notificationClientProvider)
-        {
-            _logger = logger;
-            _appSettingOptions = appSettingOptions.Value;
-            _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
-            _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
-            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-            _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
-            _notificationClientProvider = notificationClientProvider ??
-                                          throw new ArgumentNullException(nameof(notificationClientProvider));
-        }
-
-        [Function("PublicationSubscribe")]
+        [Function("RequestPendingSubscription")]
         // ReSharper disable once UnusedMember.Global
-        public async Task<IActionResult> PublicationSubscribeFunc(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/subscribe/")]
-            HttpRequest req,
-            FunctionContext context)
+        public async Task<IActionResult> RequestPendingSubscriptionFunc(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/request-pending-subscription/")]
+            [FromBody] NewPendingSubscriptionRequest req,
+            FunctionContext context,
+            CancellationToken cancellationToken)
         {
-            _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var subscriptionsTable = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
-            var pendingSubscriptionsTable = await _storageTableService.GetTable(NotifierPendingSubscriptionsTableName);
+            var validationResult = await requestValidator.Validate(req, cancellationToken);
+            if (validationResult.IsLeft) // If validation failed
+            {
+                logger.LogError("{FunctionName} failed because the {req} did not contain a valid JSON object.", context.FunctionDefinition.Name, req);
+                return validationResult.Left;
+            }
 
             var notificationClient = _notificationClientProvider.Get();
 
-            string? id = req.Query["id"];
-            string? email = req.Query["email"];
-            string? slug = req.Query["slug"];
-            string? title = req.Query["title"];
-
-            var subscriptionPending = false;
-            var data = await req.GetJsonBody();
-
-            id ??= data?.id;
-            email ??= data?.email;
-            slug ??= data?.slug;
-            title ??= data?.title;
-
-            if (id == null || email == null || slug == null || title == null)
-            {
-                return new BadRequestObjectResult("Please pass a valid email & publication");
-            }
+            var subscription = await storageTableService.GetSubscription(req.Id, req.Email);
+            var pendingSubscriptionTable =
+                await _storageTableService.GetTable(NotifierPendingSubscriptionsTableName);
 
             try
             {
-                var pendingSub =
-                    await _storageTableService.RetrieveSubscriber(pendingSubscriptionsTable,
-                        new SubscriptionEntity(id, email));
-                subscriptionPending = pendingSub != null;
+                logger.LogDebug("Pending subscription found?: {Status}", subscription.Status);
 
-                _logger.LogDebug("Pending subscription found?: {PendingSubscription}", subscriptionPending);
 
-                // If already existing and pending then don't send another one
-                if (!subscriptionPending)
+                switch (subscription.Status)
                 {
-                    // Now check if already subscribed
+                    // If already existing and pending then don't send another one
+                    case SubscriptionStatus.SubscriptionPending:
+                        return new OkResult();
 
-                    var activeSubscriber = await _storageTableService
-                        .RetrieveSubscriber(subscriptionsTable, new SubscriptionEntity(id, email));
-                    if (activeSubscriber != null)
-                    {
-                        var unsubscribeToken =
-                            _tokenService.GenerateToken(activeSubscriber.RowKey,
-                                DateTime.UtcNow.AddYears(1));
+                    // Send confirmation email if user already subscribed
+                    case SubscriptionStatus.Subscribed:
+                        {
+                            var unsubscribeToken =
+                                _tokenService.GenerateToken(subscription.Subscriber.RowKey,
+                                    DateTime.UtcNow.AddYears(1));
 
-                        var confirmationValues = new Dictionary<string, dynamic>
+                            var confirmationValues = new Dictionary<string, dynamic>
+                            {
+                                {
+                                    "publication_name", subscription.Subscriber.Title
+                                },
+                                {
+                                    "unsubscribe_link",
+                                    $"{_appSettingOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                                }
+                            };
+
+                            _emailService.SendEmail(notificationClient,
+                                email: req.Email,
+                                templateId: _emailTemplateOptions.SubscriptionConfirmationId,
+                                confirmationValues);
+
+                            return new OkResult();
+                        }
+
+                    case SubscriptionStatus.NotSubscribed:
+                        // Verification Token expires in 1 hour
+                        var expiryDateTime = DateTime.UtcNow.AddHours(1);
+                        var activationCode = _tokenService.GenerateToken(req.Email, expiryDateTime);
+                        await _storageTableService.UpdateSubscriber(pendingSubscriptionTable,
+                            new SubscriptionEntity(req.Id, req.Email, req.Title, req.Slug, expiryDateTime));
+
+                        var values = new Dictionary<string, dynamic>
                         {
                             {
-                                "publication_name", activeSubscriber.Title
+                                "publication_name", req.Title
                             },
                             {
-                                "unsubscribe_link",
-                                $"{_appSettingOptions.BaseUrl}/publication/{activeSubscriber.PartitionKey}/unsubscribe/{unsubscribeToken}"
+                                "verification_link",
+                                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
                             }
                         };
 
                         _emailService.SendEmail(notificationClient,
-                            email: email,
-                            templateId: _emailTemplateOptions.SubscriptionConfirmationId,
-                            confirmationValues);
+                            email: req.Email,
+                            templateId: _emailTemplateOptions.SubscriptionVerificationId,
+                            values);
 
-                        return new OkResult();
-                    }
-
-                    // Verification Token expires in 1 hour
-                    var expiryDateTime = DateTime.UtcNow.AddHours(1);
-                    var activationCode = _tokenService.GenerateToken(email, expiryDateTime);
-
-                    await _storageTableService.UpdateSubscriber(pendingSubscriptionsTable,
-                        new SubscriptionEntity(id, email, title, slug, expiryDateTime));
-
-                    var values = new Dictionary<string, dynamic>
-                    {
+                        return new OkObjectResult(new SubscriptionStateDto()
                         {
-                            "publication_name", title
-                        },
-                        {
-                            "verification_link",
-                            $"{_appSettingOptions.BaseUrl}/publication/{id}/verify-subscription/{activationCode}"
-                        }
-                    };
-
-                    _emailService.SendEmail(notificationClient,
-                        email: email,
-                        templateId: _emailTemplateOptions.SubscriptionVerificationId,
-                        values);
+                            Slug = req.Slug,
+                            Title = req.Title,
+                            Status = SubscriptionStatus.SubscriptionPending
+                        });
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-
-                return new OkResult();
             }
             catch (NotifyClientException e)
             {
-                _logger.LogError(e, "Caught exception sending email");
+                logger.LogError(e, "Caught exception sending email");
 
                 // Remove the subscriber from storage if we could not successfully send the email & just added it
-                if (!subscriptionPending)
+                if (subscription.Status is not SubscriptionStatus.SubscriptionPending)
                 {
-                    await _storageTableService.RemoveSubscriber(pendingSubscriptionsTable,
-                        new SubscriptionEntity(id, email));
+                    await _storageTableService.RemoveSubscriber(pendingSubscriptionTable,
+                        new SubscriptionEntity(req.Id, req.Email));
                 }
 
                 return new BadRequestResult();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Caught exception storing subscription");
+                logger.LogError(e, "Caught exception storing subscription");
                 return new BadRequestResult();
             }
         }
@@ -167,44 +153,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> PublicationUnsubscribeFunc(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
-            HttpRequest req,
             FunctionContext context,
             string id,
             string token)
         {
-            _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             var email = _tokenService.GetEmailFromToken(token);
-
-            if (email != null)
+            if (email is null)
             {
-                var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
-
-                var sub = new SubscriptionEntity(id, email);
-                sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
-
-                if (sub != null)
-                {
-                    await _storageTableService.RemoveSubscriber(table, sub);
-                    return new RedirectResult(
-                        $"{_appSettingOptions.PublicAppUrl}/subscriptions?slug={sub.Slug}&unsubscribed=true",
-                        true);
-                }
+                return new BadRequestObjectResult("Unable to unsubscribe. A valid email address could not be parsed from the given token.");
             }
 
-            return new BadRequestObjectResult("Unable to unsubscribe");
+            var table = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
+            var sub = await _storageTableService.RetrieveSubscriber(table, new SubscriptionEntity(id, email));
+            if (sub is null)
+            {
+                return new UnprocessableEntityObjectResult("Unable to unsubscribe. Given email is not currently subscribed.");
+            }
+
+            await _storageTableService.RemoveSubscriber(table, sub);
+            return new OkObjectResult(new SubscriptionStateDto()
+            {
+                Slug = sub.Slug,
+                Title = sub.Title,
+                Status = SubscriptionStatus.NotSubscribed
+            });
         }
 
-        [Function("PublicationSubscriptionVerify")]
+
+        [Function("VerifySubscription")]
         // ReSharper disable once UnusedMember.Global
-        public async Task<IActionResult> PublicationSubscriptionVerifyFunc(
+        public async Task<IActionResult> VerifySubscriptionFunc(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription/{token}")]
-            HttpRequest req,
             FunctionContext context,
             string id,
             string token)
         {
-            _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             var email = _tokenService.GetEmailFromToken(token);
 
@@ -222,11 +208,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 if (sub != null)
                 {
                     // Remove the pending subscription from the the file now verified
-                    _logger.LogDebug("Removing address from pending subscribers");
+                    logger.LogDebug("Removing address from pending subscribers");
                     await _storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, sub);
 
                     // Add them to the verified subscribers table
-                    _logger.LogDebug("Adding address to the verified subscribers");
+                    logger.LogDebug("Adding address to the verified subscribers");
                     sub.DateTimeCreated = DateTime.UtcNow;
                     await _storageTableService.UpdateSubscriber(subscriptionsTbl, sub);
                     var unsubscribeToken =
@@ -239,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                         },
                         {
                             "unsubscribe_link",
-                            $"{_appSettingOptions.BaseUrl}/publication/{sub.PartitionKey}/unsubscribe/{unsubscribeToken}"
+                            $"{_appSettingOptions.PublicAppUrl}/subscriptions/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
                         }
                     };
 
@@ -248,15 +234,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                         templateId: _emailTemplateOptions.SubscriptionConfirmationId,
                         values);
 
-                    return new RedirectResult(
-                        $"{_appSettingOptions.PublicAppUrl}/subscriptions?slug={sub.Slug}&verified=true",
-                        true);
+                    return new OkObjectResult(new SubscriptionStateDto()
+                    {
+                        Slug = sub.Slug,
+                        Title = sub.Title,
+                        Status = SubscriptionStatus.Subscribed
+                    });
                 }
             }
 
-            return new RedirectResult(
-                $"{_appSettingOptions.PublicAppUrl}/subscriptions/verification-error",
-                true);
+            return new BadRequestObjectResult("Verification-Error");
         }
 
         [Function("RemoveNonVerifiedSubscriptions")]
@@ -265,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             [TimerTrigger("0 0 * * * *")] TimerInfo myTimer,
             FunctionContext context)
         {
-            _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             var pendingSubscriptionsTbl = await _storageTableService.GetTable(NotifierPendingSubscriptionsTableName);
 
