@@ -28,7 +28,8 @@ describe('ConfirmSubscriptionPage', () => {
     render(
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
         token="test-token"
       />,
     );
@@ -46,7 +47,8 @@ describe('ConfirmSubscriptionPage', () => {
     const { user } = render(
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
         token="test-token"
       />,
     );
@@ -68,7 +70,8 @@ describe('ConfirmSubscriptionPage', () => {
     const { user } = render(
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
         token="test-token"
       />,
     );
@@ -95,7 +98,8 @@ describe('ConfirmSubscriptionPage', () => {
     const { user } = render(
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
         token="test-token"
       />,
     );

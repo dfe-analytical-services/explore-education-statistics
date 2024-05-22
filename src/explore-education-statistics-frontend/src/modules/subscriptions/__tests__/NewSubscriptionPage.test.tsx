@@ -4,9 +4,7 @@ import render from '@common-test/render';
 import _publicationService from '@common/services/publicationService';
 import _notificationService from '@frontend/services/notificationService';
 import testPublicationTitle from '@frontend/modules/subscriptions/__tests__/__data__/testPublicationData';
-import testActiveSubscription, {
-  testPendingSubscription,
-} from '@frontend/modules/subscriptions/__tests__/__data__/testSubscriptionData';
+import { testPendingSubscription } from '@frontend/modules/subscriptions/__tests__/__data__/testSubscriptionData';
 import NewSubscriptionPage from '@frontend/modules/subscriptions/NewSubscriptionPage';
 
 jest.mock('@common/services/publicationService');
@@ -29,8 +27,9 @@ describe('NewSubscriptionPage', () => {
   test('renders', async () => {
     render(
       <NewSubscriptionPage
-        slug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationSlug="test-publication-slug"
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
       />,
     );
 
@@ -46,8 +45,9 @@ describe('NewSubscriptionPage', () => {
 
     const { user } = render(
       <NewSubscriptionPage
-        slug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationSlug="test-publication-slug"
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
       />,
     );
 
@@ -77,8 +77,9 @@ describe('NewSubscriptionPage', () => {
 
     const { user } = render(
       <NewSubscriptionPage
-        slug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationSlug="test-publication-slug"
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
       />,
     );
 
@@ -101,8 +102,9 @@ describe('NewSubscriptionPage', () => {
 
       const { user } = render(
         <NewSubscriptionPage
-          slug="test-publication-slug"
-          data={testPublicationTitle}
+          publicationSlug="test-publication-slug"
+          publicationTitle={testPublicationTitle.title}
+          publicationId={testPublicationTitle.id}
         />,
       );
 
@@ -129,8 +131,9 @@ describe('NewSubscriptionPage', () => {
 
     const { user } = render(
       <NewSubscriptionPage
-        slug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationSlug="test-publication-slug"
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
       />,
     );
 
@@ -169,8 +172,9 @@ describe('NewSubscriptionPage', () => {
 
     const { user } = render(
       <NewSubscriptionPage
-        slug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationSlug="test-publication-slug"
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
       />,
     );
 

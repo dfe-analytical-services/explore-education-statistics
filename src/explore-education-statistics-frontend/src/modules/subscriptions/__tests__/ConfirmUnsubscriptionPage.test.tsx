@@ -28,7 +28,8 @@ describe('ConfirmUnsubscriptionPage', () => {
     render(
       <ConfirmUnsubscriptionPage
         publicationSlug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
         token="test-token"
       />,
     );
@@ -46,7 +47,8 @@ describe('ConfirmUnsubscriptionPage', () => {
     const { user } = render(
       <ConfirmUnsubscriptionPage
         publicationSlug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
         token="test-token"
       />,
     );
@@ -69,7 +71,8 @@ describe('ConfirmUnsubscriptionPage', () => {
     const { user } = render(
       <ConfirmUnsubscriptionPage
         publicationSlug="test-publication-slug"
-        data={testPublicationTitle}
+        publicationTitle={testPublicationTitle.title}
+        publicationId={testPublicationTitle.id}
         token="test-token"
       />,
     );
