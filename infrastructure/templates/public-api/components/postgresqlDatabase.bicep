@@ -56,8 +56,7 @@ param databaseNames string[]
 @description('An array of firewall rules containing IP address ranges')
 param firewallRules {
   name: string
-  startIpAddress: string
-  endIpAddress: string
+  cidr: string
 }[] = []
 
 @description('A set of tags with which to tag the resource in Azure')
@@ -127,8 +126,8 @@ resource rules 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-
   name: rule.name
   parent: postgreSQLDatabase
   properties: {
-    startIpAddress: rule.startIpAddress
-    endIpAddress: rule.endIpAddress
+    startIpAddress: parseCidr(rule.cidr).firstUsable
+    endIpAddress: parseCidr(rule.cidr).lastUsable
   }
 }]
 

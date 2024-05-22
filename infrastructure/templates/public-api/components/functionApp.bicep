@@ -166,7 +166,7 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
 
 // This is the file share for slot 2 to use for its code storage.
 resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${slot2StorageAccountModule}/default/${fullFunctionAppName}2'
+  name: '${slot2StorageAccountName}/default/${fullFunctionAppName}2'
   dependsOn: [
     slot2StorageAccountModule
   ]
@@ -213,6 +213,32 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2021-01-15' = {
    }))
 }
 
+resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = {
+  name: 'staging'
+  parent: functionApp
+  location: location
+  identity: identity
+  properties: {
+    enabled: true
+    httpsOnly: true
+  }
+  tags: tagValues
+}
+
+// Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
+// Where the staging slot's managed identity differs from the main slot's managed identity, add its id to the list.
+var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
+  ? [userAssignedManagedIdentityParams!.principalId]
+  : [functionApp.identity.principalId, stagingSlot.identity.principalId]
+
+module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
+  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: keyVaultPrincipalIds
+  }
+}
+
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
 // deploy and supply them as the most important appsettings. This prevents infrastructure deploys from overriding any
 // appsettings back to their original values by allowing existing ones to take precedence.
@@ -229,8 +255,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   name: '${functionAppName}AppServiceSlotConfigDeploy'
   params: {
     appName: functionApp.name
-    location: location
-    stagingSlotUserAssignedManagedIdentityId: userAssignedManagedIdentityParams!.id
     existingStagingAppSettings: existingStagingAppSettings
     existingProductionAppSettings: existingProductionAppSettings
     slotSpecificSettingKeys: [
@@ -289,22 +313,12 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       WEBSITE_CONTENTSHARE: '${fullFunctionAppName}2'
     }
     azureFileShares: azureFileShares
-    tagValues: tagValues
   }
-}
-
-// Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
-// Where the staging slot's managed identity differs from the main slot's managed identity, add its id to the list.
-var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
-  ? [userAssignedManagedIdentityParams!.principalId]
-  : [functionApp.identity.principalId, functionAppSlotSettings.outputs.stagingSlotPrincipalId]
-
-module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
-  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
-  params: {
-    keyVaultName: keyVaultName
-    principalIds: keyVaultPrincipalIds
-  }
+  dependsOn: [
+    functionAppKeyVaultAccessPolicy
+    slot1FileShare
+    slot2FileShare
+  ]
 }
 
 output functionAppName string = functionApp.name
