@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ValidationMessages =
@@ -20,7 +21,7 @@ public class DataSetService(
     PublicDataDbContext publicDataDbContext
 ) : IDataSetService
 {
-    public async Task<Either<ActionResult, Guid>> CreateDataSetVersion(
+    public async Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateDataSetVersion(
         InitialDataSetVersionCreateRequest request,
         Guid instanceId,
         CancellationToken cancellationToken = default)
@@ -34,7 +35,7 @@ public class DataSetService(
                     await CreateDataSetVersionImport(dataSetVersion, instanceId, cancellationToken))
                 .OnSuccessDo(async dataSetVersion =>
                     await UpdateFilePublicDataSetVersionId(releaseFile, dataSetVersion, cancellationToken))
-                .OnSuccess(dataSetVersion => dataSetVersion.Id));
+                .OnSuccess(dataSetVersion => (dataSetId: dataSetVersion.DataSetId, dataSetVersionId: dataSetVersion.Id)));
     }
 
     private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(
@@ -136,7 +137,9 @@ public class DataSetService(
     {
         var dataSetVersionImport = new DataSetVersionImport
         {
-            DataSetVersionId = dataSetVersion.Id, InstanceId = instanceId, Stage = DataSetVersionImportStage.Pending
+            DataSetVersionId = dataSetVersion.Id,
+            InstanceId = instanceId,
+            Stage = DataSetVersionImportStage.Pending
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);
@@ -148,7 +151,8 @@ public class DataSetService(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
-        releaseFile.File.PublicDataSetVersionId = dataSetVersion.Id;
+        releaseFile.File.PublicApiDataSetId = dataSetVersion.DataSetId;
+        releaseFile.File.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 

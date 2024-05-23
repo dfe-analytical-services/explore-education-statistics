@@ -3,11 +3,11 @@ import styles from '@admin/pages/release/datablocks/components/chart/ChartDataGr
 import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import {
   CustomDataGroup,
@@ -210,7 +210,7 @@ export default function ChartDataGroupingForm({
             value: 'EqualIntervals',
             hint: 'Data is grouped into equal-sized ranges.',
             conditional: (
-              <RHFFormFieldNumberInput<ChartDataGroupingFormValues>
+              <FormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroups"
                 label="Number of data groups"
                 width={3}
@@ -222,7 +222,7 @@ export default function ChartDataGroupingForm({
             value: 'Quantiles',
             hint: 'Data is grouped so that each group has a similar number of data points.',
             conditional: (
-              <RHFFormFieldNumberInput<ChartDataGroupingFormValues>
+              <FormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroupsQuantiles"
                 label="Number of data groups"
                 width={3}
@@ -274,7 +274,7 @@ export default function ChartDataGroupingForm({
           value: 'CopyCustom',
           hint: 'Copy custom groups from another data set.',
           conditional: (
-            <RHFFormFieldSelect<ChartDataGroupingFormValues>
+            <FormFieldSelect<ChartDataGroupingFormValues>
               name="copyCustomGroups"
               className={styles.selectContainer}
               label="Copy custom groups from another data set"
@@ -290,7 +290,7 @@ export default function ChartDataGroupingForm({
 
         return (
           <div className={styles.container}>
-            <RHFForm
+            <Form
               id={formId}
               onSubmit={() => {
                 const copiedCustomGroups: CustomDataGroup[] =
@@ -324,7 +324,7 @@ export default function ChartDataGroupingForm({
                 });
               }}
             >
-              <RHFFormFieldRadioGroup<ChartDataGroupingFormValues>
+              <FormFieldRadioGroup<ChartDataGroupingFormValues>
                 legend="Select a grouping type"
                 legendSize="s"
                 name="type"
@@ -341,7 +341,7 @@ export default function ChartDataGroupingForm({
                   Cancel
                 </Button>
               </ButtonGroup>
-            </RHFForm>
+            </Form>
           </div>
         );
       }}

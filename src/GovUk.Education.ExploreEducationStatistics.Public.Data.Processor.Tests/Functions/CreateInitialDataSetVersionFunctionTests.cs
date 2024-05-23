@@ -21,7 +21,7 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private readonly DataFixture _fixture = new();
@@ -110,6 +110,7 @@ public class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrat
             Assert.Equal(DataSetVersionImportStage.Pending, dataSetVersionImport.Stage);
 
             // Assert the response view model values match the created data set version and import
+            Assert.Equal(dataSet.Id, responseViewModel.DataSetId);
             Assert.Equal(dataSetVersion.Id, responseViewModel.DataSetVersionId);
             Assert.Equal(dataSetVersionImport.InstanceId, responseViewModel.InstanceId);
 

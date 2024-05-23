@@ -59,7 +59,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, [])
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, [])
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -96,7 +96,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -128,7 +128,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -139,6 +139,7 @@ public abstract class DataSetQueryParserTests
             Assert.Empty(queryState.Errors);
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"filters.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.FiltersNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.FiltersNotFound.Code, warning.Code);
 
@@ -170,7 +171,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -221,7 +222,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -273,7 +274,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -287,6 +288,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"filters.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.FiltersNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.FiltersNotFound.Code, warning.Code);
 
@@ -311,7 +313,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters(comparator, queryFilterOptionIds)
+                Filters = DataSetQueryCriteriaFilters.Create(comparator, queryFilterOptionIds)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -323,6 +325,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"filters.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.FiltersNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.FiltersNotFound.Code, warning.Code);
 
@@ -332,11 +335,11 @@ public abstract class DataSetQueryParserTests
         }
     }
 
-    public class ParseCriteriaGeographicLevels : DataSetQueryParserTests
+    public class ParseCriteriaGeographicLevelsTests : DataSetQueryParserTests
     {
         private readonly DataSetVersion _dataSetVersion;
 
-        public ParseCriteriaGeographicLevels()
+        public ParseCriteriaGeographicLevelsTests()
         {
             _dataSetVersion = _dataFixture
                 .DefaultDataSetVersion()
@@ -368,7 +371,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, [])
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, Array.Empty<string>())
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -396,7 +399,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -423,7 +426,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -434,6 +437,7 @@ public abstract class DataSetQueryParserTests
             Assert.Empty(queryState.Errors);
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"geographicLevels.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.GeographicLevelsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.GeographicLevelsNotFound.Code, warning.Code);
 
@@ -461,7 +465,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -496,7 +500,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -510,6 +514,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"geographicLevels.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.GeographicLevelsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.GeographicLevelsNotFound.Code, warning.Code);
 
@@ -536,7 +541,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = CreateCriteriaGeographicLevels(comparator, geographicLevels)
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create(comparator, geographicLevels)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -548,6 +553,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"geographicLevels.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.GeographicLevelsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.GeographicLevelsNotFound.Code, warning.Code);
 
@@ -590,7 +596,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, [])
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, [])
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -633,7 +639,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList(1);
 
             var queryLocation = locationOptions
-                .Select(o => MapOptionToQueryLocation(o, level))
+                .Select(MapOptionToQueryLocation)
                 .ToList();
 
             _locationRepository
@@ -645,7 +651,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocation)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocation)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -683,7 +689,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocation),
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocation),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -694,6 +700,7 @@ public abstract class DataSetQueryParserTests
             Assert.Empty(queryState.Errors);
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"locations.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
@@ -723,7 +730,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList(3);
 
             var queryLocations = locationOptions
-                .Select(o => MapOptionToQueryLocation(o, level))
+                .Select(MapOptionToQueryLocation)
                 .ToList();
 
             _locationRepository
@@ -735,7 +742,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -777,7 +784,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList();
 
             var queryLocations = locationOptions
-                .Select(o => MapOptionToQueryLocation(o, EnumUtil.GetFromEnumValue<GeographicLevel>(o.Level)))
+                .Select(MapOptionToQueryLocation)
                 .ToList();
 
             _locationRepository
@@ -789,7 +796,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
 
@@ -830,7 +837,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList();
 
             var queryLocations = locationOptions
-                .Select(o => MapOptionToQueryLocation(o, EnumUtil.GetFromEnumValue<GeographicLevel>(o.Level)))
+                .Select(MapOptionToQueryLocation)
                 .ToList();
 
             _locationRepository
@@ -842,7 +849,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -856,6 +863,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"locations.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
@@ -877,7 +885,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList();
 
             var queryLocations = locationOptions
-                .Select(o => MapOptionToQueryLocation(o, EnumUtil.GetFromEnumValue<GeographicLevel>(o.Level)))
+                .Select(MapOptionToQueryLocation)
                 .ToList();
 
             _locationRepository
@@ -889,7 +897,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Locations = CreateCriteriaLocations(comparator, queryLocations)
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -901,6 +909,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"locations.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
@@ -947,7 +956,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, [])
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, [])
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -973,11 +982,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList(1);
 
             var queryTimePeriods = timePeriods
-                .Select(o => new DataSetQueryTimePeriod
-                {
-                    Code = EnumUtil.GetFromEnumLabel<TimeIdentifier>(o.Identifier).GetEnumValue(),
-                    Period = TimePeriodFormatter.FormatFromCsv(o.Period)
-                })
+                .Select(MapQueryTimePeriod)
                 .ToList();
 
             _timePeriodRepository
@@ -989,7 +994,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1027,7 +1032,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1038,6 +1043,7 @@ public abstract class DataSetQueryParserTests
             Assert.Empty(queryState.Errors);
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"timePeriods.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.TimePeriodsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.TimePeriodsNotFound.Code, warning.Code);
 
@@ -1060,11 +1066,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList();
 
             var queryTimePeriods = timePeriods
-                .Select(o => new DataSetQueryTimePeriod
-                {
-                    Code = EnumUtil.GetFromEnumLabel<TimeIdentifier>(o.Identifier).GetEnumValue(),
-                    Period = TimePeriodFormatter.FormatFromCsv(o.Period)
-                })
+                .Select(MapQueryTimePeriod)
                 .ToList();
 
             _timePeriodRepository
@@ -1076,7 +1078,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1106,11 +1108,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList();
 
             var queryTimePeriods = timePeriods
-                .Select(o => new DataSetQueryTimePeriod
-                {
-                    Code = EnumUtil.GetFromEnumLabel<TimeIdentifier>(o.Identifier).GetEnumValue(),
-                    Period = TimePeriodFormatter.FormatFromCsv(o.Period)
-                })
+                .Select(MapQueryTimePeriod)
                 .ToList();
 
             _timePeriodRepository
@@ -1122,7 +1120,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1136,6 +1134,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"timePeriods.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.TimePeriodsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.TimePeriodsNotFound.Code, warning.Code);
 
@@ -1172,7 +1171,7 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                TimePeriods = CreateCriteriaTimePeriods(comparator, queryTimePeriods)
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(comparator, queryTimePeriods)
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1184,6 +1183,7 @@ public abstract class DataSetQueryParserTests
 
             var warning = Assert.Single(queryState.Warnings);
 
+            Assert.Equal($"timePeriods.{comparator.ToLowerFirst()}", warning.Path);
             Assert.Equal(ValidationMessages.TimePeriodsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.TimePeriodsNotFound.Code, warning.Code);
 
@@ -1193,11 +1193,11 @@ public abstract class DataSetQueryParserTests
         }
     }
 
-    public class ParseCriteriaMixedTest : DataSetQueryParserTests
+    public class ParseCriteriaMixedFacetsTests : DataSetQueryParserTests
     {
         private readonly DataSetVersion _dataSetVersion;
 
-        public ParseCriteriaMixedTest()
+        public ParseCriteriaMixedFacetsTests()
         {
             _dataSetVersion = DefaultDataSetVersion();
         }
@@ -1251,10 +1251,10 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters("Eq", []),
-                GeographicLevels = CreateCriteriaGeographicLevels("In", []),
-                Locations = CreateCriteriaLocations("NotEq", []),
-                TimePeriods = CreateCriteriaTimePeriods("Gt", []),
+                Filters = DataSetQueryCriteriaFilters.Create("Eq", []),
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create("In", Array.Empty<string>()),
+                Locations = DataSetQueryCriteriaLocations.Create("NotEq", []),
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create("Gt", []),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1297,7 +1297,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList(1);
 
             var queryLocations = locationOptions
-                .Select(o => MapOptionToQueryLocation(o, GeographicLevel.Region))
+                .Select(MapOptionToQueryLocation)
                 .ToList();
 
             _locationRepository
@@ -1313,11 +1313,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList(1);
 
             var queryTimePeriods = timePeriods
-                .Select(o => new DataSetQueryTimePeriod
-                {
-                    Code = EnumUtil.GetFromEnumLabel<TimeIdentifier>(o.Identifier).GetEnumValue(),
-                    Period = TimePeriodFormatter.FormatFromCsv(o.Period)
-                })
+                .Select(MapQueryTimePeriod)
                 .ToList();
 
             _timePeriodRepository
@@ -1329,10 +1325,10 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters("Eq", queryFilterOptionIds),
-                GeographicLevels = CreateCriteriaGeographicLevels("In", geographicLevels),
-                Locations = CreateCriteriaLocations("NotEq", queryLocations),
-                TimePeriods = CreateCriteriaTimePeriods("Gt", queryTimePeriods),
+                Filters = DataSetQueryCriteriaFilters.Create("Eq", queryFilterOptionIds),
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create("In", geographicLevels),
+                Locations = DataSetQueryCriteriaLocations.Create("NotEq", queryLocations),
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create("Gt", queryTimePeriods),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1390,7 +1386,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList();
 
             var queryLocations = locationOptions
-                .Select(o => MapOptionToQueryLocation(o, EnumUtil.GetFromEnumValue<GeographicLevel>(o.Level)))
+                .Select(MapOptionToQueryLocation)
                 .ToList();
 
             _locationRepository
@@ -1407,11 +1403,7 @@ public abstract class DataSetQueryParserTests
                 .GenerateList();
 
             var queryTimePeriods = timePeriods
-                .Select(o => new DataSetQueryTimePeriod
-                {
-                    Code = EnumUtil.GetFromEnumLabel<TimeIdentifier>(o.Identifier).GetEnumValue(),
-                    Period = TimePeriodFormatter.FormatFromCsv(o.Period)
-                })
+                .Select(MapQueryTimePeriod)
                 .ToList();
 
             _timePeriodRepository
@@ -1423,10 +1415,10 @@ public abstract class DataSetQueryParserTests
             var queryState = new QueryState();
             var criteria = new DataSetQueryCriteriaFacets
             {
-                Filters = CreateCriteriaFilters("NotIn", queryFilterOptionIds),
-                GeographicLevels = CreateCriteriaGeographicLevels("NotIn", geographicLevels),
-                Locations = CreateCriteriaLocations("In", queryLocations),
-                TimePeriods = CreateCriteriaTimePeriods("In", queryTimePeriods),
+                Filters = DataSetQueryCriteriaFilters.Create("NotIn", queryFilterOptionIds),
+                GeographicLevels = DataSetQueryCriteriaGeographicLevels.Create("NotIn", geographicLevels),
+                Locations = DataSetQueryCriteriaLocations.Create("In", queryLocations),
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create("In", queryTimePeriods),
             };
 
             var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
@@ -1457,6 +1449,1006 @@ public abstract class DataSetQueryParserTests
         }
     }
 
+    public class ParseCriteriaAndTests : DataSetQueryParserTests
+    {
+        private readonly DataSetVersion _dataSetVersion;
+
+        public ParseCriteriaAndTests()
+        {
+            _dataSetVersion = DefaultDataSetVersion();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<string>(), default))
+                .ReturnsAsync([]);
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .ReturnsAsync([]);
+
+            _timePeriodRepository
+                .Setup(r => r.List(_dataSetVersion, Array.Empty<DataSetQueryTimePeriod>(), default))
+                .ReturnsAsync([]);
+        }
+
+        [Fact]
+        public async Task Empty()
+        {
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaAnd
+            {
+                And = []
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            Assert.Empty(parsed.Sql);
+            Assert.Empty(parsed.SqlParameters);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Fact]
+        public async Task SingleFacets()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .WithFilterId("field_a")
+                .GenerateList(1);
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaAnd
+            {
+                And =
+                [
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[0] }
+                    }
+                ]
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       data."field_a" = ?
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            var parameter = Assert.Single(parsed.SqlParameters);
+            Assert.Equal(filterOptions[0].Id, parameter.Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Fact]
+        public async Task MultipleFacets()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .ForIndex(0, s => s.SetFilterId("field_a"))
+                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .GenerateList();
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var locationOptions = _dataFixture
+                .DefaultParquetLocationOption()
+                .ForIndex(0, s => s.SetDefaults(GeographicLevel.Region))
+                .ForIndex(1, s => s.SetDefaults(GeographicLevel.LocalAuthority))
+                .GenerateList();
+
+            var queryLocations = locationOptions
+                .Select(MapOptionToQueryLocation)
+                .ToList();
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryLocations.ToHashSet(), default))
+                .ReturnsAsync(locationOptions);
+
+            var timePeriods = _dataFixture
+                .DefaultParquetTimePeriod()
+                .WithPeriod("202324")
+                .WithIdentifier(TimeIdentifier.AcademicYear.GetEnumLabel())
+                .GenerateList(1);
+
+            var queryTimePeriods = timePeriods
+                .Select(MapQueryTimePeriod)
+                .ToList();
+
+            _timePeriodRepository
+                .Setup(r => r.List(_dataSetVersion, queryTimePeriods, default))
+                .ReturnsAsync(timePeriods);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaAnd
+            {
+                And =
+                [
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters { In = queryFilterOptionIds }
+                    },
+                    new DataSetQueryCriteriaFacets
+                    {
+                        GeographicLevels = new DataSetQueryCriteriaGeographicLevels
+                        {
+                            Eq = GeographicLevel.Region.GetEnumValue()
+                        }
+                    },
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Locations = new DataSetQueryCriteriaLocations { NotIn = queryLocations }
+                    },
+                    new DataSetQueryCriteriaFacets
+                    {
+                        TimePeriods = new DataSetQueryCriteriaTimePeriods { Gt = queryTimePeriods[0] }
+                    },
+                ]
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       ((data."field_a" IN (?)
+                                        OR data."field_b" IN (?)))
+                                       AND (data.geographic_level = ?)
+                                       AND ((data.locations_reg_id NOT IN (?)
+                                        AND data.locations_la_id NOT IN (?)))
+                                       AND (data.time_period_id > ?)
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Equal(6, parsed.SqlParameters.Count);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(filterOptions[1].Id, parsed.SqlParameters[1].Argument);
+            Assert.Equal(GeographicLevel.Region.GetEnumLabel(), parsed.SqlParameters[2].Argument);
+            Assert.Equal(locationOptions[0].Id, parsed.SqlParameters[3].Argument);
+            Assert.Equal(locationOptions[1].Id, parsed.SqlParameters[4].Argument);
+            Assert.Equal(timePeriods[0].Id, parsed.SqlParameters[5].Argument);
+        }
+
+        [Fact]
+        public async Task NestedConditions()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .ForRange(..2, s => s.SetFilterId("field_a"))
+                .ForIndex(2, s => s.SetFilterId("field_b"))
+                .ForRange(3..5, s => s.SetFilterId("field_c"))
+                .GenerateList();
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaAnd
+            {
+                And =
+                [
+                    new DataSetQueryCriteriaOr
+                    {
+                        Or =
+                        [
+                            new DataSetQueryCriteriaFacets
+                            {
+                                Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[0] }
+                            },
+                            new DataSetQueryCriteriaFacets
+                            {
+                                Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[1] }
+                            }
+                        ]
+                    },
+                    new DataSetQueryCriteriaAnd
+                    {
+                        And =
+                        [
+                            new DataSetQueryCriteriaFacets
+                            {
+                                Filters = new DataSetQueryCriteriaFilters { NotEq = queryFilterOptionIds[2] }
+                            }
+                        ]
+                    },
+                    new DataSetQueryCriteriaNot
+                    {
+                        Not = new DataSetQueryCriteriaFacets
+                        {
+                            Filters = new DataSetQueryCriteriaFilters { In = queryFilterOptionIds[3..] }
+                        }
+                    },
+                ]
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       ((data."field_a" = ?)
+                                       OR (data."field_a" = ?))
+                                       AND (data."field_b" != ?)
+                                       AND (NOT (data."field_c" IN (?, ?)))
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Equal(5, parsed.SqlParameters.Count);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(filterOptions[1].Id, parsed.SqlParameters[1].Argument);
+            Assert.Equal(filterOptions[2].Id, parsed.SqlParameters[2].Argument);
+            Assert.Equal(filterOptions[3].Id, parsed.SqlParameters[3].Argument);
+            Assert.Equal(filterOptions[4].Id, parsed.SqlParameters[4].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+    }
+
+    public class ParseCriteriaOrTests : DataSetQueryParserTests
+    {
+        private readonly DataSetVersion _dataSetVersion;
+
+        public ParseCriteriaOrTests()
+        {
+            _dataSetVersion = DefaultDataSetVersion();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<string>(), default))
+                .ReturnsAsync([]);
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .ReturnsAsync([]);
+
+            _timePeriodRepository
+                .Setup(r => r.List(_dataSetVersion, Array.Empty<DataSetQueryTimePeriod>(), default))
+                .ReturnsAsync([]);
+        }
+
+        [Fact]
+        public async Task Empty()
+        {
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaOr
+            {
+                Or = []
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            Assert.Empty(parsed.Sql);
+            Assert.Empty(parsed.SqlParameters);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Fact]
+        public async Task SingleFacets()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .WithFilterId("field_a")
+                .GenerateList(1);
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaOr
+            {
+                Or =
+                [
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[0] }
+                    }
+                ]
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       data."field_a" = ?
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Single(parsed.SqlParameters);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Fact]
+        public async Task MultipleFacets()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .ForIndex(0, s => s.SetFilterId("field_a"))
+                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .GenerateList();
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var locationOptions = _dataFixture
+                .DefaultParquetLocationOption()
+                .ForIndex(0, s => s.SetDefaults(GeographicLevel.Region))
+                .ForIndex(1, s => s.SetDefaults(GeographicLevel.LocalAuthority))
+                .GenerateList();
+
+            var queryLocations = locationOptions
+                .Select(MapOptionToQueryLocation)
+                .ToList();
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryLocations.ToHashSet(), default))
+                .ReturnsAsync(locationOptions);
+
+            var timePeriods = _dataFixture
+                .DefaultParquetTimePeriod()
+                .WithPeriod("202324")
+                .WithIdentifier(TimeIdentifier.AcademicYear.GetEnumLabel())
+                .GenerateList(1);
+
+            var queryTimePeriods = timePeriods
+                .Select(MapQueryTimePeriod)
+                .ToList();
+
+            _timePeriodRepository
+                .Setup(r => r.List(_dataSetVersion, queryTimePeriods, default))
+                .ReturnsAsync(timePeriods);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaOr
+            {
+                Or =
+                [
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters { In = queryFilterOptionIds }
+                    },
+                    new DataSetQueryCriteriaFacets
+                    {
+                        GeographicLevels = new DataSetQueryCriteriaGeographicLevels
+                        {
+                            Eq = GeographicLevel.Region.GetEnumValue()
+                        }
+                    },
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Locations = new DataSetQueryCriteriaLocations { NotIn = queryLocations }
+                    },
+                    new DataSetQueryCriteriaFacets
+                    {
+                        TimePeriods = new DataSetQueryCriteriaTimePeriods { Gt = queryTimePeriods[0] }
+                    },
+                ]
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       ((data."field_a" IN (?)
+                                        OR data."field_b" IN (?)))
+                                       OR (data.geographic_level = ?)
+                                       OR ((data.locations_reg_id NOT IN (?)
+                                        AND data.locations_la_id NOT IN (?)))
+                                       OR (data.time_period_id > ?)
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Equal(6, parsed.SqlParameters.Count);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(filterOptions[1].Id, parsed.SqlParameters[1].Argument);
+            Assert.Equal(GeographicLevel.Region.GetEnumLabel(), parsed.SqlParameters[2].Argument);
+            Assert.Equal(locationOptions[0].Id, parsed.SqlParameters[3].Argument);
+            Assert.Equal(locationOptions[1].Id, parsed.SqlParameters[4].Argument);
+            Assert.Equal(timePeriods[0].Id, parsed.SqlParameters[5].Argument);
+        }
+
+        [Fact]
+        public async Task NestedConditions()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .ForIndex(0, s => s.SetFilterId("field_a"))
+                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForRange(2..5, s => s.SetFilterId("field_c"))
+                .GenerateList();
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaOr
+            {
+                Or =
+                [
+                    new DataSetQueryCriteriaAnd
+                    {
+                        And =
+                        [
+                            new DataSetQueryCriteriaFacets
+                            {
+                                Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[0] }
+                            },
+                            new DataSetQueryCriteriaFacets
+                            {
+                                Filters = new DataSetQueryCriteriaFilters { NotEq = queryFilterOptionIds[1] }
+                            }
+                        ]
+                    },
+                    new DataSetQueryCriteriaOr
+                    {
+                        Or =
+                        [
+                            new DataSetQueryCriteriaFacets
+                            {
+                                Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[2] }
+                            }
+                        ]
+                    },
+                    new DataSetQueryCriteriaNot
+                    {
+                        Not = new DataSetQueryCriteriaFacets
+                        {
+                            Filters = new DataSetQueryCriteriaFilters { In = queryFilterOptionIds[3..] }
+                        }
+                    },
+                ]
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       ((data."field_a" = ?)
+                                       AND (data."field_b" != ?))
+                                       OR (data."field_c" = ?)
+                                       OR (NOT (data."field_c" IN (?, ?)))
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Equal(5, parsed.SqlParameters.Count);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(filterOptions[1].Id, parsed.SqlParameters[1].Argument);
+            Assert.Equal(filterOptions[2].Id, parsed.SqlParameters[2].Argument);
+            Assert.Equal(filterOptions[3].Id, parsed.SqlParameters[3].Argument);
+            Assert.Equal(filterOptions[4].Id, parsed.SqlParameters[4].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+    }
+
+    public class ParseCriteriaNotTests : DataSetQueryParserTests
+    {
+        private readonly DataSetVersion _dataSetVersion;
+
+        public ParseCriteriaNotTests()
+        {
+            _dataSetVersion = DefaultDataSetVersion();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<string>(), default))
+                .ReturnsAsync([]);
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .ReturnsAsync([]);
+
+            _timePeriodRepository
+                .Setup(r => r.List(_dataSetVersion, Array.Empty<DataSetQueryTimePeriod>(), default))
+                .ReturnsAsync([]);
+        }
+
+        [Fact]
+        public async Task SingleFacets()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .WithFilterId("field_a")
+                .GenerateList(1);
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaNot
+            {
+                Not = new DataSetQueryCriteriaFacets
+                {
+                    Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[0] }
+                }
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       NOT (data."field_a" = ?)
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Single(parsed.SqlParameters);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Fact]
+        public async Task MultipleFacets()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .ForIndex(0, s => s.SetFilterId("field_a"))
+                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .GenerateList();
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var locationOptions = _dataFixture
+                .DefaultParquetLocationOption()
+                .ForIndex(0, s => s.SetDefaults(GeographicLevel.Region))
+                .ForIndex(1, s => s.SetDefaults(GeographicLevel.LocalAuthority))
+                .GenerateList();
+
+            var queryLocations = locationOptions
+                .Select(MapOptionToQueryLocation)
+                .ToList();
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryLocations.ToHashSet(), default))
+                .ReturnsAsync(locationOptions);
+
+            var timePeriods = _dataFixture
+                .DefaultParquetTimePeriod()
+                .WithPeriod("202324")
+                .WithIdentifier(TimeIdentifier.AcademicYear.GetEnumLabel())
+                .GenerateList(1);
+
+            var queryTimePeriods = timePeriods
+                .Select(MapQueryTimePeriod)
+                .ToList();
+
+            _timePeriodRepository
+                .Setup(r => r.List(_dataSetVersion, queryTimePeriods, default))
+                .ReturnsAsync(timePeriods);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaNot
+            {
+                Not = new DataSetQueryCriteriaFacets
+                {
+                    Filters = new DataSetQueryCriteriaFilters { In = queryFilterOptionIds },
+                    GeographicLevels = new DataSetQueryCriteriaGeographicLevels
+                    {
+                        Eq = GeographicLevel.Region.GetEnumValue()
+                    },
+                    Locations = new DataSetQueryCriteriaLocations { NotIn = queryLocations },
+                    TimePeriods = new DataSetQueryCriteriaTimePeriods { Gt = queryTimePeriods[0] }
+                }
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       NOT ((data."field_a" IN (?)
+                                        OR data."field_b" IN (?))
+                                       OR data.geographic_level = ?
+                                       OR (data.locations_reg_id NOT IN (?)
+                                        AND data.locations_la_id NOT IN (?))
+                                       OR data.time_period_id > ?)
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Equal(6, parsed.SqlParameters.Count);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(filterOptions[1].Id, parsed.SqlParameters[1].Argument);
+            Assert.Equal(GeographicLevel.Region.GetEnumLabel(), parsed.SqlParameters[2].Argument);
+            Assert.Equal(locationOptions[0].Id, parsed.SqlParameters[3].Argument);
+            Assert.Equal(locationOptions[1].Id, parsed.SqlParameters[4].Argument);
+            Assert.Equal(timePeriods[0].Id, parsed.SqlParameters[5].Argument);
+        }
+
+        [Fact]
+        public async Task NestedConditions()
+        {
+            var filterOptions = _dataFixture
+                .DefaultParquetFilterOption()
+                .ForIndex(0, s => s.SetFilterId("field_a"))
+                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(2, s => s.SetFilterId("field_c"))
+                .ForRange(3..5, s => s.SetFilterId("field_d"))
+                .GenerateList();
+
+            var queryFilterOptionIds = filterOptions
+                .Select(o => o.PublicId)
+                .ToList();
+
+            _filterRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryFilterOptionIds.ToHashSet(), default))
+                .ReturnsAsync(filterOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaNot
+            {
+                Not = new DataSetQueryCriteriaAnd
+                {
+                    And =
+                    [
+                        new DataSetQueryCriteriaFacets
+                        {
+                            Filters = new DataSetQueryCriteriaFilters { NotEq = queryFilterOptionIds[0] }
+                        },
+                        new DataSetQueryCriteriaOr
+                        {
+                            Or =
+                            [
+                                new DataSetQueryCriteriaFacets
+                                {
+                                    Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[1] }
+                                },
+                                new DataSetQueryCriteriaFacets
+                                {
+                                    Filters = new DataSetQueryCriteriaFilters { Eq = queryFilterOptionIds[2] }
+                                }
+                            ]
+                        },
+                        new DataSetQueryCriteriaNot
+                        {
+                            Not = new DataSetQueryCriteriaFacets
+                            {
+                                Filters = new DataSetQueryCriteriaFilters { In = queryFilterOptionIds[3..] }
+                            }
+                        },
+                    ]
+                }
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            const string expectedSql = """
+                                       NOT ((data."field_a" != ?)
+                                       AND ((data."field_b" = ?)
+                                       OR (data."field_c" = ?))
+                                       AND (NOT (data."field_d" IN (?, ?))))
+                                       """;
+
+            Assert.Equal(expectedSql, parsed.Sql);
+
+            Assert.Equal(5, parsed.SqlParameters.Count);
+            Assert.Equal(filterOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(filterOptions[1].Id, parsed.SqlParameters[1].Argument);
+            Assert.Equal(filterOptions[2].Id, parsed.SqlParameters[2].Argument);
+            Assert.Equal(filterOptions[3].Id, parsed.SqlParameters[3].Argument);
+            Assert.Equal(filterOptions[4].Id, parsed.SqlParameters[4].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+    }
+
+    public class ParseCriteriaPathTests : DataSetQueryParserTests
+    {
+        private readonly DataSetVersion _dataSetVersion;
+
+        public ParseCriteriaPathTests()
+        {
+            _dataSetVersion = DefaultDataSetVersion();
+
+            _filterRepository
+                .Setup(r =>
+                    r.ListOptions(_dataSetVersion, It.IsAny<IEnumerable<string>>(), default))
+                .ReturnsAsync([]);
+
+            _locationRepository
+                .Setup(r =>
+                    r.ListOptions(_dataSetVersion, It.IsAny<IEnumerable<DataSetQueryLocation>>(), default))
+                .ReturnsAsync([]);
+
+            _timePeriodRepository
+                .Setup(r =>
+                    r.List(_dataSetVersion, It.IsAny<IEnumerable<DataSetQueryTimePeriod>>(), default))
+                .ReturnsAsync([]);
+        }
+
+        [Theory]
+        [InlineData("criteria")]
+        [InlineData("test.path")]
+        public async Task FacetsOnly_BasePathChanged(string basePath)
+        {
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaFacets
+            {
+                Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                Locations = DataSetQueryCriteriaLocations.Create(
+                    "In",
+                    [
+                        new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
+                    ]
+                ),
+                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
+                    "In",
+                    [
+                        new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
+                    ]
+                ),
+            };
+
+            await service.ParseCriteria(criteria, _dataSetVersion, queryState, basePath);
+
+            Assert.Equal(3, queryState.Warnings.Count);
+
+            Assert.Equal($"{basePath}.filters.in", queryState.Warnings[0].Path);
+            Assert.Equal($"{basePath}.locations.in", queryState.Warnings[1].Path);
+            Assert.Equal($"{basePath}.timePeriods.in", queryState.Warnings[2].Path);
+        }
+
+        [Theory]
+        [InlineData("criteria")]
+        [InlineData("test.path")]
+        public async Task AndCondition_BasePathChanged(string basePath)
+        {
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaAnd
+            {
+                And =
+                [
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                        Locations = DataSetQueryCriteriaLocations.Create(
+                            "In",
+                            [
+                                new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
+                            ]
+                        ),
+                        TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
+                            "In",
+                            [
+                                new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
+                            ]
+                        ),
+                    }
+                ]
+            };
+
+            await service.ParseCriteria(criteria, _dataSetVersion, queryState, basePath);
+
+            Assert.Equal(3, queryState.Warnings.Count);
+
+            Assert.Equal($"{basePath}.and[0].filters.in", queryState.Warnings[0].Path);
+            Assert.Equal($"{basePath}.and[0].locations.in", queryState.Warnings[1].Path);
+            Assert.Equal($"{basePath}.and[0].timePeriods.in", queryState.Warnings[2].Path);
+        }
+
+        [Theory]
+        [InlineData("criteria")]
+        [InlineData("test.path")]
+        public async Task OrCondition_BasePathChanged(string basePath)
+        {
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaOr
+            {
+                Or =
+                [
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                        Locations = DataSetQueryCriteriaLocations.Create(
+                            "In",
+                            [
+                                new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
+                            ]
+                        ),
+                        TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
+                            "In",
+                            [
+                                new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
+                            ]
+                        ),
+                    }
+                ]
+            };
+
+            await service.ParseCriteria(criteria, _dataSetVersion, queryState, basePath);
+
+            Assert.Equal(3, queryState.Warnings.Count);
+
+            Assert.Equal($"{basePath}.or[0].filters.in", queryState.Warnings[0].Path);
+            Assert.Equal($"{basePath}.or[0].locations.in", queryState.Warnings[1].Path);
+            Assert.Equal($"{basePath}.or[0].timePeriods.in", queryState.Warnings[2].Path);
+        }
+
+        [Theory]
+        [InlineData("criteria")]
+        [InlineData("test.path")]
+        public async Task NotCondition_BasePathChanged(string basePath)
+        {
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaNot
+            {
+                Not = new DataSetQueryCriteriaFacets
+                {
+                    Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                    Locations = DataSetQueryCriteriaLocations.Create(
+                        "In",
+                        [
+                            new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
+                        ]
+                    ),
+                    TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
+                        "In",
+                        [
+                            new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
+                        ]
+                    ),
+                }
+            };
+
+            await service.ParseCriteria(criteria, _dataSetVersion, queryState, basePath);
+
+            Assert.Equal(3, queryState.Warnings.Count);
+
+            Assert.Equal($"{basePath}.not.filters.in", queryState.Warnings[0].Path);
+            Assert.Equal($"{basePath}.not.locations.in", queryState.Warnings[1].Path);
+            Assert.Equal($"{basePath}.not.timePeriods.in", queryState.Warnings[2].Path);
+        }
+
+        [Theory]
+        [InlineData("criteria")]
+        [InlineData("test.path")]
+        public async Task NestedConditionMixture_BasePathChanged(string basePath)
+        {
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaOr
+            {
+                Or =
+                [
+                    new DataSetQueryCriteriaNot
+                    {
+                        Not = new DataSetQueryCriteriaFacets
+                        {
+                            Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                            Locations = DataSetQueryCriteriaLocations.Create(
+                                "In",
+                                [
+                                    new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
+                                ]
+                            ),
+                            TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
+                                "In",
+                                [
+                                    new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
+                                ]
+                            ),
+                        }
+                    },
+                    new DataSetQueryCriteriaAnd
+                    {
+                        And =
+                        [
+                            new DataSetQueryCriteriaFacets
+                            {
+                                Filters = DataSetQueryCriteriaFilters.Create("In", ["invalidFilter"]),
+                                Locations = DataSetQueryCriteriaLocations.Create(
+                                    "In",
+                                    [
+                                        new DataSetQueryLocationId { Id = "12345", Level = "NAT" }
+                                    ]
+                                ),
+                                TimePeriods = DataSetQueryCriteriaTimePeriods.Create(
+                                    "In",
+                                    [
+                                        new DataSetQueryTimePeriod { Period = "2022", Code = "AY" }
+                                    ]
+                                ),
+                            }
+                        ],
+                    }
+                ]
+            };
+
+            await service.ParseCriteria(criteria, _dataSetVersion, queryState, basePath);
+
+            Assert.Equal(6, queryState.Warnings.Count);
+
+            Assert.Equal($"{basePath}.or[0].not.filters.in", queryState.Warnings[0].Path);
+            Assert.Equal($"{basePath}.or[0].not.locations.in", queryState.Warnings[1].Path);
+            Assert.Equal($"{basePath}.or[0].not.timePeriods.in", queryState.Warnings[2].Path);
+
+            Assert.Equal($"{basePath}.or[1].and[0].filters.in", queryState.Warnings[3].Path);
+            Assert.Equal($"{basePath}.or[1].and[0].locations.in", queryState.Warnings[4].Path);
+            Assert.Equal($"{basePath}.or[1].and[0].timePeriods.in", queryState.Warnings[5].Path);
+        }
+    }
+
     private DataSetVersion DefaultDataSetVersion() => _dataFixture
         .DefaultDataSetVersion()
         .WithMetaSummary(
@@ -1464,96 +2456,11 @@ public abstract class DataSetQueryParserTests
                 .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.Region])
         );
 
-    private static DataSetQueryCriteriaFilters CreateCriteriaFilters(
-        string comparator,
-        IReadOnlyList<string> filterOptionIds)
+    private static DataSetQueryLocation MapOptionToQueryLocation(ParquetLocationOption option)
     {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaFilters.Eq) =>
-                new DataSetQueryCriteriaFilters { Eq = filterOptionIds.Count > 0 ? filterOptionIds[0] : null },
-            nameof(DataSetQueryCriteriaFilters.NotEq) =>
-                new DataSetQueryCriteriaFilters { NotEq = filterOptionIds.Count > 0 ? filterOptionIds[0] : null },
-            nameof(DataSetQueryCriteriaFilters.In) =>
-                new DataSetQueryCriteriaFilters { In = filterOptionIds },
-            nameof(DataSetQueryCriteriaFilters.NotIn) =>
-                new DataSetQueryCriteriaFilters { NotIn = filterOptionIds },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
+        var level = EnumUtil.GetFromEnumValue<GeographicLevel>(option.Level);
 
-    private static DataSetQueryCriteriaGeographicLevels CreateCriteriaGeographicLevels(
-        string comparator,
-        IReadOnlyList<GeographicLevel> geographicLevels)
-    {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaGeographicLevels.Eq) => new DataSetQueryCriteriaGeographicLevels
-            {
-                Eq = geographicLevels.Count > 0 ? geographicLevels[0].GetEnumValue() : null
-            },
-            nameof(DataSetQueryCriteriaGeographicLevels.NotEq) => new DataSetQueryCriteriaGeographicLevels
-            {
-                NotEq = geographicLevels.Count > 0 ? geographicLevels[0].GetEnumValue() : null
-            },
-            nameof(DataSetQueryCriteriaGeographicLevels.In) => new DataSetQueryCriteriaGeographicLevels
-            {
-                In = geographicLevels.Select(l => l.GetEnumValue()).ToList()
-            },
-            nameof(DataSetQueryCriteriaGeographicLevels.NotIn) => new DataSetQueryCriteriaGeographicLevels
-            {
-                NotIn = geographicLevels.Select(l => l.GetEnumValue()).ToList()
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
-
-    private static DataSetQueryCriteriaLocations CreateCriteriaLocations(
-        string comparator,
-        IReadOnlyList<DataSetQueryLocation> locations)
-    {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaLocations.Eq) =>
-                new DataSetQueryCriteriaLocations { Eq = locations.Count > 0 ? locations[0] : null },
-            nameof(DataSetQueryCriteriaLocations.NotEq) =>
-                new DataSetQueryCriteriaLocations { NotEq = locations.Count > 0 ? locations[0] : null },
-            nameof(DataSetQueryCriteriaLocations.In) =>
-                new DataSetQueryCriteriaLocations { In = locations },
-            nameof(DataSetQueryCriteriaLocations.NotIn) =>
-                new DataSetQueryCriteriaLocations { NotIn = locations },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
-
-    private static DataSetQueryCriteriaTimePeriods CreateCriteriaTimePeriods(
-        string comparator,
-        IReadOnlyList<DataSetQueryTimePeriod> timePeriods)
-    {
-        return comparator switch
-        {
-            nameof(DataSetQueryCriteriaTimePeriods.Eq) =>
-                new DataSetQueryCriteriaTimePeriods { Eq = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.NotEq) =>
-                new DataSetQueryCriteriaTimePeriods { NotEq = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.In) =>
-                new DataSetQueryCriteriaTimePeriods { In = timePeriods },
-            nameof(DataSetQueryCriteriaTimePeriods.NotIn) =>
-                new DataSetQueryCriteriaTimePeriods { NotIn = timePeriods },
-            nameof(DataSetQueryCriteriaTimePeriods.Gt) =>
-                new DataSetQueryCriteriaTimePeriods { Gt = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.Gte) =>
-                new DataSetQueryCriteriaTimePeriods { Gte = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.Lt) =>
-                new DataSetQueryCriteriaTimePeriods { Lt = timePeriods.Count > 0 ? timePeriods[0] : null },
-            nameof(DataSetQueryCriteriaTimePeriods.Lte) =>
-                new DataSetQueryCriteriaTimePeriods { Lte = timePeriods.Count > 0 ? timePeriods[0] : null },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
-        };
-    }
-
-    private static DataSetQueryLocation MapOptionToQueryLocation(ParquetLocationOption option, GeographicLevel level)
-        => level switch
+        return level switch
         {
             GeographicLevel.LocalAuthority => option switch
             {
@@ -1572,8 +2479,7 @@ public abstract class DataSetQueryParserTests
             },
             GeographicLevel.RscRegion => new DataSetQueryLocationId
             {
-                Level = option.Level,
-                Id  = option.PublicId,
+                Level = option.Level, Id = option.PublicId,
             },
             GeographicLevel.School => option switch
             {
@@ -1591,6 +2497,13 @@ public abstract class DataSetQueryParserTests
                 _ => throw new NullReferenceException($"{nameof(option.Code)} cannot be null")
             }
         };
+    }
+
+    private static DataSetQueryTimePeriod MapQueryTimePeriod(ParquetTimePeriod option) => new()
+    {
+        Code = EnumUtil.GetFromEnumLabel<TimeIdentifier>(option.Identifier).GetEnumValue(),
+        Period = TimePeriodFormatter.FormatFromCsv(option.Period)
+    };
 
     private DataSetQueryParser BuildService(
         IParquetFilterRepository? filterRepository = null,

@@ -2,7 +2,7 @@ import FormThemeTopicSelect, {
   FormThemeTopicSelectProps,
 } from '@admin/components/form/FormThemeTopicSelect';
 import { OmitStrict } from '@common/types';
-import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
+import getErrorMessage from '@common/components/form/util/getErrorMessage';
 import React from 'react';
 import {
   FieldValues,

@@ -27,7 +27,7 @@ pr:
 
 jobs:
   - job: 'Backend'
-    pool: 'ees-ubuntu2204-large'
+    pool: 'ees-ubuntu2204-xlarge'
     workspace:
       clean: all
     steps:
@@ -138,7 +138,7 @@ jobs:
           repository: 'ees-public-api/api'
           command: 'push'
           tags: $(Build.BuildNumber)
-      
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Public API - Data Processor Function'
         inputs:
@@ -154,7 +154,7 @@ jobs:
         inputs:
           artifactName: 'public-api-data-processor-$(Build.BuildNumber)'
           targetPath: '$(Build.ArtifactStagingDirectory)/public-api-data-processor'
-       
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Notifier Function'
         inputs:
@@ -356,7 +356,7 @@ jobs:
           containerRegistry: '$(AcrServiceConnection)'
           repository: 'ees-public-frontend'
           command: 'push'
-          tags: $(Build.BuildNumber)    
+          tags: $(Build.BuildNumber)
 
   - job: 'MiscellaneousArtifacts'
     pool:

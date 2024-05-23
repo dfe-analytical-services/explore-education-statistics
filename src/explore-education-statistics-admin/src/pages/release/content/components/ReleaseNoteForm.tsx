@@ -1,9 +1,9 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldDateInput from '@common/components/form/rhf/RHFFormFieldDateInput';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
@@ -48,15 +48,15 @@ export default function ReleaseNoteForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      <RHFForm id={id} onSubmit={onSubmit}>
+      <Form id={id} onSubmit={onSubmit}>
         {isEditing && (
-          <RHFFormFieldDateInput<ReleaseNoteFormValues>
+          <FormFieldDateInput<ReleaseNoteFormValues>
             name="on"
             legend="Edit date"
             legendSize="s"
           />
         )}
-        <RHFFormFieldTextArea<ReleaseNoteFormValues>
+        <FormFieldTextArea<ReleaseNoteFormValues>
           label={isEditing ? 'Edit release note' : 'New release note'}
           name="reason"
           rows={3}
@@ -70,7 +70,7 @@ export default function ReleaseNoteForm({
             Cancel
           </Button>
         </ButtonGroup>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 }

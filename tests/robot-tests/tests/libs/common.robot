@@ -474,7 +474,7 @@ user checks element should not contain
 user checks input field contains
     [Arguments]    ${element}    ${text}
     page should contain textfield    ${element}
-    textfield value should be    ${element}    ${text}
+    textfield should contain     ${element}    ${text}
 
 user checks page contains
     [Arguments]    ${text}
@@ -552,6 +552,11 @@ user waits until parent does not contain button
     [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
     user waits until parent does not contain element    ${parent}
     ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+
+user waits until parent does not contain
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    user waits until parent does not contain element    ${parent}
+    ...    .//*[contains(text(),"${text}")]    ${wait}
 
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
@@ -689,11 +694,6 @@ user enters text into element
 user checks element count is x
     [Arguments]    ${locator}    ${count}
     page should contain element    ${locator}    count=${count}
-
-user checks element contains valid URL
-    [Arguments]    ${locator}    ${expected_url}
-    ${actual_url}=    get value    ${locator}
-    should be equal as strings    ${actual_url}    ${expected_url}
 
 user checks url contains
     [Arguments]    ${text}

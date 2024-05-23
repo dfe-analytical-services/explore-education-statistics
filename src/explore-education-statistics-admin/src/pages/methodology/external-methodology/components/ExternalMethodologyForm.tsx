@@ -1,12 +1,12 @@
 import { FormFieldset, FormGroup } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
 import { ExternalMethodology } from '@admin/services/publicationService';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 
 interface Props {
   initialValues?: ExternalMethodology;
@@ -51,19 +51,19 @@ const ExternalMethodologyForm = ({
       }
       validationSchema={validationSchema}
     >
-      <RHFForm id="methodology-external" onSubmit={onSubmit}>
+      <Form id="methodology-external" onSubmit={onSubmit}>
         <FormFieldset
           id="methodology-external-fieldset"
           legend="Link to an externally hosted methodology"
           legendHidden
         >
           <FormGroup>
-            <RHFFormFieldTextInput
+            <FormFieldTextInput
               label="Link title"
               name="title"
               className="govuk-!-width-two-thirds"
             />
-            <RHFFormFieldTextInput
+            <FormFieldTextInput
               label="URL"
               name="url"
               className="govuk-!-width-two-thirds"
@@ -82,7 +82,7 @@ const ExternalMethodologyForm = ({
             </Button>
           </ButtonGroup>
         </FormFieldset>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 };

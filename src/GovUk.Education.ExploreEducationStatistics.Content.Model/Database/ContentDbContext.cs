@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
+using Semver;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -429,10 +430,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
                 entity.Property(p => p.DataSetFileMeta)
-                    .HasConversion(
+                    .HasConversion( // You might want to use EF8 JSON support instead of this
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
-                entity.HasIndex(f => f.PublicDataSetVersionId);
+
+                entity.Property(f => f.PublicApiDataSetVersion)
+                    .HasMaxLength(20)
+                    .HasConversion(
+                        v => v.ToString(),
+                        v => SemVersion.Parse(v, SemVersionStyles.Strict, 20)
+                    );
+
+                entity.HasIndex(f => new {
+                        PublicDataSetId = f.PublicApiDataSetId, PublicDataSetVersion = f.PublicApiDataSetVersion })
+                    .IsUnique();
             });
         }
 

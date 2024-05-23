@@ -1,9 +1,9 @@
 import Button from '@common/components/Button';
 import InsetText from '@common/components/InsetText';
 import Yup from '@common/validation/yup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import React from 'react';
 import WarningMessage from '@common/components/WarningMessage';
 import {
@@ -76,7 +76,7 @@ const PrototypeAddPublicationSubject = ({
           })}
         >
           {({ reset }) => (
-            <RHFForm
+            <Form
               id="form"
               onSubmit={values => {
                 reset();
@@ -84,14 +84,14 @@ const PrototypeAddPublicationSubject = ({
               }}
             >
               {/* 
-                <RHFFormFieldTextInput
+                <FormFieldTextInput
                   id="title"
                   name="title"
                   label="Title"
                   width={20}
                 /> 
               */}
-              <RHFFormFieldSelect<FormValues>
+              <FormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
                 label="Available data sets"
@@ -102,7 +102,7 @@ const PrototypeAddPublicationSubject = ({
                 placeholder="Select a data set"
               />
               <Button type="submit">Create API data set</Button>
-            </RHFForm>
+            </Form>
           )}
         </FormProvider>
       )}

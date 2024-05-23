@@ -1,4 +1,4 @@
-import Pagination from '@common/components/Pagination';
+import Pagination, { PaginationProps } from '@common/components/Pagination';
 import { render as baseRender, screen } from '@testing-library/react';
 import React from 'react';
 
@@ -12,6 +12,76 @@ jest.mock('@common/hooks/useMedia', () => ({
 }));
 
 describe('Pagination', () => {
+  test('renders correct links with custom `pageParam` prop', () => {
+    render({
+      currentPage: 1,
+      totalPages: 2,
+      pageParam: 'customPage',
+    });
+
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(3);
+
+    expect(links[0]).toHaveAttribute('href', '/test-url?customPage=1');
+    expect(links[1]).toHaveAttribute('href', '/test-url?customPage=2');
+    expect(links[2]).toHaveAttribute('href', '/test-url?customPage=2');
+  });
+
+  test('renders correct links with custom `queryParams` prop', () => {
+    render({
+      currentPage: 1,
+      totalPages: 2,
+      queryParams: {
+        foo: 'bar',
+        baz: 'qux',
+      },
+    });
+
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(3);
+
+    expect(links[0]).toHaveAttribute(
+      'href',
+      '/test-url?foo=bar&baz=qux&page=1',
+    );
+    expect(links[1]).toHaveAttribute(
+      'href',
+      '/test-url?foo=bar&baz=qux&page=2',
+    );
+    expect(links[2]).toHaveAttribute(
+      'href',
+      '/test-url?foo=bar&baz=qux&page=2',
+    );
+  });
+
+  test('renders links with custom `pageParam` and `queryParams` props', () => {
+    render({
+      currentPage: 1,
+      totalPages: 2,
+      pageParam: 'customPage',
+      queryParams: {
+        foo: 'bar',
+        baz: 'qux',
+      },
+    });
+
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(3);
+
+    expect(links[0]).toHaveAttribute(
+      'href',
+      '/test-url?foo=bar&baz=qux&customPage=1',
+    );
+    expect(links[1]).toHaveAttribute(
+      'href',
+      '/test-url?foo=bar&baz=qux&customPage=2',
+    );
+    expect(links[2]).toHaveAttribute(
+      'href',
+      '/test-url?foo=bar&baz=qux&customPage=2',
+    );
+  });
+
   describe('desktop', () => {
     test('renders the pagination without spacers when there are fewer than 8 pages', () => {
       render({ currentPage: 3, totalPages: 5 });
@@ -482,19 +552,15 @@ describe('Pagination', () => {
 });
 
 function render({
-  currentPage,
-  totalPages,
-}: {
-  currentPage: number;
-  totalPages: number;
-}) {
+  baseUrl = '/test-url',
+  ...props
+}: Omit<PaginationProps, 'renderLink'>) {
   baseRender(
     <Pagination
-      baseUrl="/test-url"
-      currentPage={currentPage}
+      {...props}
+      baseUrl={baseUrl}
       // eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-props-no-spreading
-      renderLink={props => <a {...props} href={props.to} />}
-      totalPages={totalPages}
+      renderLink={linkProps => <a {...linkProps} href={linkProps.to} />}
     />,
   );
 }

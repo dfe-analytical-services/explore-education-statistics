@@ -9,9 +9,9 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import WarningMessage from '@common/components/WarningMessage';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import Form from '@common/components/form/Form';
+import FormProvider from '@common/components/form/FormProvider';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router-dom';
 
@@ -86,8 +86,8 @@ const PublicationReleaseContributorsForm = ({
     <FormProvider initialValues={initialValues}>
       {({ formState }) => {
         return (
-          <RHFForm id="addExistingUsersForm" onSubmit={handleSubmit}>
-            <RHFFormFieldCheckboxGroup<FormValues>
+          <Form id="addExistingUsersForm" onSubmit={handleSubmit}>
+            <FormFieldCheckboxGroup<FormValues>
               name="userIds"
               legend="Select contributors for this release"
               legendSize="m"
@@ -121,7 +121,7 @@ const PublicationReleaseContributorsForm = ({
                 Cancel
               </ButtonText>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

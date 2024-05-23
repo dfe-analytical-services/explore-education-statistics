@@ -1,9 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -22,9 +23,9 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class DataSetFilesControllerCachingTests
+public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixture
 {
-    public class ListDataSetsTests : CacheServiceTestFixture
+    public class ListDataSetsTests : DataSetFilesControllerCachingTests
     {
         private readonly DataSetFileListRequest _query = new(
             ThemeId: Guid.NewGuid(),
@@ -40,10 +41,10 @@ public class DataSetFilesControllerCachingTests
         );
 
         private readonly PaginatedListViewModel<DataSetFileSummaryViewModel> _dataSetFiles = new(
-            new List<DataSetFileSummaryViewModel>
-            {
-                new()
+            [
+                new DataSetFileSummaryViewModel
                 {
+                    Id = Guid.NewGuid(),
                     FileId = Guid.NewGuid(),
                     Filename = "Filename.csv",
                     FileSize = "1 Mb",
@@ -64,11 +65,29 @@ public class DataSetFilesControllerCachingTests
                         Id = Guid.NewGuid(),
                         Title = "Academic year 2001/02"
                     },
+                    Api = new DataSetFileApiViewModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = "1.0.0"
+                    },
+                    Meta = new DataSetFileMetaViewModel
+                    {
+                        GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
+                        TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
+                        {
+                            From = "2000",
+                            To = "2001",
+                        },
+                        Filters = ["Filter 1"],
+                        Indicators = ["Indicator 1"],
+                    },
                     LatestData = true,
                     Published = DateTime.UtcNow,
-                    HasApiDataSet = true
                 }
-            }, 1, 1, 10);
+            ],
+            totalResults: 1,
+            page: 1,
+            pageSize: 10);
 
         [Fact]
         public async Task NoCachedEntryExists_CreatesCache()
@@ -79,7 +98,7 @@ public class DataSetFilesControllerCachingTests
                 .Setup(s => s.GetItem(
                     new ListDataSetFilesCacheKey(_query),
                     typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
-                .Returns((object?) null);
+                .Returns((object?)null);
 
             var expectedCacheConfiguration = new MemoryCacheConfiguration(
                 10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
@@ -143,12 +162,8 @@ public class DataSetFilesControllerCachingTests
         }
     }
 
-    private static DataSetFilesController BuildController(
-        IDataSetFileService? dataSetFileService = null
-    )
+    private static DataSetFilesController BuildController(IDataSetFileService? dataSetFileService = null)
     {
-        return new DataSetFilesController(
-            dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict)
-        );
+        return new DataSetFilesController(dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict));
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -14,26 +16,36 @@ public static class DataSetFileMetaGeneratorExtensions
 
     public static InstanceSetters<DataSetFileMeta> SetDefaults(this InstanceSetters<DataSetFileMeta> setters)
         => setters
-            .SetGeographicLevels(new List<string> { "National " })
-            .SetTimeIdentifier(TimeIdentifier.AcademicYear)
-            .SetYears(new List<int> { 2000, 2001 })
-            .SetFilters(new List<FilterMeta> { new() { Label = "Filter 1" }, })
-            .SetIndicators(new List<IndicatorMeta> { new() { Label = "Indicator 1" }, });
+            .SetGeographicLevels([GeographicLevel.Country])
+            .SetTimePeriodRange(new TimePeriodRangeMeta
+            {
+                Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
+                End = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2001", },
+            })
+            .SetFilters([ new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter 1",
+                    ColumnName = "filter_1",
+                },
+            ])
+            .SetIndicators([ new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator 1",
+                    ColumnName = "indicator_1",
+                },
+            ]);
 
     public static Generator<DataSetFileMeta> WithGeographicLevels(
         this Generator<DataSetFileMeta> generator,
-        List<string> geographicLevels)
+        List<GeographicLevel> geographicLevels)
         => generator.ForInstance(s => s.SetGeographicLevels(geographicLevels));
 
-    public static Generator<DataSetFileMeta> WithTimeIdentifier(
+    public static Generator<DataSetFileMeta> WithTimePeriodRange(
         this Generator<DataSetFileMeta> generator,
-        TimeIdentifier timeIdentifier)
-        => generator.ForInstance(s => s.SetTimeIdentifier(timeIdentifier));
-
-    public static Generator<DataSetFileMeta> WithYears(
-        this Generator<DataSetFileMeta> generator,
-        List<int> years)
-        => generator.ForInstance(s => s.SetYears(years));
+        TimePeriodRangeMeta timePeriodRange)
+        => generator.ForInstance(s => s.SetTimePeriodRange(timePeriodRange));
 
     public static Generator<DataSetFileMeta> WithFilters(
         this Generator<DataSetFileMeta> generator,
@@ -47,18 +59,13 @@ public static class DataSetFileMetaGeneratorExtensions
 
     public static InstanceSetters<DataSetFileMeta> SetGeographicLevels(
         this InstanceSetters<DataSetFileMeta> setters,
-        List<string> geographicLevels)
+        List<GeographicLevel> geographicLevels)
         => setters.Set(s => s.GeographicLevels, geographicLevels);
 
-    public static InstanceSetters<DataSetFileMeta> SetTimeIdentifier(
+    public static InstanceSetters<DataSetFileMeta> SetTimePeriodRange(
         this InstanceSetters<DataSetFileMeta> setters,
-        TimeIdentifier timeIdentifier)
-        => setters.Set(s => s.TimeIdentifier, timeIdentifier);
-
-    public static InstanceSetters<DataSetFileMeta> SetYears(
-        this InstanceSetters<DataSetFileMeta> setters,
-        List<int> years)
-        => setters.Set(s => s.Years, years);
+        TimePeriodRangeMeta timePeriodRange)
+        => setters.Set(s => s.TimePeriodRange, timePeriodRange);
 
     public static InstanceSetters<DataSetFileMeta> SetFilters(
         this InstanceSetters<DataSetFileMeta> setters,

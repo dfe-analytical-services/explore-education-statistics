@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetLocationRepository(
     IDuckDbConnection duckDbConnection,
-    IParquetPathResolver parquetPathResolver)
+    IDataSetVersionPathResolver dataSetVersionPathResolver)
     : IParquetLocationRepository
 {
     public async Task<IList<ParquetLocationOption>> ListOptions(
@@ -67,7 +67,7 @@ public class ParquetLocationRepository(
             var command = duckDbConnection.SqlBuilder(
                 $"""
                  SELECT *
-                 FROM '{parquetPathResolver.LocationsPath(dataSetVersion):raw}'
+                 FROM '{dataSetVersionPathResolver.LocationsPath(dataSetVersion):raw}'
                  WHERE {whereBuilder}
                  """
             );
@@ -141,7 +141,7 @@ public class ParquetLocationRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT {columnsFragments}
-             FROM '{parquetPathResolver.LocationsPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.LocationsPath(dataSetVersion):raw}'
              WHERE {LocationOptionsTable.Cols.Id:raw} IN ({ids})
              """
         );
@@ -156,7 +156,7 @@ public class ParquetLocationRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT DISTINCT {LocationOptionsTable.Cols.Level:raw}
-             FROM '{parquetPathResolver.LocationsPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.LocationsPath(dataSetVersion):raw}'
              """);
 
         var levels = await command.QueryAsync<string>(cancellationToken: cancellationToken);

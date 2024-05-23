@@ -71,7 +71,7 @@ describe('TableToolShare', () => {
       }),
     ).not.toBeInTheDocument();
 
-    const urlInput = screen.getByTestId('permalink-generated-url');
+    const urlInput = screen.getByLabelText('URL');
     expect(urlInput).toBeInTheDocument();
     expect(urlInput).toHaveValue(
       'http://localhost:3000/data-tables/permalink/permalink-id',

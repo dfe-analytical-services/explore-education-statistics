@@ -1,5 +1,5 @@
 import ChartCustomDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartCustomDataGroupingsConfiguration';
-import FormProvider from '@common/components/form/rhf/FormProvider';
+import FormProvider from '@common/components/form/FormProvider';
 import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';

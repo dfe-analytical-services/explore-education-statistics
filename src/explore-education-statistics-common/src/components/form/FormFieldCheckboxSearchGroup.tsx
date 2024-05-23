@@ -1,59 +1,75 @@
-import FormField, {
-  FormFieldComponentProps,
-} from '@common/components/form/FormField';
-import { OmitStrict } from '@common/types';
-import React from 'react';
 import FormCheckboxSearchGroup, {
   FormCheckboxSearchGroupProps,
-} from './FormCheckboxSearchGroup';
-import handleAllChange from './util/handleAllCheckboxChange';
+} from '@common/components/form/FormCheckboxSearchGroup';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
+import useRegister from '@common/components/form/hooks/useRegister';
+import handleAllCheckboxChange from '@common/components/form/util/handleAllCheckboxChange';
+import getErrorMessage from '@common/components/form/util/getErrorMessage';
+import React from 'react';
+import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
-export type FormFieldCheckboxSearchGroupProps<FormValues> = OmitStrict<
-  FormFieldComponentProps<FormCheckboxSearchGroupProps, FormValues>,
-  'formGroup'
->;
+export interface FormFieldCheckboxSearchGroupProps<
+  TFormValues extends FieldValues,
+> extends Omit<FormCheckboxSearchGroupProps, 'name' | 'value' | 'id'> {
+  name: Path<TFormValues>;
+  id?: string;
+  showError?: boolean;
+}
 
-function FormFieldCheckboxSearchGroup<FormValues>(
-  props: FormFieldCheckboxSearchGroupProps<FormValues>,
-) {
+export default function FormFieldCheckboxSearchGroup<
+  TFormValues extends FieldValues,
+>({
+  name,
+  id: customId,
+  showError = true,
+  ...props
+}: FormFieldCheckboxSearchGroupProps<TFormValues>) {
+  const {
+    formState: { errors },
+    register,
+    setValue,
+    trigger,
+  } = useFormContext<TFormValues>();
+
+  const { ref: inputRef, ...field } = useRegister(name, register);
+  const { fieldId } = useFormIdContext();
+  const id = fieldId(name, customId);
+  const selectedValues = useWatch({ name }) || [];
   const { onAllChange, onChange } = props;
 
   return (
-    <FormField<string[]> {...props}>
-      {({ id, field, helpers, meta }) => {
-        return (
-          <FormCheckboxSearchGroup
-            {...props}
-            {...field}
-            id={id}
-            onAllChange={(event, checked, options) => {
-              onAllChange?.(event, checked, options);
+    <FormCheckboxSearchGroup
+      {...props}
+      {...field}
+      error={getErrorMessage(errors, name, showError)}
+      id={id}
+      inputRef={inputRef}
+      value={selectedValues}
+      onAllChange={(event, checked, options) => {
+        onAllChange?.(event, checked, options);
 
-              if (event.isDefaultPrevented()) {
-                return;
-              }
+        if (event.isDefaultPrevented()) {
+          return;
+        }
 
-              handleAllChange({
-                checked,
-                helpers,
-                meta,
-                options,
-              });
-            }}
-            onChange={(event, option) => {
-              onChange?.(event, option);
-
-              if (event.isDefaultPrevented()) {
-                return;
-              }
-
-              field.onChange(event);
-            }}
-          />
-        );
+        handleAllCheckboxChange({
+          checked,
+          name,
+          options,
+          selectedValues,
+          setValue,
+          trigger,
+        });
       }}
-    </FormField>
+      onChange={(event, option) => {
+        onChange?.(event, option);
+
+        if (event.isDefaultPrevented()) {
+          return;
+        }
+
+        field.onChange(event);
+      }}
+    />
   );
 }
-
-export default FormFieldCheckboxSearchGroup;

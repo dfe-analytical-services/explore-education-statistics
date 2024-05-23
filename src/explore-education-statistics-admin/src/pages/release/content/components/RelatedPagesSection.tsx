@@ -4,9 +4,9 @@ import releaseContentRelatedInformationService from '@admin/services/releaseCont
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import useToggle from '@common/hooks/useToggle';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { BasicLink } from '@common/services/publicationService';
@@ -72,20 +72,17 @@ export default function RelatedPagesSection({ release }: Props) {
                   .required('Enter a link URL'),
               })}
             >
-              <RHFForm id="relatedPageForm" onSubmit={handleSubmit}>
+              <Form id="relatedPageForm" onSubmit={handleSubmit}>
                 <FormFieldset
                   id="relatedLink"
                   legend="Add related page link"
                   legendSize="m"
                 >
-                  <RHFFormFieldTextInput<FormValues>
+                  <FormFieldTextInput<FormValues>
                     label="Title"
                     name="description"
                   />
-                  <RHFFormFieldTextInput<FormValues>
-                    label="Link URL"
-                    name="url"
-                  />
+                  <FormFieldTextInput<FormValues> label="Link URL" name="url" />
                 </FormFieldset>
                 <ButtonGroup>
                   <Button
@@ -102,7 +99,7 @@ export default function RelatedPagesSection({ release }: Props) {
                     Cancel
                   </Button>
                 </ButtonGroup>
-              </RHFForm>
+              </Form>
             </FormProvider>
           ) : (
             <Button onClick={toggleFormOpen.on}>Add related page link</Button>

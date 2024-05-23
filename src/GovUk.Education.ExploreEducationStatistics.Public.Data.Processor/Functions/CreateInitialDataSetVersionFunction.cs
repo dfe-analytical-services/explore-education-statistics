@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -35,17 +35,19 @@ public class CreateInitialDataSetVersionFunction(
                 instanceId,
                 cancellationToken: cancellationToken
             ))
-            .OnSuccess(async dataSetVersionId =>
+            .OnSuccess(async tuple =>
             {
                 await ProcessInitialDataSetVersion(
                     client,
-                    dataSetVersionId: dataSetVersionId,
+                    dataSetVersionId: tuple.dataSetVersionId,
                     instanceId: instanceId,
                     cancellationToken);
 
                 return new CreateInitialDataSetVersionResponseViewModel
                 {
-                    DataSetVersionId = dataSetVersionId, InstanceId = instanceId
+                    DataSetId = tuple.dataSetId,
+                    DataSetVersionId = tuple.dataSetVersionId, 
+                    InstanceId = instanceId
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));

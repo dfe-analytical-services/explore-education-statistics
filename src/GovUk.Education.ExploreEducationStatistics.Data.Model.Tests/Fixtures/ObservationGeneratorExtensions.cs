@@ -36,6 +36,12 @@ public static class ObservationGeneratorExtensions
         IEnumerable<string> measures)
         => generator.ForInstance(s => s.SetMeasures(indicators, measures));
 
+    public static Generator<Observation> WithTimePeriod(
+        this Generator<Observation> generator,
+        int year,
+        TimeIdentifier identifier)
+        => generator.ForInstance(s => s.SetTimePeriod(year, identifier));
+
     public static InstanceSetters<Observation> SetDefaults(this InstanceSetters<Observation> setters)
         => setters
             .SetDefault(o => o.Id)

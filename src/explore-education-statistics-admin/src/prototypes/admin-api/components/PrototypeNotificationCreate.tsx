@@ -8,10 +8,10 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Yup from '@common/validation/yup';
 import React, { useState } from 'react';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 
 interface FormValues {
   summary: string;
@@ -80,8 +80,8 @@ const PrototypeNotificationCreate = ({
           {({ watch }) => {
             const values = watch();
             return (
-              <RHFForm id="form" onSubmit={() => {}}>
-                <RHFFormFieldTextArea
+              <Form id="form" onSubmit={() => {}}>
+                <FormFieldTextArea
                   label={
                     <span className="govuk-!-font-weight-bold">
                       Summary of updates
@@ -91,7 +91,7 @@ const PrototypeNotificationCreate = ({
                   hint=" Describe any expected breaking changes of updates in the next data set version."
                 />
 
-                <RHFFormFieldCheckboxGroup
+                <FormFieldCheckboxGroup
                   legend="Notification channels"
                   legendSize="s"
                   name="channels"
@@ -120,7 +120,7 @@ const PrototypeNotificationCreate = ({
                     Cancel
                   </Button>
                 </ButtonGroup>
-              </RHFForm>
+              </Form>
             );
           }}
         </FormProvider>

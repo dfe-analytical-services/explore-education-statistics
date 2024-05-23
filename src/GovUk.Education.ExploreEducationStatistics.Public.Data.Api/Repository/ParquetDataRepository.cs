@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetDataRepository(
     IDuckDbConnection duckDbConnection,
-    IParquetPathResolver parquetPathResolver)
+    IDataSetVersionPathResolver dataSetVersionPathResolver)
     : IParquetDataRepository
 {
     private const string DataIdsAlias = "data_ids";
@@ -31,7 +31,7 @@ public class ParquetDataRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT count(*)
-             FROM '{parquetPathResolver.DataPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.DataPath(dataSetVersion):raw}'
              """
         );
 
@@ -52,7 +52,7 @@ public class ParquetDataRepository(
         using var _ = MiniProfiler.Current
             .Step($"{nameof(ParquetDataRepository)}.{nameof(ListRows)}");
 
-        var dataPath = parquetPathResolver.DataPath(dataSetVersion);
+        var dataPath = dataSetVersionPathResolver.DataPath(dataSetVersion);
 
         var whereFragment = new DuckDbSqlBuilder()
             .AppendIf(!where.IsEmpty(), $"WHERE {where}");
@@ -101,7 +101,7 @@ public class ParquetDataRepository(
         CancellationToken cancellationToken = default)
     {
         var command = duckDbConnection.SqlBuilder(
-            $"DESCRIBE SELECT * FROM '{parquetPathResolver.DataPath(dataSetVersion):raw}' LIMIT 1");
+            $"DESCRIBE SELECT * FROM '{dataSetVersionPathResolver.DataPath(dataSetVersion):raw}' LIMIT 1");
 
         var columns = await command.QueryAsync<ParquetColumn>(cancellationToken: cancellationToken);
 

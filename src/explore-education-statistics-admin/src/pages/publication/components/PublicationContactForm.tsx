@@ -4,9 +4,9 @@ import publicationService, {
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
@@ -82,29 +82,29 @@ export default function PublicationContactForm({
       {form => {
         return (
           <>
-            <RHFForm
+            <Form
               id="publicationContactForm"
               onSubmit={() => toggleConfirmModal.on()}
             >
-              <RHFFormFieldTextInput<FormValues>
+              <FormFieldTextInput<FormValues>
                 name="teamName"
                 label="Team name"
                 className="govuk-!-width-one-half"
               />
 
-              <RHFFormFieldTextInput<FormValues>
+              <FormFieldTextInput<FormValues>
                 name="teamEmail"
                 label="Team email"
                 className="govuk-!-width-one-half"
               />
 
-              <RHFFormFieldTextInput<FormValues>
+              <FormFieldTextInput<FormValues>
                 name="contactName"
                 label="Contact name"
                 className="govuk-!-width-one-half"
               />
 
-              <RHFFormFieldTextInput<FormValues>
+              <FormFieldTextInput<FormValues>
                 name="contactTelNo"
                 label="Contact telephone (optional)"
                 className="govuk-!-width-one-half"
@@ -114,7 +114,7 @@ export default function PublicationContactForm({
                 <Button type="submit">Update contact details</Button>
                 <ButtonText onClick={onCancel}>Cancel</ButtonText>
               </ButtonGroup>
-            </RHFForm>
+            </Form>
 
             <ModalConfirm
               title="Confirm contact changes"

@@ -5,9 +5,9 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { FormFieldset } from '@common/components/form';
 import Yup from '@common/validation/yup';
 import React from 'react';
@@ -58,7 +58,7 @@ const PrototypePrepareNextSubjectStep1 = ({
             })}
           >
             {() => (
-              <RHFForm
+              <Form
                 id="form"
                 onSubmit={values => {
                   onSubmit(values.subjectId);
@@ -84,7 +84,7 @@ const PrototypePrepareNextSubjectStep1 = ({
                         removed in the new data set
                       </li>
                     </ul>
-                    <RHFFormFieldSelect<FormValues>
+                    <FormFieldSelect<FormValues>
                       id="subjectId"
                       name="subjectId"
                       label="Available data sets"
@@ -100,7 +100,7 @@ const PrototypePrepareNextSubjectStep1 = ({
                   submitText="Next step - locations"
                   {...stepProps}
                 />
-              </RHFForm>
+              </Form>
             )}
           </FormProvider>
         </div>

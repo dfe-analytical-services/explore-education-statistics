@@ -1,9 +1,9 @@
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldCheckboxGroupsMenu from '@common/components/form/rhf/RHFFormFieldCheckboxGroupsMenu';
-import RHFFormFieldCheckboxMenu from '@common/components/form/rhf/RHFFormFieldCheckboxMenu';
-import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldCheckboxGroupsMenu from '@common/components/form/FormFieldCheckboxGroupsMenu';
+import FormFieldCheckboxMenu from '@common/components/form/FormFieldCheckboxMenu';
+import getErrorMessage from '@common/components/form/util/getErrorMessage';
 import {
   LocationOption,
   SubjectMeta,
@@ -156,7 +156,7 @@ const LocationFiltersForm = ({
         }
 
         return (
-          <RHFForm
+          <Form
             id="locationFiltersForm"
             initialTouched={initialValues.length ? ['locations'] : []}
             showErrorSummary={showError}
@@ -179,7 +179,7 @@ const LocationFiltersForm = ({
                     const searchOnly = levelKey === 'school';
 
                     return hasSubGroups && !searchOnly ? (
-                      <RHFFormFieldCheckboxGroupsMenu
+                      <FormFieldCheckboxGroupsMenu
                         id={`locations-${levelKey}`}
                         key={levelKey}
                         name={`locations.${levelKey}`}
@@ -198,7 +198,7 @@ const LocationFiltersForm = ({
                         }))}
                       />
                     ) : (
-                      <RHFFormFieldCheckboxMenu
+                      <FormFieldCheckboxMenu
                         id={`locations-${levelKey}`}
                         key={levelKey}
                         name={`locations.${levelKey}`}
@@ -234,7 +234,7 @@ const LocationFiltersForm = ({
               {...stepProps}
               isSubmitting={formState.isSubmitting}
             />
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

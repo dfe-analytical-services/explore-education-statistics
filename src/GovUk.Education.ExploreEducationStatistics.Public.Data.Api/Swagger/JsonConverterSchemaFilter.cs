@@ -59,26 +59,34 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
                 continue;
             }
 
-            if (property.PropertyType.GetUnderlyingType().IsEnum)
+            var propertyType = property.PropertyType.GetUnderlyingType();
+
+            if (propertyType.IsEnum && !_typesToIgnore.Contains(propertyType))
             {
-                ApplyEnumConverter(property, propertySchema, converterType, context.SchemaRepository);
+                ApplyEnumConverter(propertyType, propertySchema, converterType, context.SchemaRepository);
+
+                continue;
+            }
+
+            if (!propertyType.IsGenericType)
+            {
+                continue;
+            }
+
+            if (propertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IReadOnlyList<>))
+                && propertyType.GenericTypeArguments[0].IsEnum)
+            {
+                ApplyReadOnlyListEnumConverter(propertySchema, converterType, context.SchemaRepository);
             }
         }
     }
 
     private void ApplyEnumConverter(
-        PropertyInfo property,
+        Type enumType,
         OpenApiSchema propertySchema,
         Type converterType,
         SchemaRepository schemaRepository)
     {
-        var enumType = property.PropertyType.GetUnderlyingType();
-
-        if (_typesToIgnore.Contains(enumType))
-        {
-            return;
-        }
-
         var hasEnumConverter = false;
 
         var converterBaseType = converterType.IsGenericType
@@ -131,5 +139,25 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
                 .Where(s => s.Reference is null || s.Reference.Id != enumSchema.Reference.Id)
                 .ToList();
         }
+    }
+
+    private void ApplyReadOnlyListEnumConverter(
+        OpenApiSchema propertySchema,
+        Type converterType,
+        SchemaRepository schemaRepository)
+    {
+        if (converterType.GetGenericTypeDefinition() != typeof(ReadOnlyListJsonConverter<,>))
+        {
+            return;
+        }
+
+        var enumType = converterType.GenericTypeArguments[0].GetUnderlyingType();
+
+        if (!enumType.IsEnum)
+        {
+            return;
+        }
+
+        ApplyEnumConverter(enumType, propertySchema.Items, converterType.GenericTypeArguments[1], schemaRepository);
     }
 }

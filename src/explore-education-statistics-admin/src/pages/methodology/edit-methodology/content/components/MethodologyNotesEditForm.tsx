@@ -1,9 +1,9 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import RHFFormFieldDateInput from '@common/components/form/rhf/RHFFormFieldDateInput';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
@@ -39,13 +39,13 @@ export default function MethodologyNotesEditForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      <RHFForm id="editMethodologyNoteForm" onSubmit={onSubmit}>
-        <RHFFormFieldDateInput<FormValues>
+      <Form id="editMethodologyNoteForm" onSubmit={onSubmit}>
+        <FormFieldDateInput<FormValues>
           name="displayDate"
           legend="Edit date"
           legendSize="s"
         />
-        <RHFFormFieldTextArea<FormValues>
+        <FormFieldTextArea<FormValues>
           label="Edit methodology note"
           name="content"
           rows={3}
@@ -57,7 +57,7 @@ export default function MethodologyNotesEditForm({
             Cancel
           </Button>
         </ButtonGroup>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 }

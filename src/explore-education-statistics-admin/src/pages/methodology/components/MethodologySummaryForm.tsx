@@ -1,10 +1,10 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
@@ -64,8 +64,8 @@ const MethodologySummaryForm = ({
     >
       {form => {
         return (
-          <RHFForm id={id} onSubmit={handleSubmit}>
-            <RHFFormFieldRadioGroup<FormValues>
+          <Form id={id} onSubmit={handleSubmit}>
+            <FormFieldRadioGroup<FormValues>
               legend="Methodology title"
               name="titleType"
               order={[]}
@@ -83,7 +83,7 @@ const MethodologySummaryForm = ({
                   label: 'Set an alternative title',
                   value: 'alternative',
                   conditional: (
-                    <RHFFormFieldTextInput<FormValues>
+                    <FormFieldTextInput<FormValues>
                       label="Enter methodology title"
                       name="title"
                     />
@@ -95,7 +95,7 @@ const MethodologySummaryForm = ({
               <Button type="submit">{submitText}</Button>
               <ButtonText onClick={onCancel}>Cancel</ButtonText>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

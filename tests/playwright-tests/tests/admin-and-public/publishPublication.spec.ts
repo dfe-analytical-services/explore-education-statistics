@@ -69,6 +69,9 @@ test('Verify that user is able to create a release via admin', async ({
 test('Validate that user is able to see the created release in public and title is same as publication name', async () => {
   await homePage.navigateToExploreFindStatisticsPage();
   await findStatisticsPage.navigateToPublicReleasePage(publicationName);
-  const title = await releasePage.pageTitle.textContent();
-  await expect(title).toContain(publicationName);
+
+  await expect(releasePage.pageTitle(publicationName)).toHaveText(
+    publicationName,
+    { useInnerText: true },
+  );
 });

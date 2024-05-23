@@ -441,8 +441,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("PublicDataSetVersionId")
+                    b.Property<Guid?>("PublicApiDataSetId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PublicApiDataSetVersion")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uniqueidentifier");
@@ -468,8 +472,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("PublicDataSetVersionId");
-
                     b.HasIndex("ReplacedById")
                         .IsUnique()
                         .HasFilter("[ReplacedById] IS NOT NULL");
@@ -481,6 +483,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("SourceId");
 
                     b.HasIndex("Type");
+
+                    b.HasIndex("PublicApiDataSetId", "PublicApiDataSetVersion")
+                        .IsUnique()
+                        .HasFilter("[PublicApiDataSetId] IS NOT NULL AND [PublicApiDataSetVersion] IS NOT NULL");
 
                     b.ToTable("Files");
                 });

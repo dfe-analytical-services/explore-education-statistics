@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -49,12 +50,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
         {
         }
 
-        public class FilterTests : ListDataSetFilesTests
+        public class FilterTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public FilterTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task FilterByReleaseId_Success()
             {
@@ -698,8 +695,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFiles(_fixture.DefaultFile()
-                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
-                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(0, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 1, minor: 0))
+                        .ForIndex(1, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 2, minor: 0))
                         .GenerateList(5))
                     .GenerateList();
 
@@ -722,7 +723,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = releaseVersionFiles
-                    .Where(rf => rf.File.PublicDataSetVersionId.HasValue)
+                    .Where(rf => rf.File.PublicApiDataSetId.HasValue)
                     .OrderBy(rf => rf.Name)
                     .ToList();
 
@@ -746,8 +747,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFiles(_fixture.DefaultFile()
-                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
-                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(0, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 1, minor: 1))
+                        .ForIndex(1, s => s
+                            .SetPublicApiDataSetId(Guid.NewGuid())
+                            .SetPublicApiDataSetVersion(major: 2, minor: 0))
                         .GenerateList(5))
                     .GenerateList();
 
@@ -817,12 +822,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SortByTests : ListDataSetFilesTests
+        public class SortByTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public SortByTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Theory]
             [InlineData(SortDirection.Asc)]
             [InlineData(null)]
@@ -1238,12 +1239,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SupersededPublicationTests : ListDataSetFilesTests
+        public class SupersededPublicationTests(TestApplicationFactory<TestStartup> testApp)
+            : ListDataSetFilesTests(testApp)
         {
-            public SupersededPublicationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task PublicationIsSuperseded_DataSetsOfSupersededPublicationsAreExcluded()
             {
@@ -1386,12 +1384,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class ValidationTests : ListDataSetFilesTests
+        public class ValidationTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public ValidationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Theory]
             [InlineData(0)]
             [InlineData(-1)]
@@ -1588,12 +1582,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class MiscellaneousTests : ListDataSetFilesTests
+        public class MiscellaneousTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
         {
-            public MiscellaneousTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task DataSetFileMetaCorrectlyReturned_Success()
             {
@@ -1610,18 +1600,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithFile(_fixture.DefaultFile()
                         .WithType(FileType.Data)
                         .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
-                            .WithGeographicLevels(["National", "Local authority"])
-                            .WithTimeIdentifier(TimeIdentifier.AcademicYear)
-                            .WithYears([2000, 2001, 2002])
+                            .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
+                            .WithTimePeriodRange(
+                                _fixture.DefaultTimePeriodRangeMeta()
+                                    .WithStart("2000", TimeIdentifier.AcademicYear)
+                                    .WithEnd("2002", TimeIdentifier.AcademicYear)
+                            )
                             .WithFilters([
-                                new FilterMeta { Label = "Filter 1" },
-                                new FilterMeta { Label = "Filter 2" },
-                                new FilterMeta { Label = "Filter 3" },
+                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", },
+                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "filter_2", },
+                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "filter_3", },
                             ])
                             .WithIndicators([
-                                new IndicatorMeta { Label = "Indicator 1" },
-                                new IndicatorMeta { Label = "Indicator 2" },
-                                new IndicatorMeta { Label = "Indicator 3" },
+                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", },
+                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "indicator_2", },
+                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "indicator_3", },
                             ])
                         ))
                     .Generate();
@@ -1649,26 +1642,31 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
-                dataSetFileMetaViewModel.GeographicLevels
-                    .AssertDeepEqualTo(originalMeta!.GeographicLevels);
+                Assert.Equal(originalMeta!.GeographicLevels
+                        .Select(gl => gl.GetEnumLabel())
+                        .ToList(),
+                    dataSetFileMetaViewModel.GeographicLevels);
 
-                dataSetFileMetaViewModel.TimePeriod.AssertDeepEqualTo(
-                    new DataSetFileTimePeriodViewModel
+                Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                     {
-                        TimeIdentifier = originalMeta.TimeIdentifier.GetEnumLabel(),
-                        From = TimePeriodLabelFormatter.Format(originalMeta.Years.First(), originalMeta.TimeIdentifier),
-                        To = TimePeriodLabelFormatter.Format(originalMeta.Years.Last(), originalMeta.TimeIdentifier),
-                    });
+                        From = TimePeriodLabelFormatter.Format(
+                            originalMeta.TimePeriodRange.Start.Period,
+                            originalMeta.TimePeriodRange.Start.TimeIdentifier),
+                        To = TimePeriodLabelFormatter.Format(
+                            originalMeta.TimePeriodRange.End.Period,
+                            originalMeta.TimePeriodRange.End.TimeIdentifier),
+                    },
+                    dataSetFileMetaViewModel.TimePeriodRange);
 
-                dataSetFileMetaViewModel.Filters
-                    .AssertDeepEqualTo(originalMeta.Filters
+                Assert.Equal(originalMeta.Filters
                         .Select(f => f.Label)
-                        .ToList());
+                        .ToList(),
+                    dataSetFileMetaViewModel.Filters);
 
-                dataSetFileMetaViewModel.Indicators
-                    .AssertDeepEqualTo(originalMeta.Indicators
+                Assert.Equal(originalMeta.Indicators
                         .Select(i => i.Label)
-                        .ToList());
+                        .ToList(),
+                    dataSetFileMetaViewModel.Indicators);
             }
 
             [Fact]
@@ -1765,6 +1763,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var releaseVersion = releaseFile.ReleaseVersion;
                 var publication = releaseVersion.Publication;
                 var theme = publication.Topic.Theme;
+                var publicApiDataSetVersion = releaseFile.File.PublicApiDataSetVersion;
 
                 Assert.Multiple(
                     () => Assert.Equal(releaseFile.FileId, viewModel.FileId),
@@ -1782,8 +1781,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
                         viewModel.LatestData),
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
-                    () => Assert.Equal(releaseFile.File.PublicDataSetVersionId.HasValue,
-                        viewModel.HasApiDataSet)
+                    () => Assert.Equal(releaseFile.File.PublicApiDataSetId, viewModel.Api?.Id),
+                    () => Assert.Equal(
+                        publicApiDataSetVersion is not null
+                            ? $"{publicApiDataSetVersion.Major}.{publicApiDataSetVersion.Minor}"
+                            : null,
+                        viewModel.Api?.Version)
                 );
             });
         }
@@ -1816,12 +1819,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    public class GetDataSetFileTests : DataSetFilesControllerTests
+    public class GetDataSetFileTests(TestApplicationFactory<TestStartup> testApp) : DataSetFilesControllerTests(testApp)
     {
-        public GetDataSetFileTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task FetchDataSetDetails_Success()
         {
@@ -1835,7 +1834,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile()
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithTimePeriodRange(
+                        _fixture.DefaultTimePeriodRangeMeta()
+                            .WithStart("2000", TimeIdentifier.CalendarYear)
+                            .WithEnd("2001", TimeIdentifier.CalendarYear)
+                        ))
+                    .WithPublicApiDataSetId(Guid.NewGuid())
+                    .WithPublicApiDataSetVersion(major: 1, minor: 0)
+                    .WithSubjectId(Guid.NewGuid())
+                );
 
             var client = BuildApp()
                 .AddContentDbTestData(context =>
@@ -1857,6 +1865,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             Assert.Equal(file.Id, viewModel.File.Id);
             Assert.Equal(file.Filename, viewModel.File.Name);
             Assert.Equal(file.DisplaySize(), viewModel.File.Size);
+            Assert.Equal(file.SubjectId, viewModel.File.SubjectId);
 
             Assert.Equal(releaseFile.ReleaseVersionId, viewModel.Release.Id);
             Assert.Equal(releaseFile.ReleaseVersion.Title, viewModel.Release.Title);
@@ -1870,29 +1879,39 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             Assert.Equal(publication.Slug, viewModel.Release.Publication.Slug);
             Assert.Equal(publication.Topic.Theme.Title, viewModel.Release.Publication.ThemeTitle);
 
+            Assert.NotNull(viewModel.Api);
+            Assert.Equal(file.PublicApiDataSetId, viewModel.Api.Id);
+            Assert.Equal(
+                $"{file.PublicApiDataSetVersion!.Major}.{file.PublicApiDataSetVersion.Minor}",
+                viewModel.Api.Version);
+
             var dataSetFileMeta = file.DataSetFileMeta;
 
-            viewModel.Meta.GeographicLevels
-                .AssertDeepEqualTo(dataSetFileMeta!.GeographicLevels);
+            Assert.Equal(dataSetFileMeta!.GeographicLevels
+                    .Select(gl => gl.GetEnumLabel())
+                    .ToList(),
+                viewModel.Meta.GeographicLevels);
 
-            viewModel.Meta.TimePeriod.AssertDeepEqualTo(
-                new DataSetFileTimePeriodViewModel
+            Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
-                    TimeIdentifier = dataSetFileMeta.TimeIdentifier.GetEnumLabel(),
                     From = TimePeriodLabelFormatter.Format(
-                        dataSetFileMeta.Years.First(), dataSetFileMeta.TimeIdentifier),
-                    To = TimePeriodLabelFormatter.Format(dataSetFileMeta.Years.Last(), dataSetFileMeta.TimeIdentifier),
-                });
+                        "2000",
+                        TimeIdentifier.CalendarYear),
+                    To = TimePeriodLabelFormatter.Format(
+                        "2001",
+                        TimeIdentifier.CalendarYear),
+                },
+                viewModel.Meta.TimePeriodRange);
 
-            viewModel.Meta.Filters
-                .AssertDeepEqualTo(dataSetFileMeta.Filters
+            Assert.Equal(dataSetFileMeta.Filters
                     .Select(f => f.Label)
-                    .ToList());
+                    .ToList(),
+                viewModel.Meta.Filters);
 
-            viewModel.Meta.Indicators
-                .AssertDeepEqualTo(dataSetFileMeta.Indicators
-                    .Select(i => i.Label)
-                    .ToList());
+            Assert.Equal(dataSetFileMeta.Indicators
+                .Select(i => i.Label)
+                .ToList(),
+                viewModel.Meta.Indicators);
         }
 
         [Fact]
@@ -1917,11 +1936,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     new FilterSequenceEntry(filter3Id, new List<FilterGroupSequenceEntry>()),
                 ])
                 .WithFile(_fixture.DefaultFile()
+                    .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
-                            new FilterMeta { Id = filter3Id, Label = "Filter 3", },
-                            new FilterMeta { Id = filter1Id, Label = "Filter 1", },
-                            new FilterMeta { Id = filter2Id, Label = "Filter 2", },
+                            new FilterMeta { Id = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
+                            new FilterMeta { Id = filter1Id, Label = "Filter 1", ColumnName = "filter_1", },
+                            new FilterMeta { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
                         ])));
 
             var client = BuildApp()
@@ -1968,12 +1988,13 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         new List<Guid> { indicator3Id, indicator4Id })
                 ])
                 .WithFile(_fixture.DefaultFile()
+                    .WithSubjectId(Guid.NewGuid())
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithIndicators([
-                            new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", },
-                            new IndicatorMeta { Id = indicator2Id, Label = "Indicator 2", },
-                            new IndicatorMeta { Id = indicator1Id, Label = "Indicator 1", },
-                            new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", },
+                            new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
+                            new IndicatorMeta { Id = indicator2Id, Label = "Indicator 2", ColumnName = "indicator_2", },
+                            new IndicatorMeta { Id = indicator1Id, Label = "Indicator 1", ColumnName = "indicator_1", },
+                            new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
 
             var client = BuildApp()
@@ -2062,6 +2083,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithTheme(_fixture.DefaultTheme()));
 
             File file = _fixture.DefaultFile()
+                .WithSubjectId(Guid.NewGuid())
                 .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta());
 
             ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()

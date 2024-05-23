@@ -11,5 +11,6 @@ public interface IDataSetQueryParser
         DataSetQueryCriteria criteria,
         DataSetVersion dataSetVersion,
         QueryState queryState,
+        string basePath = "",
         CancellationToken cancellationToken = default);
 }

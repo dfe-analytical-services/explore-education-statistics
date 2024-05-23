@@ -2,11 +2,11 @@ import ButtonText from '@common/components/ButtonText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import CollapsibleList from '@common/components/CollapsibleList';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormCheckboxSelectedCount from '@common/components/form/rhf/RHFFormCheckboxSelectedCount';
-import RHFFormFieldCheckboxSearchSubGroups from '@common/components/form/rhf/RHFFormFieldCheckboxSearchSubGroups';
-import RHFFormFieldCheckboxGroupsMenu from '@common/components/form/rhf/RHFFormFieldCheckboxGroupsMenu';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
+import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import FormFieldCheckboxGroupsMenu from '@common/components/form/FormFieldCheckboxGroupsMenu';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
@@ -19,7 +19,7 @@ import styles from '@common/modules/table-tool/components/FiltersForm.module.scs
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
+import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import {
   getErrorCode,
   hasErrorMessage,
@@ -195,13 +195,13 @@ export default function FiltersForm({
       validationSchema={validationSchema}
     >
       {({ formState, getValues, reset, setValue }) => {
-        const { getError } = createRHFErrorHelper({
+        const { getError } = createErrorHelper({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
         });
         if (isActive) {
           return (
-            <RHFForm id="filtersForm" onSubmit={handleSubmit}>
+            <Form id="filtersForm" onSubmit={handleSubmit}>
               {tableQueryError && formState.submitCount > 0 && (
                 <TableQueryError
                   errorCode={tableQueryError}
@@ -216,14 +216,14 @@ export default function FiltersForm({
 
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half-from-desktop govuk-!-margin-bottom-6">
-                  <RHFFormFieldCheckboxSearchSubGroups
+                  <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
                     groupLabel="Indicators"
                     hint="Select at least one indicator below"
                     legend={
                       <>
                         Indicators
-                        <RHFFormCheckboxSelectedCount name="indicators" />
+                        <FormCheckboxSelectedCount name="indicators" />
                       </>
                     }
                     legendSize="m"
@@ -282,7 +282,7 @@ export default function FiltersForm({
                             'order',
                           );
                           return (
-                            <RHFFormFieldCheckboxGroupsMenu
+                            <FormFieldCheckboxGroupsMenu
                               disabled={formState.isSubmitting}
                               groupLabel={filterGroup.legend}
                               hint={filterGroup.hint}
@@ -334,7 +334,7 @@ export default function FiltersForm({
                   });
                 }}
               />
-            </RHFForm>
+            </Form>
           );
         }
 

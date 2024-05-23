@@ -3,9 +3,9 @@ import {
   ReleaseRouteParams,
   releaseDataRoute,
 } from '@admin/routes/releaseRoutes';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
@@ -68,15 +68,15 @@ export default function ReleaseDataFilePage({
                 title: Yup.string().required('Enter a title'),
               })}
             >
-              <RHFForm id="dataFileForm" onSubmit={handleSubmit}>
-                <RHFFormFieldTextInput<FormValues>
+              <Form id="dataFileForm" onSubmit={handleSubmit}>
+                <FormFieldTextInput<FormValues>
                   className="govuk-!-width-two-thirds"
                   label="Title"
                   name="title"
                 />
 
                 <Button type="submit">Save changes</Button>
-              </RHFForm>
+              </Form>
             </FormProvider>
           ) : (
             <WarningMessage>Could not load data file details</WarningMessage>

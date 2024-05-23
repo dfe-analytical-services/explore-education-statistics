@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-public class ReleaseService(
+internal class ReleaseService(
     ContentDbContext contentDbContext,
     IUserService userService)
     : IReleaseService
@@ -40,13 +40,14 @@ public class ReleaseService(
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
     }
 
-    private async Task<Either<ActionResult, IReadOnlyList<ApiDataSetCandidateViewModel>>> GetApiDataSetCandidates(Guid releaseVersionId)
+    private async Task<Either<ActionResult, IReadOnlyList<ApiDataSetCandidateViewModel>>> GetApiDataSetCandidates(
+        Guid releaseVersionId)
     {
         return await contentDbContext.ReleaseFiles
             .AsNoTracking()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Where(rf => rf.File.Type == FileType.Data)
-            .Where(rf => rf.File.PublicDataSetVersionId == null)
+            .Where(rf => rf.File.PublicApiDataSetId == null)
             .Where(rf => rf.File.ReplacedById == null)
             .Where(rf => rf.File.ReplacingId == null)
             .Select(rf => new ApiDataSetCandidateViewModel

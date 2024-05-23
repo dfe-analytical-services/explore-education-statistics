@@ -1,3 +1,5 @@
+using FluentValidation;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 /// <summary>
@@ -18,12 +20,12 @@ public record DataSetQueryCriteriaFilters
     /// <summary>
     /// Filter the results to have a filter option matching at least one of these IDs.
     /// </summary>
-    public IReadOnlyList<string>? In { get; init; }
+    public virtual IReadOnlyList<string>? In { get; init; }
 
     /// <summary>
     /// Filter the results to not have a filter option matching any of these IDs.
     /// </summary>
-    public IReadOnlyList<string>? NotIn { get; init; }
+    public virtual IReadOnlyList<string>? NotIn { get; init; }
 
     public HashSet<string> GetOptions()
     {
@@ -38,5 +40,67 @@ public record DataSetQueryCriteriaFilters
         return filters
             .OfType<string>()
             .ToHashSet();
+    }
+
+    public static DataSetQueryCriteriaFilters Create(
+        string comparator,
+        IList<string> optionIds)
+    {
+        return comparator switch
+        {
+            nameof(Eq) => new DataSetQueryCriteriaFilters
+            {
+                Eq = optionIds.Count > 0 ? optionIds[0] : null
+            },
+            nameof(NotEq) => new DataSetQueryCriteriaFilters
+            {
+                NotEq = optionIds.Count > 0 ? optionIds[0] : null
+            },
+            nameof(In) => new DataSetQueryCriteriaFilters
+            {
+                In = optionIds.ToList()
+            },
+            nameof(NotIn) => new DataSetQueryCriteriaFilters
+            {
+                NotIn = optionIds.ToList()
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+        };
+    }
+
+    public class Validator : AbstractValidator<DataSetQueryCriteriaFilters>
+    {
+        public Validator()
+        {
+            RuleFor(q => q.Eq)
+                .NotEmpty()
+                .MaximumLength(10)
+                .When(q => q.Eq is not null);
+
+            RuleFor(q => q.NotEq)
+                .NotEmpty()
+                .MaximumLength(10)
+                .When(q => q.NotEq is not null);
+
+            When(q => q.In is not null, () =>
+            {
+                RuleFor(q => q.In)
+                    .NotEmpty();
+
+                RuleForEach(q => q.In)
+                    .NotEmpty()
+                    .MaximumLength(10);
+            });
+
+            When(q => q.NotIn is not null, () =>
+            {
+                RuleFor(q => q.NotIn)
+                    .NotEmpty();
+
+                RuleForEach(q => q.NotIn)
+                    .NotEmpty()
+                    .MaximumLength(10);
+            });
+        }
     }
 }

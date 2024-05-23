@@ -3,9 +3,9 @@ import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import usePinElementToContainer from '@common/hooks/usePinElementToContainer';
 import Yup from '@common/validation/yup';
 import React, { RefObject, useEffect, useRef } from 'react';
@@ -66,12 +66,12 @@ export default function CommentAddForm({
       >
         {({ formState }) => {
           return (
-            <RHFForm
+            <Form
               id={`${baseId}-commentAddForm`}
               showErrorSummary={false}
               onSubmit={handleSubmit}
             >
-              <RHFFormFieldTextArea<FormValues>
+              <FormFieldTextArea<FormValues>
                 label="Comment"
                 hideLabel
                 name="content"
@@ -95,7 +95,7 @@ export default function CommentAddForm({
                   Cancel
                 </ButtonText>
               </ButtonGroup>
-            </RHFForm>
+            </Form>
           );
         }}
       </FormProvider>

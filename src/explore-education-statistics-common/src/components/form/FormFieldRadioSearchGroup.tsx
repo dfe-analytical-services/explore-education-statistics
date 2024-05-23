@@ -1,42 +1,45 @@
-import FormField, {
-  FormFieldComponentProps,
-} from '@common/components/form/FormField';
-import { OmitStrict } from '@common/types';
 import FormRadioSearchGroup, {
   FormRadioSearchGroupProps,
 } from '@common/components/form/FormRadioSearchGroup';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
+import useRegister from '@common/components/form/hooks/useRegister';
 import React from 'react';
+import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
-export type FormFieldRadioSearchGroupProps<FormValues> = OmitStrict<
-  FormFieldComponentProps<FormRadioSearchGroupProps, FormValues>,
-  'formGroup'
->;
+export interface FormFieldRadioSearchGroupProps<TFormValues extends FieldValues>
+  extends Omit<FormRadioSearchGroupProps, 'name' | 'value' | 'id'> {
+  name: Path<TFormValues>;
+  id?: string;
+  showError?: boolean;
+}
 
-function FormFieldRadioSearchGroup<FormValues, Value extends string = string>(
-  props: FormFieldRadioSearchGroupProps<FormValues>,
-) {
+export default function FormFieldRadioSearchGroup<
+  TFormValues extends FieldValues,
+>({
+  name,
+  id: customId,
+  ...props
+}: FormFieldRadioSearchGroupProps<TFormValues>) {
+  const { register } = useFormContext<TFormValues>();
+  const { ref: inputRef, ...field } = useRegister(name, register);
+  const { fieldId } = useFormIdContext();
+  const id = fieldId(name, customId);
+  const selectedValue = useWatch({ name });
   const { onChange } = props;
 
   return (
-    <FormField<Value> {...props}>
-      {({ id, field }) => {
-        return (
-          <FormRadioSearchGroup
-            {...props}
-            {...field}
-            id={id}
-            onChange={(event, option) => {
-              onChange?.(event, option);
-
-              if (!event.isDefaultPrevented()) {
-                field.onChange(event);
-              }
-            }}
-          />
-        );
+    <FormRadioSearchGroup
+      {...props}
+      {...field}
+      id={id}
+      inputRef={inputRef}
+      value={selectedValue}
+      onChange={(event, option) => {
+        onChange?.(event, option);
+        if (!event.isDefaultPrevented()) {
+          field.onChange(event);
+        }
       }}
-    </FormField>
+    />
   );
 }
-
-export default FormFieldRadioSearchGroup;
