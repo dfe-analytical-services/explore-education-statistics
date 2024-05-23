@@ -10,7 +10,7 @@ const SubscribeLink = ({ slug }: SubscribeLinkProps) => {
     <Link
       className="govuk-!-display-none-print"
       unvisited
-      to={`/subscriptions?slug=${slug}`}
+      to={`/subscriptions/new-subscription/${slug}`}
       data-testid={`subsciption-${slug}`}
     >
       Sign up for email alerts

@@ -25,7 +25,7 @@ const PrototypeReleaseData = () => {
                 <dd className="govuk-summary-list__value">
                   <a
                     data-testid="subscription-children-looked-after-in-england-including-adoptions"
-                    href="/subscriptions?slug=children-looked-after-in-england-including-adoptions"
+                    href="/subscriptions/new-subscription/children-looked-after-in-england-including-adoptions"
                     className="govuk-link govuk-link--no-visited-state dfe-print-hidden"
                   >
                     Sign up for email alerts

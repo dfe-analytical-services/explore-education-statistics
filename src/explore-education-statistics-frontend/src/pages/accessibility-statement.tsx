@@ -221,7 +221,7 @@ function AcccessibilityStatementPage() {
                 <Link to="/glossary">glossary page</Link>
               </li>
               <li>
-                <Link to="/subscriptions?slug=pupil-absence-in-schools-in-england">
+                <Link to="/subscriptions/new-subscription/pupil-absence-in-schools-in-england">
                   notify me page
                 </Link>
               </li>
