@@ -43,7 +43,7 @@ export interface ApiDataSetVersion {
   version: string;
   status: DataSetVersionStatus;
   type: DataSetVersionType;
-  dataSetFileId: string;
+  file: IdTitlePair;
   releaseVersion: IdTitlePair;
   totalResults: number;
 }
@@ -103,6 +103,9 @@ const apiDataSetService = {
   },
   createDataSet(data: { releaseFileId: string }): Promise<ApiDataSet> {
     return client.post('/public-data/data-sets', data);
+  },
+  getDataSet(dataSetId: string): Promise<ApiDataSet> {
+    return client.get(`/public-data/data-sets/${dataSetId}`);
   },
 };
 

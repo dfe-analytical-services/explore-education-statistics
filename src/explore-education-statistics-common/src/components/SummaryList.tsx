@@ -10,6 +10,7 @@ interface Props {
   id?: string;
   noBorder?: boolean;
   smallKey?: boolean;
+  testId?: string;
 }
 
 const SummaryList = ({
@@ -20,6 +21,7 @@ const SummaryList = ({
   id,
   noBorder,
   smallKey = false,
+  testId,
 }: Props) => {
   return (
     <dl
@@ -29,6 +31,7 @@ const SummaryList = ({
         [styles.smallKey]: smallKey,
         'govuk-summary-list--no-border': noBorder,
       })}
+      data-testid={testId}
       id={id}
     >
       {children}

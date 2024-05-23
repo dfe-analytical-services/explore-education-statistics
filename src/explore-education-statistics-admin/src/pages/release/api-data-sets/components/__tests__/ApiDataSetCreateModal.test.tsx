@@ -5,8 +5,9 @@ import _apiDataSetCandidateService, {
 import _apiDataSetService from '@admin/services/apiDataSetService';
 import baseRender from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
+import { createMemoryHistory, History } from 'history';
 import { ReactElement } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetCandidateService');
@@ -84,14 +85,23 @@ describe('ApiDataSetCreateModal', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('submitting the form calls correct service', async () => {
+  test('submitting the form calls correct service and redirects to next page', async () => {
     apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
+    apiDataSetService.createDataSet.mockResolvedValue({
+      id: 'data-set-id',
+      title: 'Test title',
+      summary: 'Test summary',
+      status: 'Draft',
+    });
+
+    const history = createMemoryHistory();
 
     const { user } = render(
       <ApiDataSetCreateModal
         publicationId="publication-id"
         releaseId="release-id"
       />,
+      { history },
     );
 
     expect(await screen.findByText('Create API data set')).toBeInTheDocument();
@@ -119,9 +129,20 @@ describe('ApiDataSetCreateModal', () => {
         releaseFileId: testCandidates[0].releaseFileId,
       });
     });
+
+    expect(history.location.pathname).toBe(
+      '/publication/publication-id/release/release-id/api-data-sets/data-set-id',
+    );
   });
 
-  function render(ui: ReactElement) {
-    return baseRender(<MemoryRouter>{ui}</MemoryRouter>);
+  function render(
+    ui: ReactElement,
+    options?: {
+      history: History;
+    },
+  ) {
+    const { history = createMemoryHistory() } = options ?? {};
+
+    return baseRender(<Router history={history}>{ui}</Router>);
   }
 });

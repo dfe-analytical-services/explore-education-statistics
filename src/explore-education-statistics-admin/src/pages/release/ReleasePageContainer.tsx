@@ -27,6 +27,7 @@ import {
   releaseSummaryRoute,
   releaseTableToolRoute,
   releaseApiDataSetsRoute,
+  releaseApiDataSetDetailsRoute,
 } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -61,6 +62,7 @@ const routes = [
   releaseTableToolRoute,
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
+  releaseApiDataSetDetailsRoute,
 ];
 
 interface MatchProps {

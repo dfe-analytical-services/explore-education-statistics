@@ -1,4 +1,5 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
+import ReleaseApiDataSetDetailsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetDetailsPage';
 import ReleaseApiDataSetsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetsPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
@@ -170,5 +171,6 @@ export const releaseApiDataSetsRoute: ReleaseRouteProps = {
 export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId',
   title: 'API data set details',
+  component: ReleaseApiDataSetDetailsPage,
   protectionAction: permissions => permissions.isBauUser,
 };

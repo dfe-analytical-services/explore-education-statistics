@@ -4,7 +4,9 @@ import ApiDataSetCreateForm, {
 } from '@admin/pages/release/api-data-sets/components/ApiDataSetCreateForm';
 import apiDataSetCandidateQueries from '@admin/queries/apiDataSetCandidateQueries';
 import {
+  releaseApiDataSetDetailsRoute,
   releaseDataRoute,
+  ReleaseDataSetRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import apiDataSetService from '@admin/services/apiDataSetService';
@@ -14,7 +16,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useHistory } from 'react-router-dom';
 
 interface Props {
   publicationId: string;
@@ -25,6 +27,7 @@ export default function ApiDataSetCreateModal({
   publicationId,
   releaseId,
 }: Props) {
+  const history = useHistory();
   const [isOpen, toggleOpen] = useToggle(false);
 
   const {
@@ -41,9 +44,20 @@ export default function ApiDataSetCreateModal({
   const handleSubmit = async ({
     releaseFileId,
   }: ApiDataSetCreateFormValues) => {
-    await apiDataSetService.createDataSet({
+    const dataSet = await apiDataSetService.createDataSet({
       releaseFileId,
     });
+
+    history.push(
+      generatePath<ReleaseDataSetRouteParams>(
+        releaseApiDataSetDetailsRoute.path,
+        {
+          publicationId,
+          releaseId,
+          dataSetId: dataSet.id,
+        },
+      ),
+    );
   };
 
   if (isLoading) {

@@ -8,6 +8,12 @@ const apiDataSetQueries = createQueryKeys('apiDataSetQueries', {
       queryFn: () => apiDataSetService.listDataSets(publicationId),
     };
   },
+  get(dataSetId: string) {
+    return {
+      queryKey: [dataSetId],
+      queryFn: () => apiDataSetService.getDataSet(dataSetId),
+    };
+  },
 });
 
 export default apiDataSetQueries;
