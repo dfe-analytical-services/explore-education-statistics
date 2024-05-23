@@ -9,8 +9,9 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          Admin    Local    Dev    AltersData
+Force Tags          Admin    Local    Dev    AltersData    NotAgainstDev
 
+# TODO DW - There is ongoing issue which needs to be fixed in dev - Line chart isn't getting saved properly post removal of reference lines - EES-5156 and 5143
 
 *** Variables ***
 ${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
