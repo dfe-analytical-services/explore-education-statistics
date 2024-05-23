@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,12 +14,26 @@ using Testcontainers.PostgreSql;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 
 public abstract class ProcessorFunctionsIntegrationTest
-    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>
+    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>, IDisposable
 {
     protected ProcessorFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
     {
         ResetDbContext<ContentDbContext>();
         ClearTestData<PublicDataDbContext>();
+    }
+
+    public void Dispose()
+    {
+        var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
+
+        var testInstanceDirectory = dataSetVersionPathResolver.BasePath();
+
+        if (!Directory.Exists(testInstanceDirectory))
+        {
+            return;
+        }
+
+        Directory.Delete(testInstanceDirectory, true);
     }
 }
 
@@ -74,8 +87,6 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
 
                 using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
                 context.Database.Migrate();
-
-                services.ReplaceService<IDataSetVersionPathResolver>(new TestDataSetVersionPathResolver());
             });
     }
 

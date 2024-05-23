@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 
 public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
 {
-    private string BasePath { get; set; } = Path.Combine(
+    public string BasePath() => Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "ParquetFiles"
@@ -15,5 +15,5 @@ public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string Directory { get; set; } = string.Empty;
 
-    public string DirectoryPath(DataSetVersion dataSetVersion) => Path.Combine(BasePath, Directory);
+    public string DirectoryPath(DataSetVersion dataSetVersion) => Path.Combine(BasePath(), Directory);
 }

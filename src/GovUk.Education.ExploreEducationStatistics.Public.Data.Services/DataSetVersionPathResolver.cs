@@ -14,7 +14,6 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 {
     private readonly IOptions<ParquetFilesOptions> _options;
     private readonly IWebHostEnvironment _environment;
-
     private readonly string _basePath;
 
     public DataSetVersionPathResolver(IOptions<ParquetFilesOptions> options, IWebHostEnvironment environment)
@@ -33,6 +32,8 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
         _basePath = GetBasePath();
     }
 
+    public string BasePath() => _basePath;
+
     public string DirectoryPath(DataSetVersion dataSetVersion)
         => Path.Combine(_basePath, dataSetVersion.DataSetId.ToString(), $"v{dataSetVersion.Version}");
 
@@ -47,7 +48,8 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
         {
             return Path.Combine(
                 Assembly.GetExecutingAssembly().GetDirectoryPath(),
-                PathUtils.OsPath(_options.Value.BasePath)
+                PathUtils.OsPath(_options.Value.BasePath),
+                Guid.NewGuid().ToString()
             );
         }
 

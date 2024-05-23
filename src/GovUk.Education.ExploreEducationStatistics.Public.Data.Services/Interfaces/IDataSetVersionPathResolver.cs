@@ -5,6 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interf
 
 public interface IDataSetVersionPathResolver
 {
+    string BasePath();
+
     string DirectoryPath(DataSetVersion dataSetVersion);
 
     string CsvDataPath(DataSetVersion dataSetVersion)
