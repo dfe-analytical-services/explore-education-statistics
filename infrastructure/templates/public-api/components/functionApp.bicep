@@ -104,6 +104,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
 var sharedStorageAccountName = replace('${subscription}eessa${functionAppName}mg', '-', '')
 var slot1StorageAccountName = replace('${subscription}eessa${functionAppName}s1', '-', '')
 var slot2StorageAccountName = replace('${subscription}eessa${functionAppName}s2', '-', '')
+var functionAppCodeFileShareName = '${fullFunctionAppName}-fs'
 
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger 
 // management etc.
@@ -143,7 +144,7 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
 
 // This is the file share for slot 1 to use for its code storage.
 resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${slot1StorageAccountName}/default/${fullFunctionAppName}1'
+  name: '${slot1StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
     slot1StorageAccountModule
   ]
@@ -166,7 +167,7 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
 
 // This is the file share for slot 2 to use for its code storage.
 resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${slot2StorageAccountName}/default/${fullFunctionAppName}2'
+  name: '${slot2StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
     slot2StorageAccountModule
   ]
@@ -247,6 +248,30 @@ module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
 var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
 var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
 
+resource sharedStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: sharedStorageAccountName
+  scope: resourceGroup(resourceGroup().name)
+}
+
+resource slot1StorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: slot1StorageAccountName
+  scope: resourceGroup(resourceGroup().name)
+}
+
+resource slot2StorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: slot2StorageAccountName
+  scope: resourceGroup(resourceGroup().name)
+}
+
+var endpointSuffix = environment().suffixes.storage
+var slot1StorageAccountKey = slot1StorageAccount.listKeys().keys[0].value
+var slot2StorageAccountKey = slot2StorageAccount.listKeys().keys[0].value
+
+var sharedStorageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${sharedStorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${sharedStorageAccount.listKeys().keys[0].value}'
+var slot1StorageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${slot1StorageAccountName};EndpointSuffix=${endpointSuffix};AccountKey=${slot1StorageAccountKey}'
+var slot2StorageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${slot2StorageAccountName};EndpointSuffix=${endpointSuffix};AccountKey=${slot2StorageAccountKey}'
+
+
 // Create staging and production deploy slots, and set base app settings on both.
 // These will be infrastructure-specific appsettings, and the YAML pipeline will handle the deployment of
 // application-specific appsettings so as to be able to control the rollout of new, updated and deleted
@@ -267,7 +292,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
 
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
       // Additionally it tells the Function App where
-      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
+      AzureWebJobsStorage: sharedStorageAccountConnectionString
 
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
@@ -292,6 +317,9 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       FUNCTIONS_EXTENSION_VERSION: '~4'
       FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
       APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
+
+      // This indicates the name of the file share where the Function App code and configuration lives.
+      WEBSITE_CONTENTSHARE: functionAppCodeFileShareName
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
@@ -299,18 +327,18 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
       DataProcessorTaskHubName: 'DataProcessorSlot1TaskHub'
 
-      // The following 2 properties tell the Function App slots that their deployment code resides in the specified Storage account and File share.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
-      WEBSITE_CONTENTSHARE: '${fullFunctionAppName}1'
+      // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
+      // resides in the specified Storage account.
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: slot1StorageAccountConnectionString
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
       DataProcessorTaskHubName: 'DataProcessorSlot2TaskHub'
 
-      // The following 2 properties tell the Function App slots that their deployment code resides in the specified Storage account and File share.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
-      WEBSITE_CONTENTSHARE: '${fullFunctionAppName}2'
+      // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
+      // resides in the specified Storage account.
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: slot2StorageAccountConnectionString
     }
     azureFileShares: azureFileShares
   }
