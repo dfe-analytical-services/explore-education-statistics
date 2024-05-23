@@ -143,7 +143,7 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
 
 // This is the file share for slot 1 to use for its code storage.
 resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${slot1StorageAccountName}/default/${fullFunctionAppName}1'
+  name: '${sharedStorageAccountModule}/default/${fullFunctionAppName}1'
   dependsOn: [
     slot1StorageAccountModule
   ]
@@ -166,7 +166,7 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
 
 // This is the file share for slot 2 to use for its code storage.
 resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${slot2StorageAccountName}/default/${fullFunctionAppName}2'
+  name: '${sharedStorageAccountModule}/default/${fullFunctionAppName}2'
   dependsOn: [
     slot2StorageAccountModule
   ]
@@ -269,6 +269,8 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // Additionally it tells the Function App where
       AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
 
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
+
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
       WEBSITE_CONTENTOVERVNET: 1
@@ -300,7 +302,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       DataProcessorTaskHubName: 'DataProcessorSlot1TaskHub'
 
       // The following 2 properties tell the Function App slots that their deployment code resides in the specified Storage account and File share.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
       WEBSITE_CONTENTSHARE: '${fullFunctionAppName}1'
     }
     prodOnlySettings: {
@@ -309,7 +310,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       DataProcessorTaskHubName: 'DataProcessorSlot2TaskHub'
 
       // The following 2 properties tell the Function App slots that their deployment code resides in the specified Storage account and File share.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
       WEBSITE_CONTENTSHARE: '${fullFunctionAppName}2'
     }
     azureFileShares: azureFileShares
