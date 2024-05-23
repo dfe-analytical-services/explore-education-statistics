@@ -86,56 +86,67 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
+                echo "$(stagingSettings)" | jq .
+                echo "$(productionSettings)" | jq .
 
-                az functionapp config appsettings set \
-                  --name $(dataProcessorFunctionAppName) \
-                  --resource-group $(resourceGroupName) \
-                  --slot staging \
-                  --settings \
-                    "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
-                    "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
-                    "DataProcessorTaskHubName=DataProcessorTaskHub"
-
-                az webapp config connection-string set \
-                  --name $(dataProcessorFunctionAppName) \
-                  --resource-group $(resourceGroupName) \
-                  --slot staging \
-                  --connection-string-type SQLAzure \
-                  --settings \
-                    "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
-                
-                az webapp config connection-string set \
-                  --name $(dataProcessorFunctionAppName) \
-                  --resource-group $(resourceGroupName) \
-                  --slot staging \
-                  --connection-string-type PostgreSQL \
-                  --settings \
-                    "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
-
-          - task: AzureCLI@2
-            displayName: 'Deploy Data Processor Function App - deploy to staging slot'
-            inputs:
-              azureSubscription: ${{parameters.serviceConnection}}
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                az functionapp deployment source config-zip \
-                  --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
-                  --name $(dataProcessorFunctionAppName) \
-                  --resource-group $(resourceGroupName) \
-                  --slot staging
-
-          - task: AzureCLI@2
-            displayName: 'Deploy Data Processor Function App - swap slots'
-            inputs:
-              azureSubscription: ${{parameters.serviceConnection}}
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                az functionapp deployment slot swap \
-                  --name $(dataProcessorFunctionAppName) \
-                  --resource-group $(resourceGroupName) \
-                  --slot staging \
-                  --target-slot production
+#          - task: AzureCLI@2
+#            displayName: 'Deploy Data Processor Function App - update staging slot app settings'
+#            inputs:
+#              azureSubscription: ${{parameters.serviceConnection}}
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                set -e
+#
+#                az functionapp config appsettings set \
+#                  --name $(dataProcessorFunctionAppName) \
+#                  --resource-group $(resourceGroupName) \
+#                  --slot staging \
+#                  --settings \
+#                    "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+#                    "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
+#                    "DataProcessorTaskHubName=DataProcessorTaskHub"
+#
+#                az webapp config connection-string set \
+#                  --name $(dataProcessorFunctionAppName) \
+#                  --resource-group $(resourceGroupName) \
+#                  --slot staging \
+#                  --connection-string-type SQLAzure \
+#                  --settings \
+#                    "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
+#
+#                az webapp config connection-string set \
+#                  --name $(dataProcessorFunctionAppName) \
+#                  --resource-group $(resourceGroupName) \
+#                  --slot staging \
+#                  --connection-string-type PostgreSQL \
+#                  --settings \
+#                    "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
+#
+#          - task: AzureCLI@2
+#            displayName: 'Deploy Data Processor Function App - deploy to staging slot'
+#            inputs:
+#              azureSubscription: ${{parameters.serviceConnection}}
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                set -e
+#                az functionapp deployment source config-zip \
+#                  --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
+#                  --name $(dataProcessorFunctionAppName) \
+#                  --resource-group $(resourceGroupName) \
+#                  --slot staging
+#
+#          - task: AzureCLI@2
+#            displayName: 'Deploy Data Processor Function App - swap slots'
+#            inputs:
+#              azureSubscription: ${{parameters.serviceConnection}}
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                set -e
+#                az functionapp deployment slot swap \
+#                  --name $(dataProcessorFunctionAppName) \
+#                  --resource-group $(resourceGroupName) \
+#                  --slot staging \
+#                  --target-slot production

@@ -322,3 +322,5 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
 }
 
 output functionAppName string = functionApp.name
+output stagingSettings object = functionAppSlotSettings.outputs.stagingSettings
+output productionSettings object = functionAppSlotSettings.outputs.productionSettings

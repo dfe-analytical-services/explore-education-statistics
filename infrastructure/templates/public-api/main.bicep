@@ -426,3 +426,6 @@ output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFun
 
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
+
+output stagingSettings object = dataProcessorFunctionAppModule.outputs.stagingSettings
+output productionSettings object = dataProcessorFunctionAppModule.outputs.productionSettings

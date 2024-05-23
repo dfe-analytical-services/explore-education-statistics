@@ -49,11 +49,11 @@ resource functionSlotConfig 'Microsoft.Web/sites/config@2023-01-01' = {
 var combinedStagingSettings = union(commonSettings, stagingOnlySettings, existingStagingAppSettings)
 var combinedProductionSettings = union(commonSettings, prodOnlySettings, existingProductionAppSettings)
 
-@description('Set appsettings on the staging slot')
-resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-01-01' = {
-  name: '${appName}/${stagingSlotName}/appsettings'
-  properties: combinedStagingSettings
-}
+// @description('Set appsettings on the staging slot')
+// resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-01-01' = {
+//   name: '${appName}/${stagingSlotName}/appsettings'
+//   properties: combinedStagingSettings
+// }
 
 resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2021-01-15' = {
   name: '${appName}/${stagingSlotName}/azurestorageaccounts'
@@ -68,8 +68,11 @@ resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2021-01-15' = {
   }))
 }
 
-@description('Set appsettings on production slot')
-resource appProductionSettings 'Microsoft.Web/sites/config@2023-01-01' = {
-  name: '${appName}/appsettings'
-  properties: combinedProductionSettings
-}
+// @description('Set appsettings on production slot')
+// resource appProductionSettings 'Microsoft.Web/sites/config@2023-01-01' = {
+//   name: '${appName}/appsettings'
+//   properties: combinedProductionSettings
+// }
+
+output stagingSettings object = combinedStagingSettings
+output productionSettings object = combinedProductionSettings
