@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repositor
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using InterpolatedSql.Dapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
@@ -25,9 +26,12 @@ public class DataSetMetaService(
 ) : IDataSetMetaService
 {
     public async Task CreateDataSetVersionMeta(
-        DataSetVersion dataSetVersion,
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
+        var dataSetVersion = await publicDataDbContext.DataSetVersions
+            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken: cancellationToken);
+
         await using var duckDbConnection =
             DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
         duckDbConnection.Open();

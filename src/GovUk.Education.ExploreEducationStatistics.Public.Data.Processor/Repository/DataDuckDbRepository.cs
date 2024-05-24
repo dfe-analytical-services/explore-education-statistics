@@ -1,13 +1,13 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using InterpolatedSql.Dapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
@@ -16,28 +16,17 @@ public class DataDuckDbRepository(
     IDataSetVersionPathResolver dataSetVersionPathResolver) : IDataDuckDbRepository
 {
     public async Task CreateDataTable(
-        DataSetVersion dataSetVersion,
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        await publicDataDbContext
-            .Entry(dataSetVersion)
-            .Collection(dsv => dsv.FilterMetas)
-            .LoadAsync(cancellationToken);
-
-        await publicDataDbContext
-            .Entry(dataSetVersion)
-            .Collection(dsv => dsv.IndicatorMetas)
-            .LoadAsync(cancellationToken);
-
-        await publicDataDbContext
-            .Entry(dataSetVersion)
-            .Collection(dsv => dsv.LocationMetas)
-            .LoadAsync(cancellationToken);
-
-        await publicDataDbContext
-            .Entry(dataSetVersion)
-            .Collection(dsv => dsv.TimePeriodMetas)
-            .LoadAsync(cancellationToken);
+        var dataSetVersion = await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.FilterMetas)
+            .Include(dsv => dsv.IndicatorMetas)
+            .Include(dsv => dsv.LocationMetas)
+            .Include(dsv => dsv.TimePeriodMetas)
+            .AsSplitQuery()
+            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken: cancellationToken);
 
         await using var duckDbConnection =
             DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));

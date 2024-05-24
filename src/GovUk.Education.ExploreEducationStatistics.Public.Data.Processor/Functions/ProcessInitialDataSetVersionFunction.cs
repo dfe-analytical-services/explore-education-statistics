@@ -57,10 +57,8 @@ public class ProcessInitialDataSetVersionFunction(
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        var dataSetVersion = dataSetVersionImport.DataSetVersion;
-
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingMetadata, cancellationToken);
-        await dataSetMetaService.CreateDataSetVersionMeta(dataSetVersion, cancellationToken);
+        await dataSetMetaService.CreateDataSetVersionMeta(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(nameof(ImportData))]
@@ -69,10 +67,8 @@ public class ProcessInitialDataSetVersionFunction(
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        var dataSetVersion = dataSetVersionImport.DataSetVersion;
-
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingData, cancellationToken);
-        await dataDuckDbRepository.CreateDataTable(dataSetVersion, cancellationToken);
+        await dataDuckDbRepository.CreateDataTable(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(nameof(WriteDataFiles))]
@@ -81,10 +77,8 @@ public class ProcessInitialDataSetVersionFunction(
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        var dataSetVersion = dataSetVersionImport.DataSetVersion;
-
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.WritingDataFiles, cancellationToken);
-        await parquetService.WriteDataFiles(dataSetVersion, cancellationToken);
+        await parquetService.WriteDataFiles(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(nameof(CompleteProcessing))]
