@@ -94,11 +94,11 @@ async function startServer() {
 
     // Search wrongly indexed pages from Google Search Console for matches
     // Redirect away if found to (eventually) clear routes from index
-    const urlMatch = seoRedirects.find(
+    const seoRedirect = seoRedirects.find(
       seoRedirectPath => seoRedirectPath.from === request.url,
     );
-    if (urlMatch) {
-      redirectPath.path = urlMatch.to;
+    if (seoRedirect) {
+      redirectPath.path = seoRedirect.to;
     }
 
     const redirectionRequired =
