@@ -79,7 +79,10 @@ async function startServer() {
     return `${input.slice(0, -pattern.length)}${replacement}`;
   }
 
-  function isRedirectionRequired(request) {
+  /**
+   * @returns An absolute URL if redirection is required; undefined otherwise.
+   */
+  function getRedirectUrl(request) {
     let redirectPath = request.path;
 
     // Redirect URLs with trailing slash to equivalent without slash with 301
@@ -123,9 +126,9 @@ async function startServer() {
       return undefined;
     }
 
-    const potentialRedirectUrl = isRedirectionRequired(req);
-    if (potentialRedirectUrl) {
-      return res.redirect(301, potentialRedirectUrl);
+    const redirectUrl = getRedirectUrl(req);
+    if (redirectUrl) {
+      return res.redirect(301, redirectUrl);
     }
 
     nextFunc();
