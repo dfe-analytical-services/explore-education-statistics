@@ -340,10 +340,12 @@ public class PublicationService : IPublicationService
             .Include(rf => rf.File)
             .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data);
     }
-    
+
     public async Task<Either<ActionResult, List<PublicationSitemapSummaryViewModel>>> GetSitemapSummaries()
     {
         return await _contentDbContext.Publications
+            .Where(p => p.LatestPublishedReleaseVersionId.HasValue && 
+                        (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
             .Select(p => new PublicationSitemapSummaryViewModel()
             {
                 Slug = p.Slug,
