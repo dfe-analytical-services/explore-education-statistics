@@ -117,6 +117,17 @@ export const testDataSetFile: DataSetFile = {
     id: 'file-id',
     name: 'file name',
     size: 'file size',
+    meta: {
+      timePeriodRange: {
+        from: '2023',
+        to: '2024',
+      },
+      filters: ['Filter 1', 'Filter 2'],
+      geographicLevels: ['Local authority', 'National'],
+      indicators: ['Indicator 1', 'Indicator 2'],
+    },
+    dataCsvPreview: { headers: ['column_1'], rows: [['1']] },
+    variables: [{ value: 'column_1', label: 'Column 1 is for something' }],
     subjectId: 'subject-id',
   },
   release: {
@@ -135,15 +146,7 @@ export const testDataSetFile: DataSetFile = {
   },
   summary: 'Data set 1 summary',
   title: 'Data set 1',
-  meta: {
-    timePeriodRange: {
-      from: '2023',
-      to: '2024',
-    },
-    filters: ['Filter 1', 'Filter 2'],
-    geographicLevels: ['Local authority', 'National'],
-    indicators: ['Indicator 1', 'Indicator 2'],
-  },
+  footnotes: [{ id: 'footnote-1', label: 'Footnote 1' }],
 };
 
 export const testDataSetWithApi: DataSetFile = {

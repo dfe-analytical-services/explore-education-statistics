@@ -18,7 +18,7 @@ public class DataSetFileMeta
     public TimeIdentifier? TimeIdentifier { get; set; } // EES-4918 to remove
 
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public List<int>? Years { get; set; } = new(); // EES-4918 to remove
+    public List<int>? Years { get; set; } // EES-4918 to remove
 
     public required TimePeriodRangeMeta TimePeriodRange { get; set; }
 
