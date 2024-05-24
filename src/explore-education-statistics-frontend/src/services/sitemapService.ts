@@ -39,7 +39,9 @@ export default async function getSitemapFields(): Promise<ISitemapField[]> {
     // Other routes which exist on the site but are excluded from the sitemap by config:
     //  data-tables/fast-track/[dataBlockParentId]
     //  data-tables/permalink/[publicationSlug]
-    //
+    //  subscriptions/new-subscription/[publicationSlug]
+    //  subscriptions/[publicationSlug]/confirm-subscription/[token]
+    //  subscriptions/[publicationSlug]/confirm-unsubscription/[token]
   ];
 
   return sitemapFields;
@@ -50,9 +52,9 @@ function buildMethodologyRoutes(
 ): ISitemapField[] {
   return methodologies.map(methodology => ({
     loc: `${process.env.PUBLIC_URL}methodology/${methodology.slug}`,
-    lastmod: `${methodology.lastModified}`,
-    changefreq: 'monthly',
-    priority: 0.6,
+    lastmod: methodology.lastModified
+      ? `${methodology.lastModified}`
+      : undefined,
   }));
 }
 
@@ -65,33 +67,37 @@ function buildPublicationRoutes(
     fields = fields.concat([
       {
         loc: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
-        lastmod: `${publication.lastModified}`,
-        changefreq: 'monthly',
-        priority: 0.6,
+        lastmod: publication.lastModified
+          ? `${publication.lastModified}`
+          : undefined,
       },
       {
         loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
-        lastmod: `${publication.lastModified}`,
-        changefreq: 'monthly',
-        priority: 0.6,
+        lastmod: publication.lastModified
+          ? `${publication.lastModified}`
+          : undefined,
       },
       {
         loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}`,
-        lastmod: `${publication.lastModified}`,
+        lastmod: publication.lastModified
+          ? `${publication.lastModified}`
+          : undefined,
         changefreq: 'monthly',
-        priority: 0.6,
+        priority: 0.7,
       },
       {
         loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/data-guidance`,
-        lastmod: `${publication.lastModified}`,
-        changefreq: 'monthly',
-        priority: 0.6,
+        lastmod: publication.lastModified
+          ? `${publication.lastModified}`
+          : undefined,
+        priority: 0.4,
       },
       {
         loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/prerelease-access-list`,
-        lastmod: `${publication.lastModified}`,
-        changefreq: 'monthly',
-        priority: 0.6,
+        lastmod: publication.lastModified
+          ? `${publication.lastModified}`
+          : undefined,
+        priority: 0.2,
       },
     ]);
 
@@ -99,33 +105,25 @@ function buildPublicationRoutes(
       fields = fields.concat([
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/${release.slug}`,
-          lastmod: `${release.lastModified}`,
-          changefreq: 'monthly',
-          priority: 0.6,
+          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
         },
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/${release.slug}/data-guidance`,
-          lastmod: `${release.lastModified}`,
-          changefreq: 'monthly',
-          priority: 0.6,
+          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
+          priority: 0.4,
         },
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/${release.slug}/prerelease-access-list`,
-          lastmod: `${release.lastModified}`,
-          changefreq: 'monthly',
-          priority: 0.6,
+          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
+          priority: 0.2,
         },
         {
           loc: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}/${release.slug}`,
-          lastmod: `${release.lastModified}`,
-          changefreq: 'monthly',
-          priority: 0.6,
+          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
         },
         {
           loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}/${release.slug}`,
-          lastmod: `${release.lastModified}`,
-          changefreq: 'monthly',
-          priority: 0.6,
+          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
         },
       ]);
     });
@@ -138,8 +136,6 @@ function buildDataSetRoutes(
 ): ISitemapField[] {
   return dataSets.map(dataSet => ({
     loc: `${process.env.PUBLIC_URL}data-catalogue/data-set/${dataSet.id}`,
-    lastmod: `${dataSet.lastModified}`,
-    changefreq: 'monthly',
-    priority: 0.6,
+    lastmod: dataSet.lastModified ? `${dataSet.lastModified}` : undefined,
   }));
 }
