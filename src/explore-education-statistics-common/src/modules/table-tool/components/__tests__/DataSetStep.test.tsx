@@ -32,6 +32,7 @@ describe('DataSetStep', () => {
       },
       filters: ['School type'],
       indicators: ['Headcount', 'Percent'],
+      lastUpdated: '2023-12-01',
     },
     {
       id: 'subject-2',
@@ -52,6 +53,7 @@ describe('DataSetStep', () => {
       },
       filters: ['Ethnicity', 'FSM'],
       indicators: ['Authorised absence rate'],
+      lastUpdated: '2023-12-01',
     },
   ];
 

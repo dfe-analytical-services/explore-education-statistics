@@ -168,6 +168,12 @@ export default function DataSetFilePage({
                 {release.published}
               </FormattedDate>
             </div>
+            <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
+              <span className={styles.infoSectionHeading}>Last updated</span>{' '}
+              <FormattedDate format="d MMMM yyyy">
+                {release.lastUpdated}
+              </FormattedDate>
+            </div>
 
             <Button
               className={classNames(

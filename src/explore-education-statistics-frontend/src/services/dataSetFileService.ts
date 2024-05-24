@@ -37,6 +37,7 @@ export interface DataSetFile {
       title: string;
     };
     published: Date;
+    lastUpdated: string;
     slug: string;
     title: string;
     type: ReleaseType;
@@ -67,6 +68,7 @@ export interface DataSetFileSummary {
   };
   latestData: boolean;
   published: Date;
+  lastUpdated: string;
   api?: DataSetFileApi;
   meta: {
     geographicLevels: string[];

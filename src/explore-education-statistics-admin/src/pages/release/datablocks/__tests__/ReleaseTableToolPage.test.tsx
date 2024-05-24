@@ -82,6 +82,7 @@ describe('ReleaseTableToolPage', () => {
         },
         filters: ['Filter 1'],
         indicators: ['Indicator 1'],
+        lastUpdated: '2023-12-01',
       },
       {
         id: 'subject-2',
@@ -102,6 +103,7 @@ describe('ReleaseTableToolPage', () => {
         },
         filters: ['Filter 1'],
         indicators: ['Indicator 1'],
+        lastUpdated: '2023-12-01',
       },
     ]);
 

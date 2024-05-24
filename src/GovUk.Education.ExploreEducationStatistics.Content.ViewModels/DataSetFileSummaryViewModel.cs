@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -27,6 +27,8 @@ public record DataSetFileSummaryViewModel
     public required bool LatestData { get; init; }
 
     public required DateTime Published { get; init; }
+
+    public DateTime LastUpdated { get; init; }
 
     public required DataSetFileMetaViewModel Meta { get; init; }
 
