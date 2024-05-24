@@ -1,51 +1,17 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using InterpolatedSql.Dapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
-public class TimePeriodRepository(
-    PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : ITimePeriodRepository
+public class TimePeriodsDuckDbRepository(PublicDataDbContext publicDataDbContext) : ITimePeriodsDuckDbRepository
 {
-    public async Task<List<TimePeriodMeta>> CreateTimePeriodMetas(
-        IDuckDbConnection duckDbConnection,
-        DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
-    {
-        var metas = (await duckDbConnection.SqlBuilder(
-                $"""
-                 SELECT DISTINCT time_period, time_identifier
-                 FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
-                 ORDER BY time_period
-                 """
-            ).QueryAsync<(string TimePeriod, string TimeIdentifier)>(cancellationToken: cancellationToken))
-            .Select(tuple => new TimePeriodMeta
-                {
-                    DataSetVersionId = dataSetVersion.Id,
-                    Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
-                    Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier)
-                }
-            )
-            .OrderBy(meta => meta.Period)
-            .ThenBy(meta => meta.Code)
-            .ToList();
-
-        publicDataDbContext.TimePeriodMetas.AddRange(metas);
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-
-        return metas;
-    }
-
-    public async Task CreateTimePeriodMetaTable(
+    public async Task CreateTimePeriodsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)

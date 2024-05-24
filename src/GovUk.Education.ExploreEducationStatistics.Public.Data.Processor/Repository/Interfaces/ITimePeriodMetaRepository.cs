@@ -3,15 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 
-public interface IIndicatorRepository
+public interface ITimePeriodMetaRepository
 {
-    Task CreateIndicatorMetas(
-        IDuckDbConnection duckDbConnection,
-        DataSetVersion dataSetVersion,
-        IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default);
-
-    Task CreateIndicatorMetaTable(
+    Task<List<TimePeriodMeta>> CreateTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default);

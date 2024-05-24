@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
@@ -19,37 +18,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.GeographicL
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
-public class LocationRepository(
+public class LocationMetaRepository(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationMetaRepository
 {
-    public async Task<GeographicLevelMeta> CreateGeographicLevelMeta(
-        IDuckDbConnection duckDbConnection,
-        DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
-    {
-        var geographicLevels =
-            (await duckDbConnection.SqlBuilder(
-                $"""
-                 SELECT DISTINCT geographic_level
-                 FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
-                 """
-            ).QueryAsync<string>(cancellationToken: cancellationToken))
-            .Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider)
-            .ToList();
-
-        var geographicLevelMeta = new GeographicLevelMeta
-        {
-            DataSetVersionId = dataSetVersion.Id,
-            Levels = geographicLevels
-        };
-
-        publicDataDbContext.GeographicLevelMetas.Add(geographicLevelMeta);
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-
-        return geographicLevelMeta;
-    }
-
     public async Task CreateLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
@@ -168,9 +140,7 @@ public class LocationRepository(
             }
 
             var insertedLinks = await publicDataDbContext.LocationOptionMetaLinks
-                .CountAsync(
-                    l => l.MetaId == meta.Id,
-                    cancellationToken: cancellationToken);
+                .CountAsync(l => l.MetaId == meta.Id, cancellationToken: cancellationToken);
 
             if (insertedLinks != options.Count)
             {
@@ -178,88 +148,6 @@ public class LocationRepository(
                     $"Inserted incorrect number of location option meta links for {meta.Level}. " +
                     $"Inserted: {insertedLinks}, expected: {options.Count}"
                 );
-            }
-        }
-    }
-
-    public async Task CreateLocationMetaTable(
-        IDuckDbConnection duckDbConnection,
-        DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
-    {
-        await publicDataDbContext
-            .Entry(dataSetVersion)
-            .Collection(dsv => dsv.LocationMetas)
-            .Query()
-            .Include(m => m.Options)
-            .LoadAsync(cancellationToken);
-
-        await duckDbConnection.SqlBuilder(
-            $"""
-             CREATE TABLE {LocationOptionsTable.TableName:raw}(
-                 {LocationOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
-                 {LocationOptionsTable.Cols.Label:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Level:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.PublicId:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Code:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.OldCode:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Urn:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.LaEstab:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Ukprn:raw} VARCHAR
-             )
-             """
-        ).ExecuteAsync(cancellationToken: cancellationToken);
-
-        var id = 1;
-
-        foreach (var location in dataSetVersion.LocationMetas)
-        {
-            using var appender = duckDbConnection.CreateAppender(table: LocationOptionsTable.TableName);
-
-            var insertRow = appender.CreateRow();
-
-            foreach (var link in location.OptionLinks.OrderBy(l => l.Option.Label))
-            {
-                var option = link.Option;
-
-                insertRow.AppendValue(id++);
-                insertRow.AppendValue(option.Label);
-                insertRow.AppendValue(location.Level.GetEnumValue());
-                insertRow.AppendValue(option.PublicId);
-
-                switch (option)
-                {
-                    case LocationLocalAuthorityOptionMeta laOption:
-                        insertRow.AppendValue(laOption.Code);
-                        insertRow.AppendValue(laOption.OldCode);
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        break;
-                    case LocationCodedOptionMeta codedOption:
-                        insertRow.AppendValue(codedOption.Code);
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        break;
-                    case LocationProviderOptionMeta providerOption:
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        insertRow.AppendValue(providerOption.Ukprn);
-                        break;
-                    case LocationSchoolOptionMeta schoolOption:
-                        insertRow.AppendNullValue();
-                        insertRow.AppendNullValue();
-                        insertRow.AppendValue(schoolOption.Urn);
-                        insertRow.AppendValue(schoolOption.LaEstab);
-                        insertRow.AppendNullValue();
-                        break;
-                }
-
-                insertRow.EndRow();
             }
         }
     }

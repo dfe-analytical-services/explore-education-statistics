@@ -11,9 +11,9 @@ using InterpolatedSql.Dapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
-public class DataRepository(
+public class DataDuckDbRepository(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : IDataRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver) : IDataDuckDbRepository
 {
     public async Task CreateDataTable(
         DataSetVersion dataSetVersion,

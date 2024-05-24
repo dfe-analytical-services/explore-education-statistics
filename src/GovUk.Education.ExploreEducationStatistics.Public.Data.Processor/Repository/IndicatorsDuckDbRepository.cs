@@ -3,50 +3,14 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using InterpolatedSql.Dapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
-public class IndicatorRepository(
-    PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : IIndicatorRepository
+public class IndicatorsDuckDbRepository(PublicDataDbContext publicDataDbContext) : IIndicatorsDuckDbRepository
 {
-    public async Task CreateIndicatorMetas(
-        IDuckDbConnection duckDbConnection,
-        DataSetVersion dataSetVersion,
-        IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default)
-    {
-        var metas = (await duckDbConnection.SqlBuilder(
-                    $"""
-                     SELECT *
-                     FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
-                     WHERE "col_type" = {MetaFileRow.ColumnType.Indicator.ToString()}
-                     AND "col_name" IN ({allowedColumns})
-                     """)
-                .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
-            )
-            .OrderBy(row => row.Label)
-            .Select(
-                row => new IndicatorMeta
-                {
-                    DataSetVersionId = dataSetVersion.Id,
-                    PublicId = row.ColName,
-                    Label = row.Label,
-                    Unit = row.IndicatorUnit,
-                    DecimalPlaces = row.IndicatorDp
-                }
-            )
-            .ToList();
-
-        publicDataDbContext.IndicatorMetas.AddRange(metas);
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task CreateIndicatorMetaTable(
+    public async Task CreateIndicatorsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)

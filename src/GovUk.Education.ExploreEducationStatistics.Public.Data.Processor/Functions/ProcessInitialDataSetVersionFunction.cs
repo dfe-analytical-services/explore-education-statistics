@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class ProcessInitialDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
     IDataSetMetaService dataSetMetaService,
-    IDataRepository dataRepository,
+    IDataDuckDbRepository dataDuckDbRepository,
     IParquetService parquetService,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
@@ -72,7 +72,7 @@ public class ProcessInitialDataSetVersionFunction(
         var dataSetVersion = dataSetVersionImport.DataSetVersion;
 
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingData, cancellationToken);
-        await dataRepository.CreateDataTable(dataSetVersion, cancellationToken);
+        await dataDuckDbRepository.CreateDataTable(dataSetVersion, cancellationToken);
     }
 
     [Function(nameof(WriteDataFiles))]

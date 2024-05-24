@@ -13,10 +13,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 public class DataSetMetaService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IFilterRepository filterRepository,
-    IIndicatorRepository indicatorRepository,
-    ILocationRepository locationRepository,
-    ITimePeriodRepository timePeriodRepository
+    IFilterMetaRepository filterMetaRepository,
+    IIndicatorMetaRepository indicatorMetaRepository,
+    IGeographicLevelMetaRepository geographicLevelMetaRepository,
+    ILocationMetaRepository locationMetaRepository,
+    ITimePeriodMetaRepository timePeriodMetaRepository,
+    IFilterOptionsDuckDbRepository filterOptionsDuckDbRepository,
+    IIndicatorsDuckDbRepository indicatorsDuckDbRepository,
+    ILocationsDuckDbRepository locationsDuckDbRepository,
+    ITimePeriodsDuckDbRepository timePeriodsDuckDbRepository
 ) : IDataSetMetaService
 {
     public async Task CreateDataSetVersionMeta(
@@ -39,38 +44,59 @@ public class DataSetMetaService(
                 $"SELECT * FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'")
             .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)).AsList();
 
-        await filterRepository.CreateFilterMetas(duckDbConnection,
+        await filterMetaRepository.CreateFilterMetas(
+            duckDbConnection,
             dataSetVersion,
             allowedColumns,
             cancellationToken);
 
-        await locationRepository.CreateLocationMetas(duckDbConnection,
+        await indicatorMetaRepository.CreateIndicatorMetas(
+            duckDbConnection,
             dataSetVersion,
             allowedColumns,
             cancellationToken);
 
-        await indicatorRepository.CreateIndicatorMetas(duckDbConnection,
+        var geographicLevelMeta = await geographicLevelMetaRepository.CreateGeographicLevelMeta(
+            duckDbConnection,
+            dataSetVersion,
+            cancellationToken);
+
+        await locationMetaRepository.CreateLocationMetas(
+            duckDbConnection,
             dataSetVersion,
             allowedColumns,
             cancellationToken);
 
-        var timePeriods = await timePeriodRepository.CreateTimePeriodMetas(duckDbConnection,
+        var timePeriodMetas = await timePeriodMetaRepository.CreateTimePeriodMetas(
+            duckDbConnection,
             dataSetVersion,
             cancellationToken);
 
-        var geographicLevels = await locationRepository.CreateGeographicLevelMeta(duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
-
-        dataSetVersion.MetaSummary = BuildMetaSummary(timePeriods, metaFileRows, allowedColumns, geographicLevels);
+        dataSetVersion.MetaSummary =
+            BuildMetaSummary(timePeriodMetas, metaFileRows, allowedColumns, geographicLevelMeta);
         dataSetVersion.TotalResults = await CountCsvRows(duckDbConnection, dataSetVersion, cancellationToken);
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        await indicatorRepository.CreateIndicatorMetaTable(duckDbConnection, dataSetVersion, cancellationToken);
-        await locationRepository.CreateLocationMetaTable(duckDbConnection, dataSetVersion, cancellationToken);
-        await filterRepository.CreateFilterMetaTable(duckDbConnection, dataSetVersion, cancellationToken);
-        await timePeriodRepository.CreateTimePeriodMetaTable(duckDbConnection, dataSetVersion, cancellationToken);
+        await indicatorsDuckDbRepository.CreateIndicatorsTable(
+            duckDbConnection,
+            dataSetVersion,
+            cancellationToken);
+
+        await locationsDuckDbRepository.CreateLocationsTable(
+            duckDbConnection,
+            dataSetVersion,
+            cancellationToken);
+
+        await filterOptionsDuckDbRepository.CreateFilterOptionsTable(
+            duckDbConnection,
+            dataSetVersion,
+            cancellationToken);
+
+        await timePeriodsDuckDbRepository.CreateTimePeriodsTable(
+            duckDbConnection,
+            dataSetVersion,
+            cancellationToken);
     }
 
     private static DataSetVersionMetaSummary BuildMetaSummary(
