@@ -31,10 +31,7 @@ const PageMeta = ({
       />
 
       {process.env.APP_ENV !== 'Production' && (
-        <>
-          <meta name="robots" content="noindex,nofollow" />
-          <meta name="googlebot" content="noindex,nofollow" />
-        </>
+        <meta name="robots" content="noindex,nofollow" />
       )}
       {/* <!-- Open Graph / Facebook --> */}
       <meta property="og:type" content="website" />

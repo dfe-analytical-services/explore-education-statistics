@@ -63,7 +63,6 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
     >
       <Head>
         <meta name="robots" content="noindex,nofollow" />
-        <meta name="googlebot" content="noindex,nofollow" />
       </Head>
       {confirmedSubscription ? (
         <SubscriptionStatusMessage
