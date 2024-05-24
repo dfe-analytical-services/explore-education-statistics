@@ -5,9 +5,9 @@ import preReleaseUserService, {
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -158,8 +158,8 @@ export default function PreReleaseUserAccessForm({
         >
           {({ formState, getValues, reset }) => {
             return (
-              <RHFForm id={formId} onSubmit={handleSubmit}>
-                <RHFFormFieldTextArea<FormValues>
+              <Form id={formId} onSubmit={handleSubmit}>
+                <FormFieldTextArea<FormValues>
                   label="Invite new users by email"
                   name="emails"
                   className="govuk-!-width-one-third"
@@ -191,7 +191,7 @@ export default function PreReleaseUserAccessForm({
                     onExit={handleModalCancel}
                   />
                 )}
-              </RHFForm>
+              </Form>
             );
           }}
         </FormProvider>

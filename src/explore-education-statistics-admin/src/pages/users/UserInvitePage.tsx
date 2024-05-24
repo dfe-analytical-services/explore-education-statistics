@@ -2,8 +2,8 @@ import Page from '@admin/components/Page';
 import userService, { UserInvite } from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
@@ -13,8 +13,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ButtonGroup from '@common/components/ButtonGroup';
 import InviteUserReleaseRoleForm from '@admin/pages/users/components/InviteUserReleaseRoleForm';
 import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { ObjectSchema } from 'yup';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
@@ -159,15 +159,15 @@ export default function UserInvitePage({
           }}
           validationSchema={validationSchema}
         >
-          <RHFForm id={formId} onSubmit={handleSubmit}>
-            <RHFFormFieldTextInput<UserInviteFormValues>
+          <Form id={formId} onSubmit={handleSubmit}>
+            <FormFieldTextInput<UserInviteFormValues>
               label="User email"
               name="userEmail"
               width={20}
               hint="The invited user must be on the DfE AAD. Contact explore.statistics@education.gov.uk if unsure."
             />
 
-            <RHFFormFieldSelect<UserInviteFormValues>
+            <FormFieldSelect<UserInviteFormValues>
               label="Role"
               name="roleId"
               hint="The user's role within the service."
@@ -192,7 +192,7 @@ export default function UserInvitePage({
               <Button type="submit">Send invite</Button>
               <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         </FormProvider>
       </Page>
     </LoadingSpinner>

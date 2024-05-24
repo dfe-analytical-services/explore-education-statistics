@@ -480,10 +480,10 @@ describe('PublicationDetailsPage', () => {
         screen.getByText('The URL for this publication will change from'),
       ).toBeInTheDocument();
 
-      expect(screen.getByTestId('before-url')).toHaveValue(
+      expect(screen.getByLabelText('Before URL')).toHaveValue(
         'http://localhost/find-statistics/publication-1',
       );
-      expect(screen.getByTestId('after-url')).toHaveValue(
+      expect(screen.getByLabelText('After URL')).toHaveValue(
         'http://localhost/find-statistics/publication-1-updated',
       );
     });
@@ -533,10 +533,10 @@ describe('PublicationDetailsPage', () => {
         screen.getByText('The URL for this publication will change from'),
       ).toBeInTheDocument();
 
-      expect(screen.getByTestId('before-url')).toHaveValue(
+      expect(screen.getByLabelText('Before URL')).toHaveValue(
         'http://localhost/find-statistics/publication-1',
       );
-      expect(screen.getByTestId('after-url')).toHaveValue(
+      expect(screen.getByLabelText('After URL')).toHaveValue(
         'http://localhost/find-statistics/publication-1-updated',
       );
     });

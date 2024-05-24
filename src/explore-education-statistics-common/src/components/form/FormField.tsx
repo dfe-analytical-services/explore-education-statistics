@@ -1,135 +1,132 @@
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
-import { FormGroup } from '@common/components/form/index';
-import {
-  FieldHelperProps,
-  FieldInputProps,
-  FieldMetaProps,
-  useField,
-} from 'formik';
+import FormGroup from '@common/components/form/FormGroup';
+import useRegister from '@common/components/form/hooks/useRegister';
+import { CheckboxChangeEventHandler } from '@common/components/form/FormCheckbox';
+import getErrorMessage from '@common/components/form/util/getErrorMessage';
+import { mergeRefs } from '@common/utils/mergeRefs';
 import React, {
   ChangeEvent,
   ChangeEventHandler,
   ComponentType,
-  FocusEvent,
   FocusEventHandler,
   ReactNode,
+  Ref,
   useMemo,
 } from 'react';
+import { FieldValues, Path, useFormContext } from 'react-hook-form';
 
-export type FormFieldComponentProps<Props, FormValues> =
-  FormFieldProps<FormValues> &
-    Omit<Props, 'id' | 'value' | 'error'> & {
-      id?: string;
-    };
+export type FormFieldComponentProps<
+  TProps extends FormFieldInputProps,
+  TFormValues,
+> = FormFieldProps<TFormValues> &
+  Omit<TProps, 'name' | 'id' | 'value' | 'error'> & {
+    id?: string;
+    name: Path<TFormValues>;
+  };
 
-export interface FormFieldProps<FormValues = unknown> {
-  id?: string;
-  formGroup?: boolean;
-  formGroupClass?: string;
-  name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
-  showError?: boolean;
-}
-
-interface FormFieldInputProps<Value> extends FieldInputProps<Value> {
+interface FormFieldInputProps {
   error?: ReactNode | string;
   id: string;
+  inputRef?: Ref<Element>;
+  name: string;
+  onChange?: ChangeEventHandler | CheckboxChangeEventHandler;
+  onBlur?: FocusEventHandler;
 }
 
-type InternalFormFieldProps<P, Value> = Omit<P, 'id' | 'value' | 'error'> & {
-  as?: ComponentType<FormFieldInputProps<Value> & P>;
-  children?:
-    | ((props: {
-        id: string;
-        field: FieldInputProps<Value> & { error?: string };
-        meta: FieldMetaProps<Value>;
-        helpers: FieldHelperProps<Value>;
-      }) => ReactNode)
-    | ReactNode;
+export type FormFieldProps<TFormValues> = {
+  children?: ReactNode;
+  errorString?: string;
   id?: string;
-  type?: 'checkbox' | 'radio' | 'text' | 'number';
+  isNumberField?: boolean;
+  formGroup?: boolean;
+  formGroupClass?: string;
+  inputRef?: Ref<Element>;
+  name: Path<TFormValues>;
+  showError?: boolean;
+  onChange?: ChangeEventHandler;
+  onBlur?: FocusEventHandler;
 };
 
-function FormField<Value, Props = Record<string, unknown>>({
+type InternalFormFieldProps<TProps> = Omit<TProps, 'id' | 'value' | 'error'> & {
+  as?: ComponentType<FormFieldInputProps & TProps>;
+};
+
+export default function FormField<
+  TFormValues extends FieldValues,
+  TProps extends FormFieldInputProps,
+>({
   as,
   children,
+  errorString,
   formGroup = true,
   formGroupClass,
   id: customId,
+  inputRef,
+  isNumberField,
   name,
   showError = true,
-  type,
+  onBlur,
+  onChange,
   ...props
-}: FormFieldProps & InternalFormFieldProps<Props, Value>) {
+}: FormFieldProps<TFormValues> & InternalFormFieldProps<TProps>) {
+  const {
+    formState: { errors },
+    register,
+  } = useFormContext<TFormValues>();
+
+  const {
+    ref: fieldRef,
+    onBlur: fieldOnBlur,
+    onChange: fieldOnChange,
+  } = useRegister(name, register, isNumberField);
+
   const { fieldId } = useFormIdContext();
-  const id = fieldId(name, customId);
 
-  const [field, meta, helpers] = useField({
-    name,
-    type,
-  });
-
-  const error = showError && meta.error && meta.touched ? meta.error : '';
+  const error = errorString || getErrorMessage(errors, name, showError);
 
   const component = useMemo(() => {
-    const typedProps = props as {
-      onBlur?: FocusEventHandler;
-      onChange?: ChangeEventHandler;
-    };
-    const Component = as as ComponentType<FormFieldInputProps<Value>>;
-
+    const Component = as as ComponentType<FormFieldInputProps>;
     if (Component) {
       return (
         <Component
           {...props}
-          {...field}
+          error={error}
           id={fieldId(name, customId)}
           name={name}
-          error={error}
-          onChange={(event: ChangeEvent) => {
-            if (typedProps.onChange) {
-              typedProps.onChange(event);
-            }
+          inputRef={mergeRefs(fieldRef, inputRef)}
+          onChange={async (event: ChangeEvent) => {
+            onChange?.(event);
 
-            if (!event.isDefaultPrevented()) {
-              field.onChange(event);
+            if (!event.defaultPrevented) {
+              await fieldOnChange(event);
             }
           }}
-          onBlur={(event: FocusEvent) => {
-            if (typedProps.onBlur) {
-              typedProps.onBlur(event);
-            }
+          onBlur={async event => {
+            onBlur?.(event);
 
             if (!event.isDefaultPrevented()) {
-              field.onBlur(event);
+              await fieldOnBlur(event);
             }
           }}
         />
       );
     }
 
-    return typeof children === 'function'
-      ? children({
-          id,
-          field: {
-            ...field,
-            error,
-          },
-          helpers,
-          meta,
-        })
-      : children;
+    return children;
   }, [
     as,
     children,
-    customId,
-    error,
-    field,
-    fieldId,
-    helpers,
-    id,
-    meta,
-    name,
     props,
+    error,
+    fieldId,
+    name,
+    customId,
+    fieldRef,
+    inputRef,
+    onChange,
+    fieldOnChange,
+    onBlur,
+    fieldOnBlur,
   ]);
 
   return formGroup ? (
@@ -140,5 +137,3 @@ function FormField<Value, Props = Record<string, unknown>>({
     component
   );
 }
-
-export default FormField;

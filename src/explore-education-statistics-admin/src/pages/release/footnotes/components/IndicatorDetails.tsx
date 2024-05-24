@@ -1,6 +1,6 @@
 import { FootnoteSubjectMeta } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
-import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import React from 'react';
 
 interface Props {
@@ -29,7 +29,7 @@ export default function IndicatorDetails({
                     : ''
                 }
               >
-                <RHFFormFieldCheckboxGroup
+                <FormFieldCheckboxGroup
                   name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
                   options={indicatorGroup.options}
                   legend={indicatorGroup.label}

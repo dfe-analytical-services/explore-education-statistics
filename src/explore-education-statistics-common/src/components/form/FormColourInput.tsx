@@ -2,24 +2,24 @@ import BaseFormInput, {
   FormBaseInputProps,
 } from '@common/components/form/FormBaseInput';
 import styles from '@common/components/form/FormColourInput.module.scss';
+import useToggle from '@common/hooks/useToggle';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useEffect } from 'react';
 import { SketchPicker, ColorResult } from '@hello-pangea/color-picker';
-import useToggle from '@common/hooks/useToggle';
-import { useFormikContext } from 'formik';
-import VisuallyHidden from '../VisuallyHidden';
+import { useFormContext } from 'react-hook-form';
 
 export interface FormColourInputProps extends FormBaseInputProps {
   colours?: string[];
   value?: string;
 }
 
-const FormColourInput = ({
+export default function FormColourInput({
   colours = [],
-  value,
   name,
   ...props
-}: FormColourInputProps) => {
-  const { setFieldValue } = useFormikContext();
+}: FormColourInputProps) {
+  const { getValues, setValue } = useFormContext();
+  const value = getValues(name);
   const [showPicker, togglePicker] = useToggle(false);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const FormColourInput = ({
   }, [showPicker, togglePicker]);
 
   const handleChange = (colour: ColorResult) => {
-    setFieldValue(name, colour.hex);
+    setValue(name, colour.hex);
   };
 
   return (
@@ -59,6 +59,4 @@ const FormColourInput = ({
       )}
     </>
   );
-};
-
-export default FormColourInput;
+}

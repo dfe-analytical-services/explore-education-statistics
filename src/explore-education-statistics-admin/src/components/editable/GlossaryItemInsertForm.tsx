@@ -3,10 +3,10 @@ import glossaryQueries from '@admin/queries/glossaryQueries';
 import { GlossaryItem } from '@admin/types/ckeditor';
 import Button from '@common/components/Button';
 import FormComboBox from '@common/components/form/FormComboBox';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
-import FormProvider from '@common/components/form/rhf/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import createErrorHelper from '@common/components/form/validation/createErrorHelper';
+import FormProvider from '@common/components/form/FormProvider';
 import ButtonGroup from '@common/components/ButtonGroup';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { GlossaryEntry } from '@common/services/types/glossary';
@@ -72,7 +72,7 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
   return (
     <FormProvider validationSchema={validationSchema}>
       {({ formState, getValues, handleSubmit, setValue, trigger }) => {
-        const { getError } = createRHFErrorHelper({
+        const { getError } = createErrorHelper({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
           isSubmitted: true,
@@ -81,7 +81,7 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
         const slug = getValues('slug');
 
         return (
-          <RHFForm
+          <Form
             id="featuredTablesForm"
             showErrorSummary={false}
             onSubmit={handleFormSubmit}
@@ -113,7 +113,7 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
               <>
                 <p className="govuk-!-margin-top-1">Slug: {slug}</p>
 
-                <RHFFormFieldTextInput<FormValues>
+                <FormFieldTextInput<FormValues>
                   formGroupClass="govuk-!-margin-top-5 govuk-!-margin-bottom-2"
                   id="text"
                   label="Link text"
@@ -139,7 +139,7 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
                 Cancel
               </Button>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

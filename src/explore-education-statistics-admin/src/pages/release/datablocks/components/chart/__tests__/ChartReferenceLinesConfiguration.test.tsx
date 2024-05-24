@@ -11,7 +11,7 @@ import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactNode } from 'react';
-import FormProvider from '@common/components/form/rhf/FormProvider';
+import FormProvider from '@common/components/form/FormProvider';
 import baseRender from '@common-test/render';
 
 describe('ChartReferenceLinesConfiguration', () => {

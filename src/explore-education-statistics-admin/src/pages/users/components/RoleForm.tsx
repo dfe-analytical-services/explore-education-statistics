@@ -1,9 +1,9 @@
 import userService, { Role, User } from '@admin/services/userService';
 import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
@@ -49,7 +49,7 @@ const RoleForm = ({ roles, user, onUpdate }: Props) => {
       }}
       validationSchema={validationSchema}
     >
-      <RHFForm id={user.id} onSubmit={handleSubmit}>
+      <Form id={user.id} onSubmit={handleSubmit}>
         <FormFieldset
           id="role"
           legend="Role"
@@ -58,7 +58,7 @@ const RoleForm = ({ roles, user, onUpdate }: Props) => {
         >
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-quarter">
-              <RHFFormFieldSelect<FormValues>
+              <FormFieldSelect<FormValues>
                 label="Role"
                 name="roleId"
                 options={roles?.map(role => ({
@@ -75,7 +75,7 @@ const RoleForm = ({ roles, user, onUpdate }: Props) => {
             </div>
           </div>
         </FormFieldset>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 };

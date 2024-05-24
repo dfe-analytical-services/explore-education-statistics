@@ -14,12 +14,12 @@ import {
 } from '@admin/config/ckEditorConfig';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import SubmitError from '@common/components/form/util/SubmitError';
-import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import Yup from '@common/validation/yup';
 import deepmerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
@@ -130,7 +130,7 @@ export default function FootnoteForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      <RHFForm id={id} onSubmit={handleSubmit}>
+      <Form id={id} onSubmit={handleSubmit}>
         <p>
           Select which subjects, filters and indicators your footnote applies to
           and these will appear alongside the associated data in your published
@@ -142,7 +142,7 @@ export default function FootnoteForm({
           critical to understanding the data in the table or chart it refers to.
         </p>
 
-        <RHFFormFieldEditor<BaseFootnote>
+        <FormFieldEditor<BaseFootnote>
           name="content"
           label="Footnote"
           includePlugins={pluginsConfigLinksOnly}
@@ -156,7 +156,7 @@ export default function FootnoteForm({
           const { subjectId, subjectName } = subject;
 
           return (
-            <RHFFormFieldRadioGroup
+            <FormFieldRadioGroup
               className={styles.radio}
               key={subjectId}
               testId={`footnote-subject ${subjectName}`}
@@ -231,7 +231,7 @@ export default function FootnoteForm({
           <Button type="submit">Save footnote</Button>
           {cancelButton}
         </ButtonGroup>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 }

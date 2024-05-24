@@ -2,10 +2,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Seeds;
 
-public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, Guid DataSetVersionId)
+public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionId, Guid? ReleaseFileId = null)
 {
     private static readonly Guid SpcPublicationId = new("a91d9e05-be82-474c-85ae-4913158406d0");
-    private static readonly Guid PupilAbsencePublicationId = new("cbbd299f-8297-44bc-92ac-558bcf51f8ad");
+    private static readonly Guid ExclusionsPublicationId = new("346fd6f2-3938-4006-9867-08dc1c5c66c3");
+    private static readonly Guid PupilAbsencePublicationId = new("d40523f4-50ba-4896-9866-08dc1c5c66c3");
     private static readonly Guid _16To18PerformancePublicationId = new("cbbd299f-8297-44bc-92ac-558bcf51f8ad");
 
     public static DataSetSeed SpcEthnicityLanguage => new(
@@ -22,7 +23,6 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, 
             Created = DateTimeOffset.Parse("2023-06-01T12:00:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-06-15T09:30:00+00:00"),
         },
-        DataSetMetaId: new Guid("018c8da0-06fc-7b7c-99d7-0849ec885917"),
         DataSetVersionId: new Guid("018c7db8-d7bb-77e8-8ee7-147a705c1e3e")
     );
 
@@ -40,8 +40,24 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, 
             Created = DateTimeOffset.Parse("2023-06-02T12:00:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-06-16T09:30:00+00:00"),
         },
-        DataSetMetaId: new Guid("018c8da0-2791-7209-bfcd-40cfb0addd00"),
         DataSetVersionId: new Guid("018c7db9-3418-7b58-aa76-6a55d0d7b146")
+    );
+
+    public static DataSetSeed AbsenceByCharacteristic2016 => new(
+        Filename: nameof(AbsenceByCharacteristic2016),
+        DataSet: new DataSet
+        {
+            Id = new Guid("018f6304-42aa-7731-af09-acfa105c6fca"),
+            Title = "Absence by characteristic",
+            Summary = "Absence by characteristic data guidance content",
+            Status = DataSetStatus.Published,
+            PublicationId = PupilAbsencePublicationId,
+            Published = DateTimeOffset.Parse("2024-01-25T09:30:00+00:00"),
+            Created = DateTimeOffset.Parse("2024-01-24T12:00+00:00"),
+            Updated = DateTimeOffset.Parse("2024-01-24T09:30:00+00:00"),
+        },
+        DataSetVersionId: new Guid("018f6306-cb44-7fcd-80cc-bfdb9e1ce5a1"),
+        ReleaseFileId: new Guid("41f18583-3b28-4399-c082-08dc1c5c7ea7")
     );
 
     public static DataSetSeed AbsenceRatesCharacteristic => new(
@@ -58,7 +74,6 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, 
             Created = DateTimeOffset.Parse("2023-08-15T12:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-09-01T09:30:00+00:00"),
         },
-        DataSetMetaId: new Guid("018c8da0-8a93-7bb6-82b0-9d53fcf028a3"),
         DataSetVersionId: new Guid("018c7db9-6a8f-77e1-a789-2eb0f071ef33")
     );
 
@@ -76,7 +91,6 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, 
             Created = DateTimeOffset.Parse("2023-08-16T12:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-09-02T09:30:00+00:00"),
         },
-        DataSetMetaId: new Guid("018c8da0-a962-7124-af9e-b71ad621b89e"),
         DataSetVersionId: new Guid("018c7db9-c6e5-70b6-869f-2b177b8ad324")
     );
 
@@ -94,8 +108,24 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, 
             Created = DateTimeOffset.Parse("2023-08-17T12:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-09-03T09:30:00+00:00"),
         },
-        DataSetMetaId: new Guid("018c8da0-bc77-7b52-b8b8-c22a5b14c953"),
         DataSetVersionId: new Guid("018c7db9-f885-7897-af0a-8f62ac55d0f4")
+    );
+
+    public static DataSetSeed ExclusionsByGeographicLevel => new(
+        Filename: nameof(ExclusionsByGeographicLevel),
+        DataSet: new DataSet
+        {
+            Id = new Guid("018f630d-f1f7-7268-8af3-7e8eba892947"),
+            Title = "Exclusions by geographic level",
+            Summary = "Exclusions by geographic level data guidance content",
+            Status = DataSetStatus.Published,
+            PublicationId = ExclusionsPublicationId,
+            Published = DateTimeOffset.Parse("2024-01-25T09:30:00+00:00"),
+            Created = DateTimeOffset.Parse("2024-01-24T12:00+00:00"),
+            Updated = DateTimeOffset.Parse("2024-01-24T09:30:00+00:00"),
+        },
+        DataSetVersionId: new Guid("018f630e-bd6c-7ea5-94e6-d12c361ef2b8"),
+        ReleaseFileId: new Guid("7d602917-2c16-4745-c086-08dc1c5c7ea7")
     );
 
     public static DataSetSeed Qua01 => new(
@@ -112,7 +142,6 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, 
             Created = DateTimeOffset.Parse("2023-11-01T09:30:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-12-01T09:30:00+00:00"),
         },
-        DataSetMetaId: new Guid("018c8da0-d84f-7fb4-8979-d214d3270c46"),
         DataSetVersionId: new Guid("018c7dba-1821-747b-9a7c-c91169543a81")
     );
 
@@ -130,7 +159,6 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetMetaId, 
             Created = DateTimeOffset.Parse("2023-11-02T09:30:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-12-02T09:30:00+00:00"),
         },
-        DataSetMetaId: new Guid("018c8da0-ed73-7b18-b10b-c6407c63e96a"),
         DataSetVersionId: new Guid("018c7dba-582f-7a22-8e01-67e0a6b43603")
     );
 }

@@ -93,6 +93,14 @@ stages:
                   --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
+                  --connection-string-type 'SQLAzure' \
+                  --settings \
+                    "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
+                
+                az webapp config connection-string set \
+                  --name '$(dataProcessorFunctionAppName)' \
+                  --resource-group '$(resourceGroupName)' \
+                  --slot 'staging' \
                   --connection-string-type 'PostgreSQL' \
                   --settings \
                     "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"

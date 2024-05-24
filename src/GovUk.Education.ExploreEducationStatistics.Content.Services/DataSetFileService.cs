@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
@@ -118,7 +119,7 @@ public class DataSetFileService : IDataSetFileService
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
                 Published = result.Value.ReleaseVersion.Published!.Value,
-                HasApiDataSet = result.Value.File.PublicDataSetVersionId.HasValue,
+                Api = BuildDataSetFileApiViewModel(result.Value.File),
                 Meta = BuildDataSetFileMetaViewModel(
                     result.Value.File.DataSetFileMeta,
                     result.Value.FilterSequence,
@@ -186,11 +187,13 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
+                SubjectId = releaseFile.File.SubjectId!.Value,
             },
             Meta = BuildDataSetFileMetaViewModel(
                 releaseFile.File.DataSetFileMeta,
                 releaseFile.FilterSequence,
                 releaseFile.IndicatorSequence),
+            Api = BuildDataSetFileApiViewModel(releaseFile.File)
         };
     }
 
@@ -206,12 +209,17 @@ public class DataSetFileService : IDataSetFileService
 
         return new DataSetFileMetaViewModel
         {
-            GeographicLevels = meta.GeographicLevels,
-            TimePeriod = new DataSetFileTimePeriodViewModel
+            GeographicLevels = meta.GeographicLevels
+                .Select(gl => gl.GetEnumLabel())
+                .ToList(),
+            TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
-                TimeIdentifier = meta.TimeIdentifier.GetEnumLabel(),
-                From = TimePeriodLabelFormatter.Format(meta.Years.First(), meta.TimeIdentifier),
-                To = TimePeriodLabelFormatter.Format(meta.Years.Last(), meta.TimeIdentifier),
+                From = TimePeriodLabelFormatter.Format(
+                    meta.TimePeriodRange.Start.Period,
+                    meta.TimePeriodRange.Start.TimeIdentifier),
+                To = TimePeriodLabelFormatter.Format(
+                    meta.TimePeriodRange.End.Period,
+                    meta.TimePeriodRange.End.TimeIdentifier),
             },
             Filters = GetOrderedFilters(meta.Filters, filterSequence),
             Indicators = GetOrderedIndicators(meta.Indicators, indicatorGroupSequence),
@@ -244,6 +252,20 @@ public class DataSetFileService : IDataSetFileService
                 .OrderBy(i => Array.IndexOf(indicatorSequence, i.Id));
 
         return indicators.Select(i => i.Label).ToList();
+    }
+
+    private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(File file)
+    {
+        if (file.PublicApiDataSetId is null || file.PublicApiVersionString is null)
+        {
+            return null;
+        }
+
+        return new DataSetFileApiViewModel
+        {
+            Id = file.PublicApiDataSetId.Value,
+            Version = file.PublicApiVersionString,
+        };
     }
 }
 
@@ -343,7 +365,7 @@ internal static class ReleaseFileQueryableExtensions
         return dataSetType switch
         {
             DataSetType.All => query,
-            DataSetType.Api => query.Where(rf => rf.File.PublicDataSetVersionId.HasValue),
+            DataSetType.Api => query.Where(rf => rf.File.PublicApiDataSetId.HasValue),
             _ => throw new ArgumentOutOfRangeException(nameof(dataSetType)),
         };
     }

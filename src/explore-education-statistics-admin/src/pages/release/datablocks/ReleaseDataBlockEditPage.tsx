@@ -140,7 +140,7 @@ const ReleaseDataBlockEditPage = ({
 
                 <SummaryListItem term="Fast track URL">
                   <UrlContainer
-                    data-testid="fastTrackUrl"
+                    id="fastTrackUrl"
                     url={`${config.publicAppUrl}/data-tables/fast-track/${dataBlock.dataBlockParentId}`}
                   />
                 </SummaryListItem>

@@ -3,7 +3,7 @@ import styles from '@common/modules/table-tool/components/TableHeadersAxis.modul
 import TableHeadersGroup from '@common/modules/table-tool/components/TableHeadersGroup';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
-import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
+import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import getTableHeaderGroupId from '@common/modules/table-tool/components/utils/getTableHeaderGroupId';
 import {
   CategoryFilter,
@@ -40,7 +40,7 @@ export default function TableHeadersAxis({
 
   const values = getValues(name);
 
-  const { getError } = createRHFErrorHelper({
+  const { getError } = createErrorHelper({
     errors: formState.errors,
     touchedFields: formState.touchedFields,
   });

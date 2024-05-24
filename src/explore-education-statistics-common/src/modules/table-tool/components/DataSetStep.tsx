@@ -1,7 +1,7 @@
 import { SelectedRelease } from '@common/modules/table-tool/types/selectedPublication';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
@@ -105,7 +105,7 @@ export default function DataSetStep({
       >
         {({ formState }) => {
           return (
-            <RHFForm
+            <Form
               id="publicationDataStepForm"
               onSubmit={async ({ subjectId: id }) => {
                 await goToNextStep(async () => {
@@ -124,7 +124,7 @@ export default function DataSetStep({
                         : 'govuk-grid-column-one-third govuk-grid-column-one-quarter-from-desktop'
                     }
                   >
-                    <RHFFormFieldRadioGroup<DataSetFormValues>
+                    <FormFieldRadioGroup<DataSetFormValues>
                       className="govuk-!-margin-bottom-2"
                       disabled={formState.isSubmitting}
                       legend={renderLegend()}
@@ -169,7 +169,7 @@ export default function DataSetStep({
                   )}
                 </div>
               </LoadingSpinner>
-            </RHFForm>
+            </Form>
           );
         }}
       </FormProvider>

@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -25,11 +26,14 @@ public static class FileGeneratorExtensions
             .SetDefault(f => f.Filename)
             .SetDataSetFileMeta(new DataSetFileMeta
             {
-                GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
-                TimeIdentifier = TimeIdentifier.CalendarYear,
-                Years = [ 2000, 2001 ],
-                Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", }],
-                Indicators = [new() { Id = Guid.NewGuid(), }],
+                GeographicLevels = [GeographicLevel.Country],
+                TimePeriodRange = new TimePeriodRangeMeta
+                {
+                    Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
+                    End = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2001", }
+                },
+                Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", }],
+                Indicators = [new() { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", }],
             })
             .Set(f => f.Filename, (_, f) => $"{f.Filename}.csv");
 
@@ -68,10 +72,22 @@ public static class FileGeneratorExtensions
         Guid replacedById)
         => generator.ForInstance(s => s.SetReplacedById(replacedById));
 
-    public static Generator<File> WithPublicDataSetVersionId(
+    public static Generator<File> WithPublicApiDataSetId(
         this Generator<File> generator,
-        Guid publicDataSetVersionId)
-        => generator.ForInstance(s => s.SetPublicDataSetVersionId(publicDataSetVersionId));
+        Guid publicDataSetId)
+        => generator.ForInstance(s => s.SetPublicApiDataSetId(publicDataSetId));
+
+    public static Generator<File> WithPublicApiDataSetVersion(
+        this Generator<File> generator,
+        int major,
+        int minor,
+        int patch = 0)
+        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(major, minor, patch));
+
+    public static Generator<File> WithPublicApiDataSetVersion(
+        this Generator<File> generator,
+        SemVersion version)
+        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(version));
 
     public static Generator<File> WithRootPath(
         this Generator<File> generator,
@@ -129,10 +145,24 @@ public static class FileGeneratorExtensions
         Guid replacedById)
         => setters.Set(f => f.ReplacedById, replacedById);
 
-    public static InstanceSetters<File> SetPublicDataSetVersionId(
+    public static InstanceSetters<File> SetPublicApiDataSetId(
         this InstanceSetters<File> setters,
-        Guid publicDataSetVersionId)
-        => setters.Set(f => f.PublicDataSetVersionId, publicDataSetVersionId);
+        Guid publicDataSetId)
+        => setters.Set(f => f.PublicApiDataSetId, publicDataSetId);
+
+    public static InstanceSetters<File> SetPublicApiDataSetVersion(
+        this InstanceSetters<File> setters,
+        int major,
+        int minor,
+        int patch = 0)
+        => setters.Set(
+            f => f.PublicApiDataSetVersion,
+            new SemVersion(major: major, minor: minor, patch: patch));
+
+    public static InstanceSetters<File> SetPublicApiDataSetVersion(
+        this InstanceSetters<File> setters,
+        SemVersion version)
+        => setters.Set(f => f.PublicApiDataSetVersion, version);
 
     public static InstanceSetters<File> SetReplacing(
         this InstanceSetters<File> setters,

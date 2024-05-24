@@ -9,8 +9,9 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          Admin    Local    Dev    AltersData
+Force Tags          Admin    Local    AltersData    NotAgainstDev
 
+# TODO - There is ongoing issue which needs to be fixed in dev - Line chart isn't getting saved properly post removal of reference lines - EES-5156 and 5143
 
 *** Variables ***
 ${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
@@ -536,7 +537,7 @@ Edit reference line
 
 Remove reference line
     user clicks button containing text    Remove    testId:referenceLines
-    user waits until parent does not contain element    id:chartBuilderPreview    Edited reference line
+    user waits until parent does not contain    id:chartBuilderPreview    Edited reference line
 
 Save chart and validate marked as 'Has chart' in data blocks list
     user saves chart configuration

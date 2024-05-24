@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 
 public class ParquetFilesOptions

@@ -115,6 +115,7 @@ const PrototypePreviewExample = () => {
 
               <UrlContainer
                 className="govuk-!-margin-bottom-1"
+                id="preview-token"
                 url={apiTokenUrl}
               />
               <ButtonGroup>

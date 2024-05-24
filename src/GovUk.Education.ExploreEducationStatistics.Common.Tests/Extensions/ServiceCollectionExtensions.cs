@@ -17,7 +17,9 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// This method replaces a DcContext that has been registered in Startup with an in-memory equivalent.
     /// </summary>
-    public static IServiceCollection UseInMemoryDbContext<TDbContext>(this IServiceCollection services)
+    public static IServiceCollection UseInMemoryDbContext<TDbContext>(
+        this IServiceCollection services,
+        string databaseName = null)
         where TDbContext : DbContext
     {
         // Remove the default DbContext descriptor that was provided by Startup.cs.
@@ -25,28 +27,29 @@ public static class ServiceCollectionExtensions
             .Single(d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
 
         services.Remove(descriptor);
-            
+
         // Add the new In-Memory replacement.
         return services.AddDbContext<TDbContext>(
             options => options
-                .UseInMemoryDatabase(nameof(TDbContext), builder => builder.EnableNullChecks(false)));
+                .UseInMemoryDatabase(databaseName ?? nameof(TDbContext),
+                    builder => builder.EnableNullChecks(false)));
     }
-    
+
     /// <summary>
     /// This method replaces a service that has been registered in Startup with a new implementation. The same
     /// lifecycle that was registered in Startup will be used to register the new service.
     /// </summary>
     public static IServiceCollection ReplaceService<TService>(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         TService replacement)
-        where TService : class 
+        where TService : class
     {
         // Remove the default service descriptor that was provided by Startup.cs.
         var descriptor = services
             .Single(d => d.ServiceType == typeof(TService));
-    
+
         services.Remove(descriptor);
-            
+
         // Add the replacement.
         return descriptor.Lifetime switch
         {
@@ -57,7 +60,7 @@ public static class ServiceCollectionExtensions
                 $"Cannot register test service with {nameof(ServiceLifetime)}.{descriptor.Lifetime}")
         };
     }
-    
+
     /// <summary>
     /// This method replaces a service that has been registered in Startup with a Mock. The same
     /// lifecycle that was registered in Startup will be used to register the Mock.
@@ -69,7 +72,7 @@ public static class ServiceCollectionExtensions
     {
         return services.ReplaceService(replacement.Object);
     }
-    
+
     /// <summary>
     /// This method replaces a service that has been registered in Startup with a Mock. The same
     /// lifecycle that was registered in Startup will be used to register the new service.
@@ -83,16 +86,15 @@ public static class ServiceCollectionExtensions
     {
         return services.ReplaceService(Mock.Of<TService>(behavior));
     }
-    
+
     /// <summary>
     /// This method registers all Controllers found in the <see cref="TStartup"/> class's assembly.
     /// </summary>
-    public static IServiceCollection RegisterControllers<TStartup>(
-        this IServiceCollection services)
+    public static IServiceCollection RegisterControllers<TStartup>(this IServiceCollection services)
         where TStartup : class
     {
         services
-            .AddControllers(options => 
+            .AddControllers(options =>
                 options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")))
             .AddApplicationPart(typeof(TStartup).Assembly)
             .AddControllersAsServices();

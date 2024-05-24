@@ -4,31 +4,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record DataSetFileSummaryViewModel
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public Guid FileId { get; init; }
+    public required Guid FileId { get; init; }
 
-    public string Filename { get; init; } = string.Empty;
+    public required string Filename { get; init; }
 
-    public string FileSize { get; init; } = string.Empty;
+    public required string FileSize { get; init; }
 
     public string FileExtension => Path.GetExtension(Filename).TrimStart('.');
 
-    public string Title { get; init; } = string.Empty;
+    public required string Title { get; init; }
 
-    public string Content { get; init; } = string.Empty;
+    public required string Content { get; init; }
 
-    public IdTitleViewModel Theme { get; init; } = null!;
+    public required IdTitleViewModel Theme { get; init; }
 
-    public IdTitleViewModel Publication { get; init; } = null!;
+    public required IdTitleViewModel Publication { get; init; }
 
-    public IdTitleViewModel Release { get; init; } = null!;
+    public required IdTitleViewModel Release { get; init; }
 
-    public bool LatestData { get; init; }
+    public required bool LatestData { get; init; }
 
-    public DateTime Published { get; init; }
+    public required DateTime Published { get; init; }
 
-    public bool HasApiDataSet { get; init; }
+    public required DataSetFileMetaViewModel Meta { get; init; }
 
-    public DataSetFileMetaViewModel Meta { get; init; } = null!;
+    public DataSetFileApiViewModel? Api { get; init; }
 }

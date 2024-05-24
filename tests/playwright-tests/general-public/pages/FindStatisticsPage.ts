@@ -1,4 +1,5 @@
 import { Locator, Page } from '@playwright/test';
+import slugFromTitle from '@util/slugFromTitle';
 
 export default class FindStatisticsPage {
   readonly page: Page;
@@ -11,6 +12,9 @@ export default class FindStatisticsPage {
   }
 
   async navigateToPublicReleasePage(publicationName: string) {
-    await this.releaseLink(publicationName).click();
+    await this.releaseLink(publicationName).click({ force: true });
+    await this.page.waitForURL(
+      `**/find-statistics/${slugFromTitle(publicationName)}`,
+    );
   }
 }

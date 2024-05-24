@@ -1,12 +1,12 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Semver;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
-public abstract class VersionUtilsTests
+public static class VersionUtilsTests
 {
-    public class TryParseTests : VersionUtilsTests
+    public class TryParseTests
     {
         [Theory]
         [InlineData("1.0.0", 1, 0, 0)]
@@ -18,7 +18,14 @@ public abstract class VersionUtilsTests
         [InlineData("2.0", 2, 0)]
         [InlineData("1", 1)]
         [InlineData("2", 2)]
-        public void ValidVersion_SuccessfullyParsed(string versionString, int expectedMajor, int expectedMinor = default, int expectedPatch = default)
+        [InlineData("v2.0.0", 2, 0, 0)]
+        [InlineData("v2.0", 2, 0)]
+        [InlineData("v2", 2)]
+        public void ValidVersion_SuccessfullyParsed(
+            string versionString,
+            int expectedMajor,
+            int expectedMinor = default,
+            int expectedPatch = default)
         {
             Assert.True(VersionUtils.TryParse(versionString, out var version));
 
@@ -31,7 +38,11 @@ public abstract class VersionUtilsTests
         [InlineData(" 1.1.1", 1, 1, 1)]
         [InlineData("1.1.1 ", 1, 1, 1)]
         [InlineData(" 1.1.1 ", 1, 1, 1)]
-        public void VersionWithEmptySpaces_SuccessfullyParsed(string versionString, int expectedMajor, int expectedMinor = default, int expectedPatch = default)
+        public void VersionWithEmptySpaces_SuccessfullyParsed(
+            string versionString,
+            int expectedMajor,
+            int expectedMinor = default,
+            int expectedPatch = default)
         {
             Assert.True(VersionUtils.TryParse(versionString, out var version));
 
@@ -49,10 +60,13 @@ public abstract class VersionUtilsTests
         [InlineData("a 1")]
         [InlineData("1 a")]
         [InlineData("1.1.1.1")]
+        [InlineData("V1.1.1")]
+        [InlineData("V1.1")]
+        [InlineData("V1")]
 
         public void InvalidVersion_FailsToParse(string versionString)
         {
-            Assert.False(VersionUtils.TryParse(versionString, out var _));
+            Assert.False(VersionUtils.TryParse(versionString, out _));
         }
     }
 }

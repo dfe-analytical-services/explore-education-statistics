@@ -20,7 +20,7 @@ internal class GeographicLevelFacetsParser(
     {
         var fragments = new List<IInterpolatedSql>();
 
-        var parsedEq = facets.GeographicLevels?.ParsedEq;
+        var parsedEq = facets.GeographicLevels?.ParsedEq();
 
         if (parsedEq is not null)
         {
@@ -32,7 +32,7 @@ internal class GeographicLevelFacetsParser(
             );
         }
 
-        var parsedNotEq = facets.GeographicLevels?.ParsedNotEq;
+        var parsedNotEq = facets.GeographicLevels?.ParsedNotEq();
 
         if (parsedNotEq is not null)
         {
@@ -45,7 +45,7 @@ internal class GeographicLevelFacetsParser(
             );
         }
 
-        var parsedIn = facets.GeographicLevels?.ParsedIn;
+        var parsedIn = facets.GeographicLevels?.ParsedIn();
 
         if (parsedIn is not null && parsedIn.Count != 0)
         {
@@ -57,7 +57,7 @@ internal class GeographicLevelFacetsParser(
             );
         }
 
-        var parsedNotIn = facets.GeographicLevels?.ParsedNotIn;
+        var parsedNotIn = facets.GeographicLevels?.ParsedNotIn();
 
         if (parsedNotIn is not null && parsedNotIn.Count != 0)
         {

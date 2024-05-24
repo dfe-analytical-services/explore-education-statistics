@@ -578,6 +578,7 @@ const PrototypeHomepage = () => {
                   <h4>Data set summary</h4>
                   <UrlContainer
                     className="govuk-!-margin-bottom-2"
+                    id="data-set-summary-endpoint"
                     url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}"
                   />
                   <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/GetDataSet/">
@@ -588,11 +589,13 @@ const PrototypeHomepage = () => {
                   <h5>Using GET</h5>
                   <UrlContainer
                     className="govuk-!-margin-bottom-6"
+                    id="data-set-get-query-endpoint"
                     url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
                   />
                   <h5>Using POST</h5>
                   <UrlContainer
                     className="govuk-!-margin-bottom-2"
+                    id="data-set-post-query-endpoint"
                     url="POST https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
                   />
                   <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/QueryDataSetGet/">

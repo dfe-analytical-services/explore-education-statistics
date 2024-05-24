@@ -1,4 +1,6 @@
 using FluentValidation.TestHelper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -9,50 +11,17 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
 {
     private readonly DataSetGetQueryGeographicLevels.Validator _validator = new();
 
-    public static IEnumerable<object[]> ValidGeographicLevelsSingle()
-    {
-        return
-        [
-            ["NAT"],
-            ["LA"],
-            [null],
-        ];
-    }
+    public static readonly TheoryData<string?> ValidGeographicLevelsSingle =
+        DataSetQueryCriteriaGeographicLevelsValidatorTests.ValidGeographicLevelsSingle;
 
-    public static IEnumerable<object[]> ValidGeographicLevelsMultiple()
-    {
-        return
-        [
-            ["NAT", "LA", "REG"],
-            ["SCH", "NAT"],
-            ["PROV"],
-        ];
-    }
+    public static readonly TheoryData<string[]> ValidGeographicLevelsMultiple =
+        DataSetQueryCriteriaGeographicLevelsValidatorTests.ValidGeographicLevelsMultiple;
 
-    public static IEnumerable<object[]> InvalidGeographicLevelsSingle()
-    {
-        return
-        [
-            [""],
-            ["Invalid"],
-            ["National"],
-            ["nat"],
-            ["la"],
-            ["1"],
-        ];
-    }
+    public static readonly TheoryData<string> InvalidGeographicLevelsSingle =
+        DataSetQueryCriteriaGeographicLevelsValidatorTests.InvalidGeographicLevelsSingle;
 
-    public static IEnumerable<object[]> InvalidGeographicLevelsMultiple()
-    {
-        return
-        [
-            ["Invalid1", "Invalid2"],
-            ["National", "LocalAuthority"],
-            ["nat", "la"],
-            ["Local authority"],
-            ["National"],
-        ];
-    }
+    public static readonly TheoryData<string[]> InvalidGeographicLevelsMultiple =
+        DataSetQueryCriteriaGeographicLevelsValidatorTests.InvalidGeographicLevelsMultiple;
 
     public class EqTests : DataSetGetQueryGeographicLevelsValidatorTests
     {
@@ -71,20 +40,15 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
         {
             var query = new DataSetGetQueryGeographicLevels { Eq = geographicLevel };
 
-            var result = _validator.Validate(query);
+            var result = _validator.TestValidate(query);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(DataSetGetQueryGeographicLevels.Eq), error.PropertyName);
-            Assert.Equal(ValidationMessages.AllowedValue.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.AllowedValue.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
-
-            Assert.Equal(geographicLevel, state.Value);
-            Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
+            result.ShouldHaveValidationErrorFor(g => g.Eq)
+                .WithErrorCode(ValidationMessages.AllowedValue.Code)
+                .WithErrorMessage(ValidationMessages.AllowedValue.Message)
+                .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s => s.Value == geographicLevel)
+                .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
+                    s.Allowed.SequenceEqual(GeographicLevelUtils.OrderedCodes))
+                .Only();
         }
     }
 
@@ -105,20 +69,15 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
         {
             var query = new DataSetGetQueryGeographicLevels { NotEq = geographicLevel };
 
-            var result = _validator.Validate(query);
+            var result = _validator.TestValidate(query);
 
-            Assert.False(result.IsValid);
-
-            var error = Assert.Single(result.Errors);
-
-            Assert.Equal(nameof(DataSetGetQueryGeographicLevels.NotEq), error.PropertyName);
-            Assert.Equal(ValidationMessages.AllowedValue.Code, error.ErrorCode);
-            Assert.Equal(ValidationMessages.AllowedValue.Message, error.ErrorMessage);
-
-            var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
-
-            Assert.Equal(geographicLevel, state.Value);
-            Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
+            result.ShouldHaveValidationErrorFor(g => g.NotEq)
+                .WithErrorCode(ValidationMessages.AllowedValue.Code)
+                .WithErrorMessage(ValidationMessages.AllowedValue.Message)
+                .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s => s.Value == geographicLevel)
+                .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
+                    s.Allowed.SequenceEqual(GeographicLevelUtils.OrderedCodes))
+                .Only();
         }
     }
 
@@ -141,27 +100,37 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
+        [Fact]
+        public void Failure_Empty()
+        {
+            var query = new DataSetGetQueryGeographicLevels { In = [] };
+
+            var result = _validator.TestValidate(query);
+
+            result.ShouldHaveValidationErrorFor(q => q.In)
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+        }
+
         [Theory]
         [MemberData(nameof(InvalidGeographicLevelsMultiple))]
         public void Failure_NotAllowed(params string[] geographicLevels)
         {
             var query = new DataSetGetQueryGeographicLevels { In = geographicLevels };
 
-            var result = _validator.Validate(query);
+            var result = _validator.TestValidate(query);
 
-            Assert.False(result.IsValid);
+            Assert.Equal(geographicLevels.Length, result.Errors.Count);
 
-            Assert.All(result.Errors, (error, index) =>
+            foreach (var (error, index) in result.Errors.WithIndex())
             {
-                Assert.Equal($"In[{index}]", error.PropertyName);
-                Assert.Equal(ValidationMessages.AllowedValue.Code, error.ErrorCode);
-                Assert.Equal(ValidationMessages.AllowedValue.Message, error.ErrorMessage);
-
-                var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
-
-                Assert.Equal(error.AttemptedValue, state.Value);
-                Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
-            });
+                result.ShouldHaveValidationErrorFor($"In[{index}]")
+                    .WithErrorCode(ValidationMessages.AllowedValue.Code)
+                    .WithErrorMessage(ValidationMessages.AllowedValue.Message)
+                    .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
+                        s.Value == (string)error.AttemptedValue)
+                    .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
+                        s.Allowed.SequenceEqual(GeographicLevelUtils.OrderedCodes));
+            }
         }
     }
 
@@ -191,21 +160,20 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
         {
             var query = new DataSetGetQueryGeographicLevels { In = geographicLevels };
 
-            var result = _validator.Validate(query);
+            var result = _validator.TestValidate(query);
 
-            Assert.False(result.IsValid);
+            Assert.Equal(geographicLevels.Length, result.Errors.Count);
 
-            Assert.All(result.Errors, (error, index) =>
+            foreach (var (error, index) in result.Errors.WithIndex())
             {
-                Assert.Equal($"In[{index}]", error.PropertyName);
-                Assert.Equal(ValidationMessages.AllowedValue.Code, error.ErrorCode);
-                Assert.Equal(ValidationMessages.AllowedValue.Message, error.ErrorMessage);
-
-                var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
-
-                Assert.Equal(error.AttemptedValue, state.Value);
-                Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
-            });
+                result.ShouldHaveValidationErrorFor($"In[{index}]")
+                    .WithErrorCode(ValidationMessages.AllowedValue.Code)
+                    .WithErrorMessage(ValidationMessages.AllowedValue.Message)
+                    .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
+                        s.Value == (string)error.AttemptedValue)
+                    .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
+                        s.Allowed.SequenceEqual(GeographicLevelUtils.OrderedCodes));
+            }
         }
     }
 
@@ -223,6 +191,8 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
             };
 
             var result = _validator.TestValidate(query);
+
+            Assert.Equal(4, result.Errors.Count);
 
             result.ShouldHaveValidationErrorFor(q => q.Eq)
                 .WithErrorCode(ValidationMessages.AllowedValue.Code);
@@ -246,6 +216,8 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
             };
 
             var result = _validator.TestValidate(query);
+
+            Assert.Equal(2, result.Errors.Count);
 
             result.ShouldNotHaveValidationErrorFor(q => q.Eq);
             result.ShouldNotHaveValidationErrorFor(q => q.In);

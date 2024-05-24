@@ -4,10 +4,10 @@ import { useReleaseContentState } from '@admin/pages/release/content/contexts/Re
 import { FeaturedTableLink } from '@admin/types/ckeditor';
 import Button from '@common/components/Button';
 import FormComboBox from '@common/components/form/FormComboBox';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import ButtonGroup from '@common/components/ButtonGroup';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import Yup from '@common/validation/yup';
@@ -62,14 +62,14 @@ export default function FeaturedTableLinkInsertForm({
   return (
     <FormProvider validationSchema={validationSchema}>
       {({ formState, getValues, handleSubmit, setValue, trigger }) => {
-        const { getError } = createRHFErrorHelper({
+        const { getError } = createErrorHelper({
           errors: formState.errors,
           touchedFields: formState.touchedFields,
           isSubmitted: true,
         });
 
         return (
-          <RHFForm
+          <Form
             id="featuredTablesForm"
             showErrorSummary={false}
             onSubmit={handleFormSubmit}
@@ -104,7 +104,7 @@ export default function FeaturedTableLinkInsertForm({
                 />
 
                 {getValues('dataBlockParentId') && (
-                  <RHFFormFieldTextInput<FormValues>
+                  <FormFieldTextInput<FormValues>
                     formGroupClass="govuk-!-margin-top-5 govuk-!-margin-bottom-2"
                     id="text"
                     label="Link text"
@@ -138,7 +138,7 @@ export default function FeaturedTableLinkInsertForm({
                 </Button>
               </>
             )}
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

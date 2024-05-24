@@ -17,10 +17,11 @@ const Pagination = ({
   ...props
 }: Props) => {
   const router = useRouter();
+
   return (
     <BasePagination
       {...props}
-      baseUrl={baseUrl ?? router.pathname}
+      baseUrl={baseUrl}
       queryParams={queryParams ?? router.query}
       renderLink={({ 'data-testid': testId, ...linkProps }) => (
         <Link

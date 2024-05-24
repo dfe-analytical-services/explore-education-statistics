@@ -346,7 +346,7 @@ const PrototypeHomepage = () => {
                           : 'Show all sections on page'}
                       </a>
                     </li>
-                  </ul>      
+                  </ul>
                   */}
                   {sectionShowAll && (
                     <>
@@ -636,7 +636,7 @@ const PrototypeHomepage = () => {
                       </tbody>
                     </table>
                   </div>
-                  {/* 
+                  {/*
                   <div className="govuk-!-margin-bottom-6 govuk-!-margin-top-6">
                     <a
                       href="#"
@@ -1091,6 +1091,7 @@ const PrototypeHomepage = () => {
                     <UrlContainer
                       className="govuk-!-margin-bottom-2"
                       url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57"
+                      id="data-set-summary-endpoint"
                     />
                   </div>
                   <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/GetDataSet/">
@@ -1102,6 +1103,7 @@ const PrototypeHomepage = () => {
                     <UrlContainer
                       className="govuk-!-margin-bottom-2"
                       url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57/meta"
+                      id="data-set-meta-endpoint"
                     />
                   </div>
                   <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/GetDataSetMeta/">
@@ -1114,6 +1116,7 @@ const PrototypeHomepage = () => {
                     <UrlContainer
                       className="govuk-!-margin-bottom-2"
                       url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57/query"
+                      id="data-set-get-query-endpoint"
                     />
                   </div>
                   <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/QueryDataSetGet/">
@@ -1125,6 +1128,7 @@ const PrototypeHomepage = () => {
                     <UrlContainer
                       className="govuk-!-margin-bottom-2"
                       url="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57/query"
+                      id="data-set-post-query-endpoint"
                     />
                   </div>
                   <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/QueryDataSetPost/">

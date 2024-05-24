@@ -6,10 +6,10 @@ import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import { mapFieldErrors } from '@common/validation/serverValidations';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
@@ -65,7 +65,7 @@ export default function PublicationAccessForm({
     >
       {({ formState }) => {
         return (
-          <RHFForm
+          <Form
             id={`${user.id}-publicationRole`}
             onSubmit={handleAddPublicationRole}
           >
@@ -77,7 +77,7 @@ export default function PublicationAccessForm({
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half">
-                  <RHFFormFieldSelect<FormValues>
+                  <FormFieldSelect<FormValues>
                     label="Publication"
                     name="publicationId"
                     options={publications?.map(publication => ({
@@ -88,7 +88,7 @@ export default function PublicationAccessForm({
                 </div>
 
                 <div className="govuk-grid-column-one-quarter">
-                  <RHFFormFieldSelect<FormValues>
+                  <FormFieldSelect<FormValues>
                     label="Publication role"
                     name="publicationRole"
                     options={publicationRoles?.map(role => ({
@@ -151,7 +151,7 @@ export default function PublicationAccessForm({
                   ))}
               </tbody>
             </table>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

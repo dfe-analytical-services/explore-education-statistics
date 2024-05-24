@@ -1,6 +1,6 @@
 import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { IdTitlePair } from '@admin/services/types/common';
 import {
   InviteUserReleaseRole,
@@ -91,7 +91,7 @@ export default function InviteUserReleaseRoleForm({
       legendSize="m"
       hint="The user's release roles within the service."
     >
-      <RHFFormFieldSelect<UserInviteFormValues>
+      <FormFieldSelect<UserInviteFormValues>
         label="Release"
         name="releaseId"
         placeholder="Choose release"
@@ -100,7 +100,7 @@ export default function InviteUserReleaseRoleForm({
           value: release.id,
         }))}
       />
-      <RHFFormFieldSelect<UserInviteFormValues>
+      <FormFieldSelect<UserInviteFormValues>
         label="Release role"
         name="releaseRole"
         placeholder="Choose release role"

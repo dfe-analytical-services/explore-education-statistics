@@ -16,7 +16,6 @@ ${PUBLICATION_NAME}=                            UI tests - publish methodology p
 ${PUBLIC_METHODOLOGY_URL_ENDING}=               /methodology/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_UPDATED}=                    ${PUBLICATION_NAME} updated
 ${PUBLIC_PUBLICATION_URL_ENDING}=               /find-statistics/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
-${EXPECTED_PUBLIC_PUBLICATION_URL_ENDING}=      %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}
 ${RELEASE_NAME}=                                Academic year Q1
 ${ACADEMIC_YEAR}=                               /2046-47
 
@@ -64,8 +63,8 @@ Update publication details
     user enters text into element    label:Publication title    ${PUBLICATION_NAME_UPDATED}
     user clicks button    Update publication details
     ${modal}=    user waits until modal is visible    Confirm publication changes
-    user checks element contains valid URL    id:before-url    ${EXPECTED_PUBLIC_PUBLICATION_URL_ENDING}
-    user checks element contains valid url    id:after-url    ${EXPECTED_PUBLIC_PUBLICATION_URL_ENDING}-updated
+    user checks input field contains    id:before-url    ${PUBLIC_PUBLICATION_URL_ENDING}
+    user checks input field contains    id:after-url     ${PUBLIC_PUBLICATION_URL_ENDING}-updated
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
     user checks summary list contains    Publication title    ${PUBLICATION_NAME_UPDATED}
@@ -142,7 +141,7 @@ Navigate to sign-off page and approve the methodology immediately
     user clicks radio    Immediately
     user clicks button    Update status
     user waits until page contains    Approved
-    sleep    2    # Wait for methodology to be published
+    user waits for caches to expire
 
 Validate methodology re-directs works for the updated publication methodology
     user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}

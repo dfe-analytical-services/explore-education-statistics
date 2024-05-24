@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetFilterRepository(
     IDuckDbConnection duckDbConnection,
-    IParquetPathResolver parquetPathResolver)
+    IDataSetVersionPathResolver dataSetVersionPathResolver)
     : IParquetFilterRepository
 {
     public async Task<IList<ParquetFilterOption>> ListOptions(
@@ -44,7 +44,7 @@ public class ParquetFilterRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT *
-             FROM '{parquetPathResolver.FiltersPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
              WHERE {FilterOptionsTable.Cols.PublicId:raw} IN ({publicIdsList})
              """
         );
@@ -86,7 +86,7 @@ public class ParquetFilterRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT {columnsFragments}
-             FROM '{parquetPathResolver.FiltersPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
              WHERE {FilterOptionsTable.Cols.Id:raw} IN ({ids})
              """
         );
@@ -101,7 +101,7 @@ public class ParquetFilterRepository(
         var command = duckDbConnection.SqlBuilder(
             $"""
              SELECT DISTINCT {FilterOptionsTable.Cols.FilterId:raw}
-             FROM '{parquetPathResolver.FiltersPath(dataSetVersion):raw}'
+             FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
              """);
 
         var cols = await command

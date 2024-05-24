@@ -8,10 +8,10 @@ import userService from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
@@ -94,13 +94,13 @@ const PublicationInviteNewUsersForm = ({
       >
         {({ formState }) => {
           return (
-            <RHFForm id="inviteContributorForm" onSubmit={handleSubmit}>
-              <RHFFormFieldTextInput
+            <Form id="inviteContributorForm" onSubmit={handleSubmit}>
+              <FormFieldTextInput
                 className="govuk-!-width-one-third"
                 name="email"
                 label="Enter an email address"
               />
-              <RHFFormFieldCheckboxGroup<FormValues>
+              <FormFieldCheckboxGroup<FormValues>
                 name="releaseIds"
                 legend="Select which releases you wish the user to have access"
                 legendSize="m"
@@ -135,7 +135,7 @@ const PublicationInviteNewUsersForm = ({
                   Cancel
                 </ButtonText>
               </ButtonGroup>
-            </RHFForm>
+            </Form>
           );
         }}
       </FormProvider>

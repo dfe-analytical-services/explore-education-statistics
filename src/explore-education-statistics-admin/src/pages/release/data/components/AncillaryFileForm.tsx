@@ -2,11 +2,11 @@ import { AncillaryFile } from '@admin/services/releaseAncillaryFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFFormFieldFileInput from '@common/components/form/rhf/RHFFormFieldFileInput';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import Form from '@common/components/form/Form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
@@ -111,22 +111,22 @@ export default function AncillaryFileForm({
     >
       {({ formState, reset }) => {
         return (
-          <RHFForm id={formId} onSubmit={onSubmit}>
-            <RHFFormFieldTextInput<AncillaryFileFormValues>
+          <Form id={formId} onSubmit={onSubmit}>
+            <FormFieldTextInput<AncillaryFileFormValues>
               className="govuk-!-width-one-half"
               disabled={formState.isSubmitting}
               label="Title"
               name="title"
             />
 
-            <RHFFormFieldTextArea<AncillaryFileFormValues>
+            <FormFieldTextArea<AncillaryFileFormValues>
               className="govuk-!-width-one-half"
               disabled={formState.isSubmitting}
               label="Summary"
               name="summary"
             />
 
-            <RHFFormFieldFileInput<AncillaryFileFormValues>
+            <FormFieldFileInput<AncillaryFileFormValues>
               disabled={formState.isSubmitting}
               hint="Maximum file size 2GB"
               label={isEditing ? 'Upload new file' : 'Upload file'}
@@ -157,7 +157,7 @@ export default function AncillaryFileForm({
                 text="Saving file"
               />
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

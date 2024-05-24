@@ -1,18 +1,29 @@
 import FormField, {
   FormFieldComponentProps,
 } from '@common/components/form/FormField';
-import FormNumberInput, {
-  FormNumberInputProps,
-} from '@common/components/form/FormNumberInput';
+import FormBaseInput, {
+  FormBaseInputProps,
+} from '@common/components/form/FormBaseInput';
 import React from 'react';
+import { FieldValues } from 'react-hook-form';
 
-type Props<FormValues> = FormFieldComponentProps<
+type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
   FormNumberInputProps,
-  FormValues
+  TFormValues
 >;
 
-function FormFieldNumberInput<FormValues>(props: Props<FormValues>) {
-  return <FormField {...props} as={FormNumberInput} type="number" />;
+export default function FormFieldNumberInput<TFormValues extends FieldValues>(
+  props: Props<TFormValues>,
+) {
+  return <FormField {...props} as={FormNumberInput} isNumberField />;
 }
 
-export default FormFieldNumberInput;
+interface FormNumberInputProps extends FormBaseInputProps {
+  defaultValue?: number;
+  min?: number;
+  max?: number;
+}
+
+function FormNumberInput(props: FormNumberInputProps) {
+  return <FormBaseInput {...props} type="number" />;
+}

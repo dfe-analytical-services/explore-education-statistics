@@ -50,7 +50,7 @@ public class DataSetFilesController : ControllerBase
     }
 
     [HttpGet("data-set-files/{dataSetFileId:guid}")]
-    public async Task<ActionResult<DataSetFileViewModel>> GetDataSet(
+    public async Task<ActionResult<DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetFileId)
     {
         return await _dataSetFileService

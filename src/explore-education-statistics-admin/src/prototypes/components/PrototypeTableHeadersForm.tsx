@@ -1,7 +1,7 @@
 import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import useToggle from '@common/hooks/useToggle';
 import useMounted from '@common/hooks/useMounted';
@@ -269,7 +269,7 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
               >
                 {form => {
                   return (
-                    <RHFForm
+                    <Form
                       id={`${id}-form`}
                       showErrorSummary={false}
                       onSubmit={handleSubmit}
@@ -352,7 +352,7 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
                       >
                         Update and view reordered table
                       </Button>
-                    </RHFForm>
+                    </Form>
                   );
                 }}
               </FormProvider>

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -33,7 +34,7 @@ public class JsonConverterSchemaFilterTests
     [InlineData(nameof(TestEnumConverters.StringEnumTyped))]
     public void JsonStringEnumConverters(string propertyName)
     {
-        var schema = GenerateTestEnumConvertersSchema();
+        var schema = GenerateSchema<TestEnumConverters>();
 
         var schemaPropertyName = propertyName.CamelCase();
         var propertySchema = schema.Properties[schemaPropertyName];
@@ -54,7 +55,7 @@ public class JsonConverterSchemaFilterTests
     [Fact]
     public void EnumToEnumLabelConverter()
     {
-        var schema = GenerateTestEnumConvertersSchema();
+        var schema = GenerateSchema<TestEnumConverters>();
 
         var schemaPropertyName = nameof(TestEnumConverters.EnumToEnumLabel).CamelCase();
         var propertySchema = schema.Properties[schemaPropertyName];
@@ -75,7 +76,7 @@ public class JsonConverterSchemaFilterTests
     [Fact]
     public void EnumToEnumValueConverter()
     {
-        var schema = GenerateTestEnumConvertersSchema();
+        var schema = GenerateSchema<TestEnumConverters>();
 
         var schemaPropertyName = nameof(TestEnumConverters.EnumToEnumValue).CamelCase();
         var propertySchema = schema.Properties[schemaPropertyName];
@@ -93,14 +94,60 @@ public class JsonConverterSchemaFilterTests
         Assert.Equal(TestEnum.Sample2.GetEnumValue(), enumString2.Value);
     }
 
+    [Fact]
+    public void ListConverter_GeographicLevelEnumLabels()
+    {
+        var schema = GenerateSchema<TestReadOnlyListEnumConverters>();
+
+        var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumLabels).CamelCase();
+        var propertySchema = schema.Properties[schemaPropertyName];
+
+        Assert.Null(propertySchema.Reference);
+        Assert.Empty(propertySchema.AllOf);
+
+        Assert.Equal("array", propertySchema.Type);
+
+        Assert.Null(propertySchema.Items.Reference);
+        Assert.Empty(propertySchema.Items.AllOf);
+
+        var enumStrings = propertySchema.Items.Enum.Cast<OpenApiString>()
+            .Select(e => e.Value)
+            .ToList();
+
+        Assert.Equal(EnumUtil.GetEnumLabels<GeographicLevel>(), enumStrings);
+    }
+
+    [Fact]
+    public void ListConverter_GeographicLevelEnumValues()
+    {
+        var schema = GenerateSchema<TestReadOnlyListEnumConverters>();
+
+        var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumValues).CamelCase();
+        var propertySchema = schema.Properties[schemaPropertyName];
+
+        Assert.Null(propertySchema.Reference);
+        Assert.Empty(propertySchema.AllOf);
+
+        Assert.Equal("array", propertySchema.Type);
+
+        Assert.Null(propertySchema.Items.Reference);
+        Assert.Empty(propertySchema.Items.AllOf);
+
+        var enumStrings = propertySchema.Items.Enum.Cast<OpenApiString>()
+            .Select(e => e.Value)
+            .ToList();
+
+        Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>(), enumStrings);
+    }
+
     [Theory]
-    [InlineData(nameof(TestEnumConverters.GeographicLevelStringEnum))]
-    [InlineData(nameof(TestEnumConverters.GeographicLevelStringEnumTyped))]
-    [InlineData(nameof(TestEnumConverters.GeographicLevelEnumToEnumLabel))]
-    [InlineData(nameof(TestEnumConverters.GeographicLevelEnumToEnumValue))]
+    [InlineData(nameof(TestIgnoredEnumConverters.GeographicLevelStringEnum))]
+    [InlineData(nameof(TestIgnoredEnumConverters.GeographicLevelStringEnumTyped))]
+    [InlineData(nameof(TestIgnoredEnumConverters.GeographicLevelEnumToEnumLabel))]
+    [InlineData(nameof(TestIgnoredEnumConverters.GeographicLevelEnumToEnumValue))]
     public void GeographicLevel_Ignored(string propertyName)
     {
-        var schema = GenerateTestEnumConvertersSchema();
+        var schema = GenerateSchema<TestIgnoredEnumConverters>();
 
         var schemaPropertyName = propertyName.CamelCase();
         var propertySchema = schema.Properties[schemaPropertyName];
@@ -112,13 +159,13 @@ public class JsonConverterSchemaFilterTests
     }
 
     [Theory]
-    [InlineData(nameof(TestEnumConverters.TimeIdentifierStringEnum))]
-    [InlineData(nameof(TestEnumConverters.TimeIdentifierStringEnumTyped))]
-    [InlineData(nameof(TestEnumConverters.TimeIdentifierEnumToEnumLabel))]
-    [InlineData(nameof(TestEnumConverters.TimeIdentifierEnumToEnumValue))]
+    [InlineData(nameof(TestIgnoredEnumConverters.TimeIdentifierStringEnum))]
+    [InlineData(nameof(TestIgnoredEnumConverters.TimeIdentifierStringEnumTyped))]
+    [InlineData(nameof(TestIgnoredEnumConverters.TimeIdentifierEnumToEnumLabel))]
+    [InlineData(nameof(TestIgnoredEnumConverters.TimeIdentifierEnumToEnumValue))]
     public void TimeIdentifier_Ignored(string propertyName)
     {
-        var schema = GenerateTestEnumConvertersSchema();
+        var schema = GenerateSchema<TestIgnoredEnumConverters>();
 
         var schemaPropertyName = propertyName.CamelCase();
         var propertySchema = schema.Properties[schemaPropertyName];
@@ -129,12 +176,12 @@ public class JsonConverterSchemaFilterTests
         Assert.Empty(propertySchema.Enum);
     }
 
-    private OpenApiSchema GenerateTestEnumConvertersSchema()
+    private OpenApiSchema GenerateSchema<TConverters>()
     {
         _schemaGenerator.GenerateSchema(typeof(TestEnum), _schemaRepository);
-        _schemaGenerator.GenerateSchema(typeof(TestEnumConverters), _schemaRepository);
+        _schemaGenerator.GenerateSchema(typeof(TConverters), _schemaRepository);
 
-        return _schemaRepository.Schemas[nameof(TestEnumConverters)];
+        return _schemaRepository.Schemas[typeof(TConverters).Name];
     }
 
     private class TestEnumConverters
@@ -150,7 +197,10 @@ public class JsonConverterSchemaFilterTests
 
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<TestEnum>))]
         public TestEnum EnumToEnumValue { get; init; }
+    }
 
+    private class TestIgnoredEnumConverters
+    {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public GeographicLevel GeographicLevelStringEnum { get; init; }
 
@@ -174,6 +224,15 @@ public class JsonConverterSchemaFilterTests
 
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
         public TimeIdentifier TimeIdentifierEnumToEnumValue { get; init; }
+    }
+
+    private class TestReadOnlyListEnumConverters
+    {
+        [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
+        public IReadOnlyList<GeographicLevel> GeographicLevelEnumLabels { get; init; } = [];
+
+        [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
+        public IReadOnlyList<GeographicLevel> GeographicLevelEnumValues { get; init; } = [];
     }
 
     private enum TestEnum
