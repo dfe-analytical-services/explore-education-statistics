@@ -98,7 +98,7 @@ async function startServer() {
       seoRedirectPath => seoRedirectPath.from === request.url,
     );
     if (seoRedirect) {
-      redirectPath.path = seoRedirect.to;
+      redirectPath = seoRedirect.to;
     }
 
     const redirectionRequired =
