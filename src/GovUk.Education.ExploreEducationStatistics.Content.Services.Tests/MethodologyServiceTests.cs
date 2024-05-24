@@ -691,13 +691,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             VerifyAllMocks(methodologyVersionRepository);
         }
-        
+
         [Fact]
         public async Task GetSitemapSummaries()
         {
             var methodologyVersionId = Guid.NewGuid();
             var methodologyUpdatedDate = new DateTime(2017, 02, 03, 01, 04, 19);
-            
+
             var methodology = new Methodology
             {
                 OwningPublicationSlug = "publication-title",
@@ -751,13 +751,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(methodologyUpdatedDate, result.Single().LastModified);
             }
         }
-        
-                [Fact]
+
+        [Fact]
         public async Task GetSitemapSummaries_AlternativeSlugTakesPriority()
         {
             var methodologyVersionId = Guid.NewGuid();
             var methodologyUpdatedDate = new DateTime(2017, 02, 03, 01, 04, 19);
-            
+
             var methodology = new Methodology
             {
                 OwningPublicationSlug = "publication-title",
@@ -813,7 +813,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(methodologyUpdatedDate, result.Single().LastModified);
             }
         }
-        
+
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
