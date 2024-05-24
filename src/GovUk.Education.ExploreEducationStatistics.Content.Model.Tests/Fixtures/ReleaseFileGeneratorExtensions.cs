@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using System;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -18,7 +18,8 @@ public static class ReleaseFileGeneratorExtensions
             .SetDefault(rf => rf.Id)
             .SetDefault(rf => rf.Name)
             .SetDefault(rf => rf.Order)
-            .SetDefault(rf => rf.Summary);
+            .SetDefault(rf => rf.Summary)
+            .SetDefault(rf => rf.Published);
 
     public static Generator<ReleaseFile> WithFile(
         this Generator<ReleaseFile> generator,
