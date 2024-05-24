@@ -134,9 +134,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
             this Task<Either<TFailure, TSuccess>> task,
+            Action successTask)
+        {
+            return await task.OnSuccessDo(_ => successTask());
+        }
+
+        public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
             Func<Task> successTask)
         {
             return await task.OnSuccessDo(async _ => await successTask());
+        }
+
+        public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Action<TSuccess> successTask)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            successTask(firstResult.Right);
+            return firstResult.Right;
         }
 
         public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
