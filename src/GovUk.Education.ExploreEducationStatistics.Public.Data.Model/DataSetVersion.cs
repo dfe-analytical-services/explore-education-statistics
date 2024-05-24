@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +78,11 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     {
         public void Configure(EntityTypeBuilder<DataSetVersion> builder)
         {
-            builder.Property(dsv => dsv.Status).HasConversion<string>();
+            builder.Property(dsv => dsv.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
+            builder.Property(dsv => dsv.Status)
+                .HasConversion<string>();
 
             builder.OwnsOne(v => v.MetaSummary, ms =>
             {

@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -26,6 +27,9 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
     {
         public void Configure(EntityTypeBuilder<DataSetVersionImport> builder)
         {
+            builder.Property(i => i.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
             builder.Property(i => i.Stage)
                 .HasConversion<string>();
 

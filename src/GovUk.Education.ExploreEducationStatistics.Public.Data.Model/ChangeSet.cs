@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -26,6 +27,9 @@ public class ChangeSetFilters : ChangeSet<FilterChangeState>
     {
         public void Configure(EntityTypeBuilder<ChangeSetFilters> builder)
         {
+            builder.Property(cs => cs.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
@@ -44,6 +48,9 @@ public class ChangeSetFilterOptions : ChangeSet<FilterOptionChangeState>
     {
         public void Configure(EntityTypeBuilder<ChangeSetFilterOptions> builder)
         {
+            builder.Property(cs => cs.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
@@ -62,6 +69,9 @@ public class ChangeSetIndicators : ChangeSet<IndicatorChangeState>
     {
         public void Configure(EntityTypeBuilder<ChangeSetIndicators> builder)
         {
+            builder.Property(cs => cs.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
@@ -88,6 +98,9 @@ public class ChangeSetLocations : ChangeSet<LocationChangeState>
     {
         public void Configure(EntityTypeBuilder<ChangeSetLocations> builder)
         {
+            builder.Property(cs => cs.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
@@ -109,6 +122,9 @@ public class ChangeSetTimePeriods : ChangeSet<TimePeriodChangeState>
     {
         public void Configure(EntityTypeBuilder<ChangeSetTimePeriods> builder)
         {
+            builder.Property(cs => cs.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
