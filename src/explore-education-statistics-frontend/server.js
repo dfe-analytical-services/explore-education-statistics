@@ -72,12 +72,7 @@ async function startServer() {
   const server = express();
 
   function replaceLastOccurrence(input, pattern, replacement) {
-    if (
-      input === undefined ||
-      input === null ||
-      input.length === 0 ||
-      !input.endsWith(pattern)
-    ) {
+    if (!input || !input.endsWith(pattern)) {
       return input;
     }
 
@@ -85,42 +80,33 @@ async function startServer() {
   }
 
   function isRedirectionRequired(request) {
-    const hostnameIncludesWWW = request.hostname.startsWith('www');
-    let redirectionPath = request.path;
+    let redirectPath = request.path;
 
     // Redirect URLs with trailing slash to equivalent without slash with 301
-    redirectionPath = replaceLastOccurrence(redirectionPath, '/', '');
+    redirectPath = replaceLastOccurrence(redirectPath, '/', '');
 
     // Bots are adding /1000 and Google isn't yet omitting them from its index automatically,
     // so we should redirect away from them
-    redirectionPath = replaceLastOccurrence(redirectionPath, '/1000', '');
+    redirectPath = replaceLastOccurrence(redirectPath, '/1000', '');
 
     // Search wrongly indexed pages from Google Search Console for matches
     // Redirect away if found to (eventually) clear routes from index
-    const urlMatch = seoRedirects.find(source => source.from === request.url);
-    if (urlMatch !== undefined) {
-      redirectionPath.path = urlMatch.to;
+    const urlMatch = seoRedirects.find(
+      seoRedirectPath => seoRedirectPath.from === request.url,
+    );
+    if (urlMatch) {
+      redirectPath.path = urlMatch.to;
     }
 
     const redirectionRequired =
-      hostnameIncludesWWW || redirectionPath !== request.path;
+      request.hostname.startsWith('www') || redirectPath !== request.path;
 
     if (redirectionRequired) {
-      // PUBLIC_URL ends in a slash, and redirectionPath starts with one, but we only want one in total
-      const newUrl = new URL(
-        `${replaceLastOccurrence(
-          process.env.PUBLIC_URL,
-          '/',
-          '',
-        )}${redirectionPath}`,
-      );
-
       // Restore any search parameters on original request
-      Object.keys(request.query).forEach(paramKey => {
-        newUrl.searchParams.append(paramKey, request.param(paramKey));
-      });
+      const requestUrl = new URL(request.url, url);
+      const redirectUrl = new URL(`${redirectPath}${requestUrl.search}`, url);
 
-      return newUrl.href;
+      return redirectUrl.href;
     }
 
     return undefined;
@@ -138,7 +124,7 @@ async function startServer() {
     }
 
     const potentialRedirectUrl = isRedirectionRequired(req);
-    if (potentialRedirectUrl !== undefined) {
+    if (potentialRedirectUrl) {
       return res.redirect(301, potentialRedirectUrl);
     }
 
