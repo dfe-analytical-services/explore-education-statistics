@@ -106,7 +106,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' e
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
-resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' existing = {
   name: coreStorageAccountName
   scope: resourceGroup(resourceGroup().name)
 }
@@ -151,7 +151,7 @@ module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
 // It would be possible to use KV references if restructuring main.bicep to make the creation of the Container App
 // and Data Processor their own sub-modules in the "application" folder.  Then, we could use @secure() params
 // and keyVaultResource.getSecret() to pass the secrets through.
-resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' existing = {
   name: publicApiStorageAccountName
 }
 
