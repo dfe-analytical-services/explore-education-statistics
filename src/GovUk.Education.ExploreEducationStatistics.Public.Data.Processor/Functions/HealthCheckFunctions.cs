@@ -1,12 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class HealthCheckFunctions(
     ILogger<HealthCheckFunctions> logger,
     PublicDataDbContext publicDataDbContext,
@@ -14,18 +16,28 @@ public class HealthCheckFunctions(
 {
     [Function(nameof(CountDataSets))]
     public async Task<string> CountDataSets(
-        [ActivityTrigger] object? input,
-        FunctionContext executionContext)
+#pragma warning disable IDE0060
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData request)
+#pragma warning restore IDE0060
     {
-        var message = $"Found {await publicDataDbContext.DataSets.CountAsync()} datasets.";
-        logger.LogInformation(message);
-        return message;
+        try
+        {
+            var message = $"Found {await publicDataDbContext.DataSets.CountAsync()} datasets.";
+            logger.LogInformation(message);
+            return message;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error encountered when querying Data Sets");
+            throw;
+        }
     }
     
     [Function(nameof(CheckForFileShareMount))]
-    public async Task CheckForFileShareMount(
-        [ActivityTrigger] object? input,
-        FunctionContext executionContext)
+    public Task CheckForFileShareMount(
+#pragma warning disable IDE0060
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData request)
+#pragma warning restore IDE0060
     {
         logger.LogInformation("Attempting to read from file share");
         
@@ -45,5 +57,7 @@ public class HealthCheckFunctions(
             logger.LogError(e, "Error encountered when attempting to find the file share mount");
             throw;
         }
+        
+        return Task.CompletedTask;
     }
 }

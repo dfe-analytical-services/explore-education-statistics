@@ -2,7 +2,8 @@
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DurableManagementStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage"
   },
   "ConnectionStrings": {
     "ContentDb": "Server=db;Database=content;User=public_data_processor;Password=Your_Password123;TrustServerCertificate=True;",

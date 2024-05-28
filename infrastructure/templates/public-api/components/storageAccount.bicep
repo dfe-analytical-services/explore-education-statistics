@@ -8,7 +8,10 @@ param storageAccountName string
 param allowedSubnetIds string[] = []
 
 @description('Storage Account Network Firewall Rules')
-param storageFirewallRules array = []
+param firewallRules {
+  name: string
+  cidr: string
+}[] = []
 
 @description('Storage Account SKU')
 @allowed([
@@ -44,11 +47,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
-      ipRules:  [for firewallRule in storageFirewallRules: {
-        value: firewallRule
+      ipRules: [for firewallRule in firewallRules: {
+        value: firewallRule.cidr
         action: 'Allow'
       }]
       virtualNetworkRules: [for subnetId in allowedSubnetIds: {
+        #disable-next-line use-resource-id-functions
         id: subnetId
         action: 'Allow'
       }]

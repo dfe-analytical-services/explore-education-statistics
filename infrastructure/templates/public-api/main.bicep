@@ -4,8 +4,14 @@ param subscription string = ''
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Storage : Size of the file share in GB.')
+@description('Public API Storage : Size of the file share in GB.')
 param fileShareQuota int = 1
+
+@description('Public API Storage : Firewall rules.')
+param storageFirewallRules {
+  name: string
+  cidr: string
+}[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -33,8 +39,7 @@ param postgreSqlAutoGrowStatus string = 'Disabled'
 @description('Database : Firewall rules.')
 param postgreSqlFirewallRules {
   name: string
-  startIpAddress: string
-  endIpAddress: string
+  cidr: string
 }[] = []
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
@@ -132,6 +137,7 @@ module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
       vNetModule.outputs.dataProcessorSubnetRef
       vNetModule.outputs.containerAppEnvironmentSubnetRef
     ]
+    firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     tagValues: tagValues
@@ -188,8 +194,7 @@ module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
 
 var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   name: replace(rule.name, ' ', '_')
-  startIpAddress: rule.startIpAddress
-  endIpAddress: rule.endIpAddress
+  cidr: rule.cidr
 })
 
 // Deploy PostgreSQL Database.
@@ -335,9 +340,10 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     resourcePrefix: resourcePrefix
     functionAppName: dataProcessorFunctionAppName
     location: location
-    tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
+    publicNetworkAccessEnabled: false
+    taskHubNamePrefix: 'DataProcessorTaskHub'
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
       name: dataProcessorFunctionAppManagedIdentity.name
@@ -359,6 +365,8 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       fileShareName: parquetFileShareModule.outputs.fileShareName
       mountPath: parquetFileShareMountPath
     }]
+    storageFirewallRules: storageFirewallRules
+    tagValues: tagValues
   }
 }
 
@@ -420,3 +428,5 @@ output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFun
 
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
+
+output parquetFileShareMountPath string = parquetFileShareMountPath

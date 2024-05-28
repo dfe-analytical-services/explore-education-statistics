@@ -68,6 +68,7 @@ stages:
                       postgreSqlAdminName='$(postgreSqlAdminName)' \
                       postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                       postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
+                      storageFirewallRules='$(maintenanceFirewallRules)' \
                       dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                       deployContainerApp=$(deployContainerApp) \
                       updatePsqlFlexibleServer=$(updatePsqlFlexibleServer) \
@@ -77,8 +78,13 @@ stages:
             parameters:
               serviceConnection: ${{parameters.serviceConnection}}
 
+          # We handle the non-infrastructure appsetting and connection string configuration here rather than directly
+          # in the Bicep files so that we can implement slot swapping.
+          # Configuration changes are firstly deployed to the staging slot and combined with a fresh code deploy prior
+          # to being swapped into production.
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - update staging slot app settings'
+            retryCountOnTaskFailure: 1
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
@@ -92,7 +98,8 @@ stages:
                   --slot staging \
                   --settings \
                     "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
-                    "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)"
+                    "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
+                    "ParquetFiles__BasePath=$(parquetFileShareMountPath)"
 
                 az webapp config connection-string set \
                   --name $(dataProcessorFunctionAppName) \
@@ -101,7 +108,7 @@ stages:
                   --connection-string-type SQLAzure \
                   --settings \
                     "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
-                
+
                 az webapp config connection-string set \
                   --name $(dataProcessorFunctionAppName) \
                   --resource-group $(resourceGroupName) \
@@ -112,6 +119,7 @@ stages:
 
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - deploy to staging slot'
+            retryCountOnTaskFailure: 1
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
@@ -126,6 +134,7 @@ stages:
 
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - swap slots'
+            retryCountOnTaskFailure: 1
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash

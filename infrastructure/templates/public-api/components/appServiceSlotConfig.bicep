@@ -1,12 +1,6 @@
 @description('Specifies the Web / Function App name that these settings belong to')
 param appName string
 
-@description('Specifies the location of the resources')
-param location string
-
-@description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
-param stagingSlotUserAssignedManagedIdentityId string?
-
 @description('Specifies the names of slot settings (settings that stick to their slots rather than swap)')
 param slotSpecificSettingKeys string[]
 
@@ -18,6 +12,9 @@ param prodOnlySettings object
 
 @description('Specifies a set of appsettings that are specific to the staging slot')
 param stagingOnlySettings object
+
+@description('Specifies the name of the staging slot')
+param stagingSlotName string = 'staging'
 
 @description('Specifies any existing appsettings from the staging slot')
 param existingStagingAppSettings object
@@ -33,32 +30,6 @@ param azureFileShares {
   fileShareName: string
   mountPath: string
 }[] = []
-
-@description('A set of tags with which to tag the resource in Azure')
-param tagValues object
-
-var identity = stagingSlotUserAssignedManagedIdentityId != null
-  ? {
-      type: 'UserAssigned'
-      userAssignedIdentities: {
-        '${stagingSlotUserAssignedManagedIdentityId}': {}
-      }
-    }
-  : {
-      type: 'SystemAssigned'
-    }
-
-@description('Create a staging slot')
-resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = {
-  name: '${appName}/staging'
-  location: location
-  identity: identity
-  properties: {
-    enabled: true
-    httpsOnly: true
-  }
-  tags: tagValues
-}
 
 @description('Set specific appsettings to be slot specific values')
 resource functionSlotConfig 'Microsoft.Web/sites/config@2023-01-01' = {
@@ -80,23 +51,21 @@ var combinedProductionSettings = union(commonSettings, prodOnlySettings, existin
 
 @description('Set appsettings on the staging slot')
 resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-01-01' = {
-  name: 'appsettings'
-  parent: stagingSlot
+  name: '${appName}/${stagingSlotName}/appsettings'
   properties: combinedStagingSettings
 }
 
 resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2021-01-15' = {
-   name: 'azurestorageaccounts'
-   parent: stagingSlot
-   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
-     '${next.storageName}': {
-       type: 'AzureFiles'
-       shareName: next.fileShareName
-       mountPath: next.mountPath
-       accountName: next.storageAccountName
-       accessKey: next.storageAccountKey
-     }
-   }))
+  name: '${appName}/${stagingSlotName}/azurestorageaccounts'
+  properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
+    '${next.storageName}': {
+      type: 'AzureFiles'
+      shareName: next.fileShareName
+      mountPath: next.mountPath
+      accountName: next.storageAccountName
+      accessKey: next.storageAccountKey
+    }
+  }))
 }
 
 @description('Set appsettings on production slot')
@@ -104,5 +73,3 @@ resource appProductionSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   name: '${appName}/appsettings'
   properties: combinedProductionSettings
 }
-
-output stagingSlotPrincipalId string = stagingSlotUserAssignedManagedIdentityId == null ? stagingSlot.identity.principalId : ''
