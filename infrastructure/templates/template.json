@@ -3495,6 +3495,11 @@
             "name": "[variables('containerAppEnvironmentSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.8.0/23",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
               "delegations": [
                 {
                   "name": "environment",

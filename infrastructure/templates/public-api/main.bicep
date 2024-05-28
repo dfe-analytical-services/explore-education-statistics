@@ -4,8 +4,14 @@ param subscription string = ''
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Storage : Size of the file share in GB.')
+@description('Public API Storage : Size of the file share in GB.')
 param fileShareQuota int = 1
+
+@description('Public API Storage : Firewall rules.')
+param storageFirewallRules {
+  name: string
+  cidr: string
+}[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -33,8 +39,7 @@ param postgreSqlAutoGrowStatus string = 'Disabled'
 @description('Database : Firewall rules.')
 param postgreSqlFirewallRules {
   name: string
-  startIpAddress: string
-  endIpAddress: string
+  cidr: string
 }[] = []
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
@@ -78,7 +83,7 @@ var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerApp
 var adminAppServiceFullName = '${subscription}-as-ees-admin'
 var publisherFunctionAppFullName = '${subscription}-fa-ees-publisher'
 var dataProcessorFunctionAppName = 'processor'
-var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
+var dataProcessorFunctionAppManagedIdentityName = '${resourcePrefix}-id-fa-${dataProcessorFunctionAppName}'
 var psqlServerName = 'psql-flexibleserver'
 var psqlServerFullName = '${subscription}-ees-${psqlServerName}'
 var coreStorageAccountName = '${subscription}saeescore'
@@ -86,6 +91,9 @@ var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
+var parquetFileShareMountName = 'parquet-fileshare-mount'
+var parquetFileShareMountPath = '/data/public-api-parquet'
+var publicApiStorageAccountName = '${subscription}eespapisa'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -98,13 +106,13 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' e
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: coreStorageAccountName
   scope: resourceGroup(resourceGroup().name)
 }
-var storageAccountKey = storageAccount.listKeys().keys[0].value
+var coreStorageAccountKey = coreStorageAccount.listKeys().keys[0].value
 var endpointSuffix = environment().suffixes.storage
-var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${storageAccountKey}'
+var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${coreStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${coreStorageAccountKey}'
 
 // Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
 module vNetModule 'application/virtualNetwork.bicep' = {
@@ -116,6 +124,52 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     dataProcessorFunctionAppNameSuffix: dataProcessorFunctionAppName
     containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
   }
+}
+
+// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
+// Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
+module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
+  name: 'publicApiStorageAccountDeploy'
+  params: {
+    location: location
+    storageAccountName: publicApiStorageAccountName
+    allowedSubnetIds: [
+      vNetModule.outputs.dataProcessorSubnetRef
+      vNetModule.outputs.containerAppEnvironmentSubnetRef
+    ]
+    firewallRules: storageFirewallRules
+    skuStorageResource: 'Standard_LRS'
+    keyVaultName: keyVaultName
+    tagValues: tagValues
+  }
+}
+
+// TODO EES-5128 - we're currently needing to look up the Public API Storage Account in order to get its access keys,
+// as it's not possible to feed Key Vault secret references into the "storageAccountKey" values for Azure File Storage
+// mounts.
+//
+// It would be possible to use KV references if restructuring main.bicep to make the creation of the Container App
+// and Data Processor their own sub-modules in the "application" folder.  Then, we could use @secure() params
+// and keyVaultResource.getSecret() to pass the secrets through.
+resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: publicApiStorageAccountName
+}
+
+var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
+
+// Deploy File Share.
+module parquetFileShareModule 'components/fileShares.bicep' = {
+  name: 'fileShareDeploy'
+  params: {
+    resourcePrefix: resourcePrefix
+    fileShareName: 'data'
+    fileShareQuota: fileShareQuota
+    storageAccountName: publicApiStorageAccountName
+    fileShareAccessTier: 'TransactionOptimized'
+  }
+  dependsOn: [
+    publicApiStorageAccountModule
+  ]
 }
 
 // Deploy a single shared Application Insights for all relevant Public API resources to use.
@@ -138,35 +192,9 @@ module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
   }
 }
 
-// Create a generic Container App Environment for any Container Apps to use.
-module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' = {
-  name: 'containerAppEnvironmentDeploy'
-  params: {
-    subscription: subscription
-    location: location
-    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
-    subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
-    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
-    tagValues: tagValues
-  }
-}
-
-// Deploy File Share.
-module fileShareModule 'components/fileShares.bicep' = {
-  name: 'fileShareDeploy'
-  params: {
-    resourcePrefix: resourcePrefix
-    fileShareName: 'data'
-    fileShareQuota: fileShareQuota
-    storageAccountName: coreStorageAccountName
-  }
-}
-
 var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   name: replace(rule.name, ' ', '_')
-  startIpAddress: rule.startIpAddress
-  endIpAddress: rule.endIpAddress
+  cidr: rule.cidr
 })
 
 // Deploy PostgreSQL Database.
@@ -196,18 +224,55 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
   name: apiContainerAppManagedIdentityName
 }
 
+// Create a generic Container App Environment for any Container Apps to use.
+module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' = {
+  name: 'containerAppEnvironmentDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
+    subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
+    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    tagValues: tagValues
+    azureFileStorages: [
+      {
+        storageName: parquetFileShareModule.outputs.fileShareName
+        storageAccountName: publicApiStorageAccountName
+        storageAccountKey: publicApiStorageAccountAccessKey
+        fileShareName: parquetFileShareModule.outputs.fileShareName
+        accessMode: 'ReadWrite'
+      }
+    ]
+  }
+}
+
 // Deploy main Public API Container App.
 module apiContainerAppModule 'components/containerApp.bicep' = if (deployContainerApp) {
   name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    containerAppName: apiContainerAppName
+    containerAppName: apiContainerAppName 
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
-    managedIdentityName: apiContainerAppManagedIdentity.name
+    userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+    volumeMounts: [
+      {
+        volumeName: parquetFileShareMountName
+        mountPath: parquetFileShareMountPath
+      }
+    ]
+    volumes: [
+      {
+        name: parquetFileShareMountName
+        storageType: 'AzureFile'
+        storageName: parquetFileShareModule.outputs.fileShareName
+      }
+    ]
     appSettings: [
+      // TODO EES-5128 - replace this with a Key Vault reference string.
       {
         name: 'ConnectionStrings__PublicDataDb'
         value: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
@@ -231,7 +296,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       }
       {
         name: 'ParquetFiles__BasePath'
-        value: 'data/public-api-parquet'
+        value: parquetFileShareMountPath
       }
       {
         // This property informs the Container App of the name of the Admin's system-assigned identity.
@@ -245,7 +310,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         // It uses this to grant permissions to the Data Processor user in order for it to be able to access
         // tables in the "public_data" database successfully.
         name: 'DataProcessorFunctionAppIdentityName'
-        value: dataProcessorFunctionAppFullName
+        value: dataProcessorFunctionAppManagedIdentity.name
       }
       {
         // This property informs the Container App of the name of the Publisher's system-assigned identity.
@@ -262,6 +327,11 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   ]
 }
 
+resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: dataProcessorFunctionAppManagedIdentityName
+  location: location
+}
+
 // Deploy Data Processor Function.
 module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
@@ -270,9 +340,14 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     resourcePrefix: resourcePrefix
     functionAppName: dataProcessorFunctionAppName
     location: location
-    tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
+    publicNetworkAccessEnabled: false
+    userAssignedManagedIdentityParams: {
+      id: dataProcessorFunctionAppManagedIdentity.id
+      name: dataProcessorFunctionAppManagedIdentity.name
+      principalId: dataProcessorFunctionAppManagedIdentity.properties.principalId
+    }
     functionAppExists: dataProcessorFunctionAppExists
     keyVaultName: keyVaultName
     functionAppRuntime: 'dotnet-isolated'
@@ -282,6 +357,15 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
+    azureFileShares: [{
+      storageName: parquetFileShareModule.outputs.fileShareName
+      storageAccountKey: publicApiStorageAccountAccessKey
+      storageAccountName: publicApiStorageAccountName
+      fileShareName: parquetFileShareModule.outputs.fileShareName
+      mountPath: parquetFileShareMountPath
+    }]
+    storageFirewallRules: storageFirewallRules
+    tagValues: tagValues
   }
 }
 
@@ -293,7 +377,7 @@ module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' 
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
+    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppManagedIdentity.name)
     contentType: 'text/plain'
   }
 }
@@ -324,7 +408,7 @@ module storeAdminPsqlConnectionString 'components/keyVaultSecret.bicep' = {
   }
 }
 
-var coreStorageConnectionStringSecretKey = 'coreStorageConnectionString'
+var coreStorageConnectionStringSecretKey = 'ees-core-storage-connectionstring'
 
 module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
   name: 'storeCoreStorageConnectionString'
@@ -339,5 +423,9 @@ module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
+output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
+
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
+
+output parquetFileShareMountPath string = parquetFileShareMountPath

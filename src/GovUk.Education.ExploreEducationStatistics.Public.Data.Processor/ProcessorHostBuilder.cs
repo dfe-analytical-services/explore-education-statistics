@@ -73,7 +73,14 @@ public static class ProcessorHostBuilder
                     {
                         services.AddDbContext<PublicDataDbContext>(options =>
                         {
-                            var sqlServerTokenProvider = new DefaultAzureCredential();
+                            var sqlServerTokenProvider = new DefaultAzureCredential(
+                                new DefaultAzureCredentialOptions
+                                {
+                                    // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
+                                    // the "AZURE_CLIENT_ID" environment variable automatically when operating within
+                                    // a Function App.  We therefore provide it manually.
+                                    ManagedIdentityClientId = configuration["AZURE_CLIENT_ID"]
+                                });
                             var accessToken = sqlServerTokenProvider.GetToken(
                                 new TokenRequestContext(scopes:
                                 [

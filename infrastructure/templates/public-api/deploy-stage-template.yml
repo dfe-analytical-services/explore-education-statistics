@@ -52,6 +52,10 @@ stages:
                 set -e
                 dataProcessorExists=`az functionapp list --resource-group $(resourceGroupName) --query "[?name=='$(dataProcessorFunctionAppName)']" | jq '. != []'`
                 
+                if [[ "$dataProcessorExists" == "true" ]]; then
+                  echo "Data Processor Function App exists - combining existing appsettings with new ones"
+                fi
+                
                 az deployment group create \
                   --name 'DeployPublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
                   --resource-group $(resourceGroupName) \
@@ -64,49 +68,58 @@ stages:
                       postgreSqlAdminName='$(postgreSqlAdminName)' \
                       postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                       postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
+                      storageFirewallRules='$(maintenanceFirewallRules)' \
                       dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                       deployContainerApp=$(deployContainerApp) \
-                      updatePsqlFlexibleServer=$(updatePsqlFlexibleServer)
+                      updatePsqlFlexibleServer=$(updatePsqlFlexibleServer) \
                       dataProcessorFunctionAppExists=$dataProcessorExists
 
           - template: pipeline-variables-from-bicep-outputs-template.yml
             parameters:
               serviceConnection: ${{parameters.serviceConnection}}
 
+          # We handle the non-infrastructure appsetting and connection string configuration here rather than directly
+          # in the Bicep files so that we can implement slot swapping.
+          # Configuration changes are firstly deployed to the staging slot and combined with a fresh code deploy prior
+          # to being swapped into production.
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - update staging slot app settings'
+            retryCountOnTaskFailure: 1
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
-                
+
                 az functionapp config appsettings set \
-                  --name '$(dataProcessorFunctionAppName)' \
-                  --resource-group '$(resourceGroupName)' \
-                  --slot 'staging' \
+                  --name $(dataProcessorFunctionAppName) \
+                  --resource-group $(resourceGroupName) \
+                  --slot staging \
                   --settings \
-                    "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))"
-                
+                    "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                    "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
+                    "ParquetFiles__BasePath=$(parquetFileShareMountPath)"
+
                 az webapp config connection-string set \
-                  --name '$(dataProcessorFunctionAppName)' \
-                  --resource-group '$(resourceGroupName)' \
-                  --slot 'staging' \
-                  --connection-string-type 'SQLAzure' \
+                  --name $(dataProcessorFunctionAppName) \
+                  --resource-group $(resourceGroupName) \
+                  --slot staging \
+                  --connection-string-type SQLAzure \
                   --settings \
                     "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
-                
+
                 az webapp config connection-string set \
-                  --name '$(dataProcessorFunctionAppName)' \
-                  --resource-group '$(resourceGroupName)' \
-                  --slot 'staging' \
-                  --connection-string-type 'PostgreSQL' \
+                  --name $(dataProcessorFunctionAppName) \
+                  --resource-group $(resourceGroupName) \
+                  --slot staging \
+                  --connection-string-type PostgreSQL \
                   --settings \
                     "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - deploy to staging slot'
+            retryCountOnTaskFailure: 1
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
@@ -115,12 +128,13 @@ stages:
                 set -e
                 az functionapp deployment source config-zip \
                   --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
-                  --name '$(dataProcessorFunctionAppName)' \
-                  --resource-group '$(resourceGroupName)' \
-                  --slot 'staging'
+                  --name $(dataProcessorFunctionAppName) \
+                  --resource-group $(resourceGroupName) \
+                  --slot staging
 
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - swap slots'
+            retryCountOnTaskFailure: 1
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
@@ -128,7 +142,7 @@ stages:
               inlineScript: |
                 set -e
                 az functionapp deployment slot swap \
-                  --name '$(dataProcessorFunctionAppName)' \
-                  --resource-group '$(resourceGroupName)' \
-                  --slot 'staging' \
-                  --target-slot 'production'
+                  --name $(dataProcessorFunctionAppName) \
+                  --resource-group $(resourceGroupName) \
+                  --slot staging \
+                  --target-slot production

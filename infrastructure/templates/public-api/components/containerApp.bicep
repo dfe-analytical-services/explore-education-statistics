@@ -61,17 +61,32 @@ param appSettings {
 param tagValues object
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Container App')
-param managedIdentityName string
+param userAssignedManagedIdentityId string
 
 @description('Id of the owning Container App Environment')
 param managedEnvironmentId string
 
+@description('Volumes to mount within Containers - used in conjunction with "volumeMounts"')
+param volumes {
+  name: string
+  storageType: string
+  storageName: string
+  mountOptions: string?
+  secrets: {
+    path: string
+    secretRef: string
+  }[]?
+}[] = []
+
+@description('Volume mount points within Containers - used in conjunction with "volumes"')
+param volumeMounts {
+  mountPath: string
+  volumeName: string
+}[] = []
+
+
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
-
-resource containerAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: managedIdentityName
-}
 
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: containerApplicationName
@@ -79,7 +94,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${containerAppIdentity.id}': {}
+      '${userAssignedManagedIdentityId}': {}
     }
   }
   properties: {
@@ -101,7 +116,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       registries: [
         {
           server: acrLoginServer
-          identity: containerAppIdentity.id
+          identity: userAssignedManagedIdentityId
         }
       ]
     }
@@ -115,6 +130,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             cpu: json(cpuCore)
             memory: '${memorySize}Gi'
           }
+          volumeMounts: volumeMounts
         }
       ]
       scale: {
@@ -131,6 +147,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           }
         ]
       }
+      volumes: volumes
     }
     workloadProfileName: 'Consumption'
   }
