@@ -107,6 +107,7 @@ Verify that validation prevents adding an invalid link
     user checks page does not contain    1 link has an invalid URL.
 
 Add Methodology Annexes
+    user reloads page
     user creates new content section    1    Methodology annex section 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology annex section 1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
