@@ -343,7 +343,6 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     publicNetworkAccessEnabled: false
-    taskHubNamePrefix: 'DataProcessorTaskHub'
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
       name: dataProcessorFunctionAppManagedIdentity.name

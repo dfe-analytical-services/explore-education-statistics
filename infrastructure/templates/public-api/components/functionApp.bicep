@@ -73,9 +73,6 @@ param azureFileShares {
   mountPath: string
 }[] = []
 
-@description('Specifies a naming prefix to identify the Function App TaskHub.  A unique identifier is appended to this value per deploy slot to ensure there are no clashes')
-param taskHubNamePrefix string
-
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
 param storageFirewallRules {
   name: string
@@ -333,9 +330,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       SLOT_NAME: 'staging'
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
       
-      // Because the slots use a shared management storage account, they require unique Task Hub names in order to prevent clashes.  
-      AzureFunctionsJobHost__extensions__durableTask__hubName: '${taskHubNamePrefix}Slot1'
-
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
@@ -344,9 +338,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       SLOT_NAME: 'production'
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
       
-      // Because the slots use a shared management storage account, they require unique Task Hub names in order to prevent clashes.  
-      AzureFunctionsJobHost__extensions__durableTask__hubName: '${taskHubNamePrefix}Slot2'
-
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
