@@ -920,6 +920,12 @@ user navigates to public frontend
     enable basic auth headers
     go to    ${URL}
 
+user navigates to public frontend with www
+    [Arguments]    ${URL}=%{PUBLIC_URL}
+    enable basic auth headers
+    ${www_url}=    get www url    ${URL}
+    go to    ${www_url}
+
 user navigates to
     [Arguments]    ${URL}
     enable basic auth headers
