@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -18,7 +14,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
@@ -68,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     created: DateTime.UtcNow.AddDays(-2),
                     createdById: originalCreatedBy.Id)
                 .WithPublishScheduled(DateTime.Now.AddDays(1))
-                .WithNextReleaseDate(new PartialDate {Day = "1", Month = "1", Year = "2040"})
+                .WithNextReleaseDate(new PartialDate { Day = "1", Month = "1", Year = "2040" })
                 .WithPublished(DateTime.UtcNow.AddDays(-1))
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPreviousVersionId(Guid.NewGuid())
@@ -96,7 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Description = "Link 2",
                         Url = "URL 2"
                     }))
-                .WithUpdates(ListOf<Update>(new ()
+                .WithUpdates(ListOf<Update>(
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         On = DateTime.UtcNow.AddDays(-4),
@@ -125,18 +125,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .DefaultHtmlBlock()
                             .WithBody("<div></div>")
                             .WithComments(new List<Comment>
+                            {
+                                new()
                                 {
-                                    new()
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Content = "Comment 1 Text"
-                                    },
-                                    new()
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Content = "Comment 2 Text"
-                                    }
-                                }),
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 1 Text"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 2 Text"
+                                }
+                            }),
                             dataBlock1Parent.LatestPublishedVersion!.ContentBlock,
                             new EmbedBlockLink
                             {
@@ -313,6 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             [Guid.NewGuid()]
                         )
                     ],
+                    Published = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 },
                 new()
                 {
@@ -320,7 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ReleaseVersion = originalReleaseVersion,
                     ReleaseVersionId = originalReleaseVersion.Id,
                     File = dataFile2,
-                    FileId = dataFile2.Id
+                    FileId = dataFile2.Id,
+                    Published = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 }
             };
 
@@ -1155,7 +1157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(originalReleaseRole.DeletedById, amendedReleaseRole.DeletedById);
         }
 
-        private void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile,
+        private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile,
             ReleaseVersion amendment)
         {
             // Assert it's a new link table entry between the Release amendment and the data file reference
@@ -1164,6 +1166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amendmentDataFile.ReleaseVersionId);
             Assert.Equal(originalFile.Name, amendmentDataFile.Name);
             Assert.Equal(originalFile.Order, amendmentDataFile.Order);
+            Assert.Equal(originalFile.Published!.Value, amendmentDataFile.Published!.Value, TimeSpan.FromMinutes(1));
             originalFile.FilterSequence.AssertDeepEqualTo(amendmentDataFile.FilterSequence);
             originalFile.IndicatorSequence.AssertDeepEqualTo(amendmentDataFile.IndicatorSequence);
 

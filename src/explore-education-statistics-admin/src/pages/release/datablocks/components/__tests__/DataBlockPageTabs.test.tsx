@@ -82,6 +82,7 @@ describe('DataBlockPageTabs', () => {
       },
       filters: ['Filter 1'],
       indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
     },
   ];
 

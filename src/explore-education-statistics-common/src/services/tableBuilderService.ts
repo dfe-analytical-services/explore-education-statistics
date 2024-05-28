@@ -87,6 +87,7 @@ export interface Subject {
   file: FileInfo;
   filters: string[];
   indicators: string[];
+  lastUpdated: string;
 }
 
 export interface FeaturedTable {

@@ -34,6 +34,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       title: 'Publication 1',
     },
     published: new Date('2020-01-01'),
+    lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
@@ -66,6 +67,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       title: 'Publication 1',
     },
     published: new Date('2020-01-01'),
+    lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
@@ -98,6 +100,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       title: 'Publication 2',
     },
     published: new Date('2020-01-01'),
+    lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
@@ -140,6 +143,7 @@ export const testDataSetFile: DataSetFile = {
       title: 'Publication 1',
     },
     published: new Date('2024-01-01'),
+    lastUpdated: '2023-12-01',
     slug: 'release-slug',
     title: 'Release 1',
     type: 'NationalStatistics',

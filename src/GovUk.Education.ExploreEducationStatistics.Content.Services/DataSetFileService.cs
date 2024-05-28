@@ -1,12 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -26,6 +18,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -131,6 +131,7 @@ public class DataSetFileService : IDataSetFileService
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
                 Published = result.Value.ReleaseVersion.Published!.Value,
+                LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value.File),
                 Meta = BuildDataSetFileMetaViewModel(
                     result.Value.File.DataSetFileMeta,
@@ -194,6 +195,7 @@ public class DataSetFileService : IDataSetFileService
                     releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
                     releaseFile.ReleaseVersionId,
                 Published = releaseFile.ReleaseVersion.Published!.Value,
+                LastUpdated = releaseFile.Published!.Value,
                 Publication = new DataSetFilePublicationViewModel
                 {
                     Id = releaseFile.ReleaseVersion.PublicationId,

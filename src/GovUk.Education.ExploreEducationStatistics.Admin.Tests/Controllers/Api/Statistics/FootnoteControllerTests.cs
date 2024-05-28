@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -13,7 +9,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -30,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         public FootnoteControllerTests()
         {
-            var subjectIds = new[] {Guid.NewGuid(), Guid.NewGuid()};
+            var subjectIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
 
             var footnote = new Footnote
             {
@@ -105,7 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                                     Id = Guid.NewGuid(),
                                     FileName = "test.csv",
                                     Size = "1 Mb"
-                                }
+                                },
+                                lastUpdated: DateTime.Now
                             )
                         )
                         .ToList()

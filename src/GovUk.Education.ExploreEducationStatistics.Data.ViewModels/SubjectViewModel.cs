@@ -22,6 +22,8 @@ public record SubjectViewModel
 
     public FileInfo File { get; }
 
+    public DateTime? LastUpdated { get; }
+
     public SubjectViewModel(
         Guid id,
         string name,
@@ -31,7 +33,8 @@ public record SubjectViewModel
         List<string> geographicLevels,
         List<string> filters,
         List<string> indicators,
-        FileInfo file)
+        FileInfo file,
+        DateTime? lastUpdated)
     {
         Id = id;
         Name = name;
@@ -42,5 +45,6 @@ public record SubjectViewModel
         Filters = filters;
         Indicators = indicators;
         File = file;
+        LastUpdated = lastUpdated;
     }
 }

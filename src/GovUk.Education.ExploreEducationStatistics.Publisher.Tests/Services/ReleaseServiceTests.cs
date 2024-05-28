@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -12,6 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -227,13 +227,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .Generate())
                 .GenerateList(2);
 
-            var actualPublishedDate = DateTime.UtcNow;
+            var actualPublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            var releaseFile = new ReleaseFile
+            {
+                Published = actualPublishedDate,
+                ReleaseVersionId = releaseVersion.Id,
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -278,16 +285,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     // The LatestDraftVersion is now set to null, until a Release amendment is created in the future.
                     Assert.Null(parent.LatestDraftVersionId);
                 });
+
+                Assert.Equal(actualPublishedDate, contentDbContext.ReleaseFiles.First().Published);
             }
         }
 
         [Fact]
         public async Task CompletePublishing_AmendedRelease()
         {
+            var previousPublishedDate = DateTime.UtcNow.AddDays(-1);
+
             var previousReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddDays(-1),
+                Published = previousPublishedDate,
                 PreviousVersionId = null,
                 Version = 0
             };
@@ -297,6 +308,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PreviousVersionId = previousReleaseVersion.Id,
                 Version = 1
             };
+
+            var amendedReleaseFileId = Guid.NewGuid();
+            var amendedFileId = Guid.NewGuid();
+            var unamendedReleaseFileId = Guid.NewGuid();
+            var unamendedFileId = Guid.NewGuid();
 
             // Generate Data Blocks for both the previous Release version and for the new Amendment.
             var originalDataBlockParents = _fixture
@@ -316,6 +332,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.AddRange(previousReleaseVersion, releaseVersion);
+
+                var amendedFile = new File
+                {
+                    Id = amendedFileId,
+                    Type = FileType.Data,
+                };
+
+                var amendedReleaseFile = new ReleaseFile
+                {
+                    Id = amendedReleaseFileId,
+                    ReleaseVersionId = releaseVersion.Id,
+                    Name = "file.csv",
+                    Summary = "Summary text",
+                    FileId = amendedFileId,
+                    File = amendedFile,
+                };
+
+                var unamendedFile = new File
+                {
+                    Id = unamendedFileId,
+                    Type = FileType.Data,
+                };
+
+                var unamendedReleaseFile = new ReleaseFile
+                {
+                    Id = unamendedReleaseFileId,
+                    Published = previousPublishedDate,
+                    ReleaseVersionId = releaseVersion.Id,
+                    Name = "file.csv",
+                    Summary = "Summary text",
+                    FileId = unamendedFileId,
+                    File = unamendedFile,
+                };
+
+                contentDbContext.ReleaseFiles.AddRange(amendedReleaseFile, unamendedReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -363,6 +414,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     // The LatestDraftVersion is now set to null, until a Release amendment is created in the future.
                     Assert.Null(parent.LatestDraftVersionId);
                 });
+
+                Assert.Equal(DateTime.UtcNow, contentDbContext.ReleaseFiles.Find(amendedReleaseFileId)!.Published!.Value, TimeSpan.FromMinutes(1));
+                Assert.Equal(previousReleaseVersion.Published, contentDbContext.ReleaseFiles.Find(unamendedReleaseFileId)!.Published);
             }
         }
 
@@ -392,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .Generate())
                 // This time Data Blocks have been removed from the latest Release amendment, and so they now have no
                 // "latest" version.
-                .WithLatestDraftVersion((DataBlockVersion) null!)
+                .WithLatestDraftVersion((DataBlockVersion)null!)
                 .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();

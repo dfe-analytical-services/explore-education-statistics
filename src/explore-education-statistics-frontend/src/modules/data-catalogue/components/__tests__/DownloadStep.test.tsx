@@ -41,6 +41,7 @@ describe('DownloadStep', () => {
       },
       filters: ['Filter 1'],
       indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
     },
     {
       id: 'test-subject-1',
@@ -61,6 +62,7 @@ describe('DownloadStep', () => {
       },
       filters: ['Filter 1'],
       indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
     },
     {
       id: 'test-subject-3',
@@ -81,6 +83,7 @@ describe('DownloadStep', () => {
       },
       filters: ['Filter 1'],
       indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
     },
   ];
 

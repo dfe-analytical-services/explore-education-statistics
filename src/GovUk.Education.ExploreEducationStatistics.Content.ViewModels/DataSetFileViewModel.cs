@@ -49,6 +49,8 @@ public record DataSetFileReleaseViewModel
 
     public required DateTime Published { get; init; }
 
+    public DateTime LastUpdated { get; init; }
+
     public required DataSetFilePublicationViewModel Publication { get; init; }
 }
 

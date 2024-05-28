@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -18,6 +13,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
@@ -127,6 +127,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var content = updateRequestsByFileId[releaseFile.FileId].Content;
 
                 _contentDbContext.Update(releaseFile);
+
+                if (releaseFile.Summary != content)
+                {
+                    releaseFile.Published = null; // This will be repopulated with the current date during the publish process
+                }
+
                 releaseFile.Summary = content;
             });
 
