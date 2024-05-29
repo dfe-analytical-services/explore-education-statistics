@@ -44,7 +44,7 @@ var containerAppEnvironmentName = empty(containerAppEnvironmentNameSuffix)
   ? '${subscription}-ees-cae'
   : '${subscription}-ees-cae-${containerAppEnvironmentNameSuffix}'
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: logAnalyticsWorkspaceName
 }
 
