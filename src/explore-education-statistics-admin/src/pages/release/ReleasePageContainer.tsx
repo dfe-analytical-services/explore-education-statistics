@@ -6,6 +6,7 @@ import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import releaseQueries from '@admin/queries/releaseQueries';
 import {
   releaseContentRoute,
   releaseDataBlockCreateRoute,
@@ -29,10 +30,9 @@ import {
   releaseApiDataSetsRoute,
   releaseApiDataSetDetailsRoute,
 } from '@admin/routes/releaseRoutes';
-import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 import { generatePath, RouteComponentProps, Switch } from 'react-router';
 import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
@@ -79,13 +79,10 @@ const ReleasePageContainer = ({
   const { user } = useAuthContext();
 
   const {
-    value: release,
-    setState: setRelease,
+    data: release,
     isLoading: loadingRelease,
-  } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [releaseId],
-  );
+    refetch,
+  } = useQuery(releaseQueries.get(releaseId));
 
   const navRoutes = useMemo(() => {
     return allNavRoutes.filter(route => {
@@ -193,12 +190,7 @@ const ReleasePageContainer = ({
             label="Release"
           />
 
-          <ReleaseContextProvider
-            release={release}
-            onReleaseChange={nextRelease => {
-              setRelease({ value: nextRelease });
-            }}
-          >
+          <ReleaseContextProvider release={release} onReleaseChange={refetch}>
             <Switch>
               {routes.map(route => (
                 <ProtectedRoute exact key={route.path} {...route} />

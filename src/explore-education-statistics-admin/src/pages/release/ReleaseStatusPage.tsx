@@ -7,7 +7,10 @@ import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import releaseService, { ReleaseStatus } from '@admin/services/releaseService';
+import releaseService, {
+  ReleaseStageStatus,
+  ReleaseStatus,
+} from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -33,7 +36,7 @@ const statusMap: {
   Approved: 'Approved',
 };
 
-const ReleaseStatusPage = () => {
+export default function ReleaseStatusPage() {
   const [isEditing, toggleEditing] = useToggle(false);
 
   const location = useLocation();
@@ -64,6 +67,12 @@ const ReleaseStatusPage = () => {
 
   const { publicAppUrl } = useConfig();
 
+  const handlePublishingStatusChange = (status: ReleaseStageStatus) => {
+    if (status.overallStage === 'Complete') {
+      onReleaseChange();
+    }
+  };
+
   if (!release) {
     return <LoadingSpinner />;
   }
@@ -80,7 +89,7 @@ const ReleaseStatusPage = () => {
         onCancel={toggleEditing.off}
         onUpdate={nextRelease => {
           setRelease({ value: nextRelease });
-          onReleaseChange(nextRelease);
+          onReleaseChange();
           toggleEditing.off();
         }}
       />
@@ -112,6 +121,7 @@ const ReleaseStatusPage = () => {
             <ReleasePublishingStatus
               releaseId={releaseId}
               refreshPeriod={1000}
+              onChange={handlePublishingStatusChange}
             />
           </SummaryListItem>
         )}
@@ -188,6 +198,4 @@ const ReleaseStatusPage = () => {
       )}
     </>
   );
-};
-
-export default ReleaseStatusPage;
+}

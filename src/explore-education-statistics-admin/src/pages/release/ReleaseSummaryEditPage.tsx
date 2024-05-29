@@ -13,7 +13,9 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps, useLocation } from 'react-router';
 
-const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
+export default function ReleaseSummaryEditPage({
+  history,
+}: RouteComponentProps) {
   const location = useLocation();
   const lastLocation = useLastLocation();
 
@@ -36,7 +38,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       throw new Error('Could not update missing release');
     }
 
-    const nextRelease = await releaseService.updateRelease(releaseId, {
+    await releaseService.updateRelease(releaseId, {
       year: Number(values.timePeriodCoverageStartYear),
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
@@ -45,7 +47,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       preReleaseAccessList: release.preReleaseAccessList,
     });
 
-    onReleaseChange(nextRelease);
+    onReleaseChange();
 
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
@@ -88,6 +90,4 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       )}
     </LoadingSpinner>
   );
-};
-
-export default ReleaseSummaryEditPage;
+}
