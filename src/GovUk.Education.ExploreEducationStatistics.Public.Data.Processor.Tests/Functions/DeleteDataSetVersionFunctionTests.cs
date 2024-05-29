@@ -325,8 +325,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(1, 0, 0)
                 .WithStatus(dataSetVersionStatus)
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+                .WithDataSet(dataSet);
 
             await AddTestData<PublicDataDbContext>(context =>
             {
