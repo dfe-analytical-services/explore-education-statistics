@@ -48,7 +48,7 @@ Validate themes filters exist
 Validate release type filters exist
     user clicks button    Release type
     user checks radio is checked    Show all
-    user checks page contains radio    National statistics
+    user checks page contains radio    Accredited official statistics
     user checks page contains radio    Official statistics
     user checks page contains radio    Official statistics in development
     user checks page contains radio    Experimental statistics

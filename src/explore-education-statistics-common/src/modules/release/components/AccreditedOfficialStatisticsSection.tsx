@@ -1,13 +1,13 @@
 import React from 'react';
 
-export default function NationalStatisticsSection({
+export default function AccreditedOfficialStatisticsSection({
   showHeading = true,
 }: {
   showHeading?: boolean;
 }) {
   return (
     <>
-      {showHeading && <h3>National statistics</h3>}
+      {showHeading && <h3>Accredited official statistics</h3>}
       <p>
         These accredited official statistics have been independently reviewed by
         the{' '}

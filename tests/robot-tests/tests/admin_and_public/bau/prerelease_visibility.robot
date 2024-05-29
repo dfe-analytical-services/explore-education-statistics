@@ -25,7 +25,7 @@ Verify release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     user verifies release summary    Calendar year    2000
-    ...    National statistics
+    ...    Accredited official statistics
 
 Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv

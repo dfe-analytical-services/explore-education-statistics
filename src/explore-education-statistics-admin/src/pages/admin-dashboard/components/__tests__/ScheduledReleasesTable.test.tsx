@@ -26,7 +26,7 @@ describe('ScheduledReleasesTable', () => {
         value: 'AY',
         label: 'Academic year',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       publication: {
         id: 'publication-1',
         slug: 'publication-1-slug',
@@ -61,7 +61,7 @@ describe('ScheduledReleasesTable', () => {
         value: 'AY',
         label: 'Academic year',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       publication: {
         id: 'publication-2',
         slug: 'publication-2-slug',
@@ -96,7 +96,7 @@ describe('ScheduledReleasesTable', () => {
         value: 'AY',
         label: 'Academic year',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       publication: {
         id: 'publication-1',
         slug: 'publication-1-slug',
@@ -131,7 +131,7 @@ describe('ScheduledReleasesTable', () => {
         value: 'AY',
         label: 'Academic year',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       publication: {
         id: 'publication-3',
         slug: 'publication-3-slug',

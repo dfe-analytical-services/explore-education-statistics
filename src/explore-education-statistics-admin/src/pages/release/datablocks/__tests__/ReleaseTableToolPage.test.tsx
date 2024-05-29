@@ -51,7 +51,7 @@ const testRelease: Release = {
     label: 'test',
   },
   title: 'test title',
-  type: 'NationalStatistics',
+  type: 'AccreditedOfficialStatistics',
   preReleaseAccessList: 'test',
   year: 2023,
   yearTitle: '2023',

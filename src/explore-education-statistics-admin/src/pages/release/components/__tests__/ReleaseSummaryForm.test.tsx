@@ -62,13 +62,13 @@ describe('ReleaseSummaryForm', () => {
     ).getAllByRole('radio');
     expect(releaseTypeRadios).toHaveLength(5);
     expect(releaseTypeRadios[0]).toEqual(
-      screen.getByLabelText(releaseTypes.AdHocStatistics),
+      screen.getByLabelText(releaseTypes.AccreditedOfficialStatistics),
     );
     expect(releaseTypeRadios[1]).toEqual(
-      screen.getByLabelText(releaseTypes.ManagementInformation),
+      screen.getByLabelText(releaseTypes.AdHocStatistics),
     );
     expect(releaseTypeRadios[2]).toEqual(
-      screen.getByLabelText(releaseTypes.NationalStatistics),
+      screen.getByLabelText(releaseTypes.ManagementInformation),
     );
     expect(releaseTypeRadios[3]).toEqual(
       screen.getByLabelText(releaseTypes.OfficialStatistics),
@@ -132,13 +132,13 @@ describe('ReleaseSummaryForm', () => {
     ).getAllByRole('radio');
     expect(releaseTypeRadios).toHaveLength(5);
     expect(releaseTypeRadios[0]).toEqual(
-      screen.getByLabelText(releaseTypes.AdHocStatistics),
+      screen.getByLabelText(releaseTypes.AccreditedOfficialStatistics),
     );
     expect(releaseTypeRadios[1]).toEqual(
-      screen.getByLabelText(releaseTypes.ManagementInformation),
+      screen.getByLabelText(releaseTypes.AdHocStatistics),
     );
     expect(releaseTypeRadios[2]).toEqual(
-      screen.getByLabelText(releaseTypes.NationalStatistics),
+      screen.getByLabelText(releaseTypes.ManagementInformation),
     );
     expect(releaseTypeRadios[3]).toEqual(
       screen.getByLabelText(releaseTypes.OfficialStatistics),
@@ -376,7 +376,7 @@ describe('ReleaseSummaryForm', () => {
         initialValues={{
           timePeriodCoverageCode: 'AYQ4',
           timePeriodCoverageStartYear: '1966',
-          releaseType: 'NationalStatistics',
+          releaseType: 'AccreditedOfficialStatistics',
         }}
         onSubmit={noop}
         onCancel={noop}
@@ -401,9 +401,9 @@ describe('ReleaseSummaryForm', () => {
       screen.getByRole('group', { name: 'Release type' }),
     ).getAllByRole('radio');
     expect(releaseTypeRadios).toHaveLength(5);
-    expect(releaseTypeRadios[0]).not.toBeChecked();
+    expect(releaseTypeRadios[0]).toBeChecked();
     expect(releaseTypeRadios[1]).not.toBeChecked();
-    expect(releaseTypeRadios[2]).toBeChecked();
+    expect(releaseTypeRadios[2]).not.toBeChecked();
     expect(releaseTypeRadios[3]).not.toBeChecked();
     expect(releaseTypeRadios[4]).not.toBeChecked();
   });
@@ -444,7 +444,7 @@ describe('ReleaseSummaryForm', () => {
     await userEvent.type(inputYear, '1966');
 
     const radioOptionReleaseTypeNationalStats = screen.getByLabelText(
-      releaseTypes.NationalStatistics,
+      releaseTypes.AccreditedOfficialStatistics,
     );
     await userEvent.click(radioOptionReleaseTypeNationalStats);
 
@@ -505,7 +505,7 @@ describe('ReleaseSummaryForm', () => {
         initialValues={{
           timePeriodCoverageCode: 'AYQ4',
           timePeriodCoverageStartYear: '1966',
-          releaseType: 'NationalStatistics',
+          releaseType: 'AccreditedOfficialStatistics',
         }}
         onSubmit={noop}
         onCancel={noop}

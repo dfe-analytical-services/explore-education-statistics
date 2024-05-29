@@ -6,6 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         AdHocStatistics,
 
+        AccreditedOfficialStatistics,
+
+        // TODO remove NationalStatistics
         NationalStatistics,
 
         ExperimentalStatistics,

@@ -30,7 +30,7 @@ Go to "Release summary" page
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    Financial year    3000-01    National statistics
+    user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload subject
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
@@ -390,7 +390,7 @@ Verify accordions are correct
 
 Verify help and support section is correct
     user checks page contains    Help and support
-    user checks page contains    National statistics
+    user checks page contains    Accredited official statistics
     user checks page contains    Contact us
 
 Verify Dates data block accordion section

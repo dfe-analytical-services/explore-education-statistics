@@ -69,7 +69,7 @@ Verify new release summary
     user waits until h2 is visible    Release summary
     user checks summary list contains    Time period    Financial year
     user checks summary list contains    Release period    3001-02
-    user checks summary list contains    Release type    National statistics
+    user checks summary list contains    Release type    Accredited official statistics
 
 Upload subjects to release
     user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv

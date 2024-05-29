@@ -43,7 +43,7 @@ const PrototypeRelease = () => {
                 </div>
 
                 <img
-                  src="/assets/images/UKSA-quality-mark.jpg"
+                  src="/assets/images/accredited-official-statistics-logo.svg"
                   className="govuk-!-margin-right-3"
                   alt="UK statistics authority quality mark"
                   height="60"
