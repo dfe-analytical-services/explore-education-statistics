@@ -152,7 +152,7 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
 }
 
 // This is the file share for slot 1 to use for its code storage.
-resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-04-01' = {
   name: '${slot1StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
     slot1StorageAccountModule
@@ -176,7 +176,7 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
 }
 
 // This is the file share for slot 2 to use for its code storage.
-resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-04-01' = {
   name: '${slot2StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
     slot2StorageAccountModule
