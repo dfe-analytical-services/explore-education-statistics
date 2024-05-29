@@ -3,10 +3,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class DeleteDataSetVersionFunction(IDataSetVersionService dataSetVersionService)
+public class DeleteDataSetVersionFunction(IDataSetVersionService dataSetVersionService, ILogger<DeleteDataSetVersionFunction> logger)
 {
     [Function(nameof(DeleteDataSetVersion))]
     public async Task<IActionResult> DeleteDataSetVersion(
@@ -14,9 +15,17 @@ public class DeleteDataSetVersionFunction(IDataSetVersionService dataSetVersionS
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
-        return await dataSetVersionService.DeleteVersion(
-                dataSetVersionId,
-                cancellationToken: cancellationToken)
-            .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
+        try
+        {
+            return await dataSetVersionService.DeleteVersion(
+                    dataSetVersionId,
+                    cancellationToken: cancellationToken)
+                .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(exception: ex, null, []);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
     }
 }
