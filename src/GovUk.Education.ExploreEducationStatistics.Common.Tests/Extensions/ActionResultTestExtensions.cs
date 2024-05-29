@@ -87,6 +87,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.IsAssignableFrom<AcceptedResult>(result);
         }
 
+        public static void AssertInternalServerError(this IActionResult result)
+        {
+            var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
+
+            Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+        }
+
         public static void AssertValidationProblem<T>(this ActionResult<T> result, params Enum[] expectedErrorCodes)
         {
             Assert.NotNull(result.Result);

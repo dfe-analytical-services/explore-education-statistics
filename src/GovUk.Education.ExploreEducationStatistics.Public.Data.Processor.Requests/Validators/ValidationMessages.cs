@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
 
@@ -27,5 +28,11 @@ public static class ValidationMessages
     public static readonly LocalizableMessage NoMetadataFile = new(
         Code: "NoMetadataFile",
         Message: "The data file must have a corresponding metadata file."
+    );
+
+
+    public static readonly LocalizableMessage DataSetVersionCanNotBeDeleted = new(
+        Code: "DataSetVersionCanNotBeDeleted",
+        Message: $"The data set version is not in a '{DataSetVersionStatus.Draft}' status, so cannot be deleted."
     );
 }
