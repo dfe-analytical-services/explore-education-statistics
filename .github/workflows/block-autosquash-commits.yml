@@ -11,6 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Block auto-squash commits
-        uses: xt0rted/block-autosquash-commits-action@f1ab4d69a90297fde61bc263d2e048eb8480d293
+        uses: xt0rted/block-autosquash-commits-action@87d56ca2c3f01b9247504ead67a1a3c2ca62b030
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
