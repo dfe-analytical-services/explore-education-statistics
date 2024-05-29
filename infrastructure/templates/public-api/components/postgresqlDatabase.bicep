@@ -135,7 +135,7 @@ var privateLinkDnsZoneName = 'privatelink.postgres.database.azure.com'
 
 var privateEndpointName = '${databaseServerName}-plink'
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
   name: privateEndpointName
   location: location
   properties: {
