@@ -231,6 +231,44 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
             var error = validationProblem.AssertHasError(null, Errors.Error1.ToString());
         }
 
+        [Fact]
+        public async Task ProcessorFailureStatusCode_Returns500()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithImports(() => DataFixture
+                    .DefaultDataSetVersionImport()
+                    .Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var processorClient = new Mock<IProcessorClient>();
+            processorClient
+                .Setup(c => c.DeleteDataSetVersion(
+                    dataSetVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new HttpRequestException());
+            
+            var client = BuildApp(processorClient.Object).CreateClient();
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await DeleteVersion(dataSetVersion.Id, client));
+            Assert.IsType<HttpRequestException>(exception.InnerException);
+        }
+
         private WebApplicationFactory<TestStartup> BuildApp(
             IProcessorClient? processorClient = null,
             ClaimsPrincipal? user = null)
