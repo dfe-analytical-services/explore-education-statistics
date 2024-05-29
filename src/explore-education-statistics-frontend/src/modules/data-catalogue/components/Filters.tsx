@@ -1,3 +1,4 @@
+import ButtonText from '@common/components/ButtonText';
 import {
   PublicationTreeSummary,
   ReleaseSummary,
@@ -16,7 +17,7 @@ import {
 } from '@frontend/services/dataSetFileService';
 import styles from '@frontend/modules/data-catalogue/components/Filters.module.scss';
 import React from 'react';
-import ButtonText from '@common/components/ButtonText';
+import classNames from 'classnames';
 
 const formId = 'filters-form';
 
@@ -28,6 +29,7 @@ interface Props {
   releaseId?: string;
   releases?: ReleaseSummary[];
   showClearFiltersButton?: boolean;
+  showTypeFilter?: boolean;
   themeId?: string;
   themes: Theme[];
   onChange: ({
@@ -48,6 +50,7 @@ export default function Filters({
   releaseId,
   releases = [],
   showClearFiltersButton,
+  showTypeFilter,
   themeId,
   themes,
   onChange,
@@ -135,31 +138,37 @@ export default function Filters({
         </FormGroup>
 
         {showClearFiltersButton && (
-          <ButtonText onClick={onClearFilters}>Clear filters</ButtonText>
+          <ButtonText
+            className={classNames({ 'govuk-!-margin-top-4': !showTypeFilter })}
+            onClick={onClearFilters}
+          >
+            Clear filters
+          </ButtonText>
         )}
-
-        <FormRadioGroup<DataSetType>
-          formGroupClass="dfe-border-top govuk-!-padding-top-4 govuk-!-margin-top-2"
-          id={`${formId}-dataSetType`}
-          legend="Type of data"
-          legendSize="s"
-          name="dataSetType"
-          options={[
-            { label: 'All data', value: 'all' },
-            {
-              label: 'API data sets only',
-              value: 'api',
-            },
-          ]}
-          small
-          value={dataSetType}
-          onChange={e => {
-            onChange({
-              filterType: 'dataSetType',
-              nextValue: e.target.value,
-            });
-          }}
-        />
+        {showTypeFilter && (
+          <FormRadioGroup<DataSetType>
+            formGroupClass="dfe-border-top govuk-!-padding-top-4 govuk-!-margin-top-2"
+            id={`${formId}-dataSetType`}
+            legend="Type of data"
+            legendSize="s"
+            name="dataSetType"
+            options={[
+              { label: 'All data', value: 'all' },
+              {
+                label: 'API data sets only',
+                value: 'api',
+              },
+            ]}
+            small
+            value={dataSetType}
+            onChange={e => {
+              onChange({
+                filterType: 'dataSetType',
+                nextValue: e.target.value,
+              });
+            }}
+          />
+        )}
       </FormFieldset>
 
       <Button className="dfe-js-hidden" type="submit">

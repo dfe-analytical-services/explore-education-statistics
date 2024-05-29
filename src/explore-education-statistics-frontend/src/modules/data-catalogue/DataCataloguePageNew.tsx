@@ -55,7 +55,11 @@ export interface DataCataloguePageQuery {
   themeId?: string;
 }
 
-export default function DataCataloguePageNew() {
+interface Props {
+  showTypeFilter?: boolean;
+}
+
+export default function DataCataloguePageNew({ showTypeFilter }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isMedia: isMobileMedia } = useMobileMedia();
@@ -318,6 +322,7 @@ export default function DataCataloguePageNew() {
                 releaseId={releaseId}
                 releases={releases}
                 showClearFiltersButton={!isMobileMedia && isFiltered}
+                showTypeFilter={showTypeFilter}
                 themeId={themeId}
                 themes={themes}
                 onChange={handleChangeFilter}
@@ -420,6 +425,7 @@ export default function DataCataloguePageNew() {
                   publications={publications}
                   releaseId={releaseId}
                   releases={releases}
+                  showTypeFilter={showTypeFilter}
                   themeId={themeId}
                   themes={themes}
                   onChange={handleChangeFilter}
