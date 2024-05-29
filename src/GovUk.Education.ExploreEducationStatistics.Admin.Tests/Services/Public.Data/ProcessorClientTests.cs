@@ -129,4 +129,96 @@ public class ProcessorClientTests
             Error1,
         }
     }
+
+    public class DeleteDataSetVersionTests : ProcessorClientTests
+    {
+        private static readonly Uri Uri = new(BaseUri, "api/DeleteDataSetVersion");
+
+        [Fact]
+        public async Task HttpClientSuccess()
+        {
+            var dataSetVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+                .Respond(HttpStatusCode.NoContent);
+
+            var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var right = response.AssertRight();
+        }
+
+        [Fact]
+        public async Task HttpClientBadRequest_ReturnsBadRequest()
+        {
+            var dataSetVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+                .Respond(
+                    HttpStatusCode.BadRequest,
+                    JsonContent.Create(new ValidationProblemViewModel
+                    {
+                        Errors = new ErrorViewModel[]
+                        {
+                            new() {
+                               Code = Errors.Error1.ToString()
+                            }
+                        }
+                    }));
+
+            var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            left.AssertValidationProblem(Errors.Error1);
+        }
+
+        [Fact]
+        public async Task HttpClientNotFound_ReturnsNotFound()
+        {
+            var dataSetVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+                .Respond(HttpStatusCode.NotFound);
+
+            var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            left.AssertNotFoundResult();
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.RequestTimeout)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.BadGateway)]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.Conflict)]
+        [InlineData(HttpStatusCode.Forbidden)]
+        [InlineData(HttpStatusCode.Gone)]
+        [InlineData(HttpStatusCode.NotAcceptable)]
+        public async Task HttpClientFailureStatusCode_ThrowsException(
+            HttpStatusCode responseStatusCode)
+        {
+            var dataSetVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+                .Respond(responseStatusCode);
+
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
+            {
+                await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+            });
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        private enum Errors
+        {
+            Error1,
+        }
+    }
 }

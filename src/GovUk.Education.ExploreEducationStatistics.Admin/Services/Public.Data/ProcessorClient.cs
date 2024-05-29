@@ -83,6 +83,11 @@ internal class ProcessorClient(
         {
             switch (response.StatusCode)
             {
+                case HttpStatusCode.BadRequest:
+                    return new BadRequestObjectResult(
+                        await response.Content
+                            .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
+                    );
                 case HttpStatusCode.NotFound:
                     return new NotFoundResult();
                 default:
