@@ -16,6 +16,7 @@ Navigate to /methodology page
 
 Validate accordion sections exist
     user checks url contains    methodology
+    user scrolls down    200
     user waits until page contains accordion section    Children's social care
     user waits until page contains accordion section    COVID-19
     user waits until page contains accordion section    Destination of pupils and students
@@ -37,7 +38,7 @@ Validate page contents
 
     user checks page contains link with text and url
     ...    Pupil absence statistics: methodology
-    ...    /methodology/pupil-absence-in-schools-in-england
+    ...    /methodology/pupil-absence-statistics-methodology
 
 Validate Related information section links exist
     user checks page contains link with text and url
