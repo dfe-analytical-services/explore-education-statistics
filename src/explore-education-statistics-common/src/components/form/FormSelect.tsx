@@ -27,8 +27,9 @@ export interface FormSelectProps
   error?: string;
   id: string;
   inline?: boolean;
+  inlineHint?: boolean;
   inputRef?: Ref<HTMLSelectElement>;
-  hint?: string;
+  hint?: string | ReactNode;
   name: string;
   onBlur?: FocusEventHandler;
   onChange?: SelectChangeEventHandler;
@@ -48,6 +49,7 @@ const FormSelect = ({
   error,
   id,
   inline = false,
+  inlineHint = false,
   inputRef,
   hint,
   hideLabel,
@@ -65,24 +67,30 @@ const FormSelect = ({
   return (
     <>
       <FormSelectWrapper inline={inline}>
-        <FormLabel
-          className={classNames({ 'govuk-!-margin-right-2': inline })}
-          id={id}
-          label={label}
-          hideLabel={hideLabel}
-        />
+        <div
+          className={classNames({
+            'dfe-flex dfe-justify-content--space-between': inlineHint,
+          })}
+        >
+          <FormLabel
+            className={classNames({ 'govuk-!-margin-right-2': inline })}
+            id={id}
+            label={label}
+            hideLabel={hideLabel}
+          />
 
-        {/* Hint and error moved below the select when inline */}
-        {!inline && (
-          <>
-            {hint && (
-              <div id={`${id}-hint`} className="govuk-hint">
-                {hint}
-              </div>
-            )}
-            {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-          </>
-        )}
+          {/* Hint and error moved below the select when inline */}
+          {!inline && (
+            <>
+              {hint && (
+                <div id={`${id}-hint`} className="govuk-hint">
+                  {hint}
+                </div>
+              )}
+              {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+            </>
+          )}
+        </div>
 
         <select
           aria-describedby={
