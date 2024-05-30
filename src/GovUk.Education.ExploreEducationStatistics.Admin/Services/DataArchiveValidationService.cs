@@ -1,8 +1,12 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -69,6 +73,115 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
+        }
+
+        public async Task<Either<ActionResult, List<BulkDataArchiveFile>>> ValidateBulkDataArchiveFile(IFormFile zipFile)
+        {
+            if (!await IsZipFile(zipFile))
+            {
+                return ValidationActionResult(DataZipMustBeZipFile);
+            }
+
+            await using var stream = zipFile.OpenReadStream();
+            using var archive = new ZipArchive(stream);
+
+            ZipArchiveEntry? datasetNamesEntry = null;
+            foreach (var zipArchiveEntry in archive.Entries)
+            {
+                if (zipArchiveEntry.FullName == "dataset_names.csv")
+                {
+                    datasetNamesEntry = zipArchiveEntry;
+                }
+            }
+
+            if (datasetNamesEntry == null)
+            {
+                return ValidationActionResult(DataBulkZipFileMustContainDatasetNamesCsv);
+            }
+
+            var datasetNamesStream = datasetNamesEntry.Open();
+            var datasetNamesReader = new StreamReader(datasetNamesStream);
+            var datasetNamesCsvReader = new CsvReader(datasetNamesReader, CultureInfo.InvariantCulture);
+
+            try
+            {
+                await datasetNamesCsvReader.ReadAsync(); // @MarkFix what happens if headers but no data here?
+                datasetNamesCsvReader.ReadHeader();
+            }
+            catch (ReaderException e)
+            {
+                // @MarkFix can we return the error from the exception here?
+                return ValidationActionResult(DataBulkZipErrorReadingDatasetNamesCsv);
+            }
+
+            var headers = datasetNamesCsvReader.HeaderRecord?.ToList() ?? new List<string>();
+
+            if (headers is not ["file_name", "dataset_name"])
+            {
+                return ValidationActionResult(DataBulkZipDatasetNamesCsvMustContainTwoColumnsNamedCorrectly);
+            }
+
+            var results = new List<BulkDataArchiveFile>();
+
+            using var csvDataReader = new CsvDataReader(datasetNamesCsvReader);
+
+            var lastLine = false; // Assume one row of data // @MarkFix yeah? test it
+
+            while (!lastLine)
+            {
+                var row = Enumerable
+                    .Range(0, csvDataReader.FieldCount)
+                    .Select(datasetNamesCsvReader.GetField<string>)
+                    .ToList();
+
+                var fileName = row[0];
+                var datasetName = row[1];
+
+                ZipArchiveEntry? dataFile = null;
+                ZipArchiveEntry? metaFile = null;
+
+                foreach (var zipArchiveEntry in archive.Entries)
+                {
+                    if (zipArchiveEntry.FullName == $"{fileName}.csv")
+                    {
+                        dataFile = zipArchiveEntry;
+                    }
+
+                    if (zipArchiveEntry.FullName == $"{fileName}.meta.csv")
+                    {
+                        metaFile = zipArchiveEntry;
+                    }
+                }
+
+                if (dataFile == null)
+                {
+                    return ValidationActionResult(DataBulkZipCannotFindDataFile);
+                }
+
+                if (metaFile == null)
+                {
+                    return ValidationActionResult(DataBulkZipCannotFindMetaFile);
+                }
+
+                // @MarkFix More Data/Meta file validation here?
+
+                results.Add(new BulkDataArchiveFile(datasetName, dataFile: dataFile, metaFile: metaFile));
+
+                lastLine = !await datasetNamesCsvReader.ReadAsync();
+            }
+
+            // @MarkFix do we want to do this - probably hit MacOs archive hidden files and fail?
+            //if (archive.Entries.Count != (2 * results.Count) + 1) // +1 for dataset_names.csv
+            //{
+            //
+            //}
+
+            if (results.Count == 0)
+            {
+                return ValidationActionResult(DataBulkZipCannotHaveNoDatasets);
+            }
+
+            return results;
         }
 
         private async Task<bool> IsZipFile(IFormFile file)

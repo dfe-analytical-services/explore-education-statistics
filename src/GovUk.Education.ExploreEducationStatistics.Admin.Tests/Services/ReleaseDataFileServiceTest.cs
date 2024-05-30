@@ -1696,7 +1696,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        null))
                     .ReturnsAsync(new DataImport
                     {
                         Status = QUEUED
@@ -1869,7 +1870,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        null))
                     .ReturnsAsync(new DataImport
                     {
                         Status = QUEUED
@@ -2087,7 +2089,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        null))
                     .ReturnsAsync(new DataImport());
 
                 privateBlobStorageService.Setup(mock =>
@@ -2209,7 +2212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(Unit.Instance);
 
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataArchiveEntriesForUpload(releaseVersion.Id, archiveFile, null))
+                    .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
                     .ReturnsAsync(Unit.Instance);
 
                 dataArchiveValidationService
@@ -2217,7 +2220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile));
 
                 dataImportService
-                    .Setup(s => s.ImportZip(
+                    .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
                         It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
@@ -2387,7 +2390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(Unit.Instance);
 
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataArchiveEntriesForUpload(releaseVersion.Id, archiveFile, null))
+                    .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
                     .ReturnsAsync(Unit.Instance);
 
                 dataArchiveValidationService
@@ -2395,7 +2398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile));
 
                 dataImportService
-                    .Setup(s => s.ImportZip(
+                    .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
                         It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
@@ -2543,7 +2546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataArchiveEntriesForUpload(releaseVersion.Id,
+                    .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id,
                         archiveFile,
                         It.Is<File>(file => file.Id == originalDataReleaseFile.File.Id)))
                     .ReturnsAsync(Unit.Instance);
@@ -2553,7 +2556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile));
 
                 dataImportService
-                    .Setup(s => s.ImportZip(
+                    .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
                         It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),

@@ -41,5 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IFormFile zipFormFile,
             Guid? replacingFileId = null,
             string? subjectName = null);
+
+        Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(Guid releaseVersionId, IFormFile bulkZipFormFile);
     }
 }
