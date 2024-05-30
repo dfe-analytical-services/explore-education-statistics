@@ -666,6 +666,12 @@
       "metadata": {
         "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
       }
+    },
+    "publicDataProcessorAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
+      }
     }
   },
   "variables": {
@@ -1738,7 +1744,8 @@
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
-        "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]"
+        "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
+        "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
       }
     },
     {

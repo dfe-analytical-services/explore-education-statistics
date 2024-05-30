@@ -77,6 +77,9 @@ param publicUrls {
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
 
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
+param dataProcessorAppRegistrationClientId string = ''
+
 var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
@@ -327,6 +330,18 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   ]
 }
 
+resource adminAppService 'Microsoft.Web/sites@2023-01-01' existing = {
+  name: adminAppServiceFullName
+}
+
+resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2018-11-30' existing = {
+  scope: adminAppService
+  name: 'default'
+}
+
+var adminAppClientId = adminAppServiceIdentity.properties.clientId
+var adminAppPrincipalId = adminAppService.identity.principalId
+
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: dataProcessorFunctionAppManagedIdentityName
   location: location
@@ -343,6 +358,15 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     publicNetworkAccessEnabled: false
+    entraIdAuthentication: {
+      appRegistrationClientId: dataProcessorAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+      ]
+      allowedPrincipalIds: [
+        adminAppPrincipalId
+      ]
+    }
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
       name: dataProcessorFunctionAppManagedIdentity.name

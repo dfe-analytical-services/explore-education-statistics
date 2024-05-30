@@ -73,7 +73,7 @@ public static class ProcessorHostBuilder
                     {
                         services.AddDbContext<PublicDataDbContext>(options =>
                         {
-                            var sqlServerTokenProvider = new DefaultAzureCredential(
+                            var accessTokenProvider = new DefaultAzureCredential(
                                 new DefaultAzureCredentialOptions
                                 {
                                     // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
@@ -81,7 +81,7 @@ public static class ProcessorHostBuilder
                                     // a Function App.  We therefore provide it manually.
                                     ManagedIdentityClientId = configuration["AZURE_CLIENT_ID"]
                                 });
-                            var accessToken = sqlServerTokenProvider.GetToken(
+                            var accessToken = accessTokenProvider.GetToken(
                                 new TokenRequestContext(scopes:
                                 [
                                     "https://ossrdbms-aad.database.windows.net/.default"

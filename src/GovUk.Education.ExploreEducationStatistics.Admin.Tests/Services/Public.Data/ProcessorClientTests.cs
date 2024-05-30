@@ -12,6 +12,9 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Settings;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Public.Data;
 
@@ -26,7 +29,11 @@ public class ProcessorClientTests
         _mockHttp = new MockHttpMessageHandler();
         var client = _mockHttp.ToHttpClient();
         client.BaseAddress = BaseUri;
-        _processorClient = new ProcessorClient(Mock.Of<ILogger<ProcessorClient>>(), client);
+        _processorClient = new ProcessorClient(
+            Mock.Of<ILogger<ProcessorClient>>(), 
+            client, 
+            Mock.Of<IOptions<PublicDataProcessorOptions>>(), 
+            Mock.Of<IWebHostEnvironment>());
     }
 
     public class CreateInitialDataSetVersionTests : ProcessorClientTests
