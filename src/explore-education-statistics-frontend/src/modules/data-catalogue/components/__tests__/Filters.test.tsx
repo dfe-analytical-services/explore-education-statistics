@@ -51,6 +51,10 @@ describe('Filters', () => {
     expect(releases[1]).toHaveTextContent('All releases');
     expect(releases[1]).toHaveValue('all');
     expect(releases[1].selected).toBe(false);
+  });
+
+  test('renders the data set type filter when showTypeFilter is true', async () => {
+    render(<Filters showTypeFilter themes={testThemes} onChange={noop} />);
 
     const apiFilter = within(
       screen.getByRole('group', {
@@ -59,6 +63,14 @@ describe('Filters', () => {
     );
     expect(apiFilter.getByLabelText('All data')).toBeChecked();
     expect(apiFilter.getByLabelText('API data sets only')).not.toBeChecked();
+  });
+
+  test('does not render the data set type filter when showTypeFilter is false', async () => {
+    render(<Filters themes={testThemes} onChange={noop} />);
+
+    expect(
+      screen.queryByRole('group', { name: 'Type of data' }),
+    ).not.toBeInTheDocument();
   });
 
   test('populates the release filter with all & releases when there is a publicationId', () => {
@@ -170,6 +182,7 @@ describe('Filters', () => {
       <Filters
         publicationId="publication-2"
         releases={testReleases}
+        showTypeFilter
         themes={testThemes}
         themeId="theme-2"
         onChange={handleChange}
