@@ -192,8 +192,8 @@ public static class PublisherHostBuilderExtensions
                         {
                             services.AddDbContext<PublicDataDbContext>(options =>
                             {
-                                var sqlServerTokenProvider = new DefaultAzureCredential();
-                                var accessToken = sqlServerTokenProvider.GetToken(
+                                var accessTokenProvider = new DefaultAzureCredential();
+                                var accessToken = accessTokenProvider.GetToken(
                                     new TokenRequestContext(scopes: new[]
                                     {
                                         "https://ossrdbms-aad.database.windows.net/.default"

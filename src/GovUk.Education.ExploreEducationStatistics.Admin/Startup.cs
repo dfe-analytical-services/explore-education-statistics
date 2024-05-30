@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
@@ -107,7 +108,6 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admi
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
-using System.Threading;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -244,8 +244,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     {
                         services.AddDbContext<PublicDataDbContext>(options =>
                         {
-                            var sqlServerTokenProvider = new DefaultAzureCredential();
-                            var accessToken = sqlServerTokenProvider.GetToken(
+                            var accessTokenProvider = new DefaultAzureCredential();
+                            var accessToken = accessTokenProvider.GetToken(
                                     new TokenRequestContext(scopes:
                                         ["https://ossrdbms-aad.database.windows.net/.default"]))
                                 .Token;
