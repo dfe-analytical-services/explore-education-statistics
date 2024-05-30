@@ -402,6 +402,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .HasConversion(
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<List<IndicatorGroupSequenceEntry>>(v));
+                entity.Property(rf => rf.Published)
+                    .HasConversion(v => v,
+                        v => v.HasValue
+                            ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                            : null);
             });
         }
 
