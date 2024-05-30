@@ -381,6 +381,10 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
+    healthCheck: {
+      path: '/api/HealthCheck'
+      unhealthyMetricName: '${subscription}PublicDataProcessorUnhealthy'
+    }
     azureFileShares: [{
       storageName: fileShareModule.outputs.fileShareName
       storageAccountKey: publicApiStorageAccountAccessKey

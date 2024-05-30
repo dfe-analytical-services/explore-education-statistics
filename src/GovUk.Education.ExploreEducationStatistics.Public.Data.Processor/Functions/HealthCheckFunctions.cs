@@ -1,10 +1,10 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
@@ -12,52 +12,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class HealthCheckFunctions(
     ILogger<HealthCheckFunctions> logger,
     PublicDataDbContext publicDataDbContext,
-    IOptions<DataFilesOptions> dataFilesOptions)
+    IDataSetVersionPathResolver dataSetVersionPathResolver)
 {
-    [Function(nameof(CountDataSets))]
-    public async Task<string> CountDataSets(
+    [Function(nameof(HealthCheck))]
+    [Produces("application/json")]
+    public async Task<IActionResult> HealthCheck(
 #pragma warning disable IDE0060
-        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData request)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest request)
 #pragma warning restore IDE0060
     {
+        var psqlConnectionHealthCheck = await CheckPsqlConnectionHealthy();
+        var fileShareMountHealthCheck = CheckFileShareMountHealth();
+        var healthCheckResponse = new HealthCheckResponse(
+            PsqlConnection: psqlConnectionHealthCheck,
+            FileShareMount: fileShareMountHealthCheck);
+
+        if (healthCheckResponse.Healthy)
+        {
+            return new OkObjectResult(healthCheckResponse);
+        }
+        
+        return new ObjectResult(healthCheckResponse){
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
+    }
+    
+    private async Task<HealthCheckSummary> CheckPsqlConnectionHealthy()
+    {
+        logger.LogInformation("Attempting to test PSQL health");
+
         try
         {
-            var message = $"Found {await publicDataDbContext.DataSets.CountAsync()} data sets.";
-            logger.LogInformation(message);
-            return message;
+            await publicDataDbContext.DataSets.AnyAsync();
+            return new HealthCheckSummary(true);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error encountered when querying Data Sets");
-            throw;
+            logger.LogError(e, "Error encountered when testing PSQL connection health");
+            return new HealthCheckSummary(false, e.Message);
         }
     }
-
-    [Function(nameof(CheckForFileShareMount))]
-    public Task CheckForFileShareMount(
-#pragma warning disable IDE0060
-        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData request)
-#pragma warning restore IDE0060
+    
+    private HealthCheckSummary CheckFileShareMountHealth()
     {
         logger.LogInformation("Attempting to read from file share");
-
+        
         try
         {
-            if (Directory.Exists(dataFilesOptions.Value.BasePath))
+            if (Directory.Exists(dataSetVersionPathResolver.BasePath()))
             {
-                logger.LogInformation("Successfully found the file share mount");
+                return new HealthCheckSummary(true);
             }
-            else
-            {
-                logger.LogError("Unable to find the file share mount");
-            }
+            
+            return new HealthCheckSummary(false, "File Share Mount folder does not exist");
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error encountered when attempting to find the file share mount");
-            throw;
+            return new HealthCheckSummary(false, e.Message);
         }
-
-        return Task.CompletedTask;
     }
+
+    public record HealthCheckResponse(HealthCheckSummary PsqlConnection, HealthCheckSummary FileShareMount)
+    {
+        public bool Healthy => PsqlConnection.Healthy && FileShareMount.Healthy;
+    };
+
+    public record HealthCheckSummary(bool Healthy, string? UnhealthyReason = null);
 }
