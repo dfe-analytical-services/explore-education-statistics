@@ -405,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
 
-                var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+                var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                     archiveFile);
 
                 result.AssertRight();
@@ -419,7 +419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var archiveFile = CreateDataArchiveFileMock("test.txt", "test.meta.csv").Object;
 
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+            var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                 archiveFile);
 
             result.AssertBadRequest(DataFileMustBeCsvFile);
@@ -432,7 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.txt").Object;
 
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+            var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                 archiveFile);
 
             result.AssertBadRequest(MetaFileMustBeCsvFile);
@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var archiveFile = CreateDataArchiveFileMock("test.csv", "meta.csv").Object;
 
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+            var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                 archiveFile);
 
             result.AssertBadRequest(MetaFileIsIncorrectlyNamed);
@@ -461,7 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.csv",
                     "test.meta.csv").Object;
 
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+            var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                 archiveFile);
 
             result.AssertBadRequest(DataFilenameTooLong);
@@ -476,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.meta.csv")
                 .Object;
 
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+            var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                 archiveFile);
 
             result.AssertBadRequest(MetaFilenameTooLong);
@@ -492,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataFileSize: 0,
                 metaFileSize: 1024).Object;
 
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+            var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                 archiveFile);
 
             result.AssertBadRequest(DataFileCannotBeEmpty);
@@ -508,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataFileSize: 1024,
                 metaFileSize: 0).Object;
 
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+            var result = await service.ValidateDataArchiveFileForUpload(Guid.NewGuid(),
                 archiveFile);
 
             result.AssertBadRequest(MetadataFileCannotBeEmpty);
@@ -538,7 +538,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
 
-                var result = await service.ValidateDataArchiveEntriesForUpload(releaseVersion.Id, archiveFile);
+                var result = await service.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile);
 
                 result.AssertBadRequest(DataFilenameNotUnique);
             }
@@ -573,7 +573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
 
                 var result =
-                    await service.ValidateDataArchiveEntriesForUpload(releaseVersion.Id,
+                    await service.ValidateDataArchiveFileForUpload(releaseVersion.Id,
                         archiveFile,
                         fileBeingReplaced);
 
@@ -617,7 +617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // in this Release after the replacement is complete.
                 var archiveFile = CreateDataArchiveFileMock("another.csv", "test.meta.csv").Object;
 
-                var result = await service.ValidateDataArchiveEntriesForUpload(
+                var result = await service.ValidateDataArchiveFileForUpload(
                     releaseVersion.Id, archiveFile, fileBeingReplaced);
 
                 result.AssertBadRequest(DataFilenameNotUnique);

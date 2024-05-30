@@ -1,4 +1,3 @@
-#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 {
     public enum ValidationErrorMessages
@@ -77,6 +76,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataZipFileDoesNotContainCsvFiles,
         DataZipFilenameTooLong,
         DataZipContentFilenamesTooLong,
+        DataBulkZipFileMustContainDatasetNamesCsv,
+        DataBulkZipErrorReadingDatasetNamesCsv,
+        DataBulkZipDatasetNamesCsvMustContainTwoColumnsNamedCorrectly,
+        DataBulkZipCannotFindDataFile,
+        DataBulkZipCannotFindMetaFile,
+        DataBulkZipCannotHaveNoDatasets,
 
         // Meta file
         MetadataFileCannotBeEmpty,

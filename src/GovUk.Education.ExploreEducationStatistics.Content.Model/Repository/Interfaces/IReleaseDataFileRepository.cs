@@ -27,6 +27,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             string contentType,
             Guid createdById);
 
+        //public Task<File> CreateBulkZip( // @MarkFix see implementation
+        //    Guid releaseVersionId,
+        //    string filename,
+        //    long contentLength,
+        //    string contentType,
+        //    Guid createdById);
+
         public Task<IList<File>> ListDataFiles(Guid releaseVersionId);
 
         public Task<bool> HasAnyDataFiles(Guid releaseVersionId);

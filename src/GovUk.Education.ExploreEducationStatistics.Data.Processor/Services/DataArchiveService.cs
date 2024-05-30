@@ -26,10 +26,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using var zipBlobFileStream = await _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
-            var file1 = archive.Entries[0];
-            var file2 = archive.Entries[1];
-            var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
-            var metadataFile = file1.Name.Contains(".meta.") ? file1 : file2;
+            var dataFileName = import.File.Filename;
+            var metaFileName = import.MetaFile.Filename;
+
+            ZipArchiveEntry? dataFile = null;
+            ZipArchiveEntry? metaFile = null;
+            foreach (var zipArchiveEntry in archive.Entries)
+            {
+                if (zipArchiveEntry.FullName == dataFileName)
+                {
+                    dataFile = zipArchiveEntry;
+                }
+
+                if (zipArchiveEntry.FullName == metaFileName)
+                {
+                    metaFile = zipArchiveEntry;
+                }
+            }
+
+            // @MarkFix extra validation here? Could skip if we assume validation occurred elsewhere
 
             await using (var stream = dataFile.Open())
             {
@@ -40,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     contentType: ContentTypes.Csv);
             }
 
-            await using (var stream = metadataFile.Open())
+            await using (var stream = metaFile.Open())
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,

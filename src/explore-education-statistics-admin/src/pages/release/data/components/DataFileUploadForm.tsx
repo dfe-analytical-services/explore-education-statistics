@@ -16,7 +16,6 @@ import {
 import Yup from '@common/validation/yup';
 import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
-import {isDisabled} from "@testing-library/user-event/utils/misc/isDisabled";
 
 type FileType = 'csv' | 'zip' | 'bulkZip';
 
@@ -236,7 +235,7 @@ export default function DataFileUploadForm({
               {formState.isSubmitting && (
                 <LoadingSpinner text="Uploading files" overlay />
               )}
-              {!isDataReplacement && (
+              {!isDataReplacement && ( // @MarkFix hide if bulkZip?
                 <FormFieldTextInput<DataFileUploadFormValues>
                   name="subjectTitle"
                   label="Subject title"
@@ -289,7 +288,7 @@ export default function DataFileUploadForm({
                     hidden: isDataReplacement,
                     conditional: (
                       <FormFieldFileInput<DataFileUploadFormValues>
-                        hint="Must contain manifest and pairs of csv/meta.csv data files"
+                        hint="Must contain dataset_names.csv and pairs of csv/meta.csv data files"
                         name="zipFile"
                         label="Upload ZIP file"
                         accept=".zip"
