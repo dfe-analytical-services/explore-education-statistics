@@ -951,7 +951,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Summary = "Publication A summary",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = new DateTime(2020, 1, 1)
                     }
                 };
@@ -1037,7 +1037,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal("Publication A", results[0].Title);
                     Assert.Equal("Publication A summary", results[0].Summary);
                     Assert.Equal("Theme 1 title", results[0].Theme);
-                    Assert.Equal(NationalStatistics, results[0].Type);
+                    Assert.Equal(AccreditedOfficialStatistics, results[0].Type);
 
                     Assert.Equal(publicationB.Id, results[1].Id);
                     Assert.Equal("publication-b", results[1].Slug);
@@ -1066,7 +1066,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1124,7 +1124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1135,7 +1135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication B",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1153,7 +1153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication D",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     },
                     SupersededBy = publicationB
@@ -1165,7 +1165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication E",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     },
                     SupersededBy = publicationC
@@ -1221,7 +1221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1231,7 +1231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication B",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1311,7 +1311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1321,7 +1321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication B",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1331,7 +1331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication C",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1341,7 +1341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication D",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1401,7 +1401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1488,21 +1488,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var releaseVersionA = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = DateTime.UtcNow
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = DateTime.UtcNow
                 };
 
                 var releasedVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = DateTime.UtcNow
                 };
 
@@ -1584,21 +1584,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var releaseVersionA = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = DateTime.UtcNow
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = DateTime.UtcNow
                 };
 
                 var releaseVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = DateTime.UtcNow
                 };
 
@@ -1679,19 +1679,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var releaseVersionA = new ReleaseVersion
                 {
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = new DateTime(2020, 1, 1)
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = new DateTime(2021, 1, 1)
                 };
 
                 var releaseVersionC = new ReleaseVersion
                 {
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = new DateTime(2022, 1, 1)
                 };
 
@@ -1770,19 +1770,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var releaseVersionA = new ReleaseVersion
                 {
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = new DateTime(2020, 1, 1)
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = new DateTime(2021, 1, 1)
                 };
 
                 var releaseVersionC = new ReleaseVersion
                 {
-                    Type = NationalStatistics,
+                    Type = AccreditedOfficialStatistics,
                     Published = new DateTime(2022, 1, 1)
                 };
 
@@ -1864,7 +1864,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
@@ -1949,7 +1949,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
-                        Type = NationalStatistics,
+                        Type = AccreditedOfficialStatistics,
                         Published = DateTime.UtcNow
                     }
                 };
