@@ -27,8 +27,12 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
 
     public class DeleteVersionTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        [InlineData(DataSetVersionStatus.Cancelled)]
+        public async Task Success(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -39,7 +43,7 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(1, 0, 0)
-                .WithStatusDraft()
+                .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet)
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
@@ -108,13 +112,10 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
 
         [Theory]
         [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Deprecated)]
         [InlineData(DataSetVersionStatus.Withdrawn)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
-        public async Task VersionNotInDraft_Returns400(DataSetVersionStatus dataSetVersionStatus)
+        public async Task VersionCanNotBeDeleted_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()

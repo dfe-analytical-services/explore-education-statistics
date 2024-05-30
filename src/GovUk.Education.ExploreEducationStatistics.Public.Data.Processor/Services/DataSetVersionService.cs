@@ -58,7 +58,7 @@ internal class DataSetVersionService(
 
     private Either<ActionResult, Unit> CheckCanDeleteDataSetVersion(DataSetVersion dataSetVersion)
     {
-        if (dataSetVersion.Status == DataSetVersionStatus.Draft)
+        if (dataSetVersion.CanBeDeleted)
         {
             return Unit.Instance;
         }
