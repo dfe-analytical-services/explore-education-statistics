@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Linq;
+using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -29,14 +30,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static T AssertOkResult<T>(this ActionResult<T> result, T? expectedValue = null) where T : class
         {
             Assert.IsAssignableFrom<ActionResult<T>>(result);
-            Assert.IsAssignableFrom<T>(result.Value);
+            var value = Assert.IsAssignableFrom<T>(result.Value);
 
             if (expectedValue != null)
             {
-                Assert.Equal(expectedValue, result.Value);
+                Assert.Equal(expectedValue, value);
             }
 
-            return result.Value!;
+            return value;
+        }
+        
+        public static T AssertObjectResult<T>(
+            this IActionResult result,
+            HttpStatusCode expectedStatusCode, 
+            T? expectedValue = null) where T : class
+        {
+            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            Assert.Equal((int) expectedStatusCode, objectResult.StatusCode);
+            var value = Assert.IsAssignableFrom<T>(objectResult.Value);
+            
+            if (expectedValue != null)
+            {
+                Assert.Equal(expectedValue, value);
+            }
+
+            return value;
         }
 
         public static void AssertNotFoundResult<T>(this ActionResult<T> result) where T : class
