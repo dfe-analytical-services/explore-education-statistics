@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateDataFileTypes(dataFile, metaFile));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(
+        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveFileForUpload(
             Guid releaseVersionId,
             IDataArchiveFile archiveFile,
             File? replacingFile = null)
@@ -61,6 +61,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     dataFileName: archiveFile.DataFileName,
                     metaFileName: archiveFile.MetaFileName,
                     replacingFile));
+        }
+
+        public async Task<Either<ActionResult, Unit>> ValidateBulkDataArchiveFileListForUpload(
+            Guid releaseVersionId,
+            List<BulkDataArchiveFile> dataArchiveFiles)
+        {
+            foreach (var archiveFile in dataArchiveFiles)
+            {
+                var result = await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize)
+                    .OnSuccess(async _ => await ValidateDataFileNames(releaseVersionId,
+                        dataFileName: archiveFile.DataFileName,
+                        metaFileName: archiveFile.MetaFileName));
+
+                if (result.IsLeft)
+                {
+                    return result;
+                }
+            }
+
+            return Unit.Instance;
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
@@ -145,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             string dataFileName,
             string metaFileName,
-            File? replacingFile)
+            File? replacingFile = null)
         {
             if (string.Equals(dataFileName.ToLower(), metaFileName.ToLower(), OrdinalIgnoreCase))
             {

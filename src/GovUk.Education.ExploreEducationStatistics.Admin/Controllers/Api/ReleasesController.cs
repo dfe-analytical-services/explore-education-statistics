@@ -150,6 +150,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPost("release/{releaseVersionId:guid}/bulk-zip-data")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<List<DataFileInfo>>> UploadAsBulkZip(Guid releaseVersionId, IFormFile zipFile)
+        {
+            return await _releaseDataFileService
+                .UploadAsBulkZip(releaseVersionId: releaseVersionId, bulkZipFormFile: zipFile)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("releases/{releaseVersionId:guid}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(Guid releaseVersionId)
         {

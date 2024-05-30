@@ -2200,7 +2200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(Unit.Instance);
 
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataArchiveEntriesForUpload(releaseVersion.Id, archiveFile, null))
+                    .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
                     .ReturnsAsync(Unit.Instance);
 
                 dataArchiveValidationService
@@ -2377,7 +2377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(Unit.Instance);
 
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataArchiveEntriesForUpload(releaseVersion.Id, archiveFile, null))
+                    .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
                     .ReturnsAsync(Unit.Instance);
 
                 dataArchiveValidationService
@@ -2533,7 +2533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataArchiveEntriesForUpload(releaseVersion.Id,
+                    .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id,
                         archiveFile,
                         It.Is<File>(file => file.Id == originalDataReleaseFile.File.Id)))
                     .ReturnsAsync(Unit.Instance);

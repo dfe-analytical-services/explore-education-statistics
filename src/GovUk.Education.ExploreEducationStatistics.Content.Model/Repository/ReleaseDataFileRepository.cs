@@ -105,6 +105,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return file;
         }
 
+        //public async Task<File> CreateBulkZip( // @MarkFix remove
+        //    Guid releaseVersionId,
+        //    string filename,
+        //    long contentLength,
+        //    string contentType,
+        //    Guid createdById)
+        //{
+        //    var file = new File
+        //    {
+        //        CreatedById = createdById,
+        //        RootPath = releaseVersionId,
+        //        Filename = filename,
+        //        ContentLength = contentLength,
+        //        ContentType = contentType,
+        //        Type = BulkDataZip,
+        //    };
+
+        //    await _contentDbContext.Files.AddAsync(file);
+        //    await _contentDbContext.SaveChangesAsync();
+
+        //    return file;
+        //}
+
         public async Task<IList<File>> ListDataFiles(Guid releaseVersionId)
         {
             return await ListDataFilesQuery(releaseVersionId).ToListAsync();

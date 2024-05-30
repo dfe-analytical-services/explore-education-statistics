@@ -108,33 +108,40 @@ const ReleaseDataUploadsSection = ({
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
-      let file: DataFile;
+      let newFiles: DataFile[] = [];
       if (!values.subjectTitle) {
         return;
       }
       switch (values.uploadType) {
         case 'csv':
-          file = await releaseDataFileService.uploadDataFiles(releaseId, {
-            title: values.subjectTitle,
-            dataFile: values.dataFile as File,
-            metadataFile: values.metadataFile as File,
-          });
+          newFiles.push(
+            await releaseDataFileService.uploadDataFiles(releaseId, {
+              title: values.subjectTitle,
+              dataFile: values.dataFile as File,
+              metadataFile: values.metadataFile as File,
+            }),
+          );
           break;
         case 'zip':
-          file = await releaseDataFileService.uploadZipDataFile(releaseId, {
-            title: values.subjectTitle,
-            zipFile: values.zipFile as File,
-          });
+          newFiles.push(
+            await releaseDataFileService.uploadZipDataFile(releaseId, {
+              title: values.subjectTitle,
+              zipFile: values.zipFile as File,
+            }),
+          );
           break;
         case 'bulkZip':
-          file = await releaseDataFileService.uploadBulkZipDataFile(releaseId, { // @MarkFix
-            title: values.subjectTitle,
-            zipFile: values.zipFile as File,
-          });
+          newFiles.push(
+            ...(await releaseDataFileService.uploadBulkZipDataFile(
+              releaseId,
+              values.zipFile as File,
+            )),
+          );
           break;
+        // @MarkFix default case?
       }
-      setActiveFileId(file.id);
-      setDataFiles([...dataFiles, file]);
+      setActiveFileId(newFiles[0].id); // @MarkFix we want to open all new files really - but do we care?
+      setDataFiles([...dataFiles, ...newFiles]);
     },
     [dataFiles, releaseId, setDataFiles],
   );
