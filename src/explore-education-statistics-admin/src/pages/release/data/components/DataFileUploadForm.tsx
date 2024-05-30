@@ -16,8 +16,9 @@ import {
 import Yup from '@common/validation/yup';
 import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
+import {isDisabled} from "@testing-library/user-event/utils/misc/isDisabled";
 
-type FileType = 'csv' | 'zip';
+type FileType = 'csv' | 'zip' | 'bulkZip';
 
 export interface DataFileUploadFormValues {
   dataFile?: File | null;
@@ -43,6 +44,37 @@ const subjectErrorMappings = [
 function baseErrorMappings(
   fileType: FileType,
 ): FieldMessageMapper<DataFileUploadFormValues>[] {
+  if (fileType === 'bulkZip') {
+    return [
+      mapFieldErrors<DataFileUploadFormValues>({
+        target: 'zipFile' as FieldName<DataFileUploadFormValues>,
+        messages: {
+          DataZipMustBeZipFile: 'Choose a valid ZIP file',
+          DataBulkZipFileMustHaveManifest: 'ZIP file must contain a manifest',
+          // @MarkFix add errors here
+          // DataZipFileDoesNotContainCsvFiles:
+          //   'ZIP file does not contain any CSV files',
+          // DataFilenameNotUnique: 'Choose a unique ZIP data file name',
+          // DataZipFilenameTooLong: `Maximum ZIP data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
+          // DataFilenameTooLong: `Maximum data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
+          // MetaFilenameTooLong: `Maximum metadata filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
+          // DataZipContentFilenamesTooLong: `Maximum data and metadata filenames cannot exceed ${MAX_FILENAME_SIZE} characters`,
+          // DataAndMetadataFilesCannotHaveTheSameName:
+          //   'ZIP data and metadata filenames cannot be the same',
+          // DataFileCannotBeEmpty: 'Choose a ZIP data file that is not empty',
+          // DataFilenameCannotContainSpacesOrSpecialCharacters:
+          //   'ZIP data filename cannot contain spaces or special characters',
+          // MetadataFileCannotBeEmpty:
+          //   'Choose a ZIP metadata file that is not empty',
+          // MetaFilenameCannotContainSpacesOrSpecialCharacters:
+          //   'ZIP metadata filename cannot contain spaces or special characters',
+          // MetaFileIsIncorrectlyNamed:
+          //   'ZIP metadata filename must end with .meta.csv',
+        },
+      }),
+    ];
+  }
+
   if (fileType === 'zip') {
     return [
       mapFieldErrors<DataFileUploadFormValues>({
@@ -143,7 +175,7 @@ export default function DataFileUploadForm({
         otherwise: s => s.nullable(),
       }),
       subjectTitle: Yup.string(),
-      uploadType: Yup.string().oneOf(['csv', 'zip']).defined(),
+      uploadType: Yup.string().oneOf(['csv', 'zip', 'bulkZip']).defined(),
       zipFile: Yup.file().when('uploadType', {
         is: 'zip',
         then: s =>
@@ -216,6 +248,7 @@ export default function DataFileUploadForm({
                 name="uploadType"
                 legend="Choose upload method"
                 hint={`Filenames must be under ${MAX_FILENAME_SIZE} characters in length`}
+                order={[]}
                 options={[
                   {
                     label: 'CSV files',
@@ -243,6 +276,20 @@ export default function DataFileUploadForm({
                     conditional: (
                       <FormFieldFileInput<DataFileUploadFormValues>
                         hint="Must contain both the data and metadata CSV files"
+                        name="zipFile"
+                        label="Upload ZIP file"
+                        accept=".zip"
+                      />
+                    ),
+                  },
+                  {
+                    label: 'Bulk ZIP upload',
+                    hint: 'To import multiple data files at once',
+                    value: 'bulkZip',
+                    hidden: isDataReplacement,
+                    conditional: (
+                      <FormFieldFileInput<DataFileUploadFormValues>
+                        hint="Must contain manifest and pairs of csv/meta.csv data files"
                         name="zipFile"
                         label="Upload ZIP file"
                         accept=".zip"
