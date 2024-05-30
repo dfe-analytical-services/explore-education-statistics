@@ -204,7 +204,7 @@ internal class DataSetService(
             Version = dataSetVersion.Version,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
-            DataSetFileId = releaseFile.File.DataSetFileId!.Value,
+            File = MapVersionFile(releaseFile),
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             TotalResults = dataSetVersion.TotalResults,
             GeographicLevels = dataSetVersion.MetaSummary?.GeographicLevels
@@ -228,7 +228,7 @@ internal class DataSetService(
             Version = dataSetVersion.Version,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
-            DataSetFileId = releaseFile.File.DataSetFileId!.Value,
+            File = MapVersionFile(releaseFile),
             Published = dataSetVersion.Published!.Value,
             TotalResults = dataSetVersion.TotalResults,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
@@ -247,6 +247,15 @@ internal class DataSetService(
         {
             Id = releaseVersion.Id,
             Title = releaseVersion.Title,
+        };
+    }
+
+    private static IdTitleViewModel MapVersionFile(ReleaseFile releaseFile)
+    {
+        return new IdTitleViewModel
+        {
+            Id = releaseFile.File.DataSetFileId!.Value,
+            Title = releaseFile.Name ?? string.Empty,
         };
     }
 

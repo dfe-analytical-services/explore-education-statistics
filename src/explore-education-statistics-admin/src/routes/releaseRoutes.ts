@@ -1,3 +1,6 @@
+import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
+import ReleaseApiDataSetDetailsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetDetailsPage';
+import ReleaseApiDataSetsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetsPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
@@ -15,7 +18,6 @@ import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/Releas
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
-import { RouteProps } from 'react-router';
 
 export type ReleaseRouteParams = {
   publicationId: string;
@@ -42,7 +44,11 @@ export type ReleaseFootnoteRouteParams = ReleaseRouteParams & {
   footnoteId: string;
 };
 
-export interface ReleaseRouteProps extends RouteProps {
+export type ReleaseDataSetRouteParams = ReleaseRouteParams & {
+  dataSetId: string;
+};
+
+export interface ReleaseRouteProps extends ProtectedRouteProps {
   title: string;
   path: string;
 }
@@ -153,4 +159,18 @@ export const releasePreReleaseAccessRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/prerelease-access',
   title: 'Pre-release access',
   component: ReleasePreReleaseAccessPage,
+};
+
+export const releaseApiDataSetsRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets',
+  title: 'API data sets',
+  component: ReleaseApiDataSetsPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId',
+  title: 'API data set details',
+  component: ReleaseApiDataSetDetailsPage,
+  protectionAction: permissions => permissions.isBauUser,
 };

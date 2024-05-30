@@ -1,6 +1,6 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import getStatusDetail from '@admin/pages/release/utils/getStatusDetail';
-import { ReleaseStageStatuses } from '@admin/services/releaseService';
+import { ReleaseStageStatus } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import React from 'react';
 
@@ -8,15 +8,15 @@ const notStartedStatuses = ['Validating', 'Invalid'];
 
 interface Props {
   checklistStyle?: boolean;
-  currentStatus?: ReleaseStageStatuses;
+  currentStatus?: ReleaseStageStatus;
   includeScheduled?: boolean;
 }
 
-const ReleasePublishingStages = ({
+export default function ReleasePublishingStages({
   checklistStyle = false,
   currentStatus,
   includeScheduled = false,
-}: Props) => {
+}: Props) {
   if (
     !currentStatus ||
     (includeScheduled
@@ -79,6 +79,4 @@ const ReleasePublishingStages = ({
       )}
     </Details>
   );
-};
-
-export default ReleasePublishingStages;
+}

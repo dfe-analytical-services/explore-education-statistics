@@ -22,7 +22,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 {
     private const string BaseUrl = "api/public-data/data-set-candidates";
 
-    public class ListApiDataSetCandidatesTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class ListDataSetCandidatesTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -48,13 +48,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var content = response.AssertOk<List<ApiDataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(content);
-            Assert.NotEmpty(content);
-            Assert.Equal(3, content.Count);
-            Assert.All(releaseFiles, releaseFile =>
-                content.Any(apiDataSetCandidate => apiDataSetCandidate.FileId == releaseFile.FileId && apiDataSetCandidate.Title == releaseFile.Name));
+            Assert.NotNull(candidates);
+            Assert.Equal(3, candidates.Count);
+            Assert.Contains(releaseFiles, releaseFile =>
+                candidates.Any(candidate => candidate.ReleaseFileId == releaseFile.Id
+                                                && candidate.Title == releaseFile.Name));
         }
 
         [Theory]
@@ -92,10 +92,10 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var content = response.AssertOk<List<ApiDataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(content);
-            Assert.Empty(content);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
 
@@ -120,10 +120,10 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var content = response.AssertOk<List<ApiDataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(content);
-            Assert.Empty(content);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
         [Fact]
@@ -147,14 +147,14 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var content = response.AssertOk<List<ApiDataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(content);
-            Assert.Empty(content);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
         [Fact]
-        public async Task ReleaseFileHasAssociatedApiDataSet_NotReturned()
+        public async Task ReleaseFileHasAssociatedDataSet_NotReturned()
         {
             Release release = DataFixture
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
@@ -174,10 +174,10 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
-            var content = response.AssertOk<List<ApiDataSetCandidateViewModel>>();
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(content);
-            Assert.Empty(content);
+            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
         }
 
         [Fact]

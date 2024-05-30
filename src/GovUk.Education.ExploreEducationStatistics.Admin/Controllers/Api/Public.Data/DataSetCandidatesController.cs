@@ -14,16 +14,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 [Authorize]
 [ApiController]
 [Route("api/public-data/data-set-candidates")]
-public class DataSetCandidatesController(IReleaseService releaseService) : ControllerBase
+public class DataSetCandidatesController(IDataSetCandidateService dataSetCandidateService) : ControllerBase
 {
     [HttpGet]
     [Produces("application/json")]
-    public async Task<ActionResult<IReadOnlyList<ApiDataSetCandidateViewModel>>> ListApiDataSetCandidates(
+    public async Task<ActionResult<IReadOnlyList<DataSetCandidateViewModel>>> ListDataSetCandidates(
         [FromQuery] Guid releaseVersionId,
         CancellationToken cancellationToken)
     {
-        return await releaseService
-            .ListApiDataSetCandidates(releaseVersionId, cancellationToken)
+        return await dataSetCandidateService
+            .ListCandidates(releaseVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
 }

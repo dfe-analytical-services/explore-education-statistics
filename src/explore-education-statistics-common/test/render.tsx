@@ -8,7 +8,7 @@ import userEvent, { UserEvent } from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React, { FC, ReactElement, ReactNode } from 'react';
 
-interface CustomRenderResult extends RenderResult {
+export interface CustomRenderResult extends RenderResult {
   user: UserEvent;
 }
 

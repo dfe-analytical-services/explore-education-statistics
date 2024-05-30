@@ -546,7 +546,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.Equal(liveDataSetVersion.VersionType, viewModel.LatestLiveVersion.Type);
             Assert.Equal(liveDataSetVersion.TotalResults, viewModel.LatestLiveVersion.TotalResults);
             Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(), viewModel.LatestLiveVersion.Published);
-            Assert.Equal(liveReleaseFile.File.DataSetFileId, viewModel.LatestLiveVersion.DataSetFileId);
+            Assert.Equal(liveReleaseFile.File.DataSetFileId, viewModel.LatestLiveVersion.File.Id);
+            Assert.Equal(liveReleaseFile.Name, viewModel.LatestLiveVersion.File.Title);
 
             Assert.Equal(
                 liveDataSetVersion.MetaSummary!.GeographicLevels.Select(l => l.GetEnumLabel()),
@@ -569,7 +570,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.Equal(draftDataSetVersion.Status, viewModel.DraftVersion.Status);
             Assert.Equal(draftDataSetVersion.VersionType, viewModel.DraftVersion.Type);
             Assert.Equal(draftDataSetVersion.TotalResults, viewModel.DraftVersion.TotalResults);
-            Assert.Equal(draftReleaseFile.File.DataSetFileId, viewModel.DraftVersion.DataSetFileId);
+            Assert.Equal(draftReleaseFile.File.DataSetFileId, viewModel.DraftVersion.File.Id);
+            Assert.Equal(draftReleaseFile.Name, viewModel.DraftVersion.File.Title);
 
             Assert.Equal(draftReleaseVersion.Id, viewModel.DraftVersion.ReleaseVersion.Id);
             Assert.Equal(draftReleaseVersion.Title, viewModel.DraftVersion.ReleaseVersion.Title);
@@ -654,8 +656,9 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             Assert.Equal(dataSet.Id, viewModel.Id);
 
-            Assert.Equal(file.DataSetFileId, viewModel.LatestLiveVersion!.DataSetFileId);
-            Assert.Equal(file.DataSetFileId, viewModel.DraftVersion!.DataSetFileId);
+            Assert.Equal(viewModel.LatestLiveVersion!.File.Id, viewModel.DraftVersion!.File.Id);
+            Assert.Equal(liveReleaseFile.File.DataSetFileId, viewModel.LatestLiveVersion!.File.Id);
+            Assert.Equal(draftReleaseFile.File.DataSetFileId, viewModel.DraftVersion!.File.Id);
         }
 
         [Fact]
@@ -715,7 +718,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.Equal(dataSetVersion.Version, viewModel.LatestLiveVersion.Version);
             Assert.Equal(dataSetVersion.Status, viewModel.LatestLiveVersion.Status);
             Assert.Equal(dataSetVersion.VersionType, viewModel.LatestLiveVersion.Type);
-            Assert.Equal(releaseFile.File.DataSetFileId, viewModel.LatestLiveVersion.DataSetFileId);
+            Assert.Equal(releaseFile.File.DataSetFileId, viewModel.LatestLiveVersion!.File.Id);
+            Assert.Equal(releaseFile.Name, viewModel.LatestLiveVersion!.File.Title);
 
             Assert.Null(viewModel.DraftVersion);
         }
@@ -777,7 +781,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.Equal(dataSetVersion.Version, viewModel.DraftVersion.Version);
             Assert.Equal(dataSetVersion.Status, viewModel.DraftVersion.Status);
             Assert.Equal(dataSetVersion.VersionType, viewModel.DraftVersion.Type);
-            Assert.Equal(releaseFile.File.DataSetFileId, viewModel.DraftVersion.DataSetFileId);
+            Assert.Equal(releaseFile.File.DataSetFileId, viewModel.DraftVersion!.File.Id);
+            Assert.Equal(releaseFile.Name, viewModel.DraftVersion!.File.Title);
 
             Assert.Null(viewModel.LatestLiveVersion);
         }
@@ -992,7 +997,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.Equal(dataSetVersion.Version, content.DraftVersion!.Version);
             Assert.Equal(dataSetVersion.Status, content.DraftVersion!.Status);
             Assert.Equal(dataSetVersion.VersionType, content.DraftVersion!.Type);
-            Assert.Equal(draftReleaseFile.File.DataSetFileId!.Value, content.DraftVersion!.DataSetFileId);
+            Assert.Equal(draftReleaseFile.File.DataSetFileId, content.DraftVersion!.File.Id);
+            Assert.Equal(draftReleaseFile.Name, content.DraftVersion!.File.Title);
             Assert.Equal(draftReleaseVersion.Id, content.DraftVersion!.ReleaseVersion.Id);
             Assert.Equal(draftReleaseVersion.Title, content.DraftVersion!.ReleaseVersion.Title);
             Assert.Null(content.DraftVersion!.GeographicLevels);

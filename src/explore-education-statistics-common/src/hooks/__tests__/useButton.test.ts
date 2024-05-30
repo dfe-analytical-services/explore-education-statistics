@@ -12,8 +12,6 @@ describe('useButton', () => {
         id: 'id',
         testId: 'test id',
         type: 'submit',
-        underline: false,
-        variant: 'warning',
       }),
     );
     expect(result.current.children).toBe('button text');
@@ -23,8 +21,6 @@ describe('useButton', () => {
     expect(result.current.id).toBe('id');
     expect(result.current['data-testid']).toBe('test id');
     expect(result.current.type).toBe('submit');
-    expect(result.current.underline).toBe(false);
-    expect(result.current.variant).toBe('warning');
   });
 
   test('returns correct props when `disabled = true`', () => {
@@ -58,6 +54,6 @@ describe('useButton', () => {
       }),
     );
     expect(result.current['aria-disabled']).toBe(true);
-    expect(result.current.disabled).toBe(undefined);
+    expect(result.current.disabled).toBe(true);
   });
 });
