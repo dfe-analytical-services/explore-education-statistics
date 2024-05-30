@@ -828,7 +828,7 @@ describe('DataCataloguePage', () => {
           releaseInfo.getByText('This is the latest data'),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByRole('button', {
+          releaseInfo.getByRole('link', {
             name: 'Download 1 data set (ZIP)',
           }),
         ).toBeInTheDocument();
@@ -937,7 +937,7 @@ describe('DataCataloguePage', () => {
           releaseInfo.getByText('This is not the latest data'),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByRole('button', {
+          releaseInfo.getByRole('link', {
             name: 'Download all 2 data sets (ZIP)',
           }),
         ).toBeInTheDocument();
