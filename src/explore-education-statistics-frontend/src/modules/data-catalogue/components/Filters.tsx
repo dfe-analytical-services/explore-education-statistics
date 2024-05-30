@@ -145,7 +145,7 @@ export default function Filters({
             className={classNames({ 'govuk-!-margin-top-4': !showTypeFilter })}
             onClick={onClearFilters}
           >
-            Clear filters
+            Reset filters
           </ButtonText>
         )}
         {showTypeFilter && (
