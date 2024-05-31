@@ -4,6 +4,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Reque
 
 public static class ValidationMessages
 {
+    public static readonly LocalizableMessage FileNotFound = new(
+        Code: "FileNotFound",
+        Message: "The file could not be found."
+    );
+
+    public static readonly LocalizableMessage FileHasApiDataSetVersion = new(
+        Code: "FileHasApiDataSetVersion",
+        Message: "The file has already been used for an API data set version."
+    );
+
     public static readonly LocalizableMessage FileReleaseVersionNotDraft = new(
         Code: "FileReleaseVersionNotDraft",
         Message: "The file must belong to a release in 'Draft' approval status."
