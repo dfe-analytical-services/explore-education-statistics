@@ -50,10 +50,10 @@ test.describe('Redirect behaviour', () => {
 
   // Not ideal, I'd rather it.each like Jest has. But from the docs:
   // https://playwright.dev/docs/test-parameterize
-  for (const redirect of seoRedirects) {
-    test.skip(`Redirects from ${redirect.from}`, async ({ page }) => {
-      await page.goto(`${PUBLIC_URL}${redirect.from}`);
-      await expect(page).toHaveURL(`${PUBLIC_URL}${redirect.to}`);
+  for (const redirect of Object.keys(seoRedirects)) {
+    test.skip(`Redirects from ${redirect}`, async ({ page }) => {
+      await page.goto(`${PUBLIC_URL}${redirect}`);
+      await expect(page).toHaveURL(`${PUBLIC_URL}${seoRedirects[redirect]}`);
     });
   }
 });

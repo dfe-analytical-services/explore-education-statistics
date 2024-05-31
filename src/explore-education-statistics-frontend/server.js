@@ -83,7 +83,7 @@ async function startServer() {
    * @returns An absolute URL if redirection is required; undefined otherwise.
    */
   function getRedirectUrl(request) {
-    let redirectPath = request.path;
+    let redirectPath = request.path.toLowerCase();
 
     // Redirect URLs with trailing slash to equivalent without slash with 301
     redirectPath = replaceLastOccurrence(redirectPath, '/', '');
@@ -94,12 +94,7 @@ async function startServer() {
 
     // Search wrongly indexed pages from Google Search Console for matches
     // Redirect away if found to (eventually) clear routes from index
-    const seoRedirect = seoRedirects.find(
-      seoRedirectPath => seoRedirectPath.from === request.url,
-    );
-    if (seoRedirect) {
-      redirectPath = seoRedirect.to;
-    }
+    redirectPath = seoRedirects[redirectPath] ?? redirectPath;
 
     const redirectionRequired =
       request.hostname.startsWith('www') || redirectPath !== request.path;
