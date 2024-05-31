@@ -39,8 +39,6 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public GeographicLevelMeta? GeographicLevelMeta { get; set; }
 
-    public List<DataSetVersionImport> Imports { get; set; } = [];
-
     public List<LocationMeta> LocationMetas { get; set; } = [];
 
     public List<FilterMeta> FilterMetas { get; set; } = [];
@@ -58,6 +56,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     public List<ChangeSetLocations> LocationChanges { get; set; } = [];
 
     public List<ChangeSetTimePeriods> TimePeriodChanges { get; set; } = [];
+
+    public List<DataSetVersionImport> Imports { get; set; } = [];
 
     public DateTimeOffset? Published { get; set; }
 
