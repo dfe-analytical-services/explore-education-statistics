@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
@@ -129,20 +130,6 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
         }
 
         [Fact]
-        public async Task ReleaseFileIdIsNotFound_ReturnsNotFound()
-        {
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateInitialDataSetVersion(
-                releaseFileId: Guid.NewGuid(),
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
-
-            result.AssertNotFoundResult();
-        }
-
-        [Fact]
         public async Task ReleaseFileIdIsEmpty_ReturnsValidationProblem()
         {
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
@@ -154,8 +141,67 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             VerifyAllMocks(durableTaskClientMock);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-            validationProblem.AssertHasNotEmptyError(nameof(InitialDataSetVersionCreateRequest.ReleaseFileId)
-                .ToLowerFirst());
+
+            validationProblem.AssertHasNotEmptyError(
+                nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst());
+        }
+
+        [Fact]
+        public async Task ReleaseFileIdIsNotFound_ReturnsValidationProblem()
+        {
+            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
+
+            var result = await CreateInitialDataSetVersion(
+                releaseFileId: Guid.NewGuid(),
+                durableTaskClientMock.Object);
+
+            VerifyAllMocks(durableTaskClientMock);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedCode: ValidationMessages.FileNotFound.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseFileIdHasDataSetVersion_ReturnsValidationProblem()
+        {
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(_fixture.DefaultReleaseVersion())
+                .WithFile(_fixture.DefaultFile());
+
+            DataSet dataSet = _fixture.DefaultDataSet();
+
+            DataSetVersion dataSetVersion = _fixture.DefaultDataSetVersion()
+                .WithReleaseFileId(releaseFile.Id)
+                .WithDataSet(dataSet);
+
+            await AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSets.Add(dataSet);
+                context.SaveChanges();
+
+                context.DataSetVersions.Add(dataSetVersion);
+            });
+
+            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
+
+            var result = await CreateInitialDataSetVersion(
+                releaseFileId: releaseFile.Id,
+                durableTaskClientMock.Object);
+
+            VerifyAllMocks(durableTaskClientMock);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
         }
 
         [Fact]
