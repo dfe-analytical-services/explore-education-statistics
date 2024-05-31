@@ -162,8 +162,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddOptions<ContentApiOptions>()
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
-        services.AddOptions<ParquetFilesOptions>()
-            .Bind(configuration.GetRequiredSection(ParquetFilesOptions.Section));
+        services.AddOptions<DataFilesOptions>()
+            .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
         services.AddOptions<MiniProfilerOptions>()
             .Bind(_miniProfilerConfig);
 

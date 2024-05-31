@@ -10,7 +10,7 @@ public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
     private readonly string _basePath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
-        "ParquetFiles"
+        "DataFiles"
     );
 
     public string BasePath() => _basePath;

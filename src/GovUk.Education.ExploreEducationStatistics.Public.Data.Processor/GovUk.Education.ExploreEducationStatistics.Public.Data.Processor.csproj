@@ -34,6 +34,7 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Services\GovUk.Education.ExploreEducationStatistics.Public.Data.Services.csproj" />
+        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj" />
     </ItemGroup>
 
     <ItemGroup>

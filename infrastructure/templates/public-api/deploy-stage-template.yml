@@ -99,7 +99,7 @@ stages:
                   --settings \
                     "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
                     "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
-                    "ParquetFiles__BasePath=$(parquetFileShareMountPath)"
+                    "DataFiles__BasePath=$(dataFilesFileShareMountPath)"
 
                 az webapp config connection-string set \
                   --name $(dataProcessorFunctionAppName) \

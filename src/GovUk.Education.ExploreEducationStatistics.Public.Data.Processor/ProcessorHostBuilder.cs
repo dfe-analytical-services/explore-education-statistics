@@ -1,5 +1,6 @@
 using Azure.Core;
 using Azure.Identity;
+using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -8,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -97,6 +100,9 @@ public static class ProcessorHostBuilder
                     }
                 }
 
+                // Configure Dapper to match CSV columns with underscores
+                DefaultTypeMap.MatchNamesWithUnderscores = true;
+
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
@@ -107,12 +113,24 @@ public static class ProcessorHostBuilder
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
                     .AddFluentValidation()
                     .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
+                    .AddScoped<IDataDuckDbRepository, DataDuckDbRepository>()
+                    .AddScoped<IFilterOptionsDuckDbRepository, FilterOptionsDuckDbRepository>()
+                    .AddScoped<IIndicatorsDuckDbRepository, IndicatorsDuckDbRepository>()
+                    .AddScoped<ILocationsDuckDbRepository, LocationsDuckDbRepository>()
+                    .AddScoped<ITimePeriodsDuckDbRepository, TimePeriodsDuckDbRepository>()
+                    .AddScoped<IFilterMetaRepository, FilterMetaRepository>()
+                    .AddScoped<IGeographicLevelMetaRepository, GeographicLevelMetaRepository>()
+                    .AddScoped<IIndicatorMetaRepository, IndicatorMetaRepository>()
+                    .AddScoped<ILocationMetaRepository, LocationMetaRepository>()
+                    .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
+                    .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                     .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
                         InitialDataSetVersionCreateRequest.Validator>()
-                    .Configure<ParquetFilesOptions>(
-                        hostBuilderContext.Configuration.GetSection(ParquetFilesOptions.Section));
+                    .Configure<DataFilesOptions>(
+                        hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
             });
     }
 }
