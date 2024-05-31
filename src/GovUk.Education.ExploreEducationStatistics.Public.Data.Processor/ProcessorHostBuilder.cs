@@ -51,7 +51,8 @@ public static class ProcessorHostBuilder
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb");
+                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")
+                        .Replace(";Password=[access_token]", ""); // remove!
 
                     if (hostEnvironment.IsDevelopment())
                     {
@@ -71,27 +72,30 @@ public static class ProcessorHostBuilder
                     }
                     else
                     {
+                        var accessTokenProvider = new DefaultAzureCredential(
+                            new DefaultAzureCredentialOptions
+                            {
+                                // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
+                                // the "AZURE_CLIENT_ID" environment variable automatically when operating within
+                                // a Function App.  We therefore provide it manually.
+                                ManagedIdentityClientId = configuration["AZURE_CLIENT_ID"]
+                            });
+                        
+                        var dbDataSource = new NpgsqlDataSourceBuilder(connectionString)
+                            .UsePeriodicPasswordProvider(async (_, cancellationToken) =>
+                            {
+                                var tokenResponse = await accessTokenProvider
+                                    .GetTokenAsync(new TokenRequestContext(scopes:
+                                    [
+                                        "https://ossrdbms-aad.database.windows.net/.default"
+                                    ]), cancellationToken);
+                                    
+                                return tokenResponse.Token;
+                            }, TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5))
+                            .Build();
+
                         services.AddDbContext<PublicDataDbContext>(options =>
                         {
-                            var accessTokenProvider = new DefaultAzureCredential(
-                                new DefaultAzureCredentialOptions
-                                {
-                                    // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
-                                    // the "AZURE_CLIENT_ID" environment variable automatically when operating within
-                                    // a Function App.  We therefore provide it manually.
-                                    ManagedIdentityClientId = configuration["AZURE_CLIENT_ID"]
-                                });
-                            var accessToken = accessTokenProvider.GetToken(
-                                new TokenRequestContext(scopes:
-                                [
-                                    "https://ossrdbms-aad.database.windows.net/.default"
-                                ])).Token;
-
-                            var connectionStringWithAccessToken =
-                                connectionString.Replace("[access_token]", accessToken);
-
-                            var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-
                             options.UseNpgsql(dbDataSource);
                         });
                     }
