@@ -31,31 +31,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils
         {
             return new ContentDbContext(InMemoryContentDbContextOptions(), updateTimestamps);
         }
-
-        public static WebApplicationFactory<TEntrypoint> ResetContentDbContext<TEntrypoint>(
-            this WebApplicationFactory<TEntrypoint> app)
-            where TEntrypoint : class
-        {
-            return app.ResetDbContext<ContentDbContext, TEntrypoint>();
-        }
-
-        public static WebApplicationFactory<TEntrypoint> AddContentDbTestData<TEntrypoint>(
-            this WebApplicationFactory<TEntrypoint> app,
-            Action<ContentDbContext> testData
-        )
-            where TEntrypoint : class
-        {
-            return app.AddTestData(testData);
-        }
-
-        public static WebApplicationFactory<TEntrypoint> VerifyContentDbContext<TEntrypoint>(
-            this WebApplicationFactory<TEntrypoint> app,
-            Action<ContentDbContext> verificationAction)
-            where TEntrypoint : class
-        {
-            var context = (app.Services.GetService(typeof(ContentDbContext)) as ContentDbContext)!;
-            verificationAction(context);
-            return app;
-        }
     }
 }

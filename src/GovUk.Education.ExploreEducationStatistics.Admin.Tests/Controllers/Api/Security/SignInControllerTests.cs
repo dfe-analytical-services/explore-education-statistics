@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
@@ -86,89 +86,88 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var releaseVersionId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            // Set up scenario and test data.
-            var client = TestApp
-                .SetUser(claimsPrincipal)
-                .ResetUsersAndRolesDbContext()
-                .ResetContentDbContext()
-                .AddUsersAndRolesDbTestData(context =>
+            await TestApp.AddTestData<UsersAndRolesDbContext>(context =>
+            {
+                var globalRoles = GetGlobalRoles();
+
+                context.Roles.AddRange(globalRoles);
+
+                // Add a global role invite for an unrelated user.
+                context.UserInvites.Add(new UserInvite
                 {
-                    var globalRoles = GetGlobalRoles();
+                    Email = unrelatedUserEmail,
+                    Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
+                    Created = DateTime.UtcNow.AddDays(-1)
+                });
 
-                    context.Roles.AddRange(globalRoles);
-
-                    // Add a global role invite for an unrelated user.
-                    context.UserInvites.Add(new UserInvite
-                    {
-                        Email = unrelatedUserEmail,
-                        Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                        Created = DateTime.UtcNow.AddDays(-1)
-                    });
-
-                    // Add a global role invite for the user.
-                    context.UserInvites.Add(new UserInvite
-                    {
-                        // Change the case of the email address in the invite to test this scenario.
-                        Email = email.ToLower(),
-                        Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                        Created = DateTime.UtcNow.AddDays(-1)
-                    });
-                })
-                .AddContentDbTestData(context =>
+                // Add a global role invite for the user.
+                context.UserInvites.Add(new UserInvite
                 {
-                    var releaseVersion = new ReleaseVersion
+                    // Change the case of the email address in the invite to test this scenario.
+                    Email = email.ToLower(),
+                    Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
+                    Created = DateTime.UtcNow.AddDays(-1)
+                });
+            });
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                var releaseVersion = new ReleaseVersion
+                {
+                    Id = releaseVersionId,
+                    Publication = new Publication
                     {
-                        Id = releaseVersionId,
-                        Publication = new Publication
-                        {
-                            Id = publicationId
-                        }
-                    };
+                        Id = publicationId
+                    }
+                };
 
-                    context.ReleaseVersions.Add(releaseVersion);
+                context.ReleaseVersions.Add(releaseVersion);
 
-                    // Add a release role invite for an unrelated user.
+                // Add a release role invite for an unrelated user.
+                context.UserReleaseInvites.Add(new UserReleaseInvite
+                {
+                    ReleaseVersionId = releaseVersionId,
+                    Email = unrelatedUserEmail,
+                    Role = ReleaseRole.Approver,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                });
+
+                if (releaseRoleInInvite != null)
+                {
+                    // Add a release role invite for this user.
                     context.UserReleaseInvites.Add(new UserReleaseInvite
                     {
                         ReleaseVersionId = releaseVersionId,
-                        Email = unrelatedUserEmail,
-                        Role = ReleaseRole.Approver,
+                        Email = email.ToLower(),
+                        Role = Enum.Parse<ReleaseRole>(releaseRoleInInvite),
                         Created = DateTime.UtcNow.AddDays(-1),
                     });
+                }
 
-                    if (releaseRoleInInvite != null)
-                    {
-                        // Add a release role invite for this user.
-                        context.UserReleaseInvites.Add(new UserReleaseInvite
-                        {
-                            ReleaseVersionId = releaseVersionId,
-                            Email = email.ToLower(),
-                            Role = Enum.Parse<ReleaseRole>(releaseRoleInInvite),
-                            Created = DateTime.UtcNow.AddDays(-1),
-                        });
-                    }
+                // Add a publication role invite for an unrelated user.
+                context.UserPublicationInvites.Add(new UserPublicationInvite
+                {
+                    PublicationId = publicationId,
+                    Email = unrelatedUserEmail,
+                    Role = PublicationRole.Approver,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                });
 
-                    // Add a publication role invite for an unrelated user.
+                if (publicationRoleInInvite != null)
+                {
+                    // Add a publication role invite for this user.
                     context.UserPublicationInvites.Add(new UserPublicationInvite
                     {
-                        PublicationId = publicationId,
-                        Email = unrelatedUserEmail,
-                        Role = PublicationRole.Approver,
+                        PublicationId = releaseVersion.Publication.Id,
+                        Email = email.ToLower(),
+                        Role = Enum.Parse<PublicationRole>(publicationRoleInInvite),
                         Created = DateTime.UtcNow.AddDays(-1),
                     });
+                }
+            });
 
-                    if (publicationRoleInInvite != null)
-                    {
-                        // Add a publication role invite for this user.
-                        context.UserPublicationInvites.Add(new UserPublicationInvite
-                        {
-                            PublicationId = releaseVersion.Publication.Id,
-                            Email = email.ToLower(),
-                            Role = Enum.Parse<PublicationRole>(publicationRoleInInvite),
-                            Created = DateTime.UtcNow.AddDays(-1),
-                        });
-                    }
-                })
+            // Set up scenario and test data.
+            var client = TestApp
+                .SetUser(claimsPrincipal)
                 .CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
@@ -182,7 +181,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             Assert.NotEqual(Guid.Empty , userProfile.Id);
             Assert.Equal(firstName , userProfile.FirstName);
 
-            TestApp.VerifyUsersAndRolesDbContext(context =>
+            await using (var context = TestApp.GetDbContext<UsersAndRolesDbContext>())
             {
                 // Verify that the new Identity Framework user is created.
                 var newIdentityUser = Assert.Single(context.Users);
@@ -204,9 +203,9 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 // Verify that the invite for the unrelated user was left alone.
                 var unrelatedUserInvite = context.UserInvites.Single(i => i.Email == unrelatedUserEmail);
                 Assert.False(unrelatedUserInvite.Accepted);
-            });
+            }
 
-            TestApp.VerifyContentDbContext(context =>
+            await using (var context = TestApp.GetDbContext<ContentDbContext>())
             {
                 // Verify that the new internal user is created.
                 var newInternalUser = Assert.Single(context.Users);
@@ -233,7 +232,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                     Assert.Equal(publicationRoleInInvite, publicationRoleAssignment.Role.ToString());
                     Assert.Equal(userProfile.Id, publicationRoleAssignment.UserId);
                 }
-            });
+            }
         }
 
         [Theory]
@@ -252,56 +251,56 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var releaseVersionId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                var releaseVersion = new ReleaseVersion
+                {
+                    Id = releaseVersionId,
+                    Publication = new Publication
+                    {
+                        Id = publicationId
+                    }
+                };
+
+                context.ReleaseVersions.Add(releaseVersion);
+
+                // Add a release role invite for this user.
+                context.UserReleaseInvites.Add(new UserReleaseInvite
+                {
+                    ReleaseVersionId = releaseVersionId,
+                    Email = email.ToLower(),
+                    Role = ReleaseRole.Approver,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                });
+
+                // Add a publication role invite for this user.
+                context.UserPublicationInvites.Add(new UserPublicationInvite
+                {
+                    PublicationId = releaseVersion.Publication.Id,
+                    Email = email.ToLower(),
+                    Role = PublicationRole.Approver,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                });
+            });
+
+            await TestApp.AddTestData<UsersAndRolesDbContext>(context =>
+            {
+                var globalRoles = GetGlobalRoles();
+                context.Roles.AddRange(globalRoles);
+
+                // Add a global role invite for the user and back-date its created date.
+                context.UserInvites.Add(new UserInvite
+                {
+                    // Change the case of the email address in the invite to test this scenario.
+                    Email = email.ToLower(),
+                    Role = globalRoles.First(),
+                    Created = DateTime.UtcNow.AddDays(-daysOld),
+                });
+            });
+
             // Set up scenario and test data.
             var client = TestApp
                 .SetUser(claimsPrincipal)
-                .ResetUsersAndRolesDbContext()
-                .ResetContentDbContext()
-                .AddUsersAndRolesDbTestData(context =>
-                {
-                    var globalRoles = GetGlobalRoles();
-                    context.Roles.AddRange(globalRoles);
-
-                    // Add a global role invite for the user and back-date its created date.
-                    context.UserInvites.Add(new UserInvite
-                    {
-                        // Change the case of the email address in the invite to test this scenario.
-                        Email = email.ToLower(),
-                        Role = globalRoles.First(),
-                        Created = DateTime.UtcNow.AddDays(-daysOld),
-                    });
-                })
-                .AddContentDbTestData(context =>
-                {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = releaseVersionId,
-                        Publication = new Publication
-                        {
-                            Id = publicationId
-                        }
-                    };
-
-                    context.ReleaseVersions.Add(releaseVersion);
-
-                    // Add a release role invite for this user.
-                    context.UserReleaseInvites.Add(new UserReleaseInvite
-                    {
-                        ReleaseVersionId = releaseVersionId,
-                        Email = email.ToLower(),
-                        Role = ReleaseRole.Approver,
-                        Created = DateTime.UtcNow.AddDays(-1),
-                    });
-
-                    // Add a publication role invite for this user.
-                    context.UserPublicationInvites.Add(new UserPublicationInvite
-                    {
-                        PublicationId = releaseVersion.Publication.Id,
-                        Email = email.ToLower(),
-                        Role = PublicationRole.Approver,
-                        Created = DateTime.UtcNow.AddDays(-1),
-                    });
-                })
                 .CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
@@ -314,16 +313,16 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 Assert.Equal(LoginResult.ExpiredInvite, loginResult);
                 Assert.Null(userProfile);
 
-                TestApp.VerifyUsersAndRolesDbContext(context =>
+                await using (var context = TestApp.GetDbContext<UsersAndRolesDbContext>())
                 {
                     // Assert that no Identity user got created.
                     Assert.Empty(context.Users);
 
                     // Assert that the expired global invite got deleted.
                     Assert.Empty(context.UserInvites);
-                });
+                }
 
-                TestApp.VerifyContentDbContext(context =>
+                await using (var context = TestApp.GetDbContext<ContentDbContext>())
                 {
                     // Assert that no internal user got created.
                     Assert.Empty(context.Users);
@@ -331,7 +330,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                     // Assert that the release and publication invites were deleted.
                     Assert.Empty(context.UserReleaseInvites);
                     Assert.Empty(context.UserPublicationInvites);
-                });
+                }
             }
             else
             {
@@ -353,56 +352,55 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var releaseVersionId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
+            await TestApp.AddTestData<UsersAndRolesDbContext>(context =>
+            {
+                var globalRoles = GetGlobalRoles();
+                context.Roles.AddRange(globalRoles);
+
+                // Add a global role invite for an unrelated user.
+                context.UserInvites.Add(new UserInvite
+                {
+                    // Change the case of the email address in the invite to test this scenario.
+                    Email = "unrelated-user@education.gov.uk",
+                    Role = globalRoles.First(),
+                    Created = DateTime.UtcNow.AddDays(-1),
+                });
+            });
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                var releaseVersion = new ReleaseVersion
+                {
+                    Id = releaseVersionId,
+                    Publication = new Publication
+                    {
+                        Id = publicationId
+                    }
+                };
+
+                context.ReleaseVersions.Add(releaseVersion);
+
+                // Add a release role invite for this user, but without a global invite, this should have no effect.
+                context.UserReleaseInvites.Add(new UserReleaseInvite
+                {
+                    ReleaseVersionId = releaseVersionId,
+                    Email = email.ToLower(),
+                    Role = ReleaseRole.Approver,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                });
+
+                // Add a publication role invite for this user.
+                context.UserPublicationInvites.Add(new UserPublicationInvite
+                {
+                    PublicationId = releaseVersion.Publication.Id,
+                    Email = email.ToLower(),
+                    Role = PublicationRole.Approver,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                });
+            });
+
             // Set up scenario and test data.
             var client = TestApp
                 .SetUser(claimsPrincipal)
-                .ResetUsersAndRolesDbContext()
-                .ResetContentDbContext()
-                .AddUsersAndRolesDbTestData(context =>
-                {
-                    var globalRoles = GetGlobalRoles();
-                    context.Roles.AddRange(globalRoles);
-
-                    // Add a global role invite for an unrelated user.
-                    context.UserInvites.Add(new UserInvite
-                    {
-                        // Change the case of the email address in the invite to test this scenario.
-                        Email = "unrelated-user@education.gov.uk",
-                        Role = globalRoles.First(),
-                        Created = DateTime.UtcNow.AddDays(-1),
-                    });
-                })
-                .AddContentDbTestData(context =>
-                {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = releaseVersionId,
-                        Publication = new Publication
-                        {
-                            Id = publicationId
-                        }
-                    };
-
-                    context.ReleaseVersions.Add(releaseVersion);
-
-                    // Add a release role invite for this user, but without a global invite, this should have no effect.
-                    context.UserReleaseInvites.Add(new UserReleaseInvite
-                    {
-                        ReleaseVersionId = releaseVersionId,
-                        Email = email.ToLower(),
-                        Role = ReleaseRole.Approver,
-                        Created = DateTime.UtcNow.AddDays(-1),
-                    });
-
-                    // Add a publication role invite for this user.
-                    context.UserPublicationInvites.Add(new UserPublicationInvite
-                    {
-                        PublicationId = releaseVersion.Publication.Id,
-                        Email = email.ToLower(),
-                        Role = PublicationRole.Approver,
-                        Created = DateTime.UtcNow.AddDays(-1),
-                    });
-                })
                 .CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
@@ -413,13 +411,13 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             Assert.Equal(LoginResult.NoInvite, loginResult);
             Assert.Null(userProfile);
 
-            TestApp.VerifyUsersAndRolesDbContext(context =>
+            await using (var context = TestApp.GetDbContext<UsersAndRolesDbContext>())
             {
                 // Assert that no Identity user got created.
                 Assert.Empty(context.Users);
-            });
+            }
 
-            TestApp.VerifyContentDbContext(context =>
+            await using (var context = TestApp.GetDbContext<ContentDbContext>())
             {
                 // Assert that no internal user got created.
                 Assert.Empty(context.Users);
@@ -427,7 +425,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 // Assert that no release or publication  assignments were made.
                 Assert.Empty(context.UserReleaseRoles);
                 Assert.Empty(context.UserPublicationRoles);
-            });
+            }
         }
     }
 
@@ -444,36 +442,35 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
 
+            await TestApp.AddTestData<UsersAndRolesDbContext>(context =>
+            {
+                var globalRoles = GetGlobalRoles();
+                context.Roles.AddRange(globalRoles);
+
+                // Add an Identity user for an unrelated user.
+                context.Users.Add(new ApplicationUser
+                {
+                    Id = userId.ToString(),
+                    Email = email,
+                    NormalizedEmail = email.ToUpper(),
+                    FirstName = "FirstName",
+                    LastName = "LastName"
+                });
+
+                // Add an Identity user for the user.
+                context.Users.Add(new ApplicationUser
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = unrelatedUserEmail.ToLower(),
+                    NormalizedEmail = unrelatedUserEmail.ToUpper(),
+                    FirstName = "AnotherFirstName",
+                    LastName = "AnotherLastName"
+                });
+            });
+
             // Set up scenario and test data.
             var client = TestApp
                 .SetUser(claimsPrincipal)
-                .ResetUsersAndRolesDbContext()
-                .ResetContentDbContext()
-                .AddUsersAndRolesDbTestData(context =>
-                {
-                    var globalRoles = GetGlobalRoles();
-                    context.Roles.AddRange(globalRoles);
-
-                    // Add an Identity user for an unrelated user.
-                    context.Users.Add(new ApplicationUser
-                    {
-                        Id = userId.ToString(),
-                        Email = email,
-                        NormalizedEmail = email.ToUpper(),
-                        FirstName = "FirstName",
-                        LastName = "LastName"
-                    });
-
-                    // Add an Identity user for the user.
-                    context.Users.Add(new ApplicationUser
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Email = unrelatedUserEmail.ToLower(),
-                        NormalizedEmail = unrelatedUserEmail.ToUpper(),
-                        FirstName = "AnotherFirstName",
-                        LastName = "AnotherLastName"
-                    });
-                })
                 .CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);

@@ -7,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests;
 [Collection(CacheTestFixture.CollectionName)]
 public abstract class IntegrationTest<TStartup> :
     CacheServiceTestFixture,
-    IClassFixture<TestApplicationFactory<TStartup>>,
-    IClassFixture<CacheTestFixture> where TStartup : class
+    IClassFixture<TestApplicationFactory<TStartup>>
+    where TStartup : class
 {
-    protected readonly WebApplicationFactory<TStartup> TestApp;
+    protected readonly TestApplicationFactory<TStartup> TestApp;
 
     protected IntegrationTest(TestApplicationFactory<TStartup> testApp)
     {

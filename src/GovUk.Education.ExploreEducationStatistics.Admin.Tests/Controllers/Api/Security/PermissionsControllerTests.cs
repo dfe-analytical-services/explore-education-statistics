@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
@@ -57,24 +57,25 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     {
         var user = AnalystUser();
 
+        await TestApp.AddTestData<ContentDbContext>(context =>
+        {
+            // Add test data that gives the user access to a Release without being an Approver.
+            context.UserReleaseRoles.Add(new UserReleaseRole
+            {
+                UserId = user.GetUserId(),
+                Role = ReleaseRole.Contributor
+            });
+
+            // Add test data that gives the user access to a Publication without being an Approver.
+            context.UserPublicationRoles.Add(new UserPublicationRole
+            {
+                UserId = user.GetUserId(),
+                Role = PublicationRole.Owner
+            });
+        });
+
         var client = TestApp
             .SetUser(user)
-            .AddContentDbTestData(context =>
-            {
-                // Add test data that gives the user access to a Release without being an Approver.
-                context.UserReleaseRoles.Add(new UserReleaseRole
-                {
-                    UserId = user.GetUserId(),
-                    Role = ReleaseRole.Contributor
-                });
-
-                // Add test data that gives the user access to a Publication without being an Approver.
-                context.UserPublicationRoles.Add(new UserPublicationRole
-                {
-                    UserId = user.GetUserId(),
-                    Role = PublicationRole.Owner
-                });
-            })
             .CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
@@ -95,16 +96,17 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     {
         var user = AnalystUser();
 
+        await TestApp.AddTestData<ContentDbContext>(context =>
+        {
+            context.UserReleaseRoles.Add(new UserReleaseRole
+            {
+                UserId = user.GetUserId(),
+                Role = ReleaseRole.Approver
+            });
+        });
+
         var client = TestApp
             .SetUser(user)
-            .AddContentDbTestData(context =>
-            {
-                context.UserReleaseRoles.Add(new UserReleaseRole
-                {
-                    UserId = user.GetUserId(),
-                    Role = ReleaseRole.Approver
-                });
-            })
             .CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
@@ -125,16 +127,17 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     {
         var user = AnalystUser();
 
+        await TestApp.AddTestData<ContentDbContext>(context =>
+        {
+            context.UserReleaseRoles.Add(new UserReleaseRole
+            {
+                UserId = user.GetUserId(),
+                Role = ReleaseRole.Approver
+            });
+        });
+
         var client = TestApp
             .SetUser(user)
-            .AddContentDbTestData(context =>
-            {
-                context.UserPublicationRoles.Add(new UserPublicationRole
-                {
-                    UserId = user.GetUserId(),
-                    Role = PublicationRole.Approver
-                });
-            })
             .CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");

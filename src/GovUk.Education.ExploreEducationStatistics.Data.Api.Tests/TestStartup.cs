@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
@@ -78,7 +79,7 @@ public static class TestStartupExtensions
     public static WebApplicationFactory<TestStartup> ResetDbContexts(this WebApplicationFactory<TestStartup> testApp)
     {
         return testApp
-            .ResetContentDbContext()
-            .ResetStatisticsDbContext();
+            .ResetDbContext<ContentDbContext, TestStartup>()
+            .ResetDbContext<StatisticsDbContext, TestStartup>();
     }
 }
