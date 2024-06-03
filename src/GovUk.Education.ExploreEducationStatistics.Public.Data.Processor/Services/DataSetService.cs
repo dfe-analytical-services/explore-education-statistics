@@ -82,10 +82,6 @@ public class DataSetService(
                 dsv => dsv.ReleaseFileId == releaseFile.Id,
                 cancellationToken: cancellationToken))
         {
-            errors.Add(CreateReleaseFileIdError(
-                message: ValidationMessages.FileHasApiDataSetVersion,
-                releaseFileId: releaseFile.Id));
-
             return ValidationUtils.ValidationResult(
             [
                 CreateReleaseFileIdError(
