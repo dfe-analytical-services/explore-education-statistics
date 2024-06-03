@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
@@ -36,8 +37,8 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    public class TableBuilderControllerTests(TestApplicationFactory<TestStartup> testApp)
-        : IntegrationTest<TestStartup>(testApp)
+    public class TableBuilderControllerTests(TestApplicationFactory testApp)
+        : IntegrationTestFixture(testApp)
     {
         private static readonly DataFixture Fixture = new();
 
@@ -271,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
 
             BlobCacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
@@ -560,7 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
 
             BlobCacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
@@ -597,16 +598,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal("Academic year 2021/22", viewModel.LatestReleaseTitle);
         }
 
-        private WebApplicationFactory<TestStartup> SetupApp(
+        private WebApplicationFactory<Startup> SetupApp(
             IDataBlockService? dataBlockService = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
             ITableBuilderService? tableBuilderService = null)
         {
             return TestApp
-                .ResetDbContexts()
                 .ConfigureServices(
                     services =>
                     {
+                        services.ReplaceService(BlobCacheService);
+
                         services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
                         services.AddTransient(_ => releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
                         services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
