@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixture fixture) 
     : PublisherFunctionsIntegrationTest(fixture)
 {
-    public class PublishDataSets(PublisherFunctionsIntegrationTestFixture fixture)
+    public class PublishDataSetsTests(PublisherFunctionsIntegrationTestFixture fixture)
         : DataSetPublishingServiceTests(fixture)
     {
         [Fact]
@@ -66,6 +66,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .SingleAsync(ds => ds.Id == dataSet.Id);
 
             publishedDataSet.Published.AssertUtcNow();
+
             Assert.Equal(DataSetStatus.Published, publishedDataSet.Status);
             Assert.Equal(dataSet.LatestDraftVersionId, publishedDataSet.LatestLiveVersionId);
             Assert.Null(publishedDataSet.LatestDraftVersionId);
@@ -73,6 +74,9 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             Assert.NotNull(publishedDataSet.LatestLiveVersion);
             Assert.Equal(DataSetVersionStatus.Published, publishedDataSet.LatestLiveVersion.Status);
             publishedDataSet.LatestLiveVersion.Published.AssertUtcNow();
+
+            // Data set should be published at the same time as the latest live version
+            Assert.Equal(publishedDataSet.LatestLiveVersion.Published, publishedDataSet.Published);
         }
 
         [Fact]
