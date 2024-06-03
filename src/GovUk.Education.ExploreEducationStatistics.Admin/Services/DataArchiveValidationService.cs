@@ -8,10 +8,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CodeActions;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -79,7 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (!await IsZipFile(zipFile))
             {
-                return ValidationActionResult(DataZipMustBeZipFile);
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.MustBeZipFile.Code,
+                        Message = ValidationMessages.MustBeZipFile.Message,
+                        Path = zipFile.FileName,
+                    });
             }
 
             await using var stream = zipFile.OpenReadStream();
@@ -96,7 +104,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (datasetNamesEntry == null)
             {
-                return ValidationActionResult(DataBulkZipFileMustContainDatasetNamesCsv);
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Code,
+                        Message = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Message,
+                    });
             }
 
             var datasetNamesStream = datasetNamesEntry.Open();
@@ -110,15 +122,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             catch (ReaderException e)
             {
-                // @MarkFix can we return the error from the exception here?
-                return ValidationActionResult(DataBulkZipErrorReadingDatasetNamesCsv);
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.DatasetNamesCsvReaderException.Code,
+                        Message = ValidationMessages.DatasetNamesCsvReaderException.Message,
+                        Path = e.ToString(), // @MarkFix do we want this?
+                    });
             }
 
             var headers = datasetNamesCsvReader.HeaderRecord?.ToList() ?? new List<string>();
 
             if (headers is not ["file_name", "dataset_name"])
             {
-                return ValidationActionResult(DataBulkZipDatasetNamesCsvMustContainTwoColumnsNamedCorrectly);
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Code,
+                        Message = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Message,
+                    });
             }
 
             var results = new List<BulkDataArchiveFile>();
@@ -126,6 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             using var csvDataReader = new CsvDataReader(datasetNamesCsvReader);
 
             var lastLine = false; // Assume one row of data // @MarkFix yeah? test it
+
+            List<ErrorViewModel> errors = [];
 
             while (!lastLine)
             {
@@ -145,6 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (zipArchiveEntry.FullName == $"{fileName}.csv")
                     {
                         dataFile = zipArchiveEntry;
+                        continue;
                     }
 
                     if (zipArchiveEntry.FullName == $"{fileName}.meta.csv")
@@ -155,12 +178,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (dataFile == null)
                 {
-                    return ValidationActionResult(DataBulkZipCannotFindDataFile);
+                    errors.Add(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.DataFileNotFoundInZip.Code,
+                        Message = ValidationMessages.DataFileNotFoundInZip.Message,
+                        Path = $"{fileName}.csv",
+                    });
                 }
 
                 if (metaFile == null)
                 {
-                    return ValidationActionResult(DataBulkZipCannotFindMetaFile);
+                    errors.Add(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.MetaFileNotFoundInZip.Code,
+                        Message = ValidationMessages.MetaFileNotFoundInZip.Message,
+                        Path = $"{fileName}.meta.csv",
+                    });
                 }
 
                 // @MarkFix More Data/Meta file validation here?
@@ -170,16 +203,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 lastLine = !await datasetNamesCsvReader.ReadAsync();
             }
 
+            // @MarkFix Check all dataset_names.csv entries subject names are distinct
+            var newDatasetNames = results.Select(file => file.DataSetName).ToList();
+            
+            // @MarkFix Check all dataset_names.csv data and meta files are distinct
+
+            if (results.Count == 0)
+            {
+                errors.Add(new ErrorViewModel
+                {
+                    Code = ValidationMessages.BulkDataZipShouldContainDataSets.Code,
+                    Message = ValidationMessages.BulkDataZipShouldContainDataSets.Message,
+                });
+            }
+
+            if (errors.Count != 0)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
+            }
+
             // @MarkFix do we want to do this - probably hit MacOs archive hidden files and fail?
             //if (archive.Entries.Count != (2 * results.Count) + 1) // +1 for dataset_names.csv
             //{
             //
             //}
-
-            if (results.Count == 0)
-            {
-                return ValidationActionResult(DataBulkZipCannotHaveNoDatasets);
-            }
 
             return results;
         }
