@@ -130,7 +130,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _fileRepository.Delete(file.Id);
                             await _fileRepository.Delete(metaFile.Id);
 
-                            if (file.SourceId.HasValue)
+                            if (file.SourceId.HasValue
+                                // A bulk upload zip may be linked to multiple files - only delete zip if all have been removed
+                                && !await _contentDbContext.Files.AnyAsync(f => f.SourceId == file.SourceId.Value))
                             {
                                 var zipFile = await _fileRepository.Get(file.SourceId.Value);
                                 await _privateBlobStorageService.DeleteBlob(
