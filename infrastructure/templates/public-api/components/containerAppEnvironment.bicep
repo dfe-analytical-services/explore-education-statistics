@@ -31,15 +31,24 @@ param tagValues object
 @description('Specifies a suffix to append to the full name of the Container App Environment')
 param containerAppEnvironmentNameSuffix string = ''
 
+@description('Specifies an array of Azure File Shares to be available for Container Apps hosted within this Container App Environment')
+param azureFileStorages {
+  storageName: string
+  storageAccountKey: string
+  storageAccountName: string
+  fileShareName: string
+  accessMode: 'ReadWrite' | 'ReadOnly'
+}[] = []
+
 var containerAppEnvironmentName = empty(containerAppEnvironmentNameSuffix)
   ? '${subscription}-ees-cae'
   : '${subscription}-ees-cae-${containerAppEnvironmentNameSuffix}'
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: logAnalyticsWorkspaceName
 }
 
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: containerAppEnvironmentName
   location: location
   properties: {
@@ -58,6 +67,18 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' 
     workloadProfiles: workloadProfiles
   }
   tags: tagValues
+  
+  resource azureFileStorage 'storages@2022-03-01' = [for storage in azureFileStorages: {
+      name: storage.storageName
+      properties: {
+        azureFile: {
+          accountKey: storage.storageAccountKey
+          accountName: storage.storageAccountName
+          shareName: storage.fileShareName
+          accessMode: storage.accessMode
+        }
+      }
+  }]
 }
 
 output containerAppEnvironmentName string = containerAppEnvironmentName

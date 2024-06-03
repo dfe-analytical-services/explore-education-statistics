@@ -8,6 +8,12 @@ public record DataSetFileMetaViewModel
     public required List<string> Indicators { get; init; }
 }
 
+public record DataSetFileCsvPreviewViewModel
+{
+    public List<string> Headers { get; init; } = new();
+    public List<List<string>> Rows { get; init; } = new();
+}
+
 public record DataSetFileTimePeriodRangeViewModel
 {
     public required string From { get; init; }

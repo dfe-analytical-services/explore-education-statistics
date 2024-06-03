@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -15,6 +12,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -173,7 +173,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     Type = FileType.Ancillary,
                     FileName = "Filename",
                     UserName = "UserName"
-                });
+                },
+                DateTime.Now);
 
             var converted = DeserializeObject<SubjectViewModel>(SerializeObject(original));
             converted.AssertDeepEqualTo(original);

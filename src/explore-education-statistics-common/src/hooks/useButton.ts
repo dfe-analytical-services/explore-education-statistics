@@ -1,6 +1,6 @@
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
-import { MouseEventHandler, ReactNode, useCallback } from 'react';
+import { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
 
 export interface ButtonOptions {
   ariaControls?: string;
@@ -9,13 +9,11 @@ export interface ButtonOptions {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
-  disableDoubleClick?: boolean;
   id?: string;
+  preventDoubleClick?: boolean;
   testId?: string;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
-  underline?: boolean;
-  variant?: 'secondary' | 'warning';
+  onClick?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
 }
 
 export default function useButton({
@@ -24,45 +22,37 @@ export default function useButton({
   ariaExpanded,
   children,
   className,
-  disabled = false,
-  disableDoubleClick = true,
+  disabled,
   id,
+  preventDoubleClick = true,
   testId,
   type = 'button',
-  underline = true,
-  variant,
   onClick,
 }: ButtonOptions) {
   const [isClicking, toggleClicking] = useToggle(false);
   const isMountedRef = useMountedRef();
 
+  const isDisabled = ariaDisabled || disabled || isClicking;
+
   const handleClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     async event => {
-      if (ariaDisabled || disabled) {
+      if (isDisabled) {
+        event.preventDefault();
         return;
       }
 
-      if (disableDoubleClick) {
+      if (preventDoubleClick) {
         toggleClicking.on();
       }
 
       await onClick?.(event);
 
-      if (disableDoubleClick && isMountedRef.current) {
+      if (preventDoubleClick && isMountedRef.current) {
         toggleClicking.off();
       }
     },
-    [
-      ariaDisabled,
-      disabled,
-      disableDoubleClick,
-      isMountedRef,
-      onClick,
-      toggleClicking,
-    ],
+    [isDisabled, preventDoubleClick, onClick, isMountedRef, toggleClicking],
   );
-
-  const isDisabled = ariaDisabled || disabled || isClicking;
 
   return {
     'aria-controls': ariaControls,
@@ -71,12 +61,9 @@ export default function useButton({
     children,
     className,
     'data-testid': testId,
-    disabled: ariaDisabled ? undefined : disabled || isClicking,
+    disabled,
     id,
-    isDisabled,
     type,
-    underline,
-    variant,
     onClick: handleClick,
   };
 }

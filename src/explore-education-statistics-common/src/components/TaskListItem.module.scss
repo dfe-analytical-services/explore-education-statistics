@@ -1,0 +1,25 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.item {
+  // Can automatically figure this out with CSS instead of having to
+  // manually apply `govuk-task-list__item--with-link`.
+  &:has(a, button):hover {
+    background: govuk-colour('light-grey');
+  }
+}
+
+.nameAndHint {
+  // Copy of `govuk-task-list__link` class that adds a
+  // transparent box pseudo-element in the child element
+  // allowing the entire row to be clickable.
+  a::after,
+  button::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+}

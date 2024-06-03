@@ -129,7 +129,7 @@ type TaskStage =
   | 'Started'
   | 'Scheduled';
 
-export interface ReleaseStageStatuses {
+export interface ReleaseStageStatus {
   releaseId?: string;
   contentStage?: TaskStage;
   filesStage?: TaskStage;
@@ -261,8 +261,8 @@ const releaseService = {
     );
   },
 
-  getReleaseStatus(releaseId: string): Promise<ReleaseStageStatuses> {
-    return client.get<ReleaseStageStatuses>(
+  getReleaseStatus(releaseId: string): Promise<ReleaseStageStatus> {
+    return client.get<ReleaseStageStatus>(
       `/releases/${releaseId}/stage-status`,
     );
   },

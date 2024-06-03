@@ -7,13 +7,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 
 public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
 {
-    private string BasePath { get; set; } = Path.Combine(
+    private readonly string _basePath = Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
-        "ParquetFiles"
+        "DataFiles"
     );
+
+    public string BasePath() => _basePath;
 
     public string Directory { get; set; } = string.Empty;
 
-    public string DirectoryPath(DataSetVersion dataSetVersion) => Path.Combine(BasePath, Directory);
+    public string DirectoryPath(DataSetVersion dataSetVersion) => Path.Combine(_basePath, Directory);
 }

@@ -1,8 +1,7 @@
-import { ButtonOptions } from '@common/hooks/useButton';
-import Button from '@common/components/Button';
+import Button, { ButtonProps } from '@common/components/Button';
 import React from 'react';
 
-interface Props extends Omit<ButtonOptions, 'children'> {
+interface Props extends Omit<ButtonProps, 'children'> {
   label: string;
 }
 

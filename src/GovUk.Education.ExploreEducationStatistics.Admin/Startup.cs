@@ -473,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
-            services.AddTransient<Services.Interfaces.Public.Data.IReleaseService, Services.Public.Data.ReleaseService>();
+            services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
 
             services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
             {

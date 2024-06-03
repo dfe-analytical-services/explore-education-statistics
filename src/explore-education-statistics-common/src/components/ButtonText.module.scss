@@ -27,9 +27,12 @@
   }
 
   &.disabled {
-    color: govuk-colour('light-blue');
     cursor: not-allowed;
     text-decoration: none;
+  }
+
+  &[disabled] {
+    color: govuk-colour('light-blue');
   }
 }
 

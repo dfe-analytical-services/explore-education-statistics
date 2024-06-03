@@ -1,11 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -24,14 +17,20 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -2342,72 +2341,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Fact]
-        public async Task UpdateDataFileDetails_OnlyName()
+        [Theory]
+        [InlineData("New file title", "New file title", null, "Old file summary")]
+        [InlineData(null, "Old file title", "New file summary", "New file summary")]
+        [InlineData(null, "Old file title", null, "Old file summary")]
+        public async Task UpdateDataFileDetails_OnlyTitleOrSummary(
+            string? requestedFileName,
+            string? expectedFileName,
+            string? requestedFileSummary,
+            string? expectedFileSummary)
         {
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
             };
 
-            var releaseFile = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                Name = "Old file name",
-                Summary = "Old file summary",
-                File = new File
-                {
-                    RootPath = releaseVersion.Id,
-                    Type = FileType.Data,
-                    Filename = "test.csv",
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(releaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
-
-                var result = await service.UpdateDataFileDetails(
-                    releaseFile.ReleaseVersionId,
-                    releaseFile.FileId,
-                    new ReleaseDataFileUpdateRequest
-                    {
-                        Title = "New file title",
-                    }
-                );
-
-                Assert.True(result.IsRight);
-                Assert.IsType<Unit>(result.Right);
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var updatedReleaseFile = await contentDbContext.ReleaseFiles
-                    .AsQueryable()
-                    .FirstAsync(rf =>
-                        rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                        && rf.FileId == releaseFile.FileId);
-
-                Assert.Equal("New file title", updatedReleaseFile.Name);
-                Assert.Equal("Old file summary", updatedReleaseFile.Summary);
-            }
-        }
-
-        [Fact]
-        public async Task UpdateDataFileDetails_OnlySummary()
-        {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-            };
+            var originalPublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
             var releaseFile = new ReleaseFile
             {
@@ -2419,7 +2368,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RootPath = releaseVersion.Id,
                     Type = FileType.Data,
                     Filename = "test.csv",
-                }
+                },
+                Published = originalPublishedDate,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2439,7 +2389,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFile.FileId,
                     new ReleaseDataFileUpdateRequest
                     {
-                        Summary = "New file summary",
+                        Title = requestedFileName,
+                        Summary = requestedFileSummary,
                     }
                 );
 
@@ -2455,8 +2406,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         && rf.FileId == releaseFile.FileId);
 
-                Assert.Equal("Old file title", updatedReleaseFile.Name);
-                Assert.Equal("New file summary", updatedReleaseFile.Summary);
+                Assert.Equal(expectedFileName, updatedReleaseFile.Name);
+                Assert.Equal(expectedFileSummary, updatedReleaseFile.Summary);
+
+                if (string.IsNullOrWhiteSpace(requestedFileName) &&
+                    string.IsNullOrWhiteSpace(requestedFileSummary))
+                {
+                    Assert.Equal(originalPublishedDate, updatedReleaseFile.Published);
+                }
+                else
+                {
+                    Assert.Null(updatedReleaseFile.Published);
+                }
             }
         }
 

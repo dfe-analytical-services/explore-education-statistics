@@ -34,6 +34,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       title: 'Publication 1',
     },
     published: new Date('2020-01-01'),
+    lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
@@ -66,6 +67,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       title: 'Publication 1',
     },
     published: new Date('2020-01-01'),
+    lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
@@ -98,6 +100,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       title: 'Publication 2',
     },
     published: new Date('2020-01-01'),
+    lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
@@ -117,6 +120,17 @@ export const testDataSetFile: DataSetFile = {
     id: 'file-id',
     name: 'file name',
     size: 'file size',
+    meta: {
+      timePeriodRange: {
+        from: '2023',
+        to: '2024',
+      },
+      filters: ['Filter 1', 'Filter 2'],
+      geographicLevels: ['Local authority', 'National'],
+      indicators: ['Indicator 1', 'Indicator 2'],
+    },
+    dataCsvPreview: { headers: ['column_1'], rows: [['1']] },
+    variables: [{ value: 'column_1', label: 'Column 1 is for something' }],
     subjectId: 'subject-id',
   },
   release: {
@@ -129,21 +143,14 @@ export const testDataSetFile: DataSetFile = {
       title: 'Publication 1',
     },
     published: new Date('2024-01-01'),
+    lastUpdated: '2023-12-01',
     slug: 'release-slug',
     title: 'Release 1',
     type: 'NationalStatistics',
   },
   summary: 'Data set 1 summary',
   title: 'Data set 1',
-  meta: {
-    timePeriodRange: {
-      from: '2023',
-      to: '2024',
-    },
-    filters: ['Filter 1', 'Filter 2'],
-    geographicLevels: ['Local authority', 'National'],
-    indicators: ['Indicator 1', 'Indicator 2'],
-  },
+  footnotes: [{ id: 'footnote-1', label: 'Footnote 1' }],
 };
 
 export const testDataSetWithApi: DataSetFile = {

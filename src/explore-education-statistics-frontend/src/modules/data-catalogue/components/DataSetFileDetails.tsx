@@ -21,7 +21,9 @@ interface Props {
 export default function DataSetFileDetails({ dataSetFile }: Props) {
   const {
     release,
-    meta: { timePeriodRange, filters, geographicLevels, indicators },
+    file: {
+      meta: { timePeriodRange, filters, geographicLevels, indicators },
+    },
     title,
   } = dataSetFile;
 

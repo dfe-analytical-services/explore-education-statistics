@@ -30,6 +30,15 @@ public class DuckDbDapperSqlBuilder : DuckDbSqlBuilder, IDapperSqlBuilder
         DbConnection = connection;
     }
 
+    public DuckDbDapperSqlBuilder(
+        IDbConnection connection,
+        string value,
+        InterpolatedSqlBuilderOptions? options = null)
+        : base(value, options)
+    {
+        DbConnection = connection;
+    }
+
     protected internal DuckDbDapperSqlBuilder(
         IDbConnection connection,
         InterpolatedSqlBuilderOptions? options,

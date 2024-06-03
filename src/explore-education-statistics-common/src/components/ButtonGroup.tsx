@@ -5,10 +5,26 @@ import styles from './ButtonGroup.module.scss';
 interface Props {
   children: ReactNode;
   className?: string;
+  horizontalSpacing?: 'l' | 'm' | 's';
+  verticalSpacing?: 'l' | 'm' | 's';
 }
 
-const ButtonGroup = ({ children, className }: Props) => {
-  return <div className={classNames(styles.group, className)}>{children}</div>;
-};
-
-export default ButtonGroup;
+export default function ButtonGroup({
+  children,
+  className,
+  horizontalSpacing = 's',
+  verticalSpacing = 's',
+}: Props) {
+  return (
+    <div
+      className={classNames(
+        styles.group,
+        styles[`horizontalSpacing--${horizontalSpacing}`],
+        styles[`verticalSpacing--${verticalSpacing}`],
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}

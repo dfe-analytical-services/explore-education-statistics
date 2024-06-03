@@ -43,64 +43,70 @@ describe('ButtonText', () => {
 
     const button = screen.getByRole('button', { name: 'Test button' });
 
-    expect(button).not.toBeDisabled();
+    expect(button).toBeDisabled();
     expect(button).toBeAriaDisabled();
   });
 
-  test('disabled if current `onClick` handler is processing', async () => {
+  test('aria-disabled if current `onClick` handler is processing', async () => {
     const handleClick = jest.fn(async () => delay(100));
 
     render(<ButtonText onClick={handleClick}>Test button</ButtonText>);
 
     const button = screen.getByRole('button', { name: 'Test button' });
 
+    expect(button).not.toBeAriaDisabled();
     expect(button).toBeEnabled();
 
     await userEvent.click(button);
 
     expect(handleClick).toHaveBeenCalledTimes(1);
-    expect(button).toBeDisabled();
 
-    // Button is still disabled
-    expect(button).toBeDisabled();
+    expect(button).toBeAriaDisabled();
+    expect(button).toBeEnabled();
   });
 
-  test('enabled if current `onClick` handler is processing and `disableDoubleClick` is false', async () => {
+  test('not aria-disabled if current `onClick` handler is processing and `preventDoubleClick` is false', async () => {
     const handleClick = jest.fn(async () => delay(100));
 
     render(
-      <ButtonText disableDoubleClick={false} onClick={handleClick}>
+      <ButtonText preventDoubleClick={false} onClick={handleClick}>
         Test button
       </ButtonText>,
     );
 
     const button = screen.getByRole('button', { name: 'Test button' });
 
+    expect(button).not.toBeAriaDisabled();
     expect(button).toBeEnabled();
 
     await userEvent.click(button);
 
     expect(handleClick).toHaveBeenCalledTimes(1);
-    expect(button).toBeEnabled();
 
-    // Button is still enabled
+    expect(button).not.toBeAriaDisabled();
     expect(button).toBeEnabled();
   });
 
-  test('enabled once the current `onClick` handler has finished', async () => {
+  test('not aria-disabled once the current `onClick` handler has finished', async () => {
     const handleClick = jest.fn(async () => delay(100));
 
     render(<ButtonText onClick={handleClick}>Test button</ButtonText>);
 
     const button = screen.getByRole('button', { name: 'Test button' });
 
+    expect(button).not.toBeAriaDisabled();
+    expect(button).toBeEnabled();
+
     await userEvent.click(button);
 
     expect(handleClick).toHaveBeenCalledTimes(1);
-    expect(button).toBeDisabled();
+
+    expect(button).toBeAriaDisabled();
+    expect(button).toBeEnabled();
 
     // Task has completed, so button is now enabled
     await waitFor(() => {
+      expect(button).not.toBeAriaDisabled();
       expect(button).toBeEnabled();
     });
   });

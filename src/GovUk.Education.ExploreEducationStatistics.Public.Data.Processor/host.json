@@ -2,8 +2,10 @@
   "version": "2.0",
   "extensions": {
     "durableTask": {
+      "hubName": "DataProcessorTaskHub",
       "storageProvider": {
-        "type": "AzureStorage"
+        "type": "AzureStorage",
+        "connectionStringName": "DurableManagementStorage"
       }
     }
   },
@@ -17,6 +19,8 @@
     },
     "logLevel": {
       "default": "Error",
+      "DurableTask.AzureStorage": "Warning",
+      "DurableTask.Core": "Warning",
       "Function": "Information"
     }
   }

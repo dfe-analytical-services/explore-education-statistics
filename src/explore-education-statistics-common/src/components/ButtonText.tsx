@@ -3,9 +3,16 @@ import useButton, { ButtonOptions } from '@common/hooks/useButton';
 import classNames from 'classnames';
 import React, { forwardRef, Ref } from 'react';
 
-const ButtonText = (props: ButtonOptions, ref: Ref<HTMLButtonElement>) => {
-  const { className, isDisabled, underline, variant, ...button } =
-    useButton(props);
+export interface ButtonTextProps extends ButtonOptions {
+  underline?: boolean;
+  variant?: 'secondary' | 'warning';
+}
+
+const ButtonText = (
+  { underline = true, variant, ...props }: ButtonTextProps,
+  ref: Ref<HTMLButtonElement>,
+) => {
+  const { className, ...button } = useButton(props);
 
   return (
     // eslint-disable-next-line react/button-has-type
@@ -17,7 +24,7 @@ const ButtonText = (props: ButtonOptions, ref: Ref<HTMLButtonElement>) => {
         {
           [styles.noUnderline]: !underline,
           [styles.warning]: variant === 'warning',
-          [styles.disabled]: isDisabled,
+          [styles.disabled]: button.disabled || button['aria-disabled'],
         },
         className,
       )}

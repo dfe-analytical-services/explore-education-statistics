@@ -213,7 +213,7 @@ const PrototypeReleaseContent = ({
                   <li>
                     <Button
                       className="govuk-!-margin-bottom-3"
-                      disableDoubleClick
+                      preventDoubleClick
                       onClick={() =>
                         releaseFileService.downloadAllFilesZip(release.id)
                       }
@@ -369,7 +369,7 @@ const PrototypeReleaseContent = ({
           hasDataGuidance={release.hasDataGuidance}
           renderAllFilesLink={
             <ButtonText
-              disableDoubleClick
+              preventDoubleClick
               onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
             >
               Download all data (ZIP)

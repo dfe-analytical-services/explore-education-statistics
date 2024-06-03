@@ -1,3 +1,4 @@
+using System.Transactions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
@@ -26,16 +27,31 @@ public class DataSetService(
         Guid instanceId,
         CancellationToken cancellationToken = default)
     {
-        return await GetReleaseFile(request.ReleaseFileId, cancellationToken)
-            .OnSuccess(async releaseFile => await ValidateReleaseFile(releaseFile, cancellationToken)
-                .OnSuccess(async () => await CreateDataSet(releaseFile, cancellationToken))
-                .OnSuccess(async dataSet =>
-                    await CreateDataSetVersion(dataSet, releaseFile, cancellationToken))
-                .OnSuccessDo(async dataSetVersion =>
-                    await CreateDataSetVersionImport(dataSetVersion, instanceId, cancellationToken))
-                .OnSuccessDo(async dataSetVersion =>
-                    await UpdateFilePublicDataSetVersionId(releaseFile, dataSetVersion, cancellationToken))
-                .OnSuccess(dataSetVersion => (dataSetId: dataSetVersion.DataSetId, dataSetVersionId: dataSetVersion.Id)));
+        var strategy = contentDbContext.Database.CreateExecutionStrategy();
+
+        return await strategy.ExecuteAsync(async () =>
+        {
+            using var transactionScope = new TransactionScope(
+                TransactionScopeOption.Required,
+                new TransactionOptions
+                {
+                    IsolationLevel = IsolationLevel.ReadCommitted
+                },
+                TransactionScopeAsyncFlowOption.Enabled);
+
+            return await GetReleaseFile(request.ReleaseFileId, cancellationToken)
+                .OnSuccess(async releaseFile => await ValidateReleaseFile(releaseFile, cancellationToken)
+                    .OnSuccess(async () => await CreateDataSet(releaseFile, cancellationToken))
+                    .OnSuccess(async dataSet =>
+                        await CreateDataSetVersion(dataSet, releaseFile, cancellationToken))
+                    .OnSuccessDo(async dataSetVersion =>
+                        await CreateDataSetVersionImport(dataSetVersion, instanceId, cancellationToken))
+                    .OnSuccessDo(async dataSetVersion =>
+                        await UpdateFilePublicDataSetVersionId(releaseFile, dataSetVersion, cancellationToken))
+                    .OnSuccessDo(transactionScope.Complete)
+                    .OnSuccess(dataSetVersion =>
+                        (dataSetId: dataSetVersion.DataSetId, dataSetVersionId: dataSetVersion.Id)));
+        });
     }
 
     private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(

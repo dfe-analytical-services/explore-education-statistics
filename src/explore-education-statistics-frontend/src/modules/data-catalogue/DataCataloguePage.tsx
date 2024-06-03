@@ -16,6 +16,7 @@ import { QueryClient, dehydrate } from '@tanstack/react-query';
 import publicationQueries from '@frontend/queries/publicationQueries';
 
 interface Props {
+  showTypeFilter?: boolean;
   releases?: ReleaseSummary[];
   selectedPublication?: PublicationTreeSummary;
   selectedRelease?: ReleaseSummary;
@@ -25,6 +26,7 @@ interface Props {
 }
 
 const DataCataloguePage: NextPage<Props> = ({
+  showTypeFilter,
   releases = [],
   selectedPublication,
   selectedRelease,
@@ -34,7 +36,7 @@ const DataCataloguePage: NextPage<Props> = ({
 }) => {
   // TO DO EES-4781 - remove old version
   if (newDesign) {
-    return <DataCataloguePageNew />;
+    return <DataCataloguePageNew showTypeFilter={showTypeFilter} />;
   }
   return (
     <DataCataloguePageCurrent
@@ -54,6 +56,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     newDesign,
   } = context.query as Dictionary<string>;
 
+  let showTypeFilter = context.query.dataSetType === 'api';
+
   const queryClient = new QueryClient();
 
   if (newDesign) {
@@ -63,6 +67,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
         publicationFilter: 'DataCatalogue',
       }),
     );
+
+    if (!showTypeFilter) {
+      const apiDataSets = await queryClient.fetchQuery(
+        dataSetFileQueries.list({ dataSetType: 'api' }),
+      );
+      showTypeFilter = !!apiDataSets.results.length;
+    }
   }
 
   const themes = newDesign
@@ -99,6 +110,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   }
 
   const props: Props = {
+    showTypeFilter,
     releases,
     subjects,
     themes,

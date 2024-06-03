@@ -1,11 +1,5 @@
 trigger: none
 
-resources:
-  pipelines:
-    - pipeline: EESBuildPipeline
-      source: Explore Education Statistics
-      trigger: none
-
 parameters:
   - name: deployContainerApp
     displayName: Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.
@@ -13,6 +7,27 @@ parameters:
   - name: updatePsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
     default: false
+
+# This param is helpful for debugging to allow the selection of a particular branch from which to base a deploy from this pipeline.
+# This should be removed in the long term in favour of using the "Resources" selection from the "Run pipeline" dialog.
+#
+#  - name: buildBranchToDeploy
+#    displayName: Build branch to deploy. This allows a person who is manually running the pipeline to specify the use of the latest EESBuildPipeline build that was run against that branch.
+#    default: 'Branch from latest pipeline run'
+
+resources:
+  pipelines:
+    - pipeline: EESBuildPipeline
+      source: Explore Education Statistics
+      trigger:
+        branches:
+          - refs/heads/dev
+          - refs/heads/test
+          - refs/heads/master
+# This param is helpful for debugging to allow the selection of a particular branch from which to base a deploy from this pipeline.
+# This should be removed in the long term in favour of using the "Resources" selection from the "Run pipeline" dialog.
+#
+#      branch: ${{ replace(parameters.buildBranchToDeploy, 'Branch from latest pipeline run', '') }}
 
 variables:
   - group: Public API Infrastructure - common

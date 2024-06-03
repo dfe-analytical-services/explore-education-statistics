@@ -39,6 +39,16 @@ param applicationInsightsKey string
 @description('Specifies the subnet id')
 param subnetId string
 
+@description('Specifies whether this Function App is accessible from the public internet')
+param publicNetworkAccessEnabled bool = false
+
+@description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
+param userAssignedManagedIdentityParams {
+  id: string
+  name: string
+  principalId: string
+}?
+
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
@@ -54,9 +64,35 @@ param preWarmedInstanceCount int?
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan')
 param alwaysOn bool?
 
+@description('Specifies additional Azure Storage Accounts to make available to this Function App')
+param azureFileShares {
+  storageName: string
+  storageAccountKey: string
+  storageAccountName: string
+  fileShareName: string
+  mountPath: string
+}[] = []
+
+@description('Specifies firewall rules for the various storage accounts in use by the Function App')
+param storageFirewallRules {
+  name: string
+  cidr: string
+}[] = []
+
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux'
 var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
+
+var identity = userAssignedManagedIdentityParams != null
+  ? {
+      type: 'UserAssigned'
+      userAssignedIdentities: {
+        '${userAssignedManagedIdentityParams!.id}': {}
+      }
+    }
+  : {
+      type: 'SystemAssigned'
+    }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: appServicePlanName
@@ -68,57 +104,82 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   }
 }
 
-var dedicatedStorageAccountName = replace('${subscription}eessa${functionAppName}', '-', '')
+// Configure a single shared storage account for access key storage, and 2 individual storage accounts to be split
+// between the production slot and staging slot for reliable execution. See
+// https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-zero-downtime-deployment#status-check-with-slot
+var sharedStorageAccountName = replace('${subscription}eessa${functionAppName}mg', '-', '')
+var slot1StorageAccountName = replace('${subscription}eessa${functionAppName}s1', '-', '')
+var slot2StorageAccountName = replace('${subscription}eessa${functionAppName}s2', '-', '')
+var functionAppCodeFileShareName = '${fullFunctionAppName}-fs'
+var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
-// Create a dedicated Storage Account for this Function App for it to store its deployment code and jobs in.
-// Grant the Function App access by whitelisting its subnet for inbound traffic.
+// This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
+// management etc.
+//
+// The Durable Function App is granted access by whitelisting its subnet for inbound traffic.
 //
 // For performance, it is considered good practice for each Function App to have its own dedicated Storage Account. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
-resource dedicatedStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: dedicatedStorageAccountName
-  location: location
-  sku: {
-    name: 'Standard_LRS'
-  }
-  kind: 'Storage'
-  properties: {
-    supportsHttpsTrafficOnly: true
-    defaultToOAuthAuthentication: true
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Deny'
-      virtualNetworkRules: [
-        {
-          action: 'Allow'
-          id: subnetId
-        }
-      ]
-    }
+
+// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
+module sharedStorageAccountModule 'storageAccount.bicep' = {
+  name: '${sharedStorageAccountName}StorageAccountDeploy'
+  params: {
+    location: location
+    storageAccountName: sharedStorageAccountName
+    allowedSubnetIds: [subnetId]
+    skuStorageResource: 'Standard_LRS'
+    keyVaultName: keyVaultName
+    firewallRules: storageFirewallRules
+    tagValues: tagValues
   }
 }
 
-var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${dedicatedStorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${dedicatedStorageAccount.listKeys().keys[0].value}'
+// This is a storage account dedicated to slot 1. It uses this for its own reliable execution.
+// It also contains a file share where its slot-specific version of the code lives.
+// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
+module slot1StorageAccountModule 'storageAccount.bicep' = {
+  name: '${slot1StorageAccountName}StorageAccountDeploy'
+  params: {
+    location: location
+    storageAccountName: slot1StorageAccountName
+    allowedSubnetIds: [subnetId]
+    skuStorageResource: 'Standard_LRS'
+    keyVaultName: keyVaultName
+    firewallRules: storageFirewallRules
+    tagValues: tagValues
+  }
+}
 
-// When deploying to a Function App utilising a secured VNet to store its deployment files,
-// unique file shares must be pre-generated and unique to each slot prior to deploying the
-// Function App itself if we wish to use slot swapping.
-//
-// See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
-var fileShareName1 = '${toLower(fullFunctionAppName)}-1'
-var fileShareName2 = '${toLower(fullFunctionAppName)}-2'
-
-resource fileShare1 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${dedicatedStorageAccountName}/default/${fileShareName1}'
+// This is the file share for slot 1 to use for its code storage.
+resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+  name: '${slot1StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
-    dedicatedStorageAccount
+    slot1StorageAccountModule
   ]
 }
 
-resource fileShare2 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${dedicatedStorageAccountName}/default/${fileShareName2}'
+// This is a storage account dedicated to slot 2. It uses this for its own reliable execution.
+// It also contains a file share where its slot-specific version of the code lives.
+// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
+module slot2StorageAccountModule 'storageAccount.bicep' = {
+  name: '${slot2StorageAccountName}StorageAccountDeploy'
+  params: {
+    location: location
+    storageAccountName: slot2StorageAccountName
+    allowedSubnetIds: [subnetId]
+    skuStorageResource: 'Standard_LRS'
+    keyVaultName: keyVaultName
+    firewallRules: storageFirewallRules
+    tagValues: tagValues
+  }
+}
+
+// This is the file share for slot 2 to use for its code storage.
+resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+  name: '${slot2StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
-    dedicatedStorageAccount
+    slot2StorageAccountModule
   ]
 }
 
@@ -126,10 +187,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: fullFunctionAppName
   location: location
   kind: 'functionapp'
-  identity: {
-    type: 'SystemAssigned'
-  }
+  identity: identity
   properties: {
+    enabled: true
     httpsOnly: true
     serverFarmId: appServicePlan.id
 
@@ -143,14 +203,73 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       preWarmedInstanceCount: preWarmedInstanceCount ?? null
       netFrameworkVersion: '8.0'
       linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+      keyVaultReferenceIdentity: keyVaultReferenceIdentity
     }
+    keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
   }
   tags: tagValues
+}
+
+// TODO EES-5128 - reuse the majority of properties from the production slot configuration above
+// (e.g. enables, httpsOnly etc) rather than duplicating manually here.
+resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = {
+  name: 'staging'
+  parent: functionApp
+  location: location
+  identity: identity
+  properties: {
+    enabled: true
+    httpsOnly: true
+    serverFarmId: appServicePlan.id
+
+    // This property integrates the Function App slot into a VNet given the supplied subnet id.
+    virtualNetworkSubnetId: subnetId
+
+    clientAffinityEnabled: true
+    reserved: reserved
+    siteConfig: {
+      keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    }
+    keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
+  }
+  tags: tagValues
+}
+
+// Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
+// Where the staging slot's managed identity differs from the main slot's managed identity, add its id to the list.
+var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
+  ? [userAssignedManagedIdentityParams!.principalId]
+  : [functionApp.identity.principalId, stagingSlot.identity.principalId]
+
+module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
+  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: keyVaultPrincipalIds
+  }
+}
+
+resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2021-01-15' = {
+   name: 'azurestorageaccounts'
+   parent: functionApp
+   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
+     '${next.storageName}': {
+       type: 'AzureFiles'
+       shareName: next.fileShareName
+       mountPath: next.mountPath
+       accountName: next.storageAccountName
+       accessKey: next.storageAccountKey
+     }
+   }))
 }
 
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
 // deploy and supply them as the most important appsettings. This prevents infrastructure deploys from overriding any
 // appsettings back to their original values by allowing existing ones to take precedence.
+//
+// See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
 var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
 var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
 
@@ -162,7 +281,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   name: '${functionAppName}AppServiceSlotConfigDeploy'
   params: {
     appName: functionApp.name
-    location: location
     existingStagingAppSettings: existingStagingAppSettings
     existingProductionAppSettings: existingProductionAppSettings
     slotSpecificSettingKeys: [
@@ -174,15 +292,15 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     commonSettings: union(settings, {
 
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
-      AzureWebJobsStorage: dedicatedStorageAccountString
-
-      // This property tells the Function App that the deployment code resides in this Storage account.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
+      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
 
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
       WEBSITE_CONTENTOVERVNET: 1
       vnetContentShareEnabled: true
+
+      // This property instructs the Function App to direct all outbound traffic over the VNet.
+      WEBSITE_VNET_ROUTE_ALL: 1
 
       // This setting is necessary in order to allow slot swapping to work without complaining that
       // "Storage volume is currently in R/O mode".
@@ -199,49 +317,38 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       FUNCTIONS_EXTENSION_VERSION: '~4'
       FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
       APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
+
+      // This indicates the name of the file share where the Function App code and configuration lives.
+      WEBSITE_CONTENTSHARE: functionAppCodeFileShareName
+
+      // It's only possible to UPDATE a Function App using a Key Vault reference for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING setting,
+      // not creating a new Function App, unless we use the below setting to skip validation for the first time we create
+      // this Function App.  See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
+      WEBSITE_SKIP_CONTENTSHARE_VALIDATION: functionAppExists ? 0 : 1
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
-      // When deploying to a Function App utilising a secured VNet to store its deployment files,
-      // unique file shares must be pre-generated and unique to each slot prior to deploying the
-      // Function App itself if we wish to use slot swapping.
-      //
-      // In conjunction with WEBSITE_CONTENTAZUREFILECONNECTIONSTRING, this property tells the
-      // Function App that the deployment code resides in this Storage account and within *this*
-      // file share.
-      //
-      // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
-      //
-      // When slots are swapped, this fileshare configuration value will swap with the slots and thereby make the new
-      // code deployment location available to the other slot.
-      WEBSITE_CONTENTSHARE: fileShareName2
+      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
+      
+      // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
+      // resides in the specified Storage account.
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
-      // As above, this value is distinct from the initial staging slot equivalent and will swap to the other slot upon
-      // a slot swap operation.
-      WEBSITE_CONTENTSHARE: fileShareName1
+      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
+      
+      // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
+      // resides in the specified Storage account.
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
     }
-    tagValues: tagValues
+    azureFileShares: azureFileShares
   }
   dependsOn: [
-    fileShare1
-    fileShare2
+    functionAppKeyVaultAccessPolicy
+    slot1FileShare
+    slot2FileShare
   ]
 }
 
-// Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
-module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
-  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
-  params: {
-    keyVaultName: keyVaultName
-    principalIds: [
-      functionApp.identity.principalId
-      functionAppSlotSettings.outputs.stagingSlotPrincipalId
-    ]
-  }
-}
-
 output functionAppName string = functionApp.name
-output principalId string = functionApp.identity.principalId
-output tenantId string = functionApp.identity.tenantId

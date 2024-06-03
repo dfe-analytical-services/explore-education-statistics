@@ -22,7 +22,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "docs",
-      "applicationUrl": "https://0.0.0.0:5031;http://0.0.0.0:5030;https://[::1]:5031;http://[::1]:5030",
+      "applicationUrl": "https://0.0.0.0:5051;http://0.0.0.0:5050;https://[::1]:5051;http://[::1]:5050",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

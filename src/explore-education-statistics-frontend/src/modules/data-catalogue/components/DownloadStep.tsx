@@ -17,6 +17,7 @@ import ContentHtml from '@common/components/ContentHtml';
 import Tag from '@common/components/Tag';
 import useMounted from '@common/hooks/useMounted';
 import React, { useMemo } from 'react';
+import FormattedDate from '@common/components/FormattedDate';
 
 interface DownloadFormValues {
   files: string[];
@@ -79,12 +80,13 @@ const DownloadStep = ({
   const checkboxOptions = useMemo<CheckboxOption[]>(
     () =>
       subjects.map(subject => {
-        const { content } = subject;
+        const { content, lastUpdated } = subject;
         const geographicLevels = [...subject.geographicLevels]
           .sort()
           .join('; ');
         const timePeriod = getTimePeriod(subject);
-        const hasDetails = content || geographicLevels || timePeriod;
+        const hasDetails =
+          content || geographicLevels || timePeriod || lastUpdated;
 
         return {
           label: `${subject.name} (${subject.file.extension}, ${subject.file.size})`,
@@ -108,6 +110,12 @@ const DownloadStep = ({
                     {timePeriod}
                   </SummaryListItem>
                 )}
+
+                <SummaryListItem term="Last updated">
+                  <FormattedDate format="d MMMM yyyy">
+                    {lastUpdated}
+                  </FormattedDate>
+                </SummaryListItem>
 
                 {content && (
                   <SummaryListItem term="Content">

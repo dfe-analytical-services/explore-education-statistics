@@ -1,15 +1,25 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicDataDbContext)
+public class ProcessInitialDataSetVersionFunction(
+    PublicDataDbContext publicDataDbContext,
+    IDataSetMetaService dataSetMetaService,
+    IDataDuckDbRepository dataDuckDbRepository,
+    IParquetService parquetService,
+    IDataSetVersionPathResolver dataSetVersionPathResolver) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
+    private readonly PublicDataDbContext _publicDataDbContext = publicDataDbContext;
+
     [Function(nameof(ProcessInitialDataSetVersion))]
     public async Task ProcessInitialDataSetVersion(
         [OrchestrationTrigger] TaskOrchestrationContext context,
@@ -24,28 +34,11 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
 
         try
         {
-            await context.CallActivityAsync(nameof(CopyCsvFilesFunction.CopyCsvFiles),
-                input.DataSetVersionId);
-
-            logger.LogInformation(
-                "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
-                nameof(CopyCsvFilesFunction.CopyCsvFiles),
-                context.InstanceId,
-                input.DataSetVersionId);
-
-            // Other activity function calls to be added here to cover the following stages:
-            // Create meta summary for the DataSetVersion
-            // Import metadata to DuckDb
-            // Import data to DuckDb
-            // Export to Parquet files
-
-            await context.CallActivityAsync(nameof(CompleteProcessing), input.DataSetVersionId);
-
-            logger.LogInformation(
-                "Activity '{ActivityName}' completed (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
-                nameof(CompleteProcessing),
-                context.InstanceId,
-                input.DataSetVersionId);
+            await context.CallActivity(nameof(CopyCsvFilesFunction.CopyCsvFiles), logger, context.InstanceId);
+            await context.CallActivityExclusively(nameof(ImportMetadata), logger, context.InstanceId);
+            await context.CallActivity(nameof(ImportData), logger, context.InstanceId);
+            await context.CallActivity(nameof(WriteDataFiles), logger, context.InstanceId);
+            await context.CallActivity(nameof(CompleteProcessing), logger, context.InstanceId);
         }
         catch (Exception e)
         {
@@ -54,59 +47,68 @@ public class ProcessInitialDataSetVersionFunction(PublicDataDbContext publicData
                 context.InstanceId,
                 input.DataSetVersionId);
 
-            await context.CallActivityAsync(nameof(HandleProcessingFailure), input.DataSetVersionId);
+            await context.CallActivity(nameof(HandleProcessingFailure), logger);
         }
+    }
+
+    [Function(nameof(ImportMetadata))]
+    public async Task ImportMetadata(
+        [ActivityTrigger] Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingMetadata, cancellationToken);
+        await dataSetMetaService.CreateDataSetVersionMeta(dataSetVersionImport.DataSetVersionId, cancellationToken);
+    }
+
+    [Function(nameof(ImportData))]
+    public async Task ImportData(
+        [ActivityTrigger] Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingData, cancellationToken);
+        await dataDuckDbRepository.CreateDataTable(dataSetVersionImport.DataSetVersionId, cancellationToken);
+    }
+
+    [Function(nameof(WriteDataFiles))]
+    public async Task WriteDataFiles(
+        [ActivityTrigger] Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.WritingDataFiles, cancellationToken);
+        await parquetService.WriteDataFiles(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(nameof(CompleteProcessing))]
     public async Task CompleteProcessing(
-        [ActivityTrigger] Guid dataSetVersionId,
-        Guid instanceId,
+        [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
-        var dataSetVersion = await GetDataSetVersion(
-            dataSetVersionId: dataSetVersionId,
-            instanceId: instanceId,
-            cancellationToken);
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.Completing, cancellationToken);
 
-        var dataSetVersionImport = dataSetVersion.Imports.Single(i => i.InstanceId == instanceId);
+        var dataSetVersion = dataSetVersionImport.DataSetVersion;
 
-        dataSetVersionImport.Stage = DataSetVersionImportStage.Completing;
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-
-        // Any additional logic to tidy up after importing will be added here
+        // Delete the DuckDb database file as it is no longer needed
+        File.Delete(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
 
         dataSetVersion.Status = DataSetVersionStatus.Draft;
         dataSetVersionImport.Completed = DateTimeOffset.UtcNow;
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+        await _publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
     [Function(nameof(HandleProcessingFailure))]
     public async Task HandleProcessingFailure(
-        [ActivityTrigger] Guid dataSetVersionId,
-        Guid instanceId,
+        [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
-        var dataSetVersion = await GetDataSetVersion(
-            dataSetVersionId: dataSetVersionId,
-            instanceId: instanceId,
-            cancellationToken);
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        var dataSetVersion = dataSetVersionImport.DataSetVersion;
 
         dataSetVersion.Status = DataSetVersionStatus.Failed;
-
-        var dataSetVersionImport = dataSetVersion.Imports.Single(i => i.InstanceId == instanceId);
         dataSetVersionImport.Completed = DateTimeOffset.UtcNow;
-
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private async Task<DataSetVersion> GetDataSetVersion(
-        Guid dataSetVersionId,
-        Guid instanceId,
-        CancellationToken cancellationToken)
-    {
-        return await publicDataDbContext.DataSetVersions
-            .Include(dsv => dsv.Imports.Where(i => i.InstanceId == instanceId))
-            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken: cancellationToken);
+        await _publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 }

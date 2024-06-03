@@ -1,11 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -22,6 +15,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -298,6 +298,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         releaseFile.Name = update.Title ?? releaseFile.Name;
                         releaseFile.Summary = update.Summary ?? releaseFile.Summary;
+
+                        var releaseFileDataHasChanged =
+                            !string.IsNullOrWhiteSpace(update.Title) ||
+                            !string.IsNullOrWhiteSpace(update.Summary);
+
+                        if (releaseFileDataHasChanged)
+                        {
+                            releaseFile.Published = null; // This will be repopulated with the current date during the publish process
+                        }
+
                         await _contentDbContext.SaveChangesAsync();
                     }
                 );

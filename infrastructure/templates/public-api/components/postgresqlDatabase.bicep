@@ -56,8 +56,7 @@ param databaseNames string[]
 @description('An array of firewall rules containing IP address ranges')
 param firewallRules {
   name: string
-  startIpAddress: string
-  endIpAddress: string
+  cidr: string
 }[] = []
 
 @description('A set of tags with which to tag the resource in Azure')
@@ -119,16 +118,18 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
       name: name
   }]
 
-  resource rules 'firewallRules' = [for rule in firewallRules: {
-    name: rule.name
-    properties: {
-      startIpAddress: rule.startIpAddress
-      endIpAddress: rule.endIpAddress
-    }
-  }]
-
   tags: tagValues
 }
+
+@batchSize(1)
+resource rules 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [for rule in firewallRules: {
+  name: rule.name
+  parent: postgreSQLDatabase
+  properties: {
+    startIpAddress: parseCidr(rule.cidr).firstUsable
+    endIpAddress: parseCidr(rule.cidr).lastUsable
+  }
+}]
 
 var privateLinkDnsZoneName = 'privatelink.postgres.database.azure.com'
 

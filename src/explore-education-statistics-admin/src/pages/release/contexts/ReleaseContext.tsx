@@ -5,7 +5,7 @@ import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 export interface ReleaseContextState {
   release: Release;
   releaseId: string;
-  onReleaseChange: (nextRelease: Release) => void;
+  onReleaseChange: () => void;
 }
 
 const ReleaseContext = createContext<ReleaseContextState | undefined>(
@@ -15,7 +15,7 @@ const ReleaseContext = createContext<ReleaseContextState | undefined>(
 interface ReleaseContextProviderProps {
   children: ReactNode;
   release: Release;
-  onReleaseChange?: (nextRelease: Release) => void;
+  onReleaseChange?: () => void;
 }
 
 export const ReleaseContextProvider = ({
@@ -44,5 +44,6 @@ export function useReleaseContext() {
       'useReleaseContext must be used within a ReleaseContextProvider',
     );
   }
+
   return context;
 }

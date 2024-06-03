@@ -20,7 +20,7 @@ public record DataSetVersionViewModel
     [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
 
-    public required Guid DataSetFileId { get; init; }
+    public required IdTitleViewModel File { get; init; }
 
     public required IdTitleViewModel ReleaseVersion { get; init; }
 

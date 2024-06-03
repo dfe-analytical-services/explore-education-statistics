@@ -28,7 +28,7 @@ public abstract class DataSetVersionPathResolverTests
         public void EmptyBasePath_Throws(string basePath)
         {
             Assert.Throws<ArgumentException>(() =>
-                BuildService(options: new ParquetFilesOptions
+                BuildService(options: new DataFilesOptions
                 {
                     BasePath = basePath
                 })
@@ -38,171 +38,180 @@ public abstract class DataSetVersionPathResolverTests
 
     public class PathTests : DataSetVersionPathResolverTests
     {
-        [Fact]
-        public void DevelopmentEnv_ValidBasePath_AllPathsCorrect()
-        {
-            DataSetVersion version = _dataFixture.DefaultDataSetVersion();
+        public static IEnumerable<object[]> GetEnvironmentNames =>
+        [
+            [
+                Environments.Development
+            ],
+            [
+                HostEnvironmentExtensions.IntegrationTestEnvironment
+            ],
+            [
+                Environments.Production
+            ]
+        ];
 
+        [Fact]
+        public void DevelopmentEnv_ValidBasePath()
+        {
             _webHostEnvironmentMock
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(Environments.Development);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
-            var expectedDirectoryPath = Path.Combine(
-                PathUtils.ProjectRootPath,
-                "data",
-                "parquet-files",
-                version.DataSetId.ToString(),
-                "v1.0"
-            );
-
-            Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
-                resolver.CsvDataPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
-                resolver.CsvMetadataPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
-                resolver.DataPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, FilterOptionsTable.ParquetFile),
-                resolver.FiltersPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, IndicatorsTable.ParquetFile),
-                resolver.IndicatorsPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, LocationOptionsTable.ParquetFile),
-                resolver.LocationsPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, TimePeriodsTable.ParquetFile),
-                resolver.TimePeriodsPath(version)
-            );
+                Path.Combine(
+                    PathUtils.ProjectRootPath,
+                    "data",
+                    "data-files"
+                ),
+                resolver.BasePath());
         }
 
         [Fact]
-        public void IntegrationTestEnv_ValidBasePath_AllPathsCorrect()
+        public void IntegrationTestEnv_ValidBasePath()
         {
-            DataSetVersion version = _dataFixture.DefaultDataSetVersion();
-
             _webHostEnvironmentMock
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(HostEnvironmentExtensions.IntegrationTestEnvironment);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
-            var expectedDirectoryPath = Path.Combine(
-                Assembly.GetExecutingAssembly().GetDirectoryPath(),
-                "data",
-                "parquet-files",
-                version.DataSetId.ToString(),
-                "v1.0"
-            );
+            var basePath = resolver.BasePath();
 
-            Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
+            // Expect the last path segment to be a random test instance directory
+            var expectedLastPathSegment = basePath[(basePath.LastIndexOf(Path.DirectorySeparatorChar) + 1)..];
+            Assert.NotEmpty(expectedLastPathSegment);
+            Assert.True(Guid.TryParse(expectedLastPathSegment, out var randomTestInstanceDir));
+
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
-                resolver.CsvDataPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
-                resolver.CsvMetadataPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
-                resolver.DataPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, FilterOptionsTable.ParquetFile),
-                resolver.FiltersPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, IndicatorsTable.ParquetFile),
-                resolver.IndicatorsPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, LocationOptionsTable.ParquetFile),
-                resolver.LocationsPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedDirectoryPath, TimePeriodsTable.ParquetFile),
-                resolver.TimePeriodsPath(version)
+                Path.Combine(
+                    Assembly.GetExecutingAssembly().GetDirectoryPath(),
+                    "data",
+                    "data-files",
+                    randomTestInstanceDir.ToString()
+                ),
+                basePath
             );
         }
 
         [Fact]
-        public void ProductionEnv_ValidBasePath_AllPathsCorrect()
+        public void ProductionEnv_ValidBasePath()
+        {
+            _webHostEnvironmentMock
+                .SetupGet(s => s.EnvironmentName)
+                .Returns(Environments.Production);
+
+            var resolver = BuildService(options: new DataFilesOptions
+            {
+                BasePath = Path.Combine("data", "data-files")
+            });
+
+            Assert.Equal(
+                Path.Combine(
+                    "data",
+                    "data-files"
+                ),
+                resolver.BasePath());
+        }
+
+        [Theory]
+        [MemberData(nameof(GetEnvironmentNames))]
+        public void ValidDirectoryPath(string environmentName)
         {
             DataSetVersion version = _dataFixture.DefaultDataSetVersion();
 
             _webHostEnvironmentMock
                 .SetupGet(s => s.EnvironmentName)
-                .Returns(Environments.Production);
+                .Returns(environmentName);
 
-            var resolver = BuildService(options: new ParquetFilesOptions
+            var resolver = BuildService(options: new DataFilesOptions
             {
-                BasePath = Path.Combine("data", "parquet-files")
+                BasePath = Path.Combine("data", "data-files")
             });
 
-            var expectedDirectoryPath = Path.Combine(
-                "data",
-                "parquet-files",
-                version.DataSetId.ToString(),
-                "v1.0"
-            );
-
-            Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, "data.csv.gz"),
+                Path.Combine(
+                    resolver.BasePath(),
+                    version.DataSetId.ToString(),
+                    "v1.0"
+                ),
+                resolver.DirectoryPath(version));
+        }
+
+        [Theory]
+        [MemberData(nameof(GetEnvironmentNames))]
+        public void ValidFilePaths(string environmentName)
+        {
+            DataSetVersion version = _dataFixture.DefaultDataSetVersion();
+
+            _webHostEnvironmentMock
+                .SetupGet(s => s.EnvironmentName)
+                .Returns(environmentName);
+
+            var resolver = BuildService(options: new DataFilesOptions
+            {
+                BasePath = Path.Combine("data", "data-files")
+            });
+
+            var directoryPath = resolver.DirectoryPath(version);
+
+            Assert.Equal(
+                Path.Combine(directoryPath, DataSetFilenames.CsvDataFile),
                 resolver.CsvDataPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, "metadata.csv.gz"),
+                Path.Combine(directoryPath, DataSetFilenames.CsvMetadataFile),
                 resolver.CsvMetadataPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
+                Path.Combine(directoryPath, DataSetFilenames.DuckDbDatabaseFile),
+                resolver.DuckDbPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(directoryPath, DataSetFilenames.DuckDbLoadSqlFile),
+                resolver.DuckDbLoadSqlPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(directoryPath, DataSetFilenames.DuckDbSchemaSqlFile),
+                resolver.DuckDbSchemaSqlPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(directoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, FilterOptionsTable.ParquetFile),
+                Path.Combine(directoryPath, FilterOptionsTable.ParquetFile),
                 resolver.FiltersPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, IndicatorsTable.ParquetFile),
+                Path.Combine(directoryPath, IndicatorsTable.ParquetFile),
                 resolver.IndicatorsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, LocationOptionsTable.ParquetFile),
+                Path.Combine(directoryPath, LocationOptionsTable.ParquetFile),
                 resolver.LocationsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedDirectoryPath, TimePeriodsTable.ParquetFile),
+                Path.Combine(directoryPath, TimePeriodsTable.ParquetFile),
                 resolver.TimePeriodsPath(version)
             );
         }
     }
 
     private IDataSetVersionPathResolver BuildService(
-        ParquetFilesOptions options,
+        DataFilesOptions options,
         IWebHostEnvironment? webHostEnvironment = null)
     {
         return new DataSetVersionPathResolver(
-            new OptionsWrapper<ParquetFilesOptions>(options),
+            new OptionsWrapper<DataFilesOptions>(options),
             webHostEnvironment ?? _webHostEnvironmentMock.Object
         );
     }

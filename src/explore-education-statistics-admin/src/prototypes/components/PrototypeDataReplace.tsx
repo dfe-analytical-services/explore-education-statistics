@@ -364,13 +364,13 @@ const PrototypeMetaPreview = () => {
                   <ButtonText
                     className="govuk-!-margin-right-6"
                     onClick={() => {
-                      return (
-                        replaceInProgress &&
-                          (setOriginalData(true),
-                          setReplaceData(false),
-                          setReplaceInProgress(false)),
-                        (originalData || updatedData) && setReplaceData(true)
-                      );
+                      if (replaceInProgress) {
+                        setOriginalData(true);
+                        setReplaceData(false);
+                        setReplaceInProgress(false);
+                      } else if (originalData || updatedData) {
+                        setReplaceData(true);
+                      }
                     }}
                   >
                     {(originalData || updatedData) && 'Replace data files'}

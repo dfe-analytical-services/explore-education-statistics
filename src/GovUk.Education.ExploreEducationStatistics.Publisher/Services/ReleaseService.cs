@@ -1,14 +1,13 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -18,7 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseVersionRepository _releaseVersionRepository;
 
-        public ReleaseService(ContentDbContext contentDbContext,
+        public ReleaseService(
+            ContentDbContext contentDbContext,
             IReleaseVersionRepository releaseVersionRepository)
         {
             _contentDbContext = contentDbContext;
@@ -84,12 +84,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleAsync(rv => rv.Id == releaseVersionId);
 
             _contentDbContext.ReleaseVersions.Update(releaseVersion);
-            releaseVersion.Published =
-                await _releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
+
+            var publishedDate = await _releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
+
+            releaseVersion.Published = publishedDate;
+
+            await UpdateReleaseFilePublishedDate(releaseVersion, publishedDate);
 
             await UpdatePublishedDataBlockVersions(releaseVersion);
 
             await _contentDbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateReleaseFilePublishedDate(
+            ReleaseVersion releaseVersion,
+            DateTime publishedDate)
+        {
+            var dataReleaseFiles = _contentDbContext.ReleaseFiles
+                .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersion.Id)
+                .Include(rf => rf.File);
+
+            if (releaseVersion.PreviousVersion is null)
+            {
+                await dataReleaseFiles.ForEachAsync(releaseFile => releaseFile.Published = publishedDate);
+            }
+            else
+            {
+                await dataReleaseFiles
+                    .Where(rf => rf.Published == null)
+                    .ForEachAsync(releaseFile => releaseFile.Published = DateTime.UtcNow);
+            }
         }
 
         private async Task UpdatePublishedDataBlockVersions(ReleaseVersion releaseVersion)

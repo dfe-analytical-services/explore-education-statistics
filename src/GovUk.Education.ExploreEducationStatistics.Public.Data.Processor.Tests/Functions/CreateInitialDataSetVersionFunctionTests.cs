@@ -40,6 +40,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
                 .WithFiles(_fixture.DefaultFile()
                     .ForIndex(0, s => s.SetType(FileType.Data))
                     .ForIndex(1, s => s.SetType(FileType.Metadata))
+                    .WithSubjectId(Guid.NewGuid())
                     .Generate(2))
                 .GenerateList()
                 .ToTuple2();

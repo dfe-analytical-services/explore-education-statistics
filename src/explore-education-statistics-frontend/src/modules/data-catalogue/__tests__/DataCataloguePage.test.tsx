@@ -72,6 +72,7 @@ describe('DataCataloguePage', () => {
       },
       filters: ['Filter 1'],
       indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
     },
     {
       id: 'subject-2',
@@ -92,6 +93,7 @@ describe('DataCataloguePage', () => {
       },
       filters: ['Filter 1'],
       indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
     },
     {
       id: 'subject-3',
@@ -112,6 +114,7 @@ describe('DataCataloguePage', () => {
       },
       filters: ['Filter 1'],
       indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
     },
   ];
 
@@ -825,7 +828,7 @@ describe('DataCataloguePage', () => {
           releaseInfo.getByText('This is the latest data'),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByRole('button', {
+          releaseInfo.getByRole('link', {
             name: 'Download 1 data set (ZIP)',
           }),
         ).toBeInTheDocument();
@@ -934,7 +937,7 @@ describe('DataCataloguePage', () => {
           releaseInfo.getByText('This is not the latest data'),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByRole('button', {
+          releaseInfo.getByRole('link', {
             name: 'Download all 2 data sets (ZIP)',
           }),
         ).toBeInTheDocument();

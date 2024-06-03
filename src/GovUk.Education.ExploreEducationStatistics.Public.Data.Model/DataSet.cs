@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -42,6 +43,9 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
     {
         public void Configure(EntityTypeBuilder<DataSet> builder)
         {
+            builder.Property(ds => ds.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
             builder.Property(ds => ds.Status).HasConversion<string>();
 
             builder

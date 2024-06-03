@@ -28,6 +28,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 // TODO EES-4856
@@ -77,6 +78,7 @@ export default function DataSetFilePage({
     useState<PageSectionId>('dataSetDetails');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
   const [showAllPreview, toggleShowAllPreview] = useToggle(false);
+  const router = useRouter();
 
   const handleDownload = async () => {
     await downloadService.downloadFiles(release.id, [file.id]);
@@ -113,7 +115,16 @@ export default function DataSetFilePage({
       ) {
         setActiveSection(pageSectionId);
 
-        window.history.pushState({}, '', `#${pageSectionId}`);
+        router.push(
+          {
+            pathname: `/data-catalogue/data-set/${dataSetFile.id}`,
+            hash: pageSectionId,
+          },
+          undefined,
+          {
+            shallow: true,
+          },
+        );
       }
     });
   }, 10);
@@ -166,6 +177,12 @@ export default function DataSetFilePage({
               <span className={styles.infoSectionHeading}>Published</span>{' '}
               <FormattedDate format="d MMMM yyyy">
                 {release.published}
+              </FormattedDate>
+            </div>
+            <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
+              <span className={styles.infoSectionHeading}>Last updated</span>{' '}
+              <FormattedDate format="d MMMM yyyy">
+                {release.lastUpdated}
               </FormattedDate>
             </div>
 
