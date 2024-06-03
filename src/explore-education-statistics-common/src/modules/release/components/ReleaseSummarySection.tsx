@@ -20,8 +20,8 @@ interface ReleaseTypeIcon {
 }
 
 const releaseTypesToIcons: Partial<Record<ReleaseType, ReleaseTypeIcon>> = {
-  NationalStatistics: {
-    url: '/assets/images/UKSA-quality-mark.jpg',
+  AccreditedOfficialStatistics: {
+    url: '/assets/images/accredited-official-statistics-logo.svg',
     altText: 'UK statistics authority quality mark',
   },
 };

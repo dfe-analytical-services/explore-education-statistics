@@ -16,7 +16,7 @@ describe('getUpdatedQueryParams', () => {
         month: '',
         day: '',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       latestRelease: false,
     },
     {
@@ -32,7 +32,7 @@ describe('getUpdatedQueryParams', () => {
         month: '',
         day: '',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       latestRelease: false,
     },
     {
@@ -48,7 +48,7 @@ describe('getUpdatedQueryParams', () => {
         month: '',
         day: '',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       latestRelease: true,
     },
   ];

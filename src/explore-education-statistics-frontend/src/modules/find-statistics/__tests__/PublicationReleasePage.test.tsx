@@ -239,7 +239,7 @@ describe('PublicationReleasePage', () => {
     );
   });
 
-  test('renders national statistics image', () => {
+  test('renders accredited official statistics image', () => {
     const { container } = render(
       <PublicationReleasePage release={testRelease} />,
     );
@@ -251,11 +251,11 @@ describe('PublicationReleasePage', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders national statistics section', () => {
+  test('renders accredited official statistics section', () => {
     render(<PublicationReleasePage release={testRelease} />);
 
     expect(
-      screen.getByRole('heading', { name: 'National statistics' }),
+      screen.getByRole('heading', { name: 'Accredited official statistics' }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { name: 'Official statistics' }),
@@ -290,7 +290,7 @@ describe('PublicationReleasePage', () => {
     );
 
     expect(
-      screen.queryByRole('heading', { name: 'National statistics' }),
+      screen.queryByRole('heading', { name: 'Accredited official statistics' }),
     ).not.toBeInTheDocument();
 
     expect(

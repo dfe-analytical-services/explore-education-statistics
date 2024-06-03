@@ -24,7 +24,7 @@ Verify Release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Tax year 2020-21
     user verifies release summary    Tax year    2020-21
-    ...    National statistics
+    ...    Accredited official statistics
 
 Upload subject
     user uploads subject    UI test subject    upload-file-test-with-filter.csv

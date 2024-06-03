@@ -23,8 +23,8 @@ const ReleaseTypesModal = ({
     </p>
 
     <SummaryList>
-      <SummaryListItem term="National statistics">
-        National statistics are official statistics that have been assessed by
+      <SummaryListItem term="Accredited official statistics">
+        Accredited official statistics are statistics that have been assessed by
         the Office for Statistics Regulation as fully compliant with the Code of
         Practice for Statistics, i.e., they meet the highest standards for
         trustworthiness, quality and value.

@@ -146,7 +146,7 @@ export const testDataSetFile: DataSetFile = {
     lastUpdated: '2023-12-01',
     slug: 'release-slug',
     title: 'Release 1',
-    type: 'NationalStatistics',
+    type: 'AccreditedOfficialStatistics',
   },
   summary: 'Data set 1 summary',
   title: 'Data set 1',

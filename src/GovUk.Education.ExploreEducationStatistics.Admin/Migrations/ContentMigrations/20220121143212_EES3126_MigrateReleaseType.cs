@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             {ReleaseType.AdHocStatistics, new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0")},
             {ReleaseType.ExperimentalStatistics, new Guid("f5de8522-3150-435d-98d5-1d14763f8c54")},
             {ReleaseType.ManagementInformation, new Guid("15bd4f57-c837-4821-b308-7f4169cd9330")},
-            {ReleaseType.NationalStatistics, new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8")},
+            {ReleaseType.AccreditedOfficialStatistics, new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8")}, // Altered from ReleaseType.NationalStatistics so we could remove it from the enum
             {ReleaseType.OfficialStatistics, new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")}
         };
 
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     {ReleaseTypeIds[ReleaseType.AdHocStatistics], "Ad Hoc Statistics"},
                     {ReleaseTypeIds[ReleaseType.ExperimentalStatistics], "Experimental Statistics"},
                     {ReleaseTypeIds[ReleaseType.ManagementInformation], "Management Information"},
-                    {ReleaseTypeIds[ReleaseType.NationalStatistics], "National Statistics"},
+                    {ReleaseTypeIds[ReleaseType.AccreditedOfficialStatistics], "National Statistics"}, // Altered from ReleaseType.NationalStatistics so we could remove it from the enum
                     {ReleaseTypeIds[ReleaseType.OfficialStatistics], "Official Statistics"}
                 });
 

@@ -53,7 +53,7 @@ const ExampleSection = ({
             </div>
 
             <img
-              src="/assets/images/UKSA-quality-mark.jpg"
+              src="/assets/images/accredited-official-statistics-logo.svg"
               className="govuk-!-margin-right-3"
               alt="UK statistics authority quality mark"
               height="60"
@@ -128,7 +128,7 @@ const ExampleSection = ({
                 </div>
 
                 <img
-                  src="/assets/images/UKSA-quality-mark.jpg"
+                  src="/assets/images/accredited-official-statistics-logo.svg"
                   className="govuk-!-margin-right-3"
                   alt="UK statistics authority quality mark"
                   height="60"
@@ -194,7 +194,7 @@ const ExampleSection = ({
                 </div>
 
                 <img
-                  src="/assets/images/UKSA-quality-mark.jpg"
+                  src="/assets/images/accredited-official-statistics-logo.svg"
                   className="govuk-!-margin-right-3"
                   alt="UK statistics authority quality mark"
                   height="60"
@@ -287,7 +287,7 @@ const ExampleSection = ({
                 </div>
 
                 <img
-                  src="/assets/images/UKSA-quality-mark.jpg"
+                  src="/assets/images/accredited-official-statistics-logo.svg"
                   className="govuk-!-margin-right-3"
                   alt="UK statistics authority quality mark"
                   height="60"
@@ -369,7 +369,7 @@ const ExampleSection = ({
                 </div>
 
                 <img
-                  src="/assets/images/UKSA-quality-mark.jpg"
+                  src="/assets/images/accredited-official-statistics-logo.svg"
                   className="govuk-!-margin-right-3"
                   alt="UK statistics authority quality mark"
                   height="60"
@@ -440,7 +440,7 @@ const ExampleSection = ({
               </p>
             </div>
             <img
-              src="/assets/images/UKSA-quality-mark.jpg"
+              src="/assets/images/accredited-official-statistics-logo.svg"
               className="govuk-!-margin-right-3"
               alt="UK statistics authority quality mark"
               height="60"
@@ -502,7 +502,7 @@ const ExampleSection = ({
               </p>
             </div>
             <img
-              src="/assets/images/UKSA-quality-mark.jpg"
+              src="/assets/images/accredited-official-statistics-logo.svg"
               className="govuk-!-margin-right-3"
               alt="UK statistics authority quality mark"
               height="60"
@@ -602,7 +602,7 @@ const ExampleSection = ({
               </p>
             </div>
             <img
-              src="/assets/images/UKSA-quality-mark.jpg"
+              src="/assets/images/accredited-official-statistics-logo.svg"
               className="govuk-!-margin-right-3"
               alt="UK statistics authority quality mark"
               height="60"
@@ -681,7 +681,7 @@ const ExampleSection = ({
                 onClick={() => change3 && change3()}
               >
                 <img
-                  src="/assets/images/UKSA-quality-mark.jpg"
+                  src="/assets/images/accredited-official-statistics-logo.svg"
                   className={styles.prototypeStatsTypeLogo}
                   alt="UK statistics authority quality mark"
                 />

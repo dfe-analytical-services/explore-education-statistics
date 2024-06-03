@@ -822,7 +822,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByText('National statistics'),
+          releaseInfo.getByText('Accredited official statistics'),
         ).toBeInTheDocument();
         expect(
           releaseInfo.getByText('This is the latest data'),
@@ -931,7 +931,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByText('National statistics'),
+          releaseInfo.getByText('Accredited official statistics'),
         ).toBeInTheDocument();
         expect(
           releaseInfo.getByText('This is not the latest data'),

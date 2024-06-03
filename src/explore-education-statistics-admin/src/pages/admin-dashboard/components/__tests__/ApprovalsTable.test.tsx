@@ -61,7 +61,7 @@ describe('ApprovalsTable', () => {
         value: 'AY',
         label: 'Academic year',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       approvalStatus: 'Approved',
       amendment: false,
       permissions: {
@@ -101,7 +101,7 @@ describe('ApprovalsTable', () => {
         value: 'AY',
         label: 'Academic year',
       },
-      type: 'NationalStatistics',
+      type: 'AccreditedOfficialStatistics',
       approvalStatus: 'Approved',
       previousVersionId: 'old-release-2-id',
       amendment: false,

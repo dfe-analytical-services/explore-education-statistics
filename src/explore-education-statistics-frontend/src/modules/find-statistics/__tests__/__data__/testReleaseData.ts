@@ -90,7 +90,7 @@ export const testRelease: Release = {
   slug: '2016-17',
   hasDataGuidance: true,
   hasPreReleaseAccessList: true,
-  type: 'NationalStatistics',
+  type: 'AccreditedOfficialStatistics',
   updates: [
     {
       id: '18e0d40e-bdf7-4c84-99dd-732e72e9c9a5',

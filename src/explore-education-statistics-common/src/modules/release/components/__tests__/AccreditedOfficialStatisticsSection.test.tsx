@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import NationalStatisticsSection from '@common/modules/release/components/NationalStatisticsSection';
+import AccreditedOfficialStatisticsSection from '@common/modules/release/components/AccreditedOfficialStatisticsSection';
 
-describe('NationalStatisticsSection', () => {
+describe('AccreditedOfficialStatisticsSection', () => {
   test('renders', () => {
-    render(<NationalStatisticsSection />);
+    render(<AccreditedOfficialStatisticsSection />);
 
     expect(
       screen.getByRole('link', {
@@ -14,15 +14,15 @@ describe('NationalStatisticsSection', () => {
   });
 
   test('shows the heading if showHeading is true', () => {
-    render(<NationalStatisticsSection showHeading />);
+    render(<AccreditedOfficialStatisticsSection showHeading />);
 
     expect(
-      screen.getByRole('heading', { name: 'National statistics' }),
+      screen.getByRole('heading', { name: 'Accredited official statistics' }),
     ).toBeInTheDocument();
   });
 
   test('hides the heading if showHeading is false', () => {
-    render(<NationalStatisticsSection showHeading={false} />);
+    render(<AccreditedOfficialStatisticsSection showHeading={false} />);
 
     expect(
       screen.queryByRole('heading', { name: 'Official statistics' }),
@@ -33,7 +33,7 @@ describe('NationalStatisticsSection', () => {
     // Introduced because of changes to the National Statistics Designation Review,
     // Documented in https://dfedigital.atlassian.net/browse/EES-4620
 
-    render(<NationalStatisticsSection />);
+    render(<AccreditedOfficialStatisticsSection />);
 
     expect(
       screen.getByText(
