@@ -8,10 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -25,9 +24,9 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    public class ReleaseFileControllerTests : IntegrationTest<TestStartup>
+    public class ReleaseFileControllerTests : IntegrationTestFixture
     {
-        public ReleaseFileControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+        public ReleaseFileControllerTests(TestApplicationFactory testApp) : base(testApp)
         {
         }
 
@@ -132,10 +131,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             response.AssertOk("Test zip");
         }
 
-        private WebApplicationFactory<TestStartup> SetupApp(IReleaseFileService? releaseFileService = null)
+        private WebApplicationFactory<Startup> SetupApp(IReleaseFileService? releaseFileService = null)
         {
             return TestApp
-                .ResetDbContexts()
                 .ConfigureServices(
                     services =>
                         {
