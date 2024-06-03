@@ -260,31 +260,41 @@ Approve the adopted methodology amendment and verify the warning disappears
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
 
-Publish new release from adopted publication and make an amendment 
-   user navigates to publication page from dashboard    ${ADOPTED_PUBLICATION_NAME}
-   user creates release from publication page    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1    2200
-   user navigates to content page   ${ADOPTED_PUBLICATION_NAME}
-   user adds headlines text block
-   user adds content to headlines text block    Headline text block text
-   user clicks link    Sign off
-   user approves release for immediate publication
+Publish new release from adopted publication and make an amendment
+    user navigates to publication page from dashboard    ${ADOPTED_PUBLICATION_NAME}
+    user creates release from publication page    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1    2200
+    user navigates to content page   ${ADOPTED_PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+    user clicks link    Sign off
+    user approves release for immediate publication
 
-   user navigates to admin dashboard    Bau1
-   user creates amendment for release    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1 2200/01
+    user navigates to admin dashboard    Bau1
+    user creates amendment for release    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1 2200/01
 
 Verify the checklist errors and warnings for amendment
+    user edits release status
+    user checks checklist warnings contains
+     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    No data files uploaded
+    user checks checklist warnings contains link    A public pre-release access list has not been created
 
-   user edits release status
-   user checks checklist warnings contains
-    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
-   user checks checklist warnings contains link    No data files uploaded
-   user checks checklist warnings contains link    A public pre-release access list has not been created
+    user checks checklist errors contains link
+     ...    A public release note for this amendment is required, add this near the top of the content page
+    user checks page does not contain testid    releaseChecklist-success
 
+Navigate to contents page and add a release note
+    user clicks link    Content
+    user waits until h2 is visible    ${ADOPTED_PUBLICATION_NAME}
+    user waits until page contains button    Add a summary text block
+    user clicks button    Add note
+    user enters text into element    id:create-release-note-form-reason    Test release note one
+    user clicks button    Save note
 
-   user checks checklist errors contains link
-    ...    A public release note for this amendment is required, add this near the top of the content page
-   user checks page does not contain testid    releaseChecklist-success
-    
+Publish the release immediately
+    user clicks link    Sign off
+    user approves release for immediate publication
+
 
 
 *** Keywords ***
