@@ -37,6 +37,7 @@
         <PackageReference Include="Namotion.Reflection" Version="3.1.1" />
         <PackageReference Include="NCrontab.Signed" Version="3.3.3" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
         <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
         <PackageReference Include="Semver" Version="2.3.0" />

@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -33,7 +30,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
@@ -150,11 +146,11 @@ public static class PublisherHostBuilderExtensions
                     // UserService is added to satisfy the IUserService dependency in Content.Services.ReleaseService
                     // even though it is not used
                     .AddScoped<IUserService, UserService>(_ => new UserService(null!, null!))
-                    .AddScoped<GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService, GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService>()
+                    .AddScoped<Content.Services.Interfaces.IMethodologyService, Content.Services.MethodologyService>()
                     .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
                     .AddScoped<IPublicationService, PublicationService>()
                     .AddScoped<IPublicationCacheService, PublicationCacheService>()
-                    .AddScoped<GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService, GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService>()
+                    .AddScoped<Content.Services.Interfaces.IReleaseService, Content.Services.ReleaseService>()
                     .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                     .AddScoped<IReleaseCacheService, ReleaseCacheService>();
 
@@ -164,50 +160,7 @@ public static class PublisherHostBuilderExtensions
                 if (!hostEnvironment.IsIntegrationTest())
                 {
                     var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
-
-                    if (hostEnvironment.IsDevelopment())
-                    {
-                        // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
-                        if (publicDataDbExists)
-                        {
-                            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-
-                            // Set up the data source outside the `AddDbContext` action as this
-                            // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                            // creating over 20 `IServiceProvider` instances.
-                            var dbDataSource = dataSourceBuilder.Build();
-
-                            services.AddDbContext<PublicDataDbContext>(options =>
-                            {
-                                options
-                                    .UseNpgsql(dbDataSource)
-                                    .EnableSensitiveDataLogging();
-                            });
-                        }
-                    }
-                    else
-                    {
-                        // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
-                        if (publicDataDbExists)
-                        {
-                            services.AddDbContext<PublicDataDbContext>(options =>
-                            {
-                                var accessTokenProvider = new DefaultAzureCredential();
-                                var accessToken = accessTokenProvider.GetToken(
-                                    new TokenRequestContext(scopes: new[]
-                                    {
-                                        "https://ossrdbms-aad.database.windows.net/.default"
-                                    })).Token;
-
-                                var connectionStringWithAccessToken =
-                                    connectionString.Replace("[access_token]", accessToken);
-
-                                var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-
-                                options.UseNpgsql(dbDataSource);
-                            });
-                        }
-                    }
+                    services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostContext);
                 }
 
                 StartupUtils.AddPersistenceHelper<ContentDbContext>(services);

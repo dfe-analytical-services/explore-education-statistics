@@ -1,5 +1,3 @@
-using Azure.Core;
-using Azure.Identity;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -20,20 +18,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor;
 
 public static class ProcessorHostBuilder
 {
-    public static IHostBuilder ConfigureProcessorHostBuilder(this IHostBuilder hostBuilder)
-    {
-        return hostBuilder
+    public static IHostBuilder ConfigureProcessorHostBuilder(this IHostBuilder hostBuilder) =>
+        hostBuilder
             .ConfigureAppConfiguration(builder =>
             {
                 builder
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-                    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile("appsettings.json", true, false)
+                    .AddJsonFile("appsettings.Local.json", true, false)
                     .AddEnvironmentVariables();
             })
             .ConfigureLogging(logging =>
@@ -51,54 +47,8 @@ public static class ProcessorHostBuilder
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")
-                        .Replace(";Password=[access_token]", ""); // remove!
-
-                    if (hostEnvironment.IsDevelopment())
-                    {
-                        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-
-                        // Set up the data source outside the `AddDbContext` action as this
-                        // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                        // creating over 20 `IServiceProvider` instances.
-                        var dbDataSource = dataSourceBuilder.Build();
-
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            options
-                                .UseNpgsql(dbDataSource)
-                                .EnableSensitiveDataLogging();
-                        });
-                    }
-                    else
-                    {
-                        var accessTokenProvider = new DefaultAzureCredential(
-                            new DefaultAzureCredentialOptions
-                            {
-                                // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
-                                // the "AZURE_CLIENT_ID" environment variable automatically when operating within
-                                // a Function App.  We therefore provide it manually.
-                                ManagedIdentityClientId = configuration["AZURE_CLIENT_ID"]
-                            });
-                        
-                        var dbDataSource = new NpgsqlDataSourceBuilder(connectionString)
-                            .UsePeriodicPasswordProvider(async (_, cancellationToken) =>
-                            {
-                                var tokenResponse = await accessTokenProvider
-                                    .GetTokenAsync(new TokenRequestContext(scopes:
-                                    [
-                                        "https://ossrdbms-aad.database.windows.net/.default"
-                                    ]), cancellationToken);
-                                    
-                                return tokenResponse.Token;
-                            }, TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5))
-                            .Build();
-
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            options.UseNpgsql(dbDataSource);
-                        });
-                    }
+                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
+                    services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostBuilderContext);
                 }
 
                 services
@@ -118,5 +68,4 @@ public static class ProcessorHostBuilder
                     .Configure<ParquetFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(ParquetFilesOptions.Section));
             });
-    }
 }
