@@ -171,4 +171,65 @@ describe('FormSelect', () => {
     expect(ariaDescribedBy).toContain('test-input-error');
     expect(ariaDescribedBy).toContain('test-input-hint');
   });
+
+  test('renders correctly with inline prop', () => {
+    const { container, getByLabelText } = render(
+      <FormSelect
+        hint="Test hint"
+        id="test-select"
+        inline
+        label="Test select"
+        name="testSelect"
+        options={[
+          { value: 'option-1', label: 'Option 1' },
+          { value: 'option-2', label: 'Option 2' },
+          { value: 'option-3', label: 'Option 3' },
+        ]}
+      />,
+    );
+
+    expect(getByLabelText('Test select')).toBeDefined();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders correctly with inlineHint prop', () => {
+    const { container, getByLabelText } = render(
+      <FormSelect
+        hint="Test hint"
+        id="test-select"
+        inlineHint
+        label="Test select"
+        name="testSelect"
+        options={[
+          { value: 'option-1', label: 'Option 1' },
+          { value: 'option-2', label: 'Option 2' },
+          { value: 'option-3', label: 'Option 3' },
+        ]}
+      />,
+    );
+
+    expect(getByLabelText('Test select')).toBeDefined();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('does not render the inlineHint div if inline is also true', () => {
+    const { container, getByLabelText } = render(
+      <FormSelect
+        hint="Test hint"
+        id="test-select"
+        inline
+        inlineHint
+        label="Test select"
+        name="testSelect"
+        options={[
+          { value: 'option-1', label: 'Option 1' },
+          { value: 'option-2', label: 'Option 2' },
+          { value: 'option-3', label: 'Option 3' },
+        ]}
+      />,
+    );
+
+    expect(getByLabelText('Test select')).toBeDefined();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

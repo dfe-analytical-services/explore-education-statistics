@@ -26,9 +26,19 @@ export interface FormSelectProps
   disabled?: boolean;
   error?: string;
   id: string;
+  /**
+   * Renders the label and select inline.
+   * If a hint is provided it appears below the label
+   * and select instead of between them.
+   */
   inline?: boolean;
+  /**
+   * Renders the hint inline with the label.
+   * Has no effect if `inline` is true.
+   */
+  inlineHint?: boolean;
   inputRef?: Ref<HTMLSelectElement>;
-  hint?: string;
+  hint?: string | ReactNode;
   name: string;
   onBlur?: FocusEventHandler;
   onChange?: SelectChangeEventHandler;
@@ -48,6 +58,7 @@ const FormSelect = ({
   error,
   id,
   inline = false,
+  inlineHint = false,
   inputRef,
   hint,
   hideLabel,
@@ -62,27 +73,31 @@ const FormSelect = ({
   placeholder,
   value,
 }: FormSelectProps) => {
+  const hintAndError = (
+    <>
+      {hint && (
+        <div id={`${id}-hint`} className="govuk-hint">
+          {hint}
+        </div>
+      )}
+      {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+    </>
+  );
+
   return (
     <>
       <FormSelectWrapper inline={inline}>
-        <FormLabel
-          className={classNames({ 'govuk-!-margin-right-2': inline })}
-          id={id}
-          label={label}
-          hideLabel={hideLabel}
-        />
+        <FormSelectLabelWrapper inlineHint={inlineHint && !inline}>
+          <FormLabel
+            className={classNames({ 'govuk-!-margin-right-2': inline })}
+            id={id}
+            label={label}
+            hideLabel={hideLabel}
+          />
 
-        {/* Hint and error moved below the select when inline */}
-        {!inline && (
-          <>
-            {hint && (
-              <div id={`${id}-hint`} className="govuk-hint">
-                {hint}
-              </div>
-            )}
-            {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-          </>
-        )}
+          {/* Hint and error moved below the select when inline */}
+          {!inline && hintAndError}
+        </FormSelectLabelWrapper>
 
         <select
           aria-describedby={
@@ -135,16 +150,7 @@ const FormSelect = ({
               ))}
         </select>
       </FormSelectWrapper>
-      {inline && (
-        <>
-          {hint && (
-            <div id={`${id}-hint`} className="govuk-hint">
-              {hint}
-            </div>
-          )}
-          {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-        </>
-      )}
+      {inline && hintAndError}
     </>
   );
 };
@@ -162,6 +168,22 @@ function FormSelectWrapper({
 }) {
   return inline ? (
     <div className="dfe-flex dfe-align-items--center">{children}</div>
+  ) : (
+    <>{children}</>
+  );
+}
+
+function FormSelectLabelWrapper({
+  inlineHint,
+  children,
+}: {
+  inlineHint: boolean;
+  children: ReactNode;
+}) {
+  return inlineHint ? (
+    <div className="dfe-flex dfe-justify-content--space-between">
+      {children}
+    </div>
   ) : (
     <>{children}</>
   );
