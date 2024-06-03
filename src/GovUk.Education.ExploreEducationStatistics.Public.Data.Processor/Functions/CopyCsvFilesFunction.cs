@@ -39,13 +39,21 @@ public class CopyCsvFilesFunction(
             .SingleAsync(f => f.SubjectId == csvDataFile.SubjectId && f.Type == FileType.Metadata,
                 cancellationToken: cancellationToken);
 
-        await CopyCsvFile(csvDataFile, dataSetVersionPathResolver.CsvDataPath(dataSetVersion), cancellationToken);
-        await CopyCsvFile(csvMetaFile, dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion), cancellationToken);
+        await CopyCsvFile(csvDataFile,
+            dataSetVersionPathResolver.CsvDataPath(dataSetVersion),
+            compress: true,
+            cancellationToken);
+
+        await CopyCsvFile(csvMetaFile,
+            dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion),
+            compress: false,
+            cancellationToken);
     }
 
     private async Task CopyCsvFile(
         GovUk.Education.ExploreEducationStatistics.Content.Model.File csvFile,
         string destinationPath,
+        bool compress,
         CancellationToken cancellationToken)
     {
         var destinationDirectoryPath = Path.GetDirectoryName(destinationPath);
@@ -65,7 +73,15 @@ public class CopyCsvFilesFunction(
             csvFile.Path(),
             cancellationToken: cancellationToken);
 
-        await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
-        await CompressionUtils.CompressToStream(blobStream, fileStream, ContentEncodings.Gzip, cancellationToken);
+        await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+        if (compress)
+        {
+            await CompressionUtils.CompressToStream(blobStream, fileStream, ContentEncodings.Gzip, cancellationToken);
+        }
+        else
+        {
+            await blobStream.CopyToAsync(fileStream, cancellationToken);
+        }
     }
 }

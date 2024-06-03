@@ -157,7 +157,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
         {
             var (dataSetVersion, instanceId) = await CreateDataSetVersion(Stage.PreviousStage());
 
-            // Prepare the data set version directory with compressed data and metadata CSV files
+            // Prepare the data set version directory with data and metadata CSV files
             SetupCsvDataFiles(dataSetVersion);
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
@@ -191,7 +191,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
         {
             var (dataSetVersion, instanceId) = await CreateDataSetVersion(Stage.PreviousStage());
 
-            // Prepare the data set version directory with compressed data and metadata CSV files
+            // Prepare the data set version directory with data and metadata CSV files
             SetupCsvDataFiles(dataSetVersion);
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
@@ -229,7 +229,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
         {
             var (dataSetVersion, instanceId) = await CreateDataSetVersion(Stage.PreviousStage());
 
-            // Prepare the data set version directory with compressed data and metadata CSV files
+            // Prepare the data set version directory with data and metadata CSV files
             SetupCsvDataFiles(dataSetVersion);
 
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
