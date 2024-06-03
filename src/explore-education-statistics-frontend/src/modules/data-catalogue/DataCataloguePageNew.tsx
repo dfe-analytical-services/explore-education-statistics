@@ -8,10 +8,9 @@ import WarningMessage from '@common/components/WarningMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
-import Button from '@common/components/Button';
+import ButtonLink from '@frontend/components/ButtonLink';
 import NotificationBanner from '@common/components/NotificationBanner';
 import { releaseTypes } from '@common/services/types/releaseType';
-import downloadService from '@common/services/downloadService';
 import { Theme } from '@common/services/publicationService';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { SortDirection } from '@common/services/types/sort';
@@ -226,20 +225,6 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
     logEvent({
       category: 'Data catalogue',
       action: `Clear ${filterType} filter`,
-    });
-  };
-
-  const handleDownload = async () => {
-    if (!selectedPublication || !selectedRelease) {
-      return;
-    }
-    const fileIds = dataSets.map(dataSet => dataSet.fileId);
-    await downloadService.downloadFiles(selectedRelease.id, fileIds);
-
-    logEvent({
-      category: 'Data catalogue',
-      action: 'Data set file download - all',
-      label: `Publication: ${selectedPublication.title}, Release: ${selectedRelease.title}`,
     });
   };
 
@@ -516,14 +501,28 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                               </div>
 
                               <p>
-                                <Button
-                                  className="govuk-!-margin-bottom-0"
-                                  onClick={handleDownload}
-                                >{`Download ${
-                                  dataSets.length === 1
-                                    ? '1 data set'
-                                    : `all ${dataSets.length} data sets`
-                                } (ZIP)`}</Button>
+                                <ButtonLink
+                                  className="govuk-!-margin-bottom-2"
+                                  to={`${process.env.CONTENT_API_BASE_URL}/releases/${selectedRelease.id}/files`}
+                                  onClick={() => {
+                                    logEvent({
+                                      category: 'Data catalogue',
+                                      action: 'Data set file download - all',
+                                      label: `Publication: ${selectedPublication.title}, Release: ${selectedRelease.title}`,
+                                    });
+                                  }}
+                                >
+                                  {`Download ${
+                                    totalResults === 1
+                                      ? '1 data set'
+                                      : `all ${totalResults} data sets`
+                                  } (ZIP)`}
+                                </ButtonLink>
+                                <br />
+                                <span>
+                                  Download includes data guidance and supporting
+                                  files.
+                                </span>
                               </p>
                             </>
                           )}
