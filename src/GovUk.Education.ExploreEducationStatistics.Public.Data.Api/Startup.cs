@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
-using Azure.Core;
-using Azure.Identity;
 using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -24,15 +22,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Npgsql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
 [ExcludeFromCodeCoverage]
 public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
-    private static readonly string[] ManagedIdentityTokenScopes = new [] { "https://ossrdbms-aad.database.windows.net/.default" };
-
     private readonly IConfiguration _miniProfilerConfig =
         configuration.GetRequiredSection(MiniProfilerOptions.Section);
 
@@ -106,40 +101,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // cause the data source builder to throw a host exception.
         if (!hostEnvironment.IsIntegrationTest())
         {
-            var connectionString = configuration.GetConnectionString("PublicDataDb");
-
-            if (hostEnvironment.IsDevelopment())
-            {
-                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-
-                // Set up the data source outside the `AddDbContext` action as this
-                // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                // creating over 20 `IServiceProvider` instances.
-                var dbDataSource = dataSourceBuilder.Build();
-
-                services.AddDbContext<PublicDataDbContext>(options =>
-                {
-                    options
-                        .UseNpgsql(dbDataSource)
-                        .EnableSensitiveDataLogging();
-                });
-            }
-            else
-            {
-                services.AddDbContext<PublicDataDbContext>(options =>
-                {
-                    var sqlServerTokenProvider = new DefaultAzureCredential();
-                    var accessToken = sqlServerTokenProvider.GetToken(
-                        new TokenRequestContext(scopes: ManagedIdentityTokenScopes)).Token;
-
-                    var connectionStringWithAccessToken =
-                        connectionString.Replace("[access_token]", accessToken);
-
-                    var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-
-                    options.UseNpgsql(dbDataSource);
-                });
-            }
+            var connectionString = configuration.GetConnectionString("PublicDataDb")!;
+            services.AddPsqlDbContext<PublicDataDbContext>(connectionString, hostEnvironment);
         }
 
         // Configure Dapper to match CSV columns with underscores
@@ -211,10 +174,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Rewrites
 
-        app.UseRewriter(new RewriteOptions
-        {
-            Rules = { new LowercasePathRule() }
-        });
+        app.UseRewriter(new RewriteOptions {Rules = {new LowercasePathRule()}});
 
         // Caching and compression
 

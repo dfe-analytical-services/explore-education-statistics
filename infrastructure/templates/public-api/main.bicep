@@ -94,8 +94,8 @@ var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
-var dataFilesFileShareMountName = 'data-files-fileshare-mount'
-var dataFilesFileShareMountPath = '/data/public-api-data'
+var publicApiFileShareMountName = 'public-api-fileshare-mount'
+var publicApiFileShareMountPath = '/data/public-api-data'
 var publicApiStorageAccountName = '${subscription}eespapisa'
 
 var tagValues = union(resourceTags ?? {}, {
@@ -161,7 +161,7 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' 
 var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
 
 // Deploy File Share.
-module fileShareModule 'components/fileShare.bicep' = {
+module publicApiFileShareModule 'components/fileShares.bicep' = {
   name: 'fileShareDeploy'
   params: {
     resourcePrefix: resourcePrefix
@@ -221,7 +221,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
   }
 }
 
-var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
+var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
 
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
@@ -240,10 +240,10 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     tagValues: tagValues
     azureFileStorages: [
       {
-        storageName: fileShareModule.outputs.fileShareName
+        storageName: publicApiFileShareModule.outputs.fileShareName
         storageAccountName: publicApiStorageAccountName
         storageAccountKey: publicApiStorageAccountAccessKey
-        fileShareName: fileShareModule.outputs.fileShareName
+        fileShareName: publicApiFileShareModule.outputs.fileShareName
         accessMode: 'ReadWrite'
       }
     ]
@@ -263,15 +263,15 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     volumeMounts: [
       {
-        volumeName: dataFilesFileShareMountName
-        mountPath: dataFilesFileShareMountPath
+        volumeName: publicApiFileShareMountName
+        mountPath: publicApiFileShareMountPath
       }
     ]
     volumes: [
       {
-        name: dataFilesFileShareMountName
+        name: publicApiFileShareMountName
         storageType: 'AzureFile'
-        storageName: fileShareModule.outputs.fileShareName
+        storageName: publicApiFileShareModule.outputs.fileShareName
       }
     ]
     appSettings: [
@@ -298,8 +298,8 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         value: 'true'
       }
       {
-        name: 'DataFiles__BasePath'
-        value: dataFilesFileShareMountPath
+        name: 'ParquetFiles__BasePath'
+        value: publicApiFileShareMountPath
       }
       {
         // This property informs the Container App of the name of the Admin's system-assigned identity.
@@ -386,11 +386,11 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       unhealthyMetricName: '${subscription}PublicDataProcessorUnhealthy'
     }
     azureFileShares: [{
-      storageName: fileShareModule.outputs.fileShareName
+      storageName: publicApiFileShareModule.outputs.fileShareName
       storageAccountKey: publicApiStorageAccountAccessKey
       storageAccountName: publicApiStorageAccountName
-      fileShareName: fileShareModule.outputs.fileShareName
-      mountPath: dataFilesFileShareMountPath
+      fileShareName: publicApiFileShareModule.outputs.fileShareName
+      mountPath: publicApiFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
@@ -456,4 +456,4 @@ output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFun
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
 
-output dataFilesFileShareMountPath string = dataFilesFileShareMountPath
+output publicApiFileShareMountPath string = publicApiFileShareMountPath

@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
+using static GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions.HealthCheckFunctions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
@@ -25,12 +26,11 @@ public abstract class HealthCheckFunctionTests(ProcessorFunctionsIntegrationTest
             var httpContext = new DefaultHttpContext();
             var result = await function.HealthCheck(httpContext.Request);
 
-            var expectedHealthCheckResult = new HealthCheckFunctions.HealthCheckResponse(
-                PsqlConnection: new HealthCheckFunctions.HealthCheckSummary(Healthy: true),
-                FileShareMount: new HealthCheckFunctions.HealthCheckSummary(Healthy: true));
+            var expectedHealthCheckResult = new HealthCheckResponse(
+                PsqlConnection: HealthCheckSummary.Healthy(),
+                FileShareMount: HealthCheckSummary.Healthy());
             
             result.AssertOkObjectResult(expectedHealthCheckResult);
-            Assert.Equal((int) HttpStatusCode.OK, httpContext.Response.StatusCode);
         }
         
         [Fact]
@@ -42,11 +42,9 @@ public abstract class HealthCheckFunctionTests(ProcessorFunctionsIntegrationTest
             var httpContext = new DefaultHttpContext();
             var result = await function.HealthCheck(httpContext.Request);
 
-            var expectedHealthCheckResult = new HealthCheckFunctions.HealthCheckResponse(
-                PsqlConnection: new HealthCheckFunctions.HealthCheckSummary(Healthy: true),
-                FileShareMount: new HealthCheckFunctions.HealthCheckSummary(
-                    Healthy: false, 
-                    "File Share Mount folder does not exist"));
+            var expectedHealthCheckResult = new HealthCheckResponse(
+                PsqlConnection: HealthCheckSummary.Healthy(),
+                FileShareMount: HealthCheckSummary.Unhealthy("File Share Mount folder does not exist"));
             
             result.AssertObjectResult(HttpStatusCode.InternalServerError, expectedHealthCheckResult);
         }

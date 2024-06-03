@@ -294,7 +294,7 @@ resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing
 var commonUnhealthyMetricAlertRuleProperties = {
   enabled: true
   severity: 1
-  evaluationFrequency: 'PT5M'
+  evaluationFrequency: 'PT1M'
   windowSize: 'PT5M'
   criteria: {
     'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'

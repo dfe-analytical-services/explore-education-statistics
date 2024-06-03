@@ -54,50 +54,8 @@ public static class ProcessorHostBuilder
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb");
-
-                    if (hostEnvironment.IsDevelopment())
-                    {
-                        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-
-                        // Set up the data source outside the `AddDbContext` action as this
-                        // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                        // creating over 20 `IServiceProvider` instances.
-                        var dbDataSource = dataSourceBuilder.Build();
-
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            options
-                                .UseNpgsql(dbDataSource)
-                                .EnableSensitiveDataLogging();
-                        });
-                    }
-                    else
-                    {
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            var accessTokenProvider = new DefaultAzureCredential(
-                                new DefaultAzureCredentialOptions
-                                {
-                                    // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
-                                    // the "AZURE_CLIENT_ID" environment variable automatically when operating within
-                                    // a Function App.  We therefore provide it manually.
-                                    ManagedIdentityClientId = configuration["AZURE_CLIENT_ID"]
-                                });
-                            var accessToken = accessTokenProvider.GetToken(
-                                new TokenRequestContext(scopes:
-                                [
-                                    "https://ossrdbms-aad.database.windows.net/.default"
-                                ])).Token;
-
-                            var connectionStringWithAccessToken =
-                                connectionString.Replace("[access_token]", accessToken);
-
-                            var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-
-                            options.UseNpgsql(dbDataSource);
-                        });
-                    }
+                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
+                    services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostBuilderContext);
                 }
 
                 // Configure Dapper to match CSV columns with underscores

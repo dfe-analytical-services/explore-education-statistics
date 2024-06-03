@@ -100,7 +100,7 @@ stages:
                   --settings \
                     "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
                     "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
-                    "DataFiles__BasePath=$(dataFilesFileShareMountPath)"
+                    "DataFiles__BasePath=$(publicApiFileShareMountPath)"
 
                 az webapp config connection-string set \
                   --name $(dataProcessorFunctionAppName) \

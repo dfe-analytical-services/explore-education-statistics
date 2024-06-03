@@ -44,12 +44,12 @@ public class HealthCheckFunctions(
         try
         {
             await publicDataDbContext.DataSets.AnyAsync();
-            return new HealthCheckSummary(true);
+            return HealthCheckSummary.Healthy();
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error encountered when testing PSQL connection health");
-            return new HealthCheckSummary(false, e.Message);
+            return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
     
@@ -61,22 +61,43 @@ public class HealthCheckFunctions(
         {
             if (Directory.Exists(dataSetVersionPathResolver.BasePath()))
             {
-                return new HealthCheckSummary(true);
+                return HealthCheckSummary.Healthy();
             }
             
-            return new HealthCheckSummary(false, "File Share Mount folder does not exist");
+            return HealthCheckSummary.Unhealthy("File Share Mount folder does not exist");
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error encountered when attempting to find the file share mount");
-            return new HealthCheckSummary(false, e.Message);
+            return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
 
     public record HealthCheckResponse(HealthCheckSummary PsqlConnection, HealthCheckSummary FileShareMount)
     {
-        public bool Healthy => PsqlConnection.Healthy && FileShareMount.Healthy;
+        public bool Healthy => PsqlConnection.IsHealthy && FileShareMount.IsHealthy;
     };
 
-    public record HealthCheckSummary(bool Healthy, string? UnhealthyReason = null);
+    public record HealthCheckSummary
+    {
+        public bool IsHealthy { get; init; }
+        public string? UnhealthyReason { get; init; }
+
+        public static HealthCheckSummary Healthy()
+        {
+            return new HealthCheckSummary
+            {
+                IsHealthy = true
+            };
+        }
+
+        public static HealthCheckSummary Unhealthy(string reason)
+        {
+            return new HealthCheckSummary
+            {
+                IsHealthy = false,
+                UnhealthyReason = reason
+            };
+        }
+    }
 }
