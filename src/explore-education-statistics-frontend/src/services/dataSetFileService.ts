@@ -3,6 +3,21 @@ import { ReleaseType } from '@common/services/types/releaseType';
 import { contentApi } from '@common/services/api';
 import { SortDirection } from '@common/services/types/sort';
 
+export interface DataSetVariable {
+  label: string;
+  value: string;
+}
+
+export interface DataSetCsvPreview {
+  headers: string[];
+  rows: string[][];
+}
+
+export interface DataSetFootnote {
+  id: string;
+  label: string;
+}
+
 export interface DataSetFile {
   id: string;
   title: string;
@@ -20,11 +35,8 @@ export interface DataSetFile {
       filters: string[];
       indicators: string[];
     };
-    dataCsvPreview: {
-      headers: string[];
-      rows: string[][];
-    };
-    variables: { label: string; value: string }[];
+    dataCsvPreview: DataSetCsvPreview;
+    variables: DataSetVariable[];
     subjectId: string;
   };
   release: {
@@ -42,7 +54,7 @@ export interface DataSetFile {
     title: string;
     type: ReleaseType;
   };
-  footnotes: { id: string; label: string }[];
+  footnotes: DataSetFootnote[];
   api?: DataSetFileApi;
 }
 

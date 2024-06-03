@@ -1,7 +1,7 @@
+import render from '@common-test/render';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
 import { testDataSetFileSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
-import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 
 const longSummary = `Number of places approved and available for use, 
@@ -38,8 +38,9 @@ describe('DataSetFileSummary', () => {
   });
 
   test('renders the expanded view when show more details is clicked', async () => {
-    const user = userEvent.setup();
-    render(<DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />);
+    const { user } = render(
+      <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />,
+    );
 
     await user.click(
       screen.getByRole('button', {

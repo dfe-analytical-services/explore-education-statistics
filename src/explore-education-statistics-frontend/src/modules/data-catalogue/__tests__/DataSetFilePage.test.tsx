@@ -16,6 +16,8 @@ const downloadService = _downloadService as jest.Mocked<
 >;
 
 describe('DataSetFilePage', () => {
+  const testDataSetFileWithoutFootnotes = { ...testDataSetFile, footnotes: [] };
+
   test('renders the data set file heading, summary and info', async () => {
     render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
@@ -90,6 +92,63 @@ describe('DataSetFilePage', () => {
     ).toBeInTheDocument();
   });
 
+  test('renders the data set preview section', async () => {
+    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Data set preview' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders the data set variables section', async () => {
+    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Variables in this data set' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders the data set footnotes section', async () => {
+    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Footnotes' }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not render the data set footnotes section when there are no footnotes', async () => {
+    render(<DataSetFilePage dataSetFile={testDataSetFileWithoutFootnotes} />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Footnotes' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders the data set usage section', async () => {
+    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Using this data' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'View or create your own tables' }),
+    ).toHaveAttribute(
+      'href',
+      '/data-tables/publication-slug/release-slug?subjectId=subject-id',
+    );
+  });
+
   describe('non-API data set', () => {
     test('does not render API version info', async () => {
       render(<DataSetFilePage dataSetFile={testDataSetFile} />);
@@ -109,19 +168,28 @@ describe('DataSetFilePage', () => {
         screen.getByRole('navigation', { name: 'On this page' }),
       );
       const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(2);
+      expect(navLinks).toHaveLength(5);
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
-      expect(navLinks[1]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+      expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
+      expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
     });
 
-    test('renders the data set usage section', async () => {
-      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    test('renders the page navigation correctly when there are no footnotes', async () => {
+      render(<DataSetFilePage dataSetFile={testDataSetFileWithoutFootnotes} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
-      expect(
-        screen.getByRole('heading', { name: 'Using this data' }),
-      ).toBeInTheDocument();
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+      const navLinks = nav.getAllByRole('link');
+      expect(navLinks).toHaveLength(4);
+      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+      expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
     });
 
     test('does not render the API version history section', async () => {
@@ -178,34 +246,39 @@ describe('DataSetFilePage', () => {
       );
 
       const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(4);
+      expect(navLinks).toHaveLength(7);
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
-      expect(navLinks[1]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[2]).toHaveAttribute('href', '#apiVersionHistory');
-      expect(navLinks[3]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+      expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
+      expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
+      expect(navLinks[6]).toHaveAttribute('href', '#apiQuickStart');
     });
 
-    test('renders the data set usage section', async () => {
+    test('renders the page navigation correctly when there are no footnotes', async () => {
       render(
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          dataSetFile={testDataSetFile}
+          dataSetFile={testDataSetFileWithoutFootnotes}
         />,
       );
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
-      expect(
-        screen.getByRole('heading', { name: 'Using this data' }),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.getByRole('link', { name: 'View or create your own tables' }),
-      ).toHaveAttribute(
-        'href',
-        '/data-tables/publication-slug/release-slug?subjectId=subject-id',
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
       );
+
+      const navLinks = nav.getAllByRole('link');
+      expect(navLinks).toHaveLength(6);
+      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+      expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[4]).toHaveAttribute('href', '#apiVersionHistory');
+      expect(navLinks[5]).toHaveAttribute('href', '#apiQuickStart');
     });
 
     test('renders the API version history section', async () => {
