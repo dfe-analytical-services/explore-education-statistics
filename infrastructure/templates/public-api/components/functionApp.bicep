@@ -268,7 +268,7 @@ var authSettingsV2Properties = entraIdAuthentication == null ? {} : {
   }
 }
 
-resource functionAppAuthSettings 'Microsoft.Web/sites/config@2022-03-01' = {
+resource functionAppAuthSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   name: 'authsettingsV2'
   parent: functionApp
   properties: authSettingsV2Properties
@@ -294,7 +294,7 @@ module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
   }
 }
 
-resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2021-01-15' = {
+resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
    name: 'azurestorageaccounts'
    parent: functionApp
    properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
