@@ -222,7 +222,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
 }
 
 // Create the staging deploy slot.
-resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = {
+resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
   name: 'staging'
   parent: functionApp
   location: location
