@@ -274,7 +274,7 @@ resource functionAppAuthSettings 'Microsoft.Web/sites/config@2022-03-01' = {
   properties: authSettingsV2Properties
 }
 
-resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2022-03-01' = {
+resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = {
   name: 'authsettingsV2'
   parent: stagingSlot
   properties: authSettingsV2Properties
