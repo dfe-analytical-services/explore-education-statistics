@@ -330,7 +330,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   ]
 }
 
-resource adminAppService 'Microsoft.Web/sites@2023-01-01' existing = {
+resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
   name: adminAppServiceFullName
 }
 
