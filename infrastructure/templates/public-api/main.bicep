@@ -161,7 +161,7 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' 
 var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
 
 // Deploy File Share.
-module dataFilesFileShareModule 'components/fileShares.bicep' = {
+module dataFilesFileShareModule 'components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     resourcePrefix: resourcePrefix
