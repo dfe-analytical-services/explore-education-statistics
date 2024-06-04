@@ -1,9 +1,12 @@
+using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -12,7 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class HealthCheckFunctions(
     ILogger<HealthCheckFunctions> logger,
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver)
+    ContentDbContext contentDbContext,
+    IDataSetVersionPathResolver dataSetVersionPathResolver,
+    IConfiguration configuration)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
@@ -21,25 +26,30 @@ public class HealthCheckFunctions(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest request)
 #pragma warning restore IDE0060
     {
-        var psqlConnectionHealthCheck = await CheckPsqlConnectionHealthy();
+        var psqlConnectionHealthCheck = await CheckPsqlConnectionHealth();
         var fileShareMountHealthCheck = CheckFileShareMountHealth();
+        var coreStorageConnectionHealthCheck = await CheckCoreStorageConnectionHealth();
+        var contentDbConnectionHealthCheck = await CheckContentDbConnectionHealth();
+
         var healthCheckResponse = new HealthCheckResponse(
             PsqlConnection: psqlConnectionHealthCheck,
-            FileShareMount: fileShareMountHealthCheck);
+            FileShareMount: fileShareMountHealthCheck,
+            CoreStorageConnection: coreStorageConnectionHealthCheck,
+            ContentDbConnection: contentDbConnectionHealthCheck);
 
         if (healthCheckResponse.Healthy)
         {
             return new OkObjectResult(healthCheckResponse);
         }
         
-        return new ObjectResult(healthCheckResponse){
+        return new ObjectResult(healthCheckResponse) {
             StatusCode = StatusCodes.Status500InternalServerError
         };
     }
     
-    private async Task<HealthCheckSummary> CheckPsqlConnectionHealthy()
+    private async Task<HealthCheckSummary> CheckPsqlConnectionHealth()
     {
-        logger.LogInformation("Attempting to test PSQL health");
+        logger.LogInformation("Attempting to test PSQL connection health");
 
         try
         {
@@ -72,10 +82,54 @@ public class HealthCheckFunctions(
             return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
-
-    public record HealthCheckResponse(HealthCheckSummary PsqlConnection, HealthCheckSummary FileShareMount)
+    
+    private async Task<HealthCheckSummary> CheckCoreStorageConnectionHealth()
     {
-        public bool Healthy => PsqlConnection.IsHealthy && FileShareMount.IsHealthy;
+        logger.LogInformation("Attempting to test Core Storage connection health");
+
+        try
+        {
+            var connectionString = configuration.GetValue<string>("CoreStorage");
+            var blobClient = new BlobServiceClient(connectionString);
+            var response = await blobClient.GetAccountInfoAsync();
+            return response.HasValue
+                ? HealthCheckSummary.Healthy()
+                : HealthCheckSummary.Unhealthy("Could not retrieve Core Storage account info");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error encountered when testing Core Storage connection health");
+            return HealthCheckSummary.Unhealthy(e.Message);
+        }
+    }
+    
+    private async Task<HealthCheckSummary> CheckContentDbConnectionHealth()
+    {
+        logger.LogInformation("Attempting to test Content DB connection health");
+
+        try
+        {
+            await contentDbContext.Releases.AnyAsync();
+            return HealthCheckSummary.Healthy();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error encountered when testing Content DB connection health");
+            return HealthCheckSummary.Unhealthy(e.Message);
+        }
+    }
+
+    public record HealthCheckResponse(
+        HealthCheckSummary PsqlConnection,
+        HealthCheckSummary FileShareMount,
+        HealthCheckSummary CoreStorageConnection,
+        HealthCheckSummary ContentDbConnection)
+    {
+        public bool Healthy => 
+            PsqlConnection.IsHealthy 
+            && FileShareMount.IsHealthy
+            && CoreStorageConnection.IsHealthy
+            && ContentDbConnection.IsHealthy;
     };
 
     public record HealthCheckSummary

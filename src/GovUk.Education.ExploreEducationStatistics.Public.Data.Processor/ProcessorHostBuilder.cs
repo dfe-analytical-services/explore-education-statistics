@@ -1,5 +1,3 @@
-using Azure.Core;
-using Azure.Identity;
 using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
@@ -23,7 +21,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor;
 

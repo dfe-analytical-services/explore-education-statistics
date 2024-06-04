@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<DataImport>()
                 .HasIndex(import => import.FileId)
                 .IncludeProperties(
-                    import => new {import.Status});
+                    import => new { import.Status });
 
             modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.MetaFile)

@@ -11,9 +11,9 @@ parameters:
 # This param is helpful for debugging to allow the selection of a particular branch from which to base a deploy from this pipeline.
 # This should be removed in the long term in favour of using the "Resources" selection from the "Run pipeline" dialog.
 #
-  - name: buildBranchToDeploy
-    displayName: Build branch to deploy. This allows a person who is manually running the pipeline to specify the use of the latest EESBuildPipeline build that was run against that branch.
-    default: 'Branch from latest pipeline run'
+#  - name: buildBranchToDeploy
+#    displayName: Build branch to deploy. This allows a person who is manually running the pipeline to specify the use of the latest EESBuildPipeline build that was run against that branch.
+#    default: 'Branch from latest pipeline run'
 
 resources:
   pipelines:
@@ -27,12 +27,12 @@ resources:
 # This param is helpful for debugging to allow the selection of a particular branch from which to base a deploy from this pipeline.
 # This should be removed in the long term in favour of using the "Resources" selection from the "Run pipeline" dialog.
 #
-      branch: ${{ replace(parameters.buildBranchToDeploy, 'Branch from latest pipeline run', '') }}
+#      branch: ${{ replace(parameters.buildBranchToDeploy, 'Branch from latest pipeline run', '') }}
 
 variables:
   - group: Public API Infrastructure - common
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-5147-add-data-processor-function-app-health-checks')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
   - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
@@ -64,39 +64,39 @@ pool:
   vmImage: $(vmImageName)
 
 stages:
-#- template: validate-stage-template.yml
-#  parameters:
-#    stageName: 'Validate_Against_Development'
-#    condition: eq(variables.isDev, true)
-#    environment: 'Development'
-#    serviceConnection: $(serviceConnectionDevelopment)
-#    parameterFile: $(devParamFile)
+- template: validate-stage-template.yml
+  parameters:
+    stageName: 'Validate_Against_Development'
+    condition: eq(variables.isDev, true)
+    environment: 'Development'
+    serviceConnection: $(serviceConnectionDevelopment)
+    parameterFile: $(devParamFile)
 
 - template: deploy-stage-template.yml
   parameters:
     stageName: 'Deploy_to_Development'
     condition: and(succeeded(), eq(variables.isDev, true))
-#    dependsOn: 'Validate_Against_Development'
+    dependsOn: 'Validate_Against_Development'
     environment: 'Development'
     serviceConnection: $(serviceConnectionDevelopment)
     parameterFile: $(devParamFile)
 
-#- template: validate-stage-template.yml
-#  parameters:
-#    stageName: 'Validate_Against_Test'
-#    condition: eq(variables.isTest, true)
-#    environment: 'Test'
-#    serviceConnection: $(serviceConnectionTest)
-#    parameterFile: $(testParamFile)
-#
-#- template: deploy-stage-template.yml
-#  parameters:
-#    stageName: 'Deploy_to_Test'
-#    dependsOn: 'Validate_Against_Test'
-#    condition: and(succeeded(), eq(variables.isTest, true))
-#    environment: 'Test'
-#    serviceConnection: $(serviceConnectionTest)
-#    parameterFile: $(testParamFile)
+- template: validate-stage-template.yml
+  parameters:
+    stageName: 'Validate_Against_Test'
+    condition: eq(variables.isTest, true)
+    environment: 'Test'
+    serviceConnection: $(serviceConnectionTest)
+    parameterFile: $(testParamFile)
+
+- template: deploy-stage-template.yml
+  parameters:
+    stageName: 'Deploy_to_Test'
+    dependsOn: 'Validate_Against_Test'
+    condition: and(succeeded(), eq(variables.isTest, true))
+    environment: 'Test'
+    serviceConnection: $(serviceConnectionTest)
+    parameterFile: $(testParamFile)
 
 #  - template: validate-stage-template.yml
 #    parameters:

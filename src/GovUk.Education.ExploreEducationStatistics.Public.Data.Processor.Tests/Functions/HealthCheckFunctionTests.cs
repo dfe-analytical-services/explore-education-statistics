@@ -28,7 +28,9 @@ public abstract class HealthCheckFunctionTests(ProcessorFunctionsIntegrationTest
 
             var expectedHealthCheckResult = new HealthCheckResponse(
                 PsqlConnection: HealthCheckSummary.Healthy(),
-                FileShareMount: HealthCheckSummary.Healthy());
+                FileShareMount: HealthCheckSummary.Healthy(),
+                CoreStorageConnection: HealthCheckSummary.Healthy(), 
+                ContentDbConnection: HealthCheckSummary.Healthy());
             
             result.AssertOkObjectResult(expectedHealthCheckResult);
         }
@@ -44,7 +46,9 @@ public abstract class HealthCheckFunctionTests(ProcessorFunctionsIntegrationTest
 
             var expectedHealthCheckResult = new HealthCheckResponse(
                 PsqlConnection: HealthCheckSummary.Healthy(),
-                FileShareMount: HealthCheckSummary.Unhealthy("File Share Mount folder does not exist"));
+                FileShareMount: HealthCheckSummary.Unhealthy("File Share Mount folder does not exist"),
+                CoreStorageConnection: HealthCheckSummary.Healthy(),
+                ContentDbConnection: HealthCheckSummary.Healthy());
             
             result.AssertObjectResult(HttpStatusCode.InternalServerError, expectedHealthCheckResult);
         }
