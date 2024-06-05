@@ -80,7 +80,6 @@ export const testRelease: Release = {
   title: 'Academic year 2016/17',
   yearTitle: '2016/17',
   coverageTitle: 'Academic year',
-  releaseName: '2016',
   nextReleaseDate: {
     year: '2019',
     month: '3',

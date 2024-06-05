@@ -242,7 +242,6 @@ export const testPublicationRelease: Release = {
   title: '',
   yearTitle: '',
   coverageTitle: '',
-  releaseName: '',
   published: '',
   slug: '',
   summarySection: {

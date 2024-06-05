@@ -21,8 +21,6 @@ public record ReleaseSummaryViewModel
 
     public DateTime? Published { get; init; }
 
-    public string ReleaseName { get; init; }
-
     public PartialDate? NextReleaseDate { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -46,7 +44,6 @@ public record ReleaseSummaryViewModel
         YearTitle = release.YearTitle;
         CoverageTitle = release.CoverageTitle;
         Published = release.Published;
-        ReleaseName = release.ReleaseName;
         NextReleaseDate = release.NextReleaseDate;
         Type = release.Type;
         LatestRelease = Id == publication.LatestReleaseId;
@@ -62,7 +59,6 @@ public record ReleaseSummaryViewModel
         YearTitle = releaseVersion.YearTitle;
         CoverageTitle = releaseVersion.TimePeriodCoverage.GetEnumLabel();
         Published = releaseVersion.Published;
-        ReleaseName = releaseVersion.ReleaseName;
         NextReleaseDate = releaseVersion.NextReleaseDate;
         Type = releaseVersion.Type;
         LatestRelease = latestPublishedRelease;
