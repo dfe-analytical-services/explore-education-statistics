@@ -76,7 +76,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         {
             new()
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Test file",
+                FileName = "test-file.txt",
+                Size = "10 Kb",
+                Type = FileType.Ancillary,
+
             }
         },
         Type = ReleaseType.AccreditedOfficialStatistics,
