@@ -15,6 +15,8 @@ import DataSetFileDetails from '@frontend/modules/data-catalogue/components/Data
 import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
 import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
 import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
+import DataSetFileVariables from '@frontend/modules/data-catalogue/components/DataSetFileVariables';
+import DataSetFileFootnotes from '@frontend/modules/data-catalogue/components/DataSetFileFootnotes';
 import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
@@ -30,21 +32,14 @@ import classNames from 'classnames';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-
-// TODO EES-4856
-export const pageHiddenSections = {
-  dataSetPreview: 'Data set preview',
-  dataSetVariables: 'Variables in this data set',
-  footnotes: 'Footnotes',
-} as const;
+import omit from 'lodash/omit';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
+  dataSetPreview: 'Data set preview',
+  dataSetVariables: 'Variables in this data set',
+  dataSetFootnotes: 'Footnotes',
   dataSetUsage: 'Using this data',
-  // TODO EES-4856
-  // dataSetPreview: 'Data set preview',
-  // dataSetVariables: 'Variables in this data set',
-  // footnotes: 'Footnotes',
 } as const;
 
 export const pageApiSections = {
@@ -57,10 +52,7 @@ export const pageSections = {
   ...pageApiSections,
 } as const;
 
-export type PageHiddenSection = typeof pageHiddenSections;
 export type PageSection = typeof pageSections;
-
-export type PageHiddenSectionId = keyof PageHiddenSection;
 export type PageSectionId = keyof PageSection;
 
 interface Props {
@@ -77,7 +69,6 @@ export default function DataSetFilePage({
   const [activeSection, setActiveSection] =
     useState<PageSectionId>('dataSetDetails');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
-  const [showAllPreview, toggleShowAllPreview] = useToggle(false);
   const router = useRouter();
 
   const handleDownload = async () => {
@@ -114,17 +105,18 @@ export default function DataSetFilePage({
         pageSections[pageSectionId]
       ) {
         setActiveSection(pageSectionId);
-
-        router.push(
-          {
-            pathname: `/data-catalogue/data-set/${dataSetFile.id}`,
-            hash: pageSectionId,
-          },
-          undefined,
-          {
-            shallow: true,
-          },
-        );
+        if (router.isReady) {
+          router.push(
+            {
+              pathname: `/data-catalogue/data-set/${dataSetFile.id}`,
+              hash: pageSectionId,
+            },
+            undefined,
+            {
+              shallow: true,
+            },
+          );
+        }
       }
     });
   }, 10);
@@ -143,6 +135,11 @@ export default function DataSetFilePage({
 
   const { file, release, summary, title } = dataSetFile;
 
+  const allNavSections = apiDataSet ? pageSections : pageBaseSections;
+  const navSections = dataSetFile.footnotes.length
+    ? allNavSections
+    : omit(allNavSections, 'dataSetFootnotes');
+
   return (
     <Page
       title={title}
@@ -152,10 +149,9 @@ export default function DataSetFilePage({
     >
       {fullScreenPreview ? (
         <DataSetFilePreview
+          dataCsvPreview={dataSetFile.file.dataCsvPreview}
           fullScreen={fullScreenPreview}
-          showAll={showAllPreview}
           onToggleFullScreen={toggleFullScreenPreview}
-          onToggleShowAll={toggleShowAllPreview}
         />
       ) : (
         <>
@@ -204,29 +200,27 @@ export default function DataSetFilePage({
           <div className="govuk-grid-row">
             <DataSetFilePageNav
               activeSection={activeSection}
-              sections={apiDataSet ? pageSections : pageBaseSections}
+              sections={navSections}
               onClickItem={setActiveSection}
             />
 
             <div className="govuk-grid-column-two-thirds">
               <DataSetFileDetails dataSetFile={dataSetFile} />
 
-              {/* TODO EES-4856 */}
-              {/* <DataSetFilePreview
+              <DataSetFilePreview
+                dataCsvPreview={dataSetFile.file.dataCsvPreview}
                 fullScreen={fullScreenPreview}
-                showAll={showAllPreview}
                 onToggleFullScreen={() => {
                   toggleFullScreenPreview();
                   window.scrollTo(0, 0);
                 }}
-                onToggleShowAll={toggleShowAllPreview}
-              /> */}
+              />
 
-              {/* TODO EES-4856 */}
-              {/* <DataSetFileVariables /> */}
+              <DataSetFileVariables variables={dataSetFile.file.variables} />
 
-              {/* TODO EES-4856 */}
-              {/* <DataSetFileFootnotes /> */}
+              {!!dataSetFile.footnotes.length && (
+                <DataSetFileFootnotes footnotes={dataSetFile.footnotes} />
+              )}
 
               <DataSetFileUsage
                 hasApiDataSet={!!apiDataSet}

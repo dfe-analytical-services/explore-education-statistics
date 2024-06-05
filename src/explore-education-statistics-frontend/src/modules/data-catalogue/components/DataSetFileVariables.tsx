@@ -1,58 +1,27 @@
 import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
-import { pageHiddenSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { DataSetVariable } from '@frontend/services/dataSetFileService';
 import React from 'react';
 
-// TODO EES-4856 replace with real data
-const variables = [
-  {
-    value: 'enrolments_pa_10_exact_percent',
-    label: '	Percentage of persistent absentees',
-  },
-  { value: 'num_schools', label: 'Number of schools' },
-  {
-    value: 'enrolments_pa_10_exact_percent',
-    label: '	Percentage of persistent absentees',
-  },
-  { value: 'num_schools', label: 'Number of schools' },
-  {
-    value: 'enrolments_pa_10_exact_percent',
-    label: '	Percentage of persistent absentees',
-  },
-  { value: 'num_schools', label: 'Number of schools' },
-  {
-    value: 'enrolments_pa_10_exact_percent',
-    label: '	Percentage of persistent absentees',
-  },
-  { value: 'num_schools', label: 'Number of schools' },
-  {
-    value: 'enrolments_pa_10_exact_percent',
-    label: '	Percentage of persistent absentees',
-  },
-  { value: 'num_schools', label: 'Number of schools' },
-  {
-    value: 'enrolments_pa_10_exact_percent',
-    label: '	Percentage of persistent absentees',
-  },
-  { value: 'num_schools', label: 'Number of schools' },
-];
-
+const sectionId = 'dataSetVariables';
 const tableId = 'variables-table';
 const defaultVisible = 5;
 
-export default function DataSetFileVariables() {
+interface Props {
+  variables: DataSetVariable[];
+}
+
+export default function DataSetFileVariables({ variables }: Props) {
   const [showAll, toggleShowAll] = useToggle(false);
   const displayVariables = showAll
     ? variables
-    : variables.slice(0, defaultVisible - 1);
+    : variables.slice(0, defaultVisible);
   const totalVariables = variables.length;
 
   return (
-    <DataSetFilePageSection
-      heading={pageHiddenSections.dataSetVariables}
-      id="dataSetVariables"
-    >
+    <DataSetFilePageSection heading={pageSections[sectionId]} id={sectionId}>
       <table id={tableId}>
         <caption className="govuk-!-margin-bottom-3">
           {showAll
