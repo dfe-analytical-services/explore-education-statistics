@@ -334,7 +334,7 @@ resource adminAppService 'Microsoft.Web/sites@2023-01-01' existing = {
   name: adminAppServiceFullName
 }
 
-resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2018-11-30' existing = {
+resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
   scope: adminAppService
   name: 'default'
 }
