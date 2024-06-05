@@ -1,13 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record DataGuidanceViewModel : ReleaseSummaryViewModel
 {
-    public string DataGuidance { get;  }
+    public required string DataGuidance { get; init; }
 
-    public List<DataGuidanceDataSetViewModel> DataSets { get; }
+    public required List<DataGuidanceDataSetViewModel> DataSets { get; init; }
 
+    [SetsRequiredMembers]
     public DataGuidanceViewModel(
         ReleaseCacheViewModel release,
         PublicationCacheViewModel publication,

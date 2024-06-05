@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -8,29 +9,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record ReleaseSummaryViewModel
 {
-    public Guid Id { get; }
+    public required Guid Id { get; init; }
 
-    public string Title { get; }
+    public required string Title { get; init; }
 
-    public string Slug { get; }
+    public required string Slug { get; init; }
 
-    public string YearTitle { get; }
+    public required string YearTitle { get; init; }
 
-    public string CoverageTitle { get; }
+    public required string CoverageTitle { get; init; }
 
-    public DateTime? Published { get; }
+    public DateTime? Published { get; init; }
 
-    public string ReleaseName { get; }
+    public string ReleaseName { get; init; }
 
-    public PartialDate NextReleaseDate { get; }
+    public PartialDate? NextReleaseDate { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public ReleaseType Type { get; }
+    public required ReleaseType Type { get; init; }
 
-    public bool LatestRelease { get; }
+    public required bool LatestRelease { get; init; }
 
-    public PublicationSummaryViewModel? Publication { get; }
+    public PublicationSummaryViewModel? Publication { get; init; }
 
+    [JsonConstructor]
+    public ReleaseSummaryViewModel()
+    {
+    }
+
+    [SetsRequiredMembers]
     public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
     {
         Id = release.Id;
@@ -46,6 +53,7 @@ public record ReleaseSummaryViewModel
         Publication = new PublicationSummaryViewModel(publication);
     }
 
+    [SetsRequiredMembers]
     public ReleaseSummaryViewModel(ReleaseVersion releaseVersion, bool latestPublishedRelease)
     {
         Id = releaseVersion.Id;

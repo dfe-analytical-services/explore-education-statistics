@@ -1,38 +1,44 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record PublicationSummaryViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Title { get; set; } = string.Empty;
+    public required string Title { get; init; }
 
-    public string Slug { get; set; } = string.Empty;
+    public required string Slug { get; init; }
+
+    public bool? Owner { get; init; }
     
-    public bool Owner { get; set; }
-    
-    public ContactViewModel Contact { get; set; }
-    
+    public ContactViewModel? Contact { get; init; }
+
     public PublicationSummaryViewModel()
     {
     }
 
-    public PublicationSummaryViewModel(Guid id, string title, string slug, bool owner, Contact contact)
-    {
-        Id = id;
-        Title = title;
-        Slug = slug;
-        Owner = owner;
-        Contact = new ContactViewModel(contact);
-    }
-
+    [SetsRequiredMembers]
     public PublicationSummaryViewModel(PublicationCacheViewModel publicationCache)
     {
         Id = publicationCache.Id;
         Title = publicationCache.Title;
         Slug = publicationCache.Slug;
-        Contact = publicationCache.Contact;
+    }
+
+    [SetsRequiredMembers]
+    public PublicationSummaryViewModel(Publication publication) : this(publication, hasContact: false)
+    {
+    }
+
+    [SetsRequiredMembers]
+    public PublicationSummaryViewModel(Publication publication, bool hasContact = false)
+    {
+        Id = publication.Id;
+        Title = publication.Title;
+        Slug = publication.Slug;
+        Contact = hasContact ? new ContactViewModel(publication.Contact) : null;
     }
 }

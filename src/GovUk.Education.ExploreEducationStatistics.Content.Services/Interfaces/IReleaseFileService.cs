@@ -5,12 +5,18 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
 public interface IReleaseFileService
 {
+    Task<Either<ActionResult, IList<ReleaseFileViewModel>>> ListReleaseFiles(
+        ReleaseFileListRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<Either<ActionResult, FileStreamResult>> StreamFile(
         Guid releaseVersionId,
         Guid fileId);

@@ -15,8 +15,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -36,11 +38,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         /// cached in blob storage, in seconds.
         private const int AllFilesZipTtl = 60 * 60;
 
-        private static readonly FileType[] AllowedZipFileTypes =
+        private static readonly FileType[] AllowedFileTypes =
         [
             FileType.Ancillary,
             FileType.Data
         ];
+
+        public async Task<Either<ActionResult, IList<ReleaseFileViewModel>>> ListReleaseFiles(
+            ReleaseFileListRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var releaseFiles = await contentDbContext.ReleaseFiles
+                .Include(rf => rf.ReleaseVersion)
+                .ThenInclude(rv => rv.Publication)
+                .Include(rf => rf.File)
+                .Where(rf => AllowedFileTypes.Contains(rf.File.Type))
+                .Where(rf => request.Ids.Contains(rf.Id))
+                .Where(rv => rv.Published != null)
+                .ToListAsync(cancellationToken);
+
+            var releaseVersions = releaseFiles.Select(rf => rf.ReleaseVersion)
+                .ToHashSet();
+
+            var allowedReleaseVersions = new HashSet<ReleaseVersion>();
+
+            foreach (var releaseVersion in releaseVersions)
+            {
+                if (await userService.CheckCanViewReleaseVersion(releaseVersion).IsRight())
+                {
+                    allowedReleaseVersions.Add(releaseVersion);
+                }
+            }
+
+            return releaseFiles
+                .Where(rf => allowedReleaseVersions.Contains(rf.ReleaseVersion))
+                .Select(MapReleaseFileViewModel)
+                .ToList();
+        }
+
+        private static ReleaseFileViewModel MapReleaseFileViewModel(ReleaseFile releaseFile)
+        {
+            var releaseVersion = releaseFile.ReleaseVersion;
+            var isLatestPublishedRelease =
+                releaseVersion.Id == releaseVersion.Publication.LatestPublishedReleaseVersionId;
+
+            return new ReleaseFileViewModel
+            {
+                Id = releaseFile.Id,
+                File = releaseFile.ToPublicFileInfo(),
+                DataSetFileId = releaseFile.File.DataSetFileId,
+                Release = new ReleaseSummaryViewModel(releaseVersion, latestPublishedRelease: isLatestPublishedRelease)
+                {
+                    Publication = new PublicationSummaryViewModel(releaseVersion.Publication)
+                },
+            };
+        }
 
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseVersionId, Guid fileId)
         {
@@ -48,7 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .CheckEntityExists<ReleaseFile>(q => q
                     .Include(rf => rf.File)
                     .Include(rf => rf.ReleaseVersion)
-                    .ThenInclude(releaseVersion => releaseVersion.Publication)
                     .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
                 )
                 .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
@@ -230,10 +281,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             return contentDbContext.ReleaseFiles
                 .Include(f => f.ReleaseVersion)
-                .ThenInclude(rv => rv.Publication)
                 .Include(f => f.File)
                 .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersionId
-                                      && AllowedZipFileTypes.Contains(releaseFile.File.Type));
+                                      && AllowedFileTypes.Contains(releaseFile.File.Type));
         }
     }
 }

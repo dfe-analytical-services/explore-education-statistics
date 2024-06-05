@@ -105,12 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ =>
                 {
                     return _context.Publications
-                        .Select(p => new PublicationSummaryViewModel
-                        {
-                            Id = p.Id,
-                            Title = p.Title,
-                            Slug = p.Slug,
-                        })
+                        .Select(publication => new PublicationSummaryViewModel(publication))
                         .ToList();
                 });
         }
