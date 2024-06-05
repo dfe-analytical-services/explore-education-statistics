@@ -1678,7 +1678,7 @@
             },
             {
               "name": "PublicDataDb",
-              "type": "PostgreSQL",
+              "type": "Custom",
               "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-admin-connectionstring-publicdatadb)')]"
             }
           ]
