@@ -27,7 +27,7 @@ export default function DataSetFilePreview({
       <div className={styles.container} tabIndex={0}>
         <table id={tableId}>
           <caption className="govuk-!-font-weight-regular govuk-!-margin-bottom-3">
-            Table showing first 5 rows, from underlying data
+            {`Table showing first ${rows.length} rows, from underlying data`}
           </caption>
           <thead>
             <tr>

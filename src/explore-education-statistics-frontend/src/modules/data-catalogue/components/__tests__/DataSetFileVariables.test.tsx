@@ -83,4 +83,39 @@ describe('DataSetFileVariables', () => {
     expect(row6Cells[0]).toHaveTextContent('indicator_4');
     expect(row6Cells[1]).toHaveTextContent('Indicator 4 label');
   });
+
+  test('does not render the show all button when there are fewer than 5 variables', () => {
+    render(
+      <DataSetFileVariables
+        variables={[testDataSetVariables[0], testDataSetVariables[1]]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Variables in this data set' }),
+    ).toBeInTheDocument();
+
+    const rows = within(
+      screen.getByRole('table', {
+        name: 'Table showing all 2 variables',
+      }),
+    ).getAllByRole('row');
+    expect(rows).toHaveLength(3);
+
+    const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells[0]).toHaveTextContent('Variable name');
+    expect(headerCells[1]).toHaveTextContent('Variable description');
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('filter_1');
+    expect(row1Cells[1]).toHaveTextContent('Filter 1 label');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('filter_2');
+    expect(row2Cells[1]).toHaveTextContent('Filter 2 label');
+
+    expect(
+      screen.queryByRole('button', { name: 'Show all 6 variables' }),
+    ).not.toBeInTheDocument();
+  });
 });
