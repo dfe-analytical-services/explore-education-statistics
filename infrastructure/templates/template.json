@@ -2146,6 +2146,11 @@
               "condition": "[parameters('useSubnets')]",
               "id": "[variables('publisherSubnetRef')]",
               "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publicApiDataProcessorSubnetRef')]",
+              "action": "Allow"
             }
           ],
           "ipRules": "[parameters('storageFirewallRules')]",
