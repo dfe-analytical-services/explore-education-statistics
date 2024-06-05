@@ -41,7 +41,7 @@ public class LowercasePathRuleIntegrationTests : IntegrationTest<TestStartup>
         response.AssertPathAndQueryEqualTo("/api/test/path?query=Query");
     }
 
-    private WebApplicationFactory<TestStartup> SetupApp()
+    private TestApplicationFactory<TestStartup> SetupApp()
     {
         return TestApp.WithWebHostBuilder(builder => builder
             .WithAdditionalControllers(typeof(TestController)));

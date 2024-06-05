@@ -9,22 +9,31 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Testcontainers.Azurite;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 
-public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
+public sealed class TestApplicationFactory : TestApplicationFactory<Startup, TestApplicationFactory>
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
         .WithImage("mcr.microsoft.com/azure-storage/azurite:3.30.0")
         .WithInMemoryPersistence()
         .Build();
+
+    public TestApplicationFactory()
+    {
+        ConfigureServices(services =>
+        {
+            services
+                .UseInMemoryDbContext<ContentDbContext>()
+                .UseInMemoryDbContext<StatisticsDbContext>()
+                .ReplaceService(new Mock<IPublicBlobStorageService>());
+        });
+    }
 
     public override async ValueTask DisposeAsync()
     {
@@ -53,7 +62,7 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
         await _azuriteContainer.StopAsync();
     }
 
-    public WebApplicationFactory<Startup> WithAzurite(bool enabled = true)
+    public TestApplicationFactory WithAzurite(bool enabled = true)
     {
         if (!enabled)
         {
@@ -86,18 +95,5 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                     );
                 });
         });
-    }
-
-    protected override IHostBuilder CreateHostBuilder()
-    {
-        return base
-            .CreateHostBuilder()
-            .ConfigureServices(services =>
-            {
-                services
-                    .UseInMemoryDbContext<ContentDbContext>()
-                    .UseInMemoryDbContext<StatisticsDbContext>()
-                    .ReplaceService(new Mock<IPublicBlobStorageService>());
-            });
     }
 }

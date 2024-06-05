@@ -538,7 +538,7 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
         }
     }
 
-    private WebApplicationFactory<TestStartup> BuildApp()
+    private TestApplicationFactory<TestStartup> BuildApp()
     {
         return TestApp
             .WithWebHostBuilder(

@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             response.AssertOk("Test zip");
         }
 
-        private WebApplicationFactory<Startup> BuildApp(IReleaseFileService? releaseFileService = null)
+        private TestApplicationFactory BuildApp(IReleaseFileService? releaseFileService = null)
         {
             return TestApp
                 .ConfigureServices(

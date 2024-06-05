@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Hosting;
@@ -18,10 +19,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 /// <summary>
 /// Factory for creating test applications in integration tests.
 /// </summary>
-/// <see cref="https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests"/>
-// ReSharper disable once ClassNeverInstantiated.Global
-public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
+/// <see href="https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests"/>
+public class TestApplicationFactory<TStartup, TWebApp> :
+    IDisposable,
+    IAsyncDisposable
+    where TStartup : class
+    where TWebApp : WebApplicationFactory<TStartup>, new()
 {
+    internal WebApplicationFactory<TStartup> App = new();
+
+    public virtual void Dispose()
+    {
+        App.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    public virtual async ValueTask DisposeAsync()
+    {
+        await App.DisposeAsync();
+        GC.SuppressFinalize(this);
+    }
+
+    public virtual TestApplicationFactory<TStartup, TWebApp> WithWebHostBuilder(Action<IWebHostBuilder> configure)
+    {
+        return new TestApplicationFactory<TStartup, TWebApp>
+        {
+            App = App.WithWebHostBuilder(configure)
+        };
+    }
+
+    public virtual TestApplicationFactory<TStartup, TWebApp> ConfigureServices(Action<IServiceCollection> configureServices)
+    {
+        return new TestApplicationFactory<TStartup, TWebApp>
+        {
+            App = App.WithWebHostBuilder(builder => builder.ConfigureServices(configureServices))
+        };
+    }
+
+    public HttpClient CreateClient()
+        => App.CreateClient();
+
+    public HttpClient CreateClient(WebApplicationFactoryClientOptions options)
+        => App.CreateClient(options);
+
+    public IServiceProvider Services => App.Services;
+
     public async Task AddTestData<TDbContext>(Action<TDbContext> supplier) where TDbContext : DbContext
     {
         await using var context = GetDbContext<TDbContext>();
@@ -42,30 +84,56 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
         return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
 
-    protected override IHostBuilder CreateHostBuilder()
+    public class WebApp : WebApplicationFactory<TStartup>
     {
-        return Host
-            .CreateDefaultBuilder()
-            .ConfigureLogging(
-                builder =>
+        protected override IHostBuilder CreateHostBuilder()
+        {
+            return Host
+                .CreateDefaultBuilder()
+                .ConfigureLogging(
+                    builder =>
+                    {
+                        builder
+                            .AddFilter<ConsoleLoggerProvider>("Default", LogLevel.Warning)
+                            .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Warning);
+                    }
+                )
+                .ConfigureWebHostDefaults(builder =>
                 {
                     builder
-                        .AddFilter<ConsoleLoggerProvider>("Default", LogLevel.Warning)
-                        .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Warning);
-                }
-            )
-            .ConfigureWebHostDefaults(builder =>
-            {
-                builder
-                    .UseStartup<TStartup>()
-                    .UseIntegrationTestEnvironment()
-                    .UseTestServer();
-            })
-            .ConfigureAppConfiguration(config =>
-            {
-                config.AddConfiguration(new ConfigurationBuilder()
-                    .AddJsonFile($"appsettings.{IntegrationTestEnvironment}.json", optional: true)
-                    .Build());
-            });
+                        .UseStartup<TStartup>()
+                        .UseIntegrationTestEnvironment()
+                        .UseTestServer();
+                })
+                .ConfigureAppConfiguration(config =>
+                {
+                    config.AddConfiguration(new ConfigurationBuilder()
+                        .AddJsonFile($"appsettings.{IntegrationTestEnvironment}.json", optional: true)
+                        .Build());
+                });
+        }
+    }
+}
+
+public class TestApplicationFactory<TStartup, TWebApp, TFactory> :
+    TestApplicationFactory<TStartup, TWebApp>
+    where TStartup : class
+    where TWebApp : WebApplicationFactory<TStartup>, new()
+    where TFactory : TestApplicationFactory<TStartup, TWebApp>, new()
+{
+    public override TFactory WithWebHostBuilder(Action<IWebHostBuilder> configure)
+    {
+        return new TFactory
+        {
+            App = this.App.WithWebHostBuilder(configure)
+        };
+    }
+    
+    public override TFactory ConfigureServices(Action<IServiceCollection> configureServices)
+    {
+        return new TFactory
+        {
+            App = this.App.WithWebHostBuilder(builder => builder.ConfigureServices(configureServices))
+        };
     }
 }

@@ -2357,7 +2357,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
         private async Task<HttpResponseMessage> GetDataSetFile(
             Guid dataSetFileId,
-            WebApplicationFactory<Startup>? app = null)
+            TestApplicationFactory? app = null)
         {
             var client = (app ?? BuildApp()).CreateClient();
 
@@ -2365,7 +2365,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(
+    private TestApplicationFactory BuildApp(
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
         bool enableAzurite = false)

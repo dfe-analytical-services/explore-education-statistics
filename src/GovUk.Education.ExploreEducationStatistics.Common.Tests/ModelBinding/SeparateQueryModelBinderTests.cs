@@ -217,7 +217,7 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
             [FromQuery, QuerySeparator(":")] IList<string> items) => items;
     }
 
-    private WebApplicationFactory<TestStartup> BuildApp()
+    private TestApplicationFactory<TestStartup> BuildApp()
     {
         return TestApp.WithWebHostBuilder(builder =>
             builder.WithAdditionalControllers(typeof(TestController)));

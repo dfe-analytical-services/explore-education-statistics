@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -63,28 +62,6 @@ public class TestStartup : Startup
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, _ => { });
-    }
-}
-
-public static class TestStartupExtensions
-{
-    /// <summary>
-    /// This method adds an authenticated User in the form of a ClaimsPrincipal to the HttpContext.
-    ///
-    /// This User will subsequently be available for the Identity Framework as well as our own UserService, and any
-    /// other production code that looks up the User from the current HttpContext.
-    /// </summary>
-    /// <param name="testApp"></param>
-    /// <param name="user"></param>
-    /// <returns></returns>
-    public static WebApplicationFactory<TestStartup> SetUser(
-        this WebApplicationFactory<TestStartup> testApp,
-        ClaimsPrincipal user)
-    {
-        return testApp.ConfigureServices(services =>
-        {
-            services.AddScoped(_ => user);
-        });
     }
 }
 

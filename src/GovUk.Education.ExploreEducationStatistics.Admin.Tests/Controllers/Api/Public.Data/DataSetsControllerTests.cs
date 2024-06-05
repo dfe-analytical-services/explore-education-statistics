@@ -25,7 +25,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
@@ -1055,7 +1054,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.Equal(processorErrors, validationProblem.Errors);
         }
 
-        private WebApplicationFactory<TestStartup> BuildApp(
+        private TestApplicationFactory BuildApp(
             IProcessorClient? processorClient = null,
             ClaimsPrincipal? user = null)
         {

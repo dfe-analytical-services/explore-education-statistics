@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.ModelBinding;
@@ -74,7 +73,7 @@ public class TrimStringModelBinderTests : IntegrationTest<TestStartup>
         response.AssertOk(new QueryResponse("query"));
     }
 
-    private WebApplicationFactory<TestStartup> SetupApp()
+    private TestApplicationFactory<TestStartup> SetupApp()
     {
         return TestApp.WithWebHostBuilder(builder => builder
             .WithAdditionalControllers(typeof(TestController)));

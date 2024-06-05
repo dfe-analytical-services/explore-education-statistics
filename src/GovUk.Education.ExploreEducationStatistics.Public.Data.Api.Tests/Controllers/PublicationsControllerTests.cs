@@ -781,7 +781,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
+    private TestApplicationFactory BuildApp(IContentApiClient? contentApiClient = null)
     {
         return TestApp.ConfigureServices(
             services => { services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>()); }

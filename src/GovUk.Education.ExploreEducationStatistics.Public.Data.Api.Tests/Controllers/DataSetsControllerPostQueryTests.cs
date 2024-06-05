@@ -2813,7 +2813,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         return dataSetVersion;
     }
 
-    private WebApplicationFactory<Startup> BuildApp()
+    private TestApplicationFactory BuildApp()
     {
         return TestApp.ConfigureServices(services =>
             services.ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver));

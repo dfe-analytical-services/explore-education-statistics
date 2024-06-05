@@ -598,7 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal("Academic year 2021/22", viewModel.LatestReleaseTitle);
         }
 
-        private WebApplicationFactory<Startup> SetupApp(
+        private TestApplicationFactory SetupApp(
             IDataBlockService? dataBlockService = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
             ITableBuilderService? tableBuilderService = null)

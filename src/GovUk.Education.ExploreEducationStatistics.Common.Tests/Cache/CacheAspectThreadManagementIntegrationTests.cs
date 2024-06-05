@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -396,7 +395,7 @@ public class CacheAspectThreadManagementIntegrationTests : IntegrationTest<TestS
         return maxWorkerThreads - availableWorkerThreads;
     }
 
-    private WebApplicationFactory<TestStartup> SetupApp(
+    private TestApplicationFactory<TestStartup> SetupApp(
         IBlobCacheService blobCacheService,
         List<Event> events)
     {

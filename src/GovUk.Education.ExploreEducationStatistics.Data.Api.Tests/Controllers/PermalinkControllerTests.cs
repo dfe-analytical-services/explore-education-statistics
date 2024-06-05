@@ -179,7 +179,7 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
         response.AssertNotFound();
     }
 
-    private WebApplicationFactory<Startup> SetupApp(IPermalinkService? permalinkService = null)
+    private TestApplicationFactory SetupApp(IPermalinkService? permalinkService = null)
     {
         return TestApp.ConfigureServices(
             services =>

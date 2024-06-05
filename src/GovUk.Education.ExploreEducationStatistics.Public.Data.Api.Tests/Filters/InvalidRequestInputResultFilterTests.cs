@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Filters;
@@ -179,7 +178,7 @@ public class InvalidRequestInputResultFilterTests(TestApplicationFactory testApp
         public required TestPerson Owner { get; init; }
     }
 
-    private WebApplicationFactory<Startup> BuildApp()
+    private TestApplicationFactory BuildApp()
     {
         return TestApp
             .WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)))

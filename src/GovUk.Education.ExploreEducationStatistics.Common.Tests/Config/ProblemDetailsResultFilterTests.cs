@@ -172,7 +172,7 @@ public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup>
         public string? Name { get; init; }
     }
 
-    private WebApplicationFactory<TestStartup> BuildApp()
+    private TestApplicationFactory<TestStartup> BuildApp()
     {
         return TestApp
             .WithWebHostBuilder(
