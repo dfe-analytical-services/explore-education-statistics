@@ -58,33 +58,54 @@ public class DataSetService(
         Guid releaseFileId,
         CancellationToken cancellationToken)
     {
-        return await contentDbContext.ReleaseFiles
+        var releaseFile = await contentDbContext.ReleaseFiles
             .Include(rf => rf.File)
             .Include(rf => rf.ReleaseVersion)
-            .FirstOrNotFoundAsync(rf => rf.Id == releaseFileId, cancellationToken);
+            .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
+
+        return releaseFile is null
+            ? ValidationUtils.ValidationResult(CreateReleaseFileIdError(
+                    message: ValidationMessages.FileNotFound,
+                    releaseFileId: releaseFileId
+                ))
+            : releaseFile;
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateReleaseFile(
         ReleaseFile releaseFile,
         CancellationToken cancellationToken)
     {
-        List<ErrorViewModel> errors = [];
+        // ReleaseFile must not already have a DataSetVersion
+        if (await publicDataDbContext.DataSetVersions.AnyAsync(
+                dsv => dsv.ReleaseFileId == releaseFile.Id,
+                cancellationToken: cancellationToken))
+        {
+            return ValidationUtils.ValidationResult(
+            [
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileHasApiDataSetVersion,
+                    releaseFileId: releaseFile.Id)
+            ]);
+        }
 
         // ReleaseFile must relate to a ReleaseVersion in Draft approval status
         if (releaseFile.ReleaseVersion.ApprovalStatus != ReleaseApprovalStatus.Draft)
         {
-            errors.Add(CreateError(
-                code: ValidationMessages.FileReleaseVersionNotDraft.Code,
-                message: ValidationMessages.FileReleaseVersionNotDraft.Message,
-                releaseFileId: releaseFile.Id));
+            return ValidationUtils.ValidationResult(
+            [
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileReleaseVersionNotDraft,
+                    releaseFileId: releaseFile.Id)
+            ]);
         }
+
+        List<ErrorViewModel> errors = [];
 
         // ReleaseFile must relate to a File of type Data
         if (releaseFile.File.Type != FileType.Data)
         {
-            errors.Add(CreateError(
-                code: ValidationMessages.FileTypeNotData.Code,
-                message: ValidationMessages.FileTypeNotData.Message,
+            errors.Add(CreateReleaseFileIdError(
+                message: ValidationMessages.FileTypeNotData,
                 releaseFileId: releaseFile.Id));
         }
 
@@ -95,9 +116,8 @@ public class DataSetService(
                 .Where(rf => rf.File.Type == FileType.Metadata)
                 .AnyAsync(cancellationToken: cancellationToken))
         {
-            errors.Add(CreateError(
-                code: ValidationMessages.NoMetadataFile.Code,
-                message: ValidationMessages.NoMetadataFile.Message,
+            errors.Add(CreateReleaseFileIdError(
+                message: ValidationMessages.NoMetadataFile,
                 releaseFileId: releaseFile.Id));
         }
 
@@ -172,15 +192,14 @@ public class DataSetService(
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private static ErrorViewModel CreateError(
-        string code,
-        string message,
+    private static ErrorViewModel CreateReleaseFileIdError(
+        LocalizableMessage message,
         Guid releaseFileId)
     {
         return new ErrorViewModel
         {
-            Code = code,
-            Message = message,
+            Code = message.Code,
+            Message = message.Message,
             Path = nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
             Detail = new InvalidErrorDetail<Guid>(releaseFileId)
         };

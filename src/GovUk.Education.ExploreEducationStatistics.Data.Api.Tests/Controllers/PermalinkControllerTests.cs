@@ -6,13 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -23,12 +22,8 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
-public class PermalinkControllerTests : IntegrationTest<TestStartup>
+public class PermalinkControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    public PermalinkControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-    {
-    }
-
     [Fact]
     public async Task CreatePermalink()
     {
@@ -137,7 +132,7 @@ public class PermalinkControllerTests : IntegrationTest<TestStartup>
             uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
-                { HeaderNames.Accept, ContentTypes.Csv }
+                { HeaderNames.Accept, "text/csv, application/json" }
             }
         );
 
@@ -165,7 +160,7 @@ public class PermalinkControllerTests : IntegrationTest<TestStartup>
             uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
-                { HeaderNames.Accept, ContentTypes.Csv }
+                { HeaderNames.Accept, "text/csv, application/json" }
             }
         );
 
@@ -184,7 +179,7 @@ public class PermalinkControllerTests : IntegrationTest<TestStartup>
         response.AssertNotFound();
     }
 
-    private WebApplicationFactory<TestStartup> SetupApp(IPermalinkService? permalinkService = null)
+    private WebApplicationFactory<Startup> SetupApp(IPermalinkService? permalinkService = null)
     {
         return TestApp.ConfigureServices(
             services =>

@@ -1,34 +1,36 @@
 #nullable enable
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 
 [Collection(CacheTestFixture.CollectionName)]
-public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
+public abstract class IntegrationTestFixture :
     CacheServiceTestFixture,
     IClassFixture<TestApplicationFactory>,
-    IClassFixture<CacheTestFixture>,
     IAsyncLifetime
 {
     protected readonly DataFixture DataFixture = new();
 
-    protected readonly TestApplicationFactory TestApp = testApp;
+    protected readonly TestApplicationFactory TestApp;
+
+    internal IntegrationTestFixture(TestApplicationFactory testApp)
+    {
+        TestApp = testApp;
+    }
 
     public async Task InitializeAsync()
     {
-        await TestApp.Initialize();
+        await Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
     {
         await TestApp.EnsureDatabaseDeleted<ContentDbContext>();
         await TestApp.EnsureDatabaseDeleted<StatisticsDbContext>();
-        await TestApp.EnsureDatabaseDeleted<UsersAndRolesDbContext>();
-        await TestApp.ClearTestData<PublicDataDbContext>();
+        await TestApp.StopAzurite();
     }
 }

@@ -20,31 +20,4 @@ public static class StatisticsDbUtils
     {
         return InMemoryStatisticsDbContext(Guid.NewGuid().ToString());
     }
-
-    public static WebApplicationFactory<TEntrypoint> ResetStatisticsDbContext<TEntrypoint>(
-        this WebApplicationFactory<TEntrypoint> app
-    )
-        where TEntrypoint : class
-    {
-        return app.ResetDbContext<StatisticsDbContext, TEntrypoint>();
-    }
-
-    public static WebApplicationFactory<TEntrypoint> AddStatisticsDbTestData<TEntrypoint>(
-        this WebApplicationFactory<TEntrypoint> app,
-        Action<StatisticsDbContext> testData
-    )
-        where TEntrypoint : class
-    {
-        return app.AddTestData(testData);
-    }
-
-    public static WebApplicationFactory<TEntrypoint> VerifyStatisticsDbContext<TEntrypoint>(
-        this WebApplicationFactory<TEntrypoint> app,
-        Action<StatisticsDbContext> verificationAction)
-        where TEntrypoint : class
-    {
-        var context = (app.Services.GetService(typeof(StatisticsDbContext)) as StatisticsDbContext)!;
-        verificationAction(context);
-        return app;
-    }
 }
