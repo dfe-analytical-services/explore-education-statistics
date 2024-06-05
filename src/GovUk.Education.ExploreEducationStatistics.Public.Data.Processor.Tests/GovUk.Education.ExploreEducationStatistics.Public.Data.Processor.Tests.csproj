@@ -12,8 +12,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
     <PackageReference Include="Testcontainers.Azurite" Version="3.8.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
-    <PackageReference Include="xunit" Version="2.7.1"/>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
+    <PackageReference Include="xunit" Version="2.7.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -25,5 +25,11 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.csproj"/>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

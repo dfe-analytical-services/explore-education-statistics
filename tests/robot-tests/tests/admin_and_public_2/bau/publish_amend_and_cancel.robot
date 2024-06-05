@@ -384,7 +384,7 @@ Revisit the Release after the cancellation to double check it remains unaffected
     user waits until h2 is visible    Release summary
     user verifies release summary    Financial year
     ...    3000-01
-    ...    National statistics
+    ...    Accredited official statistics
 
 Verify that the Data and Files are unchanged
     user clicks link    Data and files

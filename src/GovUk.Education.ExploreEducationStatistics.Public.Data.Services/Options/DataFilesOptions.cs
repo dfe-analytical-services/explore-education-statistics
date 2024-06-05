@@ -1,11 +1,11 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 
-public class ParquetFilesOptions
+public class DataFilesOptions
 {
-    public static readonly string Section = "ParquetFiles";
+    public static readonly string Section = "DataFiles";
 
     /// <summary>
-    /// Base path where Parquet files are stored. This should be an absolute path
+    /// Base path where data files are stored. This should be an absolute path
     /// in a non-local environment (i.e. where the File Share has been mounted),
     /// or a relative path in a local environment.
     /// </summary>

@@ -1,5 +1,4 @@
-using Azure.Core;
-using Azure.Identity;
+using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -8,6 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -20,7 +21,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor;
 
@@ -51,51 +51,12 @@ public static class ProcessorHostBuilder
                 // cause the data source builder to throw a host exception.
                 if (!hostEnvironment.IsIntegrationTest())
                 {
-                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb");
-
-                    if (hostEnvironment.IsDevelopment())
-                    {
-                        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-
-                        // Set up the data source outside the `AddDbContext` action as this
-                        // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                        // creating over 20 `IServiceProvider` instances.
-                        var dbDataSource = dataSourceBuilder.Build();
-
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            options
-                                .UseNpgsql(dbDataSource)
-                                .EnableSensitiveDataLogging();
-                        });
-                    }
-                    else
-                    {
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            var sqlServerTokenProvider = new DefaultAzureCredential(
-                                new DefaultAzureCredentialOptions
-                                {
-                                    // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
-                                    // the "AZURE_CLIENT_ID" environment variable automatically when operating within
-                                    // a Function App.  We therefore provide it manually.
-                                    ManagedIdentityClientId = configuration["AZURE_CLIENT_ID"]
-                                });
-                            var accessToken = sqlServerTokenProvider.GetToken(
-                                new TokenRequestContext(scopes:
-                                [
-                                    "https://ossrdbms-aad.database.windows.net/.default"
-                                ])).Token;
-
-                            var connectionStringWithAccessToken =
-                                connectionString.Replace("[access_token]", accessToken);
-
-                            var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-
-                            options.UseNpgsql(dbDataSource);
-                        });
-                    }
+                    var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
+                    services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostBuilderContext);
                 }
+
+                // Configure Dapper to match CSV columns with underscores
+                DefaultTypeMap.MatchNamesWithUnderscores = true;
 
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
@@ -107,12 +68,24 @@ public static class ProcessorHostBuilder
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
                     .AddFluentValidation()
                     .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
+                    .AddScoped<IDataDuckDbRepository, DataDuckDbRepository>()
+                    .AddScoped<IFilterOptionsDuckDbRepository, FilterOptionsDuckDbRepository>()
+                    .AddScoped<IIndicatorsDuckDbRepository, IndicatorsDuckDbRepository>()
+                    .AddScoped<ILocationsDuckDbRepository, LocationsDuckDbRepository>()
+                    .AddScoped<ITimePeriodsDuckDbRepository, TimePeriodsDuckDbRepository>()
+                    .AddScoped<IFilterMetaRepository, FilterMetaRepository>()
+                    .AddScoped<IGeographicLevelMetaRepository, GeographicLevelMetaRepository>()
+                    .AddScoped<IIndicatorMetaRepository, IndicatorMetaRepository>()
+                    .AddScoped<ILocationMetaRepository, LocationMetaRepository>()
+                    .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
+                    .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                     .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
                         InitialDataSetVersionCreateRequest.Validator>()
-                    .Configure<ParquetFilesOptions>(
-                        hostBuilderContext.Configuration.GetSection(ParquetFilesOptions.Section));
+                    .Configure<DataFilesOptions>(
+                        hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
             });
     }
 }

@@ -20,6 +20,14 @@ public static class DuckDbConnectionExtensions
 
     public static DuckDbDapperSqlBuilder SqlBuilder(
         this IDuckDbConnection connection,
+        string command,
+        InterpolatedSqlBuilderOptions? options = null)
+    {
+        return new DuckDbDapperSqlBuilder(connection, command, options);
+    }
+
+    public static DuckDbDapperSqlBuilder SqlBuilder(
+        this IDuckDbConnection connection,
         InterpolatedSqlBuilderOptions options)
     {
         return new DuckDbDapperSqlBuilder(connection, options);

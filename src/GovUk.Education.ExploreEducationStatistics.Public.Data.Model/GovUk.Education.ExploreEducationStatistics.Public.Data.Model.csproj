@@ -15,11 +15,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DuckDB.NET.Data.Full" Version="0.10.1.2" />
+        <PackageReference Include="DuckDB.NET.Data.Full" Version="0.10.2" />
         <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0" />
         <PackageReference Include="linq2db.EntityFrameworkCore" Version="8.1.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

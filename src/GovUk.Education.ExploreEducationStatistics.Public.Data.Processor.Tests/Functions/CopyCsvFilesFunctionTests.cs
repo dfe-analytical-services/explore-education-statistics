@@ -1,3 +1,4 @@
+using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -23,17 +24,11 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
     public class CopyCsvFilesTests(ProcessorFunctionsIntegrationTestFixture fixture)
         : CopyCsvFilesFunctionTests(fixture)
     {
-        private const string DataFileContent =
-            "time_period,time_identifier,geographic_level,country_code,country_name,enrolments";
-
-        private const string MetadataFileContent =
-            "col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column";
+        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.CopyingCsvFiles;
 
         [Fact]
         public async Task Success()
         {
-            var instanceId = Guid.NewGuid();
-
             var subjectId = Guid.NewGuid();
 
             ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
@@ -55,20 +50,100 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                 context.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile);
             });
 
+            var (dataSetVersion, instanceId) = await CreateDataSetVersion(releaseDataFile.Id, Stage.PreviousStage());
+
+            var blobStorageService = GetRequiredService<IPrivateBlobStorageService>();
+
+            var testDataDirectoryPath = Path.Combine(
+                Assembly.GetExecutingAssembly().GetDirectoryPath(),
+                "Resources",
+                "DataFiles",
+                "AbsenceSchool"
+            );
+
+            var sourceDataFileContent = await File.ReadAllTextAsync(Path.Combine(
+                testDataDirectoryPath,
+                "source.csv"
+            ));
+
+            await using (var contentStream = sourceDataFileContent.ToStream())
+            {
+                await blobStorageService.UploadStream(
+                    BlobContainers.PrivateReleaseFiles,
+                    releaseDataFile.Path(),
+                    contentStream,
+                    ContentTypes.Csv);
+            }
+
+            var sourceMetadataFileContent = await File.ReadAllTextAsync(Path.Combine(
+                testDataDirectoryPath,
+                "source.meta.csv"
+            ));
+
+            await using (var contentStream = sourceMetadataFileContent.ToStream())
+            {
+                await blobStorageService.UploadStream(
+                    BlobContainers.PrivateReleaseFiles,
+                    releaseMetaFile.Path(),
+                    contentStream,
+                    ContentTypes.Csv);
+            }
+
+            var function = GetRequiredService<CopyCsvFilesFunction>();
+
+            await function.CopyCsvFiles(instanceId, CancellationToken.None);
+
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+            var savedImport = await publicDataDbContext.DataSetVersionImports
+                .Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
+                .SingleAsync(i => i.InstanceId == instanceId);
+
+            Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
+            Assert.Equal(Stage, savedImport.Stage);
+
+            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
+
+            Assert.True(Directory.Exists(dataSetVersionPathResolver.DirectoryPath(dataSetVersion)));
+            var actualDataSetVersionFiles = Directory.GetFiles(dataSetVersionPathResolver.DirectoryPath(dataSetVersion))
+                .Select(Path.GetFullPath)
+                .ToArray();
+
+            Assert.Equal(2, actualDataSetVersionFiles.Length);
+
+            var expectedCsvDataPath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
+            Assert.Contains(expectedCsvDataPath, actualDataSetVersionFiles);
+            Assert.Equal(sourceDataFileContent, await DecompressFileToString(expectedCsvDataPath));
+
+            var expectedCsvMetadataPath = dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion);
+            Assert.Contains(expectedCsvMetadataPath, actualDataSetVersionFiles);
+            Assert.Equal(sourceMetadataFileContent, await DecompressFileToString(expectedCsvMetadataPath));
+        }
+
+        private static async Task<string> DecompressFileToString(string path)
+        {
+            var bytes = await File.ReadAllBytesAsync(path);
+            return await CompressionUtils.DecompressToString(bytes, ContentEncodings.Gzip);
+        }
+
+        private async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersion(
+            Guid releaseFileId,
+            DataSetVersionImportStage importStage)
+        {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
             await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
+            DataSetVersionImport dataSetVersionImport = DataFixture
+                .DefaultDataSetVersionImport()
+                .WithStage(importStage);
+
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
+                .WithReleaseFileId(releaseFileId)
                 .WithStatus(DataSetVersionStatus.Processing)
-                .WithReleaseFileId(releaseDataFile.Id)
-                .WithImports(() => DataFixture
-                    .DefaultDataSetVersionImport()
-                    .WithInstanceId(instanceId)
-                    .WithStage(DataSetVersionImportStage.Pending)
-                    .Generate(1))
+                .WithImports(() => [dataSetVersionImport])
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
             await AddTestData<PublicDataDbContext>(context =>
@@ -77,51 +152,7 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                 context.DataSets.Update(dataSet);
             });
 
-            var blobStorageService = GetRequiredService<IPrivateBlobStorageService>();
-
-            await blobStorageService.UploadStream(
-                BlobContainers.PrivateReleaseFiles,
-                releaseDataFile.Path(),
-                DataFileContent.ToStream(),
-                ContentTypes.Csv);
-
-            await blobStorageService.UploadStream(
-                BlobContainers.PrivateReleaseFiles,
-                releaseMetaFile.Path(),
-                MetadataFileContent.ToStream(),
-                ContentTypes.Csv);
-
-            var function = GetRequiredService<CopyCsvFilesFunction>();
-
-            await function.CopyCsvFiles(
-                dataSetVersionId: dataSetVersion.Id,
-                instanceId: instanceId,
-                CancellationToken.None);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedDataSetVersion = await publicDataDbContext.DataSetVersions
-                .Include(dsv => dsv.Imports)
-                .FirstAsync(dsv => dsv.Id == dataSetVersion.Id);
-
-            var savedImport = savedDataSetVersion.Imports.Single();
-            Assert.Equal(DataSetVersionImportStage.CopyingCsvFiles, savedImport.Stage);
-
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-
-            var expectedCsvDataPath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
-            Assert.True(File.Exists(expectedCsvDataPath));
-            Assert.Equal(DataFileContent, await DecompressFileToString(expectedCsvDataPath));
-
-            var expectedCsvMetadataPath = dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion);
-            Assert.True(File.Exists(expectedCsvMetadataPath));
-            Assert.Equal(MetadataFileContent, await DecompressFileToString(expectedCsvMetadataPath));
-        }
-
-        private static async Task<string> DecompressFileToString(string path)
-        {
-            var bytes = await File.ReadAllBytesAsync(path);
-            return await CompressionUtils.DecompressToString(bytes, ContentEncodings.Gzip);
+            return (dataSetVersion, dataSetVersionImport.InstanceId);
         }
     }
 }

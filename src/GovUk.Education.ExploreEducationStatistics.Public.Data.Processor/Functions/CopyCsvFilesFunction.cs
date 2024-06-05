@@ -4,12 +4,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImportStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
@@ -18,20 +18,17 @@ public class CopyCsvFilesFunction(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IPrivateBlobStorageService privateBlobStorageService)
+    IPrivateBlobStorageService privateBlobStorageService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(nameof(CopyCsvFiles))]
     public async Task CopyCsvFiles(
-        [ActivityTrigger] Guid dataSetVersionId,
-        Guid instanceId,
+        [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
-        var dataSetVersion = await GetDataSetVersion(
-            dataSetVersionId: dataSetVersionId,
-            instanceId: instanceId,
-            cancellationToken);
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        var dataSetVersion = dataSetVersionImport.DataSetVersion;
 
-        await UpdateStage(dataSetVersion, instanceId, DataSetVersionImportStage.CopyingCsvFiles, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, CopyingCsvFiles, cancellationToken);
 
         var csvDataFile = await contentDbContext.ReleaseFiles
             .Where(rf => rf.Id == dataSetVersion.ReleaseFileId)
@@ -59,7 +56,7 @@ public class CopyCsvFilesFunction(
 
         if (File.Exists(destinationPath))
         {
-            logger.LogWarning("Destination csv file '{destination}' already exists and will be overwritten.",
+            logger.LogWarning("Destination csv file '{DestinationPath}' already exists and will be overwritten.",
                 destinationPath);
         }
 
@@ -70,27 +67,5 @@ public class CopyCsvFilesFunction(
 
         await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
         await CompressionUtils.CompressToStream(blobStream, fileStream, ContentEncodings.Gzip, cancellationToken);
-    }
-
-    private async Task<DataSetVersion> GetDataSetVersion(
-        Guid dataSetVersionId,
-        Guid instanceId,
-        CancellationToken cancellationToken)
-    {
-        return await publicDataDbContext.DataSetVersions
-            .Include(dsv => dsv.Imports.Where(i => i.InstanceId == instanceId))
-            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken: cancellationToken);
-    }
-
-    private async Task UpdateStage(
-        DataSetVersion dataSetVersion,
-        Guid instanceId,
-        DataSetVersionImportStage stage,
-        CancellationToken cancellationToken)
-    {
-        var dataSetVersionImport = dataSetVersion.Imports.Single(i => i.InstanceId == instanceId);
-
-        dataSetVersionImport.Stage = stage;
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 }

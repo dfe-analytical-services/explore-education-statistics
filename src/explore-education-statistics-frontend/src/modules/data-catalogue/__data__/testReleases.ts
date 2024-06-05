@@ -11,7 +11,7 @@ export const testReleases: ReleaseSummary[] = [
     coverageTitle: 'Release coverage title 3',
     releaseName: 'Release name 3',
     nextReleaseDate: { year: '' },
-    type: 'NationalStatistics',
+    type: 'AccreditedOfficialStatistics',
   },
   {
     id: 'release-2',
@@ -22,7 +22,7 @@ export const testReleases: ReleaseSummary[] = [
     coverageTitle: 'Release coverage title 2',
     releaseName: 'Release name 2',
     nextReleaseDate: { year: '' },
-    type: 'NationalStatistics',
+    type: 'AccreditedOfficialStatistics',
   },
   {
     id: 'release-1',
@@ -33,6 +33,6 @@ export const testReleases: ReleaseSummary[] = [
     coverageTitle: 'Release coverage title 1',
     releaseName: 'Release name 1',
     nextReleaseDate: { year: '' },
-    type: 'NationalStatistics',
+    type: 'AccreditedOfficialStatistics',
   },
 ];

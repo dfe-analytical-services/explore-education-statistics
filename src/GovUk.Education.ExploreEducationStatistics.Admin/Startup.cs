@@ -1,9 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -72,7 +71,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
-using Npgsql;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -107,7 +105,6 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admi
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
-using System.Threading;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -215,46 +212,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // cause the data source builder to throw a host exception.
             if (!hostEnvironment.IsIntegrationTest())
             {
-                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb");
-
-                if (hostEnvironment.IsDevelopment())
+                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
+                // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
+                if (publicDataDbExists)
                 {
-                    // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
-                    if (publicDataDbExists)
-                    {
-                        var dataSourceBuilder = new NpgsqlDataSourceBuilder(publicDataDbConnectionString);
-
-                        // Set up the data source outside the `AddDbContext` action as this
-                        // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-                        // creating over 20 `IServiceProvider` instances.
-                        var dbDataSource = dataSourceBuilder.Build();
-
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            options
-                                .UseNpgsql(dbDataSource)
-                                .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
-                        });
-                    }
-                }
-                else
-                {
-                    // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
-                    if (publicDataDbExists)
-                    {
-                        services.AddDbContext<PublicDataDbContext>(options =>
-                        {
-                            var sqlServerTokenProvider = new DefaultAzureCredential();
-                            var accessToken = sqlServerTokenProvider.GetToken(
-                                    new TokenRequestContext(scopes:
-                                        ["https://ossrdbms-aad.database.windows.net/.default"]))
-                                .Token;
-                            var connectionStringWithAccessToken =
-                                publicDataDbConnectionString.Replace("[access_token]", accessToken);
-                            var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-                            options.UseNpgsql(dbDataSource);
-                        });
-                    }
+                    services.AddPsqlDbContext<PublicDataDbContext>(publicDataDbConnectionString, hostEnvironment);
                 }
             }
 

@@ -153,7 +153,7 @@ Create new release for publication
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
 
 Verify Release type options
-    user checks page contains radio    National statistics
+    user checks page contains radio    Accredited official statistics
     user checks page contains radio    Official statistics
     user checks page contains radio    Official statistics in development
     user checks page contains radio    Ad hoc statistics
@@ -162,7 +162,7 @@ Verify Release type options
 Create new release
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2025
-    user clicks radio    National statistics
+    user clicks radio    Accredited official statistics
     user clicks button    Create new release
     user waits until page contains title caption    Edit release for Spring term 2025/26
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -171,7 +171,7 @@ Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user verifies release summary    Spring term
-    ...    2025/26    National statistics
+    ...    2025/26    Accredited official statistics
 
 Edit release summary
     user waits until page contains link    Edit release summary

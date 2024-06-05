@@ -8,10 +8,9 @@ import WarningMessage from '@common/components/WarningMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
-import Button from '@common/components/Button';
+import ButtonLink from '@frontend/components/ButtonLink';
 import NotificationBanner from '@common/components/NotificationBanner';
 import { releaseTypes } from '@common/services/types/releaseType';
-import downloadService from '@common/services/downloadService';
 import { Theme } from '@common/services/publicationService';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { SortDirection } from '@common/services/types/sort';
@@ -229,20 +228,6 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
     });
   };
 
-  const handleDownload = async () => {
-    if (!selectedPublication || !selectedRelease) {
-      return;
-    }
-    const fileIds = dataSets.map(dataSet => dataSet.fileId);
-    await downloadService.downloadFiles(selectedRelease.id, fileIds);
-
-    logEvent({
-      category: 'Data catalogue',
-      action: 'Data set file download - all',
-      label: `Publication: ${selectedPublication.title}, Release: ${selectedRelease.title}`,
-    });
-  };
-
   const handleSortByChange = async (nextSortBy: DataSetFileSortOption) => {
     await updateQueryParams({
       ...omit(router.query, 'page'),
@@ -268,7 +253,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
     >
       <NotificationBanner title="This page has changed">
         Following user feedback we've made some changes to this page to make our
-        publications easier to find, if you have any comments on the new design
+        data sets easier to find, if you have any comments on the new design
         please let us know via the{' '}
         <a
           href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u"
@@ -290,6 +275,9 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
             <ul className="govuk-list">
               <li>
                 <Link to="/find-statistics">Find statistics and data</Link>
+              </li>
+              <li>
+                <Link to="/methodology">Methodology</Link>
               </li>
               <li>
                 <Link to="/glossary">Glossary</Link>
@@ -367,7 +355,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                 <ButtonText
                   onClick={() => handleClearFilter({ filterType: 'all' })}
                 >
-                  Clear filters
+                  Reset filters
                 </ButtonText>
               )}
             </div>
@@ -516,14 +504,28 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                               </div>
 
                               <p>
-                                <Button
-                                  className="govuk-!-margin-bottom-0"
-                                  onClick={handleDownload}
-                                >{`Download ${
-                                  dataSets.length === 1
-                                    ? '1 data set'
-                                    : `all ${dataSets.length} data sets`
-                                } (ZIP)`}</Button>
+                                <ButtonLink
+                                  className="govuk-!-margin-bottom-2"
+                                  to={`${process.env.CONTENT_API_BASE_URL}/releases/${selectedRelease.id}/files`}
+                                  onClick={() => {
+                                    logEvent({
+                                      category: 'Data catalogue',
+                                      action: 'Data set file download - all',
+                                      label: `Publication: ${selectedPublication.title}, Release: ${selectedRelease.title}`,
+                                    });
+                                  }}
+                                >
+                                  {`Download ${
+                                    totalResults === 1
+                                      ? '1 data set'
+                                      : `all ${totalResults} data sets`
+                                  } (ZIP)`}
+                                </ButtonLink>
+                                <br />
+                                <span>
+                                  Download includes data guidance and supporting
+                                  files.
+                                </span>
                               </p>
                             </>
                           )}

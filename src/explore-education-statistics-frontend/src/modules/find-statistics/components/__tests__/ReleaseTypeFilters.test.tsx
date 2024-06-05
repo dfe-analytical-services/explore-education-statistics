@@ -18,7 +18,7 @@ describe('ReleaseTypeFilters', () => {
     );
     expect(releaseTypeOptions[0]).toBeChecked();
     expect(releaseTypeOptions[1]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('National statistics'),
+      releaseTypeFilterGroup.getByLabelText('Accredited official statistics'),
     );
     expect(releaseTypeOptions[1]).not.toBeChecked();
     expect(releaseTypeOptions[2]).toEqual(

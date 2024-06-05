@@ -27,7 +27,7 @@ export const testPublications: PublicationListSummary[] = [
     id: '3',
     published: new Date('2021-08-08T00:00:00'),
     rank: 0,
-    type: 'NationalStatistics',
+    type: 'AccreditedOfficialStatistics',
     slug: 'publication-3-slug',
     summary: 'Publication 3 summary',
     theme: 'Theme 3',

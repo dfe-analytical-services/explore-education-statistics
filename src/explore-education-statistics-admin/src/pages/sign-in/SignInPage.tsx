@@ -7,7 +7,7 @@ export default function SignInPage() {
     <Page title="Sign in" caption="Explore education statistics">
       <p>
         Use this service to create and publish Department for Education (DfE)
-        official and national statistics.
+        official and accredited official statistics.
       </p>
       <SignInButton />
     </Page>

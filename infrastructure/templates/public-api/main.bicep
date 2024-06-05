@@ -77,6 +77,9 @@ param publicUrls {
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
 
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
+param dataProcessorAppRegistrationClientId string = ''
+
 var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
@@ -91,8 +94,8 @@ var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
-var parquetFileShareMountName = 'parquet-fileshare-mount'
-var parquetFileShareMountPath = '/data/public-api-parquet'
+var dataFilesFileShareMountName = 'public-api-fileshare-mount'
+var dataFilesFileShareMountPath = '/data/public-api-data'
 var publicApiStorageAccountName = '${subscription}eespapisa'
 
 var tagValues = union(resourceTags ?? {}, {
@@ -158,7 +161,7 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' 
 var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
 
 // Deploy File Share.
-module parquetFileShareModule 'components/fileShares.bicep' = {
+module dataFilesFileShareModule 'components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     resourcePrefix: resourcePrefix
@@ -218,7 +221,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
   }
 }
 
-var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
+var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
 
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
@@ -237,10 +240,10 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     tagValues: tagValues
     azureFileStorages: [
       {
-        storageName: parquetFileShareModule.outputs.fileShareName
+        storageName: dataFilesFileShareModule.outputs.fileShareName
         storageAccountName: publicApiStorageAccountName
         storageAccountKey: publicApiStorageAccountAccessKey
-        fileShareName: parquetFileShareModule.outputs.fileShareName
+        fileShareName: dataFilesFileShareModule.outputs.fileShareName
         accessMode: 'ReadWrite'
       }
     ]
@@ -260,15 +263,15 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     volumeMounts: [
       {
-        volumeName: parquetFileShareMountName
-        mountPath: parquetFileShareMountPath
+        volumeName: dataFilesFileShareMountName
+        mountPath: dataFilesFileShareMountPath
       }
     ]
     volumes: [
       {
-        name: parquetFileShareMountName
+        name: dataFilesFileShareMountName
         storageType: 'AzureFile'
-        storageName: parquetFileShareModule.outputs.fileShareName
+        storageName: dataFilesFileShareModule.outputs.fileShareName
       }
     ]
     appSettings: [
@@ -296,7 +299,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       }
       {
         name: 'ParquetFiles__BasePath'
-        value: parquetFileShareMountPath
+        value: dataFilesFileShareMountPath
       }
       {
         // This property informs the Container App of the name of the Admin's system-assigned identity.
@@ -327,6 +330,18 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   ]
 }
 
+resource adminAppService 'Microsoft.Web/sites@2023-01-01' existing = {
+  name: adminAppServiceFullName
+}
+
+resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2018-11-30' existing = {
+  scope: adminAppService
+  name: 'default'
+}
+
+var adminAppClientId = adminAppServiceIdentity.properties.clientId
+var adminAppPrincipalId = adminAppService.identity.principalId
+
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: dataProcessorFunctionAppManagedIdentityName
   location: location
@@ -343,6 +358,15 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     publicNetworkAccessEnabled: false
+    entraIdAuthentication: {
+      appRegistrationClientId: dataProcessorAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+      ]
+      allowedPrincipalIds: [
+        adminAppPrincipalId
+      ]
+    }
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
       name: dataProcessorFunctionAppManagedIdentity.name
@@ -357,12 +381,16 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
+    healthCheck: {
+      path: '/api/HealthCheck'
+      unhealthyMetricName: '${subscription}PublicDataProcessorUnhealthy'
+    }
     azureFileShares: [{
-      storageName: parquetFileShareModule.outputs.fileShareName
+      storageName: dataFilesFileShareModule.outputs.fileShareName
       storageAccountKey: publicApiStorageAccountAccessKey
       storageAccountName: publicApiStorageAccountName
-      fileShareName: parquetFileShareModule.outputs.fileShareName
-      mountPath: parquetFileShareMountPath
+      fileShareName: dataFilesFileShareModule.outputs.fileShareName
+      mountPath: dataFilesFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
@@ -428,4 +456,4 @@ output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFun
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
 
-output parquetFileShareMountPath string = parquetFileShareMountPath
+output dataFilesFileShareMountPath string = dataFilesFileShareMountPath

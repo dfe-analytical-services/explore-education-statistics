@@ -240,7 +240,7 @@ export class AdminService {
         timePeriodCoverage: {
           value: timePeriodCoverage,
         },
-        type: 'NationalStatistics',
+        type: 'AccreditedOfficialStatistics',
       }),
       applicationJsonHeaders,
     );

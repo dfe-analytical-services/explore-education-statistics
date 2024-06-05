@@ -1,5 +1,5 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Models;
 
@@ -17,7 +17,7 @@ public record MetaFileRow
 
     public IndicatorUnit? IndicatorUnit =>
         _indicatorUnit is not null
-            ? EnumToEnumValueConverter<IndicatorUnit>.FromProvider(_indicatorUnit)
+            ? EnumUtil.GetFromEnumValue<IndicatorUnit>(_indicatorUnit)
             : null;
 
     public byte? IndicatorDp { get; init; }
