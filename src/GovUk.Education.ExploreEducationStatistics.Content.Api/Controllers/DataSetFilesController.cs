@@ -59,10 +59,10 @@ public class DataSetFilesController : ControllerBase
             .HandleFailuresOrOk();
     }
     
-    [HttpGet("data-set-files/sitemap-summaries")]
-    public async Task<ActionResult<List<DataSetSitemapSummaryViewModel>>> GetSitemapSummaries()
+    [HttpGet("data-set-files/sitemap-items")]
+    public async Task<ActionResult<List<DataSetSitemapItemViewModel>>> GetSitemapItems()
     {
-        return await _dataSetFileService.GetSitemapSummaries()
+        return await _dataSetFileService.GetSitemapItems()
             .HandleFailuresOrOk();
     }
 }

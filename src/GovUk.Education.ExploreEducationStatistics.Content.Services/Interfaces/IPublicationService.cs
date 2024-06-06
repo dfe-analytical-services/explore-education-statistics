@@ -29,5 +29,5 @@ public interface IPublicationService
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null);
     
-    Task<Either<ActionResult, List<PublicationSitemapSummaryViewModel>>> GetSitemapSummaries();
+    Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> GetSitemapItems();
 }

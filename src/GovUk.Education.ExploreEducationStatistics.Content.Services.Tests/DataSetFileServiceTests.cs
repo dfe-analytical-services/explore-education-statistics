@@ -13,14 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 
 public class DataSetFileServiceTests
 {
+    private readonly string sitemapItemLastModifiedTime = "2024-05-04T10:24:13";
+    
     [Fact]
-    public async Task GetSitemapSummaries()
+    public async Task GetSitemapItems()
     {
         var dataSetFileId = Guid.NewGuid();
-        var dataSetCreatedDate = new DateTime(2024, 05, 04, 10, 24, 13);
+        var dataSetCreatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
 
-        var file = new File() { DataSetFileId = dataSetFileId, Created = dataSetCreatedDate };
-        
+        var file = new File { DataSetFileId = dataSetFileId, Created = dataSetCreatedDate };
+
         var releaseFile = new ReleaseFile
         {
             File = file,
@@ -41,15 +43,13 @@ public class DataSetFileServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            contentDbContext.Attach(file);
-            contentDbContext.Attach(releaseFile);
-
             var service = SetupDataSetFileService(contentDbContext);
 
-            var result = (await service.GetSitemapSummaries()).AssertRight();
+            var result = (await service.GetSitemapItems()).AssertRight();
 
-            Assert.Equal(dataSetFileId.ToString(), result.Single().Id);
-            Assert.Equal(dataSetCreatedDate, result.Single().LastModified);
+            var item = Assert.Single(result);
+            Assert.Equal(dataSetFileId.ToString(), item.Id);
+            Assert.Equal(dataSetCreatedDate, item.LastModified);
         }
     }
 

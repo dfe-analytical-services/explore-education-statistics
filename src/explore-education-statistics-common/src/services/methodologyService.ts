@@ -27,16 +27,16 @@ export interface Methodology {
   }[];
 }
 
-export interface MethodologySitemapSummary {
+export interface MethodologySitemapItem {
   slug: string;
-  lastModified: Date | undefined;
+  lastModified?: string;
 }
 
 const methodologyService = {
   getMethodology(methodologySlug: string): Promise<Methodology> {
     return contentApi.get(`/methodologies/${methodologySlug}`);
   },
-  getSitemapSummaries(): Promise<MethodologySitemapSummary[]> {
+  getSitemapItems(): Promise<MethodologySitemapItem[]> {
     return contentApi.get('/methodologies/sitemap-summaries');
   },
 };

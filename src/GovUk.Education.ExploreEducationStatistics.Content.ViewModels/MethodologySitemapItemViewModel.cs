@@ -1,8 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public record MethodologySitemapSummaryViewModel
+public record MethodologySitemapItemViewModel
 {
-    public string Slug { get; set; } = string.Empty;
+    public required string Slug { get; init; }
 
     public DateTime? LastModified { get; init; }
 }

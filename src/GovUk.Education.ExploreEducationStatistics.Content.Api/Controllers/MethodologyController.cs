@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -26,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
         
-        [HttpGet("methodologies/sitemap-summaries")]
-        public async Task<ActionResult<List<MethodologySitemapSummaryViewModel>>> GetSitemapSummaries()
+        [HttpGet("methodologies/sitemap-items")]
+        public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> GetSitemapItems()
         {
-            return await _methodologyService.GetSitemapSummaries()
+            return await _methodologyService.GetSitemapItems()
                 .HandleFailuresOrOk();
         }
     }

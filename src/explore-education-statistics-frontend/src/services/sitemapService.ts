@@ -1,65 +1,40 @@
 import methodologyService, {
-  MethodologySitemapSummary,
+  MethodologySitemapItem,
 } from '@common/services/methodologyService';
 import publicationService, {
-  PublicationSitemapSummary,
+  PublicationSitemapItem,
 } from '@common/services/publicationService';
-import dataSetService, {
-  DataSetSitemapSummary,
-} from '@common/services/dataSetService';
+// import dataSetService, {
+//   DataSetSitemapItem,
+// } from '@common/services/dataSetService';
 import { ISitemapField } from 'next-sitemap';
 
 export default async function getSitemapFields(): Promise<ISitemapField[]> {
-  const methodologies = await methodologyService.getSitemapSummaries();
-  const publications = await publicationService.getSitemapSummaries();
-  const dataSets = await dataSetService.getSitemapSummaries();
+  const methodologies = await methodologyService.getSitemapItems();
+  const publications = await publicationService.getSitemapItems();
+  // TODO: Add datasets to sitemap once this work has been completed
+  // const dataSets = await dataSetService.getSitemapItems();
 
   const sitemapFields: ISitemapField[] = [
-    // matches dynamic routes following the patterns:
-    //  methodology/[methodology]
     ...buildMethodologyRoutes(methodologies),
-
-    // matches dynamic routes following the patterns:
-    //  data-catalogue/[publicationSlug]
-    //  data-tables/[publicationSlug]
-    //  find-statistics/[publication]
-    //  find-statistics/[publication]/data-guidance
-    //  find-statistics/[publication]/prerelease-access-list
-    //  find-statistics/[publication]/[release]/data-guidance
-    //  find-statistics/[publication]/[release]/prerelease-access-list
-    //  data-catalogue/[publicationSlug]/[releaseSlug]
-    //  data-tables/[publicationSlug]/[releaseSlug]
-    //  find-statistics/[publication]/[release]
     ...buildPublicationRoutes(publications),
-
-    // matches dynamic routes following the patterns:
-    //  data-catalogue/data-set/[dataSetFieldId]
-    ...buildDataSetRoutes(dataSets),
-
-    // Other routes which exist on the site but are excluded from the sitemap by config:
-    //  data-tables/fast-track/[dataBlockParentId]
-    //  data-tables/permalink/[publicationSlug]
-    //  subscriptions/new-subscription/[publicationSlug]
-    //  subscriptions/[publicationSlug]/confirm-subscription/[token]
-    //  subscriptions/[publicationSlug]/confirm-unsubscription/[token]
+    // ...buildDataSetRoutes(dataSets),
   ];
 
   return sitemapFields;
 }
 
 function buildMethodologyRoutes(
-  methodologies: MethodologySitemapSummary[],
+  methodologies: MethodologySitemapItem[],
 ): ISitemapField[] {
   return methodologies.map(methodology => ({
     loc: `${process.env.PUBLIC_URL}methodology/${methodology.slug}`,
-    lastmod: methodology.lastModified
-      ? `${methodology.lastModified}`
-      : undefined,
+    lastmod: methodology.lastModified,
   }));
 }
 
 function buildPublicationRoutes(
-  publications: PublicationSitemapSummary[],
+  publications: PublicationSitemapItem[],
 ): ISitemapField[] {
   let fields: ISitemapField[] = [];
 
@@ -67,36 +42,26 @@ function buildPublicationRoutes(
     fields = fields.concat([
       {
         loc: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
-        lastmod: publication.lastModified
-          ? `${publication.lastModified}`
-          : undefined,
+        lastmod: publication.lastModified,
       },
       {
         loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
-        lastmod: publication.lastModified
-          ? `${publication.lastModified}`
-          : undefined,
+        lastmod: publication.lastModified,
       },
       {
         loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}`,
-        lastmod: publication.lastModified
-          ? `${publication.lastModified}`
-          : undefined,
+        lastmod: publication.lastModified,
         changefreq: 'monthly',
         priority: 0.7,
       },
       {
         loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/data-guidance`,
-        lastmod: publication.lastModified
-          ? `${publication.lastModified}`
-          : undefined,
+        lastmod: publication.lastModified,
         priority: 0.4,
       },
       {
         loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/prerelease-access-list`,
-        lastmod: publication.lastModified
-          ? `${publication.lastModified}`
-          : undefined,
+        lastmod: publication.lastModified,
         priority: 0.2,
       },
     ]);
@@ -105,25 +70,25 @@ function buildPublicationRoutes(
       fields = fields.concat([
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/${release.slug}`,
-          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
+          lastmod: release.lastModified,
         },
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/${release.slug}/data-guidance`,
-          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
+          lastmod: release.lastModified,
           priority: 0.4,
         },
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}/${release.slug}/prerelease-access-list`,
-          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
+          lastmod: release.lastModified,
           priority: 0.2,
         },
         {
           loc: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}/${release.slug}`,
-          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
+          lastmod: release.lastModified,
         },
         {
           loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}/${release.slug}`,
-          lastmod: release.lastModified ? `${release.lastModified}` : undefined,
+          lastmod: release.lastModified,
         },
       ]);
     });
@@ -131,11 +96,11 @@ function buildPublicationRoutes(
   return fields;
 }
 
-function buildDataSetRoutes(
-  dataSets: DataSetSitemapSummary[],
-): ISitemapField[] {
-  return dataSets.map(dataSet => ({
-    loc: `${process.env.PUBLIC_URL}data-catalogue/data-set/${dataSet.id}`,
-    lastmod: dataSet.lastModified ? `${dataSet.lastModified}` : undefined,
-  }));
-}
+// function buildDataSetRoutes(
+//   dataSets: DataSetSitemapItem[],
+// ): ISitemapField[] {
+//   return dataSets.map(dataSet => ({
+//     loc: `${process.env.PUBLIC_URL}data-catalogue/data-set/${dataSet.id}`,
+//     lastmod: dataSet.lastModified ? `${dataSet.lastModified}` : undefined,
+//   }));
+// }

@@ -19,6 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 {
     public class PublicationControllerTests
     {
+        private readonly string sitemapItemLastModifiedTime = "2024-02-05T09:36:45.00Z";
+        private readonly string publicationLastModifiedTime = "2024-01-03T10:14:23.00Z";
+
         [Fact]
         public async Task GetPublicationTitle()
         {
@@ -102,35 +105,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         [Fact]
-        public async Task GetSitemapSummaries()
+        public async Task GetSitemapItems()
         {
             var publicationService = new Mock<IPublicationService>(Strict);
 
-            publicationService.Setup(mock => mock.GetSitemapSummaries())
-                .ReturnsAsync(new List<PublicationSitemapSummaryViewModel>()
+            publicationService.Setup(mock => mock.GetSitemapItems())
+                .ReturnsAsync(new List<PublicationSitemapItemViewModel>()
                 {
                     new()
                     {
                         Slug = "test-publication",
-                        LastModified = new DateTime(2024, 01, 03, 10, 14, 23),
-                        Releases = new List<ReleaseSitemapSummaryViewModel>()
-                        {
-                            new()
+                        LastModified = DateTime.Parse(publicationLastModifiedTime),
+                        Releases =
+                        [
+                            new ReleaseSitemapItemViewModel
                             {
                                 Slug = "test-release",
-                                LastModified = new DateTime(2024, 02, 05, 09, 36, 45)
+                                LastModified = DateTime.Parse(sitemapItemLastModifiedTime)
                             }
-                        }
+                        ]
                     }
                 });
 
             var controller = BuildPublicationController(publicationService: publicationService.Object);
 
-            var result = await controller.GetSitemapSummaries();
-            var sitemapSummaries = result.Value;
+            var response = await controller.GetSitemapItems();
+            var sitemapItems = response.AssertOkResult();
 
-            Assert.Equal("test-publication", sitemapSummaries?.Single().Slug);
-            Assert.Equal("test-release", sitemapSummaries?.Single().Releases.Single().Slug);
+            var item = Assert.Single(sitemapItems);
+            Assert.Equal("test-publication", item.Slug);
+
+            Assert.NotNull(item);
+            Assert.NotNull(item.Releases);
+            var release = Assert.Single(item.Releases);
+            Assert.Equal("test-release", release.Slug);
 
             VerifyAllMocks(publicationService);
         }

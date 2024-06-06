@@ -1,12 +1,12 @@
 import { contentApi } from './api';
 
-export interface DataSetSitemapSummary {
+export interface DataSetSitemapItem {
   id: string;
-  lastModified: Date | undefined;
+  lastModified?: string;
 }
 
 const dataSetService = {
-  getSitemapSummaries(): Promise<DataSetSitemapSummary[]> {
+  getSitemapItems(): Promise<DataSetSitemapItem[]> {
     return contentApi.get('/data-set-files/sitemap-summaries');
   },
 };

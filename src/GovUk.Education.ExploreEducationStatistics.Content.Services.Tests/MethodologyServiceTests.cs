@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Moq;
@@ -22,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class MethodologyServiceTests
     {
+        private readonly string sitemapItemLastModifiedTime = "2024-05-04T10:24:13";
+        
         [Fact]
         public async Task GetLatestMethodologyBySlug()
         {
@@ -693,19 +697,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetSitemapSummaries()
+        public async Task GetSitemapItems()
         {
             var methodologyVersionId = Guid.NewGuid();
-            var methodologyUpdatedDate = new DateTime(2017, 02, 03, 01, 04, 19);
+            var methodologyUpdatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
 
             var methodology = new Methodology
             {
                 OwningPublicationSlug = "publication-title",
                 OwningPublicationTitle = "Publication title",
                 LatestPublishedVersionId = methodologyVersionId,
-                Versions = new List<MethodologyVersion>
-                {
-                    new()
+                Versions =
+                [
+                    new MethodologyVersion
                     {
                         Id = methodologyVersionId,
                         PublishingStrategy = Immediately,
@@ -713,7 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Updated = methodologyUpdatedDate,
                         Status = Approved,
                     }
-                }
+                ]
             };
 
             var publication = new Publication
@@ -721,14 +725,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-title",
                 Title = "Publication title",
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Methodology = methodology,
-                        Owner = true
-                    }
-                },
+                Methodologies =
+                [
+                    new PublicationMethodology { Methodology = methodology, Owner = true }
+                ],
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -742,18 +742,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.Attach(methodology.Versions[0]);
-
                 var service = SetupMethodologyService(contentDbContext);
-                var result = (await service.GetSitemapSummaries()).AssertRight();
+                var result = (await service.GetSitemapItems()).AssertRight();
 
-                Assert.Equal(methodology.OwningPublicationSlug, result.Single().Slug);
-                Assert.Equal(methodologyUpdatedDate, result.Single().LastModified);
+                var item = Assert.Single(result);
+                Assert.Equal(methodology.OwningPublicationSlug, item.Slug);
+                Assert.Equal(methodologyUpdatedDate, item.LastModified);
             }
         }
 
         [Fact]
-        public async Task GetSitemapSummaries_AlternativeSlugTakesPriority()
+        public async Task GetSitemapItems_AlternativeSlugTakesPriority()
         {
             var methodologyVersionId = Guid.NewGuid();
             var methodologyUpdatedDate = new DateTime(2017, 02, 03, 01, 04, 19);
@@ -763,9 +762,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 OwningPublicationSlug = "publication-title",
                 OwningPublicationTitle = "Publication title",
                 LatestPublishedVersionId = methodologyVersionId,
-                Versions = new List<MethodologyVersion>
-                {
-                    new()
+                Versions =
+                [
+                    new MethodologyVersion
                     {
                         Id = methodologyVersionId,
                         PublishingStrategy = Immediately,
@@ -775,7 +774,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         AlternativeSlug = "alternative-title",
                         AlternativeTitle = "Alternative title",
                     }
-                }
+                ]
             };
 
             var publication = new Publication
@@ -783,14 +782,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-title",
                 Title = "Publication title",
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Methodology = methodology,
-                        Owner = true
-                    }
-                },
+                Methodologies =
+                [
+                    new PublicationMethodology { Methodology = methodology, Owner = true }
+                ],
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -804,13 +799,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.Attach(methodology.Versions[0]);
-
                 var service = SetupMethodologyService(contentDbContext);
-                var result = (await service.GetSitemapSummaries()).AssertRight();
+                var result = (await service.GetSitemapItems()).AssertRight();
 
-                Assert.Equal("alternative-title", result.Single().Slug);
-                Assert.Equal(methodologyUpdatedDate, result.Single().LastModified);
+                var item = Assert.Single(result);
+                Assert.Equal("alternative-title", item.Slug);
+                Assert.Equal(methodologyUpdatedDate, item.LastModified);
             }
         }
 

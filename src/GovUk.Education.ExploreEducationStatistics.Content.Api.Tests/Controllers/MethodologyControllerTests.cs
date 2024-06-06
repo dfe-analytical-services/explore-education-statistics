@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -14,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 {
     public class MethodologyControllerTests
     {
+        private readonly string sitemapItemLastModifiedTime = "2024-01-03T10:14:23.00Z";
+
         [Fact]
         public async Task GetLatestMethodologyBySlug()
         {
@@ -55,26 +58,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         [Fact]
-        public async Task GetSitemapSummaries()
+        public async Task GetSitemapItems()
         {
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.GetSitemapSummaries())
-                .ReturnsAsync(new List<MethodologySitemapSummaryViewModel>()
+            methodologyService.Setup(mock => mock.GetSitemapItems())
+                .ReturnsAsync(new List<MethodologySitemapItemViewModel>()
                 {
                     new()
                     {
                         Slug = "test-methodology",
-                        LastModified = new DateTime(2024, 01, 03, 10, 14, 23)
+                        LastModified = DateTime.Parse(sitemapItemLastModifiedTime)
                     }
                 });
 
             var controller = new MethodologyController(methodologyService.Object);
 
-            var result = await controller.GetSitemapSummaries();
-            var sitemapSummaries = result.Value;
+            var response = await controller.GetSitemapItems();
+            var sitemapItems = response.AssertOkResult();
 
-            Assert.Equal("test-methodology", sitemapSummaries.Single().Slug);
+            Assert.Equal("test-methodology", sitemapItems.Single().Slug);
 
             MockUtils.VerifyAllMocks(methodologyService);
         }

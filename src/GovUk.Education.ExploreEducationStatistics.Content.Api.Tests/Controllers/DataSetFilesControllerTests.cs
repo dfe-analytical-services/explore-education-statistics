@@ -1779,6 +1779,38 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         }
     }
 
+    public class GetSiteMapItemsTests
+    {
+        private readonly string sitemapItemLastModifiedTime = "2024-01-03T10:14:23.00Z";
+
+        [Fact]
+        public async Task GetSitemapItems()
+        {
+            var dataSetFileService = new Mock<IDataSetFileService>(MockBehavior.Strict);
+            var dataSetId = Guid.NewGuid();
+
+            dataSetFileService.Setup(mock => mock.GetSitemapItems())
+                .ReturnsAsync(new List<DataSetSitemapItemViewModel>()
+                {
+                    new()
+                    {
+                        Id = dataSetId.ToString(),
+                        LastModified = DateTime.Parse(sitemapItemLastModifiedTime)
+                    }
+                });
+
+            var controller = new DataSetFilesController(dataSetFileService.Object);
+
+            var response = await controller.GetSitemapItems();
+            var sitemapItems = response.AssertOkResult();
+
+            Assert.Equal(dataSetId.ToString(), sitemapItems.Single().Id);
+
+            MockUtils.VerifyAllMocks(dataSetFileService);
+        }
+    }
+
+
     public class GetDataSetFileTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
     {
         public override async Task InitializeAsync()
@@ -2385,6 +2417,28 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 {
                     services.ReplaceService(statisticsDbContext);
                 }
+
+                services.AddTransient<IReleaseVersionRepository>(s => new ReleaseVersionRepository(
+                    contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
+                services.AddTransient<IPublicBlobStorageService>(s =>
+                    publicBlobStorageService ?? new PublicBlobStorageService(
+                            s.GetRequiredService<ILogger<IBlobStorageService>>(),
+                        new ConfigurationBuilder()
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                            // Use appsettings.IntegrationTest.json to prevent tests passing due to data-storage docker
+                            // container running separately: appsettings.IntegrationTest.json uses different ports
+                            // to those used by the data-storage docker container - i.e. not 10000/10001
+                            .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
+                            .AddEnvironmentVariables()
+                            .Build()));
+                services.AddTransient<IFootnoteRepository>(s => new FootnoteRepository(
+                    statisticsDbContext ?? s.GetRequiredService<StatisticsDbContext>()));
+                services.AddTransient<IDataSetFileService>(
+                    s => new DataSetFileService(
+                        contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
+                        s.GetRequiredService<IReleaseVersionRepository>(),
+                        s.GetRequiredService<IPublicBlobStorageService>(),
+                        s.GetRequiredService<IFootnoteRepository>()));
             });
     }
 

@@ -134,10 +134,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
         }
 
-        public async Task<Either<ActionResult, List<MethodologySitemapSummaryViewModel>>> GetSitemapSummaries()
+        public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> GetSitemapItems()
         {
             return await _contentDbContext.MethodologyVersions
-                .Select(mv => new MethodologySitemapSummaryViewModel()
+                .Select(mv => new MethodologySitemapItemViewModel()
             {
                 Slug = mv.AlternativeSlug ?? mv.Methodology.OwningPublicationSlug,
                 // TODO: Add tests for this priority ordering once it's been discussed in PR

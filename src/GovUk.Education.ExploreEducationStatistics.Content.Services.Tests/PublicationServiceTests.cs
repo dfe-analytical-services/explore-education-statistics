@@ -2027,10 +2027,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
         }
 
-        public class GetSiteMapSummariesTests : PublicationServiceTests
+        public class GetSitemapItemsTests : PublicationServiceTests
         {
             [Fact]
-            public async Task GetSitemapSummaries()
+            public async Task GetSitemapItems()
             {
                 var publicationUpdatedDate = new DateTime(2018, 04, 06, 13, 46, 11);
                 
@@ -2056,7 +2056,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     var service = SetupPublicationService(contentDbContext);
                     
-                    var result = (await service.GetSitemapSummaries()).AssertRight();
+                    var result = (await service.GetSitemapItems()).AssertRight();
 
                     Assert.Equal(publication.Slug, result.Single().Slug);
                     Assert.Equal(publicationUpdatedDate, result.Single().LastModified);
