@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CodeActions;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -82,23 +82,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (!await IsZipFile(zipFile))
             {
-                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
-                    {
-                        Code = ValidationMessages.MustBeZipFile.Code,
-                        Message = ValidationMessages.MustBeZipFile.Message,
-                        Path = zipFile.FileName,
-                    });
+                return Common.Validators.ValidationUtils.ValidationResult(
+                    ValidationMessages.GenerateErrorMustBeZipFile(zipFile.FileName));
+            }
+
+            if (zipFile.FileName.Length > MaxFilenameSize)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(
+                    ValidationMessages.GenerateErrorFileNameTooLong(
+                        zipFile.FileName, MaxFilenameSize));
             }
 
             await using var stream = zipFile.OpenReadStream();
             using var archive = new ZipArchive(stream);
 
             ZipArchiveEntry? datasetNamesEntry = null;
+
+            var unprocessedArchiveFiles = archive.Entries.ToList();
             foreach (var zipArchiveEntry in archive.Entries)
             {
                 if (zipArchiveEntry.FullName == "dataset_names.csv")
                 {
                     datasetNamesEntry = zipArchiveEntry;
+                    unprocessedArchiveFiles.Remove(zipArchiveEntry);
+                    break;
                 }
             }
 
@@ -122,12 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             catch (ReaderException e)
             {
-                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
-                    {
-                        Code = ValidationMessages.DatasetNamesCsvReaderException.Code,
-                        Message = ValidationMessages.DatasetNamesCsvReaderException.Message,
-                        Path = e.ToString(), // @MarkFix do we want this?
-                    });
+                return Common.Validators.ValidationUtils.ValidationResult(
+                    ValidationMessages.GenerateErrorDatasetNamesCsvReaderException(e.ToString()));
             }
 
             var headers = datasetNamesCsvReader.HeaderRecord?.ToList() ?? new List<string>();
@@ -151,49 +154,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             while (!lastLine)
             {
-                var row = Enumerable
-                    .Range(0, csvDataReader.FieldCount)
-                    .Select(datasetNamesCsvReader.GetField<string>)
-                    .ToList();
-
-                var fileName = row[0];
-                var datasetName = row[1];
+                var filename = datasetNamesCsvReader.GetField<string>("file_name");
+                var datasetName = datasetNamesCsvReader.GetField<string>("dataset_name");
 
                 ZipArchiveEntry? dataFile = null;
                 ZipArchiveEntry? metaFile = null;
 
                 foreach (var zipArchiveEntry in archive.Entries)
                 {
-                    if (zipArchiveEntry.FullName == $"{fileName}.csv")
+                    if (zipArchiveEntry.FullName == $"{filename}.csv")
                     {
                         dataFile = zipArchiveEntry;
+                        unprocessedArchiveFiles.Remove(zipArchiveEntry);
                         continue;
                     }
 
-                    if (zipArchiveEntry.FullName == $"{fileName}.meta.csv")
+                    if (zipArchiveEntry.FullName == $"{filename}.meta.csv")
                     {
                         metaFile = zipArchiveEntry;
+                        unprocessedArchiveFiles.Remove(zipArchiveEntry);
                     }
                 }
 
                 if (dataFile == null)
                 {
-                    errors.Add(new ErrorViewModel
-                    {
-                        Code = ValidationMessages.DataFileNotFoundInZip.Code,
-                        Message = ValidationMessages.DataFileNotFoundInZip.Message,
-                        Path = $"{fileName}.csv",
-                    });
+                    errors.Add(ValidationMessages.GenerateErrorDataFileNotFoundInZip($"{filename}.csv"));
                 }
 
                 if (metaFile == null)
                 {
-                    errors.Add(new ErrorViewModel
-                    {
-                        Code = ValidationMessages.MetaFileNotFoundInZip.Code,
-                        Message = ValidationMessages.MetaFileNotFoundInZip.Message,
-                        Path = $"{fileName}.meta.csv",
-                    });
+                    errors.Add(ValidationMessages.GenerateErrorMetaFileNotFoundInZip($"{filename}.meta.csv"));
                 }
 
                 // @MarkFix More Data/Meta file validation here?
@@ -203,11 +193,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 lastLine = !await datasetNamesCsvReader.ReadAsync();
             }
 
-            // @MarkFix Check all dataset_names.csv entries subject names are distinct
-            var newDatasetNames = results.Select(file => file.DataSetName).ToList();
-            
-            // @MarkFix Check all dataset_names.csv data and meta files are distinct
+            // Check filename lengths
+            foreach (var zipArchiveEntry in archive.Entries)
+            {
+                if (zipArchiveEntry.Length > MaxFilenameSize)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
+                        zipArchiveEntry.FullName, MaxFilenameSize));
+                }
+            }
 
+            // Check for duplicate data set names
+            results
+                .GroupBy(file => file.DataSetName)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ForEach(duplicateDatasetName =>
+                {
+                    errors.Add(ValidationMessages
+                        .GenerateErrorBulkDataZipContainsDuplicateDatasetNames(duplicateDatasetName));
+                });
+
+            // Check for unused files in ZIP
+            if (unprocessedArchiveFiles.Count > 0)
+            {
+                // @MarkFix do we want to do this - probably hit MacOs archive hidden files and fail?
+                errors.Add(ValidationMessages.GenerateErrorZipContainsUnusedFiles(
+                    unprocessedArchiveFiles
+                        .Select(file => file.FullName)
+                        .ToList()));
+            }
+
+            // Check ZIP contains at least one data set
             if (results.Count == 0)
             {
                 errors.Add(new ErrorViewModel
@@ -221,12 +238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
-
-            // @MarkFix do we want to do this - probably hit MacOs archive hidden files and fail?
-            //if (archive.Entries.Count != (2 * results.Count) + 1) // +1 for dataset_names.csv
-            //{
-            //
-            //}
 
             return results;
         }
