@@ -1,4 +1,3 @@
-using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -93,7 +92,8 @@ public abstract class DataSetVersionPathResolverTests
 
             Assert.Equal(
                 Path.Combine(
-                    Assembly.GetExecutingAssembly().GetDirectoryPath(),
+                    Path.GetTempPath(),
+                    "ExploreEducationStatistics",
                     "data",
                     "data-files",
                     randomTestInstanceDir.ToString()
