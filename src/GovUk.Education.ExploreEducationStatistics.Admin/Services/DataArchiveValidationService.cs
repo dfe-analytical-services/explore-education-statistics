@@ -41,9 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile)
         {
-            if (!await IsZipFile(zipFile))
+            var errors = await IsValidZipFile(zipFile);
+            if (errors.Count > 0)
             {
-                return ValidationActionResult(DataZipMustBeZipFile);
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
             await using var stream = zipFile.OpenReadStream();
@@ -66,7 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
 
             var filenamesValid = ValidateFilenameLengths(
-                zipFile.FileName.Length,
                 dataFile.Name.Length,
                 metaFile.Name.Length);
 
@@ -80,17 +80,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, List<BulkDataArchiveFile>>> ValidateBulkDataArchiveFile(IFormFile zipFile)
         {
-            if (!await IsZipFile(zipFile))
+            var errors = await IsValidZipFile(zipFile);
+            if (errors.Count > 0)
             {
-                return Common.Validators.ValidationUtils.ValidationResult(
-                    ValidationMessages.GenerateErrorMustBeZipFile(zipFile.FileName));
-            }
-
-            if (zipFile.FileName.Length > MaxFilenameSize)
-            {
-                return Common.Validators.ValidationUtils.ValidationResult(
-                    ValidationMessages.GenerateErrorFileNameTooLong(
-                        zipFile.FileName, MaxFilenameSize));
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
             await using var stream = zipFile.OpenReadStream();
@@ -149,8 +142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             using var csvDataReader = new CsvDataReader(datasetNamesCsvReader);
 
             var lastLine = false; // Assume one row of data // @MarkFix yeah? test it
-
-            List<ErrorViewModel> errors = [];
 
             while (!lastLine)
             {
@@ -234,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
             }
 
-            if (errors.Count != 0)
+            if (errors.Count > 0)
             {
                 return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
@@ -242,30 +233,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return results;
         }
 
-        private async Task<bool> IsZipFile(IFormFile file)
+        private async Task<List<ErrorViewModel>> IsValidZipFile(IFormFile file)
         {
-            if (!file.FileName.ToLower().EndsWith(".zip"))
+            List<ErrorViewModel> errors = [];
+
+            if (file.FileName.Length > MaxFilenameSize)
             {
-                return false;
+                errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
+                        file.FileName, MaxFilenameSize));
             }
 
-            return await _fileTypeService.HasMatchingMimeType(
-                       file,
-                       AllowedMimeTypesByFileType[DataZip]
-                   )
-                   && _fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes);
+            if (!file.FileName.ToLower().EndsWith(".zip"))
+            {
+                errors.Add(ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(file.FileName));
+            }
+
+            if (!await _fileTypeService.HasMatchingMimeType(
+                    file,
+                    AllowedMimeTypesByFileType[DataZip]
+                )
+                || !_fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes))
+            {
+                errors.Add(ValidationMessages.GenerateErrorMustBeZipFile(file.FileName));
+            }
+
+            return errors;
         }
 
         private static Either<ActionResult, Unit> ValidateFilenameLengths(
-            int zipFilenameLength,
             int dataFilenameLength,
             int metaFilenameLength)
         {
-            if (zipFilenameLength > MaxFilenameSize)
-            {
-                return ValidationActionResult(DataZipFilenameTooLong);
-            }
-
             if (dataFilenameLength > MaxFilenameSize && metaFilenameLength > MaxFilenameSize)
             {
                 return ValidationActionResult(DataZipContentFilenamesTooLong);
