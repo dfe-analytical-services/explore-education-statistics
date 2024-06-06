@@ -58,11 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         SubjectTitleCannotBeEmpty,
         SubjectTitleCannotContainSpecialCharacters,
         SubjectTitleMustBeUnique,
-        DataFilenameNotUnique,
-        DataAndMetadataFilesCannotHaveTheSameName,
-        DataFileCannotBeEmpty,
-        DataFileMustBeCsvFile,
-        DataFilenameCannotContainSpacesOrSpecialCharacters,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         FileTypeMustBeData,
@@ -71,24 +66,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFilenameTooLong,
 
         // Data zip file
-        DataZipMustBeZipFile,
         DataZipFileCanOnlyContainTwoFiles,
         DataZipFileDoesNotContainCsvFiles,
-        DataZipFilenameTooLong,
         DataZipContentFilenamesTooLong,
-        DataBulkZipFileMustContainDatasetNamesCsv,
-        DataBulkZipErrorReadingDatasetNamesCsv,
-        DataBulkZipDatasetNamesCsvMustContainTwoColumnsNamedCorrectly,
-        DataBulkZipCannotFindDataFile,
-        DataBulkZipCannotFindMetaFile,
-        DataBulkZipCannotHaveNoDatasets,
 
         // Meta file
-        MetadataFileCannotBeEmpty,
-        MetaFileMustBeCsvFile,
         UnableToFindMetadataFileToDelete,
-        MetaFilenameCannotContainSpacesOrSpecialCharacters,
-        MetaFileIsIncorrectlyNamed,
         MetaFilenameTooLong,
 
         // Data replacement
