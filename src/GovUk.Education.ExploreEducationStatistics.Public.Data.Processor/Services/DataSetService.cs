@@ -22,8 +22,8 @@ public class DataSetService(
     PublicDataDbContext publicDataDbContext
 ) : IDataSetService
 {
-    public async Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateDataSetVersion(
-        InitialDataSetVersionCreateRequest request,
+    public async Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateDataSet(
+        DataSetCreateRequest request,
         Guid instanceId,
         CancellationToken cancellationToken = default)
     {
@@ -65,9 +65,9 @@ public class DataSetService(
 
         return releaseFile is null
             ? ValidationUtils.ValidationResult(CreateReleaseFileIdError(
-                    message: ValidationMessages.FileNotFound,
-                    releaseFileId: releaseFileId
-                ))
+                message: ValidationMessages.FileNotFound,
+                releaseFileId: releaseFileId
+            ))
             : releaseFile;
     }
 
@@ -200,7 +200,7 @@ public class DataSetService(
         {
             Code = message.Code,
             Message = message.Message,
-            Path = nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+            Path = nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
             Detail = new InvalidErrorDetail<Guid>(releaseFileId)
         };
     }

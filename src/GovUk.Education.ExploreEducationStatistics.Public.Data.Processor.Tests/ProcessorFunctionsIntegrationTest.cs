@@ -153,7 +153,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
     {
         return
         [
-            typeof(CreateInitialDataSetVersionFunction),
+            typeof(CreateDataSetFunction),
             typeof(ProcessInitialDataSetVersionFunction),
             typeof(DeleteDataSetVersionFunction),
             typeof(CopyCsvFilesFunction),

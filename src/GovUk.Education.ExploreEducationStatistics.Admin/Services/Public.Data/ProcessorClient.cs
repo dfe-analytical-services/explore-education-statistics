@@ -24,23 +24,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
 internal class ProcessorClient(
     ILogger<ProcessorClient> logger,
-    HttpClient httpClient, 
+    HttpClient httpClient,
     IOptions<PublicDataProcessorOptions> options,
     IWebHostEnvironment environment) : IProcessorClient
 {
-    public async Task<Either<ActionResult, CreateInitialDataSetVersionResponseViewModel>> CreateInitialDataSetVersion(
-        Guid releaseFileId, 
+    public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateDataSet(
+        Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
         await AddBearerToken(cancellationToken);
 
-        var request = new InitialDataSetVersionCreateRequest
+        var request = new DataSetCreateRequest
         {
             ReleaseFileId = releaseFileId,
         };
 
         var response = await httpClient
-            .PostAsJsonAsync("api/CreateInitialDataSetVersion", request, cancellationToken: cancellationToken);
+            .PostAsJsonAsync("api/CreateDataSet", request, cancellationToken: cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -56,24 +56,24 @@ internal class ProcessorClient(
                 default:
                     var message = await response.Content.ReadAsStringAsync(cancellationToken);
                     logger.LogError($"""
-                         Failed to create data set version with status code: {response.StatusCode}. Message:
-                         {message}
-                         """);
+                                     Failed to create data set with status code: {response.StatusCode}. Message:
+                                     {message}
+                                     """);
                     response.EnsureSuccessStatusCode();
                     break;
             }
         }
 
-        var content = await response.Content.ReadFromJsonAsync<CreateInitialDataSetVersionResponseViewModel>(
-                cancellationToken: cancellationToken
-            );
+        var content = await response.Content.ReadFromJsonAsync<CreateDataSetResponseViewModel>(
+            cancellationToken: cancellationToken
+        );
 
         return content
             ?? throw new Exception("Could not deserialize the response from the Public Data Processor.");
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
-        Guid dataSetVersionId, 
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
         var response = await httpClient
@@ -126,9 +126,10 @@ internal class ProcessorClient(
         {
             var accessTokenProvider = new DefaultAzureCredential();
             var tokenResponse = await accessTokenProvider.GetTokenAsync(
-                new TokenRequestContext([$"api://{options.Value.AppRegistrationClientId}/.default"]), 
+                new TokenRequestContext([$"api://{options.Value.AppRegistrationClientId}/.default"]),
                 cancellationToken);
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResponse.Token);
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", tokenResponse.Token);
         }
     }
 }
