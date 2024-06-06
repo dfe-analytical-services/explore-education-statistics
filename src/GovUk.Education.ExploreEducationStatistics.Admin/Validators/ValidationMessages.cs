@@ -72,6 +72,20 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage MustBeCsvFile = new(
+        Code: "MustBeCsvFile",
+        Message: "The file provided '{0}' must be a CSV file."
+    );
+
+    public static ErrorViewModel GenerateErrorMustBeCsvFile(string fullFilename)
+    {
+        return new ErrorViewModel
+        {
+            Code = MustBeCsvFile.Code,
+            Message = string.Format(MustBeCsvFile.Message, fullFilename),
+        };
+    }
+
     public static readonly LocalizableMessage BulkDataZipMustContainDatasetNamesCsv = new(
         Code: "BulkDataZipMustContainDatasetNamesCsv",
         Message: "For bulk imports, the ZIP must include a dataset_names.csv"
@@ -142,8 +156,8 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage FileNameTooLong = new(
-        Code: "FileNameTooLong",
+    public static readonly LocalizableMessage FilenameTooLong = new(
+        Code: "FilenameTooLong",
         Message: "Filename '{0}' is too long. Should be at most {1} characters."
     );
 
@@ -151,8 +165,8 @@ public static class ValidationMessages
     {
         return new ErrorViewModel
         {
-            Code = FileNameTooLong.Code,
-            Message = string.Format(FileNameTooLong.Message, fullFileName, maxLength),
+            Code = FilenameTooLong.Code,
+            Message = string.Format(FilenameTooLong.Message, fullFileName, maxLength),
         };
     }
 
@@ -167,6 +181,81 @@ public static class ValidationMessages
         {
             Code = ZipContainsUnusedFiles.Code,
             Message = string.Format(ZipContainsUnusedFiles.Message, unusedFilenames.JoinToString(",")),
+        };
+    }
+
+    public static readonly LocalizableMessage DataAndMetaFilesCannotHaveSameName = new(
+        Code: "DataAndMetaFilesCannotHaveSameName",
+        Message: "Data file and meta file must use a different filename"
+    );
+
+    public static readonly LocalizableMessage FilenameCannotContainSpacesOrSpecialCharacters = new(
+        Code: "FilenameCannotContainSpacesOrSpecialCharacters",
+        Message: "Filename '{0}' must not use spaces or special characters."
+    );
+
+    public static ErrorViewModel GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = FilenameCannotContainSpacesOrSpecialCharacters.Code,
+            Message = string.Format(FilenameCannotContainSpacesOrSpecialCharacters.Message, filename),
+        };
+    }
+
+    public static readonly LocalizableMessage FilenameMustEndDotCsv = new(
+        Code: "FilenameMustEndDotCsv",
+        Message: "Filename '{0}' must end in '.csv'."
+    );
+
+    public static ErrorViewModel GenerateErrorFilenameMustEndDotCsv(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = FilenameMustEndDotCsv.Code,
+            Message = string.Format(FilenameMustEndDotCsv.Message, filename),
+        };
+    }
+
+    public static readonly LocalizableMessage MetaFilenameMustEndDotMetaDotCsv = new(
+        Code: "MetaFilenameMustEndDotMetaDotCsv",
+        Message: "Meta file '{0}' must end in '.meta.csv'."
+    );
+
+    public static ErrorViewModel GenerateErrorMetaFilenameMustEndDotMetaDotCsv(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = MetaFilenameMustEndDotMetaDotCsv.Code,
+            Message = string.Format(MetaFilenameMustEndDotMetaDotCsv.Message, filename),
+        };
+    }
+
+    public static readonly LocalizableMessage DataFilenameNotUnique = new(
+        Code: "DataFilenameNotUnique",
+        Message: "Data filename '{0}' isn't unique to this release."
+    );
+
+    public static ErrorViewModel GenerateErrorDataFilenameNotUnique(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = DataFilenameNotUnique.Code,
+            Message = string.Format(DataFilenameNotUnique.Message, filename),
+        };
+    }
+
+    public static readonly LocalizableMessage FileSizeMustNotBeZero = new(
+        Code: "FileSizeMustNotBeZero",
+        Message: "File '{0}' must not be of 0 size."
+    );
+
+    public static ErrorViewModel GenerateErrorFileSizeMustNotBeZero(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = FileSizeMustNotBeZero.Code,
+            Message = string.Format(FileSizeMustNotBeZero.Message, filename),
         };
     }
 }

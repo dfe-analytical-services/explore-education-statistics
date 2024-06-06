@@ -2,10 +2,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -39,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void UploadedZippedDataFilenameTooLong()
+        public async Task UploadedZippedDataFilenameTooLong()
         {
             var fileTypeService = new Mock<IFileTypeService>(Strict);
             var service = SetupDataArchiveValidationService(fileTypeService: fileTypeService.Object);
@@ -54,10 +57,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
                 .Returns(() => true);
 
-            var result = service.ValidateDataArchiveFile(archive).Result;
+            var result = await service.ValidateDataArchiveFile(archive);
             VerifyAllMocks(fileTypeService);
 
-            result.AssertBadRequest(DataZipFilenameTooLong);
+            Assert.True(result.IsLeft); // @MarkFix abstract out
+            var badRequest = (BadRequestObjectResult)result.Left;
+            Assert.Equal(400, badRequest.StatusCode);
+            var validationProblemViewModel = (ValidationProblemViewModel)badRequest.Value;
+            var error = Assert.Single(validationProblemViewModel.Errors);
+            Assert.Equal("FilenameTooLong", error.Code);
+            Assert.Equal($"Filename '{fileName}' is too long. Should be at most 150 characters.", error.Message);
         }
 
         [Fact]
