@@ -93,7 +93,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
                 .InSequence(activitySequence)
                 .Setup(context =>
                     context.CallActivityAsync(ActivityNames.HandleProcessingFailure,
-                        null,
+                        mockOrchestrationContext.Object.InstanceId,
                         null))
                 .Returns(Task.CompletedTask);
 

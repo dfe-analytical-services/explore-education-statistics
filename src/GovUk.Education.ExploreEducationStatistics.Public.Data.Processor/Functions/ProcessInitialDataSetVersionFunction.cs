@@ -46,7 +46,7 @@ public class ProcessInitialDataSetVersionFunction(
                 context.InstanceId,
                 input.DataSetVersionId);
 
-            await context.CallActivity(ActivityNames.HandleProcessingFailure, logger);
+            await context.CallActivity(ActivityNames.HandleProcessingFailure, logger, context.InstanceId);
         }
     }
 
