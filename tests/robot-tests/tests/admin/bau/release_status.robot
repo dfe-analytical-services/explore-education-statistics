@@ -13,6 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}             UI tests - release status %{RUN_IDENTIFIER}
 ${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_DATAFILES}   ${PUBLICATION_NAME} -  datafiles-updated
 
 
 *** Test Cases ***
@@ -294,6 +295,60 @@ Navigate to contents page and add a release note
 Publish the release immediately
     user clicks link    Sign off
     user approves release for immediate publication
+
+Create third release
+    ${DATA_FILES_PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME_DATAFILES}
+    user creates test release via api    ${DATA_FILES_PUBLICATION_ID}    FY    2300
+     user navigates to draft release page from dashboard    ${PUBLICATION_NAME_DATAFILES}
+    ...    Financial year 2300-01
+
+
+Upload data files
+    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user clicks link    Data and files
+    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
+    user waits until page contains accordion section    Dates test subject
+    user opens accordion section    Dates test subject
+
+    ${section}=    user gets accordion section content element    Dates test subject
+    user clicks link    Replace data    ${section}
+
+    user waits until h2 is visible    Data file details
+    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+
+Navigate to data replacement page
+    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
+    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
+    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
+    user clicks button    Upload data files
+
+    user waits until page contains element    testid:Replacement Subject title
+    user checks table column heading contains    1    1    Original file
+    user checks table column heading contains    1    2    Replacement file
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+
+Validate checklist errors and warnings
+    user edits release status
+
+    user checks checklist warnings contains
+    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
+    user checks checklist warnings contains link    No next expected release date has been added
+    user checks checklist warnings contains link    1 data file does not have any footnotes
+    user checks checklist warnings contains link    No data blocks have been saved as featured tables
+    user checks checklist warnings contains link    A public pre-release access list has not been created
+
+    user checks checklist errors contains
+    ...    3 issues that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    All data file replacements must be completed
+     user checks checklist errors contains link
+    ...    All summary information must be completed on the data guidance page
+    user checks checklist errors contains link
+    ...    Release must contain a key statistic or a non-empty headline text block
+
+    user checks page does not contain testid    releaseChecklist-success
+
 
 
 
