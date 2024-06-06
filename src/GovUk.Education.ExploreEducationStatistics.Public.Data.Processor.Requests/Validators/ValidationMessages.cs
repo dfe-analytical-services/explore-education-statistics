@@ -30,7 +30,6 @@ public static class ValidationMessages
         Message: "The data file must have a corresponding metadata file."
     );
 
-
     public static readonly LocalizableMessage DataSetVersionCanNotBeDeleted = new(
         Code: "DataSetVersionCanNotBeDeleted",
         Message: $"The data set version is not in a '{DataSetVersionStatus.Draft}' status, so cannot be deleted."
