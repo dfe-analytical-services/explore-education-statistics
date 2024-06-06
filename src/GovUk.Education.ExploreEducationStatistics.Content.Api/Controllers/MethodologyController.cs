@@ -26,11 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             return await _methodologyService.GetLatestMethodologyBySlug(slug)
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpGet("methodologies/sitemap-items")]
-        public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> GetSitemapItems()
+        public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> ListSitemapItems()
         {
-            return await _methodologyService.GetSitemapItems()
+            return await _methodologyService.ListSitemapItems()
                 .HandleFailuresOrOk();
         }
     }

@@ -1779,17 +1779,17 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetSiteMapItemsTests
+    public class ListSitemapItemsTests
     {
         private readonly string sitemapItemLastModifiedTime = "2024-01-03T10:14:23.00Z";
 
         [Fact]
-        public async Task GetSitemapItems()
+        public async Task ListSitemapItems()
         {
             var dataSetFileService = new Mock<IDataSetFileService>(MockBehavior.Strict);
             var dataSetId = Guid.NewGuid();
 
-            dataSetFileService.Setup(mock => mock.GetSitemapItems())
+            dataSetFileService.Setup(mock => mock.ListSitemapItems())
                 .ReturnsAsync(new List<DataSetSitemapItemViewModel>()
                 {
                     new()
@@ -1801,7 +1801,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             var controller = new DataSetFilesController(dataSetFileService.Object);
 
-            var response = await controller.GetSitemapItems();
+            var response = await controller.ListSitemapItems();
             var sitemapItems = response.AssertOkResult();
 
             Assert.Equal(dataSetId.ToString(), sitemapItems.Single().Id);

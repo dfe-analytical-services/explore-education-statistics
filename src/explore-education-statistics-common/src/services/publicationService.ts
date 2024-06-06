@@ -310,7 +310,7 @@ const publicationService = {
       params,
     });
   },
-  getSitemapItems(): Promise<PublicationSitemapItem[]> {
+  listSitemapItems(): Promise<PublicationSitemapItem[]> {
     return contentApi.get('/publications/sitemap-summaries');
   },
 };

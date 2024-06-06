@@ -14,9 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 public class DataSetFileServiceTests
 {
     private readonly string sitemapItemLastModifiedTime = "2024-05-04T10:24:13";
-    
+
     [Fact]
-    public async Task GetSitemapItems()
+    public async Task ListSitemapItems()
     {
         var dataSetFileId = Guid.NewGuid();
         var dataSetCreatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
@@ -45,7 +45,7 @@ public class DataSetFileServiceTests
         {
             var service = SetupDataSetFileService(contentDbContext);
 
-            var result = (await service.GetSitemapItems()).AssertRight();
+            var result = (await service.ListSitemapItems()).AssertRight();
 
             var item = Assert.Single(result);
             Assert.Equal(dataSetFileId.ToString(), item.Id);

@@ -103,11 +103,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 })
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpGet("publications/sitemap-items")]
-        public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> GetSitemapItems()
+        public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> ListSitemapItems()
         {
-            return await _publicationService.GetSitemapItems()
+            return await _publicationService.ListSitemapItems()
                 .HandleFailuresOrOk();
         }
     }

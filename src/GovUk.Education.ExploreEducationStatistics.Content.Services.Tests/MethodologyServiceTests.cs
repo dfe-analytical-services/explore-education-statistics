@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
     public class MethodologyServiceTests
     {
         private readonly string sitemapItemLastModifiedTime = "2024-05-04T10:24:13";
-        
+
         [Fact]
         public async Task GetLatestMethodologyBySlug()
         {
@@ -697,7 +697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetSitemapItems()
+        public async Task ListSitemapItems()
         {
             var methodologyVersionId = Guid.NewGuid();
             var methodologyUpdatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
@@ -743,7 +743,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext);
-                var result = (await service.GetSitemapItems()).AssertRight();
+                var result = (await service.ListSitemapItems()).AssertRight();
 
                 var item = Assert.Single(result);
                 Assert.Equal(methodology.OwningPublicationSlug, item.Slug);
@@ -752,7 +752,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetSitemapItems_AlternativeSlugTakesPriority()
+        public async Task ListSitemapItems_AlternativeSlugTakesPriority()
         {
             var methodologyVersionId = Guid.NewGuid();
             var methodologyUpdatedDate = new DateTime(2017, 02, 03, 01, 04, 19);
@@ -800,7 +800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext);
-                var result = (await service.GetSitemapItems()).AssertRight();
+                var result = (await service.ListSitemapItems()).AssertRight();
 
                 var item = Assert.Single(result);
                 Assert.Equal("alternative-title", item.Slug);

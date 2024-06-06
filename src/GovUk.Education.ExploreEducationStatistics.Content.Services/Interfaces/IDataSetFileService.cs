@@ -28,6 +28,6 @@ public interface IDataSetFileService
 
     Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetId);
-    
-    Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> GetSitemapItems();
+
+    Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems();
 }

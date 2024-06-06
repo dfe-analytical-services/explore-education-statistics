@@ -105,11 +105,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         [Fact]
-        public async Task GetSitemapItems()
+        public async Task ListSitemapItems()
         {
             var publicationService = new Mock<IPublicationService>(Strict);
 
-            publicationService.Setup(mock => mock.GetSitemapItems())
+            publicationService.Setup(mock => mock.ListSitemapItems())
                 .ReturnsAsync(new List<PublicationSitemapItemViewModel>()
                 {
                     new()
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var controller = BuildPublicationController(publicationService: publicationService.Object);
 
-            var response = await controller.GetSitemapItems();
+            var response = await controller.ListSitemapItems();
             var sitemapItems = response.AssertOkResult();
 
             var item = Assert.Single(sitemapItems);

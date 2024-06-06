@@ -341,10 +341,10 @@ public class PublicationService : IPublicationService
             .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data);
     }
 
-    public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> GetSitemapItems()
+    public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems()
     {
         return await _contentDbContext.Publications
-            .Where(p => p.LatestPublishedReleaseVersionId.HasValue && 
+            .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
                         (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
             .Select(p => new PublicationSitemapItemViewModel()
             {

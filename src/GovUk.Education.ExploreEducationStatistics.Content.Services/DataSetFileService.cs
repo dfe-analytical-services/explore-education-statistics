@@ -140,7 +140,7 @@ public class DataSetFileService : IDataSetFileService
             };
     }
 
-    public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> GetSitemapItems()
+    public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems()
     {
         var latestReleaseVersions = _contentDbContext.ReleaseVersions
             .LatestReleaseVersions(publishedOnly: true);
@@ -154,11 +154,12 @@ public class DataSetFileService : IDataSetFileService
         return await latestReleaseFiles
             .Select(rf => new DataSetSitemapItemViewModel()
             {
-                Id = rf.File.DataSetFileId!.Value.ToString(), LastModified = rf.Published
+                Id = rf.File.DataSetFileId!.Value.ToString(),
+                LastModified = rf.Published
             })
             .ToListAsync();
     }
-    
+
     private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
         IList<DataSetFileSummaryViewModel> results)
     {

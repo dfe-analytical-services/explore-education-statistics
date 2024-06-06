@@ -13,5 +13,5 @@ public interface IMethodologyService
 
     Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree();
 
-    Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> GetSitemapItems();
+    Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems();
 }

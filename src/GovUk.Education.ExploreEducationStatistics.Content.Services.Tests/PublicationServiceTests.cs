@@ -2027,13 +2027,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
         }
 
-        public class GetSitemapItemsTests : PublicationServiceTests
+        public class ListSitemapItemsTests : PublicationServiceTests
         {
             [Fact]
-            public async Task GetSitemapItems()
+            public async Task ListSitemapItems()
             {
                 var publicationUpdatedDate = new DateTime(2018, 04, 06, 13, 46, 11);
-                
+
                 Publication publication = _dataFixture
                     .DefaultPublication()
                     .WithReleases(ListOf<Release>(
@@ -2055,13 +2055,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
                     var service = SetupPublicationService(contentDbContext);
-                    
-                    var result = (await service.GetSitemapItems()).AssertRight();
+
+                    var result = (await service.ListSitemapItems()).AssertRight();
 
                     var item = Assert.Single(result);
                     Assert.Equal(publication.Slug, item.Slug);
                     Assert.Equal(publicationUpdatedDate, item.LastModified);
-                    
+
                     // TODO: Clarify SELECT query and write matching assertions. 
                     // Should we filter out publications with a SuperSededBy ID?
                     // Should we filter out Draft Releases? Why does the above generate a list of 5?
@@ -2071,7 +2071,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             }
         }
-        
+
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
             IPublicationRepository? publicationRepository = null,

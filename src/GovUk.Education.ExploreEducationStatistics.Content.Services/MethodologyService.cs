@@ -64,9 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .LoadAsync();
 
                     var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
-                    
+
                     viewModel.Publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
-                    
+
                     return viewModel;
                 });
         }
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
         }
 
-        public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> GetSitemapItems()
+        public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems()
         {
             return await _contentDbContext.Methodologies
                 .Include(m => m.LatestPublishedVersion)
@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Select(mv =>
                     new MethodologySitemapItemViewModel
                     {
-                        Slug = mv.Slug, 
+                        Slug = mv.Slug,
                         LastModified = mv.Published
                     })
                 .ToListAsync();
