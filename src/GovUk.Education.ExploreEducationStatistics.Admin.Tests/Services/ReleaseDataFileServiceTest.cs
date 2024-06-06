@@ -1689,7 +1689,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        null))
                     .ReturnsAsync(new DataImport
                     {
                         Status = QUEUED
@@ -1861,7 +1862,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        null))
                     .ReturnsAsync(new DataImport
                     {
                         Status = QUEUED
@@ -2078,7 +2080,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        null))
                     .ReturnsAsync(new DataImport());
 
                 privateBlobStorageService.Setup(mock =>
@@ -2208,7 +2211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile));
 
                 dataImportService
-                    .Setup(s => s.ImportZip(
+                    .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
                         It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
@@ -2385,7 +2388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile));
 
                 dataImportService
-                    .Setup(s => s.ImportZip(
+                    .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
                         It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
@@ -2543,7 +2546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile));
 
                 dataImportService
-                    .Setup(s => s.ImportZip(
+                    .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
                         It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
