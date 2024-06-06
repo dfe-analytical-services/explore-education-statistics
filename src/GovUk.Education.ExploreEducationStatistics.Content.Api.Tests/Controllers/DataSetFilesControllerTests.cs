@@ -1779,34 +1779,69 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListSitemapItemsTests
+    public class ListSitemapItemsTests(TestApplicationFactory<TestStartup> testApp) : DataSetFilesControllerTests(testApp)
     {
-        private readonly string sitemapItemLastModifiedTime = "2024-01-03T10:14:23.00Z";
-
         [Fact]
         public async Task ListSitemapItems()
         {
-            var dataSetFileService = new Mock<IDataSetFileService>(MockBehavior.Strict);
-            var dataSetId = Guid.NewGuid();
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
 
-            dataSetFileService.Setup(mock => mock.ListSitemapItems())
-                .ReturnsAsync(new List<DataSetSitemapItemViewModel>()
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFile(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithTimePeriodRange(
+                        _fixture.DefaultTimePeriodRangeMeta()
+                            .WithStart("2000", TimeIdentifier.CalendarYear)
+                            .WithEnd("2001", TimeIdentifier.CalendarYear)
+                        ))
+                    .WithPublicApiDataSetId(Guid.NewGuid())
+                    .WithPublicApiDataSetVersion(major: 1, minor: 0)
+                );
+
+            var azuriteContainer = await GetAzuriteContainer();
+
+            var configuration = CreateConfiguration();
+            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+
+            var publicBlobStorageService = new PublicBlobStorageService(
+                logger: new Logger<BlobStorageService>(new LoggerFactory()),
+                configuration: configuration);
+
+            var formFile = CreateDataCsvFormFile(""""
+                                                 column_1,column_2,column_3
+                                                 1,2,3
+                                                 2,"3,4",5
+                                                 3,"""4",5
+                                                 4,,6
+                                                 5,6,7
+                                                 6,7,8
+                                                 """");
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            var client = BuildApp(
+                publicBlobStorageService: publicBlobStorageService)
+                .AddContentDbTestData(context =>
                 {
-                    new()
-                    {
-                        Id = dataSetId.ToString(),
-                        LastModified = DateTime.Parse(sitemapItemLastModifiedTime)
-                    }
-                });
-
-            var controller = new DataSetFilesController(dataSetFileService.Object);
-
-            var response = await controller.ListSitemapItems();
-            var sitemapItems = response.AssertOkResult();
-
-            Assert.Equal(dataSetId.ToString(), sitemapItems.Single().Id);
-
-            MockUtils.VerifyAllMocks(dataSetFileService);
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+            
+            var response = await client.GetAsync("/api/data-set-files/sitemap-items");
+            var sitemapItems = response.AssertOk<List<DataSetSitemapItemViewModel>>();
+            
+            var item = Assert.Single(sitemapItems);
+            Assert.Equal(releaseFile.File.DataSetFileId!.Value.ToString(), item.Id);
+            Assert.Equal(releaseFile.Published, item.LastModified);
         }
     }
 

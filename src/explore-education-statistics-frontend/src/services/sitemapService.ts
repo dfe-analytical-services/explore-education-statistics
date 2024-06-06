@@ -47,10 +47,13 @@ function buildPublicationRoutes(
           loc: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
           lastmod: publication.lastModified,
         },
-        {
-          loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
-          lastmod: publication.lastModified,
-        },
+        // TODO: Check if data-tables should be included in the sitemap
+        // Add <noindex, nofollow> to the data-tables page if not
+        // Add to robots.txt if not
+        // {
+        //   loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
+        //   lastmod: publication.lastModified,
+        // },
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}`,
           lastmod: publication.lastModified,
@@ -75,10 +78,13 @@ function buildPublicationRoutes(
           loc: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
           lastmod: publication.lastModified,
         },
-        {
-          loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
-          lastmod: publication.lastModified,
-        },
+        // TODO: Check if data-tables should be included in the sitemap
+        // Add <noindex, nofollow> to the data-tables page if not
+        // Add to robots.txt if not
+        // {
+        //   loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
+        //   lastmod: publication.lastModified,
+        // },
         {
           loc: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}`,
           lastmod: publication.lastModified,
@@ -118,10 +124,13 @@ function buildPublicationRoutes(
             loc: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}/${release.slug}`,
             lastmod: release.lastModified,
           },
-          {
-            loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}/${release.slug}`,
-            lastmod: release.lastModified,
-          },
+          // TODO: Check if data-tables should be included in the sitemap
+          // Add <noindex, nofollow> to the data-tables page if not
+          // Add to robots.txt if not
+          // {
+          //   loc: `${process.env.PUBLIC_URL}data-tables/${publication.slug}/${release.slug}`,
+          //   lastmod: release.lastModified,
+          // },
         ],
       );
     });
@@ -135,6 +144,6 @@ function buildPublicationRoutes(
 // ): ISitemapField[] {
 //   return dataSets.map(dataSet => ({
 //     loc: `${process.env.PUBLIC_URL}data-catalogue/data-set/${dataSet.id}`,
-//     lastmod: dataSet.lastModified ? `${dataSet.lastModified}` : undefined,
+//     lastmod: dataSet.lastModified,
 //   }));
 // }
