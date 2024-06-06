@@ -120,13 +120,15 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             Assert.NotNull(processInitialDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
             Assert.Equal(new ProcessInitialDataSetVersionContext
-            {
-                DataSetVersionId = dataSetVersion.Id
-            }, processInitialDataSetVersionContext);
+                {
+                    DataSetVersionId = dataSetVersion.Id
+                },
+                processInitialDataSetVersionContext);
             Assert.Equal(new StartOrchestrationOptions
-            {
-                InstanceId = dataSetVersionImport.InstanceId.ToString()
-            }, startOrchestrationOptions);
+                {
+                    InstanceId = dataSetVersionImport.InstanceId.ToString()
+                },
+                startOrchestrationOptions);
         }
 
         [Fact]

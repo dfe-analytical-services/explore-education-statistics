@@ -20,7 +20,7 @@ public class CopyCsvFilesFunction(
     IDataSetVersionPathResolver dataSetVersionPathResolver,
     IPrivateBlobStorageService privateBlobStorageService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
-    [Function(nameof(CopyCsvFiles))]
+    [Function(ActivityNames.CopyCsvFiles)]
     public async Task CopyCsvFiles(
         [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
