@@ -8,6 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 public static class ValidationMessages
 {
+    public static readonly LocalizableMessage ZipFilenameMustEndDotZip = new(
+        Code: "ZipFilenameMustEndDotZip",
+        Message: "The file provided '{0}' should have a filename ending in '.zip'."
+    );
+
+    public static ErrorViewModel GenerateErrorZipFilenameMustEndDotZip(string fullFilename)
+    {
+        return new ErrorViewModel
+        {
+            Code = ZipFilenameMustEndDotZip.Code,
+            Message = string.Format(ZipFilenameMustEndDotZip.Message, fullFilename),
+        };
+    }
+
     public static readonly LocalizableMessage MustBeZipFile = new(
         Code: "MustBeZipFile",
         Message: "The file provided '{0}' must be a ZIP file."
@@ -115,8 +129,8 @@ public static class ValidationMessages
     {
         return new ErrorViewModel
         {
-            Code = FileNameTooLong.Code,
-            Message = string.Format(FileNameTooLong.Message, unusedFilenames.JoinToString(",")),
+            Code = ZipContainsUnusedFiles.Code,
+            Message = string.Format(ZipContainsUnusedFiles.Message, unusedFilenames.JoinToString(",")),
         };
     }
 }
