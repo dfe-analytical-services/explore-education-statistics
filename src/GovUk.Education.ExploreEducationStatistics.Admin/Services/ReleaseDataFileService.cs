@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -246,8 +247,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            Guid? replacingFileId = null,
-            string? subjectName = null)
+            string subjectName,
+            Guid? replacingFileId = null)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -256,11 +257,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
-                        .OnSuccessDo(replacingFile =>
-                            _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseVersionId,
+                        .OnSuccessDo(async replacingFile =>
+                        {
+                            var errors = await _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseVersionId,
                                 dataFormFile,
                                 metaFormFile,
-                                replacingFile))
+                                replacingFile);
+
+                            if (errors.Count > 0)
+                            {
+                                return new Either<ActionResult, Unit>(
+                                    Common.Validators.ValidationUtils.ValidationResult(errors));
+                            }
+
+                            return Unit.Instance;
+                        })
                         .OnSuccessCombineWith(replacingFile =>
                             ValidateSubjectName(releaseVersionId, subjectName, replacingFile))
                         .OnSuccess(async replacingFileAndSubjectName =>
@@ -328,13 +339,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             return await ValidateSubjectName(releaseVersionId, subjectName, replacingFile)
                                 .OnSuccess(validSubjectName =>
                                     _dataArchiveValidationService.ValidateDataArchiveFile(zipFormFile)
-                                        .OnSuccess(async archiveFile =>
-                                        {
-                                            return await _fileUploadsValidatorService
-                                                .ValidateDataArchiveFileForUpload(releaseVersionId,
-                                                    archiveFile,
-                                                    replacingFile)
-                                                .OnSuccess(async () =>
+                                        .OnSuccessDo(archiveFile =>
+                                            {
+                                                var errors = _fileUploadsValidatorService
+                                                    .ValidateDataArchiveFileForUpload(releaseVersionId,
+                                                        archiveFile,
+                                                        replacingFile);
+                                                if (errors.Count > 0)
+                                                {
+                                                    return new Either<ActionResult, Unit>(
+                                                        Common.Validators.ValidationUtils.ValidationResult(errors));
+                                                }
+
+                                                return Unit.Instance;
+                                            })
+                                            .OnSuccess(async archiveFile =>
                                                 {
                                                     var zipFile = await _releaseDataFileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
@@ -387,8 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         dataImport.TotalRows,
                                                         dataImport.Status,
                                                         permissions);
-                                                });
-                                        }));
+                                                }));
                         });
                 });
         }
@@ -401,8 +419,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ => _dataArchiveValidationService.ValidateBulkDataArchiveFile(bulkZipFormFile)
-                .OnSuccessDo(dataArchiveFiles => _fileUploadsValidatorService
-                    .ValidateBulkDataArchiveFileListForUpload(releaseVersionId, dataArchiveFiles))
+                .OnSuccessDo(dataArchiveFiles =>
+                {
+                    List<ErrorViewModel> errors = [];
+                    foreach (var dataArchiveFile in dataArchiveFiles)
+                    {
+                        errors.AddRange(_fileUploadsValidatorService.ValidateDataArchiveFileForUpload(
+                            releaseVersionId, dataArchiveFile));
+                    }
+
+                    if (errors.Count > 0)
+                    {
+                        return new Either<ActionResult, Unit>(
+                            Common.Validators.ValidationUtils.ValidationResult(errors));
+                    }
+
+                    return Unit.Instance;
+                })
                 .OnSuccessDo(dataArchiveFiles => ValidateSubjectNames(
                     releaseVersionId,
                     dataArchiveFiles.Select(daf => daf.DataSetName).ToList()))
