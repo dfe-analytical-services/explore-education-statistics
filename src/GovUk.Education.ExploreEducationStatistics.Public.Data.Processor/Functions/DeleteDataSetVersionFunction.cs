@@ -14,8 +14,8 @@ public class DeleteDataSetVersionFunction(
     [Function(nameof(DeleteDataSetVersion))]
     public async Task<IActionResult> DeleteDataSetVersion(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete",
-            Route = $"{nameof(DeleteDataSetVersion)}/{{dataSetVersionId}}")]
-        HttpRequest httpRequest,
+            Route = $"{nameof(DeleteDataSetVersion)}/{{dataSetVersionId:guid}}")]
+        HttpRequest request,
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
