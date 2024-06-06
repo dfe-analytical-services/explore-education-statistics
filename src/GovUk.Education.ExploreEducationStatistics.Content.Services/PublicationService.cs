@@ -353,7 +353,7 @@ public class PublicationService : IPublicationService
                 Releases = p.ReleaseVersions.Select(r => new ReleaseSitemapItemViewModel()
                 {
                     Slug = r.Slug,
-                    LastModified = r.Published ?? r.Created
+                    LastModified = r.Published
                 }).ToList()
             }).ToListAsync();
     }

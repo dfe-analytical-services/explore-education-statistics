@@ -2058,14 +2058,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     
                     var result = (await service.GetSitemapItems()).AssertRight();
 
-                    Assert.Equal(publication.Slug, result.Single().Slug);
-                    Assert.Equal(publicationUpdatedDate, result.Single().LastModified);
+                    var item = Assert.Single(result);
+                    Assert.Equal(publication.Slug, item.Slug);
+                    Assert.Equal(publicationUpdatedDate, item.LastModified);
                     
                     // TODO: Clarify SELECT query and write matching assertions. 
                     // Should we filter out publications with a SuperSededBy ID?
                     // Should we filter out Draft Releases? Why does the above generate a list of 5?
                     // Should we de-dupe slugs? Why are duped slugs even found?
-                    Assert.NotEmpty(result.Single().Releases);
+                    Assert.NotNull(item.Releases);
+                    Assert.NotEmpty(item.Releases);
                 }
             }
         }

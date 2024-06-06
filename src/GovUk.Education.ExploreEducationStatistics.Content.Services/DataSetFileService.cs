@@ -150,11 +150,11 @@ public class DataSetFileService : IDataSetFileService
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingLatestPublishedReleaseVersions(latestReleaseVersions, latestOnly: false);
-        
-        return await latestReleaseFiles.Select(rf => new DataSetSitemapItemViewModel()
+
+        return await latestReleaseFiles
+            .Select(rf => new DataSetSitemapItemViewModel()
             {
-                Id = rf.File.DataSetFileId!.Value.ToString(), 
-                LastModified = rf.File.Created
+                Id = rf.File.DataSetFileId!.Value.ToString(), LastModified = rf.Published
             })
             .ToListAsync();
     }

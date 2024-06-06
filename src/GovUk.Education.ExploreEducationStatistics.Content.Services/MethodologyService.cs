@@ -136,13 +136,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> GetSitemapItems()
         {
-            return await _contentDbContext.MethodologyVersions
-                .Select(mv => new MethodologySitemapItemViewModel()
-            {
-                Slug = mv.AlternativeSlug ?? mv.Methodology.OwningPublicationSlug,
-                // TODO: Add tests for this priority ordering once it's been discussed in PR
-                LastModified = mv.Updated ?? mv.Published ?? mv.Created
-            }).ToListAsync();
+            return await _contentDbContext.Methodologies
+                .Include(m => m.LatestPublishedVersion)
+                .Where(m => m.LatestPublishedVersion != null)
+                .Select(m => m.LatestPublishedVersion)
+                .OfType<MethodologyVersion>()
+                .Select(mv =>
+                    new MethodologySitemapItemViewModel
+                    {
+                        Slug = mv.Slug, 
+                        LastModified = mv.Published
+                    })
+                .ToListAsync();
         }
     }
 }
