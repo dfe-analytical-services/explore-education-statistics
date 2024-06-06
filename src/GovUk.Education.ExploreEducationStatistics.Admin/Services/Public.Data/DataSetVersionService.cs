@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -47,15 +48,6 @@ public class DataSetVersionService(
     {
         return await userService.CheckIsBauUser()
             .OnSuccessVoid(async () => await processorClient.DeleteDataSetVersion(dataSetVersionId, cancellationToken));
-    }
-
-    public async Task<bool> FileHasVersion(
-        Guid releaseFileId,
-        CancellationToken cancellationToken = default)
-    {
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .AnyAsync(dsv => dsv.ReleaseFileId == releaseFileId, cancellationToken);
     }
 }
 
