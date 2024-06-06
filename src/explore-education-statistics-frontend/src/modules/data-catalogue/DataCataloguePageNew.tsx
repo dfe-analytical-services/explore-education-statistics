@@ -157,7 +157,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
           ...router.query,
           themeId: publicationThemeId,
         },
-        ...(releaseId && { releaseId }),
+        ...(!latestOnly && releaseId && { releaseId }),
         onFetchReleases: () =>
           queryClient.fetchQuery(
             publicationQueries.listReleases(publicationSlug ?? ''),
@@ -217,9 +217,10 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
   }) => {
     await updateQueryParams({
       ...(filterType === 'all'
-        ? omit(router.query, 'page', ...dataSetFileFilters)
+        ? omit(router.query, 'page', 'latestOnly', ...dataSetFileFilters)
         : omit(router.query, getFiltersToRemove(filterType), 'page')),
       sortBy: searchTerm && sortBy === 'relevance' ? 'newest' : sortBy,
+      ...(filterType === 'releaseId' && { latestOnly: 'false' }),
     });
 
     logEvent({
