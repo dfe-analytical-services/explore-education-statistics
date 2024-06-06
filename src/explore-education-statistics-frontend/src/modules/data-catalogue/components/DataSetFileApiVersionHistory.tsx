@@ -42,6 +42,7 @@ export default function DataSetFileApiVersionHistory({
               <thead>
                 <tr>
                   <th>Version</th>
+                  <th>Release</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -50,15 +51,16 @@ export default function DataSetFileApiVersionHistory({
                   <tr key={version.version}>
                     <td>
                       {version.version !== currentVersion ? (
-                        // TODO: EES-5138 Add data set linking
-                        <Link to="/data-catalogue/data-set/TODO">
+                        <Link
+                          to={`/data-catalogue/data-set/${version.file.id}`}
+                        >
                           {version.version}
                         </Link>
                       ) : (
                         <strong>{version.version} (current)</strong>
                       )}
                     </td>
-
+                    <td>{version.release.title}</td>
                     <td>
                       <Tag
                         colour={
