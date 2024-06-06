@@ -329,7 +329,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             var validationProblem = response.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: null,
+                expectedPath: "dataSetVersionId",
                 expectedCode: ValidationMessages.DataSetVersionCanNotBeDeleted.Code);
         }
 
