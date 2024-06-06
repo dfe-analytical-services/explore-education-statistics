@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@8.8.0",
   "engines": {
-    "node": "18.18.2",
+    "node": "20.14.0",
     "pnpm": ">=8.8.0"
   },
   "devDependencies": {
@@ -42,7 +42,7 @@
     "stylelint-config-sass-guidelines": "^10.0.0",
     "stylelint-prettier": "^4.0.2",
     "tree-kill": "^1.2.2",
-    "ts-node": "^10.9.1",
+    "tsx": "^4.12.0",
     "typescript": "^5.1.6"
   },
   "scripts": {
@@ -63,7 +63,7 @@
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",
     "lint:python": "python3 -m pipenv run flake8 tests",
     "lint:style": "stylelint src/**/*.{scss,css}",
-    "start": "ts-node useful-scripts/start.ts",
+    "start": "tsx useful-scripts/start.ts",
     "test": "pnpm -r --no-bail test",
     "test:snapshot": "pnpm -r --no-bail test:snapshot",
     "test:ci": "pnpm -r --no-bail --aggregate-output --reporter=append-only test:ci",
