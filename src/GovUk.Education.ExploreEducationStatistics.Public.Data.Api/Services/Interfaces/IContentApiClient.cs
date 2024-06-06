@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,5 +17,9 @@ public interface IContentApiClient
 
     Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(
         Guid publicationId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ReleaseFileViewModel>> ListReleaseFiles(
+        ReleaseFileListRequest request,
         CancellationToken cancellationToken = default);
 }

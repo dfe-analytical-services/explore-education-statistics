@@ -10,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 
@@ -17,7 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
-    IUserService userService)
+    IUserService userService,
+    IContentApiClient contentApiClient)
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
@@ -74,7 +77,8 @@ internal class DataSetService(
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
-            .OnSuccess(MapDataSetVersion);
+            .OnSuccess(async dsv =>
+                MapDataSetVersion(dsv, await GetReleaseFile(dsv, cancellationToken)));
     }
 
     public async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListVersions(
@@ -122,21 +126,63 @@ internal class DataSetService(
 
         var totalResults = await queryable.CountAsync(cancellationToken: cancellationToken);
 
-        var dataSetVersions = (await queryable
-                .OrderByDescending(dsv => dsv.VersionMajor)
-                .ThenByDescending(dsv => dsv.VersionMinor)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync(cancellationToken: cancellationToken)
-            )
-            .Select(MapDataSetVersion)
+        var dataSetVersions = await queryable
+            .OrderByDescending(dsv => dsv.VersionMajor)
+            .ThenByDescending(dsv => dsv.VersionMinor)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var releaseFilesByVersion =
+            await GetReleaseFilesByDataSetVersion(dataSetVersions, cancellationToken);
+
+        var results = dataSetVersions
+            .Select(dsv => MapDataSetVersion(dsv, releaseFilesByVersion[dsv]))
             .ToList();
 
         return new DataSetVersionPaginatedListViewModel
         {
-            Results = dataSetVersions,
+            Results = results,
             Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults)
         };
+    }
+
+    private async Task<ReleaseFileViewModel> GetReleaseFile(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        var request = new ReleaseFileListRequest
+        {
+            Ids = [dataSetVersion.ReleaseFileId]
+        };
+
+        var releaseFiles =
+            await contentApiClient.ListReleaseFiles(request, cancellationToken);
+
+        return releaseFiles[0];
+    }
+
+    private async Task<Dictionary<DataSetVersion, ReleaseFileViewModel>> GetReleaseFilesByDataSetVersion(
+        List<DataSetVersion> dataSetVersions,
+        CancellationToken cancellationToken)
+    {
+        if (dataSetVersions.Count == 0)
+        {
+            return [];
+        }
+
+        var request = new ReleaseFileListRequest
+        {
+            Ids = [..dataSetVersions.Select(dsv => dsv.ReleaseFileId)]
+        };
+
+        var releaseFiles =
+            await contentApiClient.ListReleaseFiles(request, cancellationToken);
+
+        return dataSetVersions.ToDictionary(
+            dsv => dsv,
+            dsv => releaseFiles.Single(releaseFile => releaseFile.Id == dsv.ReleaseFileId)
+        );
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
@@ -193,7 +239,9 @@ internal class DataSetService(
         };
     }
 
-    private static DataSetVersionViewModel MapDataSetVersion(DataSetVersion dataSetVersion)
+    private static DataSetVersionViewModel MapDataSetVersion(
+        DataSetVersion dataSetVersion,
+        ReleaseFileViewModel releaseFile)
     {
         return new DataSetVersionViewModel
         {
@@ -204,10 +252,29 @@ internal class DataSetService(
             Withdrawn = dataSetVersion.Withdrawn,
             Notes = dataSetVersion.Notes,
             TotalResults = dataSetVersion.TotalResults,
+            File = MapFile(releaseFile),
+            Release = MapRelease(releaseFile),
             TimePeriods = MapTimePeriods(dataSetVersion.MetaSummary!.TimePeriodRange),
             GeographicLevels = dataSetVersion.MetaSummary.GeographicLevels,
             Filters = dataSetVersion.MetaSummary.Filters,
             Indicators = dataSetVersion.MetaSummary.Indicators,
+        };
+    }
+
+    private static DataSetVersionFileViewModel MapFile(ReleaseFileViewModel releaseFile)
+    {
+        return new DataSetVersionFileViewModel
+        {
+            Id = releaseFile.DataSetFileId!.Value
+        };
+    }
+
+    private static DataSetVersionReleaseViewModel MapRelease(ReleaseFileViewModel releaseFile)
+    {
+        return new DataSetVersionReleaseViewModel
+        {
+            Title = releaseFile.Release.Title,
+            Slug = releaseFile.Release.Slug,
         };
     }
 

@@ -102,4 +102,31 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
         return publication
             ?? throw new NullReferenceException("Could not deserialize from content API response.");
     }
+
+    public async Task<IReadOnlyList<ReleaseFileViewModel>> ListReleaseFiles(
+        ReleaseFileListRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await httpClient
+            .PostAsJsonAsync($"api/release-files", request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var message = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            logger.LogError(
+                """
+                Failed to release files with status code: {statusCode}. 
+                Message: {message}
+                """,
+                response.StatusCode,
+                message
+            );
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        return await response.Content
+            .ReadFromJsonAsync<List<ReleaseFileViewModel>>(cancellationToken) ?? [];
+    }
 }

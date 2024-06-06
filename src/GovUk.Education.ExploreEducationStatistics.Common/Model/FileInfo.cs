@@ -1,8 +1,8 @@
 #nullable enable
 using System;
 using System.IO;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
@@ -20,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public required string Size { get; set; }
 
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
+        [JsonConverter(typeof(Converters.SystemJson.EnumToEnumValueJsonConverter<FileType>))]
+        [Newtonsoft.Json.JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
         public virtual FileType Type { get; set; }
 
         public DateTime? Created { get; set; }
