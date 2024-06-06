@@ -69,10 +69,17 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public string Version => $"{VersionMajor}.{VersionMinor}";
 
+    public bool IsFirstVersion => Version == "1.0";
+
     public SemVersion FullSemanticVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
     public DataSetVersionType VersionType
         => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
+
+    public bool CanBeDeleted => Status is DataSetVersionStatus.Failed
+        or DataSetVersionStatus.Mapping
+        or DataSetVersionStatus.Draft
+        or DataSetVersionStatus.Cancelled;
 
     internal class Config : IEntityTypeConfiguration<DataSetVersion>
     {

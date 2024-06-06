@@ -72,6 +72,38 @@ internal class ProcessorClient(
             ?? throw new Exception("Could not deserialize the response from the Public Data Processor.");
     }
 
+    public async Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
+        Guid dataSetVersionId, 
+        CancellationToken cancellationToken = default)
+    {
+        var response = await httpClient
+            .DeleteAsync($"api/DeleteDataSetVersion/{dataSetVersionId}", cancellationToken: cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.BadRequest:
+                    return new BadRequestObjectResult(
+                        await response.Content
+                            .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
+                    );
+                case HttpStatusCode.NotFound:
+                    return new NotFoundResult();
+                default:
+                    var message = await response.Content.ReadAsStringAsync(cancellationToken);
+                    logger.LogError($"""
+                         Failed to delete data set version with status code: {response.StatusCode}. Message:
+                         {message}
+                         """);
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
+        }
+
+        return Unit.Instance;
+    }
+
     /// <summary>
     /// Request an access token to authenticate the Admin App Service with the Data Processor using its
     /// system-assigned identity.

@@ -95,6 +95,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             typeof(CreateInitialDataSetVersionFunction),
             typeof(ProcessInitialDataSetVersionFunction),
             typeof(HealthCheckFunctions),
+            typeof(DeleteDataSetVersionFunction),
         ];
     }
 }
