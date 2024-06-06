@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Check filename lengths
             foreach (var zipArchiveEntry in archive.Entries)
             {
-                if (zipArchiveEntry.Length > MaxFilenameLength)
+                if (zipArchiveEntry.FullName.Length > MaxFilenameLength)
                 {
                     errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
                         zipArchiveEntry.FullName, MaxFilenameLength));

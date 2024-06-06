@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(releaseVersion => _userService.CheckCanUpdateReleaseVersion(releaseVersion))
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     if (fileIds.Distinct().Count() != fileIds.Count)
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string subjectName,
+            string? subjectName = null,
             Guid? replacingFileId = null)
         {
             return await _persistenceHelper
@@ -257,23 +257,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
-                        .OnSuccessDo(async replacingFile =>
+                        .OnSuccess(async replacingFile =>
                         {
-                            var errors = await _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseVersionId,
-                                dataFormFile,
-                                metaFormFile,
-                                replacingFile);
+                            var errors = await _fileUploadsValidatorService
+                                .ValidateDataFilesForUpload(
+                                    releaseVersionId,
+                                    dataFormFile,
+                                    metaFormFile,
+                                    replacingFile);
 
                             if (errors.Count > 0)
                             {
-                                return new Either<ActionResult, Unit>(
+                                return new Either<ActionResult, Tuple<File?, string>>(
                                     Common.Validators.ValidationUtils.ValidationResult(errors));
                             }
 
-                            return Unit.Instance;
+                            var validSubjectName = await ValidateSubjectName(
+                                releaseVersionId, subjectName, replacingFile);
+                            if (validSubjectName.IsLeft)
+                            {
+                                return new Either<ActionResult, Tuple<File?, string>>(validSubjectName.Left);
+                            }
+
+                            return new Tuple<File?, string>(replacingFile, validSubjectName.Right);
                         })
-                        .OnSuccessCombineWith(replacingFile =>
-                            ValidateSubjectName(releaseVersionId, subjectName, replacingFile))
                         .OnSuccess(async replacingFileAndSubjectName =>
                         {
                             var (replacingFile, validSubjectName) = replacingFileAndSubjectName;
@@ -343,84 +350,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
                         {
-                            return await ValidateSubjectName(releaseVersionId, subjectName, replacingFile)
-                                .OnSuccess(validSubjectName =>
-                                    _dataArchiveValidationService.ValidateDataArchiveFile(zipFormFile)
-                                        .OnSuccessDo(archiveFile =>
-                                            {
-                                                var errors = _fileUploadsValidatorService
-                                                    .ValidateDataArchiveFileForUpload(releaseVersionId,
-                                                        archiveFile,
-                                                        replacingFile);
-                                                if (errors.Count > 0)
-                                                {
-                                                    return new Either<ActionResult, Unit>(
-                                                        Common.Validators.ValidationUtils.ValidationResult(errors));
-                                                }
+                            var validSubjectName =
+                                await ValidateSubjectName(releaseVersionId, subjectName, replacingFile);
+                            if (validSubjectName.IsLeft)
+                            {
+                                return new Either<ActionResult, Tuple<IDataArchiveFile, string?, File?>>(
+                                    validSubjectName.Left);
+                            }
 
-                                                return Unit.Instance;
-                                            })
-                                            .OnSuccess(async archiveFile =>
-                                                {
-                                                    var zipFile = await _releaseDataFileRepository.CreateZip(
-                                                        filename: zipFormFile.FileName.ToLower(),
-                                                        contentLength: zipFormFile.Length,
-                                                        contentType: zipFormFile.ContentType,
-                                                        releaseVersionId: releaseVersionId,
-                                                        createdById: _userService.GetUserId());
+                            var archiveFile = await _dataArchiveValidationService
+                                .ValidateDataArchiveFile(zipFormFile);
+                            if (archiveFile.IsLeft)
+                            {
+                                return archiveFile.Left;
+                            }
 
-                                                    var releaseDataFileOrder =
-                                                        await GetNextDataFileOrder(releaseVersionId, replacingFile);
+                            return new Tuple<IDataArchiveFile, string?, File?>(
+                                archiveFile.Right, validSubjectName.Right, replacingFile);
+                        })
+                        .OnSuccessDo(tuple =>
+                        {
+                            var (archiveFile, _, replacingFile) = tuple;
 
-                                                    var subjectId = await _releaseVersionRepository
-                                                        .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
+                            var errors = _fileUploadsValidatorService
+                                .ValidateDataArchiveFileForUpload(releaseVersionId,
+                                    archiveFile,
+                                    replacingFile);
+                            if (errors.Count > 0)
+                            {
+                                return new Either<ActionResult, Unit>(
+                                    Common.Validators.ValidationUtils.ValidationResult(errors));
+                            }
 
-                                                    var dataFile = await _releaseDataFileRepository.Create(
-                                                        releaseVersionId: releaseVersionId,
-                                                        subjectId: subjectId,
-                                                        filename: archiveFile.DataFileName,
-                                                        contentLength: archiveFile.DataFileSize,
-                                                        type: FileType.Data,
-                                                        createdById: _userService.GetUserId(),
-                                                        name: validSubjectName,
-                                                        replacingDataFile: replacingFile,
-                                                        source: zipFile,
-                                                        order: releaseDataFileOrder);
+                            return Unit.Instance;
+                        })
+                        .OnSuccess(async tuple =>
+                        {
+                            var (archiveFile, validSubjectName, replacingFile) = tuple;
 
-                                                    var dataReleaseFile = await _contentDbContext.ReleaseFiles
-                                                        .Include(rf => rf.File)
-                                                        .SingleAsync(rf =>
-                                                            rf.ReleaseVersionId == releaseVersionId
-                                                            && rf.FileId == dataFile.Id);
+                            var zipFile = await _releaseDataFileRepository.CreateZip(
+                                filename: zipFormFile.FileName.ToLower(),
+                                contentLength: zipFormFile.Length,
+                                contentType: zipFormFile.ContentType,
+                                releaseVersionId: releaseVersionId,
+                                createdById: _userService.GetUserId());
 
-                                                    var metaFile = await _releaseDataFileRepository.Create(
-                                                        releaseVersionId: releaseVersionId,
-                                                        subjectId: subjectId,
-                                                        filename: archiveFile.MetaFileName,
-                                                        contentLength: archiveFile.MetaFileSize,
-                                                        type: Metadata,
-                                                        createdById: _userService.GetUserId(),
-                                                        source: zipFile);
+                            var releaseDataFileOrder =
+                                await GetNextDataFileOrder(releaseVersionId, replacingFile);
 
-                                                    await UploadFileToStorage(zipFile, zipFormFile);
+                            var subjectId = await _releaseVersionRepository
+                                .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
-                                                    var dataImport = await _dataImportService.Import(
-                                                        subjectId: subjectId,
-                                                        dataFile: dataFile,
-                                                        metaFile: metaFile,
-                                                        sourceZipFile: zipFile);
+                            var dataFile = await _releaseDataFileRepository.Create(
+                                releaseVersionId: releaseVersionId,
+                                subjectId: subjectId,
+                                filename: archiveFile.DataFileName,
+                                contentLength: archiveFile.DataFileSize,
+                                type: FileType.Data,
+                                createdById: _userService.GetUserId(),
+                                name: validSubjectName,
+                                replacingDataFile: replacingFile,
+                                source: zipFile,
+                                order: releaseDataFileOrder);
 
-                                                    var permissions =
-                                                        await _userService.GetDataFilePermissions(dataFile);
+                            var dataReleaseFile = await _contentDbContext.ReleaseFiles
+                                .Include(rf => rf.File)
+                                .SingleAsync(rf =>
+                                    rf.ReleaseVersionId == releaseVersionId
+                                    && rf.FileId == dataFile.Id);
 
-                                                    return BuildDataFileViewModel(
-                                                        dataReleaseFile: dataReleaseFile,
-                                                        metaFile: metaFile,
-                                                        validSubjectName,
-                                                        dataImport.TotalRows,
-                                                        dataImport.Status,
-                                                        permissions);
-                                                }));
+                            var metaFile = await _releaseDataFileRepository.Create(
+                                releaseVersionId: releaseVersionId,
+                                subjectId: subjectId,
+                                filename: archiveFile.MetaFileName,
+                                contentLength: archiveFile.MetaFileSize,
+                                type: Metadata,
+                                createdById: _userService.GetUserId(),
+                                source: zipFile);
+
+                            await UploadFileToStorage(zipFile, zipFormFile);
+
+                            var dataImport = await _dataImportService.Import(
+                                subjectId: subjectId,
+                                dataFile: dataFile,
+                                metaFile: metaFile,
+                                sourceZipFile: zipFile);
+
+                            var permissions =
+                                await _userService.GetDataFilePermissions(dataFile);
+
+                            return BuildDataFileViewModel(
+                                dataReleaseFile: dataReleaseFile,
+                                metaFile: metaFile,
+                                validSubjectName,
+                                dataImport.TotalRows,
+                                dataImport.Status,
+                                permissions);
                         });
                 });
         }
@@ -433,91 +458,97 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ => _dataArchiveValidationService.ValidateBulkDataArchiveFile(bulkZipFormFile)
-                .OnSuccessDo(dataArchiveFiles =>
-                {
-                    List<ErrorViewModel> errors = [];
-                    foreach (var dataArchiveFile in dataArchiveFiles)
+                    .OnSuccessDo(dataArchiveFiles =>
                     {
-                        errors.AddRange(_fileUploadsValidatorService.ValidateDataArchiveFileForUpload(
-                            releaseVersionId, dataArchiveFile));
-                    }
+                        List<ErrorViewModel> errors = [];
+                        foreach (var dataArchiveFile in dataArchiveFiles)
+                        {
+                            errors.AddRange(_fileUploadsValidatorService.ValidateDataArchiveFileForUpload(
+                                releaseVersionId, dataArchiveFile));
+                        }
 
-                    if (errors.Count > 0)
+                        if (errors.Count > 0)
+                        {
+                            return new Either<ActionResult, Unit>(
+                                Common.Validators.ValidationUtils.ValidationResult(errors));
+                        }
+
+                        return Unit.Instance;
+                    })
+                    .OnSuccessDo(dataArchiveFiles => ValidateSubjectNames(
+                        releaseVersionId,
+                        dataArchiveFiles.Select(daf => daf.DataSetName).ToList()))
+                    .OnSuccess(async dataArchiveFiles =>
                     {
-                        return new Either<ActionResult, Unit>(
-                            Common.Validators.ValidationUtils.ValidationResult(errors));
-                    }
+                        var bulkZipFile = new File
+                        {
+                            CreatedById = _userService.GetUserId(),
+                            RootPath = releaseVersionId,
+                            ContentLength = bulkZipFormFile.Length,
+                            ContentType = bulkZipFormFile.ContentType,
+                            Filename = bulkZipFormFile.FileName.ToLower(),
+                            Type = BulkDataZip,
+                        };
+                        _contentDbContext.Files.Add(bulkZipFile);
+                        await _contentDbContext.SaveChangesAsync();
 
-                    return Unit.Instance;
-                })
-                .OnSuccessDo(dataArchiveFiles => ValidateSubjectNames(
-                    releaseVersionId,
-                    dataArchiveFiles.Select(daf => daf.DataSetName).ToList()))
-                .OnSuccess(async dataArchiveFiles =>
-                {
-                    var bulkZipFile = new File
-                    {
-                        CreatedById = _userService.GetUserId(),
-                        RootPath = releaseVersionId,
-                        ContentLength = bulkZipFormFile.Length,
-                        ContentType = bulkZipFormFile.ContentType,
-                        Filename = bulkZipFormFile.FileName.ToLower(),
-                        Type = BulkDataZip,
-                    };
-                    _contentDbContext.Files.Add(bulkZipFile);
-                    await _contentDbContext.SaveChangesAsync();
+                        await UploadFileToStorage(bulkZipFile, bulkZipFormFile);
 
-                    await UploadFileToStorage(bulkZipFile, bulkZipFormFile);
+                        var results = new List<DataFileInfo>();
 
-                    var results = new List<DataFileInfo>();
+                        foreach (var archiveFile in dataArchiveFiles)
+                        {
+                            var subjectId = await _releaseVersionRepository
+                                .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
-                    foreach (var archiveFile in dataArchiveFiles)
-                    {
-                        var subjectId = await _releaseVersionRepository
-                            .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
-                        
-                        var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId);
-                        
-                        var dataFile = await _releaseDataFileRepository.Create(
-                            releaseVersionId: releaseVersionId,
-                            subjectId: subjectId,
-                            filename: archiveFile.DataFileName,
-                            contentLength: archiveFile.DataFileSize,
-                            type: FileType.Data,
-                            createdById: _userService.GetUserId(),
-                            name: archiveFile.DataSetName,
-                            source: bulkZipFile,
-                            order: releaseDataFileOrder);
-                        
-                        var metaFile = await _releaseDataFileRepository.Create(
-                            releaseVersionId: releaseVersionId,
-                            subjectId: subjectId,
-                            filename: archiveFile.MetaFileName,
-                            contentLength: archiveFile.MetaFileSize,
-                            type: Metadata,
-                            createdById: _userService.GetUserId(),
-                            source: bulkZipFile);
+                            var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId);
 
-                        var dataImport = await _dataImportService.Import(
-                            subjectId: subjectId,
-                            dataFile: dataFile,
-                            metaFile: metaFile,
-                            sourceZipFile: bulkZipFile);
+                            var dataFile = await _releaseDataFileRepository.Create(
+                                releaseVersionId: releaseVersionId,
+                                subjectId: subjectId,
+                                filename: archiveFile.DataFileName,
+                                contentLength: archiveFile.DataFileSize,
+                                type: FileType.Data,
+                                createdById: _userService.GetUserId(),
+                                name: archiveFile.DataSetName,
+                                source: bulkZipFile,
+                                order: releaseDataFileOrder);
 
-                        var permissions = await _userService.GetDataFilePermissions(dataFile);
+                            var dataReleaseFile = await _contentDbContext.ReleaseFiles
+                                .Include(rf => rf.File)
+                                .SingleAsync(rf =>
+                                    rf.ReleaseVersionId == releaseVersionId
+                                    && rf.FileId == dataFile.Id);
 
-                        results.Add(
-                            BuildDataFileViewModel(
+                            var metaFile = await _releaseDataFileRepository.Create(
+                                releaseVersionId: releaseVersionId,
+                                subjectId: subjectId,
+                                filename: archiveFile.MetaFileName,
+                                contentLength: archiveFile.MetaFileSize,
+                                type: Metadata,
+                                createdById: _userService.GetUserId(),
+                                source: bulkZipFile);
+
+                            var dataImport = await _dataImportService.Import(
+                                subjectId: subjectId,
                                 dataFile: dataFile,
                                 metaFile: metaFile,
-                                archiveFile.DataSetName,
-                                dataImport.TotalRows,
-                                dataImport.Status,
-                                permissions));
-                    }
+                                sourceZipFile: bulkZipFile);
 
-                    return results;
-                }));
+                            var permissions = await _userService.GetDataFilePermissions(dataFile);
+
+                            results.Add(
+                                BuildDataFileViewModel(
+                                    dataReleaseFile: dataReleaseFile,
+                                    metaFile: metaFile,
+                                    archiveFile.DataSetName,
+                                    dataImport.TotalRows,
+                                    dataImport.Status,
+                                    permissions));
+                        }
+
+                        return results;
+                    }));
         }
 
         private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
@@ -637,6 +668,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     throw new ArgumentException("replacingFile.Type should equal FileType.Data");
                 }
 
+                // No need to validate the subject name if a replacement is occurring - we've already validated it
                 return (await _releaseFileRepository.Find(releaseVersionId: releaseVersionId,
                     fileId: replacingFile.Id))?.Name ?? "Unknown";
             }
