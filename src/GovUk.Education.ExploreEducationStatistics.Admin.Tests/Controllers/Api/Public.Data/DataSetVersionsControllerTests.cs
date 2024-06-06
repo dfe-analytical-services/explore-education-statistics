@@ -8,12 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Moq;
@@ -21,18 +19,14 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetVersionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    private const string BaseUrl = "api/public-data/data-sets/versions";
+    private const string BaseUrl = "api/public-data/data-set-versions";
 
-    public class DeleteVersionTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class DeleteVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
-        public async Task Success(DataSetVersionStatus dataSetVersionStatus)
+        [Fact]
+        public async Task Success()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -43,7 +37,7 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(1, 0, 0)
-                .WithStatus(dataSetVersionStatus)
+                .WithStatusDraft()
                 .WithDataSet(dataSet)
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
@@ -71,36 +65,6 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
         }
 
         [Fact]
-        public async Task DataSetVersionDoesNotExist_Returns404()
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusDraft();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0, 0)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .WithImports(() => DataFixture
-                    .DefaultDataSetVersionImport()
-                    .Generate(1))
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            var response = await DeleteVersion(Guid.NewGuid());
-
-            response.AssertNotFound();
-        }
-
-        [Fact]
         public async Task NotBauUser_Returns403()
         {
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
@@ -108,38 +72,6 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
             var response = await DeleteVersion(Guid.NewGuid(), client);
 
             response.AssertForbidden();
-        }
-
-        [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task VersionCanNotBeDeleted_Returns400(DataSetVersionStatus dataSetVersionStatus)
-        {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0, 0)
-                .WithStatus(dataSetVersionStatus)
-                .WithDataSet(dataSet);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            var response = await DeleteVersion(dataSetVersion.Id);
-
-            var validationProblem = response.AssertValidationProblem();
-
-            var error = validationProblem.AssertHasError(null, ValidationMessages.DataSetVersionCanNotBeDeleted.Code);
         }
 
         [Fact]
@@ -218,7 +150,8 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
                             Errors = new ErrorViewModel[]
                                 {
                                     new() {
-                                       Code = Errors.Error1.ToString()
+                                       Code = "error code",
+                                       Path = "error path"
                                     }
                                 }
                         })));
@@ -229,7 +162,7 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
 
             var validationProblem = response.AssertValidationProblem();
 
-            var error = validationProblem.AssertHasError(null, Errors.Error1.ToString());
+            var error = validationProblem.AssertHasError("error path", "error code");
         }
 
         [Fact]
@@ -289,11 +222,6 @@ public class DataSetVersionsControllerTests(TestApplicationFactory testApp) : In
             var uri = new Uri($"{BaseUrl}/{dataSetVersionId}", UriKind.Relative);
 
             return await client.DeleteAsync(uri);
-        }
-
-        private enum Errors
-        {
-            Error1,
         }
     }
 }

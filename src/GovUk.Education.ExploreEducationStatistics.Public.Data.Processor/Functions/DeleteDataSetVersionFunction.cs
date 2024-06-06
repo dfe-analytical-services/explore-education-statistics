@@ -7,11 +7,15 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class DeleteDataSetVersionFunction(IDataSetVersionService dataSetVersionService, ILogger<DeleteDataSetVersionFunction> logger)
+public class DeleteDataSetVersionFunction(
+    IDataSetVersionService dataSetVersionService,
+    ILogger<DeleteDataSetVersionFunction> logger)
 {
     [Function(nameof(DeleteDataSetVersion))]
     public async Task<IActionResult> DeleteDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Function, "delete", Route = $"{nameof(DeleteDataSetVersion)}/{{dataSetVersionId}}")] HttpRequest httpRequest,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete",
+            Route = $"{nameof(DeleteDataSetVersion)}/{{dataSetVersionId}}")]
+        HttpRequest httpRequest,
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
@@ -24,7 +28,7 @@ public class DeleteDataSetVersionFunction(IDataSetVersionService dataSetVersionS
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, null, []);
+            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(DeleteDataSetVersion));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

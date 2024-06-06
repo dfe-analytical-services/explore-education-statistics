@@ -12,7 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
-using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
+using ValidationMessages =
+    GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
@@ -20,9 +21,10 @@ internal class DataSetVersionService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver
-    ) : IDataSetVersionService
+) : IDataSetVersionService
 {
-    public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
     {
         var strategy = contentDbContext.Database.CreateExecutionStrategy();
 
@@ -31,29 +33,31 @@ internal class DataSetVersionService(
             {
                 using var transactionScope = new TransactionScope(
                     TransactionScopeOption.Required,
-                    new TransactionOptions
-                    {
-                        IsolationLevel = IsolationLevel.ReadCommitted
-                    },
+                    new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
                     TransactionScopeAsyncFlowOption.Enabled);
 
                 return await GetDataSetVersion(dataSetVersionId, cancellationToken)
                     .OnSuccessDo(CheckCanDeleteDataSetVersion)
                     .OnSuccessDo(async dataSetVersion => await GetReleaseFile(dataSetVersion, cancellationToken)
-                        .OnSuccessVoid(async releaseFile => await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken))
-                        .OnFailureDo(_ => throw new KeyNotFoundException($"The expected 'ReleaseFile', with ID '{dataSetVersion.ReleaseFileId}', was not found.")))
+                        .OnSuccessVoid(async releaseFile =>
+                            await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken))
+                        .OnFailureDo(_ =>
+                            throw new KeyNotFoundException(
+                                $"The expected 'ReleaseFile', with ID '{dataSetVersion.ReleaseFileId}', was not found.")))
                     .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
                     .OnSuccessVoid(DeleteParquetFiles)
                     .OnSuccessVoid(transactionScope.Complete);
             });
     }
-    private async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(Guid dataSetVersionId, CancellationToken cancellationToken)
+
+    private async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(Guid dataSetVersionId,
+        CancellationToken cancellationToken)
     {
         return await publicDataDbContext.DataSetVersions
-           .AsNoTracking()
-           .Include(dsv => dsv.DataSet)
-           .Where(dsv => dsv.Id == dataSetVersionId)
-           .SingleOrNotFoundAsync(cancellationToken);
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
+            .Where(dsv => dsv.Id == dataSetVersionId)
+            .SingleOrNotFoundAsync(cancellationToken);
     }
 
     private Either<ActionResult, Unit> CheckCanDeleteDataSetVersion(DataSetVersion dataSetVersion)
@@ -67,7 +71,8 @@ internal class DataSetVersionService(
         {
             Code = ValidationMessages.DataSetVersionCanNotBeDeleted.Code,
             Message = ValidationMessages.DataSetVersionCanNotBeDeleted.Message,
-            Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id)
+            Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+            Path = "dataSetVersionId"
         });
     }
 
@@ -83,7 +88,8 @@ internal class DataSetVersionService(
         }
     }
 
-    private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
+    private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken)
     {
         return await contentDbContext.ReleaseFiles
             .Include(rf => rf.File)

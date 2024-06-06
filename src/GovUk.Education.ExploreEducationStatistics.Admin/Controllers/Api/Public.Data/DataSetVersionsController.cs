@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 
 [Authorize]
 [ApiController]
-[Route("api/public-data/data-sets/versions")]
+[Route("api/public-data/data-set-versions")]
 public class DataSetVersionsController(IDataSetVersionService dataSetVersionService) : ControllerBase
 {
     [HttpDelete("{dataSetVersionId:guid}")]

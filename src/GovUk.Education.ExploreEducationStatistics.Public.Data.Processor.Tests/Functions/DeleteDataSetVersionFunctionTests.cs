@@ -77,7 +77,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             var dataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
 
             Directory.CreateDirectory(dataSetVersionDirectory);
-            System.IO.File.WriteAllText(Path.Combine(dataSetVersionDirectory, "version1.txt"), "dummy file text");
+            await System.IO.File.Create(Path.Combine(dataSetVersionDirectory, "version1.txt")).DisposeAsync();
 
             await DeleteDataSetVersion(dataSetVersion.Id);
 
@@ -95,34 +95,20 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             Assert.Null(await publicDataDbContext.DataSetVersions.SingleOrDefaultAsync(dsv => dsv.Id == dataSetVersion.Id));
 
             // Assert that the Data Set Version metadata is deleted
-            Assert.Equal(0,
-                await publicDataDbContext.FilterMetas
-                    .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-                    .CountAsync());
-            Assert.Equal(0, 
-                await publicDataDbContext.FilterOptionMetaLinks
-                    .Where(foml => dataSetVersion.FilterMetas.Contains(foml.Meta))
-                    .CountAsync());
-            Assert.Equal(0,
-                await publicDataDbContext.LocationMetas
-                    .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-                    .CountAsync());
-            Assert.Equal(0, 
-                await publicDataDbContext.LocationOptionMetaLinks
-                    .Where(loml => dataSetVersion.LocationMetas.Contains(loml.Meta))
-                    .CountAsync());
-            Assert.Equal(0,
-                await publicDataDbContext.IndicatorMetas
-                    .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-                    .CountAsync());
-            Assert.Equal(0,
-                await publicDataDbContext.GeographicLevelMetas
-                    .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-                    .CountAsync());
-            Assert.Equal(0,
-                await publicDataDbContext.TimePeriodMetas
-                    .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-                    .CountAsync());
+            Assert.False(await publicDataDbContext.FilterMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.FilterOptionMetaLinks
+                    .AnyAsync(foml => dataSetVersion.FilterMetas.Contains(foml.Meta)));
+            Assert.False(await publicDataDbContext.LocationMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.LocationOptionMetaLinks
+                    .AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta)));
+            Assert.False(await publicDataDbContext.IndicatorMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.GeographicLevelMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.TimePeriodMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
 
             // Assert that the Data Set Version Import has been deleted
             Assert.Null(await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(dsvi => dsvi.Id == dataSetVersion.Imports.Single().Id));
