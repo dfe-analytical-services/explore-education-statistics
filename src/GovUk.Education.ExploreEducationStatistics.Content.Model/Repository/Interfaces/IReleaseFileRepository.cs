@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,7 @@ public interface IReleaseFileRepository
         Guid fileId);
 
     Task<List<ReleaseFile>> GetByFileType(Guid releaseVersionId,
+        CancellationToken cancellationToken = default,
         params FileType[] types);
 
     Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId,

@@ -59,4 +59,9 @@ public static class ValidationMessages
         Code: nameof(DataSetNoLiveVersion),
         Message: "The data set must have a live version."
     );
+
+    public static readonly LocalizableMessage MultipleDataSetVersionsCanNotBeDeleted = new(
+        Code: nameof(MultipleDataSetVersionsCanNotBeDeleted),
+        Message: $"One or more data set versions are not in a '{DataSetVersionStatus.Draft}' status, so cannot be deleted."
+);
 }

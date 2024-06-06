@@ -6,6 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
@@ -70,6 +72,7 @@ public static class ProcessorHostBuilder
                     .AddFluentValidation()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
                     .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                     .AddScoped<IDataSetVersionService, DataSetVersionService>()
                     .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataDuckDbRepository, DataDuckDbRepository>()
