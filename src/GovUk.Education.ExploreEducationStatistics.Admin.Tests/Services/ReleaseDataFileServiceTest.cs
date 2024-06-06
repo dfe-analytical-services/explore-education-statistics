@@ -1683,7 +1683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         dataFormFile,
                         metaFormFile,
                         null))
-                    .ReturnsAsync(Unit.Instance);
+                    .ReturnsAsync([]);
 
                 dataImportService
                     .Setup(s => s.Import(
@@ -1856,7 +1856,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         dataFormFile,
                         metaFormFile,
                         It.Is<File>(f => f.Id == originalDataReleaseFile.File.Id)))
-                    .ReturnsAsync(Unit.Instance);
+                    .ReturnsAsync([]);
 
                 dataImportService
                     .Setup(s => s.Import(
@@ -1895,6 +1895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
+                    "Subject name",
                     replacingFileId: originalDataReleaseFile.File.Id);
 
                 var dataFileInfo = result.AssertRight();
@@ -2074,7 +2075,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         dataFormFile,
                         metaFormFile,
                         null))
-                    .ReturnsAsync(Unit.Instance);
+                    .ReturnsAsync([]);
 
                 dataImportService
                     .Setup(s => s.Import(
@@ -2204,7 +2205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
-                    .ReturnsAsync(Unit.Instance);
+                    .Returns([]);
 
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(zipFormFile))
@@ -2381,7 +2382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
-                    .ReturnsAsync(Unit.Instance);
+                    .Returns([]);
 
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(zipFormFile))
@@ -2539,7 +2540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id,
                         archiveFile,
                         It.Is<File>(file => file.Id == originalDataReleaseFile.File.Id)))
-                    .ReturnsAsync(Unit.Instance);
+                    .Returns([]);
 
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(zipFormFile))

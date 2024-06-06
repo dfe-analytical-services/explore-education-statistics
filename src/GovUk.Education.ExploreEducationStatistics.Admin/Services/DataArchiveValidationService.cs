@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly IFileTypeService _fileTypeService;
 
-        private const int MaxFilenameSize = 150;
+        private const int MaxFilenameLength = 150;
 
         private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
             new()
@@ -187,10 +187,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Check filename lengths
             foreach (var zipArchiveEntry in archive.Entries)
             {
-                if (zipArchiveEntry.Length > MaxFilenameSize)
+                if (zipArchiveEntry.Length > MaxFilenameLength)
                 {
                     errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
-                        zipArchiveEntry.FullName, MaxFilenameSize));
+                        zipArchiveEntry.FullName, MaxFilenameLength));
                 }
             }
 
@@ -237,10 +237,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             List<ErrorViewModel> errors = [];
 
-            if (file.FileName.Length > MaxFilenameSize)
+            if (file.FileName.Length > MaxFilenameLength)
             {
                 errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
-                        file.FileName, MaxFilenameSize));
+                        file.FileName, MaxFilenameLength));
             }
 
             if (!file.FileName.ToLower().EndsWith(".zip"))
@@ -264,17 +264,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             int dataFilenameLength,
             int metaFilenameLength)
         {
-            if (dataFilenameLength > MaxFilenameSize && metaFilenameLength > MaxFilenameSize)
+            if (dataFilenameLength > MaxFilenameLength && metaFilenameLength > MaxFilenameLength)
             {
                 return ValidationActionResult(DataZipContentFilenamesTooLong);
             }
 
-            if (dataFilenameLength > MaxFilenameSize)
+            if (dataFilenameLength > MaxFilenameLength)
             {
                 return ValidationActionResult(DataFilenameTooLong);
             }
 
-            if (metaFilenameLength > MaxFilenameSize)
+            if (metaFilenameLength > MaxFilenameLength)
             {
                 return ValidationActionResult(MetaFilenameTooLong);
             }

@@ -69,8 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
-                    null,
-                    "Subject name"))
+                    "Subject name",
+                    null))
                 .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
@@ -99,8 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
-                    null,
-                    "Subject name"))
+                    "Subject name",
+                    null))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
