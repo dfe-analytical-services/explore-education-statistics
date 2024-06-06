@@ -48,7 +48,7 @@ function baseErrorMappings(
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'zipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
-          DataZipMustBeZipFile: 'Choose a valid ZIP file',
+          DataZipMustBeZipFile: 'Choose a valid ZIP file', // @MarkFix This error is gone! Replaced by ZipFilenameMustEndDotZip and MustBeZipFile
           DataBulkZipFileMustHaveManifest: 'ZIP file must contain a manifest',
           // @MarkFix add errors here
           // DataZipFileDoesNotContainCsvFiles:
@@ -79,7 +79,7 @@ function baseErrorMappings(
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'zipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
-          DataZipMustBeZipFile: 'Choose a valid ZIP file',
+          DataZipMustBeZipFile: 'Choose a valid ZIP file', // @MarkFix This error is gone! Replaced by ZipFilenameMustEndDotZip and MustBeZipFile
           DataZipFileCanOnlyContainTwoFiles:
             'ZIP file can only contain two CSV files',
           DataZipFileDoesNotContainCsvFiles:
