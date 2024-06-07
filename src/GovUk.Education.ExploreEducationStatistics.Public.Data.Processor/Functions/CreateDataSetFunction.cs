@@ -14,15 +14,15 @@ using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribut
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class CreateInitialDataSetVersionFunction(
-    ILogger<CreateInitialDataSetVersionFunction> logger,
+public class CreateDataSetFunction(
+    ILogger<CreateDataSetFunction> logger,
     IDataSetService dataSetService,
-    IValidator<InitialDataSetVersionCreateRequest> requestValidator)
+    IValidator<DataSetCreateRequest> requestValidator)
 {
-    [Function(nameof(CreateInitialDataSetVersion))]
-    public async Task<IActionResult> CreateInitialDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateInitialDataSetVersion))] [FromBody]
-        InitialDataSetVersionCreateRequest request,
+    [Function(nameof(CreateDataSet))]
+    public async Task<IActionResult> CreateDataSet(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateDataSet))] [FromBody]
+        DataSetCreateRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
@@ -30,7 +30,7 @@ public class CreateInitialDataSetVersionFunction(
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetService.CreateDataSetVersion(
+            .OnSuccess(() => dataSetService.CreateDataSet(
                 request,
                 instanceId,
                 cancellationToken: cancellationToken
@@ -43,10 +43,10 @@ public class CreateInitialDataSetVersionFunction(
                     instanceId: instanceId,
                     cancellationToken);
 
-                return new CreateInitialDataSetVersionResponseViewModel
+                return new CreateDataSetResponseViewModel
                 {
                     DataSetId = tuple.dataSetId,
-                    DataSetVersionId = tuple.dataSetVersionId, 
+                    DataSetVersionId = tuple.dataSetVersionId,
                     InstanceId = instanceId
                 };
             })

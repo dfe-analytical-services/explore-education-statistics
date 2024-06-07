@@ -22,13 +22,13 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private readonly DataFixture _fixture = new();
 
-    public class CreateInitialDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-        : CreateInitialDataSetVersionFunctionTests(fixture)
+    public class CreateDataSetTests(ProcessorFunctionsIntegrationTestFixture fixture)
+        : CreateDataSetFunctionTests(fixture)
     {
         private const string DurableTaskClientName = "TestClient";
 
@@ -71,13 +71,13 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
                         startOrchestrationOptions = options;
                     });
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
             VerifyAllMocks(durableTaskClientMock);
 
-            var responseViewModel = result.AssertOkObjectResult<CreateInitialDataSetVersionResponseViewModel>();
+            var responseViewModel = result.AssertOkObjectResult<CreateDataSetResponseViewModel>();
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -120,13 +120,15 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             Assert.NotNull(processInitialDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
             Assert.Equal(new ProcessInitialDataSetVersionContext
-            {
-                DataSetVersionId = dataSetVersion.Id
-            }, processInitialDataSetVersionContext);
+                {
+                    DataSetVersionId = dataSetVersion.Id
+                },
+                processInitialDataSetVersionContext);
             Assert.Equal(new StartOrchestrationOptions
-            {
-                InstanceId = dataSetVersionImport.InstanceId.ToString()
-            }, startOrchestrationOptions);
+                {
+                    InstanceId = dataSetVersionImport.InstanceId.ToString()
+                },
+                startOrchestrationOptions);
         }
 
         [Fact]
@@ -134,7 +136,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
         {
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: Guid.Empty,
                 durableTaskClientMock.Object);
 
@@ -143,7 +145,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst());
+                nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
         }
 
         [Fact]
@@ -151,7 +153,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
         {
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: Guid.NewGuid(),
                 durableTaskClientMock.Object);
 
@@ -160,7 +162,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileNotFound.Code);
         }
 
@@ -191,7 +193,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
@@ -200,7 +202,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
         }
 
@@ -224,7 +226,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
@@ -233,7 +235,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileReleaseVersionNotDraft.Code
             );
         }
@@ -253,7 +255,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
@@ -262,7 +264,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileTypeNotData.Code
             );
         }
@@ -281,7 +283,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
@@ -290,17 +292,17 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.NoMetadataFile.Code
             );
         }
 
-        private async Task<IActionResult> CreateInitialDataSetVersion(
+        private async Task<IActionResult> CreateDataSet(
             Guid releaseFileId,
             DurableTaskClient durableTaskClient)
         {
-            var function = GetRequiredService<CreateInitialDataSetVersionFunction>();
-            return await function.CreateInitialDataSetVersion(new InitialDataSetVersionCreateRequest
+            var function = GetRequiredService<CreateDataSetFunction>();
+            return await function.CreateDataSet(new DataSetCreateRequest
                 {
                     ReleaseFileId = releaseFileId
                 },
