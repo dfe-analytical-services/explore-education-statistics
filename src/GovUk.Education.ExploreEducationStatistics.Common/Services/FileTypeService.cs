@@ -133,9 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return true;
         }
 
-        public Task<bool> IsValidCsvFile(IFormFile file)
+        public async Task<bool> IsValidCsvFile(IFormFile file)
         {
-            return IsValidCsvFile(() => Task.FromResult(file.OpenReadStream()), file.FileName);
+            return await IsValidCsvFile(() => Task.FromResult(file.OpenReadStream()), file.FileName);
         }
 
         /// <summary>
