@@ -1779,8 +1779,18 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListSitemapItemsTests(TestApplicationFactory<TestStartup> testApp) : DataSetFilesControllerTests(testApp)
+    public class ListSitemapItemsTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
     {
+        public override async Task InitializeAsync() => await TestApp.StartAzurite();
+
+        private async Task<HttpResponseMessage> InvokeListSitemapItems(
+            WebApplicationFactory<Startup>? app = null)
+        {
+            var client = (app ?? BuildApp()).CreateClient();
+
+            return await client.GetAsync("/api/data-set-files/sitemap-items");
+        }
+        
         [Fact]
         public async Task ListSitemapItems()
         {
@@ -1804,15 +1814,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 );
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.StartAzurite();
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
-
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
-
+            var testApp = BuildApp(enableAzurite: true);
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            
             var formFile = CreateDataCsvFormFile(""""
                                                  column_1,column_2,column_3
                                                  1,2,3
@@ -1828,15 +1834,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 releaseFile.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-            
-            var response = await client.GetAsync("/api/data-set-files/sitemap-items");
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+
+            var response = await InvokeListSitemapItems();
+
             var sitemapItems = response.AssertOk<List<DataSetSitemapItemViewModel>>();
             
             var item = Assert.Single(sitemapItems);
@@ -2452,28 +2457,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 {
                     services.ReplaceService(statisticsDbContext);
                 }
-
-                services.AddTransient<IReleaseVersionRepository>(s => new ReleaseVersionRepository(
-                    contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
-                services.AddTransient<IPublicBlobStorageService>(s =>
-                    publicBlobStorageService ?? new PublicBlobStorageService(
-                            s.GetRequiredService<ILogger<IBlobStorageService>>(),
-                        new ConfigurationBuilder()
-                            .SetBasePath(Directory.GetCurrentDirectory())
-                            // Use appsettings.IntegrationTest.json to prevent tests passing due to data-storage docker
-                            // container running separately: appsettings.IntegrationTest.json uses different ports
-                            // to those used by the data-storage docker container - i.e. not 10000/10001
-                            .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
-                            .AddEnvironmentVariables()
-                            .Build()));
-                services.AddTransient<IFootnoteRepository>(s => new FootnoteRepository(
-                    statisticsDbContext ?? s.GetRequiredService<StatisticsDbContext>()));
-                services.AddTransient<IDataSetFileService>(
-                    s => new DataSetFileService(
-                        contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
-                        s.GetRequiredService<IReleaseVersionRepository>(),
-                        s.GetRequiredService<IPublicBlobStorageService>(),
-                        s.GetRequiredService<IFootnoteRepository>()));
             });
     }
 
