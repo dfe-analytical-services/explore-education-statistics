@@ -1681,8 +1681,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateSubjectName(releaseVersion.Id, subjectName))
-                    .ReturnsAsync(Unit.Instance);
+                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
+                    .Returns([]);
 
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataFilesForUpload(
@@ -1866,6 +1866,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<File>(f => f.Id == originalDataReleaseFile.File.Id)))
                     .ReturnsAsync([]);
 
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(
+                        releaseVersion.Id,
+                        originalDataReleaseFile.Name))
+                    .Returns([]);
+
                 dataImportService
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
@@ -1903,7 +1909,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
-                    "Subject name",
                     replacingFileId: originalDataReleaseFile.File.Id);
 
                 var dataFileInfo = result.AssertRight();
@@ -2075,8 +2080,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateSubjectName(releaseVersion.Id, subjectName))
-                    .ReturnsAsync(Unit.Instance);
+                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
+                    .Returns([]);
 
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataFilesForUpload(
@@ -2209,8 +2214,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateSubjectName(releaseVersion.Id, subjectName))
-                    .ReturnsAsync(Unit.Instance);
+                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
+                    .Returns([]);
 
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
@@ -2387,8 +2392,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateSubjectName(releaseVersion.Id, subjectName))
-                    .ReturnsAsync(Unit.Instance);
+                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
+                    .Returns([]);
 
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id, archiveFile, null))
@@ -2550,6 +2555,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.ValidateDataArchiveFileForUpload(releaseVersion.Id,
                         archiveFile,
                         It.Is<File>(file => file.Id == originalDataReleaseFile.File.Id)))
+                    .Returns([]);
+
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id,
+                        originalDataReleaseFile.Name))
                     .Returns([]);
 
                 dataArchiveValidationService

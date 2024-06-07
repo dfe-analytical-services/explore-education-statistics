@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -25,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DataArchiveValidationService : IDataArchiveValidationService
     {
         private readonly IFileTypeService _fileTypeService;
+        private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
 
         private const int MaxFilenameLength = 150;
 
@@ -34,9 +36,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {DataZip, AllowedArchiveMimeTypes}
             };
 
-        public DataArchiveValidationService(IFileTypeService fileTypeService)
+        public DataArchiveValidationService(
+            IFileTypeService fileTypeService,
+            IFileUploadsValidatorService fileUploadsValidatorService)
         {
             _fileTypeService = fileTypeService;
+            _fileUploadsValidatorService = fileUploadsValidatorService;
         }
 
         public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile)
@@ -78,7 +83,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
         }
 
-        public async Task<Either<ActionResult, List<BulkDataArchiveFile>>> ValidateBulkDataArchiveFile(IFormFile zipFile)
+        public async Task<Either<ActionResult, List<BulkDataArchiveFile>>> ValidateBulkDataArchiveFile(
+            Guid releaseVersionId,
+            IFormFile zipFile)
         {
             var errors = await IsValidZipFile(zipFile);
             if (errors.Count > 0)
@@ -89,20 +96,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await using var stream = zipFile.OpenReadStream();
             using var archive = new ZipArchive(stream);
 
-            ZipArchiveEntry? datasetNamesEntry = null;
-
             var unprocessedArchiveFiles = archive.Entries.ToList();
-            foreach (var zipArchiveEntry in archive.Entries)
-            {
-                if (zipArchiveEntry.FullName == "dataset_names.csv")
-                {
-                    datasetNamesEntry = zipArchiveEntry;
-                    unprocessedArchiveFiles.Remove(zipArchiveEntry);
-                    break;
-                }
-            }
 
-            if (datasetNamesEntry == null)
+            var dataSetNamesEntry = archive.GetEntry("dataset_names.csv");
+
+            if (dataSetNamesEntry == null)
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
                     {
@@ -111,14 +109,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
             }
 
-            var datasetNamesStream = datasetNamesEntry.Open();
-            var datasetNamesReader = new StreamReader(datasetNamesStream);
-            var datasetNamesCsvReader = new CsvReader(datasetNamesReader, CultureInfo.InvariantCulture);
+            unprocessedArchiveFiles.Remove(dataSetNamesEntry);
+
+            var dataSetNamesStream = dataSetNamesEntry.Open();
+            var dataSetNamesReader = new StreamReader(dataSetNamesStream);
+            var dataSetNamesCsvReader = new CsvReader(dataSetNamesReader, CultureInfo.InvariantCulture);
 
             try
             {
-                await datasetNamesCsvReader.ReadAsync(); // @MarkFix what happens if headers but no data here?
-                datasetNamesCsvReader.ReadHeader();
+                await dataSetNamesCsvReader.ReadAsync(); // @MarkFix what happens if headers but no data here?
+                dataSetNamesCsvReader.ReadHeader();
             }
             catch (ReaderException e)
             {
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ValidationMessages.GenerateErrorDatasetNamesCsvReaderException(e.ToString()));
             }
 
-            var headers = datasetNamesCsvReader.HeaderRecord?.ToList() ?? new List<string>();
+            var headers = dataSetNamesCsvReader.HeaderRecord?.ToList() ?? new List<string>();
 
             if (headers is not ["file_name", "dataset_name"])
             {
@@ -139,33 +139,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var results = new List<BulkDataArchiveFile>();
 
-            using var csvDataReader = new CsvDataReader(datasetNamesCsvReader);
+            using var csvDataReader = new CsvDataReader(dataSetNamesCsvReader);
 
             var lastLine = false; // Assume one row of data // @MarkFix yeah? test it
 
             while (!lastLine)
             {
-                var filename = datasetNamesCsvReader.GetField<string>("file_name");
-                var datasetName = datasetNamesCsvReader.GetField<string>("dataset_name");
+                var filename = dataSetNamesCsvReader.GetField<string>("file_name");
+                var datasetName = dataSetNamesCsvReader.GetField<string>("dataset_name");
 
-                ZipArchiveEntry? dataFile = null;
-                ZipArchiveEntry? metaFile = null;
-
-                foreach (var zipArchiveEntry in archive.Entries)
-                {
-                    if (zipArchiveEntry.FullName == $"{filename}.csv")
-                    {
-                        dataFile = zipArchiveEntry;
-                        unprocessedArchiveFiles.Remove(zipArchiveEntry);
-                        continue;
-                    }
-
-                    if (zipArchiveEntry.FullName == $"{filename}.meta.csv")
-                    {
-                        metaFile = zipArchiveEntry;
-                        unprocessedArchiveFiles.Remove(zipArchiveEntry);
-                    }
-                }
+                var dataFile = archive.GetEntry($"{filename}.csv");
+                var metaFile = archive.GetEntry($"{filename}.meta.csv");
 
                 if (dataFile == null)
                 {
@@ -177,11 +161,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     errors.Add(ValidationMessages.GenerateErrorMetaFileNotFoundInZip($"{filename}.meta.csv"));
                 }
 
-                // @MarkFix More Data/Meta file validation here?
+                unprocessedArchiveFiles.Remove(dataFile);
+                unprocessedArchiveFiles.Remove(metaFile);
 
-                results.Add(new BulkDataArchiveFile(datasetName, dataFile: dataFile, metaFile: metaFile));
+                var dataArchiveFile = new BulkDataArchiveFile(datasetName, dataFile: dataFile, metaFile: metaFile);
 
-                lastLine = !await datasetNamesCsvReader.ReadAsync();
+                errors.AddRange(_fileUploadsValidatorService.ValidateDataArchiveFileForUpload(
+                            releaseVersionId, dataArchiveFile));
+
+                // @MarkFix merge into above method call I think
+                errors.AddRange(_fileUploadsValidatorService.ValidateReleaseVersionDataSetFileName(
+                            releaseVersionId, dataArchiveFile.DataSetName));
+
+                results.Add(dataArchiveFile);
+
+                lastLine = !await dataSetNamesCsvReader.ReadAsync();
             }
 
             // Check filename lengths
@@ -202,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ForEach(duplicateDatasetName =>
                 {
                     errors.Add(ValidationMessages
-                        .GenerateErrorBulkDataZipContainsDuplicateDatasetNames(duplicateDatasetName));
+                        .GenerateErrorDataSetFileNamesShouldBeUnique(duplicateDatasetName));
                 });
 
             // Check for unused files in ZIP

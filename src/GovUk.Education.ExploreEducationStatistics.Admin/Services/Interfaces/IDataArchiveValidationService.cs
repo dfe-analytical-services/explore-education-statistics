@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile);
 
-        Task<Either<ActionResult, List<BulkDataArchiveFile>>> ValidateBulkDataArchiveFile(IFormFile zipFile);
+        Task<Either<ActionResult, List<BulkDataArchiveFile>>> ValidateBulkDataArchiveFile(
+            Guid releaseVersionId,
+            IFormFile zipFile);
     }
 }
