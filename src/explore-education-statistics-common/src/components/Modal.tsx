@@ -66,7 +66,13 @@ const Modal = ({
       )}
       <Dialog.Portal>
         <Dialog.Overlay
-          className={classNames(styles.underlay, underlayClass)}
+          className={classNames(
+            styles.underlay,
+            {
+              [styles.noUnderlayClick]: !closeOnOutsideClick,
+            },
+            underlayClass,
+          )}
           data-testid="modal-underlay"
         >
           <Dialog.Content
