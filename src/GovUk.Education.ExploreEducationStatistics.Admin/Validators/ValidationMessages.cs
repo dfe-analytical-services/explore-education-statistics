@@ -106,17 +106,17 @@ public static class ValidationMessages
         Message: "No data sets were included in the ZIP file."
     );
 
-    public static readonly LocalizableMessage BulkDataZipContainsDuplicateDatasetNames = new(
-        Code: "BulkDataZipContainsDuplicateDatasetNames",
-        Message: "All new data sets should have unique names. Duplicated name: '{0}'."
+    public static readonly LocalizableMessage DataSetFileNamesShouldBeUnique = new(
+        Code: "DataSetFileNamesShouldBeUnique",
+        Message: "All new data sets should have unique names. Duplicate name: '{0}'."
     );
 
-    public static ErrorViewModel GenerateErrorBulkDataZipContainsDuplicateDatasetNames(string duplicate)
+    public static ErrorViewModel GenerateErrorDataSetFileNamesShouldBeUnique(string duplicate)
     {
         return new ErrorViewModel
         {
-            Code = BulkDataZipContainsDuplicateDatasetNames.Code,
-            Message = string.Format(BulkDataZipContainsDuplicateDatasetNames.Message, duplicate),
+            Code = DataSetFileNamesShouldBeUnique.Code,
+            Message = string.Format(DataSetFileNamesShouldBeUnique.Message, duplicate),
         };
     }
 
@@ -222,4 +222,24 @@ public static class ValidationMessages
             Message = string.Format(FileSizeMustNotBeZero.Message, filename),
         };
     }
+    
+    public static readonly LocalizableMessage DataSetFileNameCannotBeEmpty = new(
+        Code: "DataSetFileNameCannotBeEmpty",
+        Message: "Data set name cannot be empty"
+    );
+
+    public static readonly LocalizableMessage DataSetFileNameShouldNotContainSpecialCharacters = new(
+        Code: "DataSetFileNameShouldNotContainSpecialCharacters",
+        Message: "Data set name '{0}' should not contain special characters"
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetFileNameShouldNotContainSpecialCharacters(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetFileNameShouldNotContainSpecialCharacters.Code,
+            Message = string.Format(DataSetFileNameShouldNotContainSpecialCharacters.Message, filename),
+        };
+    }
+    
 }

@@ -266,20 +266,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     metaFormFile,
                                     replacingFile);
 
+                            var dataSetFileName = await GetReleaseVersionDataSetFileName(
+                                releaseVersionId, subjectName, replacingFile);
+
+                            errors.AddRange(_fileUploadsValidatorService
+                                .ValidateReleaseVersionDataSetFileName(releaseVersionId, dataSetFileName));
+
                             if (errors.Count > 0)
                             {
                                 return new Either<ActionResult, Tuple<File?,string>>(
                                     Common.Validators.ValidationUtils.ValidationResult(errors));
                             }
 
-                            var validSubjectName = await ValidateSubjectName(
-                                releaseVersionId, subjectName, replacingFile);
-                            if (validSubjectName.IsLeft)
-                            {
-                                return new Either<ActionResult, Tuple<File?,string>>(validSubjectName.Left);
-                            }
-
-                            return new Tuple<File?,string>(replacingFile, validSubjectName.Right);
+                            return new Tuple<File?,string>(replacingFile, dataSetFileName);
                         })
                         .OnSuccess(async replacingFileAndSubjectName =>
                         {
@@ -343,14 +342,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
                         {
-                            var validSubjectName =
-                                await ValidateSubjectName(releaseVersionId, subjectName, replacingFile);
-                            if (validSubjectName.IsLeft)
-                            {
-                                return new Either<ActionResult,Tuple<IDataArchiveFile,string?,File?>>(
-                                    validSubjectName.Left);
-                            }
-
                             var archiveFile = await _dataArchiveValidationService
                                 .ValidateDataArchiveFile(zipFormFile);
                             if (archiveFile.IsLeft)
@@ -358,24 +349,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 return archiveFile.Left;
                             }
 
-                            return new Tuple<IDataArchiveFile,string?,File?>(
-                                archiveFile.Right, validSubjectName.Right, replacingFile);
-                        })
-                        .OnSuccessDo(tuple =>
-                        {
-                            var (archiveFile, validSubjectName, replacingFile) = tuple;
+                            List<ErrorViewModel> errors = [];
 
-                            var errors = _fileUploadsValidatorService
+                            var newDataSetFileName = await GetReleaseVersionDataSetFileName(
+                                releaseVersionId, subjectName, replacingFile);
+
+                            errors.AddRange(_fileUploadsValidatorService.ValidateReleaseVersionDataSetFileName(
+                                releaseVersionId, newDataSetFileName));
+
+                            errors.AddRange(_fileUploadsValidatorService
                                 .ValidateDataArchiveFileForUpload(releaseVersionId,
-                                    archiveFile,
-                                    replacingFile);
+                                    archiveFile.Right,
+                                    replacingFile));
+
                             if (errors.Count > 0)
                             {
-                                return new Either<ActionResult, Unit>(
+                                return new Either<ActionResult, Tuple<IDataArchiveFile,string?,File?>>(
                                     Common.Validators.ValidationUtils.ValidationResult(errors));
                             }
 
-                            return Unit.Instance;
+                            return new Tuple<IDataArchiveFile,string?,File?>(
+                                archiveFile.Right, newDataSetFileName, replacingFile);
                         })
                         .OnSuccess(async tuple =>
                         {
@@ -415,6 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 createdById: _userService.GetUserId(),
                                 source: zipFile);
 
+                            // data/meta files are extracted to blob storage by _dataImportService.Import
                             await UploadFileToStorage(zipFile, zipFormFile);
 
                             var dataImport = await _dataImportService.Import(
@@ -443,27 +438,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(_ => _dataArchiveValidationService.ValidateBulkDataArchiveFile(bulkZipFormFile)
-                .OnSuccessDo(dataArchiveFiles =>
-                {
-                    List<ErrorViewModel> errors = [];
-                    foreach (var dataArchiveFile in dataArchiveFiles)
-                    {
-                        errors.AddRange(_fileUploadsValidatorService.ValidateDataArchiveFileForUpload(
-                            releaseVersionId, dataArchiveFile));
-                    }
-
-                    if (errors.Count > 0)
-                    {
-                        return new Either<ActionResult, Unit>(
-                            Common.Validators.ValidationUtils.ValidationResult(errors));
-                    }
-
-                    return Unit.Instance;
-                })
-                .OnSuccessDo(dataArchiveFiles => ValidateSubjectNames(
-                    releaseVersionId,
-                    dataArchiveFiles.Select(daf => daf.DataSetName).ToList()))
+                .OnSuccess(_ => _dataArchiveValidationService.ValidateBulkDataArchiveFile(
+                        releaseVersionId, bulkZipFormFile)
                 .OnSuccess(async dataArchiveFiles =>
                 {
                     var bulkZipFile = new File
@@ -478,6 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _contentDbContext.Files.Add(bulkZipFile);
                     await _contentDbContext.SaveChangesAsync();
 
+                    // each data/meta file pair are extracted to blob storage by _dataImportService.Import
                     await UploadFileToStorage(bulkZipFile, bulkZipFormFile);
 
                     var results = new List<DataFileInfo>();
@@ -608,37 +585,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateSubjectNames(
-            Guid releaseVersionId,
-            List<string> subjectNames)
-        {
-            // @MarkFix I'd prefer to collect all invalid subject names and return them all
-
-            if (subjectNames.Count != subjectNames.Distinct().ToList().Count)
-            {
-                return ValidationActionResult(SubjectTitleMustBeUnique);
-            }
-
-            foreach (var subjectName in subjectNames)
-            {
-                var result = await _fileUploadsValidatorService.ValidateSubjectName(
-                    releaseVersionId, subjectName);
-
-                if (result.IsLeft)
-                {
-                    return result;
-                }
-            }
-
-            return Unit.Instance;
-        }
-
-        private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseVersionId,
-            string? subjectName,
+        // Some endpoints can be used in two scenarios: 1. to create brand new data set files and 2. to do replacements
+        // of existing data set files. This method fetches the release version data set file name based on the scenario.
+        private async Task<string> GetReleaseVersionDataSetFileName(Guid releaseVersionId, string? subjectName = null,
             File? replacingFile = null)
         {
             if (replacingFile != null)
             {
+                if (subjectName != null)
+                {
+                    throw new ArgumentException("subjectName and replacingFile shouldn't both be provided");
+                }
+
                 if (replacingFile.Type != FileType.Data)
                 {
                     throw new ArgumentException("replacingFile.Type should equal FileType.Data");
@@ -651,11 +609,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (subjectName == null)
             {
-                throw new ArgumentException("Original subjects cannot have null subject name");
+                throw new ArgumentException("New data set files cannot have null subject name");
             }
 
-            return await _fileUploadsValidatorService.ValidateSubjectName(releaseVersionId, subjectName)
-                .OnSuccess(async () => await Task.FromResult(subjectName));
+            return subjectName;
         }
 
         private async Task UploadFileToStorage(

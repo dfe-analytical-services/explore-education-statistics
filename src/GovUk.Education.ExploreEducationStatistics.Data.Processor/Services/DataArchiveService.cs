@@ -29,20 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var dataFileName = import.File.Filename;
             var metaFileName = import.MetaFile.Filename;
 
-            ZipArchiveEntry? dataFile = null;
-            ZipArchiveEntry? metaFile = null;
-            foreach (var zipArchiveEntry in archive.Entries)
-            {
-                if (zipArchiveEntry.FullName == dataFileName)
-                {
-                    dataFile = zipArchiveEntry;
-                }
-
-                if (zipArchiveEntry.FullName == metaFileName)
-                {
-                    metaFile = zipArchiveEntry;
-                }
-            }
+            var dataFile = archive.GetEntry(dataFileName);
+            var metaFile = archive.GetEntry(metaFileName);
 
             // @MarkFix extra validation here? Could skip if we assume validation occurred elsewhere
 
