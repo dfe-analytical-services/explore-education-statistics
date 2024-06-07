@@ -259,15 +259,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
                         {
+                            var dataSetFileName = await GetReleaseVersionDataSetFileName(
+                                releaseVersionId, subjectName, replacingFile);
+
                             var errors = await _fileUploadsValidatorService
                                 .ValidateDataFilesForUpload(
                                     releaseVersionId,
+                                    dataSetFileName,
                                     dataFormFile,
                                     metaFormFile,
                                     replacingFile);
-
-                            var dataSetFileName = await GetReleaseVersionDataSetFileName(
-                                releaseVersionId, subjectName, replacingFile);
 
                             errors.AddRange(_fileUploadsValidatorService
                                 .ValidateReleaseVersionDataSetFileName(releaseVersionId, dataSetFileName));
@@ -342,38 +343,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
                         {
-                            var archiveFile = await _dataArchiveValidationService
-                                .ValidateDataArchiveFile(zipFormFile);
-                            if (archiveFile.IsLeft)
-                            {
-                                return archiveFile.Left;
-                            }
-
-                            List<ErrorViewModel> errors = [];
-
                             var newDataSetFileName = await GetReleaseVersionDataSetFileName(
                                 releaseVersionId, subjectName, replacingFile);
 
-                            errors.AddRange(_fileUploadsValidatorService.ValidateReleaseVersionDataSetFileName(
-                                releaseVersionId, newDataSetFileName));
-
-                            errors.AddRange(_fileUploadsValidatorService
-                                .ValidateDataArchiveFileForUpload(releaseVersionId,
-                                    archiveFile.Right,
-                                    replacingFile));
-
-                            if (errors.Count > 0)
+                            var archiveDataSet = await _dataArchiveValidationService
+                                .ValidateDataArchiveFile(
+                                    releaseVersionId,
+                                    newDataSetFileName,
+                                    zipFormFile,
+                                    replacingFile);
+                            if (archiveDataSet.IsLeft)
                             {
-                                return new Either<ActionResult, Tuple<IDataArchiveFile,string?,File?>>(
-                                    Common.Validators.ValidationUtils.ValidationResult(errors));
+                                return new Either<ActionResult,Tuple<ArchiveDataSetFile,string?,File?>>(
+                                    archiveDataSet.Left);
                             }
 
-                            return new Tuple<IDataArchiveFile,string?,File?>(
-                                archiveFile.Right, newDataSetFileName, replacingFile);
+                            return new Tuple<ArchiveDataSetFile,string?,File?>(
+                                archiveDataSet.Right, newDataSetFileName, replacingFile);
                         })
                         .OnSuccess(async tuple =>
                         {
-                            var (archiveFile, validSubjectName, replacingFile) = tuple;
+                            var (archiveDataSet, validSubjectName, replacingFile) = tuple;
 
                             var zipFile = await _releaseDataFileRepository.CreateZip(
                                 filename: zipFormFile.FileName.ToLower(),
@@ -391,8 +381,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var dataFile = await _releaseDataFileRepository.Create(
                                 releaseVersionId: releaseVersionId,
                                 subjectId: subjectId,
-                                filename: archiveFile.DataFileName,
-                                contentLength: archiveFile.DataFileSize,
+                                filename: archiveDataSet.DataFileName,
+                                contentLength: archiveDataSet.DataFileSize,
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: validSubjectName,
@@ -403,8 +393,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var metaFile = await _releaseDataFileRepository.Create(
                                 releaseVersionId: releaseVersionId,
                                 subjectId: subjectId,
-                                filename: archiveFile.MetaFileName,
-                                contentLength: archiveFile.MetaFileSize,
+                                filename: archiveDataSet.MetaFileName,
+                                contentLength: archiveDataSet.MetaFileSize,
                                 type: Metadata,
                                 createdById: _userService.GetUserId(),
                                 source: zipFile);

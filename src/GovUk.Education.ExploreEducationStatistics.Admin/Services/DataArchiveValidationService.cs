@@ -44,7 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileUploadsValidatorService = fileUploadsValidatorService;
         }
 
-        public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile)
+        public async Task<Either<ActionResult, ArchiveDataSetFile>> ValidateDataArchiveFile(
+            Guid releaseVersionId,
+            string dataSetFileName,
+            IFormFile zipFile,
+            Content.Model.File? replacingFile = null)
         {
             var errors = await IsValidZipFile(zipFile);
             if (errors.Count > 0)
@@ -71,19 +75,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
             var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
 
-            var filenamesValid = ValidateFilenameLengths(
-                dataFile.Name.Length,
-                metaFile.Name.Length);
-
-            if (filenamesValid.IsLeft)
+            if (errors.Count > 0)
             {
-                return filenamesValid.Left;
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
-            return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
+            var archiveDataSet = new ArchiveDataSetFile(
+                dataSetFileName,
+                dataFile.FullName,
+                dataFile.Length,
+                metaFile.FullName,
+                metaFile.Length);
+
+            errors.AddRange(await _fileUploadsValidatorService
+                .ValidateDataFilesForUpload(
+                    releaseVersionId,
+                    archiveDataSet,
+                    () => Task.FromResult(dataFile.Open()), // @MarkFix probably wrong
+                    () => Task.FromResult(metaFile.Open()),
+                    replacingFile));
+
+            if (errors.Count > 0)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
+            }
+
+            return new ArchiveDataSetFile(
+                dataSetFileName,
+                dataFile.FullName,
+                dataFile.Length,
+                metaFile.FullName,
+                metaFile.Length);
         }
 
-        public async Task<Either<ActionResult, List<BulkDataArchiveFile>>> ValidateBulkDataArchiveFile(
+        public async Task<Either<ActionResult, List<ArchiveDataSetFile>>> ValidateBulkDataArchiveFile(
             Guid releaseVersionId,
             IFormFile zipFile)
         {
@@ -137,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
             }
 
-            var results = new List<BulkDataArchiveFile>();
+            var results = new List<ArchiveDataSetFile>();
 
             using var csvDataReader = new CsvDataReader(dataSetNamesCsvReader);
 
@@ -164,10 +189,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 unprocessedArchiveFiles.Remove(dataFile);
                 unprocessedArchiveFiles.Remove(metaFile);
 
-                var dataArchiveFile = new BulkDataArchiveFile(datasetName, dataFile: dataFile, metaFile: metaFile);
+                var dataArchiveFile = new ArchiveDataSetFile(
+                    datasetName,
+                    dataFile.FullName,
+                    dataFile.Length,
+                    metaFile.FullName,
+                    metaFile.Length);
 
-                errors.AddRange(_fileUploadsValidatorService.ValidateDataArchiveFileForUpload(
-                            releaseVersionId, dataArchiveFile));
+                errors.AddRange(await _fileUploadsValidatorService.ValidateDataFilesForUpload(
+                            releaseVersionId, dataArchiveFile,
+                            () => Task.FromResult(dataFile.Open()),
+                            () => Task.FromResult(metaFile.Open())));
 
                 // @MarkFix merge into above method call I think
                 errors.AddRange(_fileUploadsValidatorService.ValidateReleaseVersionDataSetFileName(
@@ -252,28 +284,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return errors;
-        }
-
-        private static Either<ActionResult, Unit> ValidateFilenameLengths(
-            int dataFilenameLength,
-            int metaFilenameLength)
-        {
-            if (dataFilenameLength > MaxFilenameLength && metaFilenameLength > MaxFilenameLength)
-            {
-                return ValidationActionResult(DataZipContentFilenamesTooLong);
-            }
-
-            if (dataFilenameLength > MaxFilenameLength)
-            {
-                return ValidationActionResult(DataFilenameTooLong);
-            }
-
-            if (metaFilenameLength > MaxFilenameLength)
-            {
-                return ValidationActionResult(MetaFilenameTooLong);
-            }
-
-            return Unit.Instance;
         }
     }
 }

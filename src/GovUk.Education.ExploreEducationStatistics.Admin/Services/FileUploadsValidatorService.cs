@@ -37,77 +37,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        //public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
-        //    Guid releaseVersionId,
-        //    string dataFileName,
-        //    long dataFileSize,
-        //    string metaFileName,
-        //    long metaFileSize,
-        //    File? replacingFile = null)
-        //{
-        //    List<ErrorViewModel> errors = [];
-
-        //    errors.AddRange(ValidateDataFileNames(releaseVersionId,
-        //        dataFileName: dataFileName,
-        //        metaFileName: metaFileName,
-        //        replacingFile));
-
-        //    errors.AddRange(ValidateDataFileSizes(
-        //        dataFileSize,
-        //        dataFileName,
-        //        metaFileSize,
-        //        metaFileName));
-
-        //    errors.AddRange(await ValidateDataFileTypes(dataFile, metaFile));
-
-        //    return errors;
-        //}
-
         public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
             Guid releaseVersionId,
-            IFormFile dataFile,
-            IFormFile metaFile,
+            string dataSetName,
+            string dataFileName,
+            long dataFileSize,
+            Func<Task<Stream>> dataFileStreamProvider,
+            string metaFileName,
+            long metaFileSize,
+            Func<Task<Stream>> metaFileStreamProvider,
             File? replacingFile = null)
         {
             List<ErrorViewModel> errors = [];
 
-            errors.AddRange(ValidateDataFileNames(releaseVersionId,
-                dataFileName: dataFile.FileName,
-                metaFileName: metaFile.FileName,
+            errors.AddRange(ValidateReleaseVersionDataSetFileName(
+                releaseVersionId, dataSetName));
+
+            errors.AddRange(ValidateDataFileNames(
+                releaseVersionId,
+                dataFileName: dataFileName,
+                metaFileName: metaFileName,
                 replacingFile));
 
             errors.AddRange(ValidateDataFileSizes(
-                dataFile.Length,
-                dataFile.FileName,
-                metaFile.Length,
-                metaFile.FileName));
+                dataFileSize,
+                dataFileName,
+                metaFileSize,
+                metaFileName));
 
-            errors.AddRange(await ValidateDataFileTypes(dataFile, metaFile));
+            errors.AddRange(await ValidateDataFileTypes(
+                dataFileName,
+                dataFileStreamProvider,
+                metaFileName,
+                metaFileStreamProvider));
 
             return errors;
         }
 
-        public List<ErrorViewModel> ValidateDataArchiveFileForUpload(
+        public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
             Guid releaseVersionId,
-            IDataArchiveFile archiveFile,
+            string dataSetFileName,
+            IFormFile dataFile,
+            IFormFile metaFile,
             File? replacingFile = null)
         {
-            List<ErrorViewModel> errors = [];
+            return await ValidateDataFilesForUpload(
+                releaseVersionId,
+                dataSetFileName,
+                dataFile.FileName,
+                dataFile.Length,
+                () => Task.FromResult(dataFile.OpenReadStream()),
+                metaFile.FileName,
+                metaFile.Length,
+                () => Task.FromResult(metaFile.OpenReadStream()),
+                replacingFile);
+        }
 
-            errors.AddRange(ValidateDataFileSizes(
-                archiveFile.DataFileSize,
-                archiveFile.DataFileName,
-                archiveFile.MetaFileSize,
-                archiveFile.MetaFileName));
-
-            errors.AddRange(ValidateDataFileNames(releaseVersionId,
-                    dataFileName: archiveFile.DataFileName,
-                    metaFileName: archiveFile.MetaFileName,
-                    replacingFile));
-
-            //errors.AddRange(await ValidateDataFileTypes(archive)); // @MarkFix
-
-            return errors;
+        public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
+            Guid releaseVersionId,
+            ArchiveDataSetFile archiveDataSet,
+            Func<Task<Stream>> dataFileStreamProvider,
+            Func<Task<Stream>> metaFileStreamProvider,
+            File? replacingFile = null)
+        {
+            return await ValidateDataFilesForUpload(
+                releaseVersionId,
+                archiveDataSet.DataSetName,
+                archiveDataSet.DataFileName,
+                archiveDataSet.DataFileSize,
+                dataFileStreamProvider,
+                archiveDataSet.MetaFileName,
+                archiveDataSet.MetaFileSize,
+                metaFileStreamProvider,
+                replacingFile);
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
@@ -276,18 +278,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errors;
         }
 
-        private async Task<List<ErrorViewModel>> ValidateDataFileTypes(IFormFile dataFile, IFormFile metaFile)
+        private async Task<List<ErrorViewModel>> ValidateDataFileTypes(
+            string dataFileName,
+            Func<Task<Stream>> dataFileStreamProvider,
+            string metaFileName,
+            Func<Task<Stream>> metaFileStreamProvider)
         {
             List<ErrorViewModel> errors = [];
 
-            if (!await _fileTypeService.IsValidCsvFile(dataFile))
+            if (!await _fileTypeService.IsValidCsvFile(dataFileStreamProvider, dataFileName))
             {
-                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFile.FileName));
+                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFileName));
             }
 
-            if (!await _fileTypeService.IsValidCsvFile(metaFile))
+            if (!await _fileTypeService.IsValidCsvFile(metaFileStreamProvider, metaFileName))
             {
-                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(metaFile.FileName));
+                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(metaFileName));
             }
 
             return errors;
