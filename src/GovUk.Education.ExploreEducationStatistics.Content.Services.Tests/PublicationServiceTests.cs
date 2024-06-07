@@ -2029,26 +2029,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         public class ListSitemapItemsTests : PublicationServiceTests
         {
+            private readonly string publicationUpdated = "2018-04-06T13:46:11";
+            private readonly Guid publicationId = Guid.NewGuid();
+
+            private readonly Guid firstReleaseId = Guid.NewGuid();
+            private readonly string firstReleaseSlug = "first-release-slug";
+
+            private readonly Guid secondReleaseId = Guid.NewGuid();
+            private readonly string secondReleaseSlug = "second-release-slug";
+
+            private readonly string firstReleaseVersionPublishedDate = "2019-02-03T07:34:12";
+            private readonly string firstReleaseVersionUpdateDate = "2019-02-04T08:29:54";
+
             [Fact]
             public async Task ListSitemapItems()
             {
-                var publicationUpdatedDate = new DateTime(2018, 04, 06, 13, 46, 11);
+                var publicationUpdatedDate = DateTime.Parse(publicationUpdated);
+                var firstReleaseVersionPublished = DateTime.Parse(firstReleaseVersionPublishedDate);
+                var firstReleaseVersionUpdated = DateTime.Parse(firstReleaseVersionUpdateDate);
 
-                Publication publication = _dataFixture
-                    .DefaultPublication()
-                    .WithReleases(ListOf<Release>(
-                        _dataFixture
-                            .DefaultRelease(publishedVersions: 1, year: 2020),
-                        _dataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                        _dataFixture
-                            .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)));
-                publication.Updated = publicationUpdatedDate;
+                var releaseOneVersionOne = new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = firstReleaseSlug,
+                    ReleaseId = firstReleaseId,
+                    Published = firstReleaseVersionPublished
+                };
+
+                var releaseOneVersionTwo = new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = firstReleaseSlug,
+                    ReleaseId = firstReleaseId,
+                    Published = firstReleaseVersionUpdated // Two versions with same slug to test de-duping
+                };
+
+                var releaseTwoVersionOne = new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = secondReleaseSlug,
+                    ReleaseId = secondReleaseId,
+                    Published = null // still in draft
+                };
+
+                var publication = new Publication
+                {
+                    Id = publicationId,
+                    Updated = publicationUpdatedDate,
+                    ReleaseSeries =
+                    [
+                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = firstReleaseId },
+                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = secondReleaseId }
+                    ],
+                    ReleaseVersions =
+                    [
+                        releaseOneVersionOne,
+                        releaseOneVersionTwo,
+                        releaseTwoVersionOne
+                    ],
+                    LatestPublishedReleaseVersionId = firstReleaseId
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
                     contentDbContext.Publications.Add(publication);
+                    contentDbContext.ReleaseVersions.AddRange(releaseOneVersionOne, releaseOneVersionTwo,
+                        releaseTwoVersionOne);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -2061,13 +2108,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     var item = Assert.Single(result);
                     Assert.Equal(publication.Slug, item.Slug);
                     Assert.Equal(publicationUpdatedDate, item.LastModified);
-
-                    // TODO: Clarify SELECT query and write matching assertions. 
-                    // Should we filter out publications with a SuperSededBy ID?
-                    // Should we filter out Draft Releases? Why does the above generate a list of 5?
-                    // Should we de-dupe slugs? Why are duped slugs even found?
+                    
                     Assert.NotNull(item.Releases);
-                    Assert.NotEmpty(item.Releases);
+                    var nonDraftReleaseVersion = Assert.Single(item.Releases);
+
+                    Assert.Equal(firstReleaseSlug, nonDraftReleaseVersion.Slug);
+                    Assert.Equal(firstReleaseVersionUpdated, nonDraftReleaseVersion.LastModified);
                 }
             }
         }

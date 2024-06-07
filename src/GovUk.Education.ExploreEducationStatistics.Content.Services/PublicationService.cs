@@ -341,20 +341,27 @@ public class PublicationService : IPublicationService
             .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data);
     }
 
-    public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems()
-    {
-        return await _contentDbContext.Publications
-            .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
-                        (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
-            .Select(p => new PublicationSitemapItemViewModel()
-            {
-                Slug = p.Slug,
-                LastModified = p.Updated,
-                Releases = p.ReleaseVersions.Select(r => new ReleaseSitemapItemViewModel()
+    public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems() =>
+        await
+            _contentDbContext.Publications
+                .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
+                            (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
+                .Include(p => p.ReleaseVersions)
+                .Select(p => new PublicationSitemapItemViewModel
                 {
-                    Slug = r.Slug,
-                    LastModified = r.Published
-                }).ToList()
-            }).ToListAsync();
-    }
+                    Slug = p.Slug,
+                    LastModified = p.Updated,
+                    Releases = ListUniqueReleaseVersionSitemapItems(p)
+                })
+                .ToListAsync();
+
+    private static List<ReleaseSitemapItemViewModel> ListUniqueReleaseVersionSitemapItems(Publication publication) =>
+        publication.ReleaseVersions
+            .Where(r => r.Published != null) // r.Live cannot be translated by LINQ
+            .OrderByDescending(r => r.Published)
+            .GroupBy(r => r.Slug)
+            .Select(slugGroup => slugGroup.First())
+            .ToList()
+            .Select(r => new ReleaseSitemapItemViewModel { Slug = r.Slug, LastModified = r.Published })
+            .ToList();
 }
