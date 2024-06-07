@@ -53,8 +53,7 @@ internal class DataSetService(
                 .OrderByDescending(ds => ds.LatestLiveVersion!.Published)
                 .ThenBy(ds => ds.Title)
                 .ThenBy(ds => ds.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Paginate(page: page, pageSize: pageSize)
                 .ToListAsync(cancellationToken: cancellationToken)
             )
             .Select(MapDataSet)
@@ -129,8 +128,7 @@ internal class DataSetService(
         var dataSetVersions = await queryable
             .OrderByDescending(dsv => dsv.VersionMajor)
             .ThenByDescending(dsv => dsv.VersionMinor)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
+            .Paginate(page: page, pageSize: pageSize)
             .ToListAsync(cancellationToken: cancellationToken);
 
         var releaseFilesByVersion =
