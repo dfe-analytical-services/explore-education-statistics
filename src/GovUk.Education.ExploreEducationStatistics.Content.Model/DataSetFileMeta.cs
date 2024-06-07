@@ -13,13 +13,6 @@ public class DataSetFileMeta
     [JsonConverter(typeof(GeographicLevelsListJsonConverter))]
     public required List<GeographicLevel> GeographicLevels { get; set; }
 
-    [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public TimeIdentifier? TimeIdentifier { get; set; } // EES-4918 to remove
-
-    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public List<int>? Years { get; set; } // EES-4918 to remove
-
     public required TimePeriodRangeMeta TimePeriodRange { get; set; }
 
     public required List<FilterMeta> Filters { get; set; }

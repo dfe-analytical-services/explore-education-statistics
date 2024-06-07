@@ -15,7 +15,7 @@ export default class CreateNewReleasePage {
       'input[name="timePeriodCoverageStartYear"]',
     );
     this.releaseType = page.locator(
-      'input[id="releaseSummaryForm-releaseType-NationalStatistics"]',
+      'input[id="releaseSummaryForm-releaseType-AccreditedOfficialStatistics"]',
     );
     this.createNewReleaseButton = page.locator(
       '//button[contains(text(),"Create new release")]',

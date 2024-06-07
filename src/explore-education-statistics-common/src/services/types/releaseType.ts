@@ -1,6 +1,6 @@
 export const releaseTypes = {
   // NOTE: Set in the desired display order
-  NationalStatistics: 'National statistics',
+  AccreditedOfficialStatistics: 'Accredited official statistics',
   OfficialStatistics: 'Official statistics',
   OfficialStatisticsInDevelopment: 'Official statistics in development',
   ExperimentalStatistics: 'Experimental statistics',

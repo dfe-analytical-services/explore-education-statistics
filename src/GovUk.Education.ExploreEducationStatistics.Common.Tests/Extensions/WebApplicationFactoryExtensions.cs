@@ -24,16 +24,6 @@ public static class WebApplicationFactoryExtensions
         return app.WithWebHostBuilder(builder => builder.ResetDbContext<TDbContext>());
     }
 
-    public static WebApplicationFactory<TEntrypoint> AddTestData<TDbContext, TEntrypoint>(
-        this WebApplicationFactory<TEntrypoint> app,
-        Action<TDbContext> testData
-    )
-        where TDbContext : DbContext
-        where TEntrypoint : class
-    {
-        return app.WithWebHostBuilder(builder => builder.AddTestData(testData));
-    }
-    
     /// <summary>
     /// This method registers all Controllers found in the <see cref="TStartup"/> class's assembly.
     /// 

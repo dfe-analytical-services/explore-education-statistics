@@ -20,101 +20,101 @@ public class DataSetPublishingService(
     public async Task PublishDataSets(Guid[] releaseVersionIds)
     {
         await PromoteDraftDataSetVersions(releaseVersionIds);
-        await UpdateReleaseFileIdsForReleaseAmendment(releaseVersionIds);
+        await UpdateDataSetVersionFileIdsForAmendments(releaseVersionIds);
     }
 
     /// <summary>
-    /// This method moves any Draft DataSetVersions that are connected to any of the provided releaseVersionIds
-    /// into Published, making them the latest live versions of their overarching DataSets. It also marks the
-    /// DataSets themselves as published if they haven't previously been published. 
+    /// Publishes any relevant data set versions, marking them as the latest live version
+    /// of their data set. If the data set has not been published before, this will
+    /// also be marked as published.
     /// </summary>
     private async Task PromoteDraftDataSetVersions(IEnumerable<Guid> releaseVersionIds)
     {
-        // Find all Data Files associated with the given ReleaseVersions.
-        var releaseFileIds = (await GetReleaseFilesForReleaseVersions(releaseVersionIds))
+        var releaseFileIds = (await GetReleaseFiles(releaseVersionIds))
             .Select(releaseFile => releaseFile.Id);
 
-        // Find all DataSets whose current Draft DataSetVersions reference any of the Release Versions' Data Files. 
-        var releaseVersionDataSets = await publicDataDbContext
+        var dataSets = await publicDataDbContext
             .DataSets
-            .AsNoTracking()
             .Include(dataSet => dataSet.LatestLiveVersion)
             .Include(dataSet => dataSet.LatestDraftVersion)
             .Where(dataSet => dataSet.LatestDraftVersion != null
                               && releaseFileIds.Contains(dataSet.LatestDraftVersion.ReleaseFileId))
             .ToListAsync();
 
-        // For each DataSet due to have a Draft DataSetVersion go live with the given Release Versions, publish the
-        // Draft version, and ensure that the overarching DataSet is also published.
-        releaseVersionDataSets
-            .ForEach(dataSet => 
-            {
-                var currentDraftVersion = dataSet.LatestDraftVersion;
-                currentDraftVersion!.Status = DataSetVersionStatus.Published;
-                currentDraftVersion.Published = DateTimeOffset.UtcNow;
+        foreach (var dataSet in dataSets)
+        {
+            var currentDraftVersion = dataSet.LatestDraftVersion;
+            currentDraftVersion!.Status = DataSetVersionStatus.Published;
+            currentDraftVersion.Published = DateTimeOffset.UtcNow;
 
-                // Mark the overarching DataSet as Published, and set a Published date if one has not previously been
-                // set.
-                dataSet.Status = DataSetStatus.Published;
-                dataSet.Published ??= currentDraftVersion.Published;
-                
-                // Set the newly published DataSetVersion as the overarching DataSet's LatestLiveVersion,
-                // and unset it from being the latest Draft version.
-                dataSet.LatestLiveVersion = currentDraftVersion;
-                dataSet.LatestLiveVersionId = currentDraftVersion.Id;
-                dataSet.LatestDraftVersion = null;
-                dataSet.LatestDraftVersionId = null;
-                
-                publicDataDbContext.DataSets.Update(dataSet);
-                publicDataDbContext.DataSetVersions.Update(currentDraftVersion);
-            });
-        
-        publicDataDbContext.DataSets.UpdateRange(releaseVersionDataSets);
+            dataSet.Status = DataSetStatus.Published;
+            dataSet.Published ??= currentDraftVersion.Published;
+
+            dataSet.LatestLiveVersion = currentDraftVersion;
+            dataSet.LatestLiveVersionId = currentDraftVersion.Id;
+
+            dataSet.LatestDraftVersion = null;
+            dataSet.LatestDraftVersionId = null;
+        }
 
         await publicDataDbContext.SaveChangesAsync();
     }
 
     /// <summary>
-    /// This method updates any ReleaseFileId values on DataSetVersions that referenced any Ids of ReleaseFiles on
-    /// previous ReleaseVersions, in the case that any of the given releaseVersionIds that are being published are
-    /// amendments of ReleaseVersions that contain Public API Data sets.
+    /// For any amendment release, update any relevant data set versions being published
+    /// with IDs that reference the amendment's files.
     /// </summary>
-    private async Task UpdateReleaseFileIdsForReleaseAmendment(IEnumerable<Guid> releaseVersionIds)
+    private async Task UpdateDataSetVersionFileIdsForAmendments(IEnumerable<Guid> releaseVersionIds)
     {
         var previousReleaseVersionIds = await contentDbContext
             .ReleaseVersions
-            .Where(releaseVersion =>
-                releaseVersionIds.Contains(releaseVersion.Id)
-                && releaseVersion.PreviousVersionId != null)
+            .Where(releaseVersion => releaseVersionIds.Contains(releaseVersion.Id))
+            .Where(releaseVersion => releaseVersion.PreviousVersionId != null)
             .Select(releaseVersion => releaseVersion.PreviousVersionId)
+            .Distinct()
             .Cast<Guid>()
             .ToListAsync();
 
-        var currentReleaseFiles = await GetReleaseFilesForReleaseVersions(releaseVersionIds);
-        var previousReleaseFiles = await GetReleaseFilesForReleaseVersions(previousReleaseVersionIds);
-        var previousToCurrentReleaseFileIds = previousReleaseFiles.ToDictionary(
-            previousReleaseFile => previousReleaseFile.Id,
-            previousReleaseFile => currentReleaseFiles.SingleOrDefault(currentReleaseFile => currentReleaseFile.FileId == previousReleaseFile.FileId)?.Id);
-        
-        var previousReleaseFileIdsToUpdate = previousToCurrentReleaseFileIds
-            .Where(mapping => mapping.Value != null)
-            .Select(mapping => mapping.Key);
+        if (previousReleaseVersionIds.Count == 0)
+        {
+            return;
+        }
 
-        var previousDataSetVersions = await publicDataDbContext
+        var previousReleaseFilesById = (await GetReleaseFiles(previousReleaseVersionIds))
+            .ToDictionary(rf => rf.Id);
+
+        var dataSetVersions = await publicDataDbContext
             .DataSetVersions
-            .Where(dataSetVersion => previousReleaseFileIdsToUpdate.Contains(dataSetVersion.ReleaseFileId))
+            .Where(dataSetVersion => previousReleaseFilesById.Keys.Contains(dataSetVersion.ReleaseFileId))
             .ToListAsync();
-        
-        previousDataSetVersions.ForEach(previousDataSetVersion => 
-            previousDataSetVersion.ReleaseFileId =
-                previousToCurrentReleaseFileIds[previousDataSetVersion.ReleaseFileId]!.Value);
+
+        if (dataSetVersions.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var dataSetVersion in dataSetVersions)
+        {
+            var previousReleaseFile = previousReleaseFilesById[dataSetVersion.ReleaseFileId];
+
+            var nextReleaseFile = await contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseVersion)
+                .Where(rf => rf.FileId == previousReleaseFile.FileId)
+                .Where(rf => rf.ReleaseVersion.PreviousVersionId == previousReleaseFile.ReleaseVersionId)
+                .SingleAsync();
+
+            dataSetVersion.ReleaseFileId = nextReleaseFile.Id;
+        }
 
         await publicDataDbContext.SaveChangesAsync();
     }
 
-    private async Task<List<ReleaseFile>> GetReleaseFilesForReleaseVersions(IEnumerable<Guid> releaseVersionIds) =>
-        await contentDbContext
+    private async Task<List<ReleaseFile>> GetReleaseFiles(IEnumerable<Guid> releaseVersionIds)
+    {
+        return await contentDbContext
             .ReleaseFiles
             .Where(rf => releaseVersionIds.Contains(rf.ReleaseVersionId) && rf.File.Type == FileType.Data)
             .ToListAsync();
+    }
 }

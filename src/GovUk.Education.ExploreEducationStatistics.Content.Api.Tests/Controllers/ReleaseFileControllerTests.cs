@@ -8,12 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -25,12 +24,8 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    public class ReleaseFileControllerTests : IntegrationTest<TestStartup>
+    public class ReleaseFileControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
     {
-        public ReleaseFileControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
@@ -43,6 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             await using var stream = "Test file".ToStream();
             var fileId = Guid.NewGuid();
 
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseVersions.Add(_releaseVersion);
+            });
+
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             releaseFileService
@@ -54,8 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
-            var client = SetupApp(releaseFileService: releaseFileService.Object)
-                .AddContentDbTestData(context => context.ReleaseVersions.Add(_releaseVersion))
+            var client = BuildApp(releaseFileService: releaseFileService.Object)
                 .CreateClient();
 
             var response = await client
@@ -69,6 +68,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task StreamFilesToZip()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseVersions.Add(_releaseVersion);
+            });
+
             var fileId1 = Guid.NewGuid();
             var fileId2 = Guid.NewGuid();
 
@@ -86,11 +90,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 )
                 .ReturnsAsync(Unit.Instance)
                 .Callback<Guid, Stream, IEnumerable<Guid>, CancellationToken?>(
-                    (_, stream, _, _) => { stream.WriteText("Test zip"); }
-                );
+                    (_, stream, _, _) => stream.WriteText("Test zip"));
 
-            var client = SetupApp(releaseFileService: releaseFileService.Object)
-                .AddContentDbTestData(context => context.ReleaseVersions.Add(_releaseVersion))
+            var client = BuildApp(releaseFileService: releaseFileService.Object)
                 .CreateClient();
 
             var response = await client
@@ -104,6 +106,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task StreamFilesToZip_NoFileIds()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseVersions.Add(_releaseVersion);
+            });
+
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             releaseFileService
@@ -117,11 +124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 )
                 .ReturnsAsync(Unit.Instance)
                 .Callback<Guid, Stream, IEnumerable<Guid>?, CancellationToken?>(
-                    (_, stream, _, _) => { stream.WriteText("Test zip"); }
-                );
+                    (_, stream, _, _) => stream.WriteText("Test zip"));
 
-            var client = SetupApp(releaseFileService: releaseFileService.Object)
-                .AddContentDbTestData(context => context.ReleaseVersions.Add(_releaseVersion))
+            var client = BuildApp(releaseFileService: releaseFileService.Object)
                 .CreateClient();
 
             var response = await client
@@ -132,10 +137,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             response.AssertOk("Test zip");
         }
 
-        private WebApplicationFactory<TestStartup> SetupApp(IReleaseFileService? releaseFileService = null)
+        private WebApplicationFactory<Startup> BuildApp(IReleaseFileService? releaseFileService = null)
         {
             return TestApp
-                .ResetDbContexts()
                 .ConfigureServices(
                     services =>
                         {

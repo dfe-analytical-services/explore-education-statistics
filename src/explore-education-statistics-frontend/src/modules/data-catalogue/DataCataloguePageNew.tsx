@@ -253,7 +253,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
     >
       <NotificationBanner title="This page has changed">
         Following user feedback we've made some changes to this page to make our
-        publications easier to find, if you have any comments on the new design
+        data sets easier to find, if you have any comments on the new design
         please let us know via the{' '}
         <a
           href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u"
@@ -275,6 +275,9 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
             <ul className="govuk-list">
               <li>
                 <Link to="/find-statistics">Find statistics and data</Link>
+              </li>
+              <li>
+                <Link to="/methodology">Methodology</Link>
               </li>
               <li>
                 <Link to="/glossary">Glossary</Link>
@@ -352,7 +355,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                 <ButtonText
                   onClick={() => handleClearFilter({ filterType: 'all' })}
                 >
-                  Clear filters
+                  Reset filters
                 </ButtonText>
               )}
             </div>

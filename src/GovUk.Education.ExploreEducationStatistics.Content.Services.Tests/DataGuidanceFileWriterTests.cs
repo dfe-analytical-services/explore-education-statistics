@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             <h2>Description</h2>
             <p>
                 This document describes the data included in the ‘Children looked after in England 
-                including adoptions: 2019 to 2020’ National Statistics release’s underlying data files. 
+                including adoptions: 2019 to 2020’ Accredited Official Statistics release’s underlying data files. 
                 This data is released under the terms of the <a href=""https://the-license.gov.uk"">Open Government License</a> 
                 and is intended to meet at least three stars for Open Data.
             </p>

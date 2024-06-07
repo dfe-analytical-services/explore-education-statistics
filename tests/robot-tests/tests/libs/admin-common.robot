@@ -189,7 +189,7 @@ user creates release from publication page
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
-    user clicks radio    National statistics
+    user clicks radio    Accredited official statistics
     user clicks radio if exists    Create new template
     user waits until button is enabled    Create new release    %{WAIT_SMALL}
     user clicks button    Create new release

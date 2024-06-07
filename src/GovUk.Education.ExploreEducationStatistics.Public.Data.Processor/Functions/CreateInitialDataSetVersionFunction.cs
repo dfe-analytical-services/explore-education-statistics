@@ -21,7 +21,7 @@ public class CreateInitialDataSetVersionFunction(
 {
     [Function(nameof(CreateInitialDataSetVersion))]
     public async Task<IActionResult> CreateInitialDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = nameof(CreateInitialDataSetVersion))] [FromBody]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateInitialDataSetVersion))] [FromBody]
         InitialDataSetVersionCreateRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)

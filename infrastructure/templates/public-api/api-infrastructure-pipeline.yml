@@ -24,6 +24,7 @@ resources:
           - refs/heads/dev
           - refs/heads/test
           - refs/heads/master
+
 # This param is helpful for debugging to allow the selection of a particular branch from which to base a deploy from this pipeline.
 # This should be removed in the long term in favour of using the "Resources" selection from the "Run pipeline" dialog.
 #

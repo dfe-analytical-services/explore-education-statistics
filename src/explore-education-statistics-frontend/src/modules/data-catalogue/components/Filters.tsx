@@ -1,16 +1,17 @@
-import ButtonText from '@common/components/ButtonText';
 import {
   PublicationTreeSummary,
   ReleaseSummary,
   Theme,
 } from '@common/services/publicationService';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import {
   FormFieldset,
   FormGroup,
   FormRadioGroup,
   FormSelect,
 } from '@common/components/form';
+import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import {
   DataSetFileFilter,
   DataSetType,
@@ -68,7 +69,9 @@ export default function Filters({
         <FormGroup>
           <FormSelect
             className="govuk-!-width-full"
+            hint={<ThemesModal themes={themes} />}
             id={`${formId}-theme`}
+            inlineHint
             label="Theme"
             name="themeId"
             options={[
@@ -142,7 +145,7 @@ export default function Filters({
             className={classNames({ 'govuk-!-margin-top-4': !showTypeFilter })}
             onClick={onClearFilters}
           >
-            Clear filters
+            Reset filters
           </ButtonText>
         )}
         {showTypeFilter && (

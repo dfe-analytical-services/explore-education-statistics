@@ -14,12 +14,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
@@ -36,7 +37,8 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    public class TableBuilderControllerTests : IntegrationTest<TestStartup>
+    public class TableBuilderControllerTests(TestApplicationFactory testApp)
+        : IntegrationTestFixture(testApp)
     {
         private static readonly DataFixture Fixture = new();
 
@@ -130,10 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             },
         };
 
-        public TableBuilderControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task Query()
         {
@@ -195,6 +193,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task Query_ReleaseId()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.ReleaseVersions.Add(ReleaseVersion));
+
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
             tableBuilderService
@@ -208,7 +209,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-                .AddContentDbTestData(context => context.ReleaseVersions.Add(ReleaseVersion))
                 .CreateClient();
 
             var response = await client
@@ -223,6 +223,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task Query_ReleaseId_Csv()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.ReleaseVersions.Add(ReleaseVersion));
+
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
             tableBuilderService
@@ -240,7 +243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 );
 
             var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-                .AddContentDbTestData(context => context.ReleaseVersions.Add(ReleaseVersion))
                 .CreateClient();
 
             var response = await client
@@ -261,13 +263,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.DataBlockParents.Add(DataBlockParent));
+
             var cacheKey = new DataBlockTableResultCacheKey(publicationSlug: ReleaseVersion.Publication.Slug,
                 releaseSlug: ReleaseVersion.Slug,
                 DataBlockParentId);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
 
             BlobCacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
@@ -280,7 +285,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
-                .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             var response =
@@ -306,8 +310,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult_NotModified()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.DataBlockParents.Add(DataBlockParent));
+
             var client = SetupApp()
-                .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             var publishedDate = DataBlockParent
@@ -342,13 +348,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult_ETagChanged()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.DataBlockParents.Add(DataBlockParent));
+
             var cacheKey = new DataBlockTableResultCacheKey(publicationSlug: ReleaseVersion.Publication.Slug,
                 releaseSlug: ReleaseVersion.Slug,
                 DataBlockParentId);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
 
             BlobCacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
@@ -361,7 +370,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
-                .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             var publishedDate = DataBlockParent
@@ -397,13 +405,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult_LastModifiedChanged()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.DataBlockParents.Add(DataBlockParent));
+
             var cacheKey = new DataBlockTableResultCacheKey(publicationSlug: ReleaseVersion.Publication.Slug,
                 releaseSlug: ReleaseVersion.Slug,
                 DataBlockParentId);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
 
             BlobCacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
@@ -416,7 +427,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
-                .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             // The latest published DataBlockVersion has been published since the caller last requested it, so we
@@ -450,6 +460,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.DataBlockParents.Add(DataBlockParent));
+
             var latestReleaseVersion = new ReleaseVersion
             {
                 Id = ReleaseVersionId,
@@ -486,7 +499,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     dataBlockService: dataBlockService.Object,
                     releaseVersionRepository: releaseVersionRepository.Object
                 )
-                .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentId}");
@@ -516,8 +528,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack_DataBlockNotYetPublished()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.DataBlockParents.Add(DataBlockParentWithNoPublishedVersion));
+
             var client = SetupApp()
-                .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParentWithNoPublishedVersion))
                 .CreateClient();
 
             var response =
@@ -531,6 +545,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack_NotLatestRelease()
         {
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.DataBlockParents.Add(DataBlockParent));
+
             var latestReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
@@ -544,7 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
 
             BlobCacheService
                 .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
@@ -566,7 +583,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     dataBlockService: dataBlockService.Object,
                     releaseVersionRepository: releaseVersionRepository.Object
                 )
-                .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentId}");
@@ -582,16 +598,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal("Academic year 2021/22", viewModel.LatestReleaseTitle);
         }
 
-        private WebApplicationFactory<TestStartup> SetupApp(
+        private WebApplicationFactory<Startup> SetupApp(
             IDataBlockService? dataBlockService = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
             ITableBuilderService? tableBuilderService = null)
         {
             return TestApp
-                .ResetDbContexts()
                 .ConfigureServices(
                     services =>
                     {
+                        services.ReplaceService(BlobCacheService);
+
                         services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
                         services.AddTransient(_ => releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
                         services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));

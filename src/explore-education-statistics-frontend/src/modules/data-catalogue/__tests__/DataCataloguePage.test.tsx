@@ -475,11 +475,12 @@ describe('DataCataloguePage', () => {
         relatedInformationNav,
       ).getAllByRole('link');
 
-      expect(relatedInformationLinks).toHaveLength(2);
+      expect(relatedInformationLinks).toHaveLength(3);
       expect(relatedInformationLinks[0]).toHaveTextContent(
         'Find statistics and data',
       );
-      expect(relatedInformationLinks[1]).toHaveTextContent('Glossary');
+      expect(relatedInformationLinks[1]).toHaveTextContent('Methodology');
+      expect(relatedInformationLinks[2]).toHaveTextContent('Glossary');
     });
 
     test('renders correctly with data sets', async () => {
@@ -689,14 +690,14 @@ describe('DataCataloguePage', () => {
         });
       });
 
-      test('shows the remove theme filter and clear filters buttons', async () => {
+      test('shows the remove theme filter and reset filters buttons', async () => {
         expect(
           screen.getByRole('button', {
             name: 'Remove filter: Theme Theme title 2',
           }),
         ).toBeInTheDocument();
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
     });
@@ -809,7 +810,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
 
@@ -822,7 +823,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByText('National statistics'),
+          releaseInfo.getByText('Accredited official statistics'),
         ).toBeInTheDocument();
         expect(
           releaseInfo.getByText('This is the latest data'),
@@ -920,7 +921,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
 
         const releaseInfo = within(screen.getByTestId('release-info'));
@@ -931,7 +932,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          releaseInfo.getByText('National statistics'),
+          releaseInfo.getByText('Accredited official statistics'),
         ).toBeInTheDocument();
         expect(
           releaseInfo.getByText('This is not the latest data'),
@@ -1038,14 +1039,14 @@ describe('DataCataloguePage', () => {
         });
       });
 
-      test('shows the remove search filter and clear filters buttons', async () => {
+      test('shows the remove search filter and reset filters buttons', async () => {
         expect(
           screen.getByRole('button', {
             name: 'Remove filter: Search find me',
           }),
         ).toBeInTheDocument();
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
     });
@@ -1096,7 +1097,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
 
@@ -1166,7 +1167,7 @@ describe('DataCataloguePage', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
 
@@ -1236,7 +1237,7 @@ describe('DataCataloguePage', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
 
@@ -1309,7 +1310,7 @@ describe('DataCataloguePage', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
 
@@ -1339,7 +1340,7 @@ describe('DataCataloguePage', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', { name: 'Clear filters' }),
+          screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
       });
 
@@ -1363,7 +1364,7 @@ describe('DataCataloguePage', () => {
         expect(screen.getByLabelText('Releases')).toHaveValue('latest');
 
         expect(
-          screen.queryByRole('button', { name: 'Clear filters' }),
+          screen.queryByRole('button', { name: 'Reset filters' }),
         ).not.toBeInTheDocument();
       });
     });
@@ -1715,7 +1716,7 @@ describe('DataCataloguePage', () => {
 
         await userEvent.click(
           screen.getByRole('button', {
-            name: 'Clear filters',
+            name: 'Reset filters',
           }),
         );
 
@@ -1748,7 +1749,7 @@ describe('DataCataloguePage', () => {
 
         expect(
           screen.queryByRole('button', {
-            name: 'Clear filters',
+            name: 'Reset filters',
           }),
         ).toBeInTheDocument();
       });

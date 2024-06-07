@@ -686,7 +686,7 @@ export const summary: PublicationReleaseSummary = {
     month: '10',
     day: '',
   },
-  type: 'NationalStatistics',
+  type: 'AccreditedOfficialStatistics',
   latestRelease: true,
   publication: {
     id: '89869bba-0c00-40f7-b7d6-e28cb904ad37',

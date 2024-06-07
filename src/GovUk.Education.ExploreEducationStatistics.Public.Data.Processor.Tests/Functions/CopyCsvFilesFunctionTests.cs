@@ -63,7 +63,7 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
 
             var sourceDataFileContent = await File.ReadAllTextAsync(Path.Combine(
                 testDataDirectoryPath,
-                "source.csv"
+                "data.csv"
             ));
 
             await using (var contentStream = sourceDataFileContent.ToStream())
@@ -77,7 +77,7 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
 
             var sourceMetadataFileContent = await File.ReadAllTextAsync(Path.Combine(
                 testDataDirectoryPath,
-                "source.meta.csv"
+                DataSetFilenames.CsvMetadataFile
             ));
 
             await using (var contentStream = sourceMetadataFileContent.ToStream())
@@ -117,7 +117,7 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
 
             var expectedCsvMetadataPath = dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion);
             Assert.Contains(expectedCsvMetadataPath, actualDataSetVersionFiles);
-            Assert.Equal(sourceMetadataFileContent, await DecompressFileToString(expectedCsvMetadataPath));
+            Assert.Equal(sourceMetadataFileContent, await File.ReadAllTextAsync(expectedCsvMetadataPath));
         }
 
         private static async Task<string> DecompressFileToString(string path)

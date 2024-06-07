@@ -13,6 +13,7 @@ import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import Modal from '@common/components/Modal';
 import { parseISO } from 'date-fns';
 import React, { ReactNode } from 'react';
+import classNames from 'classnames';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -20,8 +21,8 @@ interface ReleaseTypeIcon {
 }
 
 const releaseTypesToIcons: Partial<Record<ReleaseType, ReleaseTypeIcon>> = {
-  NationalStatistics: {
-    url: '/assets/images/UKSA-quality-mark.jpg',
+  AccreditedOfficialStatistics: {
+    url: '/assets/images/accredited-official-statistics-logo.svg',
     altText: 'UK statistics authority quality mark',
   },
 };
@@ -55,13 +56,18 @@ export default function ReleaseSummarySection({
 }: Props) {
   return (
     <div data-scroll={trackScroll ? true : undefined} id="summary-section">
-      <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
+      <div
+        className={classNames(
+          'dfe-flex dfe-align-items--center dfe-justify-content--space-between',
+          { 'govuk-!-margin-bottom-3': !releaseTypesToIcons[releaseType] },
+        )}
+      >
         <div>{renderStatusTags}</div>
         {releaseTypesToIcons[releaseType] && (
           <img
             src={releaseTypesToIcons[releaseType]?.url}
             alt={releaseTypesToIcons[releaseType]?.altText}
-            height="60"
+            height="76"
             width="60"
           />
         )}

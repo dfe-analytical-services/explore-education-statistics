@@ -4,9 +4,61 @@ import {
   ApiDataSetVersion,
 } from '@frontend/services/apiDataSetService';
 import {
+  DataSetCsvPreview,
   DataSetFile,
+  DataSetFootnote,
   DataSetFileSummary,
+  DataSetVariable,
 } from '@frontend/services/dataSetFileService';
+
+export const testDataSetCsvPreview: DataSetCsvPreview = {
+  headers: ['time_period', 'geographic_level', 'filter_1', 'indicator_1'],
+  rows: [
+    ['201819', 'National', 'filter_1_value', '100'],
+    ['201920', 'National', 'filter_1_value', '101'],
+    ['202021', 'National', 'filter_1_value', '102'],
+    ['202122', 'National', 'filter_1_value', '103'],
+    ['202223', 'National', 'filter_1_value', '104'],
+  ],
+};
+
+export const testDataSetVariables: DataSetVariable[] = [
+  {
+    label: 'Filter 1 label',
+    value: 'filter_1',
+  },
+  {
+    label: 'Filter 2 label',
+    value: 'filter_2',
+  },
+  {
+    label: 'Indicator 1 label',
+    value: 'indicator_1',
+  },
+  {
+    label: 'Indicator 2 label',
+    value: 'indicator_2',
+  },
+  {
+    label: 'Indicator 3 label',
+    value: 'indicator_3',
+  },
+  {
+    label: 'Indicator 4 label',
+    value: 'indicator_4',
+  },
+];
+
+export const testDataSetFootnotes: DataSetFootnote[] = [
+  {
+    id: 'footnote-1',
+    label: 'Footnote 1',
+  },
+  {
+    id: 'footnote-2',
+    label: 'Footnote 2',
+  },
+];
 
 export const testDataSetFileSummaries: DataSetFileSummary[] = [
   {
@@ -129,8 +181,8 @@ export const testDataSetFile: DataSetFile = {
       geographicLevels: ['Local authority', 'National'],
       indicators: ['Indicator 1', 'Indicator 2'],
     },
-    dataCsvPreview: { headers: ['column_1'], rows: [['1']] },
-    variables: [{ value: 'column_1', label: 'Column 1 is for something' }],
+    dataCsvPreview: testDataSetCsvPreview,
+    variables: testDataSetVariables,
     subjectId: 'subject-id',
   },
   release: {
@@ -146,11 +198,11 @@ export const testDataSetFile: DataSetFile = {
     lastUpdated: '2023-12-01',
     slug: 'release-slug',
     title: 'Release 1',
-    type: 'NationalStatistics',
+    type: 'AccreditedOfficialStatistics',
   },
   summary: 'Data set 1 summary',
   title: 'Data set 1',
-  footnotes: [{ id: 'footnote-1', label: 'Footnote 1' }],
+  footnotes: testDataSetFootnotes,
 };
 
 export const testDataSetWithApi: DataSetFile = {

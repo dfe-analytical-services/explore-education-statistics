@@ -144,7 +144,7 @@ describe('FindStatisticsPage', () => {
     );
     expect(releaseTypeOptions[0]).toBeChecked();
     expect(releaseTypeOptions[1]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('National statistics'),
+      releaseTypeFilterGroup.getByLabelText('Accredited official statistics'),
     );
     expect(releaseTypeOptions[1]).not.toBeChecked();
     expect(releaseTypeOptions[2]).toEqual(
@@ -611,7 +611,7 @@ describe('FindStatisticsPage', () => {
 
   test('removing filters', async () => {
     mockRouter.setCurrentUrl(
-      '/find-statistics?releaseType=NationalStatistics&themeId=theme-2',
+      '/find-statistics?releaseType=AccreditedOfficialStatistics&themeId=theme-2',
     );
 
     publicationService.listPublications
@@ -637,7 +637,7 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
       screen.getByRole('button', {
-        name: 'Remove filter: National statistics',
+        name: 'Remove filter: Accredited official statistics',
       }),
     ).toBeInTheDocument();
     expect(
@@ -653,7 +653,7 @@ describe('FindStatisticsPage', () => {
     // remove release type filter
     await userEvent.click(
       screen.getByRole('button', {
-        name: 'Remove filter: National statistics',
+        name: 'Remove filter: Accredited official statistics',
       }),
     );
 
@@ -669,7 +669,7 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
-        name: 'Remove filter: National statistics',
+        name: 'Remove filter: Accredited official statistics',
       }),
     ).not.toBeInTheDocument();
     expect(
@@ -702,7 +702,7 @@ describe('FindStatisticsPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
-        name: 'Remove filter: National statistics',
+        name: 'Remove filter: Accredited official statistics',
       }),
     ).not.toBeInTheDocument();
     expect(

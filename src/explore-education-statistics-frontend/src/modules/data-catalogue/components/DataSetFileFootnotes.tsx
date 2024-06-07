@@ -1,27 +1,17 @@
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
-import { pageHiddenSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { DataSetFootnote } from '@frontend/services/dataSetFileService';
 import React from 'react';
 
-// TODO EES-4856 replace with real data
-const footnotes = [
-  {
-    id: 'footnote-1',
-    label:
-      'Local authority response rates to the data collection vary by census date. To account for non-response, national and regional figures have been uprated based on local authority pupil populations.',
-  },
-  {
-    id: 'footnote-2',
-    label:
-      'Local authority response rates to the data collection vary by census date. To account for non-response, national and regional figures have been uprated based on local authority pupil populations.',
-  },
-];
+const sectionId = 'dataSetFootnotes';
 
-export default function DataSetFileFootnotes() {
+interface Props {
+  footnotes: DataSetFootnote[];
+}
+
+export default function DataSetFileFootnotes({ footnotes }: Props) {
   return (
-    <DataSetFilePageSection
-      heading={pageHiddenSections.footnotes}
-      id="footnotes"
-    >
+    <DataSetFilePageSection heading={pageSections[sectionId]} id={sectionId}>
       <ol>
         {footnotes.map(footnote => (
           <li key={footnote.id}>{footnote.label}</li>

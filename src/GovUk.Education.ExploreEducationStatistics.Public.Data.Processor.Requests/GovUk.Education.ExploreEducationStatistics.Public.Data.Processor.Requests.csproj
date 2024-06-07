@@ -8,16 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <CompilerVisibleProperty Include="RootNamespace"/>
-    <CompilerVisibleProperty Include="ProjectDir"/>
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="11.9.0" />
+    <PackageReference Include="FluentValidation" Version="11.9.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
   </ItemGroup>
 
 </Project>

@@ -77,6 +77,9 @@ param publicUrls {
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
 
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
+param dataProcessorAppRegistrationClientId string = ''
+
 var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
@@ -91,7 +94,7 @@ var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
 var containerAppEnvironmentNameSuffix = '01'
-var dataFilesFileShareMountName = 'data-files-fileshare-mount'
+var dataFilesFileShareMountName = 'public-api-fileshare-mount'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 var publicApiStorageAccountName = '${subscription}eespapisa'
 
@@ -158,7 +161,7 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' 
 var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
 
 // Deploy File Share.
-module fileShareModule 'components/fileShare.bicep' = {
+module dataFilesFileShareModule 'components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     resourcePrefix: resourcePrefix
@@ -218,7 +221,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
   }
 }
 
-var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
+var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
 
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
@@ -237,10 +240,10 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     tagValues: tagValues
     azureFileStorages: [
       {
-        storageName: fileShareModule.outputs.fileShareName
+        storageName: dataFilesFileShareModule.outputs.fileShareName
         storageAccountName: publicApiStorageAccountName
         storageAccountKey: publicApiStorageAccountAccessKey
-        fileShareName: fileShareModule.outputs.fileShareName
+        fileShareName: dataFilesFileShareModule.outputs.fileShareName
         accessMode: 'ReadWrite'
       }
     ]
@@ -268,7 +271,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       {
         name: dataFilesFileShareMountName
         storageType: 'AzureFile'
-        storageName: fileShareModule.outputs.fileShareName
+        storageName: dataFilesFileShareModule.outputs.fileShareName
       }
     ]
     appSettings: [
@@ -295,7 +298,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         value: 'true'
       }
       {
-        name: 'DataFiles__BasePath'
+        name: 'ParquetFiles__BasePath'
         value: dataFilesFileShareMountPath
       }
       {
@@ -327,6 +330,18 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   ]
 }
 
+resource adminAppService 'Microsoft.Web/sites@2023-01-01' existing = {
+  name: adminAppServiceFullName
+}
+
+resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2018-11-30' existing = {
+  scope: adminAppService
+  name: 'default'
+}
+
+var adminAppClientId = adminAppServiceIdentity.properties.clientId
+var adminAppPrincipalId = adminAppService.identity.principalId
+
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: dataProcessorFunctionAppManagedIdentityName
   location: location
@@ -343,6 +358,15 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     publicNetworkAccessEnabled: false
+    entraIdAuthentication: {
+      appRegistrationClientId: dataProcessorAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+      ]
+      allowedPrincipalIds: [
+        adminAppPrincipalId
+      ]
+    }
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
       name: dataProcessorFunctionAppManagedIdentity.name
@@ -357,11 +381,15 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
+    healthCheck: {
+      path: '/api/HealthCheck'
+      unhealthyMetricName: '${subscription}PublicDataProcessorUnhealthy'
+    }
     azureFileShares: [{
-      storageName: fileShareModule.outputs.fileShareName
+      storageName: dataFilesFileShareModule.outputs.fileShareName
       storageAccountKey: publicApiStorageAccountAccessKey
       storageAccountName: publicApiStorageAccountName
-      fileShareName: fileShareModule.outputs.fileShareName
+      fileShareName: dataFilesFileShareModule.outputs.fileShareName
       mountPath: dataFilesFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules

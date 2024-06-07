@@ -79,7 +79,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                 Id = Guid.NewGuid()
             }
         },
-        Type = ReleaseType.NationalStatistics,
+        Type = ReleaseType.AccreditedOfficialStatistics,
         RelatedInformation = new List<LinkViewModel>
         {
             new()

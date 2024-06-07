@@ -55,7 +55,7 @@ Navigate to the "Release summary" page for the new release
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    Financial year    3000-01    National statistics
+    user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload subject
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv

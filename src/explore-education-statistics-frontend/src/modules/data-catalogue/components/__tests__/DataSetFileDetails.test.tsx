@@ -21,7 +21,7 @@ describe('DataSetFileDetails', () => {
     ).toHaveAttribute('href', '/find-statistics/publication-slug/release-slug');
     expect(
       within(screen.getByTestId('Release type')).getByRole('button', {
-        name: /National statistics/,
+        name: /Accredited official statistics/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -52,12 +52,12 @@ describe('DataSetFileDetails', () => {
     );
 
     await user.click(
-      screen.getByRole('button', { name: /National statistics/ }),
+      screen.getByRole('button', { name: /Accredited official statistics/ }),
     );
 
     const modal = within(screen.getByRole('dialog'));
     expect(
-      modal.getByRole('heading', { name: 'National statistics' }),
+      modal.getByRole('heading', { name: 'Accredited official statistics' }),
     ).toBeInTheDocument();
     expect(modal.getByRole('button', { name: 'Close' })).toBeInTheDocument();
   });

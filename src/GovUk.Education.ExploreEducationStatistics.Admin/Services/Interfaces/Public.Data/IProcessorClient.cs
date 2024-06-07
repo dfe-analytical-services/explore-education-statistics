@@ -13,4 +13,8 @@ public interface IProcessorClient
     Task<Either<ActionResult, CreateInitialDataSetVersionResponseViewModel>> CreateInitialDataSetVersion(
         Guid releaseFileId,
         CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default);
 }

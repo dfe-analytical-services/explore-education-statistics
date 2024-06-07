@@ -297,7 +297,7 @@ export const testPublicationRelease: Release = {
   },
   latestRelease: true,
   relatedInformation: [],
-  type: 'NationalStatistics',
+  type: 'AccreditedOfficialStatistics',
   updates: [],
   content: [],
   downloadFiles: [],
