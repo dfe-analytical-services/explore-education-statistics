@@ -86,8 +86,8 @@ export default function ApiDataSetCreateModal({
       ) : (
         <>
           <WarningMessage>
-            No API data sets can be created as there are no candidates data
-            files available. New candidate data files can be uploaded in the{' '}
+            No API data sets can be created as there are no candidate data files
+            available. New candidate data files can be uploaded in the{' '}
             <Link
               to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
                 publicationId,

@@ -43,7 +43,7 @@ describe('ApiDataSetCreateModal', () => {
 
     expect(
       await screen.findByText(
-        /No API data sets can be created as there are no candidates data files available/,
+        /No API data sets can be created as there are no candidate data files available/,
       ),
     ).toBeInTheDocument();
 

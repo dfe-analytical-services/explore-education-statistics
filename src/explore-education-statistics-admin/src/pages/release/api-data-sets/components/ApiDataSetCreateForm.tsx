@@ -58,9 +58,12 @@ export default function ApiDataSetCreateForm({
                 Cancel
               </ButtonText>
               <LoadingSpinner
+                alert
+                hideText
                 inline
                 loading={formState.isSubmitting}
                 size="sm"
+                text="Creating new API data set"
               />
             </ButtonGroup>
           </Form>
