@@ -680,7 +680,6 @@ export const summary: PublicationReleaseSummary = {
   yearTitle: '2021',
   coverageTitle: 'Reporting Year',
   published: '2021-10-28T08:30:02.6926703',
-  releaseName: '2021',
   nextReleaseDate: {
     year: '2022',
     month: '10',

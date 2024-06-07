@@ -165,7 +165,6 @@ export interface Release<
   title: string;
   yearTitle: string;
   coverageTitle: string;
-  releaseName: string;
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
@@ -190,7 +189,6 @@ export interface ReleaseSummary {
   title: string;
   yearTitle: string;
   coverageTitle: string;
-  releaseName: string;
   published?: string;
   slug: string;
   nextReleaseDate: PartialDate;

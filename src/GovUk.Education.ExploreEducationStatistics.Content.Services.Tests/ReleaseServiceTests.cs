@@ -744,7 +744,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Ordered from most newest to oldest
                 Assert.Equal(release2Version1.Id, releases[0].Id);
                 Assert.Equal(release2Version1.Title, releases[0].Title);
-                Assert.Equal(release2Version1.ReleaseName, releases[0].ReleaseName);
                 Assert.Equal(release2Version1.Slug, releases[0].Slug);
                 Assert.Equal(release2Version1.TimePeriodCoverage.GetEnumLabel(), releases[0].CoverageTitle);
                 Assert.Equal(release2Version1.YearTitle, releases[0].YearTitle);
@@ -755,7 +754,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(release1Version1.Id, releases[1].Id);
                 Assert.Equal(release1Version1.Title, releases[1].Title);
-                Assert.Equal(release1Version1.ReleaseName, releases[1].ReleaseName);
                 Assert.Equal(release1Version1.Slug, releases[1].Slug);
                 Assert.Equal(release1Version1.TimePeriodCoverage.GetEnumLabel(), releases[1].CoverageTitle);
                 Assert.Equal(release1Version1.YearTitle, releases[1].YearTitle);

@@ -15,8 +15,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -24,53 +26,89 @@ using File = System.IO.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
-    public class ReleaseFileService : IReleaseFileService
+    public class ReleaseFileService(
+        ContentDbContext contentDbContext,
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IPublicBlobStorageService publicBlobStorageService,
+        IDataGuidanceFileWriter dataGuidanceFileWriter,
+        IUserService userService)
+        : IReleaseFileService
     {
         /// How long the all files zip should be
         /// cached in blob storage, in seconds.
         private const int AllFilesZipTtl = 60 * 60;
 
-        private static readonly FileType[] AllowedZipFileTypes =
-        {
+        private static readonly FileType[] AllowedFileTypes =
+        [
             FileType.Ancillary,
-            FileType.Data,
-        };
+            FileType.Data
+        ];
 
-        private readonly ContentDbContext _contentDbContext;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IPublicBlobStorageService _publicBlobStorageService;
-        private readonly IDataGuidanceFileWriter _dataGuidanceFileWriter;
-        private readonly IUserService _userService;
-
-        public ReleaseFileService(
-            ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPublicBlobStorageService publicBlobStorageService,
-            IDataGuidanceFileWriter dataGuidanceFileWriter,
-            IUserService userService)
+        public async Task<Either<ActionResult, IList<ReleaseFileViewModel>>> ListReleaseFiles(
+            ReleaseFileListRequest request,
+            CancellationToken cancellationToken = default)
         {
-            _contentDbContext = contentDbContext;
-            _persistenceHelper = persistenceHelper;
-            _publicBlobStorageService = publicBlobStorageService;
-            _dataGuidanceFileWriter = dataGuidanceFileWriter;
-            _userService = userService;
+            var releaseFiles = await contentDbContext.ReleaseFiles
+                .Include(rf => rf.ReleaseVersion)
+                .ThenInclude(rv => rv.Publication)
+                .Include(rf => rf.File)
+                .Where(rf => AllowedFileTypes.Contains(rf.File.Type))
+                .Where(rf => request.Ids.Contains(rf.Id))
+                .Where(rv => rv.Published != null)
+                .ToListAsync(cancellationToken);
+
+            var releaseVersions = releaseFiles.Select(rf => rf.ReleaseVersion)
+                .ToHashSet();
+
+            var allowedReleaseVersions = new HashSet<ReleaseVersion>();
+
+            foreach (var releaseVersion in releaseVersions)
+            {
+                if (await userService.CheckCanViewReleaseVersion(releaseVersion).IsRight())
+                {
+                    allowedReleaseVersions.Add(releaseVersion);
+                }
+            }
+
+            return releaseFiles
+                .Where(rf => allowedReleaseVersions.Contains(rf.ReleaseVersion))
+                .Select(MapReleaseFileViewModel)
+                .ToList();
+        }
+
+        private static ReleaseFileViewModel MapReleaseFileViewModel(ReleaseFile releaseFile)
+        {
+            var releaseVersion = releaseFile.ReleaseVersion;
+            var isLatestPublishedRelease =
+                releaseVersion.Id == releaseVersion.Publication.LatestPublishedReleaseVersionId;
+
+            return new ReleaseFileViewModel
+            {
+                Id = releaseFile.Id,
+                File = releaseFile.ToPublicFileInfo(),
+                DataSetFileId = releaseFile.File.DataSetFileId,
+                Release = new ReleaseSummaryViewModel(releaseVersion, latestPublishedRelease: isLatestPublishedRelease)
+                {
+                    Publication = new PublicationSummaryViewModel(releaseVersion.Publication)
+                },
+            };
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseVersionId, Guid fileId)
         {
-            return await _persistenceHelper
+            return await persistenceHelper
                 .CheckEntityExists<ReleaseFile>(q => q
                     .Include(rf => rf.File)
                     .Include(rf => rf.ReleaseVersion)
-                    .ThenInclude(releaseVersion => releaseVersion.Publication)
                     .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
                 )
-                .OnSuccessDo(rf => _userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
+                .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
                 .OnSuccessCombineWith(rf =>
-                    _publicBlobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
-                .OnSuccess(methodologyFileAndStream =>
+                    publicBlobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
+                .OnSuccess(tuple =>
                 {
-                    var (releaseFile, stream) = methodologyFileAndStream;
+                    var (releaseFile, stream) = tuple;
+
                     return new FileStreamResult(stream, releaseFile.File.ContentType)
                     {
                         FileDownloadName = releaseFile.File.Filename
@@ -84,11 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             IEnumerable<Guid>? fileIds = null,
             CancellationToken cancellationToken = default)
         {
-            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
+            return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
                     releaseVersionId,
                     q => q.Include(rv => rv.Publication)
                 )
-                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess(userService.CheckCanViewReleaseVersion)
                 .OnSuccessVoid(
                     async release =>
                     {
@@ -106,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         {
                             var releaseFiles = (await QueryReleaseFiles(releaseVersionId)
                                     .Where(rf => fileIds.Contains(rf.FileId))
-                                    .ToListAsync())
+                                    .ToListAsync(cancellationToken: cancellationToken))
                                 .OrderBy(rf => rf.File.ZipFileEntryName())
                                 .ToList();
 
@@ -122,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             CancellationToken cancellationToken)
         {
             var path = releaseVersion.AllFilesZipPath();
-            var allFilesZip = await _publicBlobStorageService.FindBlob(PublicReleaseFiles, path);
+            var allFilesZip = await publicBlobStorageService.FindBlob(PublicReleaseFiles, path);
 
             // Ideally, we would have some way to do this caching via annotations,
             // but this a chunk of work to get working properly as piping
@@ -131,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             if (allFilesZip?.Updated is not null
                 && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
             {
-                var result = await _publicBlobStorageService.DownloadToStream(
+                var result = await publicBlobStorageService.DownloadToStream(
                     containerName: PublicReleaseFiles,
                     path: path,
                     stream: outputStream,
@@ -151,7 +189,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             Stream outputStream,
             CancellationToken cancellationToken)
         {
-            var releaseFiles = (await QueryReleaseFiles(releaseVersion.Id).ToListAsync())
+            var releaseFiles = (await QueryReleaseFiles(releaseVersion.Id)
+                    .ToListAsync(cancellationToken: cancellationToken))
                 .OrderBy(rf => rf.File.ZipFileEntryName())
                 .ToList();
 
@@ -161,17 +200,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             await using var multiWriteStream = new MultiWriteStream(outputStream, fileStream);
 
             await DoZipFilesToStream(releaseFiles, releaseVersion, multiWriteStream, cancellationToken);
-            await multiWriteStream.FlushAsync();
+            await multiWriteStream.FlushAsync(cancellationToken);
 
             // Now cache the All files zip into blob storage
             // so that we can quickly fetch it again.
             fileStream.Position = 0;
 
-            await _publicBlobStorageService.UploadStream(
+            await publicBlobStorageService.UploadStream(
                 containerName: PublicReleaseFiles,
                 path: releaseVersion.AllFilesZipPath(),
                 stream: fileStream,
-                contentType: MediaTypeNames.Application.Zip
+                contentType: MediaTypeNames.Application.Zip,
+                cancellationToken: cancellationToken
             );
 
             await fileStream.DisposeAsync();
@@ -187,6 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create);
 
             var releaseFilesWithZipEntries = new List<ReleaseFile>();
+
             foreach (var releaseFile in releaseFiles)
             {
                 // Stop immediately if we receive a cancellation request
@@ -195,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     return;
                 }
 
-                var blobExists = await _publicBlobStorageService.CheckBlobExists(
+                var blobExists = await publicBlobStorageService.CheckBlobExists(
                     PublicReleaseFiles,
                     releaseFile.PublicPath()
                 );
@@ -210,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                 await using var entryStream = entry.Open();
 
-                await _publicBlobStorageService.DownloadToStream(
+                await publicBlobStorageService.DownloadToStream(
                     containerName: PublicReleaseFiles,
                     path: releaseFile.PublicPath(),
                     stream: entryStream,
@@ -232,18 +273,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     .Select(rf => rf.FileId)
                     .ToList();
 
-                await _dataGuidanceFileWriter.WriteToStream(entryStream, releaseVersion, dataFileIds);
+                await dataGuidanceFileWriter.WriteToStream(entryStream, releaseVersion, dataFileIds);
             }
         }
 
         private IQueryable<ReleaseFile> QueryReleaseFiles(Guid releaseVersionId)
         {
-            return _contentDbContext.ReleaseFiles
+            return contentDbContext.ReleaseFiles
                 .Include(f => f.ReleaseVersion)
-                .ThenInclude(rv => rv.Publication)
                 .Include(f => f.File)
                 .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersionId
-                                      && AllowedZipFileTypes.Contains(releaseFile.File.Type));
+                                      && AllowedFileTypes.Contains(releaseFile.File.Type));
         }
     }
 }

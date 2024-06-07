@@ -678,7 +678,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private static PublicationSummaryViewModel BuildPublicationViewModel(PublicationMethodology publicationMethodology)
         {
             var publication = publicationMethodology.Publication;
-            return new PublicationSummaryViewModel(publication.Id, publication.Title, publication.Slug, publicationMethodology.Owner, publication.Contact);
+            return new PublicationSummaryViewModel
+            {
+                Id = publication.Id,
+                Title = publication.Title,
+                Slug = publication.Slug,
+                Owner = publicationMethodology.Owner,
+                Contact = new ContactViewModel(publication.Contact)
+            };
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateMethodologySlug(

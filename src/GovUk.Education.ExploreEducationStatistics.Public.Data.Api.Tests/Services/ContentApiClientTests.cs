@@ -8,6 +8,9 @@ using RichardSzalay.MockHttp;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
@@ -16,18 +19,20 @@ public abstract class ContentApiClientTests
     private readonly MockHttpMessageHandler _mockHttp;
     private readonly ContentApiClient _contentApiClient;
 
-    public ContentApiClientTests()
+    private ContentApiClientTests()
     {
         _mockHttp = new MockHttpMessageHandler();
+
         var client = _mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("http://localhost/");
+
         _contentApiClient = new ContentApiClient(Mock.Of<ILogger<ContentApiClient>>(), client);
     }
 
     public class ListPublicationsTests : ContentApiClientTests
     {
         [Fact]
-        public async Task HttpClientBadRequest_ReturnsBadRequest()
+        public async Task ValidationProblem()
         {
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
                 .Respond(
@@ -63,7 +68,7 @@ public abstract class ContentApiClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task HttpClientFailureStatusCode_ThrowsException(
+        public async Task FailureStatusCode_ThrowsException(
                 HttpStatusCode responseStatusCode)
         {
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
@@ -82,7 +87,7 @@ public abstract class ContentApiClientTests
         }
 
         [Fact]
-        public async Task HttpClientSuccess_ReturnsPublications()
+        public async Task Success_ReturnsPublications()
         {
             var results = new List<PublicationSearchResultViewModel>()
             {
@@ -113,9 +118,8 @@ public abstract class ContentApiClientTests
 
     public class GetPublicationTests : ContentApiClientTests
     {
-
         [Fact]
-        public async Task HttpClientBadRequest_ReturnsBadRequest()
+        public async Task ValidationProblem()
         {
             var publicationId = Guid.NewGuid();
 
@@ -141,23 +145,7 @@ public abstract class ContentApiClientTests
         }
 
         [Fact]
-        public async Task HttpClientNotFound_ReturnsNotFound()
-        {
-            var publicationId = Guid.NewGuid();
-
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
-                .Respond(HttpStatusCode.NotFound);
-
-            var response = await _contentApiClient.GetPublication(publicationId);
-
-            _mockHttp.VerifyNoOutstandingExpectation();
-
-            var left = response.AssertLeft();
-            left.AssertNotFoundResult();
-        }
-
-        [Fact]
-        public async Task HttpClientNotFoundObjectResult_ReturnsNotFoundResult()
+        public async Task NotFound()
         {
             var publicationId = Guid.NewGuid();
 
@@ -181,7 +169,7 @@ public abstract class ContentApiClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task HttpClientFailureStatusCode_ThrowsException(
+        public async Task FailureStatusCode_ThrowsException(
             HttpStatusCode responseStatusCode)
         {
             var publicationId = Guid.NewGuid();
@@ -196,7 +184,7 @@ public abstract class ContentApiClientTests
         }
 
         [Fact]
-        public async Task HttpClientSuccess_ReturnsPublication()
+        public async Task Success_ReturnsPublication()
         {
             var result = new PublishedPublicationSummaryViewModel
             {
@@ -221,6 +209,72 @@ public abstract class ContentApiClientTests
             Assert.Equal(result.Slug, right.Slug);
             Assert.Equal(result.Summary, right.Summary);
             Assert.Equal(result.Published, right.Published);
+        }
+    }
+
+    public class ListReleaseFilesTests : ContentApiClientTests
+    {
+        [Theory]
+        [InlineData(HttpStatusCode.RequestTimeout)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.BadGateway)]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.BadRequest)]
+        [InlineData(HttpStatusCode.Conflict)]
+        [InlineData(HttpStatusCode.Forbidden)]
+        [InlineData(HttpStatusCode.Gone)]
+        [InlineData(HttpStatusCode.NotAcceptable)]
+        public async Task FailureStatusCode_ThrowsException(
+            HttpStatusCode responseStatusCode)
+        {
+            _mockHttp.Expect(HttpMethod.Post, $"http://localhost/api/release-files")
+                .Respond(responseStatusCode);
+
+            var request = new ReleaseFileListRequest { Ids = [] };
+
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
+                await _contentApiClient.ListReleaseFiles(request));
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Fact]
+        public async Task Success_ReturnsReleaseFiles()
+        {
+            var result = new List<ReleaseFileViewModel>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    File = new FileInfo
+                    {
+                        Name = "Test file",
+                        FileName = "test-file.csv",
+                        Size = "10 KB"
+                    },
+                    Release = new ReleaseSummaryViewModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test title",
+                        Slug = "test-slug",
+                        YearTitle = "Academic year 2020",
+                        CoverageTitle = "Academic year",
+                        Type = ReleaseType.AdHocStatistics,
+                        LatestRelease = false,
+                    }
+                }
+            };
+
+            _mockHttp.Expect(HttpMethod.Post, $"http://localhost/api/release-files")
+                .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(result));
+
+            var request = new ReleaseFileListRequest { Ids = [result[0].Id] };
+
+            var viewModels = await _contentApiClient.ListReleaseFiles(request);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            Assert.Equal(result, viewModels);
         }
     }
 

@@ -16,8 +16,6 @@ public record ReleaseViewModel
 
     public string CoverageTitle { get; }
 
-    public string ReleaseName { get; }
-
     public PartialDate? NextReleaseDate { get; }
 
     public DateTime? Published { get; }
@@ -59,7 +57,6 @@ public record ReleaseViewModel
         Title = release.Title;
         YearTitle = release.YearTitle;
         CoverageTitle = release.CoverageTitle;
-        ReleaseName = release.ReleaseName;
         NextReleaseDate = release.NextReleaseDate;
         Published = release.Published;
         Slug = release.Slug;

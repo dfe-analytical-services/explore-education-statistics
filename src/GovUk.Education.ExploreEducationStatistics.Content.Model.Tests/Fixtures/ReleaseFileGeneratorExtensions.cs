@@ -26,6 +26,11 @@ public static class ReleaseFileGeneratorExtensions
         File file)
         => generator.ForInstance(s => s.SetFile(file));
 
+    public static Generator<ReleaseFile> WithFile(
+        this Generator<ReleaseFile> generator,
+        Func<File> file)
+        => generator.ForInstance(s => s.SetFile(file));
+
     public static Generator<ReleaseFile> WithFileId(
         this Generator<ReleaseFile> generator,
         Guid fileId)
@@ -87,9 +92,14 @@ public static class ReleaseFileGeneratorExtensions
     public static InstanceSetters<ReleaseFile> SetFile(
         this InstanceSetters<ReleaseFile> setters,
         File file)
+        => setters.SetFile(() => file);
+
+    public static InstanceSetters<ReleaseFile> SetFile(
+        this InstanceSetters<ReleaseFile> setters,
+        Func<File> file)
         => setters
             .Set(rf => rf.File, file)
-            .SetFileId(file.Id);
+            .Set(rf => rf.FileId, (_, rf) => rf.File.Id);
 
     public static InstanceSetters<ReleaseFile> SetFileId(
         this InstanceSetters<ReleaseFile> setters,
