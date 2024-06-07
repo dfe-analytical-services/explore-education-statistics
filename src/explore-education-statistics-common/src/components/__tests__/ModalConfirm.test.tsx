@@ -1,4 +1,3 @@
-import flushPromises from '@common-test/flushPromises';
 import ModalConfirm from '@common/components/ModalConfirm';
 import delay from '@common/utils/delay';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -7,7 +6,7 @@ import React from 'react';
 
 describe('ModalConfirm', () => {
   describe('confirming', () => {
-    test('clicking Confirm button disables all buttons', async () => {
+    test('clicking Confirm button disables all buttons and shows loading spinner', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
       const handleConfirm = jest.fn(async () => {
@@ -31,8 +30,12 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeAriaDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+
+      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
     });
 
     test('clicking Confirm button prevents closing modal using Esc', async () => {
@@ -107,12 +110,16 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeAriaDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
 
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
       });
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 
@@ -167,7 +174,7 @@ describe('ModalConfirm', () => {
       });
     });
 
-    test('clicking Cancel button disables all buttons', async () => {
+    test('clicking Cancel button disables all buttons and shows loading spinner', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn(async () => {
         await delay(100);
@@ -188,7 +195,9 @@ describe('ModalConfirm', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeAriaDisabled();
+
+      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
     });
 
     test('clicking Cancel button prevents closing modal using Esc', async () => {
@@ -263,13 +272,13 @@ describe('ModalConfirm', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-
-      await flushPromises();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeAriaDisabled();
 
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
       });
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 });
