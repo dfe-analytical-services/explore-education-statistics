@@ -361,7 +361,6 @@ public class PublicationService : IPublicationService
             .OrderByDescending(r => r.Published)
             .GroupBy(r => r.Slug)
             .Select(slugGroup => slugGroup.First())
-            .ToList()
             .Select(r => new ReleaseSitemapItemViewModel { Slug = r.Slug, LastModified = r.Published })
             .ToList();
 }
