@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -20,12 +23,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class DataArchiveValidationServiceTests
     {
         [Fact]
-        public void UploadedZippedDatafileIsValid()
+        public async Task UploadedZippedDatafileIsValid()
         {
-            var fileTypeService = new Mock<IFileTypeService>(MockBehavior.Strict);
+            var releaseVersionId = Guid.NewGuid();
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
 
-            var service = SetupDataArchiveValidationService(fileTypeService: fileTypeService.Object);
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
             var archive = CreateFormFileFromResource("data-zip-valid.zip");
+
+            fileUploadsValidatorService.Setup(mock => mock.ValidateDataFilesForUpload(
+                releaseVersionId,
+                It.IsAny<ArchiveDataSetFile>(),
+                It.IsAny<Task<Stream>>, // @MarkFix I cannot mock this to save my life
+                It.IsAny<Task<Stream>>,
+                null))
+                .ReturnsAsync([]);
 
             fileTypeService
                 .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
@@ -34,7 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
                 .Returns(() => true);
 
-            var result = service.ValidateDataArchiveFile(archive).Result;
+            var result = await service.ValidateDataArchiveFile(
+                releaseVersionId,
+                "Data set name",
+                archive);
 
             Assert.True(result.IsRight);
 
@@ -57,7 +75,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
                 .Returns(() => true);
 
-            var result = await service.ValidateDataArchiveFile(archive);
+            var result = await service.ValidateDataArchiveFile(
+                Guid.NewGuid(),
+                "Data set name",
+                archive);
             VerifyAllMocks(fileTypeService);
 
             Assert.True(result.IsLeft); // @MarkFix abstract out
@@ -70,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void UploadedZippedDatafileIsInvalid()
+        public async Task UploadedZippedDatafileIsInvalid()
         {
             var fileTypeService = new Mock<IFileTypeService>(MockBehavior.Strict);
 
@@ -84,7 +105,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
                 .Returns(() => true);
 
-            var result = service.ValidateDataArchiveFile(archive).Result;
+            var result = await service.ValidateDataArchiveFile(
+                Guid.NewGuid(),
+                "Data set name",
+                archive);
             VerifyAllMocks(fileTypeService);
 
             result.AssertBadRequest(DataZipFileDoesNotContainCsvFiles);
