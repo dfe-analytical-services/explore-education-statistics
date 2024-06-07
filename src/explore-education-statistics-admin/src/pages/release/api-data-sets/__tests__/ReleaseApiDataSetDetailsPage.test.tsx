@@ -92,7 +92,23 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     },
   };
 
-  test('renders correctly with processing version only', async () => {
+  test('renders correctly with data set summary', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testProcessingVersion,
+    });
+
+    renderPage();
+
+    const summary = within(await screen.findByTestId('data-set-summary'));
+
+    expect(summary.getByTestId('Status')).toHaveTextContent('Published');
+    expect(summary.getByTestId('Summary')).toHaveTextContent(
+      'Data set summary',
+    );
+  });
+
+  test('renders correctly with processing draft version only', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       draftVersion: testProcessingVersion,
@@ -123,7 +139,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders correctly with draft version only', async () => {
+  test('renders correctly with processed draft version only', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       draftVersion: testDraftVersion,
