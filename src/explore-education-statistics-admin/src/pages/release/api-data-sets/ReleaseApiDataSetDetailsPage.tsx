@@ -8,10 +8,14 @@ import {
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
+import { DataSetStatus } from '@admin/services/apiDataSetService';
 import ButtonText from '@common/components/ButtonText';
+import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryCard from '@common/components/SummaryCard';
-import Tag from '@common/components/Tag';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import Tag, { TagProps } from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
 import TaskListItem from '@common/components/TaskListItem';
 import { useQuery } from '@tanstack/react-query';
@@ -95,6 +99,17 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
+  function getDataSetStatusColour(status: DataSetStatus): TagProps['colour'] {
+    switch (status) {
+      case 'Deprecated':
+        return 'purple';
+      case 'Withdrawn':
+        return 'red';
+      default:
+        return 'blue';
+    }
+  }
+
   return (
     <>
       <Link
@@ -113,6 +128,20 @@ export default function ReleaseApiDataSetDetailsPage() {
           <>
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
+
+            <SummaryList
+              className="govuk-!-width-two-thirds govuk-!-margin-bottom-8"
+              testId="data-set-summary"
+            >
+              <SummaryListItem term="Status">
+                <Tag colour={getDataSetStatusColour(dataSet.status)}>
+                  {dataSet.status}
+                </Tag>
+              </SummaryListItem>
+              <SummaryListItem term="Summary">
+                <ContentHtml html={dataSet.summary} />
+              </SummaryListItem>
+            </SummaryList>
 
             {dataSet.draftVersion?.status === 'Mapping' &&
               showDraftVersionTasks && (
