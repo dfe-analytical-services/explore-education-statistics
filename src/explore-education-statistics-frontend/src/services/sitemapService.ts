@@ -5,6 +5,7 @@ import publicationService, {
   PublicationSitemapItem,
 } from '@common/services/publicationService';
 // TODO: Add datasets to sitemap once this work has been completed
+// https://dfedigital.atlassian.net/browse/EES-5202
 // import dataSetService, {
 //   DataSetSitemapItem,
 // } from '@common/services/dataSetService';
@@ -14,12 +15,14 @@ export default async function getSitemapFields(): Promise<ISitemapField[]> {
   const methodologies = await methodologyService.listSitemapItems();
   const publications = await publicationService.listSitemapItems();
   // TODO: Add datasets to sitemap once this work has been completed
+  // https://dfedigital.atlassian.net/browse/EES-5202
   // const dataSets = await dataSetService.listSitemapItems();
 
   const sitemapFields: ISitemapField[] = [
     ...buildMethodologyRoutes(methodologies),
     ...buildPublicationRoutes(publications),
     // TODO: Add datasets to sitemap once this work has been completed
+    // https://dfedigital.atlassian.net/browse/EES-5202
     // ...buildDataSetRoutes(dataSets),
   ];
 
@@ -139,6 +142,7 @@ function buildPublicationRoutes(
 }
 
 // TODO: Add datasets to sitemap once this work has been completed
+// https://dfedigital.atlassian.net/browse/EES-5202
 // function buildDataSetRoutes(
 //   dataSets: DataSetSitemapItem[],
 // ): ISitemapField[] {
