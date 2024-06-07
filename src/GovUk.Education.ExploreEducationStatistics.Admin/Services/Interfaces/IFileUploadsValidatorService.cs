@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IDataArchiveFile archiveFile,
             File? replacingFile = null);
 
-        Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseVersionId,
+        List<ErrorViewModel> ValidateReleaseVersionDataSetFileName(Guid releaseVersionId,
             string name);
     }
 }

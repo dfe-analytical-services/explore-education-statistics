@@ -37,7 +37,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
+        //public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
+        //    Guid releaseVersionId,
+        //    string dataFileName,
+        //    long dataFileSize,
+        //    string metaFileName,
+        //    long metaFileSize,
+        //    File? replacingFile = null)
+        //{
+        //    List<ErrorViewModel> errors = [];
+
+        //    errors.AddRange(ValidateDataFileNames(releaseVersionId,
+        //        dataFileName: dataFileName,
+        //        metaFileName: metaFileName,
+        //        replacingFile));
+
+        //    errors.AddRange(ValidateDataFileSizes(
+        //        dataFileSize,
+        //        dataFileName,
+        //        metaFileSize,
+        //        metaFileName));
+
+        //    errors.AddRange(await ValidateDataFileTypes(dataFile, metaFile));
+
+        //    return errors;
+        //}
+
         public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
             Guid releaseVersionId,
             IFormFile dataFile,
@@ -74,10 +99,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 archiveFile.DataFileName,
                 archiveFile.MetaFileSize,
                 archiveFile.MetaFileName));
+
             errors.AddRange(ValidateDataFileNames(releaseVersionId,
                     dataFileName: archiveFile.DataFileName,
                     metaFileName: archiveFile.MetaFileName,
                     replacingFile));
+
+            //errors.AddRange(await ValidateDataFileTypes(archive)); // @MarkFix
 
             return errors;
         }
@@ -108,17 +136,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseVersionId,
+        public List<ErrorViewModel> ValidateReleaseVersionDataSetFileName(Guid releaseVersionId,
             string name)
         {
+            List<ErrorViewModel> errors = [];
+
             if (!name.Any())
             {
-                return ValidationActionResult(SubjectTitleCannotBeEmpty);
+                errors.Add(new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetFileNameCannotBeEmpty.Code,
+                    Message = ValidationMessages.DataSetFileNameCannotBeEmpty.Message,
+                });
             }
 
             if (FileContainsSpecialChars(name))
             {
-                return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
+                errors.Add(ValidationMessages.GenerateErrorDataSetFileNameShouldNotContainSpecialCharacters(name));
             }
 
             var subjectNameExists = _context.ReleaseFiles
@@ -129,10 +163,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && rf.Name == name);
             if (subjectNameExists)
             {
-                return ValidationActionResult(SubjectTitleMustBeUnique);
+                errors.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldBeUnique(name));
             }
 
-            return await Task.FromResult(Unit.Instance);
+            return errors;
         }
 
         private static bool FileContainsSpacesOrSpecialChars(string filename)

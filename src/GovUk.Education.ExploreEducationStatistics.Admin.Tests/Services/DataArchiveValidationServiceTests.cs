@@ -4,13 +4,13 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -125,10 +125,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static DataArchiveValidationService SetupDataArchiveValidationService(
-            IFileTypeService fileTypeService = null)
+            IFileTypeService fileTypeService = null,
+            IFileUploadsValidatorService fileUploadsValidatorService = null)
         {
             return new DataArchiveValidationService(
-                fileTypeService ?? new Mock<IFileTypeService>().Object
+                fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
+                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict)
             );
         }
     }

@@ -2,6 +2,26 @@ using System.IO.Compression;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
+    public record ArchiveDataSet // @MarkFix refactor this in and IDataArchiveFile out
+    {
+        public string DataSetName;
+        public readonly ZipArchiveEntry DataFile;
+        public readonly ZipArchiveEntry MetaFile;
+
+        public ArchiveDataSet(string dataSetName, ZipArchiveEntry dataFile, ZipArchiveEntry metaFile)
+        {
+            DataSetName = dataSetName;
+            DataFile = dataFile;
+            MetaFile = metaFile;
+        }
+
+        public string DataFileName => DataFile.Name.ToLower();
+        public string MetaFileName => MetaFile.Name.ToLower();
+
+        public long DataFileSize => DataFile.Length;
+        public long MetaFileSize => MetaFile.Length;
+    }
+
     public interface IDataArchiveFile
     {
         public string DataFileName { get; }
