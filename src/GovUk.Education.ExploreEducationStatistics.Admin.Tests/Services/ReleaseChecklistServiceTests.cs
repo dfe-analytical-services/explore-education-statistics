@@ -43,11 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Created = DateTime.UtcNow.AddMonths(-2),
                 Updates = new List<Update>
                 {
-                    new()
-                    {
-                        Reason = "Original release note",
-                        Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
-                    }
+                    new() {Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),}
                 },
             };
 
@@ -57,52 +53,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreviousVersion = originalReleaseVersion,
                 Version = 1,
                 Created = DateTime.UtcNow.AddMonths(-1),
-                GenericContent = new List<ContentSection>
-                {
-                    new()
+                GenericContent =
+                    new List<ContentSection>
                     {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>()
+                        new() {Type = ContentSectionType.Generic, Content = new List<ContentBlock>()},
+                        new()
+                        {
+                            Type = ContentSectionType.Generic,
+                            Content =
+                                new List<ContentBlock>
+                                {
+                                    new HtmlBlock {Body = "<p>Test</p>"},
+                                    new DataBlock(),
+                                    new HtmlBlock {Body = ""}
+                                }
+                        }
                     },
-                    new()
+                RelatedDashboardsSection =
+                    new ContentSection
                     {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>
-                        {
-                            new HtmlBlock
-                            {
-                                Body = "<p>Test</p>"
-                            },
-                            new DataBlock(),
-                            new HtmlBlock
-                            {
-                                Body = ""
-                            }
-                        }
-                    }
-                },
-                RelatedDashboardsSection = new ContentSection
-                {
-                    Type = ContentSectionType.RelatedDashboards,
-                    Content = new List<ContentBlock>
+                        Type = ContentSectionType.RelatedDashboards,
+                        Content = new List<ContentBlock> {new HtmlBlock {Body = ""}}
+                    },
+                SummarySection =
+                    new ContentSection
                     {
-                        new HtmlBlock
-                        {
-                            Body = ""
-                        }
-                    }
-                },
-                SummarySection = new ContentSection
-                {
-                    Type = ContentSectionType.ReleaseSummary,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = ""
-                        }
-                    }
-                },
+                        Type = ContentSectionType.ReleaseSummary,
+                        Content = new List<ContentBlock> {new HtmlBlock {Body = ""}}
+                    },
                 Updates = new List<Update>
                 {
                     new()
@@ -140,10 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileRepository
                     .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
                     .ReturnsAsync(
-                        new List<File>
-                        {
-                            new()
-                        }
+                        new List<File> {new()}
                     );
 
                 dataImportService
@@ -155,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, default))
                     .ReturnsAsync([
                         new DataSetVersionStatusSummary(
                             Id: Guid.NewGuid(),
@@ -221,10 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithNoDataFiles()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            var releaseVersion = new ReleaseVersion {Publication = new Publication()};
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -238,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
             var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
-            
+
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
@@ -256,9 +228,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataGuidanceService
                     .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
-                
+
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, default))
                     .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
@@ -291,10 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithDataFiles()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            var releaseVersion = new ReleaseVersion {Publication = new Publication()};
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -313,14 +282,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var subject = new Subject
-                {
-                    Id = Guid.NewGuid()
-                };
-                var otherSubject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                };
+                var subject = new Subject {Id = Guid.NewGuid()};
+                var otherSubject = new Subject {Id = Guid.NewGuid(),};
 
                 methodologyVersionRepository
                     .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
@@ -355,10 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteRepository
                     .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
                     .ReturnsAsync(
-                        new List<Subject>
-                        {
-                            subject,
-                        }
+                        new List<Subject> {subject,}
                     );
 
                 releaseDataFileRepository
@@ -368,15 +328,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService
                     .Setup(s => s.ListDataBlocks(releaseVersion.Id))
                     .ReturnsAsync(
-                        new List<DataBlock>
-                        {
-                            new(),
-                            new(),
-                        }
+                        new List<DataBlock> {new(), new(),}
                     );
-                
+
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, default))
                     .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
@@ -418,15 +374,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithUnapprovedMethodology()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            var releaseVersion = new ReleaseVersion {Publication = new Publication()};
 
-            var methodologyVersion = new MethodologyVersion
-            {
-                Status = Draft
-            };
+            var methodologyVersion = new MethodologyVersion {Status = Draft};
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -458,9 +408,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataGuidanceService
                     .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
-                
+
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, default))
                     .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
@@ -501,16 +451,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication();
 
-            var methodologyVersion = new MethodologyVersion
-            {
-                Status = Approved
-            };
+            var methodologyVersion = new MethodologyVersion {Status = Approved};
 
             var originalReleaseVersion = new ReleaseVersion
             {
-                Publication = publication,
-                Version = 0,
-                Created = DateTime.UtcNow.AddMonths(-2),
+                Publication = publication, Version = 0, Created = DateTime.UtcNow.AddMonths(-2),
             };
 
             var dataBlockId = Guid.NewGuid();
@@ -523,69 +468,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Created = DateTime.UtcNow.AddMonths(-1),
                 DataGuidance = "Test guidance",
                 PreReleaseAccessList = "Test access list",
-                GenericContent = new List<ContentSection>
-                {
-                    new()
+                GenericContent =
+                    new List<ContentSection>
                     {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>
+                        new()
                         {
-                            new HtmlBlock
-                            {
-                                Body = "<p>test</p>"
-                            }
+                            Type = ContentSectionType.Generic,
+                            Content = new List<ContentBlock> {new HtmlBlock {Body = "<p>test</p>"}}
+                        },
+                        new()
+                        {
+                            Type = ContentSectionType.Generic,
+                            Content = new List<ContentBlock> {new DataBlock {Id = dataBlockId}}
                         }
                     },
-                    new()
+                HeadlinesSection =
+                    new ContentSection
                     {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>
-                        {
-                            new DataBlock
-                            {
-                                Id = dataBlockId
-                            }
-                        }
-                    }
-                },
-                HeadlinesSection = new ContentSection
-                {
-                    Type = ContentSectionType.Headlines,
-                    Content = new List<ContentBlock>
+                        Type = ContentSectionType.Headlines,
+                        Content = new List<ContentBlock> {new HtmlBlock {Body = "Not empty"}}
+                    },
+                RelatedDashboardsSection =
+                    new ContentSection
                     {
-                        new HtmlBlock
-                        {
-                            Body = "Not empty"
-                        }
-                    }
-                },
-                RelatedDashboardsSection = new ContentSection
-                {
-                    Type = ContentSectionType.RelatedDashboards,
-                    Content = new List<ContentBlock>
+                        Type = ContentSectionType.RelatedDashboards,
+                        Content = new List<ContentBlock> {new HtmlBlock {Body = "Not empty"}}
+                    },
+                SummarySection =
+                    new ContentSection
                     {
-                        new HtmlBlock
-                        {
-                            Body = "Not empty"
-                        }
-                    }
-                },
-                SummarySection = new ContentSection
-                {
-                    Type = ContentSectionType.ReleaseSummary,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = "Not empty"
-                        }
-                    }
-                },
-                NextReleaseDate = new PartialDate
-                {
-                    Month = "12",
-                    Year = "2021"
-                },
+                        Type = ContentSectionType.ReleaseSummary,
+                        Content = new List<ContentBlock> {new HtmlBlock {Body = "Not empty"}}
+                    },
+                NextReleaseDate = new PartialDate {Month = "12", Year = "2021"},
                 Updates = new List<Update>
                 {
                     new()
@@ -598,10 +513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var featuredTable = new FeaturedTable
-            {
-                DataBlockId = dataBlockId,
-            };
+            var featuredTable = new FeaturedTable {DataBlockId = dataBlockId,};
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -621,10 +533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var subject = new Subject
-                {
-                    Id = Guid.NewGuid()
-                };
+                var subject = new Subject {Id = Guid.NewGuid()};
 
                 methodologyVersionRepository
                     .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
@@ -660,23 +569,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService
                     .Setup(s => s.ListDataBlocks(releaseVersion.Id))
                     .ReturnsAsync(
-                        new List<DataBlock>
-                        {
-                            new()
-                            {
-                                Id = dataBlockId
-                            }
-                        }
+                        new List<DataBlock> {new() {Id = dataBlockId}}
                     );
 
                 dataSetVersionService
-                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, default))
                     .ReturnsAsync(new[]
                         {
-                            DataSetVersionStatus.Draft, 
-                            DataSetVersionStatus.Withdrawn,
-                            DataSetVersionStatus.Published, 
-                            DataSetVersionStatus.Deprecated
+                            DataSetVersionStatus.Draft, DataSetVersionStatus.Withdrawn,
+                            DataSetVersionStatus.Published, DataSetVersionStatus.Deprecated
                         }
                         .Select(status => new DataSetVersionStatusSummary(
                             Id: Guid.NewGuid(),

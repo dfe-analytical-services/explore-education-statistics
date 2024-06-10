@@ -24,6 +24,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
@@ -451,15 +452,9 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             var queryParams = new Dictionary<string, string?>
             {
-                {
-                    "page", page?.ToString()
-                },
-                {
-                    "pageSize", pageSize?.ToString()
-                },
-                {
-                    "publicationId", publicationId.ToString()
-                },
+                {"page", page?.ToString()},
+                {"pageSize", pageSize?.ToString()},
+                {"publicationId", publicationId.ToString()},
             };
 
             var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
@@ -944,7 +939,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
 
             processorClient
-                .Setup(c => c.CreateDataSet(
+                .Setup(c => c.CreateInitialDataSetVersion(
                     releaseFile.Id,
                     It.IsAny<CancellationToken>()))
                 .Returns(async () =>
@@ -971,9 +966,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
                     return new CreateDataSetResponseViewModel
                     {
-                        DataSetId = dataSet!.Id,
-                        DataSetVersionId = dataSetVersion!.Id,
-                        InstanceId = Guid.NewGuid()
+                        DataSetId = dataSet.Id, DataSetVersionId = dataSetVersion.Id, InstanceId = Guid.NewGuid()
                     };
                 });
 
@@ -1023,22 +1016,12 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ErrorViewModel[] processorErrors =
             [
-                new ErrorViewModel
-                {
-                    Code = "TestError1",
-                    Message = "Test message 1",
-                    Path = "releaseFileId"
-                },
-                new ErrorViewModel
-                {
-                    Code = "TestError2",
-                    Message = "Test message 2",
-                    Path = "releaseFileId"
-                }
+                new ErrorViewModel {Code = "TestError1", Message = "Test message 1", Path = "releaseFileId"},
+                new ErrorViewModel {Code = "TestError2", Message = "Test message 2", Path = "releaseFileId"}
             ];
 
             processorClient
-                .Setup(c => c.CreateDataSet(releaseFileId, It.IsAny<CancellationToken>()))
+                .Setup(c => c.CreateInitialDataSetVersion(releaseFileId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ValidationUtils.ValidationResult(processorErrors));
 
             var client = BuildApp(processorClient.Object).CreateClient();
@@ -1067,10 +1050,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         {
             client ??= BuildApp().CreateClient();
 
-            var request = new DataSetVersionCreateRequest
-            {
-                ReleaseFileId = releaseFileId
-            };
+            var request = new InitialDataSetVersionCreateRequest {ReleaseFileId = releaseFileId};
 
             return await client.PostAsJsonAsync(BaseUrl, request);
         }

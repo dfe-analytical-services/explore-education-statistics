@@ -14,15 +14,15 @@ using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribut
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class CreateDataSetFunction(
-    ILogger<CreateDataSetFunction> logger,
+public class CreateNextDataSetVersionFunction(
+    ILogger<CreateNextDataSetVersionFunction> logger,
     IDataSetService dataSetService,
-    IValidator<InitialDataSetVersionCreateRequest> requestValidator)
+    IValidator<NextDataSetVersionCreateRequest> requestValidator)
 {
-    [Function(nameof(CreateInitialDataSetVersion))]
-    public async Task<IActionResult> CreateInitialDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateInitialDataSetVersion))] [FromBody]
-        InitialDataSetVersionCreateRequest request,
+    [Function(nameof(CreateNextDataSetVersion))]
+    public async Task<IActionResult> CreateNextDataSetVersion(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateNextDataSetVersion))] [FromBody]
+        NextDataSetVersionCreateRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
@@ -30,14 +30,14 @@ public class CreateDataSetFunction(
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetService.CreateInitialDataSetVersion(
+            .OnSuccess(() => dataSetService.CreateNextDataSetVersion(
                 request,
                 instanceId,
                 cancellationToken: cancellationToken
             ))
             .OnSuccess(async tuple =>
             {
-                await ProcessInitialDataSetVersion(
+                await ProcessNextDataSetVersion(
                     client,
                     dataSetVersionId: tuple.dataSetVersionId,
                     instanceId: instanceId,
@@ -51,13 +51,13 @@ public class CreateDataSetFunction(
             .HandleFailuresOr(result => new OkObjectResult(result));
     }
 
-    private async Task ProcessInitialDataSetVersion(
+    private async Task ProcessNextDataSetVersion(
         DurableTaskClient client,
         Guid dataSetVersionId,
         Guid instanceId,
         CancellationToken cancellationToken)
     {
-        const string orchestratorName = nameof(ProcessInitialDataSetVersionFunction.ProcessInitialDataSetVersion);
+        const string orchestratorName = nameof(ProcessNextDataSetVersionFunction.ProcessNextDataSetVersion);
 
         var input = new ProcessInitialDataSetVersionContext {DataSetVersionId = dataSetVersionId};
 

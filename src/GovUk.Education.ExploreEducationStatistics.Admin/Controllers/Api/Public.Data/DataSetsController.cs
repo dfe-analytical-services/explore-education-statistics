@@ -48,7 +48,7 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
     [HttpPost]
     [Produces("application/json")]
     public async Task<ActionResult<DataSetViewModel>> CreateDataSet(
-        [FromBody] DataSetVersionCreateRequest request,
+        [FromBody] InitialDataSetVersionCreateRequest request,
         CancellationToken cancellationToken)
     {
         return await dataSetService

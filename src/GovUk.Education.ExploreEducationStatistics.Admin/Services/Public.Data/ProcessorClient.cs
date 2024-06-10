@@ -34,48 +34,81 @@ internal class ProcessorClient(
     {
         await AddBearerToken(cancellationToken);
 
-        var request = new DataSetCreateRequest
+        var request = new DataSetCreateRequest 
         {
-            ReleaseFileId = releaseFileId,
+            ReleaseFileId = releaseFileId
         };
 
-        var response = await httpClient
-            .PostAsJsonAsync("api/CreateDataSet", request, cancellationToken: cancellationToken);
+        return await HandlePost<DataSetCreateRequest, CreateDataSetResponseViewModel>(
+            "api/CreateInitialDataSetVersion",
+            "Creating initial data set version",
+            request,
+            cancellationToken);
+    }
 
-        if (!response.IsSuccessStatusCode)
-        {
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.BadRequest:
-                    return new BadRequestObjectResult(
-                        await response.Content
-                            .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
-                    );
-                default:
-                    var message = await response.Content.ReadAsStringAsync(cancellationToken);
-                    logger.LogError($"""
-                                     Failed to create data set with status code: {response.StatusCode}. Message:
-                                     {message}
-                                     """);
-                    response.EnsureSuccessStatusCode();
-                    break;
-            }
-        }
+    public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateNextDataSetVersion(
+        Guid releaseFileId,
+        Guid dataSetId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new NextDataSetVersionCreateRequest {ReleaseFileId = releaseFileId, DataSetId = dataSetId};
 
-        var content = await response.Content.ReadFromJsonAsync<CreateDataSetResponseViewModel>(
-            cancellationToken: cancellationToken
-        );
-
-        return content
-            ?? throw new Exception("Could not deserialize the response from the Public Data Processor.");
+        return await HandlePost<NextDataSetVersionCreateRequest, CreateDataSetResponseViewModel>(
+            "api/CreateNextDataSetVersion",
+            "Creating next data set version",
+            request,
+            cancellationToken);
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        var response = await httpClient
-            .DeleteAsync($"api/DeleteDataSetVersion/{dataSetVersionId}", cancellationToken: cancellationToken);
+        return await HandleDelete(
+            $"api/DeleteDataSetVersion/{dataSetVersionId}",
+            "Deleting data set version",
+            cancellationToken);
+    }
+
+    private async Task<Either<ActionResult, TResponse>> HandlePost<TRequest, TResponse>(
+        string url,
+        string actionDescription,
+        TRequest request,
+        CancellationToken cancellationToken = default)
+        where TResponse : class
+    {
+        return await HandleRequest<TResponse>(() =>
+                httpClient.PostAsJsonAsync(
+                    url,
+                    request,
+                    cancellationToken: cancellationToken),
+            actionDescription,
+            cancellationToken);
+    }
+
+    private async Task<Either<ActionResult, Unit>> HandleDelete(
+        string url,
+        string actionDescription,
+        CancellationToken cancellationToken = default)
+    {
+        return await HandleRequest<Unit>(
+                () => httpClient.DeleteAsync(
+                    url,
+                    cancellationToken: cancellationToken),
+                actionDescription,
+                cancellationToken)
+            .OnSuccessVoid();
+    }
+
+    private async Task<Either<ActionResult, TResponse>> HandleRequest<TResponse>(
+        Func<Task<HttpResponseMessage>> requestFunction,
+        string actionDescription,
+        CancellationToken cancellationToken = default)
+        where TResponse : class
+    {
+        await AddBearerToken(cancellationToken);
+
+        var response = await requestFunction.Invoke();
 
         if (!response.IsSuccessStatusCode)
         {
@@ -91,15 +124,25 @@ internal class ProcessorClient(
                 default:
                     var message = await response.Content.ReadAsStringAsync(cancellationToken);
                     logger.LogError($"""
-                         Failed to delete data set version with status code: {response.StatusCode}. Message:
-                         {message}
-                         """);
+                                     Failed while performing action "{actionDescription}" with status code:
+                                     {response.StatusCode}. Message: {message}
+                                     """);
                     response.EnsureSuccessStatusCode();
                     break;
             }
         }
 
-        return Unit.Instance;
+        if (typeof(TResponse) == typeof(Unit))
+        {
+            return (Unit.Instance as TResponse)!;
+        }
+
+        var content = await response.Content.ReadFromJsonAsync<TResponse>(
+            cancellationToken: cancellationToken
+        );
+
+        return content
+               ?? throw new Exception("Could not deserialize the response from the Public Data Processor.");
     }
 
     /// <summary>

@@ -80,7 +80,7 @@ internal class DataSetService(
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async _ => await processorClient.CreateDataSet(
+            .OnSuccess(async _ => await processorClient.CreateInitialDataSetVersion(
                 releaseFileId: releaseFileId,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await QueryDataSet(processorResponse.DataSetId)
@@ -246,19 +246,14 @@ internal class DataSetService(
 
     private static IdTitleViewModel MapReleaseVersion(ReleaseVersion releaseVersion)
     {
-        return new IdTitleViewModel
-        {
-            Id = releaseVersion.Id,
-            Title = releaseVersion.Title,
-        };
+        return new IdTitleViewModel {Id = releaseVersion.Id, Title = releaseVersion.Title,};
     }
 
     private static IdTitleViewModel MapVersionFile(ReleaseFile releaseFile)
     {
         return new IdTitleViewModel
         {
-            Id = releaseFile.File.DataSetFileId!.Value,
-            Title = releaseFile.Name ?? string.Empty,
+            Id = releaseFile.File.DataSetFileId!.Value, Title = releaseFile.Name ?? string.Empty,
         };
     }
 

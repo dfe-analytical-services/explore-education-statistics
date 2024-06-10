@@ -22,11 +22,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Settings;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -56,6 +58,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
@@ -81,21 +84,29 @@ using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Ser
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
-using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
-using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
+using IContentMethodologyService =
+    GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using IContentPublicationService =
+    GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
-using IDataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
+using IDataSetService =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
-using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
-using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IMethodologyImageService =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
+using IMethodologyService =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
+using IPublicationRepository =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
-using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
+using MethodologyImageService =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
@@ -264,8 +275,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             if (!hostEnvironment.IsIntegrationTest())
             {
                 services
-                        // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
-                        // headers as a way of identifying users.
+                    // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
+                    // headers as a way of identifying users.
                     .AddAuthentication(options =>
                     {
                         // This line tells Identity Framework to use the JWT mechanism for verifying users based upon
@@ -331,7 +342,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Configuration options
              */
 
-            services.Configure<PublicDataProcessorOptions>(configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
+            services.Configure<PublicDataProcessorOptions>(
+                configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
             services.Configure<PreReleaseOptions>(configuration);
             services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
             services.Configure<ReleaseApprovalOptions>(
@@ -460,7 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         provider.GetService<PublicDataDbContext>(),
                         provider.GetRequiredService<IProcessorClient>(),
                         provider.GetRequiredService<IUserService>()));
-                
+
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
             }
 
@@ -577,7 +589,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         {
                             new OpenApiSecurityScheme
                             {
-                                Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "Bearer"}
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme, Id = "Bearer"
+                                }
                             },
                             new[] {string.Empty}
                         }
@@ -649,7 +664,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .FontSources(s => s.Self())
                 .FormActions(s =>
                 {
-                    var loginAuthorityUrl = configuration.GetRequiredSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
+                    var loginAuthorityUrl = configuration.GetRequiredSection("OpenIdConnectIdentityFramework")
+                        .GetValue<string>("Authority");
                     var loginAuthorityUri = new Uri(loginAuthorityUrl);
                     s
                         .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
@@ -745,15 +761,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
     internal class NoOpDataSetVersionService : IDataSetVersionService
     {
-        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(Guid releaseVersionId)
+        public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
+            Guid releaseVersionId, CancellationToken cancellationToken)
         {
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
 
-        public Task<bool> FileHasVersion(Guid releaseFileId, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(false);
-        }
+        public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextDataSetVersion(
+            Guid releaseFileId,
+            Guid dataSetId,
+            CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
         {

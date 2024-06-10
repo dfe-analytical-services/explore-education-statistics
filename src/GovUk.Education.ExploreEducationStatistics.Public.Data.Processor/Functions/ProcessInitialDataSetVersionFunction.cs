@@ -70,8 +70,8 @@ public class ProcessInitialDataSetVersionFunction(
         await parquetService.WriteDataFiles(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
-    [Function(ActivityNames.CompleteProcessing)]
-    public async Task CompleteProcessing(
+    [Function(nameof(CompleteInitialDataSetVersionProcessing))]
+    public async Task CompleteInitialDataSetVersionProcessing(
         [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
