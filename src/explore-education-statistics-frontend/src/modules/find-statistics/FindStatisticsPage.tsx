@@ -1,4 +1,5 @@
 import GoToTopLink from '@common/components/GoToTopLink';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import {
   publicationFilters,
   PublicationFilter,
@@ -8,7 +9,7 @@ import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import React, { useState } from 'react';
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -32,6 +33,8 @@ import omit from 'lodash/omit';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 
+const defaultPageTitle = 'Find statistics and data';
+
 export interface FindStatisticsPageQuery {
   page?: number;
   releaseType?: ReleaseType;
@@ -43,6 +46,8 @@ export interface FindStatisticsPageQuery {
 const FindStatisticsPage: NextPage = () => {
   const router = useRouter();
   const { isMedia: isMobileMedia } = useMobileMedia();
+
+  const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
 
   const {
     data: publicationsData,
@@ -79,6 +84,12 @@ const FindStatisticsPage: NextPage = () => {
   ]).join(', ');
 
   const updateQueryParams = async (nextQuery: FindStatisticsPageQuery) => {
+    // When a query param is changed for the first time Next announces the page title,
+    // even if it hasn't changed.
+    // Set the title here so it's more useful the just announcing the default title.
+    // Have to set it before the route change otherwise the previous title will be announced.
+    // It won't be reannounced on subsequent query param changes.
+    setPageTitle(`${defaultPageTitle} - Search results`);
     await router.push(
       {
         pathname: '/find-statistics',
@@ -155,14 +166,16 @@ const FindStatisticsPage: NextPage = () => {
     });
   };
 
+  const totalResultsMessage = `${totalResults} ${
+    totalResults !== 1 ? 'results' : 'result'
+  }`;
+
   return (
     <Page
-      title="Find statistics and data"
-      metaTitle={
-        totalPages && totalPages > 1
-          ? `Find statistics and data (page ${page} of ${totalPages})`
-          : undefined
-      }
+      title={defaultPageTitle}
+      // Don't include the default meta title when filtered to prevent too much screen reader noise.
+      includeDefaultMetaTitle={pageTitle === defaultPageTitle}
+      metaTitle={pageTitle}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
@@ -215,13 +228,15 @@ const FindStatisticsPage: NextPage = () => {
         <div className="govuk-grid-column-two-thirds">
           <div>
             <h2
-              aria-live="polite"
-              aria-atomic="true"
+              aria-hidden
               className="govuk-!-margin-bottom-2"
               data-testid="total-results"
             >
-              {`${totalResults} ${totalResults !== 1 ? 'results' : 'result'}`}
+              {totalResultsMessage}
             </h2>
+            {/* Using ScreenReaderMessage here as the message is announced twice if have
+            aria-live etc on the h2. */}
+            <ScreenReaderMessage message={totalResultsMessage} />
 
             <div className="dfe-flex dfe-justify-content--space-between dfe-align-items-start">
               <p className="govuk-!-margin-bottom-2">
@@ -361,6 +376,9 @@ const FindStatisticsPage: NextPage = () => {
                 shallow
                 totalPages={totalPages}
                 onClick={pageNumber => {
+                  // Make sure the page title is updated before the route change,
+                  // otherwise the wrong page number is announced.
+                  setPageTitle(`${defaultPageTitle} - page ${pageNumber}`);
                   logEvent({
                     category: 'Find statistics and data',
                     action: `Pagination clicked`,

@@ -43,7 +43,7 @@ describe('ContentHtml', () => {
       modal.getByRole('heading', { name: 'Absence heading' }),
     ).toBeInTheDocument();
     expect(modal.getByText('Absence body')).toBeInTheDocument();
-    const closeButton = modal.getByRole('button', { name: 'Close' });
+    const closeButton = modal.getByRole('button', { name: 'Close modal' });
     expect(closeButton).toBeInTheDocument();
   });
 
@@ -73,7 +73,7 @@ describe('ContentHtml', () => {
     expect(getEntry).toHaveBeenCalled();
 
     const modal = within(screen.getByRole('dialog'));
-    const closeButton = modal.getByRole('button', { name: 'Close' });
+    const closeButton = modal.getByRole('button', { name: 'Close modal' });
     await userEvent.click(closeButton);
 
     await waitFor(() => {

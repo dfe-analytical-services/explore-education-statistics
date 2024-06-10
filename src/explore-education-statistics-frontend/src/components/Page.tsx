@@ -10,6 +10,7 @@ import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
 
 type Props = {
+  includeDefaultMetaTitle?: boolean;
   title: string;
   metaTitle?: string;
   caption?: string;
@@ -23,6 +24,7 @@ type Props = {
 } & BreadcrumbsProps;
 
 const Page = ({
+  includeDefaultMetaTitle,
   title,
   metaTitle,
   caption = '',
@@ -39,6 +41,7 @@ const Page = ({
     <>
       <CookieBanner wide={wide} />
       <PageMeta
+        includeDefaultMetaTitle={includeDefaultMetaTitle}
         title={metaTitle ?? `${title}${caption && `, ${caption}`}`}
         description={description}
         {...pageMeta}

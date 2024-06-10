@@ -1,4 +1,4 @@
-import publicationService, {
+import {
   PublicationTreeSummary,
   ReleaseSummary,
   Theme,
