@@ -100,10 +100,14 @@ internal class DataSetVersionService(
         IReadOnlyList<ReleaseFile> releaseFiles,
         CancellationToken cancellationToken)
     {
+        var releaseFileIds = releaseFiles
+            .Select(rf => rf.Id)
+            .ToList();
+
         return await publicDataDbContext.DataSetVersions
             .AsNoTracking()
             .Include(dsv => dsv.DataSet)
-            .Where(dsv => releaseFiles.Any(rf => rf.Id == dsv.ReleaseFileId))
+            .Where(dsv => releaseFileIds.Contains(dsv.ReleaseFileId))
             .ToListAsync(cancellationToken);
     }
 
