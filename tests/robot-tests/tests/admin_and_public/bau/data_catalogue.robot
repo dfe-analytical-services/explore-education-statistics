@@ -252,6 +252,7 @@ Remove publication filter
 Remove release filter
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user chooses select option    id:filters-form-release    ${PUPIL_ABSENCE_RELEASE_NAME}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
@@ -266,11 +267,11 @@ Clear all filters
     user checks page contains button    pupil
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
-    user clicks button    Clear filters
+    user clicks button    Reset filters
 
     user checks page does not contain button    pupil
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page does not contain button    Clear filters
+    user checks page does not contain button    Reset filters
 
 Searching
     user clicks element    id:searchForm-search
@@ -298,3 +299,21 @@ Validate zip contains correct files
     sleep    8    # wait for file to download
     ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
+
+Validate data catalogue page redirect from slug based urls
+    environment variable should be set    PUBLIC_URL
+    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/${PUPIL_ABSENCE_PUBLICATION_SLUG}/2016-17?newDesign=true
+    user waits until h1 is visible    Data catalogue
+
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
+
+    user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    2
+    ${dataSet_1}=    user gets testid element    data-set-file-summary-Absence by characteristic
+    user checks element contains    ${dataSet_1}    Absence by characteristic
+    ${dataSet_2}=    user gets testid element    data-set-file-summary-Absence in PRUs
+    user checks element contains    ${dataSet_2}    Absence in PRUs
+
+
+    
