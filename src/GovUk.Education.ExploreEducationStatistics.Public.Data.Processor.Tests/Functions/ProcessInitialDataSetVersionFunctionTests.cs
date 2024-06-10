@@ -107,10 +107,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.ProcessInitialDataSetVersion(
                 orchestrationContext,
-                new ProcessInitialDataSetVersionContext
-                {
-                    DataSetVersionId = Guid.NewGuid()
-                });
+                new ProcessInitialDataSetVersionContext {DataSetVersionId = Guid.NewGuid()});
         }
 
         private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(
@@ -261,7 +258,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
         private async Task CompleteProcessing(Guid instanceId)
         {
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.CompleteProcessing(instanceId, CancellationToken.None);
+            await function.CompleteInitialDataSetVersionProcessing(instanceId, CancellationToken.None);
         }
     }
 }
