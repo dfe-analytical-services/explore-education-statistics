@@ -30,7 +30,6 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import omit from 'lodash/omit';
 
@@ -69,7 +68,6 @@ export default function DataSetFilePage({
   const [activeSection, setActiveSection] =
     useState<PageSectionId>('dataSetDetails');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
-  const router = useRouter();
 
   const handleDownload = async () => {
     await downloadService.downloadFiles(release.id, [file.id]);
@@ -105,18 +103,6 @@ export default function DataSetFilePage({
         pageSections[pageSectionId]
       ) {
         setActiveSection(pageSectionId);
-        if (router.isReady) {
-          router.push(
-            {
-              pathname: `/data-catalogue/data-set/${dataSetFile.id}`,
-              hash: pageSectionId,
-            },
-            undefined,
-            {
-              shallow: true,
-            },
-          );
-        }
       }
     });
   }, 10);

@@ -14,11 +14,12 @@ interface Props {
 }
 
 export default function DataSetFileVariables({ variables }: Props) {
-  const [showAll, toggleShowAll] = useToggle(false);
+  const totalVariables = variables.length;
+  const expandable = totalVariables > defaultVisible;
+  const [showAll, toggleShowAll] = useToggle(!expandable);
   const displayVariables = showAll
     ? variables
     : variables.slice(0, defaultVisible);
-  const totalVariables = variables.length;
 
   return (
     <DataSetFilePageSection heading={pageSections[sectionId]} id={sectionId}>
@@ -44,16 +45,17 @@ export default function DataSetFileVariables({ variables }: Props) {
           ))}
         </tbody>
       </table>
-
-      <ButtonText
-        ariaControls={tableId}
-        ariaExpanded={!showAll}
-        onClick={toggleShowAll}
-      >
-        {showAll
-          ? `Show only ${defaultVisible} variables`
-          : `Show all ${totalVariables} variables`}
-      </ButtonText>
+      {expandable && (
+        <ButtonText
+          ariaControls={tableId}
+          ariaExpanded={!showAll}
+          onClick={toggleShowAll}
+        >
+          {showAll
+            ? `Show only ${defaultVisible} variables`
+            : `Show all ${totalVariables} variables`}
+        </ButtonText>
+      )}
     </DataSetFilePageSection>
   );
 }
