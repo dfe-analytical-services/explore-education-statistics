@@ -27,7 +27,7 @@ const ThemeFilters = ({
   return (
     <form id="themeFilters">
       <FormRadioGroup
-        hint={<ThemesModal themes={themes} />}
+        formGroupClass="govuk-!-margin-bottom-1"
         id="theme"
         legend="Filter by theme"
         name="theme"
@@ -39,6 +39,7 @@ const ThemeFilters = ({
           onChange({ filterType: 'themeId', nextValue: e.target.value });
         }}
       />
+      <ThemesModal themes={themes} />
       <Button className="dfe-js-hidden" type="submit">
         Submit
       </Button>

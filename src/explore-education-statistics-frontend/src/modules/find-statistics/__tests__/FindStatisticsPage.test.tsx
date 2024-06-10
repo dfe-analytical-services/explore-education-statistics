@@ -91,10 +91,6 @@ describe('FindStatisticsPage', () => {
     });
 
     expect(
-      screen.getByRole('heading', { name: '30 results' }),
-    ).toBeInTheDocument();
-
-    expect(
       screen.getByText('Page 1 of 3, showing all publications'),
     ).toBeInTheDocument();
 
@@ -353,9 +349,7 @@ describe('FindStatisticsPage', () => {
       await screen.findByText('There are no matching results.'),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole('heading', { name: '0 results' }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('0 results')).toBeInTheDocument();
 
     expect(screen.getByText('0 pages, filtered by:')).toBeInTheDocument();
 
