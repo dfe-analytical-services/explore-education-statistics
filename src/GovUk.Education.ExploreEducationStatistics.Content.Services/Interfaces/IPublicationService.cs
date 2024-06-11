@@ -28,4 +28,6 @@ public interface IPublicationService
         int page = 1,
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null);
+
+    Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems();
 }

@@ -1,3 +1,5 @@
+#nullable enable
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -22,6 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
         {
             return await _methodologyService.GetLatestMethodologyBySlug(slug)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("methodologies/sitemap-items")]
+        public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> ListSitemapItems()
+        {
+            return await _methodologyService.ListSitemapItems()
                 .HandleFailuresOrOk();
         }
     }

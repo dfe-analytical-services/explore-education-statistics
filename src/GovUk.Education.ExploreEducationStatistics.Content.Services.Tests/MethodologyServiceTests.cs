@@ -22,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class MethodologyServiceTests
     {
+        private readonly string sitemapItemLastModifiedTime = "2024-05-04T10:24:13";
+
         [Fact]
         public async Task GetLatestMethodologyBySlug()
         {
@@ -690,6 +692,122 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
 
             VerifyAllMocks(methodologyVersionRepository);
+        }
+
+        [Fact]
+        public async Task ListSitemapItems()
+        {
+            var methodologyVersionId = Guid.NewGuid();
+            var methodologyUpdatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
+            
+            var methodology = new Methodology
+            {
+                OwningPublicationSlug = "publication-title",
+                OwningPublicationTitle = "Publication title",
+                LatestPublishedVersionId = methodologyVersionId,
+                Versions =
+                [
+                    new MethodologyVersion
+                    {
+                        Id = methodologyVersionId,
+                        PublishingStrategy = Immediately,
+                        Published = methodologyUpdatedDate,
+                        Updated = methodologyUpdatedDate,
+                        Status = Approved,
+                    }
+                ]
+            };
+            
+            var publication = new Publication
+            {
+                Slug = "publication-title",
+                Title = "Publication title",
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                Methodologies =
+                [
+                    new PublicationMethodology { Methodology = methodology, Owner = true }
+                ],
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Attach(methodology.Versions[0]);
+                
+                var service = SetupMethodologyService(contentDbContext);
+                var result = (await service.ListSitemapItems()).AssertRight();
+
+                var item = Assert.Single(result);
+                Assert.Equal(methodology.OwningPublicationSlug, item.Slug);
+                Assert.Equal(methodologyUpdatedDate, item.LastModified);
+            }
+        }
+
+        [Fact]
+        public async Task ListSitemapItems_AlternativeSlugTakesPriority()
+        {
+            var methodologyVersionId = Guid.NewGuid();
+            var methodologyUpdatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
+            
+            var methodology = new Methodology
+            {
+                OwningPublicationSlug = "publication-title",
+                OwningPublicationTitle = "Publication title",
+                LatestPublishedVersionId = methodologyVersionId,
+                Versions =
+                [
+                    new MethodologyVersion
+                    {
+                        Id = methodologyVersionId,
+                        PublishingStrategy = Immediately,
+                        Published = methodologyUpdatedDate,
+                        Updated = methodologyUpdatedDate,
+                        Status = Approved,
+                        AlternativeSlug = "alternative-title",
+                        AlternativeTitle = "Alternative title",
+                    }
+                ]
+            };
+
+            var publication = new Publication
+            {
+                Slug = "publication-title",
+                Title = "Publication title",
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                Methodologies =
+                [
+                    new PublicationMethodology { Methodology = methodology, Owner = true }
+                ],
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Attach(methodology.Versions[0]);
+                
+                var service = SetupMethodologyService(contentDbContext);
+                var result = (await service.ListSitemapItems()).AssertRight();
+
+                var item = Assert.Single(result);
+                Assert.Equal("alternative-title", item.Slug);
+                Assert.Equal(methodologyUpdatedDate, item.LastModified);
+            }
         }
 
         private static MethodologyService SetupMethodologyService(
