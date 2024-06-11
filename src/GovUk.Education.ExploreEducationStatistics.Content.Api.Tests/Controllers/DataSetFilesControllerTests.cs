@@ -1794,14 +1794,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task ListSitemapItems()
         {
-            var publication = _fixture.DefaultPublication()
+            Publication publication = _fixture.DefaultPublication()
                 .WithReleases(
                     _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
 
-            var releaseFile = _fixture.DefaultReleaseFile()
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile()
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
