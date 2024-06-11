@@ -97,7 +97,8 @@ async function startServer() {
     redirectPath = seoRedirects[redirectPath] ?? redirectPath;
 
     const redirectionRequired =
-      request.hostname.startsWith('www') || redirectPath !== request.path;
+      request.hostname.startsWith('www') ||
+      redirectPath !== request.path.toLowerCase();
 
     if (redirectionRequired) {
       // Restore any search parameters on original request
