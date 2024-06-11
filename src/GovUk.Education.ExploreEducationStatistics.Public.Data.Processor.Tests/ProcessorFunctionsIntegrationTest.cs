@@ -62,16 +62,27 @@ public abstract class ProcessorFunctionsIntegrationTest
 
         await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
+        return await CreateDataSetVersionAndImport(dataSet, importStage, status, releaseFileId);
+    }
+
+    protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersionAndImport(
+        DataSet dataSet,
+        DataSetVersionImportStage importStage, 
+        DataSetVersionStatus? status = null,
+        Guid? releaseFileId = null,
+        string? versionNumber = null)
+    {
         DataSetVersionImport dataSetVersionImport = DataFixture
             .DefaultDataSetVersionImport()
             .WithStage(importStage);
-
+        
         DataSetVersion dataSetVersion = DataFixture
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
             .WithReleaseFileId(releaseFileId ?? Guid.NewGuid())
             .WithStatus(status ?? DataSetVersionStatus.Processing)
             .WithImports(() => [dataSetVersionImport])
+            .WithVersionNumber(versionNumber ?? DataSetVersion.FirstVersionString)
             .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
         await AddTestData<PublicDataDbContext>(context =>
@@ -162,9 +173,11 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         [
             typeof(CreateDataSetFunction),
             typeof(ProcessInitialDataSetVersionFunction),
+            typeof(ProcessNextDataSetVersionFunction),
             typeof(DeleteDataSetVersionFunction),
             typeof(CopyCsvFilesFunction),
             typeof(ImportMetadataFunction),
+            typeof(CompleteProcessingFunction),
             typeof(HandleProcessingFailureFunction),
             typeof(HealthCheckFunctions),
         ];

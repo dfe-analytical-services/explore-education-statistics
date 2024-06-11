@@ -115,7 +115,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.ProcessInitialDataSetVersion(
                 orchestrationContext,
-                new ProcessInitialDataSetVersionContext {DataSetVersionId = Guid.NewGuid()});
+                new ProcessDataSetVersionContext {DataSetVersionId = Guid.NewGuid()});
         }
 
         private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(

@@ -59,7 +59,7 @@ public class CreateNextDataSetVersionFunction(
     {
         const string orchestratorName = nameof(ProcessNextDataSetVersionFunction.ProcessNextDataSetVersion);
 
-        var input = new ProcessInitialDataSetVersionContext {DataSetVersionId = dataSetVersionId};
+        var input = new ProcessDataSetVersionContext {DataSetVersionId = dataSetVersionId};
 
         var options = new StartOrchestrationOptions {InstanceId = instanceId.ToString()};
 

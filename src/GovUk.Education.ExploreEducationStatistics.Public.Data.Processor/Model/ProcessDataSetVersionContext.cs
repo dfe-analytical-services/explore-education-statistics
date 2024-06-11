@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 
-public record ProcessInitialDataSetVersionContext
+public record ProcessDataSetVersionContext
 {
     public required Guid DataSetVersionId { get; init; }
 }
