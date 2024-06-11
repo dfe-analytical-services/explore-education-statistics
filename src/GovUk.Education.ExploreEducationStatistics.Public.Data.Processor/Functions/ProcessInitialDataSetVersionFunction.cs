@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Extension
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.Extensions.Logging;
@@ -14,15 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class ProcessInitialDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
     IDataDuckDbRepository dataDuckDbRepository,
-    IParquetService parquetService,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IParquetService parquetService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
-    private readonly PublicDataDbContext _publicDataDbContext = publicDataDbContext;
-
     [Function(nameof(ProcessInitialDataSetVersion))]
     public async Task ProcessInitialDataSetVersion(
         [OrchestrationTrigger] TaskOrchestrationContext context,
-        ProcessInitialDataSetVersionContext input)
+        ProcessDataSetVersionContext input)
     {
         var logger = context.CreateReplaySafeLogger(nameof(ProcessInitialDataSetVersion));
 
@@ -68,23 +64,5 @@ public class ProcessInitialDataSetVersionFunction(
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.WritingDataFiles, cancellationToken);
         await parquetService.WriteDataFiles(dataSetVersionImport.DataSetVersionId, cancellationToken);
-    }
-
-    [Function(nameof(CompleteInitialDataSetVersionProcessing))]
-    public async Task CompleteInitialDataSetVersionProcessing(
-        [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
-    {
-        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.Completing, cancellationToken);
-
-        var dataSetVersion = dataSetVersionImport.DataSetVersion;
-
-        // Delete the DuckDb database file as it is no longer needed
-        File.Delete(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
-
-        dataSetVersion.Status = DataSetVersionStatus.Draft;
-        dataSetVersionImport.Completed = DateTimeOffset.UtcNow;
-        await _publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 }

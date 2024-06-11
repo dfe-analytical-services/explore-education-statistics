@@ -1,11 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -107,7 +105,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.ProcessInitialDataSetVersion(
                 orchestrationContext,
-                new ProcessInitialDataSetVersionContext {DataSetVersionId = Guid.NewGuid()});
+                new ProcessDataSetVersionContext {DataSetVersionId = Guid.NewGuid()});
         }
 
         private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(
@@ -202,63 +200,6 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
 
             AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion, _allDataSetVersionFiles);
-        }
-    }
-
-    public class CompleteProcessingTests(ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessInitialDataSetVersionFunctionTests(fixture)
-    {
-        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
-
-        [Fact]
-        public async Task Success()
-        {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
-
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(dataSetVersion));
-
-            await CompleteProcessing(instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedImport = await publicDataDbContext.DataSetVersionImports
-                .Include(i => i.DataSetVersion)
-                .SingleAsync(i => i.InstanceId == instanceId);
-
-            Assert.Equal(Stage, savedImport.Stage);
-            savedImport.Completed.AssertUtcNow();
-
-            Assert.Equal(DataSetVersionStatus.Draft, savedImport.DataSetVersion.Status);
-        }
-
-        [Fact]
-        public async Task DuckDbFileIsDeleted()
-        {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
-
-            // Create empty data set version files for all file paths
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            var directoryPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
-            Directory.CreateDirectory(directoryPath);
-            foreach (var filename in _allDataSetVersionFiles)
-            {
-                await File.Create(Path.Combine(directoryPath, filename)).DisposeAsync();
-            }
-
-            await CompleteProcessing(instanceId);
-
-            // Ensure the duck db database file is the only file that was deleted
-            AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion,
-                _allDataSetVersionFiles
-                    .Where(file => file != DataSetFilenames.DuckDbDatabaseFile)
-                    .ToArray());
-        }
-
-        private async Task CompleteProcessing(Guid instanceId)
-        {
-            var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.CompleteInitialDataSetVersionProcessing(instanceId, CancellationToken.None);
         }
     }
 }

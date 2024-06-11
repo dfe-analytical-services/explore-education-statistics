@@ -53,12 +53,12 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            ProcessInitialDataSetVersionContext? processInitialDataSetVersionContext = null;
+            ProcessDataSetVersionContext? processInitialDataSetVersionContext = null;
             StartOrchestrationOptions? startOrchestrationOptions = null;
             durableTaskClientMock.Setup(client =>
                     client.ScheduleNewOrchestrationInstanceAsync(
                         nameof(ProcessInitialDataSetVersionFunction.ProcessInitialDataSetVersion),
-                        It.IsAny<ProcessInitialDataSetVersionContext>(),
+                        It.IsAny<ProcessDataSetVersionContext>(),
                         It.IsAny<StartOrchestrationOptions>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
@@ -67,7 +67,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                     (_, input, options, _) =>
                     {
                         processInitialDataSetVersionContext =
-                            Assert.IsAssignableFrom<ProcessInitialDataSetVersionContext>(input);
+                            Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
                         startOrchestrationOptions = options;
                     });
 
@@ -119,7 +119,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             // Assert the processing orchestrator was scheduled with the correct arguments
             Assert.NotNull(processInitialDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
-            Assert.Equal(new ProcessInitialDataSetVersionContext {DataSetVersionId = dataSetVersion.Id},
+            Assert.Equal(new ProcessDataSetVersionContext {DataSetVersionId = dataSetVersion.Id},
                 processInitialDataSetVersionContext);
             Assert.Equal(new StartOrchestrationOptions {InstanceId = dataSetVersionImport.InstanceId.ToString()},
                 startOrchestrationOptions);
