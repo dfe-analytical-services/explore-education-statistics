@@ -2029,21 +2029,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         public class ListSitemapItemsTests : PublicationServiceTests
         {
-            private readonly string publicationUpdated = "2018-04-06T13:46:11";
-            private readonly Guid publicationId = Guid.NewGuid();
-
-            private readonly Guid firstReleaseId = Guid.NewGuid();
-            private readonly string firstReleaseSlug = "first-release-slug";
-
-            private readonly Guid secondReleaseId = Guid.NewGuid();
-            private readonly string secondReleaseSlug = "second-release-slug";
-
-            private readonly string firstReleaseVersionPublishedDate = "2019-02-03T07:34:12";
-            private readonly string firstReleaseVersionUpdateDate = "2019-02-04T08:29:54";
-
             [Fact]
             public async Task ListSitemapItems()
             {
+                var publicationUpdated = "2018-04-06T13:46:11";
+                var publicationId = Guid.NewGuid();
+
+                var firstReleaseId = Guid.NewGuid();
+                var firstReleaseSlug = "first-release-slug";
+
+                var secondReleaseId = Guid.NewGuid();
+                var secondReleaseSlug = "second-release-slug";
+
+                var firstReleaseVersionPublishedDate = "2019-02-03T07:34:12";
+                var firstReleaseVersionUpdateDate = "2019-02-04T08:29:54";
+            
                 var publicationUpdatedDate = DateTime.Parse(publicationUpdated);
                 var firstReleaseVersionPublished = DateTime.Parse(firstReleaseVersionPublishedDate);
                 var firstReleaseVersionUpdated = DateTime.Parse(firstReleaseVersionUpdateDate);

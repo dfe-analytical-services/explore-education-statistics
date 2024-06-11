@@ -1790,18 +1790,18 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             return await client.GetAsync("/api/data-set-files/sitemap-items");
         }
-        
+
         [Fact]
         public async Task ListSitemapItems()
         {
-            Publication publication = _fixture.DefaultPublication()
+            var publication = _fixture.DefaultPublication()
                 .WithReleases(
                     _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
 
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+            var releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile()
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
@@ -1818,7 +1818,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             var testApp = BuildApp(enableAzurite: true);
             var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
-            
+
             var formFile = CreateDataCsvFormFile(""""
                                                  column_1,column_2,column_3
                                                  1,2,3
@@ -1843,7 +1843,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             var response = await InvokeListSitemapItems();
 
             var sitemapItems = response.AssertOk<List<DataSetSitemapItemViewModel>>();
-            
+
             var item = Assert.Single(sitemapItems);
             Assert.Equal(releaseFile.File.DataSetFileId!.Value.ToString(), item.Id);
             Assert.Equal(releaseFile.Published, item.LastModified);

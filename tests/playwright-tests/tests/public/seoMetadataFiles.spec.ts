@@ -4,7 +4,7 @@ import environment from '@util/env';
 const { PUBLIC_URL } = environment;
 
 test.describe('SEO Metadata Files', () => {
-  test('An xml sitemap file can be found at the expected route', async ({
+  test('An xml sitemap index file can be found at the expected route', async ({
     page,
   }) => {
     await page.goto(`${PUBLIC_URL}/sitemap.xml`);
@@ -13,6 +13,27 @@ test.describe('SEO Metadata Files', () => {
     await expect(
       page.getByText('http://www.sitemaps.org/schemas/sitemap/0.9'),
     ).toHaveCount(1);
+
+    await expect(
+      page.getByText(`${PUBLIC_URL}/server-sitemap.xml`),
+    ).toHaveCount(1);
+  });
+
+  test('An xml sitemap file can be found at the expected route', async ({
+    page,
+  }) => {
+    await page.goto(`${PUBLIC_URL}/sitemap-0.xml`);
+    await expect(page).toHaveURL(`${PUBLIC_URL}/sitemap-0.xml`);
+
+    await expect(
+      page.getByText('http://www.sitemaps.org/schemas/sitemap/0.9'),
+    ).toHaveCount(1);
+
+    await expect(page.getByText(`${PUBLIC_URL}/data-catalogue`)).toHaveCount(1);
+
+    await expect(page.getByText(`${PUBLIC_URL}/find-statistics`)).toHaveCount(
+      1,
+    );
   });
 
   test('A robots.txt file can be found at the expected route', async ({
@@ -31,9 +52,13 @@ test.describe('SEO Metadata Files', () => {
     await expect(
       page.getByText('Sitemap: http://localhost:3000/sitemap.xml'),
     ).toHaveCount(1);
+
+    await expect(
+      page.getByText('Sitemap: http://localhost:3000/server-sitemap.xml'),
+    ).toHaveCount(1);
   });
 
-  test('The Googlebot is instructed not to crawl fast track data tables', async ({
+  test('Bots are instructed not to crawl fast track data tables', async ({
     page,
   }) => {
     await page.goto(`${PUBLIC_URL}/robots.txt`);
