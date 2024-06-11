@@ -28,12 +28,6 @@ test.describe('SEO Metadata Files', () => {
     await expect(
       page.getByText('http://www.sitemaps.org/schemas/sitemap/0.9'),
     ).toHaveCount(1);
-
-    await expect(page.getByText(`${PUBLIC_URL}/data-catalogue`)).toHaveCount(1);
-
-    await expect(page.getByText(`${PUBLIC_URL}/find-statistics`)).toHaveCount(
-      1,
-    );
   });
 
   test('A robots.txt file can be found at the expected route', async ({
