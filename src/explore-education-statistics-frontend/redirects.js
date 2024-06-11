@@ -877,7 +877,6 @@ const seoRedirects = {
   '/find-statistics/key-stage-4': '/find-statistics',
   '/find-statistics/key-stage-4-': '/find-statistics',
   '/find-statistics/key-stage-4-destination-measures/2018-': '/find-statistics',
-  '/find-statistics/key-stage-4-performance': '/find-statistics',
   '/find-statistics/key-stage-4-performance-': '/find-statistics',
   '/find-statistics/key-stage-4-performance-revised/2020-': '/find-statistics',
   '/find-statistics/key-stage-4-performance-revised/2021%e2%80%9322':
