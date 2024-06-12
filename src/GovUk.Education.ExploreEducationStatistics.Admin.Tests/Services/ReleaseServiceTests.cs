@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -15,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -26,8 +22,18 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -43,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
         private static readonly User User = new()
         {
             Id = Guid.NewGuid()
@@ -1120,6 +1127,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
+            DataSet dataSet = _dataFixture
+                .DefaultDataSet();
+
+            var dataSetVersions = _dataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .GenerateList(3);
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1133,12 +1148,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+
+            dataSetVersionService.Setup(mock => mock.GetDataSetVersions(releaseBeingDeleted.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersions);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(context,
+                    dataSetVersionService: dataSetVersionService.Object);
 
                 var result = await releaseService.GetDeleteReleasePlan(releaseBeingDeleted.Id);
+
+                VerifyAllMocks(dataSetVersionService);
+
                 var plan = result.AssertRight();
+
+                // Assert that the delete plan is valid
+                Assert.True(plan.Valid);
 
                 // Assert that only the 2 Methodologies that were scheduled with the Release being deleted are flagged
                 // up in the Plan.
@@ -1148,6 +1175,105 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Methodology 1 with alternative title", methodology1.Title);
                 Assert.Equal("Methodology 2 with owned Publication title", methodology2.Title);
+
+                // Assert that the linked API data set versions are flagged up in the plan
+                Assert.Equal(dataSetVersions.Count, plan.ApiDataSetVersions.Count);
+
+                var expectedDataSetVersionDeletePlans = dataSetVersions
+                    .Select(dsv => new DeleteApiDataSetVersionPlan
+                    {
+                        DataSetId = dsv.DataSet.Id,
+                        DataSetName = dsv.DataSet.Title,
+                        DataSetVersionId = dsv.Id,
+                        Version = dsv.Version,
+                        Status = dsv.Status
+                    })
+                    .ToList();
+
+                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan => Assert.True(dataSetVersionDeletePlan.Valid));
+
+                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan =>
+                    Assert.Contains(expectedDataSetVersionDeletePlans, expectedPlan => 
+                        expectedPlan.DataSetId == dataSetVersionDeletePlan.DataSetId 
+                        && expectedPlan.DataSetName == dataSetVersionDeletePlan.DataSetName
+                        && expectedPlan.DataSetVersionId == dataSetVersionDeletePlan.DataSetVersionId
+                        && expectedPlan.Version == dataSetVersionDeletePlan.Version
+                        && expectedPlan.Status == dataSetVersionDeletePlan.Status));
+            }
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Published)]
+        [InlineData(DataSetVersionStatus.Deprecated)]
+        [InlineData(DataSetVersionStatus.Withdrawn)]
+        public async Task GetDeleteReleasePlan_ReleaseIsLinkedToApiDataSetsWhichCannotBeDeleted(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid()
+            };
+
+            DataSet dataSet = _dataFixture
+                .DefaultDataSet();
+
+            var dataSetVersions = _dataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithStatus(dataSetVersionStatus)
+                .GenerateList(3);
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+
+            dataSetVersionService.Setup(mock => mock.GetDataSetVersions(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersions);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context,
+                    dataSetVersionService: dataSetVersionService.Object);
+
+                var result = await releaseService.GetDeleteReleasePlan(releaseVersion.Id);
+
+                VerifyAllMocks(dataSetVersionService);
+
+                var plan = result.AssertRight();
+
+                // Assert that the delete plan is NOT valid
+                Assert.False(plan.Valid);
+
+                // Assert that the linked API data set versions, which cannot be deleted, are flagged up in the plan
+                Assert.Equal(dataSetVersions.Count, plan.ApiDataSetVersions.Count);
+
+                var expectedDataSetVersionDeletePlans = dataSetVersions
+                    .Select(dsv => new DeleteApiDataSetVersionPlan
+                    {
+                        DataSetId = dsv.DataSet.Id,
+                        DataSetName = dsv.DataSet.Title,
+                        DataSetVersionId = dsv.Id,
+                        Version = dsv.Version,
+                        Status = dsv.Status
+                    })
+                    .ToList();
+
+                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan => Assert.False(dataSetVersionDeletePlan.Valid));
+
+                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan =>
+                    Assert.Contains(expectedDataSetVersionDeletePlans, expectedPlan =>
+                        expectedPlan.DataSetId == dataSetVersionDeletePlan.DataSetId
+                        && expectedPlan.DataSetName == dataSetVersionDeletePlan.DataSetName
+                        && expectedPlan.DataSetVersionId == dataSetVersionDeletePlan.DataSetVersionId
+                        && expectedPlan.Version == dataSetVersionDeletePlan.Version
+                        && expectedPlan.Status == dataSetVersionDeletePlan.Status));
             }
         }
 
@@ -1232,6 +1358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var cacheService = new Mock<IBlobCacheService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
 
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
@@ -1247,13 +1374,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
                 .Returns(Task.CompletedTask);
 
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id, 
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context,
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
-                    cacheService: cacheService.Object);
+                    cacheService: cacheService.Object,
+                    processorClient: processorClient.Object);
 
                 var result = await releaseService.DeleteRelease(releaseVersion.Id);
 
@@ -1265,7 +1398,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(cacheService,
                     releaseDataFilesService,
-                    releaseFileService
+                    releaseFileService,
+                    processorClient
                 );
 
                 result.AssertRight();
@@ -1362,6 +1496,141 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId);
+            }
+        }
+
+        [Fact]
+        public async Task DeleteRelease_ProcessorReturns400_Returns400()
+        {
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var cacheService = new Mock<IBlobCacheService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+
+            releaseDataFilesService.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+
+            releaseFileService.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository.Setup(mock =>
+                mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
+
+            cacheService
+                .Setup(mock => mock.DeleteCacheFolderAsync(
+                    ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
+                .Returns(Task.CompletedTask);
+
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BadRequestObjectResult(new ValidationProblemViewModel
+                    {
+                        Errors = new ErrorViewModel[]
+                        {
+                            new() {
+                                Path ="error path",
+                                Code = "error code"
+                            }
+                        }
+                    }));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context,
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    cacheService: cacheService.Object,
+                    processorClient: processorClient.Object);
+
+                var result = await releaseService.DeleteRelease(releaseVersion.Id);
+
+                VerifyAllMocks(cacheService,
+                    releaseDataFilesService,
+                    releaseFileService,
+                    processorClient
+                );
+
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertHasError(
+                    expectedPath: "error path",
+                    expectedCode: "error code");
+            }
+        }
+
+        [Fact]
+        public async Task DeleteRelease_ProcessorThrows_Throws()
+        {
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var cacheService = new Mock<IBlobCacheService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+
+            releaseDataFilesService.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+
+            releaseFileService.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository.Setup(mock =>
+                mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
+
+            cacheService
+                .Setup(mock => mock.DeleteCacheFolderAsync(
+                    ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
+                .Returns(Task.CompletedTask);
+
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new HttpRequestException());
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context,
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    cacheService: cacheService.Object,
+                    processorClient: processorClient.Object);
+
+                await Assert.ThrowsAsync<HttpRequestException>(async () => await releaseService.DeleteRelease(releaseVersion.Id));
+
+                VerifyAllMocks(cacheService,
+                    releaseDataFilesService,
+                    releaseFileService,
+                    processorClient
+                );
             }
         }
 

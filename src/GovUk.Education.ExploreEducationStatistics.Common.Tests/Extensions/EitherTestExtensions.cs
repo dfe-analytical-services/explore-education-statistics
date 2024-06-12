@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
@@ -78,6 +79,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
             badRequest.AssertValidationProblem(expectedValidationErrors);
             return either.Left;
+        }
+        public static ValidationProblemViewModel AssertBadRequestWithValidationProblem<TRight>(this Either<ActionResult, TRight> either)
+        {
+            var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>(); 
+            return Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
         }
 
         private static TActionResult AssertActionResultOfType<TActionResult, TRight>(this Either<ActionResult, TRight> result)

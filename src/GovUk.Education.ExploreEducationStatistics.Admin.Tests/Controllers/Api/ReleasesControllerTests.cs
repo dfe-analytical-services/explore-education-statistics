@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -313,6 +315,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             VerifyAllMocks(releaseService);
 
             result.AssertOkResult(deleteReleasePlan);
+        }
+
+        [Fact]
+        public async Task DeleteRelease_Returns_NoContent()
+        {
+            var releaseService = new Mock<IReleaseService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            releaseService
+                .Setup(service => service.DeleteRelease(_releaseVersionId))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = BuildController(releaseService: releaseService.Object);
+
+            var result = await controller.DeleteRelease(_releaseVersionId);
+            VerifyAllMocks(releaseService);
+
+            Assert.IsAssignableFrom<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteRelease_Returns_NotFound()
+        {
+            var releaseService = new Mock<IReleaseService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            releaseService
+                .Setup(service => service.DeleteRelease(_releaseVersionId))
+                .ReturnsAsync(new NotFoundResult());
+
+            var controller = BuildController(releaseService: releaseService.Object);
+
+            var result = await controller.DeleteRelease(_releaseVersionId);
+            VerifyAllMocks(releaseService);
+
+            result.AssertNotFoundResult();
+        }
+
+        [Fact]
+        public async Task DeleteRelease_Returns_ValidationProblem()
+        {
+            var releaseService = new Mock<IReleaseService>(Strict);
+
+            var fileId = Guid.NewGuid();
+
+            releaseService
+                .Setup(service => service.DeleteRelease(_releaseVersionId))
+                .ReturnsAsync(ValidationUtils.ValidationResult(new ErrorViewModel
+                {
+                    Code = "error code",
+                    Path = "error path"
+                }));
+
+            var controller = BuildController(releaseService: releaseService.Object);
+
+            var result = await controller.DeleteRelease(_releaseVersionId);
+            VerifyAllMocks(releaseService);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "error path",
+                expectedCode: "error code");
         }
 
         [Fact]
