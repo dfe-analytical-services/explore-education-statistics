@@ -1,43 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <IsPackable>false</IsPackable>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <CompilerVisibleProperty Include="RootNamespace" />
-        <CompilerVisibleProperty Include="ProjectDir" />
-    </ItemGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="RootNamespace"/>
+    <CompilerVisibleProperty Include="ProjectDir"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="AspectInjector" Version="2.8.2" />
-        <PackageReference Include="Bogus" Version="35.5.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.4" PrivateAssets="all" />
-        <PackageReference Include="CompareNETObjects" Version="4.83.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.6" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0" />  
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-        <PackageReference Include="Moq" Version="4.20.70" />
-        <PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
-        <PackageReference Include="xunit" Version="2.7.1" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AspectInjector" Version="2.8.2"/>
+    <PackageReference Include="Bogus" Version="35.5.1"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.4" PrivateAssets="all"/>
+    <PackageReference Include="CompareNETObjects" Version="4.83.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.6"/>
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
+    <PackageReference Include="Moq" Version="4.20.70"/>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2"/>
+    <PackageReference Include="Snapshooter.Xunit" Version="0.14.1"/>
+    <PackageReference Include="xunit" Version="2.7.1"/>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.NameResolution" Version="4.3.0"/>
+    <PackageReference Include="Testcontainers" Version="3.8.0"/>
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <None Remove="Resources\**" />
-        <Content Include="Resources\**">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\**"/>
+    <Content Include="Resources\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

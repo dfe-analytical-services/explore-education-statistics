@@ -55,7 +55,10 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                 services.UseInMemoryDbContext<ContentDbContext>();
 
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
+                    options => options
+                        .UseNpgsql(
+                            _postgreSqlContainer.GetConnectionString(),
+                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()

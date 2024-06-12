@@ -51,7 +51,10 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
             .ConfigureServices(services =>
             {
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
+                    options => options
+                        .UseNpgsql(
+                            _postgreSqlContainer.GetConnectionString(),
+                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
             });
     }
 }

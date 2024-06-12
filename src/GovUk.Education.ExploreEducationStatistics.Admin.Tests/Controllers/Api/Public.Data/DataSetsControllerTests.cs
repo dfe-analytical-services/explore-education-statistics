@@ -31,7 +31,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-sets";
 

@@ -149,7 +149,9 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                 services.UseInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
 
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
+                    options => options.UseNpgsql(
+                        _postgreSqlContainer.GetConnectionString(),
+                        psqlOptions => psqlOptions.EnableRetryOnFailure()));
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()

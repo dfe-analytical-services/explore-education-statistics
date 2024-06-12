@@ -34,6 +34,11 @@ public static class ValidationMessages
         Code: nameof(DataSetVersionCanNotBeDeleted),
         Message: $"The data set version is not in a '{DataSetVersionStatus.Draft}' status, so cannot be deleted."
     );
+
+    public static readonly LocalizableMessage DataSetMustHaveNoExistingVersions = new(
+        Code: nameof(DataSetMustHaveNoExistingVersions),
+        Message: "The data set must have no existing versions when creating the initial version."
+    );
     
     public static readonly LocalizableMessage DataSetNotFound = new(
         Code: nameof(DataSetNotFound),
