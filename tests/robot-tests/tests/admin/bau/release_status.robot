@@ -14,6 +14,7 @@ Force Tags          Admin    Local    Dev    AltersData
 ${PUBLICATION_NAME}             UI tests - release status %{RUN_IDENTIFIER}
 ${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_DATAFILES}   ${PUBLICATION_NAME} -  datafiles-updated
+${SUBJECT_NAME}         	Dates test subject
 
 
 *** Test Cases ***
@@ -338,10 +339,55 @@ Validate checklist errors and warnings
     user checks checklist warnings contains link    No data blocks have been saved as featured tables
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
+
+
     user checks checklist errors contains
     ...    3 issues that must be resolved before this release can be published.
     user checks checklist errors contains link
     ...    All data file replacements must be completed
+     user checks checklist errors contains link
+    ...    All summary information must be completed on the data guidance page
+    user checks checklist errors contains link
+    ...    Release must contain a key statistic or a non-empty headline text block
+
+    user checks page does not contain testid    releaseChecklist-success
+
+Navigate to data upload and confirm data replacement
+
+  user clicks link    Data and files
+    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
+    user waits until page contains accordion section    Dates test subject
+    user opens accordion section    Dates test subject
+
+    ${section}=    user gets accordion section content element    Dates test subject
+    user clicks link    Replace data    ${section}
+    user waits until page contains    Footnotes: OK
+    user waits until page contains    Data blocks: OK
+    user waits until button is enabled    Confirm data replacement
+    user clicks button    Confirm data replacement
+    user waits until h2 is visible    Data replacement complete    %{WAIT_MEDIUM}
+
+Upload the larger data file via data upload
+      User Waits Until Data Upload Displays Importing
+    ...    ${SUBJECT_NAME}-updated
+    ...    large.csv
+    ...    large.meta.csv
+
+    user edits release status
+    user checks checklist warnings contains
+    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
+    user checks checklist warnings contains link    No next expected release date has been added
+    user checks checklist warnings contains link    2 data files don't have any footnotes
+    user checks checklist warnings contains link    No data blocks have been saved as featured tables
+    user checks checklist warnings contains link    A public pre-release access list has not been created
+
+
+
+    user checks checklist errors contains
+    ...    3 issues that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    All data imports must be completed
      user checks checklist errors contains link
     ...    All summary information must be completed on the data guidance page
     user checks checklist errors contains link
