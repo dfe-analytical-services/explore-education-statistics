@@ -219,7 +219,7 @@ var commonSiteProperties = {
 }
 
 // Create the main production deploy slot.
-resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
+resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   name: fullFunctionAppName
   location: location
   kind: 'functionapp'
