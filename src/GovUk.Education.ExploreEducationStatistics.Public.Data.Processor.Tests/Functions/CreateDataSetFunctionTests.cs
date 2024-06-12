@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -25,8 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests
 public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    private readonly DataFixture _fixture = new();
-
     public class CreateDataSetTests(ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateDataSetFunctionTests(fixture)
     {
@@ -35,10 +32,10 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         [Fact]
         public async Task Success()
         {
-            var (releaseFile, releaseMetaFile) = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion()
-                    .WithPublication(_fixture.DefaultPublication()))
-                .WithFiles(_fixture.DefaultFile()
+            var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithPublication(DataFixture.DefaultPublication()))
+                .WithFiles(DataFixture.DefaultFile()
                     .ForIndex(0, s => s.SetType(FileType.Data))
                     .ForIndex(1, s => s.SetType(FileType.Metadata))
                     .WithSubjectId(Guid.NewGuid())
@@ -163,13 +160,13 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         [Fact]
         public async Task ReleaseFileIdHasDataSetVersion_ReturnsValidationProblem()
         {
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion())
-                .WithFile(_fixture.DefaultFile());
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile());
 
-            DataSet dataSet = _fixture.DefaultDataSet();
+            DataSet dataSet = DataFixture.DefaultDataSet();
 
-            DataSetVersion dataSetVersion = _fixture.DefaultDataSetVersion()
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion()
                 .WithReleaseFileId(releaseFile.Id)
                 .WithDataSet(dataSet);
 
@@ -203,10 +200,10 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         [Fact]
         public async Task ReleaseVersionNotDraft_ReturnsValidationProblem()
         {
-            var (releaseFile, releaseMetaFile) = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion()
+            var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithApprovalStatus(ReleaseApprovalStatus.Approved))
-                .WithFiles(_fixture.DefaultFile()
+                .WithFiles(DataFixture.DefaultFile()
                     .ForIndex(0, s => s.SetType(FileType.Data))
                     .ForIndex(1, s => s.SetType(FileType.Metadata))
                     .Generate(2))
@@ -237,9 +234,9 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         [Fact]
         public async Task ReleaseFileTypeNotData_ReturnsValidationProblem()
         {
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion())
-                .WithFile(_fixture.DefaultFile()
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile()
                     .WithType(FileType.Ancillary));
 
             await AddTestData<ContentDbContext>(context =>
@@ -266,9 +263,9 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         [Fact]
         public async Task ReleaseFileHasNoMetaFile_ReturnsValidationProblem()
         {
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion())
-                .WithFile(_fixture.DefaultFile());
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile());
 
             await AddTestData<ContentDbContext>(context =>
             {

@@ -35,6 +35,11 @@ public static class ReleaseVersionGeneratorExtensions
         this Generator<ReleaseVersion> generator,
         Publication publication)
         => generator.ForInstance(s => s.SetPublication(publication));
+    
+    public static Generator<ReleaseVersion> WithPublicationId(
+        this Generator<ReleaseVersion> generator,
+        Guid publicationId)
+        => generator.ForInstance(s => s.SetPublicationId(publicationId));
 
     public static Generator<ReleaseVersion> WithPublications(this Generator<ReleaseVersion> generator,
         IEnumerable<Publication> publications)
@@ -49,6 +54,11 @@ public static class ReleaseVersionGeneratorExtensions
         this Generator<ReleaseVersion> generator,
         Release release)
         => generator.ForInstance(s => s.SetRelease(release));
+    
+    public static Generator<ReleaseVersion> WithReleaseId(
+        this Generator<ReleaseVersion> generator,
+        Guid releaseId)
+        => generator.ForInstance(s => s.SetReleaseId(releaseId));
 
     public static Generator<ReleaseVersion> WithApprovalStatus(
         this Generator<ReleaseVersion> generator,
@@ -194,6 +204,8 @@ public static class ReleaseVersionGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.DataGuidance)
             .SetDefault(p => p.Type)
+            .SetDefault(p => p.PublicationId)
+            .SetDefault(p => p.ReleaseId)
             .SetApprovalStatus(ReleaseApprovalStatus.Draft)
             .SetTimePeriodCoverage(TimeIdentifier.AcademicYear)
             .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}")
@@ -210,11 +222,14 @@ public static class ReleaseVersionGeneratorExtensions
     public static InstanceSetters<ReleaseVersion> SetPublication(
         this InstanceSetters<ReleaseVersion> setters,
         Publication publication)
-        => setters.Set((_, releaseVersion, _) =>
-        {
-            releaseVersion.Publication = publication;
-            releaseVersion.PublicationId = publication.Id;
-        });
+        => setters
+            .Set(releaseVersion => releaseVersion.Publication, publication)
+            .SetPublicationId(publication.Id);
+
+    public static InstanceSetters<ReleaseVersion> SetPublicationId(
+        this InstanceSetters<ReleaseVersion> setters,
+        Guid publicationId)
+        => setters.Set(releaseVersion => releaseVersion.PublicationId, publicationId);
 
     public static InstanceSetters<ReleaseVersion> SetRelease(
         this InstanceSetters<ReleaseVersion> setters,
