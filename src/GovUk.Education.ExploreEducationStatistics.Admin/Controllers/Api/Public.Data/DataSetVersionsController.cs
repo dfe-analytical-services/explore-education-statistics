@@ -18,12 +18,12 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
 {
     [HttpPost]
     [Produces("application/json")]
-    public async Task<ActionResult<DataSetVersionSummaryViewModel>> CreateNextDataSetVersion(
+    public async Task<ActionResult<DataSetVersionSummaryViewModel>> CreateNextVersion(
         [FromBody] NextDataSetVersionCreateRequest nextDataSetVersionCreateRequest,
         CancellationToken cancellationToken)
     {
         return await dataSetVersionService
-            .CreateNextDataSetVersion(
+            .CreateNextVersion(
                 releaseFileId: nextDataSetVersionCreateRequest.ReleaseFileId,
                 dataSetId: nextDataSetVersionCreateRequest.DataSetId,
                 cancellationToken: cancellationToken)

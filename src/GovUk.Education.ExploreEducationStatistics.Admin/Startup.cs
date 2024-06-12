@@ -767,7 +767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
 
-        public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextDataSetVersion(
+        public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
             Guid releaseFileId,
             Guid dataSetId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();

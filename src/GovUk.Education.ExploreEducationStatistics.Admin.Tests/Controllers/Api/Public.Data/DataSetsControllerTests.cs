@@ -7,7 +7,6 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -24,12 +23,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using InitialDataSetVersionCreateRequest = GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data.InitialDataSetVersionCreateRequest;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -1050,7 +1049,10 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         {
             client ??= BuildApp().CreateClient();
 
-            var request = new InitialDataSetVersionCreateRequest {ReleaseFileId = releaseFileId};
+            var request = new InitialDataSetVersionCreateRequest
+            {
+                ReleaseFileId = releaseFileId
+            };
 
             return await client.PostAsJsonAsync(BaseUrl, request);
         }
