@@ -30,10 +30,10 @@ import {
 import Filters from '@frontend/modules/data-catalogue/components/Filters';
 import SearchForm from '@frontend/components/SearchForm';
 import { getParamsFromQuery } from '@frontend/modules/data-catalogue/utils/createDataSetFileListRequest';
-import styles from '@frontend/modules/data-catalogue/DataCataloguePage.module.scss';
 import publicationQueries from '@frontend/queries/publicationQueries';
-import FilterClearButton from '@frontend/components/FilterClearButton';
+import FilterResetButton from '@frontend/components/FilterResetButton';
 import FiltersMobile from '@frontend/components/FiltersMobile';
+import FiltersDesktop from '@frontend/components/FiltersDesktop';
 import getUpdatedQueryParams from '@frontend/modules/data-catalogue/utils/getUpdatedQueryParams';
 import SortControls, { SortOption } from '@frontend/components/SortControls';
 import compact from 'lodash/compact';
@@ -221,7 +221,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
     });
   };
 
-  const handleClearFilter = async ({
+  const handleResetFilter = async ({
     filterType,
   }: {
     filterType: DataSetFileFilter | 'all';
@@ -236,7 +236,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
 
     logEvent({
       category: 'Data catalogue',
-      action: `Clear ${filterType} filter`,
+      action: `Reset ${filterType} filter`,
     });
   };
 
@@ -301,7 +301,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
       </div>
       <hr />
       <div className="govuk-grid-row">
-        <div className={`govuk-grid-column-one-third ${styles.desktopFilters}`}>
+        <FiltersDesktop>
           <SearchForm
             label="Search data sets"
             value={searchTerm}
@@ -322,16 +322,16 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                 publications={publications}
                 releaseId={releaseId}
                 releases={releases}
-                showClearFiltersButton={!isMobileMedia && isFiltered}
+                showResetFiltersButton={!isMobileMedia && isFiltered}
                 showTypeFilter={showTypeFilter}
                 themeId={themeId}
                 themes={themes}
                 onChange={handleChangeFilter}
-                onClearFilters={() => handleClearFilter({ filterType: 'all' })}
+                onResetFilters={() => handleResetFilter({ filterType: 'all' })}
               />
             </LoadingSpinner>
           )}
-        </div>
+        </FiltersDesktop>
         <div className="govuk-grid-column-two-thirds">
           <div className="dfe-border-bottom">
             <h2
@@ -366,7 +366,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
 
               {isMobileMedia && isFiltered && (
                 <ButtonText
-                  onClick={() => handleClearFilter({ filterType: 'all' })}
+                  onClick={() => handleResetFilter({ filterType: 'all' })}
                 >
                   Reset filters
                 </ButtonText>
@@ -376,36 +376,36 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
             {isFiltered && (
               <div className="govuk-!-padding-bottom-2 dfe-flex dfe-flex-wrap ">
                 {searchTerm && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Search"
                     name={searchTerm}
                     onClick={() =>
-                      handleClearFilter({ filterType: 'searchTerm' })
+                      handleResetFilter({ filterType: 'searchTerm' })
                     }
                   />
                 )}
                 {selectedTheme && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Theme"
                     name={selectedTheme.title}
-                    onClick={() => handleClearFilter({ filterType: 'themeId' })}
+                    onClick={() => handleResetFilter({ filterType: 'themeId' })}
                   />
                 )}
                 {selectedPublication && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Publication"
                     name={selectedPublication.title}
                     onClick={() =>
-                      handleClearFilter({ filterType: 'publicationId' })
+                      handleResetFilter({ filterType: 'publicationId' })
                     }
                   />
                 )}
                 {selectedRelease && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Release"
                     name={selectedRelease.title}
                     onClick={() =>
-                      handleClearFilter({ filterType: 'releaseId' })
+                      handleResetFilter({ filterType: 'releaseId' })
                     }
                   />
                 )}

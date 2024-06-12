@@ -25,7 +25,7 @@ interface Props {
   publications?: PublicationTreeSummary[];
   releaseId?: string;
   releases?: ReleaseSummary[];
-  showClearFiltersButton?: boolean;
+  showResetFiltersButton?: boolean;
   showTypeFilter?: boolean;
   themeId?: string;
   themes: Theme[];
@@ -36,7 +36,7 @@ interface Props {
     filterType: DataSetFileFilter;
     nextValue: string;
   }) => void;
-  onClearFilters?: () => void;
+  onResetFilters?: () => void;
 }
 
 export default function Filters({
@@ -46,22 +46,21 @@ export default function Filters({
   publicationId,
   releaseId,
   releases = [],
-  showClearFiltersButton,
+  showResetFiltersButton,
   showTypeFilter,
   themeId,
   themes,
   onChange,
-  onClearFilters,
+  onResetFilters,
 }: Props) {
   const latestValue = latestOnly === 'true' ? 'latest' : 'all';
   return (
     <form className={styles.form} id={formId}>
-      <FormGroup className="govuk-!-margin-bottom-1">
-        <h2 className="govuk-heading-m">Filter data sets</h2>
+      <h2 className="govuk-heading-m">Filter data sets</h2>
+      <FormGroup>
         <FormSelect
-          className="govuk-!-width-full"
+          className="govuk-!-width-full govuk-!-margin-bottom-1"
           id={`${formId}-theme`}
-          inlineHint
           label={
             <>
               <VisuallyHidden>Filter by </VisuallyHidden>Theme
@@ -81,10 +80,10 @@ export default function Filters({
             onChange({ filterType: 'themeId', nextValue: e.target.value });
           }}
         />
+        <ThemesModal themes={themes} />
       </FormGroup>
-      <ThemesModal themes={themes} />
 
-      <FormGroup className="govuk-!-margin-top-4">
+      <FormGroup>
         <FormSelect
           className="govuk-!-width-full"
           disabled={!themeId}
@@ -143,10 +142,10 @@ export default function Filters({
         />
       </FormGroup>
 
-      {showClearFiltersButton && (
+      {showResetFiltersButton && (
         <ButtonText
           className={classNames({ 'govuk-!-margin-top-4': !showTypeFilter })}
-          onClick={onClearFilters}
+          onClick={onResetFilters}
         >
           Reset filters
         </ButtonText>

@@ -20,9 +20,10 @@ import { useMobileMedia } from '@common/hooks/useMedia';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
-import FilterClearButton from '@frontend/components/FilterClearButton';
+import FilterResetButton from '@frontend/components/FilterResetButton';
 import Filters from '@frontend/modules/find-statistics/components/Filters';
 import FiltersMobile from '@frontend/components/FiltersMobile';
+import FiltersDesktop from '@frontend/components/FiltersDesktop';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import SearchForm from '@frontend/components/SearchForm';
 import SortControls, { SortOption } from '@frontend/components/SortControls';
@@ -140,7 +141,7 @@ const FindStatisticsPage: NextPage = () => {
     });
   };
 
-  const handleClearFilter = async ({
+  const handleResetFilter = async ({
     filterType,
   }: {
     filterType: PublicationFilter | 'all';
@@ -162,7 +163,7 @@ const FindStatisticsPage: NextPage = () => {
 
     logEvent({
       category: 'Find statistics and data',
-      action: `Clear ${filterType} filter`,
+      action: `Reset ${filterType} filter`,
     });
   };
 
@@ -188,23 +189,23 @@ const FindStatisticsPage: NextPage = () => {
           <RelatedInformation heading="Related information">
             <ul className="govuk-list">
               <li>
-                <Link to="/data-catalogue">
-                  Education statistics: data catalogue
-                </Link>
+                <Link to="/data-catalogue">Data catalogue</Link>
               </li>
               <li>
-                <Link to="/methodology">Education statistics: methodology</Link>
+                <Link to="/methodology">Methodology</Link>
               </li>
               <li>
-                <Link to="/glossary">Education statistics: glossary</Link>
+                <Link to="/glossary">Glossary</Link>
               </li>
             </ul>
           </RelatedInformation>
         </div>
       </div>
+      <hr />
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
+        <FiltersDesktop>
           <SearchForm
+            label="Search publications"
             value={search}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
@@ -214,17 +215,16 @@ const FindStatisticsPage: NextPage = () => {
             Skip to search results
           </a>
           {!isMobileMedia && (
-            <div className="govuk-!-margin-top-3">
-              <h2 className="govuk-visually-hidden">Filter publications</h2>
-              <Filters
-                releaseType={releaseType}
-                themeId={themeId}
-                themes={themes}
-                onChange={handleChangeFilter}
-              />
-            </div>
+            <Filters
+              releaseType={releaseType}
+              showResetFiltersButton={!isMobileMedia && isFiltered}
+              themeId={themeId}
+              themes={themes}
+              onChange={handleChangeFilter}
+              onResetFilters={() => handleResetFilter({ filterType: 'all' })}
+            />
           )}
-        </div>
+        </FiltersDesktop>
         <div className="govuk-grid-column-two-thirds">
           <div>
             <h2
@@ -255,11 +255,11 @@ const FindStatisticsPage: NextPage = () => {
                 }`}</VisuallyHidden>
               </p>
 
-              {isFiltered && (
+              {isMobileMedia && isFiltered && (
                 <ButtonText
-                  onClick={() => handleClearFilter({ filterType: 'all' })}
+                  onClick={() => handleResetFilter({ filterType: 'all' })}
                 >
-                  Clear all filters
+                  Reset filters
                 </ButtonText>
               )}
             </div>
@@ -267,22 +267,25 @@ const FindStatisticsPage: NextPage = () => {
             {isFiltered && (
               <div className="govuk-!-margin-bottom-5 dfe-flex dfe-flex-wrap">
                 {search && (
-                  <FilterClearButton
+                  <FilterResetButton
+                    filterType="Search"
                     name={search}
-                    onClick={() => handleClearFilter({ filterType: 'search' })}
+                    onClick={() => handleResetFilter({ filterType: 'search' })}
                   />
                 )}
                 {selectedTheme && (
-                  <FilterClearButton
+                  <FilterResetButton
+                    filterType="Theme"
                     name={selectedTheme.title}
-                    onClick={() => handleClearFilter({ filterType: 'themeId' })}
+                    onClick={() => handleResetFilter({ filterType: 'themeId' })}
                   />
                 )}
                 {selectedReleaseType && (
-                  <FilterClearButton
+                  <FilterResetButton
+                    filterType="Release type"
                     name={selectedReleaseType}
                     onClick={() =>
-                      handleClearFilter({ filterType: 'releaseType' })
+                      handleResetFilter({ filterType: 'releaseType' })
                     }
                   />
                 )}

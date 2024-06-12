@@ -1,14 +1,14 @@
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import styles from '@frontend/components/FilterClearButton.module.scss';
+import styles from '@frontend/components/FilterResetButton.module.scss';
 import React from 'react';
 
 interface Props {
-  filterType?: string;
+  filterType: string;
   name: string;
   onClick: () => void;
 }
 
-const FilterClearButton = ({ filterType, name, onClick }: Props) => {
+const FilterResetButton = ({ filterType, name, onClick }: Props) => {
   return (
     <button className={styles.button} type="button" onClick={onClick}>
       <span aria-hidden>✕</span>
@@ -21,4 +21,4 @@ const FilterClearButton = ({ filterType, name, onClick }: Props) => {
   );
 };
 
-export default FilterClearButton;
+export default FilterResetButton;

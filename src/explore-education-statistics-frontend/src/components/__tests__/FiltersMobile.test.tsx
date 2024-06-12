@@ -1,6 +1,6 @@
+import render from '@common-test/render';
 import FiltersMobile from '@frontend/components/FiltersMobile';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import React from 'react';
 
 describe('FiltersMobile', () => {
@@ -18,16 +18,14 @@ describe('FiltersMobile', () => {
     expect(screen.queryByText('10 results')).not.toBeInTheDocument();
   });
 
-  test('renders the modal trigger button', async () => {
-    render(
+  test('renders the modal when click the trigger button', async () => {
+    const { user } = render(
       <FiltersMobile title="Test title" totalResults={10}>
         <p>The filters</p>
       </FiltersMobile>,
     );
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Filter results' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Filter results' }));
 
     expect(screen.getByText('10 results')).toBeInTheDocument();
     expect(screen.getByText('The filters')).toBeInTheDocument();
