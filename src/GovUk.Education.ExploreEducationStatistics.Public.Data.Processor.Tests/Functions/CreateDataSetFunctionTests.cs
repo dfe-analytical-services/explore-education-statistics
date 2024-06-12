@@ -27,8 +27,6 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
     public class CreateDataSetTests(ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateDataSetFunctionTests(fixture)
     {
-        private const string DurableTaskClientName = "TestClient";
-
         [Fact]
         public async Task Success()
         {
@@ -48,7 +46,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
             });
 
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
+            var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
 
             ProcessDataSetVersionContext? processInitialDataSetVersionContext = null;
             StartOrchestrationOptions? startOrchestrationOptions = null;
@@ -125,13 +123,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         [Fact]
         public async Task ReleaseFileIdIsEmpty_ReturnsValidationProblem()
         {
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateDataSet(
-                releaseFileId: Guid.Empty,
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
+            var result = await CreateDataSet(releaseFileId: Guid.Empty);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -142,13 +134,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         [Fact]
         public async Task ReleaseFileIdIsNotFound_ReturnsValidationProblem()
         {
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateDataSet(
-                releaseFileId: Guid.NewGuid(),
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
+            var result = await CreateDataSet(releaseFileId: Guid.NewGuid());
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -182,13 +168,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 context.DataSetVersions.Add(dataSetVersion);
             });
 
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateDataSet(
-                releaseFileId: releaseFile.Id,
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
+            var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -215,13 +195,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
             });
 
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateDataSet(
-                releaseFileId: releaseFile.Id,
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
+            var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -243,13 +217,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateDataSet(
-                releaseFileId: releaseFile.Id,
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
+            var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -271,13 +239,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateDataSet(
-                releaseFileId: releaseFile.Id,
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
+            var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -289,11 +251,11 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
 
         private async Task<IActionResult> CreateDataSet(
             Guid releaseFileId,
-            DurableTaskClient durableTaskClient)
+            DurableTaskClient? durableTaskClient = null)
         {
             var function = GetRequiredService<CreateDataSetFunction>();
             return await function.CreateInitialDataSetVersion(new DataSetCreateRequest {ReleaseFileId = releaseFileId},
-                durableTaskClient,
+                durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
                 CancellationToken.None);
         }
     }

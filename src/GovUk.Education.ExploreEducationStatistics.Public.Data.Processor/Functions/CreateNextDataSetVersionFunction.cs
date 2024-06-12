@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class CreateNextDataSetVersionFunction(
     ILogger<CreateNextDataSetVersionFunction> logger,
-    IDataSetService dataSetService,
+    IDataSetVersionService dataSetVersionService,
     IValidator<NextDataSetVersionCreateRequest> requestValidator)
 {
     [Function(nameof(CreateNextDataSetVersion))]
@@ -30,8 +30,9 @@ public class CreateNextDataSetVersionFunction(
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetService.CreateNextDataSetVersion(
-                request,
+            .OnSuccess(() => dataSetVersionService.CreateNextVersion(
+                dataSetId: request.DataSetId,
+                releaseFileId: request.ReleaseFileId,
                 instanceId,
                 cancellationToken: cancellationToken
             ))

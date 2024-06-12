@@ -30,7 +30,7 @@ public class CreateDataSetFunction(
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetService.CreateInitialDataSetVersion(
+            .OnSuccess(() => dataSetService.CreateDataSet(
                 request,
                 instanceId,
                 cancellationToken: cancellationToken

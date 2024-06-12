@@ -76,7 +76,9 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<TDbContext>(options =>
         {
             options
-                .UseNpgsql(dataSource)
+                .UseNpgsql(
+                    dataSource,
+                    psqlOptions => psqlOptions.EnableRetryOnFailure())
                 .EnableSensitiveDataLogging();
 
             optionsConfiguration?.Invoke(options);
@@ -111,7 +113,10 @@ public static class ServiceCollectionExtensions
 
         services.AddDbContext<TDbContext>(options =>
         {
-            options.UseNpgsql(dataSource);
+            options
+                .UseNpgsql(
+                    dataSource,
+                    psqlOptions => psqlOptions.EnableRetryOnFailure());
 
             optionsConfiguration?.Invoke(options);
         });
