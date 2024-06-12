@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -13,6 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 public interface IDataSetVersionService
 {
     Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default);
 

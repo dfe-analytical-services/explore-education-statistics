@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -303,12 +304,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var deleteReleasePlan = new DeleteReleasePlan();
 
             releaseService
-                .Setup(s => s.GetDeleteReleasePlan(_releaseVersionId))
+                .Setup(s => s.GetDeleteReleasePlan(_releaseVersionId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(deleteReleasePlan);
 
             var controller = BuildController(releaseService: releaseService.Object);
 
-            var result = await controller.GetDeleteReleasePlan(_releaseVersionId);
+            var result = await controller.GetDeleteReleasePlan(_releaseVersionId, It.IsAny<CancellationToken>());
             VerifyAllMocks(releaseService);
 
             result.AssertOkResult(deleteReleasePlan);

@@ -56,6 +56,15 @@ internal class ProcessorClient(
             request,
             cancellationToken: cancellationToken);
     }
+    
+    public async Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
+        Guid releaseVersionId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await SendDelete(
+            $"api/BulkDeleteDataSetVersions/{releaseVersionId}",
+            cancellationToken: cancellationToken);
+    }
 
     public async Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
         Guid dataSetVersionId,

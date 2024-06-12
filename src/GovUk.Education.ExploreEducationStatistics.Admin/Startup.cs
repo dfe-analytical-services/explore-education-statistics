@@ -118,6 +118,7 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using Microsoft.AspNetCore.Mvc;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -779,6 +780,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid releaseFileId,
             Guid dataSetId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        
+        public Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(Guid releaseVersionId, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult, IReadOnlyList<DataSetVersion>>([]));
+        }
 
         public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
             CancellationToken cancellationToken = default)

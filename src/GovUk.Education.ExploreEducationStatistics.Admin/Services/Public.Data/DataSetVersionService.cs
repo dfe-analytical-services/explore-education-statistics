@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 public class DataSetVersionService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
+    IReleaseFileRepository releaseFileRepository,
     IProcessorClient processorClient,
     IUserService userService)
     : IDataSetVersionService
@@ -62,6 +65,21 @@ public class DataSetVersionService(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
             .OnSuccess(MapDraftSummaryVersion);
+    }
+    
+    public async Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        var releaseFileIds = (await releaseFileRepository.GetByFileType(releaseVersionId, cancellationToken, types: FileType.Data))
+            .Select(rf => rf.Id)
+            .ToList();
+
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
+            .Where(dsv => releaseFileIds.Contains(dsv.ReleaseFileId))
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,

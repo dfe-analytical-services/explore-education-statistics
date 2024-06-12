@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -236,10 +237,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseVersionId)
+        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleasePlan(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken)
         {
             return await _releaseService
-                .GetDeleteReleasePlan(releaseVersionId)
+                .GetDeleteReleasePlan(releaseVersionId, cancellationToken)
                 .HandleFailuresOrOk();
         }
 

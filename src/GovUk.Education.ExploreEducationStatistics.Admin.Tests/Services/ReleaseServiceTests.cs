@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -27,7 +28,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -1889,6 +1889,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IDataSetVersionService? dataSetVersionService = null,
+            IProcessorClient? processorClient = null,
             IBlobCacheService? cacheService = null)
         {
             var userService = AlwaysTrueUserService();
@@ -1912,6 +1914,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
+                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
+                processorClient ?? Mock.Of<IProcessorClient>(Strict),
                 new SequentialGuidGenerator(),
                 cacheService ?? Mock.Of<IBlobCacheService>(Strict)
             );

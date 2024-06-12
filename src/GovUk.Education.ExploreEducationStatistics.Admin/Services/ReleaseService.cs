@@ -1,11 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -24,9 +21,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -51,6 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
+        private readonly IDataSetVersionService _dataSetVersionService;
+        private readonly IProcessorClient _processorClient;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
 
@@ -71,6 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
+            IDataSetVersionService dataSetVersionService,
+            IProcessorClient processorClient,
             IGuidGenerator guidGenerator,
             IBlobCacheService cacheService)
         {
@@ -88,6 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
+            _dataSetVersionService = dataSetVersionService;
+            _processorClient = processorClient;
             _guidGenerator = guidGenerator;
             _cacheService = cacheService;
         }
@@ -174,21 +184,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseVersionId)
+        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(
+            Guid releaseVersionId, 
+            CancellationToken cancellationToken = default)
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
-                .OnSuccess(_ =>
+                .OnSuccessDo(_userService.CheckCanDeleteReleaseVersion)
+                .OnSuccess(async () => await _dataSetVersionService.GetDataSetVersions(releaseVersionId, cancellationToken))
+                .OnSuccess(dataSetVersions =>
                 {
                     var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseVersionId)
                         .Select(m => new IdTitleViewModel(m.Id, m.Title))
                         .ToList();
 
+                    var dataSetVersionDeletePlans = dataSetVersions
+                        .Select(dsv => new DeleteApiDataSetVersionPlan
+                        {
+                            DataSetId = dsv.DataSet.Id,
+                            DataSetName = dsv.DataSet.Title,
+                            DataSetVersionId = dsv.Id,
+                            Version = dsv.Version,
+                            Status = dsv.Status
+                        })
+                        .ToList();
+
                     return new DeleteReleasePlan
                     {
-                        ScheduledMethodologies = methodologiesScheduledWithRelease
+                        ScheduledMethodologies = methodologiesScheduledWithRelease,
+                        ApiDataSetVersions = dataSetVersionDeletePlans
                     };
                 });
         }
@@ -202,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersionId))
-                .OnSuccessVoid(async releaseVersion =>
+                .OnSuccessDo(async releaseVersion =>
                 {
                     // NOTE: As only removing unapproved amendments, releaseVersion.Release will not be orphaned
                     // and associated item in releaseVersion.Publication.ReleaseSeries will also not be orphaned
@@ -246,7 +271,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: releaseVersionId);
-                });
+                })
+                .OnSuccessVoid(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId));
+
         }
 
         public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
@@ -650,6 +677,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class DeleteReleasePlan
     {
-        public List<IdTitleViewModel> ScheduledMethodologies { get; set; } = new();
+        public IReadOnlyList<IdTitleViewModel> ScheduledMethodologies { get; init; } = [];
+
+        public IReadOnlyList<DeleteApiDataSetVersionPlan> ApiDataSetVersions { get; init; } = [];
+
+        public bool Valid => ApiDataSetVersions.All(dsv => dsv.Valid);
+    }
+
+    public class DeleteApiDataSetVersionPlan
+    {
+        public Guid DataSetId { get; init; }
+
+        public string DataSetName { get; init; } = null!;
+
+        public Guid DataSetVersionId { get; init; }
+
+        public string Version { get; init; } = null!;
+
+        public DataSetVersionStatus Status { get; init; }
+
+        public bool Valid => Status.IsDeletableState();
     }
 }
