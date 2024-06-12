@@ -59,10 +59,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
 
             processorClient
-                .Setup(c => c.CreateNextDataSetVersion(
-                    nextReleaseFileId,
-                    dataSet.Id,
-                    It.IsAny<CancellationToken>()))
+                .Setup(c => c.CreateNextDataSetVersion(dataSet.Id,
+                    nextReleaseFileId, It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
                     var savedDataSet = await TestApp.GetDbContext<PublicDataDbContext>()

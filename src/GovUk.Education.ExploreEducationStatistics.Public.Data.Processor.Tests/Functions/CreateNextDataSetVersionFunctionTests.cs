@@ -209,7 +209,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             var validationProblem = result.AssertBadRequestWithValidationProblem();
         
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileNotFound.Code);
         }
         
@@ -289,7 +289,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             var validationProblem = result.AssertBadRequestWithValidationProblem();
         
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileReleaseVersionNotDraft.Code
             );
         }
@@ -321,7 +321,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             var validationProblem = result.AssertBadRequestWithValidationProblem();
         
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileTypeNotData.Code
             );
         }
@@ -352,7 +352,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             var validationProblem = result.AssertBadRequestWithValidationProblem();
         
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.NoMetadataFile.Code
             );
         }

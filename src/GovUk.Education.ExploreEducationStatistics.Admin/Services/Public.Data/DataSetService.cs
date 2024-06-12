@@ -80,7 +80,7 @@ internal class DataSetService(
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async _ => await processorClient.CreateInitialDataSetVersion(
+            .OnSuccess(async _ => await processorClient.CreateDataSet(
                 releaseFileId: releaseFileId,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await QueryDataSet(processorResponse.DataSetId)

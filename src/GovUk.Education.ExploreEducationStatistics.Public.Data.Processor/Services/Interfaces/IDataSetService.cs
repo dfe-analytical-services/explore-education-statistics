@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 public interface IDataSetService
 {
     Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateInitialDataSetVersion(
-        InitialDataSetVersionCreateRequest request,
+        DataSetCreateRequest request,
         Guid instanceId,
         CancellationToken cancellationToken = default);
 

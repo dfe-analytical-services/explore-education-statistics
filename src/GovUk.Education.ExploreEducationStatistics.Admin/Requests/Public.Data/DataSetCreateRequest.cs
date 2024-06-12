@@ -4,11 +4,11 @@ using FluentValidation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 
-public record InitialDataSetVersionCreateRequest
+public record DataSetCreateRequest
 {
     public required Guid ReleaseFileId { get; init; }
 
-    public class Validator : AbstractValidator<InitialDataSetVersionCreateRequest>
+    public class Validator : AbstractValidator<DataSetCreateRequest>
     {
         public Validator()
         {

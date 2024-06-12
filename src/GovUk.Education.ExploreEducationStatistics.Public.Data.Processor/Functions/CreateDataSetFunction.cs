@@ -17,12 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CreateDataSetFunction(
     ILogger<CreateDataSetFunction> logger,
     IDataSetService dataSetService,
-    IValidator<InitialDataSetVersionCreateRequest> requestValidator)
+    IValidator<DataSetCreateRequest> requestValidator)
 {
     [Function(nameof(CreateInitialDataSetVersion))]
     public async Task<IActionResult> CreateInitialDataSetVersion(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateInitialDataSetVersion))] [FromBody]
-        InitialDataSetVersionCreateRequest request,
+        DataSetCreateRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {

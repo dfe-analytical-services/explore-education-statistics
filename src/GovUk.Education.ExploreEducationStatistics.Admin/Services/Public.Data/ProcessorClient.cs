@@ -28,22 +28,21 @@ internal class ProcessorClient(
     IOptions<PublicDataProcessorOptions> options,
     IWebHostEnvironment environment) : IProcessorClient
 {
-    public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateInitialDataSetVersion(
+    public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateDataSet(
         Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
-        var request = new InitialDataSetVersionCreateRequest {ReleaseFileId = releaseFileId};
+        var request = new DataSetCreateRequest {ReleaseFileId = releaseFileId};
 
-        return await HandlePost<InitialDataSetVersionCreateRequest, CreateDataSetResponseViewModel>(
+        return await HandlePost<DataSetCreateRequest, CreateDataSetResponseViewModel>(
             "api/CreateInitialDataSetVersion",
             "Creating initial data set version",
             request,
             cancellationToken);
     }
 
-    public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateNextDataSetVersion(
+    public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateNextDataSetVersion(Guid dataSetId,
         Guid releaseFileId,
-        Guid dataSetId,
         CancellationToken cancellationToken = default)
     {
         var request = new NextDataSetVersionCreateRequest {ReleaseFileId = releaseFileId, DataSetId = dataSetId};

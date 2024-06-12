@@ -7,6 +7,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -27,7 +28,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
-using InitialDataSetVersionCreateRequest = GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data.InitialDataSetVersionCreateRequest;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -938,7 +938,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
 
             processorClient
-                .Setup(c => c.CreateInitialDataSetVersion(
+                .Setup(c => c.CreateDataSet(
                     releaseFile.Id,
                     It.IsAny<CancellationToken>()))
                 .Returns(async () =>
@@ -1020,7 +1020,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             ];
 
             processorClient
-                .Setup(c => c.CreateInitialDataSetVersion(releaseFileId, It.IsAny<CancellationToken>()))
+                .Setup(c => c.CreateDataSet(releaseFileId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ValidationUtils.ValidationResult(processorErrors));
 
             var client = BuildApp(processorClient.Object).CreateClient();
@@ -1049,7 +1049,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         {
             client ??= BuildApp().CreateClient();
 
-            var request = new InitialDataSetVersionCreateRequest
+            var request = new DataSetCreateRequest
             {
                 ReleaseFileId = releaseFileId
             };
