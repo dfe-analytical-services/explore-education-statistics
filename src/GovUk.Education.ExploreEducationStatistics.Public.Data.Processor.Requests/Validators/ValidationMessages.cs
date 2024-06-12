@@ -45,9 +45,9 @@ public static class ValidationMessages
         Message: "The data set must have a live version."
     );
 
-    public static readonly LocalizableMessage DataSetAndReleaseFileMustBeForSamePublication = new(
-        Code: nameof(DataSetAndReleaseFileMustBeForSamePublication),
-        Message: "The data set and file must belong to the same publication."
+    public static readonly LocalizableMessage NextReleaseFileMustBeForSamePublicationAsDataSet = new(
+        Code: nameof(NextReleaseFileMustBeForSamePublicationAsDataSet),
+        Message: "The file must belong to the same publication as the data set."
     );
 
     /// <summary>

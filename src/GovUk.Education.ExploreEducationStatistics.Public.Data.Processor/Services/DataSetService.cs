@@ -39,15 +39,40 @@ public class DataSetService(
         Guid instanceId,
         CancellationToken cancellationToken = default)
     {
-        return await CreateDataSetVersion(
-            releaseFileId: request.ReleaseFileId,
-            instanceId: instanceId,
-            dataSetSupplier: async _ => await publicDataDbContext
-                .DataSets
-                .Include(dataSet => dataSet.LatestLiveVersion)
-                .Include(dataSet => dataSet.Versions)
-                .SingleAsync(dataSet => dataSet.Id == request.DataSetId, cancellationToken),
-            cancellationToken: cancellationToken);
+        return await ValidateDataSet(request.DataSetId, cancellationToken)
+            .OnSuccess(dataSet => CreateDataSetVersion(
+                releaseFileId: request.ReleaseFileId,
+                instanceId: instanceId,
+                dataSetSupplier: _ => Task.FromResult(dataSet), 
+                cancellationToken: cancellationToken));
+    }
+    
+    private async Task<Either<ActionResult, DataSet>> ValidateDataSet(
+        Guid dataSetId,
+        CancellationToken cancellationToken = default)
+    {
+        var dataSet = await publicDataDbContext
+            .DataSets
+            .Include(dataSet => dataSet.LatestLiveVersion)
+            .Include(dataSet => dataSet.Versions)
+            .FirstOrDefaultAsync(dataSet => dataSet.Id == dataSetId, cancellationToken);
+
+        if (dataSet is null)
+        {
+            return ValidationUtils.ValidationResult(CreateDataSetIdError(
+                message: ValidationMessages.FileNotFound,
+                dataSetId: dataSetId
+            ));
+        }
+        
+        if (dataSet.LatestLiveVersionId is null)
+        {
+            return ValidationUtils.ValidationResult(CreateDataSetIdError(
+                message: ValidationMessages.DataSetMustHaveLiveDataSetVersion,
+                dataSetId: dataSet.Id));
+        }
+
+        return dataSet;
     }
 
     private async Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateDataSetVersion(
@@ -159,46 +184,34 @@ public class DataSetService(
     {
         List<ErrorViewModel> errors = [];
 
-        if (dataSet.PublicationId != releaseFile.ReleaseVersion.PublicationId)
+        if (releaseFile.ReleaseVersion.PublicationId != dataSet.PublicationId)
         {
-            errors.Add(CreatDataSetIdError(
-                message: ValidationMessages.DataSetAndReleaseFileMustBeForSamePublication,
-                dataSetId: dataSet.Id));
+            errors.Add(CreateReleaseFileIdError(
+                message: ValidationMessages.NextReleaseFileMustBeForSamePublicationAsDataSet,
+                releaseFileId: releaseFile.Id));
         }
 
-        var firstVersion = dataSet.Versions.Count == 0;
+        var historicReleaseFileIds = dataSet
+            .Versions
+            .Select(version => version.ReleaseFileId)
+            .ToList();
 
-        if (!firstVersion)
-        {
-            if (dataSet.LatestLiveVersionId is null)
-            {
-                errors.Add(CreatDataSetIdError(
-                    message: ValidationMessages.DataSetMustHaveLiveDataSetVersion,
-                    dataSetId: dataSet.Id));
-            }
-            
-            var historicReleaseFileIds = dataSet
-                .Versions
-                .Select(version => version.ReleaseFileId)
-                .ToList();
+        var historicalReleaseIds = await GetReleaseIdsForReleaseFiles(
+            contentDbContext,
+            historicReleaseFileIds,
+            cancellationToken);
 
-            var historicalReleaseIds = await GetReleaseIdsForReleaseFiles(
+        var selectedReleaseFileReleaseId = (await GetReleaseIdsForReleaseFiles(
                 contentDbContext,
-                historicReleaseFileIds,
-                cancellationToken);
+                [releaseFile.Id],
+                cancellationToken))
+            .Single();
 
-            var selectedReleaseFileReleaseId = (await GetReleaseIdsForReleaseFiles(
-                    contentDbContext,
-                    [releaseFile.Id],
-                    cancellationToken))
-                .Single();
-
-            if (historicalReleaseIds.Contains(selectedReleaseFileReleaseId))
-            {
-                errors.Add(CreateReleaseFileIdError(
-                    message: ValidationMessages.ReleaseFileMustBeFromDifferentReleaseToHistoricalVersions,
-                    releaseFileId: releaseFile.Id));
-            }
+        if (historicalReleaseIds.Contains(selectedReleaseFileReleaseId))
+        {
+            errors.Add(CreateReleaseFileIdError(
+                message: ValidationMessages.ReleaseFileMustBeFromDifferentReleaseToHistoricalVersions,
+                releaseFileId: releaseFile.Id));
         }
         
         return errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
@@ -296,7 +309,7 @@ public class DataSetService(
         };
     }
 
-    private static ErrorViewModel CreatDataSetIdError(
+    private static ErrorViewModel CreateDataSetIdError(
         LocalizableMessage message,
         Guid dataSetId)
     {
