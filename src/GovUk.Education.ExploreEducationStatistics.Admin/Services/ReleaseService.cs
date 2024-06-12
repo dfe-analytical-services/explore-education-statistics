@@ -1,8 +1,11 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -13,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -21,14 +25,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -53,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
+        private readonly IDataSetVersionService _dataSetVersionService;
         private readonly IProcessorClient _processorClient;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
@@ -74,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
+            IDataSetVersionService dataSetVersionService,
             IProcessorClient processorClient,
             IGuidGenerator guidGenerator,
             IBlobCacheService cacheService)
@@ -92,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
+            _dataSetVersionService = dataSetVersionService;
             _processorClient = processorClient;
             _guidGenerator = guidGenerator;
             _cacheService = cacheService;
@@ -457,16 +461,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (file, subject) = tuple;
 
+                    return await GetLinkedDataSetVersion(file)
+                        .OnSuccess(apiDataSetVersion => (file, subject, apiDataSetVersion));
+                })
+                .OnSuccess(async tuple =>
+                {
                     var footnotes =
                         await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
-                            subjectId: file.SubjectId);
+                            subjectId: tuple.file.SubjectId);
+
+                    var linkedApiDataSetVersion = tuple.apiDataSetVersion is null 
+                    ? null 
+                    : new ApiDataSetVersionSummary
+                    {
+                        DataSetId = tuple.apiDataSetVersion.DataSetId,
+                        DataSetName = tuple.apiDataSetVersion.DataSet.Title,
+                        DataSetVersionId = tuple.apiDataSetVersion.Id,
+                        Version = tuple.apiDataSetVersion.Version,
+                        Status = tuple.apiDataSetVersion.Status
+                    };
 
                     return new DeleteDataFilePlan
                     {
                         ReleaseId = releaseVersionId,
-                        SubjectId = subject.Id,
-                        DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseVersionId, subject),
-                        FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList()
+                        SubjectId = tuple.subject.Id,
+                        DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseVersionId, tuple.subject),
+                        FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
+                        IsLinkedToApiDataSetVersion = tuple.apiDataSetVersion is not null,
+                        LinkedApiDataSetVersion = linkedApiDataSetVersion
                     };
                 });
         }
@@ -498,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId));
                 })
-                .OnSuccess(() => _releaseDataFileService.Delete(releaseVersionId, fileId));
+                .OnSuccessVoid(() => _releaseDataFileService.Delete(releaseVersionId, fileId));
         }
 
         public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
@@ -606,6 +628,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved;
         }
 
+        private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(File file)
+        {
+            if (file.PublicApiDataSetId is null)
+            {
+                return (DataSetVersion)null!;
+            }
+
+            return await _dataSetVersionService.GetDataSetVersion(file.PublicApiDataSetId.Value, file.PublicApiDataSetVersion!)
+                .OnSuccess(dsv => (DataSetVersion?)dsv);
+        }
+
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, File file)
         {
             var import = await _dataImportService.GetImport(file.Id);
@@ -619,6 +652,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!await CanUpdateDataFiles(releaseVersionId))
             {
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
+            }
+
+            if (file.PublicApiDataSetId is not null)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                {
+                    Code = ValidationMessages.CannotRemoveDataFileLinkedToApiDataSet.Code,
+                    Message = ValidationMessages.CannotRemoveDataFileLinkedToApiDataSet.Message,
+                    Detail = new InvalidErrorDetail<Guid>(file.PublicApiDataSetId.Value),
+                    Path = "fileId"
+                });
             }
 
             return Unit.Instance;
@@ -646,14 +690,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DeleteDataFilePlan
     {
         [JsonIgnore]
-        public Guid ReleaseId { get; set; }
+        public Guid ReleaseId { get; init; }
 
         [JsonIgnore]
-        public Guid SubjectId { get; set; }
+        public Guid SubjectId { get; init; }
 
-        public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; } = null!;
+        public DeleteDataBlockPlan DeleteDataBlockPlan { get; init; } = null!;
 
-        public List<Guid> FootnoteIds { get; set; } = null!;
+        public List<Guid> FootnoteIds { get; init; } = null!;
+
+        public bool IsLinkedToApiDataSetVersion { get; init; }
+
+        public ApiDataSetVersionSummary? LinkedApiDataSetVersion { get; init; }
+
+        public bool Valid => !IsLinkedToApiDataSetVersion;
+    }
+
+    public class ApiDataSetVersionSummary
+    {
+        public Guid DataSetId { get; init; }
+
+        public string DataSetName { get; init; } = null!;
+
+        public Guid DataSetVersionId { get; init; }
+
+        public string Version { get; init; } = null!;
+
+        public DataSetVersionStatus Status { get; init; }
     }
 
     public class DeleteReleasePlan

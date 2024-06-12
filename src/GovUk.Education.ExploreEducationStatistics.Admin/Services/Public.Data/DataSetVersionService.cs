@@ -63,6 +63,20 @@ public class DataSetVersionService(
                     cancellationToken))
             .OnSuccess(MapDraftSummaryVersion);
     }
+    
+    public async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
+        Guid dataSetId,
+        SemVersion version,
+        CancellationToken cancellationToken = default)
+    {
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.VersionMajor == version!.Major)
+            .Where(dsv => dsv.VersionMinor == version!.Minor)
+            .SingleOrNotFoundAsync(cancellationToken);
+    }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
