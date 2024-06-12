@@ -3,10 +3,6 @@
 import { test, expect } from '@playwright/test';
 import environment from '@util/env';
 
-// TODO: Maybe install frontend as a dependency so we can import this properly?
-// eslint-disable-next-line import/no-relative-packages
-import seoRedirects from '../../../../src/explore-education-statistics-frontend/redirects.js';
-
 const { PUBLIC_URL } = environment;
 
 test.describe('Redirect behaviour', () => {
@@ -47,13 +43,4 @@ test.describe('Redirect behaviour', () => {
     await page.goto(`${PUBLIC_URL}/`);
     await expect(page).toHaveURL(`${PUBLIC_URL}/`);
   });
-
-  // Not ideal, I'd rather it.each like Jest has. But from the docs:
-  // https://playwright.dev/docs/test-parameterize
-  for (const redirect of Object.keys(seoRedirects)) {
-    test.skip(`Redirects from ${redirect}`, async ({ page }) => {
-      await page.goto(`${PUBLIC_URL}${redirect}`);
-      await expect(page).toHaveURL(`${PUBLIC_URL}${seoRedirects[redirect]}`);
-    });
-  }
 });
