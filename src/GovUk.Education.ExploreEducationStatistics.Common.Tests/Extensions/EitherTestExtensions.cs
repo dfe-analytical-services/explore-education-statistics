@@ -87,6 +87,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
         }
 
+        public static ActionResult AssertBadRequest<TRight>(this Either<ActionResult, TRight> either)
+        {
+            return either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
+        }
+
         private static TActionResult AssertActionResultOfType<TActionResult, TRight>(this Either<ActionResult, TRight> result)
             where TActionResult : ActionResult
         {

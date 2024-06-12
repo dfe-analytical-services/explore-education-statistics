@@ -247,11 +247,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseVersionId, Guid fileId)
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(
+            Guid releaseVersionId, 
+            Guid fileId,
+            CancellationToken cancellationToken = default)
         {
             return await _releaseService
-                .GetDeleteDataFilePlan(releaseVersionId: releaseVersionId,
-                    fileId: fileId)
+                .GetDeleteDataFilePlan(
+                    releaseVersionId: releaseVersionId,
+                    fileId: fileId,
+                    cancellationToken: cancellationToken)
                 .HandleFailuresOrOk();
         }
 

@@ -448,8 +448,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseVersionId,
-            Guid fileId)
+        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(
+            Guid releaseVersionId,
+            Guid fileId,
+            CancellationToken cancellationToken = default)
         {
             return await _context.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
@@ -461,7 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (file, subject) = tuple;
 
-                    return await GetLinkedDataSetVersion(file)
+                    return await GetLinkedDataSetVersion(file, cancellationToken)
                         .OnSuccess(apiDataSetVersion => (file, subject, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -628,14 +630,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved;
         }
 
-        private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(File file)
+        private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
+            File file,
+            CancellationToken cancellationToken = default)
         {
             if (file.PublicApiDataSetId is null)
             {
                 return (DataSetVersion)null!;
             }
 
-            return await _dataSetVersionService.GetDataSetVersion(file.PublicApiDataSetId.Value, file.PublicApiDataSetVersion!)
+            return await _dataSetVersionService.GetDataSetVersion(
+                file.PublicApiDataSetId.Value, 
+                file.PublicApiDataSetVersion!, 
+                cancellationToken)
                 .OnSuccess(dsv => (DataSetVersion?)dsv);
         }
 

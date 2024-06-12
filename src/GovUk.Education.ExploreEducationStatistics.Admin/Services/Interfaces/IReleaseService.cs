@@ -41,7 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases();
 
-        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseVersionId, Guid fileId);
+        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(
+            Guid releaseVersionId, 
+            Guid fileId,
+            CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId);
 
