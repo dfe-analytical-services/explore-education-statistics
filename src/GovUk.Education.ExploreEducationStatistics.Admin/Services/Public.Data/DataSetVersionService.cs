@@ -55,7 +55,7 @@ public class DataSetVersionService(
             .AnyAsync(dsv => dsv.ReleaseFileId == releaseFileId, cancellationToken);
     }
 
-    public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextDataSetVersion(
+    public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
         CancellationToken cancellationToken = default)

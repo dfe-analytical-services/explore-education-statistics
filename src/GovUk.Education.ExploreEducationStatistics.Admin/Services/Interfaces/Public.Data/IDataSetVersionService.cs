@@ -20,7 +20,7 @@ public interface IDataSetVersionService
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextDataSetVersion(
+    Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
         CancellationToken cancellationToken = default);
