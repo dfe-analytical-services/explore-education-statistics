@@ -50,12 +50,12 @@ var combinedStagingSettings = union(commonSettings, stagingOnlySettings, existin
 var combinedProductionSettings = union(commonSettings, prodOnlySettings, existingProductionAppSettings)
 
 @description('Set appsettings on the staging slot')
-resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-01-01' = {
+resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = {
   name: '${appName}/${stagingSlotName}/appsettings'
   properties: combinedStagingSettings
 }
 
-resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2021-01-15' = {
+resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2023-12-01' = {
   name: '${appName}/${stagingSlotName}/azurestorageaccounts'
   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
     '${next.storageName}': {
