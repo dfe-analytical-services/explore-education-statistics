@@ -136,7 +136,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst());
+                nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
         }
 
         [Fact]
@@ -153,7 +153,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileNotFound.Code);
         }
 
@@ -193,7 +193,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
         }
 
@@ -226,7 +226,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileReleaseVersionNotDraft.Code
             );
         }
@@ -254,7 +254,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileTypeNotData.Code
             );
         }
@@ -282,7 +282,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.NoMetadataFile.Code
             );
         }
@@ -292,7 +292,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             DurableTaskClient durableTaskClient)
         {
             var function = GetRequiredService<CreateDataSetFunction>();
-            return await function.CreateInitialDataSetVersion(new InitialDataSetVersionCreateRequest {ReleaseFileId = releaseFileId},
+            return await function.CreateInitialDataSetVersion(new DataSetCreateRequest {ReleaseFileId = releaseFileId},
                 durableTaskClient,
                 CancellationToken.None);
         }

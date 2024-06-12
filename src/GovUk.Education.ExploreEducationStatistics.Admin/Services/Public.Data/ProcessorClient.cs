@@ -47,8 +47,8 @@ internal class ProcessorClient(
     }
 
     public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateNextDataSetVersion(
-        Guid releaseFileId,
         Guid dataSetId,
+        Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
         var request = new NextDataSetVersionCreateRequest {ReleaseFileId = releaseFileId, DataSetId = dataSetId};

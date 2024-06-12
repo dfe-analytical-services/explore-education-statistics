@@ -83,7 +83,7 @@ public static class ProcessorHostBuilder
                     .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
                     .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
-                    .AddScoped<IValidator<InitialDataSetVersionCreateRequest>, InitialDataSetVersionCreateRequest.Validator>()
+                    .AddScoped<IValidator<DataSetCreateRequest>, DataSetCreateRequest.Validator>()
                     .AddScoped<IValidator<NextDataSetVersionCreateRequest>,
                         NextDataSetVersionCreateRequest.Validator>()
                     .Configure<DataFilesOptions>(

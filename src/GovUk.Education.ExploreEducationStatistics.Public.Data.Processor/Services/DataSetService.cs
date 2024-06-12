@@ -23,7 +23,7 @@ public class DataSetService(
 ) : IDataSetService
 {
     public async Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateInitialDataSetVersion(
-        InitialDataSetVersionCreateRequest request,
+        DataSetCreateRequest request,
         Guid instanceId,
         CancellationToken cancellationToken = default)
     {
@@ -304,7 +304,7 @@ public class DataSetService(
         {
             Code = message.Code,
             Message = message.Message,
-            Path = nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+            Path = nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
             Detail = new InvalidErrorDetail<Guid>(releaseFileId)
         };
     }
