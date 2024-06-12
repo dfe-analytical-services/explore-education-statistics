@@ -1,4 +1,6 @@
 import FormattedDate from '@common/components/FormattedDate';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import { PublicationListSummary } from '@common/services/publicationService';
 import { releaseTypes } from '@common/services/types/releaseType';
 import styles from '@frontend/modules/find-statistics/components/PublicationSummary.module.scss';
@@ -18,26 +20,19 @@ const PublicationSummary = ({ publication }: Props) => {
       </h3>
       <p>{summary}</p>
 
-      <dl>
-        <div className="dfe-flex">
-          <dt>Release type:</dt>
-          <dd className="govuk-!-margin-left-2" data-testid="release-type">
-            {releaseTypes[type]}
-          </dd>
-        </div>
-        <div className="dfe-flex">
-          <dt>Published:</dt>
-          <dd className="govuk-!-margin-left-2" data-testid="published">
-            <FormattedDate format="d MMM yyyy">{published}</FormattedDate>
-          </dd>
-        </div>
-        <div className="dfe-flex">
-          <dt>Theme:</dt>
-          <dd className="govuk-!-margin-left-2" data-testid="theme">
-            {theme}
-          </dd>
-        </div>
-      </dl>
+      <SummaryList
+        className="govuk-!-margin-bottom-4 govuk-!-margin-top-4"
+        compact
+        noBorder
+      >
+        <SummaryListItem term="Release type">
+          {releaseTypes[type]}
+        </SummaryListItem>
+        <SummaryListItem term="Published">
+          <FormattedDate format="d MMM yyyy">{published}</FormattedDate>
+        </SummaryListItem>
+        <SummaryListItem term="Theme">{theme}</SummaryListItem>
+      </SummaryList>
     </li>
   );
 };

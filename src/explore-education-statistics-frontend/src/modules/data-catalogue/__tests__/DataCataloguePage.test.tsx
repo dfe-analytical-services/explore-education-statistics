@@ -499,9 +499,11 @@ describe('DataCataloguePage', () => {
         ),
       ).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(screen.getByText('30 data sets')).toBeInTheDocument();
-      });
+      await waitFor(() =>
+        expect(screen.getByTestId('total-results')).toHaveTextContent(
+          '30 data sets',
+        ),
+      );
 
       expect(
         screen.getByText('Page 1 of 3, showing all available data sets'),
@@ -579,9 +581,11 @@ describe('DataCataloguePage', () => {
 
       render(<DataCataloguePage newDesign />);
 
-      await waitFor(() => {
-        expect(screen.getByText('30 data sets')).toBeInTheDocument();
-      });
+      await waitFor(() =>
+        expect(screen.getByTestId('total-results')).toHaveTextContent(
+          '30 data sets',
+        ),
+      );
 
       const themesSelect = screen.getByLabelText('Filter by Theme');
       const themes = within(themesSelect).getAllByRole(
@@ -633,9 +637,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(screen.getByLabelText('Filter by Publication')).toBeDisabled();
         expect(
@@ -648,9 +654,11 @@ describe('DataCataloguePage', () => {
           'theme-2',
         ]);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
       });
       test('populates and enables the publications dropdown', async () => {
         const publicationsSelect = screen.getByLabelText(
@@ -724,17 +732,21 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         user.selectOptions(screen.getByLabelText('Filter by Theme'), [
           'theme-2',
         ]);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(publicationService.listReleases).not.toHaveBeenCalled();
 
@@ -870,9 +882,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         const releasesSelect = screen.getByLabelText('Filter by Releases');
 
@@ -881,9 +895,11 @@ describe('DataCataloguePage', () => {
           'theme-2',
         ]);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         // Select publication
         user.selectOptions(screen.getByLabelText('Filter by Publication'), [
@@ -896,9 +912,11 @@ describe('DataCataloguePage', () => {
 
         user.selectOptions(releasesSelect, ['release-1']);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -970,9 +988,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         const releasesSelect = screen.getByLabelText('Filter by Releases');
 
@@ -1018,16 +1038,20 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         await user.type(screen.getByLabelText('Search data sets'), 'find me');
         await user.click(screen.getByRole('button', { name: 'Search' }));
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
       });
 
       test('updates the data sets list', async () => {
@@ -1071,9 +1095,11 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
 
@@ -1127,9 +1153,11 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
         expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
@@ -1199,9 +1227,11 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
         expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
@@ -1269,9 +1299,11 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1343,9 +1375,11 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(screen.getByLabelText('Filter by Theme')).toHaveValue('all');
         expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
@@ -1377,9 +1411,11 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(screen.getByLabelText('Filter by Theme')).toHaveValue('all');
         expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
@@ -1411,9 +1447,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         const themesSelect = screen.getByLabelText('Filter by Theme');
         expect(themesSelect).toHaveValue('theme-2');
@@ -1433,9 +1471,11 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1471,9 +1511,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         const themesSelect = screen.getByLabelText('Filter by Theme');
         expect(themesSelect).toHaveValue('theme-2');
@@ -1510,9 +1552,11 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1566,9 +1610,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         const publicationsSelect = screen.getByLabelText(
           'Filter by Publication',
@@ -1592,8 +1638,10 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        expect(await screen.getByTestId('total-results')).toHaveTextContent(
-          '30 data sets',
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
         );
 
         expect(mockRouter).toMatchObject({
@@ -1634,9 +1682,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         const releasesSelect = screen.getByLabelText('Filter by Releases');
         await waitFor(() => {
@@ -1649,9 +1699,11 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1682,9 +1734,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         user.click(
           screen.getByRole('button', {
@@ -1692,9 +1746,11 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1726,9 +1782,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(
           screen.getByRole('button', {
@@ -1754,9 +1812,11 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1799,9 +1859,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         user.click(screen.getByLabelText('A to Z'));
 
@@ -1826,16 +1888,20 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         await user.type(screen.getByLabelText('Search data sets'), 'Find me');
         await await user.click(screen.getByRole('button', { name: 'Search' }));
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1859,9 +1925,11 @@ describe('DataCataloguePage', () => {
 
         const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('1 data set')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '1 data set',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1874,9 +1942,11 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1895,7 +1965,11 @@ describe('DataCataloguePage', () => {
 
       const { user } = render(<DataCataloguePage newDesign />);
 
-      expect(await screen.findByText('30 data sets')).toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.getByTestId('total-results')).toHaveTextContent(
+          '30 data sets',
+        ),
+      );
 
       await user.click(screen.getByRole('button', { name: 'Filter results' }));
 
