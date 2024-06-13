@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import DeleteDraftVersionButton from '@admin/pages/release/api-data-sets/components/DeleteDraftVersionButton';
 import getVersionStatusTagColour from '@admin/pages/release/api-data-sets/utils/getVersionStatusColour';
 import getVersionStatusText from '@admin/pages/release/api-data-sets/utils/getVersionStatusText';
 import {
@@ -99,10 +100,13 @@ export default function DraftApiDataSetsTable({
                   horizontalSpacing="m"
                 >
                   {draftVersion.status !== 'Processing' && (
-                    <ButtonText variant="warning">
-                      Remove draft
+                    <DeleteDraftVersionButton
+                      dataSet={dataSet}
+                      dataSetVersion={draftVersion}
+                    >
+                      Delete draft
                       <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
-                    </ButtonText>
+                    </DeleteDraftVersionButton>
                   )}
                   <Link
                     to={generatePath<ReleaseDataSetRouteParams>(

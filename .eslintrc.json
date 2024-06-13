@@ -118,6 +118,12 @@
       }
     ],
     "no-shadow": "off",
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": ["_def"]
+      }
+    ],
     "no-unreachable": "error",
     "no-use-before-define": "off",
     "no-useless-constructor": "off"

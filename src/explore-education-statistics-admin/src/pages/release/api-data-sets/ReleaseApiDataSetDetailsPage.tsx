@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import ApiDataSetVersionSummaryList from '@admin/pages/release/api-data-sets/components/ApiDataSetVersionSummaryList';
+import DeleteDraftVersionButton from '@admin/pages/release/api-data-sets/components/DeleteDraftVersionButton';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
@@ -9,7 +10,6 @@ import {
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import { DataSetStatus } from '@admin/services/apiDataSetService';
-import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryCard from '@common/components/SummaryCard';
@@ -20,10 +20,8 @@ import TaskList from '@common/components/TaskList';
 import TaskListItem from '@common/components/TaskListItem';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 
-// TODO: EES-4370
-const showRemoveDraft = false;
 // TODO: Version mapping
 const showDraftVersionTasks = false;
 
@@ -34,6 +32,8 @@ const showVersionHistory = false;
 
 export default function ReleaseApiDataSetDetailsPage() {
   const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
+  const history = useHistory();
+
   const { publicAppUrl } = useConfig();
   const { release } = useReleaseContext();
 
@@ -56,12 +56,21 @@ export default function ReleaseApiDataSetDetailsPage() {
       publicationId={release.publicationId}
       collapsibleButtonHiddenText="for draft version"
       actions={
-        showRemoveDraft ? (
-          <ul className="govuk-list">
-            <li>
-              <ButtonText variant="warning">Remove draft version</ButtonText>
-            </li>
-          </ul>
+        dataSet.draftVersion.status !== 'Processing' ? (
+          <DeleteDraftVersionButton
+            dataSet={dataSet}
+            dataSetVersion={dataSet.draftVersion}
+            onDeleted={() =>
+              history.push(
+                generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
+                  publicationId: release.publicationId,
+                  releaseId: release.id,
+                }),
+              )
+            }
+          >
+            Delete draft version
+          </DeleteDraftVersionButton>
         ) : undefined
       }
     />

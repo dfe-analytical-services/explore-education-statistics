@@ -107,6 +107,6 @@ const apiDataSetService = {
   getDataSet(dataSetId: string): Promise<ApiDataSet> {
     return client.get(`/public-data/data-sets/${dataSetId}`);
   },
-};
+} as const;
 
 export default apiDataSetService;
