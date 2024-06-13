@@ -16,7 +16,6 @@ describe('createDataSetListRequest', () => {
       latestOnly: 'true',
       page: 4,
       publicationId: 'publication-id',
-      releaseId: 'release-id',
       sortBy: 'relevance',
       searchTerm: 'find me',
       themeId: 'theme-id',
@@ -25,7 +24,6 @@ describe('createDataSetListRequest', () => {
       latestOnly: 'true',
       page: 4,
       publicationId: 'publication-id',
-      releaseId: 'release-id',
       searchTerm: 'find me',
       sort: 'relevance',
       sortDirection: 'Desc',
@@ -64,6 +62,27 @@ describe('createDataSetListRequest', () => {
       sort: 'title',
       page: 1,
       sortDirection: 'Asc',
+    });
+  });
+
+  test('returns `natural` sort when the release id is set', () => {
+    const result = createDataSetFileListRequest({
+      latestOnly: 'true',
+      page: 4,
+      publicationId: 'publication-id',
+      releaseId: 'release-id',
+      sortBy: 'newest',
+      searchTerm: 'find me',
+      themeId: 'theme-id',
+    });
+    expect(result).toEqual<DataSetFileListRequest>({
+      latestOnly: 'true',
+      page: 4,
+      publicationId: 'publication-id',
+      releaseId: 'release-id',
+      searchTerm: 'find me',
+      sort: 'natural',
+      themeId: 'theme-id',
     });
   });
 

@@ -60,7 +60,7 @@ const ReleaseDataGuidancePage = ({
               renderDataCatalogueLink={
                 model.release.published ? (
                   <Link
-                    to={`${publicAppUrl}/data-catalogue/${model.release.publicationSlug}/${model.release.slug}`}
+                    to={`${publicAppUrl}/data-catalogue?publicationId=${model.release.publicationId}&releaseId=${model.release.id}`}
                   >
                     data catalogue
                   </Link>

@@ -140,6 +140,7 @@ const prototypeReleaseContent: ReleaseContent = {
       title: 'Initial Teacher Training Census',
       topic: {
         theme: {
+          id: 'test-theme',
           title: 'Test theme',
         },
       },

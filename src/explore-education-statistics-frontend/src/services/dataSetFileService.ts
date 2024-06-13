@@ -107,7 +107,11 @@ export const dataSetFileSortOptions = [
 
 export type DataSetFileSortOption = (typeof dataSetFileSortOptions)[number];
 
-export type DataSetFileSortParam = 'published' | 'title' | 'relevance';
+export type DataSetFileSortParam =
+  | 'published'
+  | 'title'
+  | 'relevance'
+  | 'natural';
 
 export const dataSetFileFilters = [
   'dataSetType',

@@ -278,6 +278,7 @@ export const testPublicationRelease: Release = {
     topic: {
       theme: {
         title: '',
+        id: '',
       },
     },
     contact: {

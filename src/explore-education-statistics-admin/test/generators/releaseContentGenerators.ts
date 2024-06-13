@@ -103,7 +103,7 @@ const defaultPublication: Publication = {
   ],
   slug: 'publication-slug',
   title: 'Publication title',
-  topic: { theme: { title: 'Test theme' } },
+  topic: { theme: { id: 'test-theme', title: 'Test theme' } },
 };
 
 const defaultKeyStatistics: KeyStatistic[] = [

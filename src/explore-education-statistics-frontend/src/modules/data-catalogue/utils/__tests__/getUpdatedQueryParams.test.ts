@@ -142,7 +142,6 @@ describe('getUpdatedQueryParams', () => {
 
       expect(result).toEqual({
         publicationId: 'selected-publication-id',
-        sortBy: 'newest',
         releaseId: 'release-id-3',
         themeId: 'theme-id',
       });
@@ -168,7 +167,6 @@ describe('getUpdatedQueryParams', () => {
 
       expect(result).toEqual({
         publicationId: 'selected-publication-id',
-        sortBy: 'newest',
         releaseId: 'release-id-4',
         themeId: 'theme-id',
       });
@@ -212,7 +210,6 @@ describe('getUpdatedQueryParams', () => {
       });
 
       expect(result).toEqual({
-        sortBy: 'newest',
         publicationId: 'selected-publication-id',
         releaseId: 'release-id-3',
         themeId: 'theme-id',
@@ -221,7 +218,7 @@ describe('getUpdatedQueryParams', () => {
   });
 
   describe('filter by release', () => {
-    test('removes the page param and updates the release id when changing release', async () => {
+    test('removes the page and sortBy params and updates the release id when changing release', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'selected-release-id',
@@ -238,7 +235,6 @@ describe('getUpdatedQueryParams', () => {
       expect(result).toEqual({
         publicationId: 'publication-id',
         releaseId: 'selected-release-id',
-        sortBy: 'newest',
         themeId: 'theme-id',
       });
     });
@@ -275,9 +271,9 @@ describe('getUpdatedQueryParams', () => {
       });
       expect(result).toEqual({
         latestOnly: 'false',
-        sortBy: 'newest',
       });
     });
+
     test('sets latestOnly to true when changing from all to latest releases', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
@@ -288,7 +284,6 @@ describe('getUpdatedQueryParams', () => {
       });
       expect(result).toEqual({
         latestOnly: 'true',
-        sortBy: 'newest',
       });
     });
   });

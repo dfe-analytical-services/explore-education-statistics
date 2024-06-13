@@ -28,6 +28,7 @@ export interface Publication {
   releaseSeries: ReleaseSeriesItem[];
   topic: {
     theme: {
+      id: string;
       title: string;
     };
   };

@@ -64,15 +64,6 @@ user navigates to data tables page on public frontend
 user navigates to data catalogue page on public frontend
     environment variable should be set    PUBLIC_URL
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
-    user waits until page contains title caption    Data catalogue
-    user waits until h1 is visible    Browse our open data
-    user waits until page contains    View all of the open data available and choose files to download.
-
-# TO DO EES-4781 - remove this
-
-user navigates to new data catalogue page on public frontend
-    environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue?newDesign=true
     user waits until h1 is visible    Data catalogue
     user waits until page contains    Find and download data sets with associated guidance files.
 
