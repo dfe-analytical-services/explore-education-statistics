@@ -40,8 +40,8 @@ internal class ProcessorClient(
         };
 
         return await HandlePost<DataSetCreateRequest, CreateDataSetResponseViewModel>(
-            "api/CreateInitialDataSetVersion",
-            "Creating initial data set version",
+            "api/CreateDataSet",
+            "Creating data set",
             request,
             cancellationToken);
     }

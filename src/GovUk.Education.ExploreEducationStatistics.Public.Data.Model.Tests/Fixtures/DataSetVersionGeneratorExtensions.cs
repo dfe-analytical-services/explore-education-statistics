@@ -1,6 +1,5 @@
 using Bogus;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 
@@ -54,20 +53,6 @@ public static class DataSetVersionGeneratorExtensions
         int minor,
         int patch = 0)
         => generator.ForInstance(s => s.SetVersionNumber(major, minor, patch));
-
-    public static Generator<DataSetVersion> WithVersionNumber(
-        this Generator<DataSetVersion> generator,
-        string versionString)
-    {
-        var valid = VersionUtils.TryParse(versionString, out var semVer);
-
-        if (!valid)
-        {
-            throw new ArgumentException($"Invalid version string {versionString}");
-        }
-        
-        return generator.WithVersionNumber(semVer.Major, semVer.Minor, semVer.Patch);
-    }
 
     public static Generator<DataSetVersion> WithPublished(
         this Generator<DataSetVersion> generator,

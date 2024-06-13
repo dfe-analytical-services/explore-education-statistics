@@ -19,9 +19,9 @@ public class CreateDataSetFunction(
     IDataSetService dataSetService,
     IValidator<DataSetCreateRequest> requestValidator)
 {
-    [Function(nameof(CreateInitialDataSetVersion))]
-    public async Task<IActionResult> CreateInitialDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateInitialDataSetVersion))] [FromBody]
+    [Function(nameof(CreateDataSet))]
+    public async Task<IActionResult> CreateDataSet(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateDataSet))] [FromBody]
         DataSetCreateRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)

@@ -254,7 +254,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             DurableTaskClient? durableTaskClient = null)
         {
             var function = GetRequiredService<CreateDataSetFunction>();
-            return await function.CreateInitialDataSetVersion(new DataSetCreateRequest {ReleaseFileId = releaseFileId},
+            return await function.CreateDataSet(new DataSetCreateRequest {ReleaseFileId = releaseFileId},
                 durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
                 CancellationToken.None);
         }

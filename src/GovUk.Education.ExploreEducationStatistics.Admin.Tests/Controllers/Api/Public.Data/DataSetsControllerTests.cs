@@ -971,7 +971,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             var client = BuildApp(processorClient.Object).CreateClient();
 
-            var response = await CreateDataSetVersion(releaseFile.Id, client);
+            var response = await CreateDataSet(releaseFile.Id, client);
 
             MockUtils.VerifyAllMocks(processorClient);
 
@@ -1002,7 +1002,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         {
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
-            var response = await CreateDataSetVersion(Guid.NewGuid(), client);
+            var response = await CreateDataSet(Guid.NewGuid(), client);
 
             response.AssertForbidden();
         }
@@ -1024,7 +1024,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 .ReturnsAsync(ValidationUtils.ValidationResult(processorErrors));
 
             var client = BuildApp(processorClient.Object).CreateClient();
-            var response = await CreateDataSetVersion(releaseFileId, client);
+            var response = await CreateDataSet(releaseFileId, client);
 
             MockUtils.VerifyAllMocks(processorClient);
 
@@ -1043,7 +1043,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 .SetUser(user ?? BauUser());
         }
 
-        private async Task<HttpResponseMessage> CreateDataSetVersion(
+        private async Task<HttpResponseMessage> CreateDataSet(
             Guid releaseFileId,
             HttpClient? client = null)
         {

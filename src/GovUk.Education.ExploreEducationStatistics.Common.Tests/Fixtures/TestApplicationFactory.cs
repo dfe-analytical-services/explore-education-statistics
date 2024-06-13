@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -32,14 +33,13 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
 
     public async Task EnsureDatabaseDeleted<TDbContext>() where TDbContext : DbContext
     {
-        await using var context = GetDbContext<TDbContext>();
+        await using var context = this.GetDbContext<TDbContext, TStartup>();
         await context.Database.EnsureDeletedAsync();
     }
 
     public TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext
     {
-        var scope = Services.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<TDbContext>();
+        return this.GetDbContext<TDbContext, TStartup>();
     }
 
     protected override IHostBuilder CreateHostBuilder()
