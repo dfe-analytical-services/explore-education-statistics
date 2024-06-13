@@ -473,9 +473,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
                             subjectId: tuple.file.SubjectId);
 
-                    var linkedApiDataSetVersion = tuple.apiDataSetVersion is null 
+                    var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null 
                     ? null 
-                    : new ApiDataSetVersionSummary
+                    : new DeleteApiDataSetVersionPlan
                     {
                         DataSetId = tuple.apiDataSetVersion.DataSetId,
                         DataSetName = tuple.apiDataSetVersion.DataSet.Title,
@@ -491,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseVersionId, tuple.subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
                         IsLinkedToApiDataSetVersion = tuple.apiDataSetVersion is not null,
-                        LinkedApiDataSetVersion = linkedApiDataSetVersion
+                        LinkedApiDataSetVersionDeletionPlan = linkedApiDataSetVersionDeletionPlan
                     };
                 });
         }
@@ -709,12 +709,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public bool IsLinkedToApiDataSetVersion { get; init; }
 
-        public ApiDataSetVersionSummary? LinkedApiDataSetVersion { get; init; }
+        public DeleteApiDataSetVersionPlan? LinkedApiDataSetVersionDeletionPlan { get; init; }
 
         public bool Valid => !IsLinkedToApiDataSetVersion;
     }
 
-    public class ApiDataSetVersionSummary
+    public class DeleteApiDataSetVersionPlan
     {
         public Guid DataSetId { get; init; }
 
@@ -725,6 +725,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public string Version { get; init; } = null!;
 
         public DataSetVersionStatus Status { get; init; }
+
+        public bool Valid => Status.IsDeletableState();
     }
 
     public class DeleteReleasePlan

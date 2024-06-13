@@ -355,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
                 Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
                 Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
-                Assert.Null(deleteDataFilePlan.LinkedApiDataSetVersion);
+                Assert.Null(deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan);
                 Assert.False(deleteDataFilePlan.IsLinkedToApiDataSetVersion);
                 Assert.True(deleteDataFilePlan.Valid);
             }
@@ -439,12 +439,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
                 Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
                 Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
-                Assert.NotNull(deleteDataFilePlan.LinkedApiDataSetVersion);
-                Assert.Equal(dataSet.Id, deleteDataFilePlan.LinkedApiDataSetVersion.DataSetId);
-                Assert.Equal(dataSet.Title, deleteDataFilePlan.LinkedApiDataSetVersion.DataSetName);
-                Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.LinkedApiDataSetVersion.DataSetVersionId);
-                Assert.Equal(dataSetVersion.Version, deleteDataFilePlan.LinkedApiDataSetVersion.Version);
-                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.LinkedApiDataSetVersion.Status);
+                Assert.NotNull(deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan);
+                Assert.Equal(dataSet.Id, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.DataSetId);
+                Assert.Equal(dataSet.Title, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.DataSetName);
+                Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.DataSetVersionId);
+                Assert.Equal(dataSetVersion.Version, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Version);
+                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Status);
                 Assert.True(deleteDataFilePlan.IsLinkedToApiDataSetVersion);
                 Assert.False(deleteDataFilePlan.Valid);
             }
