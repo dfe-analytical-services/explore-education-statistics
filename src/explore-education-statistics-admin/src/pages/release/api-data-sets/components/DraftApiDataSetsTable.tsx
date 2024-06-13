@@ -118,7 +118,9 @@ export default function DraftApiDataSetsTable({
                       },
                     )}
                   >
-                    View / edit draft
+                    {draftVersion.version === '1.0'
+                      ? 'View details'
+                      : 'View details / edit draft'}
                     <VisuallyHidden>for {dataSet.title}</VisuallyHidden>
                   </Link>
                 </ButtonGroup>

@@ -123,7 +123,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row1Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 1 title',
+        name: 'View details / edit draft for Data set 1 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-1`);
     expect(
@@ -143,7 +143,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row2Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 2 title',
+        name: 'View details / edit draft for Data set 2 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-2`);
 
@@ -164,7 +164,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row3Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 3 title',
+        name: 'View details for Data set 3 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-3`);
     expect(
@@ -184,7 +184,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row4Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 4 title',
+        name: 'View details for Data set 4 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-4`);
 
@@ -205,7 +205,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row5Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 5 title',
+        name: 'View details for Data set 5 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-5`);
 
@@ -226,7 +226,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row6Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 6 title',
+        name: 'View details for Data set 6 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-6`);
 
