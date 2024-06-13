@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import ApiDataSetCreateForm, {
   ApiDataSetCreateFormValues,
-} from '@admin/pages/release/api-data-sets/components/ApiDataSetCreateForm';
+} from '@admin/pages/release/data/components/ApiDataSetCreateForm';
 import apiDataSetCandidateQueries from '@admin/queries/apiDataSetCandidateQueries';
 import {
   releaseApiDataSetDetailsRoute,

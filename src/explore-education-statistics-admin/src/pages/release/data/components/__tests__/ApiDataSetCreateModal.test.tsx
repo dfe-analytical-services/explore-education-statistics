@@ -1,4 +1,4 @@
-import ApiDataSetCreateModal from '@admin/pages/release/api-data-sets/components/ApiDataSetCreateModal';
+import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import _apiDataSetCandidateService, {
   ApiDataSetCandidate,
 } from '@admin/services/apiDataSetCandidateService';

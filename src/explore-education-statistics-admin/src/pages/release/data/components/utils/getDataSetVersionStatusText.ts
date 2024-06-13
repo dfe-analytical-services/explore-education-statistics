@@ -1,6 +1,6 @@
 import { DataSetVersionStatus } from '@admin/services/apiDataSetService';
 
-export default function getVersionStatusText(
+export default function getDataSetVersionStatusText(
   status: DataSetVersionStatus,
 ): string {
   switch (status) {

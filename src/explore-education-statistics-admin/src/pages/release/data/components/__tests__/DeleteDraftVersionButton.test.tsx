@@ -1,6 +1,6 @@
 import DeleteDraftVersionButton, {
   DeleteDraftVersionButtonProps,
-} from '@admin/pages/release/api-data-sets/components/DeleteDraftVersionButton';
+} from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import render from '@common-test/render';
 import { screen, within, waitFor } from '@testing-library/react';

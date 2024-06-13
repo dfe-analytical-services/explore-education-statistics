@@ -1,6 +1,6 @@
 import LiveApiDataSetsTable, {
   LiveApiDataSetSummary,
-} from '@admin/pages/release/api-data-sets/components/LiveApiDataSetsTable';
+} from '@admin/pages/release/data/components/LiveApiDataSetsTable';
 import { render as baseRender, screen, within } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import DraftApiDataSetsTable, {
   DraftApiDataSetSummary,
-} from '@admin/pages/release/api-data-sets/components/DraftApiDataSetsTable';
+} from '@admin/pages/release/data/components/DraftApiDataSetsTable';
 import baseRender from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import { ReactNode } from 'react';

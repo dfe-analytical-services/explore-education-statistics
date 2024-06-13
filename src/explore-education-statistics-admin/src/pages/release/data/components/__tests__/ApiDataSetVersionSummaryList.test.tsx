@@ -1,4 +1,4 @@
-import ApiDataSetVersionSummaryList from '@admin/pages/release/api-data-sets/components/ApiDataSetVersionSummaryList';
+import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/ApiDataSetVersionSummaryList';
 import { ApiDataSetDraftVersion } from '@admin/services/apiDataSetService';
 import { render as baseRender, screen, within } from '@testing-library/react';
 import { ReactElement } from 'react';

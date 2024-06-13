@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import ApiDataSetVersionSummaryList from '@admin/pages/release/api-data-sets/components/ApiDataSetVersionSummaryList';
-import DeleteDraftVersionButton from '@admin/pages/release/api-data-sets/components/DeleteDraftVersionButton';
+import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/ApiDataSetVersionSummaryList';
+import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {

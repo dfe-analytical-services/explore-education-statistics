@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
-import DeleteDraftVersionButton from '@admin/pages/release/api-data-sets/components/DeleteDraftVersionButton';
-import getVersionStatusTagColour from '@admin/pages/release/api-data-sets/utils/getVersionStatusColour';
-import getVersionStatusText from '@admin/pages/release/api-data-sets/utils/getVersionStatusText';
+import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
+import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
+import getDataSetVersionStatusText from '@admin/pages/release/data/components/utils/getDataSetVersionStatusText';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
@@ -11,7 +11,6 @@ import {
   ApiDataSetSummary,
 } from '@admin/services/apiDataSetService';
 import ButtonGroup from '@common/components/ButtonGroup';
-import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -71,7 +70,7 @@ export default function DraftApiDataSetsTable({
               <td className="govuk-!-padding-left-1">
                 <Tag
                   className={styles.versionTag}
-                  colour={getVersionStatusTagColour(draftVersion.status)}
+                  colour={getDataSetVersionStatusTagColour(draftVersion.status)}
                 >
                   {`v${draftVersion.version}`}
                 </Tag>
@@ -90,8 +89,10 @@ export default function DraftApiDataSetsTable({
               ) : null}
               <td>{dataSet.title}</td>
               <td>
-                <Tag colour={getVersionStatusTagColour(draftVersion.status)}>
-                  {getVersionStatusText(draftVersion.status)}
+                <Tag
+                  colour={getDataSetVersionStatusTagColour(draftVersion.status)}
+                >
+                  {getDataSetVersionStatusText(draftVersion.status)}
                 </Tag>
               </td>
               <td>

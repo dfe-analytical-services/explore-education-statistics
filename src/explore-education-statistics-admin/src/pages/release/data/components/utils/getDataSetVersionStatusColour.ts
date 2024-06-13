@@ -1,7 +1,7 @@
 import { DataSetVersionStatus } from '@admin/services/apiDataSetService';
 import { TagProps } from '@common/components/Tag';
 
-export default function getVersionStatusTagColour(
+export default function getDataSetVersionStatusTagColour(
   status: DataSetVersionStatus,
 ): TagProps['colour'] {
   switch (status) {

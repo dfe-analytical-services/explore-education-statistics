@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { releaseDataPageTabIds } from '@admin/pages/release/data/ReleaseDataPage';
+import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
 import { releasePreReleaseAccessPageTabs } from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 import {
   MethodologyRouteParams,
