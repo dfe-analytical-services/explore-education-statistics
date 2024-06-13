@@ -100,15 +100,6 @@ export default function DraftApiDataSetsTable({
                   className="govuk-!-margin-bottom-0"
                   horizontalSpacing="m"
                 >
-                  {draftVersion.status !== 'Processing' && (
-                    <DeleteDraftVersionButton
-                      dataSet={dataSet}
-                      dataSetVersion={draftVersion}
-                    >
-                      Delete draft
-                      <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
-                    </DeleteDraftVersionButton>
-                  )}
                   <Link
                     to={generatePath<ReleaseDataSetRouteParams>(
                       releaseApiDataSetDetailsRoute.path,
@@ -124,6 +115,15 @@ export default function DraftApiDataSetsTable({
                       : 'View details / edit draft'}
                     <VisuallyHidden>for {dataSet.title}</VisuallyHidden>
                   </Link>
+                  {draftVersion.status !== 'Processing' && (
+                    <DeleteDraftVersionButton
+                      dataSet={dataSet}
+                      dataSetVersion={draftVersion}
+                    >
+                      Delete draft
+                      <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
+                    </DeleteDraftVersionButton>
+                  )}
                 </ButtonGroup>
               </td>
             </tr>
