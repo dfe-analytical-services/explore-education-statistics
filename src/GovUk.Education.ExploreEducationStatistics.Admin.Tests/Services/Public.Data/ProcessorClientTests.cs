@@ -36,9 +36,9 @@ public class ProcessorClientTests
             Mock.Of<IWebHostEnvironment>());
     }
 
-    public class CreateInitialDataSetVersionTests : ProcessorClientTests
+    public class CreateDataSetTests : ProcessorClientTests
     {
-        private static readonly Uri Uri = new(BaseUri, "api/CreateInitialDataSetVersion");
+        private static readonly Uri Uri = new(BaseUri, "api/CreateDataSet");
 
         [Fact]
         public async Task HttpClientSuccess()

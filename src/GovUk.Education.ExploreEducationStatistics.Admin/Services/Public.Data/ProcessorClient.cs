@@ -35,8 +35,8 @@ internal class ProcessorClient(
         var request = new DataSetCreateRequest {ReleaseFileId = releaseFileId};
 
         return await HandlePost<DataSetCreateRequest, CreateDataSetResponseViewModel>(
-            "api/CreateInitialDataSetVersion",
-            "Creating initial data set version",
+            "api/CreateDataSet",
+            "Creating data set",
             request,
             cancellationToken);
     }

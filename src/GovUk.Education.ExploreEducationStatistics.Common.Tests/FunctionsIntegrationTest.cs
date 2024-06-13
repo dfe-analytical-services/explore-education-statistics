@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -44,19 +45,8 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
 
     protected void ClearTestData<TDbContext>() where TDbContext : DbContext
     {
-        using var context = GetDbContext<TDbContext>();
-
-        var tables = context.Model.GetEntityTypes()
-            .Select(type => type.GetTableName())
-            .Distinct()
-            .ToList();
-
-        foreach (var table in tables)
-        {
-#pragma warning disable EF1002
-            context.Database.ExecuteSqlRaw($@"TRUNCATE TABLE ""{table}"" RESTART IDENTITY CASCADE;");
-#pragma warning restore EF1002
-        }
+        var context = GetDbContext<TDbContext>();
+        context.ClearTestData();
     }
 
     protected void ResetDbContext<TDbContext>() where TDbContext : DbContext

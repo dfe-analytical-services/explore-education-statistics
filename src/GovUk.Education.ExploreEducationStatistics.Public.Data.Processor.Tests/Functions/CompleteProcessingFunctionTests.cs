@@ -56,7 +56,8 @@ public abstract class CompleteProcessingFunctionTests(ProcessorFunctionsIntegrat
             var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
                 dataSet: dataSet, 
                 importStage: Stage.PreviousStage(),
-                versionNumber: "1.1");
+                versionNumberMajor: 1,
+                versionNumberMinor: 1);
             
             await AssertCompletedProcessingSuccessfully(
                 dataSetVersion: nextDataSetVersion,

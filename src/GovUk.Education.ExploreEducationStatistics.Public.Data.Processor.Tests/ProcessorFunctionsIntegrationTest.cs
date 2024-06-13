@@ -69,7 +69,8 @@ public abstract class ProcessorFunctionsIntegrationTest
         DataSetVersionImportStage importStage, 
         DataSetVersionStatus? status = null,
         Guid? releaseFileId = null,
-        string? versionNumber = null)
+        int versionNumberMajor = 1,
+        int versionNumberMinor = 0)
     {
         DataSetVersionImport dataSetVersionImport = DataFixture
             .DefaultDataSetVersionImport()
@@ -81,7 +82,7 @@ public abstract class ProcessorFunctionsIntegrationTest
             .WithReleaseFileId(releaseFileId ?? Guid.NewGuid())
             .WithStatus(status ?? DataSetVersionStatus.Processing)
             .WithImports(() => [dataSetVersionImport])
-            .WithVersionNumber(versionNumber ?? DataSetVersion.FirstVersionString)
+            .WithVersionNumber(major: versionNumberMajor, minor: versionNumberMinor)
             .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
         await AddTestData<PublicDataDbContext>(context =>

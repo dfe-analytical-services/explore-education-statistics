@@ -43,7 +43,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             DataSetVersion currentDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(DataSetVersion.FirstVersionString)
+                .WithVersionNumber(major: 1, minor: 0)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
@@ -70,7 +70,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     nextVersion = DataFixture
                         .DefaultDataSetVersion()
                         .WithStatusMapping()
-                        .WithVersionNumber("1.1")
+                        .WithVersionNumber(major: 1, minor: 1)
                         .WithReleaseFileId(nextReleaseFileId)
                         .WithDataSet(savedDataSet)
                         .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
