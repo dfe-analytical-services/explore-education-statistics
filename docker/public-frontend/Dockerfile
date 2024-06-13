@@ -20,9 +20,6 @@ COPY src/explore-education-statistics-common/ ./src/explore-education-statistics
 COPY src/explore-education-statistics-frontend/ ./src/explore-education-statistics-frontend/
 COPY src/tsconfig.json ./src/tsconfig.json
 
-ENV APP_ENV=production
-ENV PUBLIC_URL=https://explore-education-statistics.service.gov.uk/
-
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm --filter=explore-education-statistics-frontend... --ignore-scripts --frozen-lockfile install
 
