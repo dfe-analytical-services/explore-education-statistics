@@ -66,6 +66,26 @@ describe('DataSetFilePage', () => {
     expect(screen.queryByText('Latest data')).not.toBeInTheDocument();
   });
 
+  test('renders the `not the latest data` tag when the publication is superseded', async () => {
+    render(
+      <DataSetFilePage
+        dataSetFile={{
+          ...testDataSetFile,
+          release: {
+            ...testDataSetFile.release,
+            isSuperseded: true,
+          },
+        }}
+      />,
+    );
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+    expect(screen.getByText('Not the latest data')).toBeInTheDocument();
+
+    expect(screen.queryByText('Latest data')).not.toBeInTheDocument();
+  });
+
   test('calls the download service with the correct id when the download button is clicked', async () => {
     const { user } = render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 

@@ -23,7 +23,7 @@ export default function DataSetFileVariables({ variables }: Props) {
 
   return (
     <DataSetFilePageSection heading={pageSections[sectionId]} id={sectionId}>
-      <table id={tableId}>
+      <table id={tableId} data-testid={tableId}>
         <caption className="govuk-!-margin-bottom-3">
           {showAll
             ? `Table showing all ${totalVariables} variables`

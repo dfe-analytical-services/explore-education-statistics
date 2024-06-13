@@ -38,13 +38,7 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import React, {
-  ReactElement,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { Dictionary } from 'lodash';
 

@@ -1,10 +1,9 @@
 import { PaginatedList } from '@common/services/types/pagination';
 import dataSetFileService, {
   DataSetFile,
+  DataSetFileListRequest,
   DataSetFileSummary,
 } from '@frontend/services/dataSetFileService';
-import createDataSetFileListRequest from '@frontend/modules/data-catalogue/utils/createDataSetFileListRequest';
-import { ParsedUrlQuery } from 'querystring';
 import { UseQueryOptions } from '@tanstack/react-query';
 
 const dataSetFileQueries = {
@@ -15,14 +14,11 @@ const dataSetFileQueries = {
     };
   },
   list(
-    query: ParsedUrlQuery,
+    query: DataSetFileListRequest,
   ): UseQueryOptions<PaginatedList<DataSetFileSummary>> {
     return {
       queryKey: ['listDataSetFiles', query],
-      queryFn: () =>
-        dataSetFileService.listDataSetFiles(
-          createDataSetFileListRequest(query),
-        ),
+      queryFn: () => dataSetFileService.listDataSetFiles(query),
     };
   },
 } as const;

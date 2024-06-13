@@ -1,10 +1,6 @@
 import GoToTopLink from '@common/components/GoToTopLink';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
-import {
-  publicationFilters,
-  PublicationFilter,
-  PublicationSortOption,
-} from '@common/services/publicationService';
+
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
@@ -28,6 +24,11 @@ import PublicationSummary from '@frontend/modules/find-statistics/components/Pub
 import SearchForm from '@frontend/components/SearchForm';
 import SortControls, { SortOption } from '@frontend/components/SortControls';
 import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import {
+  PublicationFilter,
+  publicationFilters,
+} from '@frontend/modules/find-statistics/utils/publicationFilters';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';

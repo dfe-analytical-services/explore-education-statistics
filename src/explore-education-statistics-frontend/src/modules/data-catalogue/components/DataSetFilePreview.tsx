@@ -25,7 +25,7 @@ export default function DataSetFilePreview({
     <DataSetFilePageSection heading={pageSections[sectionId]} id={sectionId}>
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
       <div className={styles.container} tabIndex={0}>
-        <table id={tableId}>
+        <table id={tableId} data-testid={tableId}>
           <caption className="govuk-!-font-weight-regular govuk-!-margin-bottom-3">
             {`Table showing first ${rows.length} rows, from underlying data`}
           </caption>

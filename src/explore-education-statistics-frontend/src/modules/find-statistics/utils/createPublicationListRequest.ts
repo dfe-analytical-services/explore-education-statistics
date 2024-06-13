@@ -1,7 +1,5 @@
 import {
   PublicationListRequest,
-  PublicationSortOption,
-  publicationSortOptions,
   PublicationSortParam,
 } from '@common/services/publicationService';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
@@ -10,6 +8,10 @@ import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
 import { FindStatisticsPageQuery } from '@frontend/modules/find-statistics/FindStatisticsPage';
+import {
+  PublicationSortOption,
+  publicationSortOptions,
+} from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import omitBy from 'lodash/omitBy';
 
 export default function createPublicationListRequest(

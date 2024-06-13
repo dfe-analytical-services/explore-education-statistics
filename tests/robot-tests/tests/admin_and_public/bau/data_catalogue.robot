@@ -100,73 +100,8 @@ Approve release
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
-User navigates to /data-catalogue page
-    user navigates to data catalogue page on public frontend
-
-User checks search filters publications properly
-    user enters text into element    id:publicationForm-publicationIdSearch    Pupil
-    user waits until page contains    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_SMALL}
-    user clears element text    id:publicationForm-publicationIdSearch
-
-Choose publication
-    user reloads page
-    user clicks radio    Test theme
-    user clicks radio    UI tests - data catalogue %{RUN_IDENTIFIER}
-    user clicks button    Next step
-
-Check page displays correct data
-    user waits until page finishes loading
-    user waits until h1 is visible    Browse our open data
-    user checks page contains    Choose a release
-    user clicks radio    ${RELEASE_NAME} 2021/22
-
-Navigate to Next step
-    user clicks button    Next step
-
-Check step 3 displays correctly
-    user waits until page contains    Choose files to download    10
-
-    user checks element contains    testid:choose-files    This is the latest data
-
-Check checkbox and download file
-    user clicks checkbox    UI test subject 3 (csv, 17 Kb)
-    user clicks button    Download selected files
-
-# Check zip file for 2021 here
-
-Validate zip contains correct files
-    [Documentation]    EES-4147
-    [Tags]    Failing
-    sleep    8    # wait for file to download
-    ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
-    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
-
-go back to second step and check page displays correct data
-    user clicks button    Previous step
-    user checks element contains    testid:Radio item for ${RELEASE_NAME} 2021/22    This is the latest data
-
-Select alternate release
-    user clicks radio    ${RELEASE_NAME} 2020/21
-    user clicks button    Next step
-
-Check page displays 'This is not the latest data' tag
-    user checks element contains    testid:choose-files    This is not the latest data
-
-Select new subject and download new subject file
-    user clicks checkbox    ${SUBJECT_NAME_1} (csv, 456 Kb)
-    user clicks button    Download selected files
-
-Validate new zip contains correct files
-    [Documentation]    EES-4147
-    [Tags]    Failing
-    sleep    8    # wait for file to download
-    ${list}=    create list    data/seven_filters.csv    data-guidance/data-guidance.txt
-    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2020-21-q1.zip    ${list}
-
-# TO DO EES-4781 - remove the above tests for the old version.
-
 User navigates to data catalogue page
-    user navigates to new data catalogue page on public frontend
+    user navigates to data catalogue page on public frontend
 
 Validate Related information section and links exist
     ${relatedInformation}=    get webelement    css:[aria-labelledby="related-information"]
@@ -227,7 +162,6 @@ Validate release filter exists
     user checks selected option label     id:filters-form-release    Latest releases
     user checks select contains option    id:filters-form-release    All releases
     
-
 Filter by theme
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -298,22 +232,6 @@ Searching
 Removing search
     user clicks button    Exclusions by geographic level
     user checks page does not contain button    Exclusions by geographic level
-
-Navigate to data set page
-    user clicks link    ${SUBJECT_NAME_3}
-    user waits until h1 is visible    ${SUBJECT_NAME_3}    %{WAIT_MEDIUM}
-    user waits until page contains title caption    Data set from Test theme    %{WAIT_MEDIUM}
-    user checks page contains    Latest data
-    user checks page contains    ${PUBLICATION_NAME}
-    user checks page contains    ${RELEASE_NAME}
-
-Validate zip contains correct files
-    [Documentation]    EES-4147
-    user clicks button containing text    Download data set (ZIP)
-
-    sleep    8    # wait for file to download
-    ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
-    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
 
 Validate data catalogue page redirect from slug based urls
     environment variable should be set    PUBLIC_URL

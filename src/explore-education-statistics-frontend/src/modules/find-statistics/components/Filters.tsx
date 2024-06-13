@@ -1,6 +1,5 @@
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { FormGroup, FormSelect } from '@common/components/form';
-import { PublicationFilter } from '@common/services/publicationService';
 import { ThemeSummary } from '@common/services/themeService';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import Button from '@common/components/Button';
@@ -8,6 +7,7 @@ import ButtonText from '@common/components/ButtonText';
 import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import styles from '@frontend/modules/data-catalogue/components/Filters.module.scss';
+import { PublicationFilter } from '@frontend/modules/find-statistics/utils/publicationFilters';
 import React from 'react';
 
 const formId = 'filters-form';

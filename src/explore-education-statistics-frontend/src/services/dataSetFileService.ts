@@ -100,27 +100,11 @@ export interface DataSetFileApi {
   version: string;
 }
 
-export const dataSetFileSortOptions = [
-  'newest',
-  'oldest',
-  'relevance',
-  'title',
-] as const;
-
-export type DataSetFileSortOption = (typeof dataSetFileSortOptions)[number];
-
-export type DataSetFileSortParam = 'published' | 'title' | 'relevance';
-
-export const dataSetFileFilters = [
-  'dataSetType',
-  'latest',
-  'publicationId',
-  'releaseId',
-  'searchTerm',
-  'themeId',
-] as const;
-
-export type DataSetFileFilter = (typeof dataSetFileFilters)[number];
+export type DataSetFileSortParam =
+  | 'published'
+  | 'title'
+  | 'relevance'
+  | 'natural';
 
 export type DataSetType = 'all' | 'api';
 
