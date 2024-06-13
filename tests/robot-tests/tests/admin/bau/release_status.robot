@@ -354,7 +354,7 @@ Validate checklist errors and warnings
 
 Navigate to data upload and confirm data replacement
 
-  user clicks link    Data and files
+    user clicks link    Data and files
     user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
     user waits until page contains accordion section    Dates test subject
     user opens accordion section    Dates test subject
@@ -368,10 +368,12 @@ Navigate to data upload and confirm data replacement
     user waits until h2 is visible    Data replacement complete    %{WAIT_MEDIUM}
 
 Upload the larger data file via data upload
-      User Waits Until Data Upload Displays Importing
+    user waits until data upload displays importing
     ...    ${SUBJECT_NAME}-updated
-    ...    large.csv
-    ...    large.meta.csv
+    ...    data-upload.csv
+    ...    data-upload.meta.csv
+
+Validate checklist errors and warnings( 3rd release)
 
     user edits release status
     user checks checklist warnings contains
@@ -381,8 +383,6 @@ Upload the larger data file via data upload
     user checks checklist warnings contains link    2 data files don't have any footnotes
     user checks checklist warnings contains link    No data blocks have been saved as featured tables
     user checks checklist warnings contains link    A public pre-release access list has not been created
-
-
 
     user checks checklist errors contains
     ...    3 issues that must be resolved before this release can be published.
@@ -394,6 +394,35 @@ Upload the larger data file via data upload
     ...    Release must contain a key statistic or a non-empty headline text block
 
     user checks page does not contain testid    releaseChecklist-success
+
+Add data guidance to subject
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${SUBJECT_NAME}
+    user waits until page contains accordion section    ${SUBJECT_NAME}-updated
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    ${SUBJECT_NAME} Main guidance content
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}-updated
+    ...    ${SUBJECT_NAME} Main guidance content
+
+    user clicks button    Save guidance
+
+
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+    User Waits Until Data Upload Is Completed    ${SUBJECT_NAME}-updated
+    Sleep    100
+    user edits release status
 
 
 

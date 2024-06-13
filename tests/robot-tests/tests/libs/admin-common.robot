@@ -580,7 +580,7 @@ user uploads subject
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
 
-user waits until data upload displays Importing
+user waits until data upload displays importing
     [Arguments]
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
@@ -599,6 +599,16 @@ user waits until data upload displays Importing
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
     user checks headed table body row contains    Status    Importing    ${section}    %{WAIT_DATA_FILE_IMPORT}
+
+user waits until data upload is completed
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+    user opens accordion section    ${SUBJECT_NAME}
+    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
+    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
+
 
 user puts release into draft
     [Arguments]
