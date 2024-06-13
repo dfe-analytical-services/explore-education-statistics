@@ -311,7 +311,7 @@ const publicationService = {
     });
   },
   listSitemapItems(): Promise<PublicationSitemapItem[]> {
-    return contentApi.get('/publications/sitemap-summaries');
+    return contentApi.get('/publications/sitemap-items');
   },
 };
 export default publicationService;

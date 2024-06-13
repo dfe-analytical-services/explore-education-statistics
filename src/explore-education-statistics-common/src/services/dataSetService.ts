@@ -7,7 +7,7 @@ export interface DataSetSitemapItem {
 
 const dataSetService = {
   listSitemapItems(): Promise<DataSetSitemapItem[]> {
-    return contentApi.get('/data-set-files/sitemap-summaries');
+    return contentApi.get('/data-set-files/sitemap-items');
   },
 };
 
