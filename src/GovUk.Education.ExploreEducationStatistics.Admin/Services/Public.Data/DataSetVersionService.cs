@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -14,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 

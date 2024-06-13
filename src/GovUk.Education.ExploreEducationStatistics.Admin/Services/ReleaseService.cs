@@ -35,6 +35,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
