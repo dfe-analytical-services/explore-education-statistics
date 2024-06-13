@@ -87,19 +87,6 @@ public class ProcessorClientTests
             left.AssertValidationProblem(Errors.Error1);
         }
 
-        [Fact]
-        public async Task HttpClientNotFound_ReturnsNotFound()
-        {
-            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
-                .Respond(HttpStatusCode.NotFound);
-
-            var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
-
-            _mockHttp.VerifyNoOutstandingExpectation();
-
-            var left = response.AssertLeft();
-            left.AssertNotFoundResult();
-        }
 
         [Theory]
         [InlineData(HttpStatusCode.RequestTimeout)]
@@ -109,6 +96,7 @@ public class ProcessorClientTests
         [InlineData(HttpStatusCode.Conflict)]
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
+        [InlineData(HttpStatusCode.NotFound)]
         [InlineData(HttpStatusCode.NotAcceptable)]
         public async Task HttpClientFailureStatusCode_ThrowsException(
             HttpStatusCode responseStatusCode)

@@ -51,8 +51,6 @@ internal class ProcessorClient(
                         await response.Content
                             .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
                     );
-                case HttpStatusCode.NotFound:
-                    return new NotFoundResult();
                 default:
                     var message = await response.Content.ReadAsStringAsync(cancellationToken);
                     logger.LogError($"""

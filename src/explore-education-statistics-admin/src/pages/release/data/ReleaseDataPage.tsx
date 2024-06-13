@@ -29,7 +29,7 @@ const ReleaseDataPage = () => {
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <Tabs id="dataUploadTab">
+      <Tabs id="data-and-files-tabs">
         <TabsSection
           id={releaseDataPageTabIds.dataUploads}
           title="Data uploads"
