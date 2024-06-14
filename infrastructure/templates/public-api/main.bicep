@@ -64,7 +64,7 @@ param dockerImagesTag string = ''
 @description('Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.')
 param deployContainerApp bool = true
 
-// TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL 
+// TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
 // will redeploy even if no changes exist in this deploy from the previous one.
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
 param updatePsqlFlexibleServer bool = false
@@ -256,7 +256,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    containerAppName: apiContainerAppName 
+    containerAppName: apiContainerAppName
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
