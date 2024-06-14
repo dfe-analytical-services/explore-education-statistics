@@ -31,21 +31,27 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Release release = DataFixture
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
-            var files = DataFixture
-                .DefaultFile(FileType.Data)
+            var dataImports = DataFixture
+                .DefaultDataImport()
+                .WithStatus(DataImportStatus.COMPLETE)
                 .GenerateList(3);
 
             var releaseVersion = release.Versions.Single();
 
-            var releaseFiles = DataFixture
-                .DefaultReleaseFile()
-                .ForIndex(0, rf => rf.SetFile(files[0]))
-                .ForIndex(1, rf => rf.SetFile(files[1]))
-                .ForIndex(2, rf => rf.SetFile(files[2]))
-                .WithReleaseVersion(releaseVersion)
-                .GenerateList(3);
+            var releaseFiles = dataImports
+                .Select(di => DataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(di.File)
+                    .WithReleaseVersion(releaseVersion)
+                    .Generate()
+                )
+                .ToList();
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.AddRange(releaseFiles));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.DataImports.AddRange(dataImports);
+                context.ReleaseFiles.AddRange(releaseFiles);
+            });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -95,7 +101,6 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(candidates);
             Assert.Empty(candidates);
         }
 
@@ -106,24 +111,30 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Release release = DataFixture
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
-            File file = DataFixture
-                .DefaultFile(FileType.Data)
-                .WithReplacingId(Guid.NewGuid());
+            DataImport dataImport = DataFixture
+                .DefaultDataImport()
+                .WithFile(DataFixture
+                    .DefaultFile(FileType.Data)
+                    .WithReplacingId(Guid.NewGuid())
+                );
 
             var releaseVersion = release.Versions.Single();
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(file)
+                .WithFile(dataImport.File)
                 .WithReleaseVersion(releaseVersion);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.DataImports.Add(dataImport);
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
             var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(candidates);
             Assert.Empty(candidates);
         }
 
@@ -133,24 +144,30 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Release release = DataFixture
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
-            File file = DataFixture
-                .DefaultFile(FileType.Data)
-                .WithReplacedById(Guid.NewGuid());
+            DataImport dataImport = DataFixture
+                .DefaultDataImport()
+                .WithFile(DataFixture
+                    .DefaultFile(FileType.Data)
+                    .WithReplacedById(Guid.NewGuid())
+                );
 
             var releaseVersion = release.Versions.Single();
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(file)
+                .WithFile(dataImport.File)
                 .WithReleaseVersion(releaseVersion);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.DataImports.Add(dataImport);
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
             var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(candidates);
             Assert.Empty(candidates);
         }
 
@@ -160,32 +177,75 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Release release = DataFixture
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
-            File file = DataFixture
-                .DefaultFile(FileType.Data)
-                .WithPublicApiDataSetId(Guid.NewGuid());
+            DataImport dataImport = DataFixture
+                .DefaultDataImport()
+                .WithFile(DataFixture.DefaultFile(FileType.Data)
+                    .WithPublicApiDataSetId(Guid.NewGuid())
+                );
 
             var releaseVersion = release.Versions.Single();
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(file)
+                .WithFile(dataImport.File)
                 .WithReleaseVersion(releaseVersion);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.DataImports.Add(dataImport);
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
             var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.NotNull(candidates);
+            Assert.Empty(candidates);
+        }
+
+        [Theory]
+        [InlineData(DataImportStatus.QUEUED)]
+        [InlineData(DataImportStatus.STAGE_1)]
+        [InlineData(DataImportStatus.STAGE_2)]
+        [InlineData(DataImportStatus.STAGE_3)]
+        [InlineData(DataImportStatus.FAILED)]
+        [InlineData(DataImportStatus.NOT_FOUND)]
+        [InlineData(DataImportStatus.CANCELLED)]
+        [InlineData(DataImportStatus.CANCELLING)]
+        public async Task ReleaseFileImportIsNotComplete_NotReturned(DataImportStatus status)
+        {
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+
+            DataImport dataImport = DataFixture
+                .DefaultDataImport()
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithStatus(status);
+
+            var releaseVersion = release.Versions.Single();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(dataImport.File)
+                .WithReleaseVersion(releaseVersion);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.DataImports.Add(dataImport);
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+            var response = await GetDataSetCandidates(releaseVersion.Id);
+
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
+
             Assert.Empty(candidates);
         }
 
         [Fact]
         public async Task ReleaseVersionDoesNotExist_Returns404()
         {
-            var response = await GetDataSetCandidates(
-                releaseVersionId: Guid.NewGuid());
+            var response = await GetDataSetCandidates(releaseVersionId: Guid.NewGuid());
 
             response.AssertNotFound();
         }
