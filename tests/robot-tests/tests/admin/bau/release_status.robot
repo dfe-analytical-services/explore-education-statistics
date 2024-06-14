@@ -342,7 +342,7 @@ Validate checklist errors and warnings
     ...    3 issues that must be resolved before this release can be published.
     user checks checklist errors contains link
     ...    All data file replacements must be completed
-     user checks checklist errors contains link
+    user checks checklist errors contains link
     ...    All summary information must be completed on the data guidance page
     user checks checklist errors contains link
     ...    Release must contain a key statistic or a non-empty headline text block
