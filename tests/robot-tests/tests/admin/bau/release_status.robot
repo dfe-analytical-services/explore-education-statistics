@@ -399,6 +399,7 @@ Add data guidance to subject
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user waits until page contains accordion section    ${SUBJECT_NAME}-updated
+    user reloads page
 
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
     ...    ${SUBJECT_NAME} Main guidance content
