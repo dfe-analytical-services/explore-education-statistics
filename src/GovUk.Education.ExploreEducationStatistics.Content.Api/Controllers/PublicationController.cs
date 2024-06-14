@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -105,10 +106,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("publications/sitemap-items")]
-        public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> ListSitemapItems()
-        {
-            return await _publicationService.ListSitemapItems()
+        public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> ListSitemapItems(
+            CancellationToken cancellationToken) =>
+            await _publicationService.ListSitemapItems(cancellationToken)
                 .HandleFailuresOrOk();
-        }
     }
 }

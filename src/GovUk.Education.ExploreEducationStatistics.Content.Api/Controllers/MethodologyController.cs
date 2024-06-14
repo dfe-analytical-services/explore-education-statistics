@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -28,10 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("methodologies/sitemap-items")]
-        public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> ListSitemapItems()
-        {
-            return await _methodologyService.ListSitemapItems()
+        public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> ListSitemapItems(
+            CancellationToken cancellationToken) =>
+            await _methodologyService.ListSitemapItems(cancellationToken)
                 .HandleFailuresOrOk();
-        }
     }
 }

@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.ListSitemapItems())
+            methodologyService.Setup(mock => mock.ListSitemapItems(default))
                 .ReturnsAsync(new List<MethodologySitemapItemViewModel>()
                 {
                     new()
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var controller = new MethodologyController(methodologyService.Object);
 
-            var response = await controller.ListSitemapItems();
+            var response = await controller.ListSitemapItems(default);
             var sitemapItems = response.AssertOkResult();
 
             Assert.Equal("test-methodology", sitemapItems.Single().Slug);

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -29,5 +30,6 @@ public interface IPublicationService
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null);
 
-    Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems();
+    Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
+        CancellationToken cancellationToken);
 }
