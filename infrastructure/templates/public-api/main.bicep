@@ -298,7 +298,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         value: 'true'
       }
       {
-        name: 'ParquetFiles__BasePath'
+        name: 'DataFiles__BasePath'
         value: dataFilesFileShareMountPath
       }
       {
