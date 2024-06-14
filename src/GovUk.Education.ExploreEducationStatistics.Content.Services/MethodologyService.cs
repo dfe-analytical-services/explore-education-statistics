@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         }
 
         public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems(
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             return await _contentDbContext.Methodologies
                 .Include(m => m.LatestPublishedVersion)

@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         [HttpGet("publications/sitemap-items")]
         public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken = default) =>
             await _publicationService.ListSitemapItems(cancellationToken)
                 .HandleFailuresOrOk();
     }

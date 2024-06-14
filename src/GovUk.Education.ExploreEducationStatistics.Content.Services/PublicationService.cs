@@ -343,7 +343,7 @@ public class PublicationService : IPublicationService
     }
 
     public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken) =>
+        CancellationToken cancellationToken = default) =>
         await
             _contentDbContext.Publications
                 .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&

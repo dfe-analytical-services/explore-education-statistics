@@ -141,7 +141,7 @@ public class DataSetFileService : IDataSetFileService
     }
 
     public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var latestReleaseVersions = _contentDbContext.ReleaseVersions
             .LatestReleaseVersions(publishedOnly: true);

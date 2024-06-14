@@ -31,5 +31,5 @@ public interface IPublicationService
         IEnumerable<Guid>? publicationIds = null);
 
     Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

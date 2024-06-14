@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         [HttpGet("methodologies/sitemap-items")]
         public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> ListSitemapItems(
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken = default) =>
             await _methodologyService.ListSitemapItems(cancellationToken)
                 .HandleFailuresOrOk();
     }

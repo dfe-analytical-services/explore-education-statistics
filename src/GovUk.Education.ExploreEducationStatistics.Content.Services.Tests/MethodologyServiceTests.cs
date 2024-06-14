@@ -741,7 +741,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext);
-                var result = (await service.ListSitemapItems(default)).AssertRight();
+                var result = (await service.ListSitemapItems()).AssertRight();
 
                 var item = Assert.Single(result);
                 Assert.Equal(methodology.OwningPublicationSlug, item.Slug);
@@ -798,7 +798,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext);
-                var result = (await service.ListSitemapItems(default)).AssertRight();
+                var result = (await service.ListSitemapItems()).AssertRight();
 
                 var item = Assert.Single(result);
                 Assert.Equal("alternative-title", item.Slug);

@@ -2103,7 +2103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     var service = SetupPublicationService(contentDbContext);
 
-                    var result = (await service.ListSitemapItems(default)).AssertRight();
+                    var result = (await service.ListSitemapItems()).AssertRight();
 
                     var item = Assert.Single(result);
                     Assert.Equal(publication.Slug, item.Slug);

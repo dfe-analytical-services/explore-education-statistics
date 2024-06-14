@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var publicationService = new Mock<IPublicationService>(Strict);
 
-            publicationService.Setup(mock => mock.ListSitemapItems(default))
+            publicationService.Setup(mock => mock.ListSitemapItems())
                 .ReturnsAsync(new List<PublicationSitemapItemViewModel>()
                 {
                     new()
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var controller = BuildPublicationController(publicationService: publicationService.Object);
 
-            var response = await controller.ListSitemapItems(default);
+            var response = await controller.ListSitemapItems();
             var sitemapItems = response.AssertOkResult();
 
             var item = Assert.Single(sitemapItems);
