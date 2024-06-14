@@ -402,6 +402,7 @@ Add data guidance to subject
 
 Save data guidance (third release)
     user clicks button    Save guidance
+    user waits for cache to expire
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
