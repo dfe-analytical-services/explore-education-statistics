@@ -24,6 +24,7 @@ public static class FileGeneratorExtensions
             .SetContentType("text/csv")
             .SetType(FileType.Data)
             .SetDefault(f => f.Filename)
+            .SetDefault(f => f.DataSetFileId)
             .SetDataSetFileMeta(new DataSetFileMeta
             {
                 GeographicLevels = [GeographicLevel.Country],
@@ -114,6 +115,11 @@ public static class FileGeneratorExtensions
         FileType type)
         => generator.ForInstance(s => s.SetType(type));
 
+    public static Generator<File> WithDataSetFileId(
+        this Generator<File> generator,
+        Guid dataSetFileId)
+        => generator.ForInstance(s => s.SetDataSetFileId(dataSetFileId));
+
     public static Generator<File> WithDataSetFileMeta(
         this Generator<File> generator,
         DataSetFileMeta dataSetFileMeta)
@@ -200,6 +206,11 @@ public static class FileGeneratorExtensions
         this InstanceSetters<File> setters,
         FileType type)
         => setters.Set(f => f.Type, type);
+
+    public static InstanceSetters<File> SetDataSetFileId(
+        this InstanceSetters<File> setters,
+        Guid dataSetFileId)
+        => setters.Set(f => f.DataSetFileId, dataSetFileId);
 
     public static InstanceSetters<File> SetDataSetFileMeta(
         this InstanceSetters<File> setters,

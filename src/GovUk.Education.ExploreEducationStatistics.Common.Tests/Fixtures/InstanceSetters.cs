@@ -129,7 +129,7 @@ public class InstanceSetters<T> where T : class
         return Set(property, DateTime.UtcNow.AddDays(-1));
     }
 
-    private static int GetDisplayIndex(SetterContext context, Faker faker)
+    public int GetDisplayIndex(SetterContext context, Faker faker)
         => context.FixtureTypeIndex > 0 ? context.FixtureTypeIndex : faker.IndexFaker;
 }
 

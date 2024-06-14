@@ -9,41 +9,29 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
-using GovUk.Education.ExploreEducationStatistics.Content.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MockQueryable.Moq;
 using Moq;
-using Testcontainers.Azurite;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -51,22 +39,26 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
+public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 {
     private readonly DataFixture _fixture = new();
 
-    private DataSetFilesControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+    private DataSetFilesControllerTests(TestApplicationFactory testApp) : base(testApp)
     {
     }
 
     public class ListDataSetFilesTests : DataSetFilesControllerTests
     {
-        private ListDataSetFilesTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+        private ListDataSetFilesTests(TestApplicationFactory testApp) : base(testApp)
         {
         }
 
-        public class FilterTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
+        public class FilterTests : ListDataSetFilesTests
         {
+            public FilterTests(TestApplicationFactory testApp) : base(testApp)
+            {
+            }
+
             [Fact]
             public async Task FilterByReleaseId_Success()
             {
@@ -83,19 +75,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(ReleaseId: publication1.ReleaseVersions[0].Id);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -122,19 +112,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(PublicationId: publication1.Id);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -164,19 +152,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(ThemeId: publication1.Topic.ThemeId);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -207,23 +193,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
                 var release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[1]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                    context.ReleaseFiles.AddRange(release2Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(release1Version1Files);
-                        context.ReleaseFiles.AddRange(release2Version1Files);
-                    })
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[1].Id,
                     LatestOnly = latestOnly
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -254,23 +238,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
                 var release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[1]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                    context.ReleaseFiles.AddRange(release2Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(release1Version1Files);
-                        context.ReleaseFiles.AddRange(release2Version1Files);
-                    })
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[1].Id,
                     LatestOnly = true
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -305,24 +287,22 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version2Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[1]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication1Release1Version2Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication1Release1Version2Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication1.ReleaseVersions[1].Id,
                     LatestOnly = latestOnly
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -350,23 +330,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
                 var release1Version2Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[1]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                    context.ReleaseFiles.AddRange(release1Version2Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(release1Version1Files);
-                        context.ReleaseFiles.AddRange(release1Version2Files);
-                    })
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[0].Id,
                     LatestOnly = latestOnly
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -398,19 +376,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(PublicationId: publication1.Id);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -443,19 +419,18 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest(ThemeId: publication1.Topic.ThemeId);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -494,7 +469,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .CreateClient();
 
                 var query = new DataSetFileListRequest(SearchTerm: "aaa");
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query, client);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -533,7 +508,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .CreateClient();
 
                 var query = new DataSetFileListRequest(SearchTerm: "aaa");
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query, client);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -591,19 +566,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .Concat(publication2Release3Version1Files)
                     .ToList();
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1ReleaseFiles);
+                    context.ReleaseFiles.AddRange(publication2ReleaseFiles);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1ReleaseFiles);
-                        context.ReleaseFiles.AddRange(publication2ReleaseFiles);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(LatestOnly: latestOnly);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -665,19 +638,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .Concat(publication2Release3Version1Files)
                     .ToList();
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1ReleaseFiles);
+                    context.ReleaseFiles.AddRange(publication2ReleaseFiles);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1ReleaseFiles);
-                        context.ReleaseFiles.AddRange(publication2ReleaseFiles);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(LatestOnly: false);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -719,19 +690,20 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         .GenerateList(5))
                     .GenerateList();
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseVersionFiles);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(releaseVersionFiles))
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     DataSetType = DataSetType.Api
                 };
 
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -771,19 +743,20 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         .GenerateList(5))
                     .GenerateList();
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseVersionFiles);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(releaseVersionFiles))
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     DataSetType = dataSetType
                 };
 
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -809,19 +782,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest();
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -837,7 +808,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SortByTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
+        public class SortByTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
         {
             [Theory]
             [InlineData(SortDirection.Asc)]
@@ -858,19 +829,20 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 release1Version1Files[0].Name = "b";
                 release1Version1Files[1].Name = "a";
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Title,
                     SortDirection = sortDirection
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -902,19 +874,20 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 release1Version1Files[0].Name = "a";
                 release1Version1Files[1].Name = "b";
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Title,
                     SortDirection = SortDirection.Desc
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -949,12 +922,13 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 release1Version1Files[0].Order = 1;
                 release1Version1Files[1].Order = 0;
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
@@ -962,7 +936,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     Sort = DataSetsListRequestSortBy.Natural,
                     SortDirection = sortDirection
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -995,12 +969,13 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 release1Version1Files[0].Order = 0;
                 release1Version1Files[1].Order = 1;
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
@@ -1008,7 +983,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     Sort = DataSetsListRequestSortBy.Natural,
                     SortDirection = SortDirection.Desc
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1048,23 +1023,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1Release1Version1);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2Release1Version1);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Published,
                     SortDirection = SortDirection.Asc
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1109,23 +1082,21 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1Release1Version1);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2Release1Version1);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                    })
-                    .CreateClient();
 
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Published,
                     SortDirection = sortDirection
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1180,7 +1151,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     Sort = DataSetsListRequestSortBy.Relevance,
                     SortDirection = SortDirection.Asc
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query, client);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1236,7 +1207,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     Sort = DataSetsListRequestSortBy.Relevance,
                     SortDirection = sortDirection
                 };
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query, client);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1254,7 +1225,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SupersededPublicationTests(TestApplicationFactory<TestStartup> testApp)
+        public class SupersededPublicationTests(TestApplicationFactory testApp)
             : ListDataSetFilesTests(testApp)
         {
             [Fact]
@@ -1278,19 +1249,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
                 var supersededPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
+                    context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
-                        context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest();
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1325,19 +1294,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
                 var supersededPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
+                    context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
-                        context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(PublicationId: supersededPublication.Id);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1372,19 +1339,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
                 var supersededPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
+                    context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
-                        context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest();
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1399,7 +1364,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class ValidationTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
+        public class ValidationTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
         {
             [Theory]
             [InlineData(0)]
@@ -1407,10 +1372,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             [InlineData(10000)]
             public async Task PageOutsideAllowedRange_ReturnsValidationError(int page)
             {
-                var client = BuildApp().CreateClient();
-
                 var query = new DataSetFileListRequest(Page: page);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -1426,12 +1389,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             {
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var client = BuildApp()
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(Page: page);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1446,10 +1405,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             [InlineData(41)]
             public async Task PageSizeOutsideAllowedRange_ReturnsValidationError(int pageSize)
             {
-                var client = BuildApp().CreateClient();
-
                 var query = new DataSetFileListRequest(PageSize: pageSize);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -1466,11 +1423,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest(PageSize: pageSize);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1484,10 +1438,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             [InlineData("aa")]
             public async Task SearchTermBelowMinimumLength_ReturnsValidationError(string searchTerm)
             {
-                var client = BuildApp().CreateClient();
-
                 var query = new DataSetFileListRequest(SearchTerm: searchTerm);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -1510,7 +1462,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .CreateClient();
 
                 var query = new DataSetFileListRequest(SearchTerm: searchTerm);
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query, client);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1520,13 +1472,11 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             [Fact]
             public async Task SortByNaturalWithoutReleaseId_ReturnsValidationError()
             {
-                var client = BuildApp().CreateClient();
-
                 var query = new DataSetFileListRequest(
                     ReleaseId: null,
                     Sort: DataSetsListRequestSortBy.Natural
                 );
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -1541,13 +1491,11 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp().CreateClient();
-
                 var query = new DataSetFileListRequest(
                     ReleaseId: Guid.NewGuid(),
                     Sort: DataSetsListRequestSortBy.Natural
                 );
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1557,13 +1505,11 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             [Fact]
             public async Task SortByRelevanceWithoutSearchTerm_ReturnsValidationError()
             {
-                var client = BuildApp().CreateClient();
-
                 var query = new DataSetFileListRequest(
                     SearchTerm: null,
                     Sort: DataSetsListRequestSortBy.Relevance
                 );
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1589,7 +1535,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     SearchTerm: "aaa",
                     Sort: DataSetsListRequestSortBy.Relevance
                 );
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query, client);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1597,7 +1543,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class MiscellaneousTests(TestApplicationFactory<TestStartup> testApp) : ListDataSetFilesTests(testApp)
+        public class MiscellaneousTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
         {
             [Fact]
             public async Task DataSetFileMetaCorrectlyReturned_Success()
@@ -1634,19 +1580,17 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                         ))
                     .Generate();
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey,
                         PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context =>
-                    {
-                        context.ReleaseFiles.Add(releaseFile);
-                    })
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest();
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1663,14 +1607,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     dataSetFileMetaViewModel.GeographicLevels);
 
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
-                    {
-                        From = TimePeriodLabelFormatter.Format(
+                {
+                    From = TimePeriodLabelFormatter.Format(
                             originalMeta.TimePeriodRange.Start.Period,
                             originalMeta.TimePeriodRange.Start.TimeIdentifier),
-                        To = TimePeriodLabelFormatter.Format(
+                    To = TimePeriodLabelFormatter.Format(
                             originalMeta.TimePeriodRange.End.Period,
                             originalMeta.TimePeriodRange.End.TimeIdentifier),
-                    },
+                },
                     dataSetFileMetaViewModel.TimePeriodRange);
 
                 Assert.Equal(originalMeta.Filters
@@ -1690,10 +1634,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp().CreateClient();
-
                 var query = new DataSetFileListRequest();
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1720,15 +1662,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     releaseFile.Summary = $"<p>{releaseFile.Summary}</p>";
                 });
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(release1Version1Files);
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var client = BuildApp()
-                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
-                    .CreateClient();
-
                 var query = new DataSetFileListRequest();
-                var response = await ListDataSets(client, query);
+                var response = await ListDataSetFiles(query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
@@ -1743,9 +1686,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        private static async Task<HttpResponseMessage> ListDataSets(
-            HttpClient client,
-            DataSetFileListRequest request)
+        private async Task<HttpResponseMessage> ListDataSetFiles(
+            DataSetFileListRequest request,
+            HttpClient? client = null)
         {
             var queryParams = new Dictionary<string, string?>
             {
@@ -1760,6 +1703,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 { "pageSize", request.PageSize.ToString() },
                 { "dataSetType", request.DataSetType?.ToString() }
             };
+
+            client ??= BuildApp().CreateClient();
 
             var uri = QueryHelpers.AddQueryString("/api/data-set-files", queryParams);
 
@@ -1834,8 +1779,85 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    public class GetDataSetFileTests(TestApplicationFactory<TestStartup> testApp) : DataSetFilesControllerTests(testApp)
+    public class ListSitemapItemsTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
     {
+        public override async Task InitializeAsync() => await TestApp.StartAzurite();
+
+        private async Task<HttpResponseMessage> InvokeListSitemapItems(
+            WebApplicationFactory<Startup>? app = null)
+        {
+            var client = (app ?? BuildApp()).CreateClient();
+
+            return await client.GetAsync("/api/data-set-files/sitemap-items");
+        }
+
+        [Fact]
+        public async Task ListSitemapItems()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFile(_fixture.DefaultFile()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithTimePeriodRange(
+                        _fixture.DefaultTimePeriodRangeMeta()
+                            .WithStart("2000", TimeIdentifier.CalendarYear)
+                            .WithEnd("2001", TimeIdentifier.CalendarYear)
+                        ))
+                    .WithPublicApiDataSetId(Guid.NewGuid())
+                    .WithPublicApiDataSetVersion(major: 1, minor: 0)
+                );
+
+            await TestApp.StartAzurite();
+
+            var testApp = BuildApp(enableAzurite: true);
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+
+            var formFile = CreateDataCsvFormFile(""""
+                                                 column_1,column_2,column_3
+                                                 1,2,3
+                                                 2,"3,4",5
+                                                 3,"""4",5
+                                                 4,,6
+                                                 5,6,7
+                                                 6,7,8
+                                                 """");
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+
+            var response = await InvokeListSitemapItems();
+
+            var sitemapItems = response.AssertOk<List<DataSetSitemapItemViewModel>>();
+
+            var item = Assert.Single(sitemapItems);
+            Assert.Equal(releaseFile.File.DataSetFileId!.Value.ToString(), item.Id);
+            Assert.Equal(releaseFile.Published, item.LastModified);
+        }
+    }
+
+
+    public class GetDataSetFileTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
+    {
+        public override async Task InitializeAsync()
+        {
+            await TestApp.StartAzurite();
+        }
+
         [Fact]
         public async Task FetchDataSetDetails_Success()
         {
@@ -1859,14 +1881,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 );
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+            await TestApp.StartAzurite();
 
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
+            var testApp = BuildApp(enableAzurite: true);
+
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
 
             var formFile = CreateDataCsvFormFile(""""
                                                  column_1,column_2,column_3
@@ -1883,17 +1907,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 releaseFile.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-
-            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(releaseFile.Name, viewModel.Title);
@@ -1932,14 +1946,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 viewModel.File.Meta.GeographicLevels);
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
-                {
-                    From = TimePeriodLabelFormatter.Format(
+            {
+                From = TimePeriodLabelFormatter.Format(
                         "2000",
                         TimeIdentifier.CalendarYear),
-                    To = TimePeriodLabelFormatter.Format(
+                To = TimePeriodLabelFormatter.Format(
                         "2001",
                         TimeIdentifier.CalendarYear),
-                },
+            },
                 viewModel.File.Meta.TimePeriodRange);
 
             Assert.Equal(dataSetFileMeta.Filters
@@ -1989,14 +2003,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithFile(_fixture.DefaultFile()
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+            await TestApp.StartAzurite();
 
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
+            var testApp = BuildApp(enableAzurite: true);
+
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1,column_2,column_3
@@ -2008,17 +2024,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 releaseFile.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-
-            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(releaseFile.Name, viewModel.Title);
@@ -2050,9 +2056,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFilterSequence([
-                    new FilterSequenceEntry(filter1Id, new List<FilterGroupSequenceEntry>()),
-                    new FilterSequenceEntry(filter2Id, new List<FilterGroupSequenceEntry>()),
-                    new FilterSequenceEntry(filter3Id, new List<FilterGroupSequenceEntry>()),
+                    new FilterSequenceEntry(filter1Id, []),
+                    new FilterSequenceEntry(filter2Id, []),
+                    new FilterSequenceEntry(filter3Id, []),
                 ])
                 .WithFile(_fixture.DefaultFile()
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
@@ -2062,14 +2068,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new FilterMeta { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
                         ])));
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+            await TestApp.StartAzurite();
 
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
+            var testApp = BuildApp(enableAzurite: true);
+
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2081,17 +2089,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 releaseFile.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-
-            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(3, viewModel.File.Meta.Filters.Count);
@@ -2118,12 +2116,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithIndicatorSequence([
-                    new IndicatorGroupSequenceEntry(Guid.NewGuid(),
-                        new List<Guid> { indicator1Id, }),
-                    new IndicatorGroupSequenceEntry(Guid.NewGuid(),
-                        new List<Guid> { indicator2Id, }),
-                    new IndicatorGroupSequenceEntry(Guid.NewGuid(),
-                        new List<Guid> { indicator3Id, indicator4Id })
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator1Id]),
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator2Id]),
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator3Id, indicator4Id])
                 ])
                 .WithFile(_fixture.DefaultFile()
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
@@ -2134,14 +2129,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+            await TestApp.StartAzurite();
 
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
+            var testApp = BuildApp(enableAzurite: true);
+
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2153,17 +2150,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 releaseFile.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-
-            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(4, viewModel.File.Meta.Indicators.Count);
@@ -2199,14 +2186,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                             new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 4", ColumnName = "F_indicator_4", },
                         ])));
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+            await TestApp.StartAzurite();
 
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
+            var testApp = BuildApp(enableAzurite: true);
+
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2218,17 +2207,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 releaseFile.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-
-            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(7, viewModel.File.Variables.Count);
@@ -2284,14 +2263,20 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     .WithFilters(new List<Filter> { filter }))
                 .Generate();
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+            await TestApp.AddTestData<StatisticsDbContext>(context =>
+            {
+                context.ReleaseFootnote.AddRange(releaseFootnote1, releaseFootnote2);
+            });
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+            await TestApp.StartAzurite();
 
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
+            var testApp = BuildApp(enableAzurite: true);
+
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2303,21 +2288,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 releaseFile.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .AddStatisticsDbTestData(context =>
-                {
-                    context.ReleaseFootnote.AddRange(releaseFootnote1, releaseFootnote2);
-                })
-                .CreateClient();
-
-            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             var footnotes = viewModel.Footnotes;
@@ -2341,16 +2312,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile());
 
-            var client = BuildApp()
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
-            var uri = $"/api/data-set-files/{Guid.NewGuid()}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(Guid.NewGuid());
 
             response.AssertNotFound();
         }
@@ -2369,16 +2336,12 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile());
 
-            var client = BuildApp()
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
-            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
 
             response.AssertNotFound();
         }
@@ -2408,14 +2371,16 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 .WithReleaseVersion(publication.ReleaseVersions[2]) // the draft version
                 .WithFile(file);
 
-            var azuriteContainer = await GetAzuriteContainer();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.AddRange(releaseFile0, releaseFile1, releaseFile2);
+            });
 
-            var configuration = CreateConfiguration();
-            configuration["PublicStorage"] = azuriteContainer.GetConnectionString();
+            await TestApp.StartAzurite();
 
-            var publicBlobStorageService = new PublicBlobStorageService(
-                logger: new Logger<BlobStorageService>(new LoggerFactory()),
-                configuration: configuration);
+            var testApp = BuildApp(enableAzurite: true);
+
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
 
             var formFile = CreateDataCsvFormFile("""
                                                  column_1
@@ -2427,18 +2392,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 releaseFile1.PublicPath(),
                 formFile);
 
-            var client = BuildApp(
-                publicBlobStorageService: publicBlobStorageService)
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.AddRange(releaseFile0, releaseFile1, releaseFile2);
-                })
-                .CreateClient();
-
-            var uri = $"/api/data-set-files/{releaseFile2.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
-
+            var response = await GetDataSetFile(releaseFile2.File.DataSetFileId!.Value, testApp);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             // Fetches latest published version, not amendment
@@ -2463,84 +2417,61 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
             // NOTE: No ReleaseFile for publication.ReleaseVersions[1]
 
-            var client = BuildApp()
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile0);
-                })
-                .CreateClient();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile0);
+            });
 
-            var uri = $"/api/data-set-files/{releaseFile0.File.DataSetFileId}";
-
-            var response = await client.GetAsync(uri);
+            var response = await GetDataSetFile(releaseFile0.File.DataSetFileId!.Value);
 
             response.AssertNotFound();
         }
+
+        private async Task<HttpResponseMessage> GetDataSetFile(
+            Guid dataSetFileId,
+            WebApplicationFactory<Startup>? app = null)
+        {
+            var client = (app ?? BuildApp()).CreateClient();
+
+            return await client.GetAsync($"/api/data-set-files/{dataSetFileId}");
+        }
     }
 
-    private WebApplicationFactory<TestStartup> BuildApp(
+    private WebApplicationFactory<Startup> BuildApp(
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
-        IPublicBlobStorageService? publicBlobStorageService = null)
+        bool enableAzurite = false)
     {
         return TestApp
-            .ResetDbContexts()
+            .WithAzurite(enabled: enableAzurite)
             .ConfigureServices(services =>
             {
-                services.AddTransient<IReleaseVersionRepository>(s => new ReleaseVersionRepository(
-                    contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
-                services.AddTransient<IPublicBlobStorageService>(s =>
-                    publicBlobStorageService ?? new PublicBlobStorageService(
-                            s.GetRequiredService<ILogger<IBlobStorageService>>(),
-                        new ConfigurationBuilder()
-                            .SetBasePath(Directory.GetCurrentDirectory())
-                             // Use appsettings.IntegrationTest.json to prevent tests passing due to data-storage docker
-                             // container running separately: appsettings.IntegrationTest.json uses different ports
-                             // to those used by the data-storage docker container - i.e. not 10000/10001
-                            .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
-                            .AddEnvironmentVariables()
-                            .Build()));
-               services.AddTransient<IFootnoteRepository>(s => new FootnoteRepository(
-                   statisticsDbContext ?? s.GetRequiredService<StatisticsDbContext>()));
-                services.AddTransient<IDataSetFileService>(
-                    s => new DataSetFileService(
-                        contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
-                        s.GetRequiredService<IReleaseVersionRepository>(),
-                        s.GetRequiredService<IPublicBlobStorageService>(),
-                        s.GetRequiredService<IFootnoteRepository>()));
+                services.ReplaceService(MemoryCacheService);
+
+                if (contentDbContext is not null)
+                {
+                    services.ReplaceService(contentDbContext);
+                }
+
+                if (statisticsDbContext is not null)
+                {
+                    services.ReplaceService(statisticsDbContext);
+                }
             });
     }
 
-    private async Task<AzuriteContainer> GetAzuriteContainer()
-    {
-        var azuriteContainer = new AzuriteBuilder()
-            .WithImage("mcr.microsoft.com/azure-storage/azurite:3.27.0")
-            .WithHostname("data-storage-test")
-            .Build();
-        await azuriteContainer.StartAsync();
-        return azuriteContainer;
-    }
-
-    private IConfiguration CreateConfiguration()
-    {
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.IntegrationTest.json", optional: false)
-            .AddEnvironmentVariables()
-            .Build();
-
-        return configuration;
-    }
-
-    private IFormFile CreateDataCsvFormFile(string content)
+    private static IFormFile CreateDataCsvFormFile(string content)
     {
         var memoryStream = new MemoryStream();
         var writer = new StreamWriter(memoryStream);
         writer.Write(content);
         writer.Flush();
         memoryStream.Position = 0;
-        var headerDictionary = new HeaderDictionary();
-        headerDictionary["ContentType"] = "text/csv";
+
+        var headerDictionary = new HeaderDictionary
+        {
+            ["ContentType"] = "text/csv"
+        };
 
         return new FormFile(
             memoryStream,

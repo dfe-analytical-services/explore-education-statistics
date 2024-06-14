@@ -1,9 +1,6 @@
 import SectionBreak from '@common/components/SectionBreak';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import {
-  PageHiddenSectionId,
-  PageSectionId,
-} from '@frontend/modules/data-catalogue/DataSetFilePage';
+import { PageSectionId } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React, { ReactNode } from 'react';
 import styles from './DataSetFilePageSection.module.scss';
 
@@ -11,7 +8,7 @@ interface Props {
   children: ReactNode;
   className?: string;
   heading: string;
-  id: PageSectionId | PageHiddenSectionId;
+  id: PageSectionId;
   testId?: string;
 }
 

@@ -64,9 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .LoadAsync();
 
                     var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
-                    
+
                     viewModel.Publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
-                    
+
                     return viewModel;
                 });
         }
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ThenInclude(p => p.Contact)
                 .Where(pm => pm.MethodologyId == methodologyId
                              && pm.Publication.LatestPublishedReleaseVersionId != null)
-                .Select(pm => new PublicationSummaryViewModel()
+                .Select(pm => new PublicationSummaryViewModel
                 {
                     Id = pm.PublicationId,
                     Title = pm.Publication.Title,
@@ -132,6 +132,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             var latestPublishedMethodologies =
                 await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
             return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
+        }
+
+        public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems()
+        {
+            return await _contentDbContext.Methodologies
+                .Include(m => m.LatestPublishedVersion)
+                .Where(m => m.LatestPublishedVersion != null)
+                .Select(m => m.LatestPublishedVersion)
+                .OfType<MethodologyVersion>()
+                .Select(mv =>
+                    new MethodologySitemapItemViewModel
+                    {
+                        Slug = mv.Slug,
+                        LastModified = mv.Published
+                    })
+                .ToListAsync();
         }
     }
 }

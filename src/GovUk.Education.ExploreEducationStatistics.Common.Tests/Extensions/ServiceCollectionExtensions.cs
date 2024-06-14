@@ -36,12 +36,24 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// This method replaces a service that has been registered in Startup with a new implementation. The same
+    /// Replace a service that has been registered in Startup with a new implementation. The same
     /// lifecycle that was registered in Startup will be used to register the new service.
     /// </summary>
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services,
         TService replacement)
+        where TService : class
+    {
+        return services.ReplaceService(_ => replacement);
+    }
+
+    /// <summary>
+    /// Replace a service that has been registered in Startup with a new implementation. The same
+    /// lifecycle that was registered in Startup will be used to register the new service.
+    /// </summary>
+    public static IServiceCollection ReplaceService<TService>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TService> replacement)
         where TService : class
     {
         // Remove the default service descriptor that was provided by Startup.cs.
@@ -53,16 +65,16 @@ public static class ServiceCollectionExtensions
         // Add the replacement.
         return descriptor.Lifetime switch
         {
-            ServiceLifetime.Singleton => services.AddSingleton(_ => replacement),
-            ServiceLifetime.Scoped => services.AddScoped(_ => replacement),
-            ServiceLifetime.Transient => services.AddTransient(_ => replacement),
+            ServiceLifetime.Singleton => services.AddSingleton(replacement),
+            ServiceLifetime.Scoped => services.AddScoped(replacement),
+            ServiceLifetime.Transient => services.AddTransient(replacement),
             _ => throw new ArgumentOutOfRangeException(
                 $"Cannot register test service with {nameof(ServiceLifetime)}.{descriptor.Lifetime}")
         };
     }
 
     /// <summary>
-    /// This method replaces a service that has been registered in Startup with a Mock. The same
+    /// Replace a service that has been registered in Startup with a Mock. The same
     /// lifecycle that was registered in Startup will be used to register the Mock.
     /// </summary>
     public static IServiceCollection ReplaceService<TService>(
@@ -84,7 +96,7 @@ public static class ServiceCollectionExtensions
         MockBehavior behavior = Strict)
         where TService : class
     {
-        return services.ReplaceService(Mock.Of<TService>(behavior));
+        return services.ReplaceService(_ => Mock.Of<TService>(behavior));
     }
 
     /// <summary>

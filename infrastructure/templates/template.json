@@ -1247,7 +1247,7 @@
       ],
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.14.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
@@ -1475,7 +1475,7 @@
       ],
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.14.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]"
@@ -1678,7 +1678,7 @@
             },
             {
               "name": "PublicDataDb",
-              "type": "PostgreSQL",
+              "type": "Custom",
               "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-admin-connectionstring-publicdatadb)')]"
             }
           ]
@@ -1704,7 +1704,7 @@
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
         "AppInsights__InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.14.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
@@ -2061,7 +2061,7 @@
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "18.18.2",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.14.0",
         "WEBSITES_PORT": 3000
       }
     },
@@ -2145,6 +2145,11 @@
             {
               "condition": "[parameters('useSubnets')]",
               "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publicApiDataProcessorSubnetRef')]",
               "action": "Allow"
             }
           ],

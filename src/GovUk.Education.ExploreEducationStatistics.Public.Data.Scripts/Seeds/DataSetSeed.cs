@@ -4,10 +4,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Seeds;
 
 public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionId, Guid? ReleaseFileId = null)
 {
-    private static readonly Guid SpcPublicationId = new("a91d9e05-be82-474c-85ae-4913158406d0");
     private static readonly Guid ExclusionsPublicationId = new("346fd6f2-3938-4006-9867-08dc1c5c66c3");
     private static readonly Guid PupilAbsencePublicationId = new("d40523f4-50ba-4896-9866-08dc1c5c66c3");
-    private static readonly Guid _16To18PerformancePublicationId = new("cbbd299f-8297-44bc-92ac-558bcf51f8ad");
+    private static readonly Guid PerformanceTestingPublicationId = new("cbbd299f-8297-44bc-92ac-558bcf51f8ad");
 
     public static DataSetSeed SpcEthnicityLanguage => new(
         Filename: nameof(SpcEthnicityLanguage),
@@ -18,7 +17,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Summary =
                 "Number of pupils in state-funded nursery, primary, secondary and special schools, non-maintained special schools and pupil referral units by language and ethnicity.",
             Status = DataSetStatus.Published,
-            PublicationId = SpcPublicationId,
+            PublicationId = PerformanceTestingPublicationId,
             Published = DateTimeOffset.Parse("2023-06-15T09:30:00+00:00"),
             Created = DateTimeOffset.Parse("2023-06-01T12:00:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-06-15T09:30:00+00:00"),
@@ -35,7 +34,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Summary =
                 "Number of pupils in state-funded nursery, primary, secondary and special schools, non-maintained special schools, pupil referral units and independent schools by national curriculum year and gender.",
             Status = DataSetStatus.Published,
-            PublicationId = SpcPublicationId,
+            PublicationId = PerformanceTestingPublicationId,
             Published = DateTimeOffset.Parse("2023-06-16T09:30:00+00:00"),
             Created = DateTimeOffset.Parse("2023-06-02T12:00:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-06-16T09:30:00+00:00"),
@@ -57,7 +56,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Updated = DateTimeOffset.Parse("2024-01-24T09:30:00+00:00"),
         },
         DataSetVersionId: new Guid("018f6306-cb44-7fcd-80cc-bfdb9e1ce5a1"),
-        ReleaseFileId: new Guid("41f18583-3b28-4399-c082-08dc1c5c7ea7")
+        ReleaseFileId: new Guid("59a2afde-3949-4204-98c3-0c49e7358fa3")
     );
 
     public static DataSetSeed AbsenceRatesCharacteristic => new(
@@ -69,7 +68,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Summary =
                 "Absence information for the full academic year, by pupil characteristics including SEN, FSM, language, year group, gender and ethnicity for England.",
             Status = DataSetStatus.Published,
-            PublicationId = PupilAbsencePublicationId,
+            PublicationId = PerformanceTestingPublicationId,
             Published = DateTimeOffset.Parse("2023-09-01T09:30:00+00:00"),
             Created = DateTimeOffset.Parse("2023-08-15T12:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-09-01T09:30:00+00:00"),
@@ -86,7 +85,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Summary =
                 "Absence information for full academic years for all enrolments in state-funded primary, secondary and special schools including information on overall absence, persistent absence and reason for absence for pupils aged 5-15.",
             Status = DataSetStatus.Published,
-            PublicationId = PupilAbsencePublicationId,
+            PublicationId = PerformanceTestingPublicationId,
             Published = DateTimeOffset.Parse("2023-09-02T09:30:00+00:00"),
             Created = DateTimeOffset.Parse("2023-08-16T12:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-09-02T09:30:00+00:00"),
@@ -103,7 +102,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Summary =
                 "Absence information for full academic years for all enrolments in state-funded primary, secondary and special schools including information on overall absence, persistent absence and reason for absence for pupils aged 5-15. Includes school level data.",
             Status = DataSetStatus.Published,
-            PublicationId = PupilAbsencePublicationId,
+            PublicationId = PerformanceTestingPublicationId,
             Published = DateTimeOffset.Parse("2023-09-03T09:30:00+00:00"),
             Created = DateTimeOffset.Parse("2023-08-17T12:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-09-03T09:30:00+00:00"),
@@ -137,7 +136,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Summary =
                 "Reports on the employment, and learning destinations of adult FE & Skills learners, all age apprentices that achieved their learning aim, and Traineeship learners that completed their aim. Destination rates are calculated as a proportion of learners for whom a match was found in the LEO data.",
             Status = DataSetStatus.Published,
-            PublicationId = _16To18PerformancePublicationId,
+            PublicationId = PerformanceTestingPublicationId,
             Published = DateTimeOffset.Parse("2023-12-01T09:30:00+00:00"),
             Created = DateTimeOffset.Parse("2023-11-01T09:30:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-12-01T09:30:00+00:00"),
@@ -154,7 +153,7 @@ public record DataSetSeed(string Filename, DataSet DataSet, Guid DataSetVersionI
             Summary =
                 "Reports on the employment and learning destinations of adult FE & skills learners, all age apprentices that achieved their learning aim, and traineeship learners that completed their aim. Destination rates are calculated as a proportion of learners for whom a match was found in the LEO data.",
             Status = DataSetStatus.Published,
-            PublicationId = _16To18PerformancePublicationId,
+            PublicationId = PerformanceTestingPublicationId,
             Published = DateTimeOffset.Parse("2023-12-02T09:30:00+00:00"),
             Created = DateTimeOffset.Parse("2023-11-02T09:30:00+00:00"),
             Updated = DateTimeOffset.Parse("2023-12-02T09:30:00+00:00"),

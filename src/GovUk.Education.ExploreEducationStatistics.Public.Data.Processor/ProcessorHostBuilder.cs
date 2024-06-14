@@ -67,9 +67,10 @@ public static class ProcessorHostBuilder
                                 providerOptions => providerOptions.EnableCustomRetryOnFailure())
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
                     .AddFluentValidation()
-                    .AddScoped<IDataSetService, DataSetService>()
-                    .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
+                    .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IDataSetVersionService, DataSetVersionService>()
+                    .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataDuckDbRepository, DataDuckDbRepository>()
                     .AddScoped<IFilterOptionsDuckDbRepository, FilterOptionsDuckDbRepository>()
                     .AddScoped<IIndicatorsDuckDbRepository, IndicatorsDuckDbRepository>()
@@ -82,8 +83,8 @@ public static class ProcessorHostBuilder
                     .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
                     .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
-                    .AddScoped<IValidator<InitialDataSetVersionCreateRequest>,
-                        InitialDataSetVersionCreateRequest.Validator>()
+                    .AddScoped<IValidator<DataSetCreateRequest>,
+                        DataSetCreateRequest.Validator>()
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
             });

@@ -1,4 +1,3 @@
-using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -50,21 +48,14 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                 context.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile);
             });
 
-            var (dataSetVersion, instanceId) = await CreateDataSetVersion(releaseDataFile.Id, Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage(),
+                releaseFileId: releaseDataFile.Id);
 
             var blobStorageService = GetRequiredService<IPrivateBlobStorageService>();
 
-            var testDataDirectoryPath = Path.Combine(
-                Assembly.GetExecutingAssembly().GetDirectoryPath(),
-                "Resources",
-                "DataFiles",
-                "AbsenceSchool"
-            );
+            var testData = ProcessorTestData.AbsenceSchool;
 
-            var sourceDataFileContent = await File.ReadAllTextAsync(Path.Combine(
-                testDataDirectoryPath,
-                "source.csv"
-            ));
+            var sourceDataFileContent = await File.ReadAllTextAsync(testData.CsvDataFilePath);
 
             await using (var contentStream = sourceDataFileContent.ToStream())
             {
@@ -75,10 +66,7 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                     ContentTypes.Csv);
             }
 
-            var sourceMetadataFileContent = await File.ReadAllTextAsync(Path.Combine(
-                testDataDirectoryPath,
-                "source.meta.csv"
-            ));
+            var sourceMetadataFileContent = await File.ReadAllTextAsync(testData.CsvMetadataFilePath);
 
             await using (var contentStream = sourceMetadataFileContent.ToStream())
             {
@@ -90,7 +78,6 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
             }
 
             var function = GetRequiredService<CopyCsvFilesFunction>();
-
             await function.CopyCsvFiles(instanceId, CancellationToken.None);
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
@@ -99,8 +86,8 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                 .Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
-            Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
             Assert.Equal(Stage, savedImport.Stage);
+            Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
 
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
 
@@ -117,42 +104,13 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
 
             var expectedCsvMetadataPath = dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion);
             Assert.Contains(expectedCsvMetadataPath, actualDataSetVersionFiles);
-            Assert.Equal(sourceMetadataFileContent, await DecompressFileToString(expectedCsvMetadataPath));
+            Assert.Equal(sourceMetadataFileContent, await File.ReadAllTextAsync(expectedCsvMetadataPath));
         }
 
         private static async Task<string> DecompressFileToString(string path)
         {
             var bytes = await File.ReadAllBytesAsync(path);
             return await CompressionUtils.DecompressToString(bytes, ContentEncodings.Gzip);
-        }
-
-        private async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersion(
-            Guid releaseFileId,
-            DataSetVersionImportStage importStage)
-        {
-            DataSet dataSet = DataFixture.DefaultDataSet();
-
-            await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersionImport dataSetVersionImport = DataFixture
-                .DefaultDataSetVersionImport()
-                .WithStage(importStage);
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithDataSet(dataSet)
-                .WithReleaseFileId(releaseFileId)
-                .WithStatus(DataSetVersionStatus.Processing)
-                .WithImports(() => [dataSetVersionImport])
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            return (dataSetVersion, dataSetVersionImport.InstanceId);
         }
     }
 }

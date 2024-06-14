@@ -10,7 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 
 public interface IProcessorClient
 {
-    Task<Either<ActionResult, CreateInitialDataSetVersionResponseViewModel>> CreateInitialDataSetVersion(
+    Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateDataSet(
         Guid releaseFileId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 }

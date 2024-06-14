@@ -41,19 +41,22 @@ describe('DataSetFileApiVersionHistory', () => {
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('2.0 (current)');
     expect(within(row1Cells[0]).queryByRole('link')).not.toBeInTheDocument();
-    expect(row1Cells[1]).toHaveTextContent('Published');
+    expect(row1Cells[1]).toHaveTextContent('Release 1 title');
+    expect(row1Cells[2]).toHaveTextContent('Published');
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(
       within(row2Cells[0]).getByRole('link', { name: '1.2' }),
-    ).toHaveAttribute('href', '/data-catalogue/data-set/TODO');
-    expect(row2Cells[1]).toHaveTextContent('Deprecated');
+    ).toHaveAttribute('href', '/data-catalogue/data-set/file-2-id');
+    expect(row2Cells[1]).toHaveTextContent('Release 2 title');
+    expect(row2Cells[2]).toHaveTextContent('Deprecated');
 
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(
       within(row3Cells[0]).getByRole('link', { name: '1.0' }),
-    ).toHaveAttribute('href', '/data-catalogue/data-set/TODO');
-    expect(row3Cells[1]).toHaveTextContent('Withdrawn');
+    ).toHaveAttribute('href', '/data-catalogue/data-set/file-3-id');
+    expect(row3Cells[1]).toHaveTextContent('Release 3 title');
+    expect(row3Cells[2]).toHaveTextContent('Withdrawn');
 
     expect(
       screen.queryByRole('navigation', { name: 'Version history pagination' }),
@@ -120,9 +123,18 @@ describe('DataSetFileApiVersionHistory', () => {
         totalResults: 5,
       },
       results: times(3, index => {
+        const i = index + 1;
+
         return {
           ...testApiDataSetVersion,
           version: `2.${2 - index}`,
+          file: {
+            id: `file-${i}-id`,
+          },
+          release: {
+            title: `Release ${i} title`,
+            slug: `release-${i}-slug`,
+          },
         };
       }),
     });
@@ -143,15 +155,18 @@ describe('DataSetFileApiVersionHistory', () => {
 
     expect(within(rows[1]).getByRole('link', { name: '2.2' })).toHaveAttribute(
       'href',
-      '/data-catalogue/data-set/TODO',
+      '/data-catalogue/data-set/file-1-id',
     );
+    expect(within(rows[1]).getByText('Release 1 title')).toBeInTheDocument();
 
     expect(within(rows[2]).getByRole('link', { name: '2.1' })).toHaveAttribute(
       'href',
-      '/data-catalogue/data-set/TODO',
+      '/data-catalogue/data-set/file-2-id',
     );
+    expect(within(rows[2]).getByText('Release 2 title')).toBeInTheDocument();
 
     expect(within(rows[3]).getByText('2.0 (current)')).toBeInTheDocument();
+    expect(within(rows[3]).getByText('Release 3 title')).toBeInTheDocument();
 
     const pagination = within(
       screen.getByRole('navigation', {
@@ -167,9 +182,18 @@ describe('DataSetFileApiVersionHistory', () => {
         totalResults: 5,
       },
       results: times(2, index => {
+        const i = index + 3;
+
         return {
           ...testApiDataSetVersion,
           version: `1.${1 - index}`,
+          file: {
+            id: `file-${i}-id`,
+          },
+          release: {
+            title: `Release ${i} title`,
+            slug: `release-${i}-slug`,
+          },
         };
       }),
     });
@@ -185,12 +209,15 @@ describe('DataSetFileApiVersionHistory', () => {
 
     expect(within(rows[1]).getByRole('link', { name: '1.1' })).toHaveAttribute(
       'href',
-      '/data-catalogue/data-set/TODO',
+      '/data-catalogue/data-set/file-3-id',
     );
+    expect(within(rows[1]).getByText('Release 3 title')).toBeInTheDocument();
+
     expect(within(rows[2]).getByRole('link', { name: '1.0' })).toHaveAttribute(
       'href',
-      '/data-catalogue/data-set/TODO',
+      '/data-catalogue/data-set/file-4-id',
     );
+    expect(within(rows[2]).getByText('Release 4 title')).toBeInTheDocument();
   });
 
   test('renders error message when data set versions cannot be loaded', async () => {

@@ -31,6 +31,8 @@ export interface ApiDataSetVersion {
   withdrawn?: Date;
   notes: string;
   totalResults: number;
+  file: ApiDataSetVersionFile;
+  release: ApiDataSetVersionRelease;
   timePeriods: {
     start: string;
     end: string;
@@ -38,6 +40,15 @@ export interface ApiDataSetVersion {
   geographicLevels: string[];
   filters: string[];
   indicators: string[];
+}
+
+export interface ApiDataSetVersionFile {
+  id: string;
+}
+
+export interface ApiDataSetVersionRelease {
+  title: string;
+  slug: string;
 }
 
 export interface ApiDataSetVersionsListRequest {

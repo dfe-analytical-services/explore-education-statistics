@@ -9,7 +9,6 @@ describe('getUpdatedQueryParams', () => {
       yearTitle: '2010',
       coverageTitle: 'Release coverage title 1',
       published: '2010-01-01',
-      releaseName: 'Release name 1',
       slug: 'release-slug-1',
       nextReleaseDate: {
         year: '',
@@ -25,7 +24,6 @@ describe('getUpdatedQueryParams', () => {
       yearTitle: '2011',
       coverageTitle: 'Release coverage title 2',
       published: '2011-01-01',
-      releaseName: 'Release name 2',
       slug: 'release-slug-2',
       nextReleaseDate: {
         year: '',
@@ -41,7 +39,6 @@ describe('getUpdatedQueryParams', () => {
       yearTitle: '2012',
       coverageTitle: 'Release coverage title 3',
       published: '2012-01-01',
-      releaseName: 'Release name 3',
       slug: 'release-slug-3',
       nextReleaseDate: {
         year: '',

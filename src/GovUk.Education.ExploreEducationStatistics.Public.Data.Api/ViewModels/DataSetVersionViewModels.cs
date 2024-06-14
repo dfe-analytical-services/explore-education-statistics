@@ -5,6 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
+/// <summary>
+/// Provides high-level information about a data set version.
+/// </summary>
 public class DataSetVersionViewModel
 {
     /// <summary>
@@ -53,6 +56,16 @@ public class DataSetVersionViewModel
     /// The total number of results available to query in the data set.
     /// </summary>
     public required long TotalResults { get; init; }
+
+    /// <summary>
+    /// The file that this data set version is based on.
+    /// </summary>
+    public required DataSetVersionFileViewModel File { get; init; }
+
+    /// <summary>
+    /// The statistical release that this version was published with.
+    /// </summary>
+    public required DataSetVersionReleaseViewModel Release { get; init; }
 
     /// <summary>
     /// The time period range covered by the data set.
@@ -123,3 +136,29 @@ public record DataSetLatestVersionViewModel
     public required IReadOnlyList<string> Indicators { get; init; }
 }
 
+/// <summary>
+/// Details about the file a data set version is based on.
+/// </summary>
+public record DataSetVersionFileViewModel
+{
+    /// <summary>
+    /// The ID of the file.
+    /// </summary>
+    public required Guid Id { get; init; }
+}
+
+/// <summary>
+/// Details about the statistical release a data set version was published with.
+/// </summary>
+public record DataSetVersionReleaseViewModel
+{
+    /// <summary>
+    /// The title of the release.
+    /// </summary>
+    public required string Title { get; init; }
+
+    /// <summary>
+    /// The slug of the release.
+    /// </summary>
+    public required string Slug { get; init; }
+}

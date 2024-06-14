@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
@@ -21,13 +22,13 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private readonly DataFixture _fixture = new();
 
-    public class CreateInitialDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-        : CreateInitialDataSetVersionFunctionTests(fixture)
+    public class CreateDataSetTests(ProcessorFunctionsIntegrationTestFixture fixture)
+        : CreateDataSetFunctionTests(fixture)
     {
         private const string DurableTaskClientName = "TestClient";
 
@@ -70,13 +71,13 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
                         startOrchestrationOptions = options;
                     });
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
             VerifyAllMocks(durableTaskClientMock);
 
-            var responseViewModel = result.AssertOkObjectResult<CreateInitialDataSetVersionResponseViewModel>();
+            var responseViewModel = result.AssertOkObjectResult<CreateDataSetResponseViewModel>();
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -119,27 +120,15 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             Assert.NotNull(processInitialDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
             Assert.Equal(new ProcessInitialDataSetVersionContext
-            {
-                DataSetVersionId = dataSetVersion.Id
-            }, processInitialDataSetVersionContext);
+                {
+                    DataSetVersionId = dataSetVersion.Id
+                },
+                processInitialDataSetVersionContext);
             Assert.Equal(new StartOrchestrationOptions
-            {
-                InstanceId = dataSetVersionImport.InstanceId.ToString()
-            }, startOrchestrationOptions);
-        }
-
-        [Fact]
-        public async Task ReleaseFileIdIsNotFound_ReturnsNotFound()
-        {
-            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
-
-            var result = await CreateInitialDataSetVersion(
-                releaseFileId: Guid.NewGuid(),
-                durableTaskClientMock.Object);
-
-            VerifyAllMocks(durableTaskClientMock);
-
-            result.AssertNotFoundResult();
+                {
+                    InstanceId = dataSetVersionImport.InstanceId.ToString()
+                },
+                startOrchestrationOptions);
         }
 
         [Fact]
@@ -147,15 +136,74 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
         {
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: Guid.Empty,
                 durableTaskClientMock.Object);
 
             VerifyAllMocks(durableTaskClientMock);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-            validationProblem.AssertHasNotEmptyError(nameof(InitialDataSetVersionCreateRequest.ReleaseFileId)
-                .ToLowerFirst());
+
+            validationProblem.AssertHasNotEmptyError(
+                nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
+        }
+
+        [Fact]
+        public async Task ReleaseFileIdIsNotFound_ReturnsValidationProblem()
+        {
+            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
+
+            var result = await CreateDataSet(
+                releaseFileId: Guid.NewGuid(),
+                durableTaskClientMock.Object);
+
+            VerifyAllMocks(durableTaskClientMock);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedCode: ValidationMessages.FileNotFound.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseFileIdHasDataSetVersion_ReturnsValidationProblem()
+        {
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(_fixture.DefaultReleaseVersion())
+                .WithFile(_fixture.DefaultFile());
+
+            DataSet dataSet = _fixture.DefaultDataSet();
+
+            DataSetVersion dataSetVersion = _fixture.DefaultDataSetVersion()
+                .WithReleaseFileId(releaseFile.Id)
+                .WithDataSet(dataSet);
+
+            await AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSets.Add(dataSet);
+                context.SaveChanges();
+
+                context.DataSetVersions.Add(dataSetVersion);
+            });
+
+            var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
+
+            var result = await CreateDataSet(
+                releaseFileId: releaseFile.Id,
+                durableTaskClientMock.Object);
+
+            VerifyAllMocks(durableTaskClientMock);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
         }
 
         [Fact]
@@ -178,7 +226,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
@@ -187,7 +235,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileReleaseVersionNotDraft.Code
             );
         }
@@ -207,7 +255,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
@@ -216,7 +264,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileTypeNotData.Code
             );
         }
@@ -235,7 +283,7 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(DurableTaskClientName);
 
-            var result = await CreateInitialDataSetVersion(
+            var result = await CreateDataSet(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object);
 
@@ -244,17 +292,17 @@ public abstract class CreateInitialDataSetVersionFunctionTests(ProcessorFunction
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(InitialDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.NoMetadataFile.Code
             );
         }
 
-        private async Task<IActionResult> CreateInitialDataSetVersion(
+        private async Task<IActionResult> CreateDataSet(
             Guid releaseFileId,
             DurableTaskClient durableTaskClient)
         {
-            var function = GetRequiredService<CreateInitialDataSetVersionFunction>();
-            return await function.CreateInitialDataSetVersion(new InitialDataSetVersionCreateRequest
+            var function = GetRequiredService<CreateDataSetFunction>();
+            return await function.CreateDataSet(new DataSetCreateRequest
                 {
                     ReleaseFileId = releaseFileId
                 },

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
@@ -15,7 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -28,7 +28,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
-using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -233,10 +232,10 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 .GenerateList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
-        {
-            context.DataSetVersions.AddRange(dataSetVersions);
-            context.DataSets.UpdateRange(dataSets);
-        });
+            {
+                context.DataSetVersions.AddRange(dataSetVersions);
+                context.DataSets.UpdateRange(dataSets);
+            });
 
             var response = await ListPublicationDataSets(publication.Id);
 
@@ -477,8 +476,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 .DefaultPublication()
                 .WithReleases(
                     DataFixture
-                    .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                    .Generate(1)
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
+                        .Generate(1)
                 );
 
             var liveReleaseVersion = publication.ReleaseVersions.Single(rv => rv.Published is not null);
@@ -596,8 +595,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 .DefaultPublication()
                 .WithReleases(
                     DataFixture
-                    .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                    .Generate(1)
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
+                        .Generate(1)
                 );
 
             File file = DataFixture.DefaultFile();
@@ -915,10 +914,6 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
     public class CreateDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        public static IEnumerable<object[]> AllDataSetVersionStatuses =>
-            EnumUtil.GetEnums<DataSetVersionStatus>()
-            .Select(e => new object[] { e });
-
         [Fact]
         public async Task Success()
         {
@@ -926,13 +921,13 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 .DefaultPublication()
                 .WithReleases(
                     DataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1)
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1)
                 );
 
             var draftReleaseVersion = publication.ReleaseVersions.Single();
 
-            ReleaseFile draftReleaseFile = DataFixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithFile(DataFixture.DefaultFile())
                 .WithReleaseVersion(draftReleaseVersion);
@@ -940,16 +935,17 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
                 context.Publications.Add(publication);
-                context.ReleaseFiles.Add(draftReleaseFile);
+                context.ReleaseFiles.Add(releaseFile);
             });
 
             DataSet? dataSet = null;
             DataSetVersion? dataSetVersion = null;
 
-            var processorClient = new Mock<IProcessorClient>();
+            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
+
             processorClient
-                .Setup(c => c.CreateInitialDataSetVersion(
-                    draftReleaseFile.Id,
+                .Setup(c => c.CreateDataSet(
+                    releaseFile.Id,
                     It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
@@ -963,7 +959,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     dataSetVersion = DataFixture
                         .DefaultDataSetVersion()
                         .WithStatusProcessing()
-                        .WithReleaseFileId(draftReleaseFile.Id)
+                        .WithReleaseFileId(releaseFile.Id)
                         .WithDataSet(dataSet)
                         .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
@@ -973,7 +969,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                         context.DataSets.Update(dataSet);
                     });
 
-                    return new CreateInitialDataSetVersionResponseViewModel
+                    return new CreateDataSetResponseViewModel
                     {
                         DataSetId = dataSet!.Id,
                         DataSetVersionId = dataSetVersion!.Id,
@@ -983,7 +979,9 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             var client = BuildApp(processorClient.Object).CreateClient();
 
-            var response = await CreateDataSetVersion(draftReleaseFile.Id, client);
+            var response = await CreateDataSetVersion(releaseFile.Id, client);
+
+            MockUtils.VerifyAllMocks(processorClient);
 
             var content = response.AssertOk<DataSetViewModel>();
 
@@ -997,8 +995,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.Equal(dataSetVersion.Version, content.DraftVersion!.Version);
             Assert.Equal(dataSetVersion.Status, content.DraftVersion!.Status);
             Assert.Equal(dataSetVersion.VersionType, content.DraftVersion!.Type);
-            Assert.Equal(draftReleaseFile.File.DataSetFileId, content.DraftVersion!.File.Id);
-            Assert.Equal(draftReleaseFile.Name, content.DraftVersion!.File.Title);
+            Assert.Equal(releaseFile.File.DataSetFileId, content.DraftVersion!.File.Id);
+            Assert.Equal(releaseFile.Name, content.DraftVersion!.File.Title);
             Assert.Equal(draftReleaseVersion.Id, content.DraftVersion!.ReleaseVersion.Id);
             Assert.Equal(draftReleaseVersion.Title, content.DraftVersion!.ReleaseVersion.Title);
             Assert.Null(content.DraftVersion!.GeographicLevels);
@@ -1017,49 +1015,40 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             response.AssertForbidden();
         }
 
-        [Theory]
-        [MemberData(nameof(AllDataSetVersionStatuses))]
-        public async Task DataSetVersionExistsForReleaseFile_Returns400(DataSetVersionStatus dataSetVersionStatus)
+        [Fact]
+        public async Task ProcessorReturns400_Returns400_WithProcessorErrors()
         {
             var releaseFileId = Guid.NewGuid();
+            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            ErrorViewModel[] processorErrors =
+            [
+                new ErrorViewModel
+                {
+                    Code = "TestError1",
+                    Message = "Test message 1",
+                    Path = "releaseFileId"
+                },
+                new ErrorViewModel
+                {
+                    Code = "TestError2",
+                    Message = "Test message 2",
+                    Path = "releaseFileId"
+                }
+            ];
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            processorClient
+                .Setup(c => c.CreateDataSet(releaseFileId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ValidationUtils.ValidationResult(processorErrors));
 
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(dataSetVersionStatus)
-                .WithReleaseFileId(releaseFileId)
-                .WithDataSet(dataSet);
+            var client = BuildApp(processorClient.Object).CreateClient();
+            var response = await CreateDataSetVersion(releaseFileId, client);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            var response = await CreateDataSetVersion(releaseFileId);
-
-            var validationProblem = response.AssertValidationProblem();
-
-            var error = validationProblem.AssertHasError("releaseFileId", ValidationMessages.FileHasApiDataSetVersion.Code);
-
-            var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
-
-            Assert.Equal(releaseFileId.ToString(), errorDetail["value"].GetString());
-        }
-
-        [Fact]
-        public async Task ReleaseFileIdIsEmpty_Returns400()
-        {
-            var response = await CreateDataSetVersion(Guid.Empty);
+            MockUtils.VerifyAllMocks(processorClient);
 
             var validationProblem = response.AssertValidationProblem();
 
-            var error = validationProblem.AssertHasNotEmptyError("releaseFileId");
+            Assert.Equal(processorErrors, validationProblem.Errors);
         }
 
         private WebApplicationFactory<TestStartup> BuildApp(

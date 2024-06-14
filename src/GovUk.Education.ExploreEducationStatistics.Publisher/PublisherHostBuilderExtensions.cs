@@ -160,7 +160,10 @@ public static class PublisherHostBuilderExtensions
                 if (!hostEnvironment.IsIntegrationTest())
                 {
                     var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
-                    services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostContext);
+                    if (publicDataDbExists)
+                    {
+                        services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostContext);
+                    }
                 }
 
                 StartupUtils.AddPersistenceHelper<ContentDbContext>(services);

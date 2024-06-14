@@ -1,36 +1,40 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record ReleaseSummaryViewModel
 {
-    public Guid Id { get; }
+    public required Guid Id { get; init; }
 
-    public string Title { get; }
+    public required string Title { get; init; }
 
-    public string Slug { get; }
+    public required string Slug { get; init; }
 
-    public string YearTitle { get; }
+    public required string YearTitle { get; init; }
 
-    public string CoverageTitle { get; }
+    public required string CoverageTitle { get; init; }
 
-    public DateTime? Published { get; }
+    public DateTime? Published { get; init; }
 
-    public string ReleaseName { get; }
+    public PartialDate? NextReleaseDate { get; init; }
 
-    public PartialDate NextReleaseDate { get; }
+    [JsonConverter(typeof(JsonStringEnumConverter<ReleaseType>))]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    public required ReleaseType Type { get; init; }
 
-    [JsonConverter(typeof(StringEnumConverter))]
-    public ReleaseType Type { get; }
+    public required bool LatestRelease { get; init; }
 
-    public bool LatestRelease { get; }
+    public PublicationSummaryViewModel? Publication { get; init; }
 
-    public PublicationSummaryViewModel? Publication { get; }
+    public ReleaseSummaryViewModel()
+    {
+    }
 
+    [SetsRequiredMembers]
     public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
     {
         Id = release.Id;
@@ -39,13 +43,13 @@ public record ReleaseSummaryViewModel
         YearTitle = release.YearTitle;
         CoverageTitle = release.CoverageTitle;
         Published = release.Published;
-        ReleaseName = release.ReleaseName;
         NextReleaseDate = release.NextReleaseDate;
         Type = release.Type;
         LatestRelease = Id == publication.LatestReleaseId;
         Publication = new PublicationSummaryViewModel(publication);
     }
 
+    [SetsRequiredMembers]
     public ReleaseSummaryViewModel(ReleaseVersion releaseVersion, bool latestPublishedRelease)
     {
         Id = releaseVersion.Id;
@@ -54,7 +58,6 @@ public record ReleaseSummaryViewModel
         YearTitle = releaseVersion.YearTitle;
         CoverageTitle = releaseVersion.TimePeriodCoverage.GetEnumLabel();
         Published = releaseVersion.Published;
-        ReleaseName = releaseVersion.ReleaseName;
         NextReleaseDate = releaseVersion.NextReleaseDate;
         Type = releaseVersion.Type;
         LatestRelease = latestPublishedRelease;

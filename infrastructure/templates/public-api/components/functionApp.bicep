@@ -107,7 +107,7 @@ var identity = userAssignedManagedIdentityParams != null
       type: 'SystemAssigned'
     }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: appServicePlanName
   location: location
   kind: 'functionapp'
@@ -165,7 +165,7 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
 }
 
 // This is the file share for slot 1 to use for its code storage.
-resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
   name: '${slot1StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
     slot1StorageAccountModule
@@ -189,7 +189,7 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
 }
 
 // This is the file share for slot 2 to use for its code storage.
-resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
+resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
   name: '${slot2StorageAccountName}/default/${functionAppCodeFileShareName}'
   dependsOn: [
     slot2StorageAccountModule
@@ -219,7 +219,7 @@ var commonSiteProperties = {
 }
 
 // Create the main production deploy slot.
-resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
+resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   name: fullFunctionAppName
   location: location
   kind: 'functionapp'
@@ -229,7 +229,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
 }
 
 // Create the staging deploy slot.
-resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = {
+resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
   name: 'staging'
   parent: functionApp
   location: location
@@ -275,13 +275,13 @@ var authSettingsV2Properties = entraIdAuthentication == null ? {} : {
   }
 }
 
-resource functionAppAuthSettings 'Microsoft.Web/sites/config@2022-03-01' = {
+resource functionAppAuthSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   name: 'authsettingsV2'
   parent: functionApp
   properties: authSettingsV2Properties
 }
 
-resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2022-03-01' = {
+resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = {
   name: 'authsettingsV2'
   parent: stagingSlot
   properties: authSettingsV2Properties
@@ -363,7 +363,7 @@ module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
   }
 }
 
-resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2021-01-15' = {
+resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
    name: 'azurestorageaccounts'
    parent: functionApp
    properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {

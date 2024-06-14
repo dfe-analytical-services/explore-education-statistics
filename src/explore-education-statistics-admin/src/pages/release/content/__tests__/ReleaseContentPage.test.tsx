@@ -141,7 +141,6 @@ describe('ReleaseContentPage', () => {
       methodologies: [],
     },
     relatedInformation: [],
-    releaseName: '2020',
     slug: '2020-21',
     summarySection: {
       id: 'summary-id',

@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -71,55 +71,55 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
         var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
         claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
 
+        await TestApp.AddTestData<UsersAndRolesDbContext>(context =>
+        {
+            var globalRoles = GetGlobalRoles();
+            context.Roles.AddRange(globalRoles);
+
+            var globalRoleClaims = GetGlobalRoleClaims();
+            context.RoleClaims.AddRange(globalRoleClaims);
+
+            // Add an Identity user for an unrelated user.
+            context.Users.Add(new ApplicationUser
+            {
+                Id = unrelatedUserId.ToString(),
+                Email = unrelatedUserEmail.ToLower(),
+                NormalizedEmail = unrelatedUserEmail.ToUpper(),
+                FirstName = "AnotherFirstName",
+                LastName = "AnotherLastName"
+            });
+
+            // Add a global role assignment for the unrelated user.
+            context.UserRoles.Add(new IdentityUserRole<string>
+            {
+                UserId = unrelatedUserId.ToString(),
+                RoleId = globalRoles[0].Id
+            });
+
+            // Add an Identity user for the user.
+            context.Users.Add(new ApplicationUser
+            {
+                Id = userId.ToString(),
+                Email = email,
+                NormalizedEmail = email.ToUpper(),
+                FirstName = "FirstName",
+                LastName = "LastName"
+            });
+
+            // Add a global role assignment for the user.
+            context.UserRoles.Add(new IdentityUserRole<string>
+            {
+                UserId = userId.ToString(),
+                RoleId = globalRoles[1].Id
+            });
+
+        });
+
         // Set up scenario and test data.
         var client = TestApp
             .WithWebHostBuilder(builder => builder
                 .WithAdditionalControllers(typeof(TestController)))
             .SetUser(claimsPrincipal)
-            .ResetUsersAndRolesDbContext()
-            .AddUsersAndRolesDbTestData(context =>
-            {
-                var globalRoles = GetGlobalRoles();
-                context.Roles.AddRange(globalRoles);
-
-                var globalRoleClaims = GetGlobalRoleClaims();
-                context.RoleClaims.AddRange(globalRoleClaims);
-
-                // Add an Identity user for an unrelated user.
-                context.Users.Add(new ApplicationUser
-                {
-                    Id = unrelatedUserId.ToString(),
-                    Email = unrelatedUserEmail.ToLower(),
-                    NormalizedEmail = unrelatedUserEmail.ToUpper(),
-                    FirstName = "AnotherFirstName",
-                    LastName = "AnotherLastName"
-                });
-
-                // Add a global role assignment for the unrelated user.
-                context.UserRoles.Add(new IdentityUserRole<string>
-                {
-                    UserId = unrelatedUserId.ToString(),
-                    RoleId = globalRoles[0].Id
-                });
-
-                // Add an Identity user for the user.
-                context.Users.Add(new ApplicationUser
-                {
-                    Id = userId.ToString(),
-                    Email = email,
-                    NormalizedEmail = email.ToUpper(),
-                    FirstName = "FirstName",
-                    LastName = "LastName"
-                });
-
-                // Add a global role assignment for the user.
-                context.UserRoles.Add(new IdentityUserRole<string>
-                {
-                    UserId = userId.ToString(),
-                    RoleId = globalRoles[1].Id
-                });
-
-            })
             .CreateClient();
 
         var response = await client.GetAsync("/test/role-claims");

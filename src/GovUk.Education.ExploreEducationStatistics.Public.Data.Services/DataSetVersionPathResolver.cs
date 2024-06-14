@@ -1,4 +1,3 @@
-using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -46,10 +45,12 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 
         if (_environment.IsIntegrationTest())
         {
+            var randomTestInstanceDir = Guid.NewGuid().ToString();
             return Path.Combine(
-                Assembly.GetExecutingAssembly().GetDirectoryPath(),
+                Path.GetTempPath(),
+                "ExploreEducationStatistics",
                 PathUtils.OsPath(_options.Value.BasePath),
-                Guid.NewGuid().ToString()
+                randomTestInstanceDir
             );
         }
 

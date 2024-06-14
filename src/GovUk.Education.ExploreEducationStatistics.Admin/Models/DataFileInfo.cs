@@ -7,12 +7,9 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
-    public class DataFileInfo : FileInfo
+    public record DataFileInfo : FileInfo
     {
-        public DataFileInfo()
-        {
-            Type = FileType.Data;
-        }
+        public override FileType Type { get; set; } = FileType.Data;
 
         public Guid? MetaFileId { get; set; }
 

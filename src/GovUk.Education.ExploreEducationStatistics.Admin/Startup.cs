@@ -105,6 +105,8 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admi
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
+using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -751,6 +753,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public Task<bool> FileHasVersion(Guid releaseFileId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(false);
+        }
+
+        public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
     }
 }
