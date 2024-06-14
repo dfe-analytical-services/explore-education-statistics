@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.ListSitemapItems())
+            methodologyService.Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<MethodologySitemapItemViewModel>()
                 {
                     new()

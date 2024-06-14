@@ -60,9 +60,8 @@ public class DataSetFilesController : ControllerBase
     }
 
     [HttpGet("data-set-files/sitemap-items")]
-    public async Task<ActionResult<List<DataSetSitemapItemViewModel>>> ListSitemapItems()
-    {
-        return await _dataSetFileService.ListSitemapItems()
+    public async Task<ActionResult<List<DataSetSitemapItemViewModel>>> ListSitemapItems(
+        CancellationToken cancellationToken = default) =>
+        await _dataSetFileService.ListSitemapItems(cancellationToken)
             .HandleFailuresOrOk();
-    }
 }

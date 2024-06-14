@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -341,7 +342,8 @@ public class PublicationService : IPublicationService
             .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data);
     }
 
-    public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems() =>
+    public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
+        CancellationToken cancellationToken = default) =>
         await
             _contentDbContext.Publications
                 .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
@@ -353,7 +355,7 @@ public class PublicationService : IPublicationService
                     LastModified = p.Updated,
                     Releases = ListUniqueReleaseVersionSitemapItems(p)
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
     private static List<ReleaseSitemapItemViewModel> ListUniqueReleaseVersionSitemapItems(Publication publication) =>
         publication.ReleaseVersions

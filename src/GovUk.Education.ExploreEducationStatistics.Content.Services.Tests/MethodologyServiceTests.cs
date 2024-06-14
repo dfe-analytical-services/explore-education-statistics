@@ -740,8 +740,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.Attach(methodology.Versions[0]);
-                
                 var service = SetupMethodologyService(contentDbContext);
                 var result = (await service.ListSitemapItems()).AssertRight();
 
@@ -799,8 +797,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.Attach(methodology.Versions[0]);
-                
                 var service = SetupMethodologyService(contentDbContext);
                 var result = (await service.ListSitemapItems()).AssertRight();
 

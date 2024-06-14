@@ -1,4 +1,12 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -18,14 +26,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -140,7 +140,8 @@ public class DataSetFileService : IDataSetFileService
             };
     }
 
-    public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems()
+    public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems(
+        CancellationToken cancellationToken = default)
     {
         var latestReleaseVersions = _contentDbContext.ReleaseVersions
             .LatestReleaseVersions(publishedOnly: true);
@@ -157,7 +158,7 @@ public class DataSetFileService : IDataSetFileService
                 Id = rf.File.DataSetFileId!.Value.ToString(),
                 LastModified = rf.Published
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
