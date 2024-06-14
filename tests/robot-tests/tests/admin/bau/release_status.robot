@@ -300,9 +300,8 @@ Publish the release immediately
 Create third release
     ${DATA_FILES_PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME_DATAFILES}
     user creates test release via api    ${DATA_FILES_PUBLICATION_ID}    FY    2300
-     user navigates to draft release page from dashboard    ${PUBLICATION_NAME_DATAFILES}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME_DATAFILES}
     ...    Financial year 2300-01
-
 
 Upload data files
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
@@ -339,8 +338,6 @@ Validate checklist errors and warnings
     user checks checklist warnings contains link    No data blocks have been saved as featured tables
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
-
-
     user checks checklist errors contains
     ...    3 issues that must be resolved before this release can be published.
     user checks checklist errors contains link
@@ -353,7 +350,6 @@ Validate checklist errors and warnings
     user checks page does not contain testid    releaseChecklist-success
 
 Navigate to data upload and confirm data replacement
-
     user clicks link    Data and files
     user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
     user waits until page contains accordion section    Dates test subject
@@ -373,8 +369,7 @@ Upload the larger data file via data upload
     ...    data-upload.csv
     ...    data-upload.meta.csv
 
-Validate checklist errors and warnings( 3rd release)
-
+Validate checklist errors and warnings(3rd release)
     user edits release status
     user checks checklist warnings contains
     ...    5 things you may have forgotten, but do not need to resolve to publish this release.
@@ -388,11 +383,10 @@ Validate checklist errors and warnings( 3rd release)
     ...    3 issues that must be resolved before this release can be published.
     user checks checklist errors contains link
     ...    All data imports must be completed
-     user checks checklist errors contains link
+    user checks checklist errors contains link
     ...    All summary information must be completed on the data guidance page
     user checks checklist errors contains link
     ...    Release must contain a key statistic or a non-empty headline text block
-
     user checks page does not contain testid    releaseChecklist-success
 
 Add data guidance to subject
@@ -412,17 +406,37 @@ Add data guidance to subject
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}-updated
     ...    ${SUBJECT_NAME} Main guidance content
 
+Save data guidance (third release)
     user clicks button    Save guidance
-
-
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
-    User Waits Until Data Upload Is Completed    ${SUBJECT_NAME}-updated
-    Sleep    100
+    user waits until data upload is completed    ${SUBJECT_NAME}-updated
+
+Validate checklist errors and warnings, after changes
     user edits release status
+    user checks checklist warnings contains
+    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
+    user checks checklist warnings contains link    No next expected release date has been added
+    user checks checklist warnings contains link    2 data files don't have any footnotes
+    user checks checklist warnings contains link    No data blocks have been saved as featured tables
+    user checks checklist warnings contains link    A public pre-release access list has not been created
+
+Publish the release immediately
+    user clicks radio    Approved for publication
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
+    user clicks radio    Immediately
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-month    12
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    2500
+    user clicks button    Update status
+    user waits until h2 is visible    Sign off    %{RELEASE_COMPLETE_WAIT}
+    user checks summary list contains    Current status    Approved
+    user waits for release process status to be    Complete    %{RELEASE_COMPLETE_WAIT}
+    user reloads page
+    user checks page does not contain button    Edit release status
 
 
 
