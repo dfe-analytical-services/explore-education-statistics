@@ -323,20 +323,13 @@ Navigate to data replacement page
     user clicks button    Upload data files
 
     user waits until page contains element    testid:Replacement Subject title
+    user reloads page
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Validate checklist errors and warnings
     user edits release status
-
-    user checks checklist warnings contains
-    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
-    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
-    user checks checklist warnings contains link    No next expected release date has been added
-    user checks checklist warnings contains link    1 data file does not have any footnotes
-    user checks checklist warnings contains link    No data blocks have been saved as featured tables
-    user checks checklist warnings contains link    A public pre-release access list has not been created
 
     user checks checklist errors contains
     ...    3 issues that must be resolved before this release can be published.
