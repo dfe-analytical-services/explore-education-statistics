@@ -138,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             return await _contentDbContext.Methodologies
                 .Include(m => m.LatestPublishedVersion)
+                .ThenInclude(mv => mv!.Methodology)
                 .Where(m => m.LatestPublishedVersion != null)
                 .Select(m => m.LatestPublishedVersion)
                 .OfType<MethodologyVersion>()
