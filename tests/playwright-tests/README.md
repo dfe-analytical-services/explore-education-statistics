@@ -9,8 +9,15 @@
 * ES-lint extension
 * Playwright test runner
 
+## Setup
 
-## Installation (VSCode)
+Playwright will be installed alongside all other dependencies when running the `pnpm i` command (see root project setup)
+
+## Running the tests
+
+From the root directly, enter the command `pnpm test:playwright`.
+
+## Manual Installation (VSCode)
 
 1. Navigate to 'Playwright-tests' folder
 1. Ensure the NodeJS version is above 14 from the command prompt.
@@ -50,7 +57,7 @@ pnpm create playwright
 1. Add a GitHub Actions workflow to easily run tests on CI
 1. Install Playwright browsers (default is true)
 
-## How to run the playwright test?
+## How to run the playwright test from <root>/src/tests/playwright-tests?
 
 ### Running the end-to-end test: 
 ```bash

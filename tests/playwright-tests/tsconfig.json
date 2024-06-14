@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "@util/*": ["./utils/*"],
       "@admin/*": ["./admin/*"],
-      "@general-public/*": ["./general-public/*"]
+      "@general-public/*": ["./general-public/*"],
+      "@frontend-root/*": [
+        "../../src/explore-education-statistics-frontend/*"
+      ]
     }
   },
   "include": ["**/*.ts"],
