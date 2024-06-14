@@ -41,7 +41,7 @@
     "devopsSPN": {
       "value": "2d5a7bf2-a6b1-4474-b202-ab17dd87c375",
       "metadata": {
-         "comments": "ObjectId for s101prep-datahub-spn-ees-dfe-gov-uk"
+        "comments": "ObjectId for s101prep-datahub-spn-ees-dfe-gov-uk"
       }
     },
     "domain": {
@@ -52,6 +52,9 @@
     },
     "dataApiUrl": {
       "value": "data.pre-production.explore-education-statistics.service.gov.uk"
+    },
+    "publicApiUrl": {
+      "value": "pre-production.statistics.api.education.gov.uk"
     },
     "publicAppGATrackingId": {
       "value": "G-8FSLWXTV2W"
