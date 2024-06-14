@@ -592,8 +592,8 @@ user waits until data upload displays importing
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    Sleep    2
-    User Waits Until Page Finishes Loading
+    sleep    2
+    user waits until page finishes loading
     user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
     user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
     user opens accordion section    ${SUBJECT_NAME}
