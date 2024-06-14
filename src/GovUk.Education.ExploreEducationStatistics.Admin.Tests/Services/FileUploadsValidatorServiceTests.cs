@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .WithFile(_fixture.DefaultFile()
+                .WithFile(_fixture.DefaultFile(FileType.Data)
                     .WithFilename("test.csv"));
 
             var contextId = Guid.NewGuid().ToString();
@@ -260,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
 
             // The file being replaced here has the same name as the one being uploaded, but that's ok.
-            var fileBeingReplaced = _fixture.DefaultFile()
+            var fileBeingReplaced = _fixture.DefaultFile(FileType.Data)
                 .WithFilename("test.csv");
 
             var releaseFile = _fixture.DefaultReleaseFile()
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Create two release files, one of which is the file being replaced, and the other has the same filename
             // as the file being uploaded.
-            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile()
+            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile(FileType.Data)
                 .ForIndex(0, s => s.SetFilename("test.csv"))
                 .ForIndex(1, s => s.SetFilename("another.csv"))
                 .Generate(2)
@@ -521,7 +521,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .WithFile(_fixture.DefaultFile()
+                .WithFile(_fixture.DefaultFile(FileType.Data)
                     .WithFilename("test.csv"));
 
             var contextId = Guid.NewGuid().ToString();
@@ -550,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
 
             // The file being replaced here has the same name as the one being uploaded, but that's ok.
-            var fileBeingReplaced = _fixture.DefaultFile()
+            var fileBeingReplaced = _fixture.DefaultFile(FileType.Data)
                 .WithFilename("test.csv");
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
@@ -589,7 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Create two release files, one of which is the file being replaced, and the other has the same filename
             // as the file being uploaded.
-            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile()
+            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile(FileType.Data)
                 .ForIndex(0, s => s.SetFilename("test.csv"))
                 .ForIndex(1, s => s.SetFilename("another.csv"))
                 .Generate(2)

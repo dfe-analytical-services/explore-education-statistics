@@ -171,7 +171,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         {
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(_fixture.DefaultReleaseVersion())
-                .WithFile(_fixture.DefaultFile());
+                .WithFile(_fixture.DefaultFile(FileType.Data));
 
             DataSet dataSet = _fixture.DefaultDataSet();
 
@@ -245,8 +245,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         {
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(_fixture.DefaultReleaseVersion())
-                .WithFile(_fixture.DefaultFile()
-                    .WithType(FileType.Ancillary));
+                .WithFile(_fixture.DefaultFile(FileType.Ancillary));
 
             await AddTestData<ContentDbContext>(context =>
             {
@@ -274,7 +273,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
         {
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(_fixture.DefaultReleaseVersion())
-                .WithFile(_fixture.DefaultFile());
+                .WithFile(_fixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
             {
