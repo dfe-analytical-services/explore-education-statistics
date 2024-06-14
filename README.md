@@ -552,6 +552,8 @@ These scripts can generally be run from most `package.json` files across the pro
 
 - `pnpm format` - Format codebase using Prettier.
 
+- `pnpm test:playwright` - Run the Playwright tests (requires all services running)
+
 #### Project root scripts
 
 These can only be run from the project root `package.json`.
