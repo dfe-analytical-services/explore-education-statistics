@@ -44,19 +44,27 @@ internal class DataSetCandidateService(
         Guid releaseVersionId,
         CancellationToken cancellationToken)
     {
-        return await contentDbContext.ReleaseFiles
+        var releaseFilesByFileId = await contentDbContext.ReleaseFiles
             .AsNoTracking()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Where(rf => rf.File.Type == FileType.Data)
             .Where(rf => rf.File.PublicApiDataSetId == null)
             .Where(rf => rf.File.ReplacedById == null)
             .Where(rf => rf.File.ReplacingId == null)
+            .ToDictionaryAsync(rf => rf.FileId, cancellationToken: cancellationToken);
+
+        return (await contentDbContext.DataImports
+            .Where(di => di.Status == DataImportStatus.COMPLETE)
+            .Where(di => releaseFilesByFileId.Keys.Contains(di.FileId))
+            .Select(di => di.FileId)
+            .ToListAsync(cancellationToken: cancellationToken))
+            .Select(fileId => releaseFilesByFileId[fileId])
             .Select(rf => new DataSetCandidateViewModel
             {
                 ReleaseFileId = rf.Id,
                 Title = rf.Name!,
             })
             .OrderBy(rf => rf.Title)
-            .ToListAsync(cancellationToken: cancellationToken);
+            .ToList();
     }
 }
