@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -31,7 +32,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             var files = DataFixture
-                .DefaultFile()
+                .DefaultFile(FileType.Data)
                 .GenerateList(3);
 
             var releaseVersion = release.Versions.Single();
@@ -106,7 +107,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             File file = DataFixture
-                .DefaultFile()
+                .DefaultFile(FileType.Data)
                 .WithReplacingId(Guid.NewGuid());
 
             var releaseVersion = release.Versions.Single();
@@ -133,7 +134,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             File file = DataFixture
-                .DefaultFile()
+                .DefaultFile(FileType.Data)
                 .WithReplacedById(Guid.NewGuid());
 
             var releaseVersion = release.Versions.Single();
@@ -160,7 +161,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             File file = DataFixture
-                .DefaultFile()
+                .DefaultFile(FileType.Data)
                 .WithPublicApiDataSetId(Guid.NewGuid());
 
             var releaseVersion = release.Versions.Single();
