@@ -402,7 +402,7 @@ Add data guidance to subject
 
 Save data guidance (third release)
     user clicks button    Save guidance
-    user waits for cache to expire
+    user waits for caches to expire       #prevent intermittent failure in pipeline - data guidance to be saved  before navigating to content page
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
