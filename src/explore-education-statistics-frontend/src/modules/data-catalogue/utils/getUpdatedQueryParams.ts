@@ -28,7 +28,7 @@ export default async function getUpdatedQueryParams({
     return {
       ...omit(query, [
         'page',
-        ...(filterByReleaseId ? ['latest'] : ['releaseId']),
+        ...(filterByReleaseId ? ['latest', 'latestOnly'] : ['releaseId']),
       ]),
       ...(!filterByReleaseId && {
         latestOnly: nextValue === 'latest' ? 'true' : 'false',

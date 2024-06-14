@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -58,6 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataFileInfo = new DataFileInfo
             {
                 Name = "Subject name",
+                FileName = "subject-name.csv",
+                Size = "1 Kb",
             };
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
@@ -122,13 +123,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 {
                     FileName = "file1.csv",
                     Name = "Release a file 1",
-                    Size = "1 Kb"
+                    Size = "1 Kb",
                 },
                 new()
                 {
                     FileName = "file2.csv",
                     Name = "Release a file 2",
-                    Size = "1 Kb"
+                    Size = "1 Kb",
                 }
             };
 

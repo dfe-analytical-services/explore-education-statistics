@@ -8,7 +8,7 @@ export default function getVersionStatusTagColour(
     case 'Published':
       return 'blue';
     case 'Deprecated':
-      return 'light-blue';
+      return 'purple';
     case 'Withdrawn':
       return 'grey';
     case 'Draft':

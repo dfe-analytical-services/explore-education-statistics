@@ -165,7 +165,6 @@ export interface Release<
   title: string;
   yearTitle: string;
   coverageTitle: string;
-  releaseName: string;
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
@@ -190,7 +189,6 @@ export interface ReleaseSummary {
   title: string;
   yearTitle: string;
   coverageTitle: string;
-  releaseName: string;
   published?: string;
   slug: string;
   nextReleaseDate: PartialDate;
@@ -237,6 +235,17 @@ export interface Theme {
 
 export interface PublicationTreeOptions {
   publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
+}
+
+export interface PublicationSitemapItem {
+  slug: string;
+  lastModified?: string;
+  releases: ReleaseSitemapItem[];
+}
+
+export interface ReleaseSitemapItem {
+  slug: string;
+  lastModified?: string;
 }
 
 const publicationService = {
@@ -300,6 +309,9 @@ const publicationService = {
     return contentApi.get(`/publications`, {
       params,
     });
+  },
+  listSitemapItems(): Promise<PublicationSitemapItem[]> {
+    return contentApi.get('/publications/sitemap-items');
   },
 };
 export default publicationService;

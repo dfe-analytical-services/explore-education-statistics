@@ -36,14 +36,14 @@ public class ProcessorClientTests
             Mock.Of<IWebHostEnvironment>());
     }
 
-    public class CreateInitialDataSetVersionTests : ProcessorClientTests
+    public class CreateDataSetTests : ProcessorClientTests
     {
-        private static readonly Uri Uri = new(BaseUri, "api/CreateInitialDataSetVersion");
+        private static readonly Uri Uri = new(BaseUri, "api/CreateDataSet");
 
         [Fact]
         public async Task HttpClientSuccess()
         {
-            var responseBody = new CreateInitialDataSetVersionResponseViewModel
+            var responseBody = new CreateDataSetResponseViewModel
             {
                 DataSetId = Guid.NewGuid(),
                 DataSetVersionId = Guid.NewGuid(),
@@ -53,7 +53,7 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
 
-            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
+            var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -79,7 +79,7 @@ public class ProcessorClientTests
                         }
                     }));
 
-            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
+            var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -93,7 +93,7 @@ public class ProcessorClientTests
             _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.NotFound);
 
-            var response = await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
+            var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -118,7 +118,7 @@ public class ProcessorClientTests
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _processorClient.CreateInitialDataSetVersion(releaseFileId: Guid.NewGuid());
+                await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();

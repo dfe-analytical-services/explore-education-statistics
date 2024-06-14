@@ -60,27 +60,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
 
   const queryClient = new QueryClient();
 
-  if (newDesign) {
-    await queryClient.prefetchQuery(dataSetFileQueries.list(context.query));
-    await queryClient.prefetchQuery(
-      publicationQueries.getPublicationTree({
-        publicationFilter: 'DataCatalogue',
-      }),
-    );
-
-    if (!showTypeFilter) {
-      const apiDataSets = await queryClient.fetchQuery(
-        dataSetFileQueries.list({ dataSetType: 'api' }),
-      );
-      showTypeFilter = !!apiDataSets.results.length;
-    }
-  }
-
-  const themes = newDesign
-    ? []
-    : await publicationService.getPublicationTree({
-        publicationFilter: 'DataCatalogue',
-      });
+  const themes = await queryClient.fetchQuery(
+    publicationQueries.getPublicationTree({
+      publicationFilter: 'DataCatalogue',
+    }),
+  );
 
   const selectedPublication = themes
     .flatMap(option => option.topics)
@@ -88,17 +72,40 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     .find(option => option.slug === publicationSlug);
 
   let releases: ReleaseSummary[] = [];
-
-  if (selectedPublication) {
-    releases = newDesign
-      ? []
-      : await publicationService.listReleases(publicationSlug);
-  }
-
   let selectedRelease: ReleaseSummary | undefined;
 
-  if (releaseSlug) {
-    selectedRelease = releases.find(rel => rel.slug === releaseSlug);
+  if (selectedPublication) {
+    releases = await queryClient.fetchQuery(
+      publicationQueries.listReleases(selectedPublication.slug),
+    );
+
+    selectedRelease = releaseSlug
+      ? releases.find(rel => rel.slug === releaseSlug)
+      : undefined;
+
+    // Redirect old slug based links to new format.
+    if (newDesign) {
+      const redirectUrlQuery = selectedRelease
+        ? `publicationId=${selectedPublication.id}&releaseId=${selectedRelease.id}`
+        : `publicationId=${selectedPublication.id}`;
+      return {
+        redirect: {
+          destination: `/data-catalogue?${redirectUrlQuery}&newDesign=true`,
+          permanent: true,
+        },
+      };
+    }
+  }
+
+  if (newDesign) {
+    await queryClient.prefetchQuery(dataSetFileQueries.list(context.query));
+
+    if (!showTypeFilter) {
+      const apiDataSets = await queryClient.fetchQuery(
+        dataSetFileQueries.list({ dataSetType: 'api' }),
+      );
+      showTypeFilter = !!apiDataSets.results.length;
+    }
   }
 
   let subjects: Subject[] = [];
@@ -114,16 +121,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     releases,
     subjects,
     themes,
+    ...(selectedPublication && { selectedPublication }),
+    ...(selectedRelease && { selectedRelease }),
     newDesign: !!newDesign,
   };
-
-  if (selectedPublication) {
-    props.selectedPublication = selectedPublication;
-
-    if (selectedRelease) {
-      props.selectedRelease = selectedRelease;
-    }
-  }
 
   return {
     props: { ...props, dehydratedState: dehydrate(queryClient) },

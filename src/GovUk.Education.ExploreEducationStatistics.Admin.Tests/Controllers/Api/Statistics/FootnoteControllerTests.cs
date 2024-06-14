@@ -102,8 +102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                                 file: new FileInfo
                                 {
                                     Id = Guid.NewGuid(),
+                                    Name = "Test file",
                                     FileName = "test.csv",
-                                    Size = "1 Mb"
+                                    Size = "1 Mb",
                                 },
                                 lastUpdated: DateTime.Now
                             )

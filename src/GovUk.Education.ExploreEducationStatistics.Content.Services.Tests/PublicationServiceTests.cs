@@ -2027,6 +2027,97 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
         }
 
+        public class ListSitemapItemsTests : PublicationServiceTests
+        {
+            [Fact]
+            public async Task ListSitemapItems()
+            {
+                var publicationUpdated = "2018-04-06T13:46:11";
+                var publicationId = Guid.NewGuid();
+
+                var firstReleaseId = Guid.NewGuid();
+                var firstReleaseSlug = "first-release-slug";
+
+                var secondReleaseId = Guid.NewGuid();
+                var secondReleaseSlug = "second-release-slug";
+
+                var firstReleaseVersionPublishedDate = "2019-02-03T07:34:12";
+                var firstReleaseVersionUpdateDate = "2019-02-04T08:29:54";
+            
+                var publicationUpdatedDate = DateTime.Parse(publicationUpdated);
+                var firstReleaseVersionPublished = DateTime.Parse(firstReleaseVersionPublishedDate);
+                var firstReleaseVersionUpdated = DateTime.Parse(firstReleaseVersionUpdateDate);
+
+                var releaseOneVersionOne = new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = firstReleaseSlug,
+                    ReleaseId = firstReleaseId,
+                    Published = firstReleaseVersionPublished
+                };
+
+                var releaseOneVersionTwo = new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = firstReleaseSlug,
+                    ReleaseId = firstReleaseId,
+                    Published = firstReleaseVersionUpdated // Two versions with same slug to test de-duping
+                };
+
+                var releaseTwoVersionOne = new ReleaseVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = secondReleaseSlug,
+                    ReleaseId = secondReleaseId,
+                    Published = null // still in draft
+                };
+
+                var publication = new Publication
+                {
+                    Id = publicationId,
+                    Updated = publicationUpdatedDate,
+                    ReleaseSeries =
+                    [
+                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = firstReleaseId },
+                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = secondReleaseId }
+                    ],
+                    ReleaseVersions =
+                    [
+                        releaseOneVersionOne,
+                        releaseOneVersionTwo,
+                        releaseTwoVersionOne
+                    ],
+                    LatestPublishedReleaseVersionId = firstReleaseId
+                };
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    contentDbContext.ReleaseVersions.AddRange(releaseOneVersionOne, releaseOneVersionTwo,
+                        releaseTwoVersionOne);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+
+                    var result = (await service.ListSitemapItems()).AssertRight();
+
+                    var item = Assert.Single(result);
+                    Assert.Equal(publication.Slug, item.Slug);
+                    Assert.Equal(publicationUpdatedDate, item.LastModified);
+                    
+                    Assert.NotNull(item.Releases);
+                    var nonDraftReleaseVersion = Assert.Single(item.Releases);
+
+                    Assert.Equal(firstReleaseSlug, nonDraftReleaseVersion.Slug);
+                    Assert.Equal(firstReleaseVersionUpdated, nonDraftReleaseVersion.LastModified);
+                }
+            }
+        }
+
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
             IPublicationRepository? publicationRepository = null,

@@ -151,7 +151,6 @@ const prototypeReleaseContent: ReleaseContent = {
         url: 'https://test.com',
       },
     ],
-    releaseName: '2023',
     slug: 'Release-title',
     summarySection: {
       id: 'summary-section-id',

@@ -32,7 +32,7 @@ param azureFileShares {
 }[] = []
 
 @description('Set specific appsettings to be slot specific values')
-resource functionSlotConfig 'Microsoft.Web/sites/config@2023-01-01' = {
+resource functionSlotConfig 'Microsoft.Web/sites/config@2023-12-01' = {
   name: '${appName}/slotConfigNames'
   properties: {
     appSettingNames: slotSpecificSettingKeys
@@ -50,12 +50,12 @@ var combinedStagingSettings = union(commonSettings, stagingOnlySettings, existin
 var combinedProductionSettings = union(commonSettings, prodOnlySettings, existingProductionAppSettings)
 
 @description('Set appsettings on the staging slot')
-resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-01-01' = {
+resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = {
   name: '${appName}/${stagingSlotName}/appsettings'
   properties: combinedStagingSettings
 }
 
-resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2021-01-15' = {
+resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2023-12-01' = {
   name: '${appName}/${stagingSlotName}/azurestorageaccounts'
   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
     '${next.storageName}': {
@@ -69,7 +69,7 @@ resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2021-01-15' = {
 }
 
 @description('Set appsettings on production slot')
-resource appProductionSettings 'Microsoft.Web/sites/config@2023-01-01' = {
+resource appProductionSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   name: '${appName}/appsettings'
   properties: combinedProductionSettings
 }

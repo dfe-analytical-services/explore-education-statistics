@@ -104,7 +104,6 @@ describe('PreReleaseContentPage', () => {
     },
     publishScheduled: '2020-03-03',
     relatedInformation: [],
-    releaseName: '2020',
     slug: '2020-21',
     summarySection: {
       id: 'summary-id',

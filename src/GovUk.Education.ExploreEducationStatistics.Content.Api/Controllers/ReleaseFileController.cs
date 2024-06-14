@@ -2,31 +2,36 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Net.Http.Headers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class ReleaseFileController : ControllerBase
+    public class ReleaseFileController(
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IReleaseFileService releaseFileService)
+        : ControllerBase
     {
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IReleaseFileService _releaseFileService;
-
-        public ReleaseFileController(IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IReleaseFileService releaseFileService)
+        [HttpPost("release-files")]
+        public async Task<ActionResult<IList<ReleaseFileViewModel>>> ListReleaseFiles(
+            [FromBody] ReleaseFileListRequest request,
+            CancellationToken cancellationToken)
         {
-            _persistenceHelper = persistenceHelper;
-            _releaseFileService = releaseFileService;
+            return await releaseFileService
+                .ListReleaseFiles(request, cancellationToken)
+                .HandleFailuresOrOk();
         }
 
         [ResponseCache(Duration = 300)]
@@ -36,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             if (Guid.TryParse(releaseVersionId, out var releaseVersionIdGuid) &&
                 Guid.TryParse(fileId, out var fileIdGuid))
             {
-                return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionIdGuid)
+                return await persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionIdGuid)
                     .OnSuccessDo(rv => this.CacheWithLastModified(rv.Published))
-                    .OnSuccess(rv =>  _releaseFileService.StreamFile(releaseVersionId: rv.Id,
+                    .OnSuccess(rv =>  releaseFileService.StreamFile(releaseVersionId: rv.Id,
                         fileId: fileIdGuid))
                     .OnSuccessDo(result => this.CacheWithETag(result.FileStream.ComputeMd5Hash()))
                     .HandleFailures();
@@ -54,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             Guid releaseVersionId,
             [FromQuery] IList<Guid>? fileIds = null)
         {
-            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
+            return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
                     releaseVersionId,
                     q => q.Include(rv => rv.Publication)
                 )
@@ -71,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         // appended in-flight to the user's download.
                         // This is more efficient and means the user doesn't have
                         // to spend time waiting for the download to initiate.
-                        return await _releaseFileService.ZipFilesToStream(
+                        return await releaseFileService.ZipFilesToStream(
                             releaseVersionId: releaseVersionId,
                             outputStream: Response.BodyWriter.AsStream(),
                             fileIds: fileIds,

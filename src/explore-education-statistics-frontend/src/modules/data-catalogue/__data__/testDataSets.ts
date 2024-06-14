@@ -220,6 +220,13 @@ export const testApiDataSetVersion: ApiDataSetVersion = {
   published: '2024-05-13',
   notes: 'Test notes',
   totalResults: 1,
+  file: {
+    id: 'file-id',
+  },
+  release: {
+    title: 'Release title',
+    slug: 'release-slug',
+  },
   timePeriods: { start: '2019', end: '2020' },
   geographicLevels: [],
   filters: [],
@@ -234,9 +241,41 @@ export const testApiDataSetVersions: PaginatedList<ApiDataSetVersion> = {
     totalPages: 1,
   },
   results: [
-    { ...testApiDataSetVersion, version: '2.0' },
-    { ...testApiDataSetVersion, version: '1.2', status: 'Deprecated' },
-    { ...testApiDataSetVersion, version: '1.0', status: 'Withdrawn' },
+    {
+      ...testApiDataSetVersion,
+      version: '2.0',
+      file: {
+        id: 'file-1-id',
+      },
+      release: {
+        title: 'Release 1 title',
+        slug: 'release-1-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '1.2',
+      status: 'Deprecated',
+      file: {
+        id: 'file-2-id',
+      },
+      release: {
+        title: 'Release 2 title',
+        slug: 'release-2-slug',
+      },
+    },
+    {
+      ...testApiDataSetVersion,
+      version: '1.0',
+      status: 'Withdrawn',
+      file: {
+        id: 'file-3-id',
+      },
+      release: {
+        title: 'Release 3 title',
+        slug: 'release-3-slug',
+      },
+    },
   ],
 };
 

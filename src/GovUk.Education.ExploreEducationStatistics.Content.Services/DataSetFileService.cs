@@ -140,6 +140,26 @@ public class DataSetFileService : IDataSetFileService
             };
     }
 
+    public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems()
+    {
+        var latestReleaseVersions = _contentDbContext.ReleaseVersions
+            .LatestReleaseVersions(publishedOnly: true);
+
+        var latestReleaseFiles = _contentDbContext.ReleaseFiles
+            .AsNoTracking()
+            .OfFileType(FileType.Data)
+            .HavingNoDataReplacementInProgress()
+            .HavingLatestPublishedReleaseVersions(latestReleaseVersions, latestOnly: false);
+
+        return await latestReleaseFiles
+            .Select(rf => new DataSetSitemapItemViewModel()
+            {
+                Id = rf.File.DataSetFileId!.Value.ToString(),
+                LastModified = rf.Published
+            })
+            .ToListAsync();
+    }
+
     private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
         IList<DataSetFileSummaryViewModel> results)
     {
