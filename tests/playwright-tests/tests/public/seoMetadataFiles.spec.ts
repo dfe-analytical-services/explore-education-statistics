@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import environment from '@util/env';
 
-const { PUBLIC_URL } = environment;
+const { PUBLIC_URL, PROD_PUBLIC_URL } = environment;
 
 test.describe('SEO Metadata Files', () => {
   test('An xml sitemap index file can be found at the expected route', async ({
@@ -15,7 +15,7 @@ test.describe('SEO Metadata Files', () => {
     ).toHaveCount(1);
 
     await expect(
-      page.getByText(`${PUBLIC_URL}/server-sitemap.xml`),
+      page.getByText(`${PROD_PUBLIC_URL}/server-sitemap.xml`),
     ).toHaveCount(1);
   });
 
@@ -44,11 +44,11 @@ test.describe('SEO Metadata Files', () => {
     await expect(page).toHaveURL(`${PUBLIC_URL}/robots.txt`);
 
     await expect(
-      page.getByText('Sitemap: http://localhost:3000/sitemap.xml'),
+      page.getByText(`Sitemap: ${PROD_PUBLIC_URL}/sitemap.xml`),
     ).toHaveCount(1);
 
     await expect(
-      page.getByText('Sitemap: http://localhost:3000/server-sitemap.xml'),
+      page.getByText(`Sitemap: ${PROD_PUBLIC_URL}/server-sitemap.xml`),
     ).toHaveCount(1);
   });
 

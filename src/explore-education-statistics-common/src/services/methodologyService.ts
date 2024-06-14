@@ -37,7 +37,7 @@ const methodologyService = {
     return contentApi.get(`/methodologies/${methodologySlug}`);
   },
   listSitemapItems(): Promise<MethodologySitemapItem[]> {
-    return contentApi.get('/methodologies/sitemap-summaries');
+    return contentApi.get('/methodologies/sitemap-items');
   },
 };
 
