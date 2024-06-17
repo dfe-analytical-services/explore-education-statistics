@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseVersionId:guid}/data-blocks/{dataBlockVersionId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteDataBlockPlan>> GetDeletePlan(Guid releaseVersionId,
+        public async Task<ActionResult<DeleteDataBlockPlanViewModel>> GetDeletePlan(Guid releaseVersionId,
             Guid dataBlockVersionId)
         {
             return await _dataBlockService

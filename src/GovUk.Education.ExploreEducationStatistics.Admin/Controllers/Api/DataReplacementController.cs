@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -24,12 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseVersionId:guid}/data/{fileId:guid}/replacement-plan/{replacementFileId:guid}")]
         public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(Guid releaseVersionId,
             Guid fileId,
-            Guid replacementFileId)
+            Guid replacementFileId,
+            CancellationToken cancellationToken)
         {
             return await _replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersionId,
                     originalFileId: fileId,
-                    replacementFileId: replacementFileId
+                    replacementFileId: replacementFileId,
+                    cancellationToken: cancellationToken
                 )
                 .OnSuccess(plan => plan.ToSummary())
                 .HandleFailuresOrOk();

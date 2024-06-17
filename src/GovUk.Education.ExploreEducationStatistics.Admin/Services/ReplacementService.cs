@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -20,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -39,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ILocationRepository _locationRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IReleaseService _releaseService;
+        private readonly IDataSetVersionService _dataSetVersionService;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly ICacheKeyService _cacheKeyService;
@@ -54,6 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ILocationRepository locationRepository,
             IFootnoteRepository footnoteRepository,
             IReleaseService releaseService,
+            IDataSetVersionService dataSetVersionService,
             ITimePeriodService timePeriodService,
             IUserService userService,
             ICacheKeyService cacheKeyService,
@@ -67,6 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _locationRepository = locationRepository;
             _footnoteRepository = footnoteRepository;
             _releaseService = releaseService;
+            _dataSetVersionService = dataSetVersionService;
             _timePeriodService = timePeriodService;
             _userService = userService;
             _cacheKeyService = cacheKeyService;
@@ -76,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
             Guid releaseVersionId,
             Guid originalFileId,
-            Guid replacementFileId)
+            Guid replacementFileId,
+            CancellationToken cancellationToken = default)
         {
             return await _contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
@@ -84,10 +91,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
                     originalFileId: originalFileId,
                     replacementFileId: replacementFileId))
-                .OnSuccess(async releaseFiles =>
+                .OnSuccess(async tuple =>
                 {
-                    var originalFile = releaseFiles.originalReleaseFile.File;
-                    var replacementFile = releaseFiles.replacementReleaseFile.File;
+                    var (originalReleaseFile, replacementReleaseFile) = tuple;
+
+                    return await GetLinkedDataSetVersion(originalReleaseFile.File, cancellationToken)
+                        .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
+                })
+                .OnSuccess(async tuple =>
+                {
+                    var originalFile = tuple.originalReleaseFile.File;
+                    var replacementFile = tuple.replacementReleaseFile.File;
 
                     var originalSubjectId = originalFile.SubjectId!.Value;
                     var replacementSubjectId = replacementFile.SubjectId!.Value;
@@ -101,11 +115,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectId: originalSubjectId,
                         replacementSubjectMeta);
 
-                    return new DataReplacementPlanViewModel(
-                        dataBlocks,
-                        footnotes,
-                        originalSubjectId,
-                        replacementSubjectId);
+                    var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
+                    ? null
+                    : new DeleteApiDataSetVersionPlanViewModel
+                    {
+                        DataSetId = tuple.apiDataSetVersion.DataSetId,
+                        DataSetName = tuple.apiDataSetVersion.DataSet.Title,
+                        DataSetVersionId = tuple.apiDataSetVersion.Id,
+                        Version = tuple.apiDataSetVersion.Version,
+                        Status = tuple.apiDataSetVersion.Status
+                    };
+
+                    return new DataReplacementPlanViewModel
+                    {
+                        DataBlocks = dataBlocks,
+                        Footnotes = footnotes,
+                        IsLinkedToApiDataSetVersion = linkedApiDataSetVersionDeletionPlan is not null,
+                        LinkedApiDataSetVersion = linkedApiDataSetVersionDeletionPlan,
+                        OriginalSubjectId = originalSubjectId,
+                        ReplacementSubjectId = replacementSubjectId
+                    };
                 });
         }
 
@@ -120,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessCombineWith(_ => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
                     originalFileId: originalFileId,
                     replacementFileId: replacementFileId))
-                .OnSuccess(async planAndReleaseFiles =>
+                .OnSuccess(planAndReleaseFiles =>
                 {
                     var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
 
@@ -140,6 +169,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         throw new InvalidOperationException(
                             "Replacement file has no link with the original file");
                     }
+
+                    return (plan, originalReleaseFile, replacementReleaseFile);
+                })
+                .OnSuccess(async planAndReleaseFiles =>
+                {
+                    var (plan, originalReleaseFile, replacementReleaseFile) = planAndReleaseFiles;
 
                     var originalSubjectId = plan.OriginalSubjectId;
                     var replacementSubjectId = plan.ReplacementSubjectId;
@@ -171,6 +206,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await RemoveOriginalSubjectAndFileFromRelease(releaseVersionId, originalFileId,
                         replacementFileId);
                 });
+        }
+
+        private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
+            File file,
+            CancellationToken cancellationToken = default)
+        {
+            if (file.PublicApiDataSetId is null)
+            {
+                return (DataSetVersion)null!;
+            }
+
+            return await _dataSetVersionService.GetDataSetVersion(
+                file.PublicApiDataSetId.Value,
+                file.PublicApiDataSetVersion!,
+                cancellationToken)
+                .OnSuccess(dsv => (DataSetVersion?)dsv);
         }
 
         private async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>

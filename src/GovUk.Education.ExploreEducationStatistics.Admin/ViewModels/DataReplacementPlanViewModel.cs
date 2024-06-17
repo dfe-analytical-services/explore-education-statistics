@@ -1,36 +1,27 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public class DataReplacementPlanViewModel
     {
-        public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; }
-        public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; }
-        public Guid OriginalSubjectId { get; }
-        public Guid ReplacementSubjectId { get; }
-
-        public DataReplacementPlanViewModel(
-            IEnumerable<DataBlockReplacementPlanViewModel> dataBlocks,
-            IEnumerable<FootnoteReplacementPlanViewModel> footnotes,
-            Guid originalSubjectId,
-            Guid replacementSubjectId)
-        {
-            DataBlocks = dataBlocks;
-            Footnotes = footnotes;
-            OriginalSubjectId = originalSubjectId;
-            ReplacementSubjectId = replacementSubjectId;
-        }
+        public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; init; } = [];
+        public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
+        public bool IsLinkedToApiDataSetVersion { get; init; }
+        public DeleteApiDataSetVersionPlanViewModel? LinkedApiDataSetVersion { get; init; }
+        public Guid OriginalSubjectId { get; init; }
+        public Guid ReplacementSubjectId { get; init; }
 
         public bool Valid => DataBlocks.All(info => info.Valid)
-                             && Footnotes.All(info => info.Valid);
+                             && Footnotes.All(info => info.Valid)
+                             && !IsLinkedToApiDataSetVersion;
 
         /**
          * Trimmed down version of the data replacement plan that
@@ -38,12 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
          */
         public DataReplacementPlanViewModel ToSummary()
         {
-            return new DataReplacementPlanViewModel(
-                DataBlocks.Select(block => block.ToSummary()),
-                Footnotes.Select(footnote => footnote.ToSummary()),
-                OriginalSubjectId,
-                ReplacementSubjectId
-            );
+            return new DataReplacementPlanViewModel
+            {
+                DataBlocks = DataBlocks.Select(block => block.ToSummary()),
+                Footnotes = Footnotes.Select(footnote => footnote.ToSummary()),
+                IsLinkedToApiDataSetVersion = IsLinkedToApiDataSetVersion,
+                LinkedApiDataSetVersion = LinkedApiDataSetVersion,
+                OriginalSubjectId = OriginalSubjectId,
+                ReplacementSubjectId = ReplacementSubjectId
+            };
         }
     }
 

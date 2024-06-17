@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -184,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleaseVersionPlan(
+        public Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId, 
             CancellationToken cancellationToken = default)
         {
@@ -198,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(m => new IdTitleViewModel(m.Id, m.Title))
                         .ToList();
 
-                    return new DeleteReleasePlan
+                    return new DeleteReleasePlanViewModel
                     {
                         ScheduledMethodologies = methodologiesScheduledWithRelease
                     };
@@ -449,7 +450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(
+        public async Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
             Guid releaseVersionId,
             Guid fileId,
             CancellationToken cancellationToken = default)
@@ -475,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null 
                     ? null 
-                    : new DeleteApiDataSetVersionPlan
+                    : new DeleteApiDataSetVersionPlanViewModel
                     {
                         DataSetId = tuple.apiDataSetVersion.DataSetId,
                         DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
@@ -485,7 +486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Valid = false
                     };
 
-                    return new DeleteDataFilePlan
+                    return new DeleteDataFilePlanViewModel
                     {
                         ReleaseId = releaseVersionId,
                         SubjectId = tuple.subject.Id,
@@ -699,42 +700,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(m => releaseVersionId == m.ScheduledWithReleaseVersionId)
                 .ToList();
         }
-    }
-
-    public class DeleteDataFilePlan
-    {
-        [JsonIgnore]
-        public Guid ReleaseId { get; init; }
-
-        [JsonIgnore]
-        public Guid SubjectId { get; init; }
-
-        public DeleteDataBlockPlan DeleteDataBlockPlan { get; init; } = null!;
-
-        public List<Guid> FootnoteIds { get; init; } = null!;
-
-        public DeleteApiDataSetVersionPlan? DeleteApiDataSetVersionPlan { get; init; }
-
-        public bool Valid => DeleteApiDataSetVersionPlan?.Valid ?? true;
-    }
-
-    public class DeleteApiDataSetVersionPlan
-    {
-        public Guid DataSetId { get; init; }
-
-        public string DataSetTitle { get; init; } = null!;
-
-        public Guid Id { get; init; }
-
-        public string Version { get; init; } = null!;
-
-        public DataSetVersionStatus Status { get; init; }
-
-        public bool Valid { get; init; }
-    }
-
-    public class DeleteReleasePlan
-    {
-        public IReadOnlyList<IdTitleViewModel> ScheduledMethodologies { get; init; } = [];
     }
 }
