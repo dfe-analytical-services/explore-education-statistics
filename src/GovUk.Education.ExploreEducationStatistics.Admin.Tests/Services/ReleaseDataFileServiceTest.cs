@@ -2216,18 +2216,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
-                    .Returns([]);
+                //fileUploadsValidatorService // @MarkFix needed? I think not
+                //    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
+                //    .Returns([]);
 
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataFilesForUpload(
+                dataArchiveValidationService
+                    .Setup(s => s.ValidateDataArchiveFile(
                         releaseVersion.Id,
-                        archiveFile,
-                        () => Task.FromResult(Mock.Of<Stream>()),
-                        () => Task.FromResult(Mock.Of<Stream>()),
+                        subjectName,
+                        zipFormFile,
                         null))
-                    .ReturnsAsync([]);
+                    .ReturnsAsync(archiveFile);
 
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(
@@ -2392,26 +2391,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFormFile = CreateFormFileMock(zipFileName).Object;
             var archiveFile = CreateArchiveDataSet(subjectName, dataFileName, metaFileName);
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
-            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(MockBehavior.Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
-            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
-                    .Returns([]);
+                //fileUploadsValidatorService
+                //    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
+                //    .Returns([]);
 
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataFilesForUpload(
-                        releaseVersion.Id,
-                        archiveFile,
-                        () => Task.FromResult(Mock.Of<Stream>()),
-                        () => Task.FromResult(Mock.Of<Stream>()),
-                        null))
-                    .ReturnsAsync([]);
+                //fileUploadsValidatorService
+                //    .Setup(s => s.ValidateDataFilesForUpload(
+                //        releaseVersion.Id,
+                //        archiveFile,
+                //        Mock.Of<Stream>(),
+                //        Mock.Of<Stream>(),
+                //        null))
+                //    .ReturnsAsync([]);
 
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(
@@ -2566,23 +2565,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id,
-                        originalDataReleaseFile.Name))
-                    .Returns([]);
+                //fileUploadsValidatorService
+                //    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id,
+                //        originalDataReleaseFile.Name))
+                //    .Returns([]);
 
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataFilesForUpload(
-                        releaseVersion.Id,
-                        archiveFile,
-                        () => Task.FromResult(Mock.Of<Stream>()),
-                        () => Task.FromResult(Mock.Of<Stream>()),
-                        It.Is<File>(file => file.Id == originalDataReleaseFile.File.Id)))
-                    .ReturnsAsync([]);
+                //fileUploadsValidatorService
+                //    .Setup(s => s.ValidateDataFilesForUpload(
+                //        releaseVersion.Id,
+                //        archiveFile,
+                //        Mock.Of<Stream>(),
+                //        Mock.Of<Stream>(),
+                //        It.Is<File>(file => file.Id == originalDataReleaseFile.File.Id)))
+                //    .ReturnsAsync([]);
 
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(
-                        releaseVersion.Id, originalDataReleaseFile.Name, zipFormFile, null))
+                        releaseVersion.Id, originalDataReleaseFile.Name, zipFormFile,
+                        It.Is<File>(file => file.Filename == originalDataReleaseFile.File.Filename))) // @MarkFix probably want to check this
                     .ReturnsAsync(new Either<ActionResult, ArchiveDataSetFile>(archiveFile));
 
                 dataImportService
