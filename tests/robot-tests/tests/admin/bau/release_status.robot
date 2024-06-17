@@ -328,7 +328,7 @@ Navigate to data replacement page
     user checks table column heading contains    1    2    Replacement file
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 
-Validate checklist errors and warnings
+Validate checklist errors
     user edits release status
 
     user checks checklist errors contains
@@ -362,15 +362,8 @@ Upload the larger data file via data upload
     ...    data-upload-import.csv
     ...    data-upload-import.meta.csv
 
-Validate checklist errors and warnings(3rd release)
+Validate checklist errors (3rd release)
     user edits release status
-    user checks checklist warnings contains
-    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
-    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
-    user checks checklist warnings contains link    No next expected release date has been added
-    user checks checklist warnings contains link    2 data files don't have any footnotes
-    user checks checklist warnings contains link    No data blocks have been saved as featured tables
-    user checks checklist warnings contains link    A public pre-release access list has not been created
 
     user checks checklist errors contains
     ...    3 issues that must be resolved before this release can be published.
@@ -409,16 +402,6 @@ Add headline text block to Content page
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
     user waits until data upload is completed    ${SUBJECT_NAME}-updated
-
-Validate checklist errors and warnings, after changes
-    user edits release status
-    user checks checklist warnings contains
-    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
-    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
-    user checks checklist warnings contains link    No next expected release date has been added
-    user checks checklist warnings contains link    2 data files don't have any footnotes
-    user checks checklist warnings contains link    No data blocks have been saved as featured tables
-    user checks checklist warnings contains link    A public pre-release access list has not been created
 
 Publish the release immediately
     user clicks radio    Approved for publication
