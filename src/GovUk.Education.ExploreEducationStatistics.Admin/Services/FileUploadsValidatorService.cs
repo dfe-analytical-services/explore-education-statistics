@@ -42,10 +42,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string dataSetName,
             string dataFileName,
             long dataFileSize,
-            Func<Task<Stream>> dataFileStreamProvider,
+            Stream dataFileStream,
             string metaFileName,
             long metaFileSize,
-            Func<Task<Stream>> metaFileStreamProvider,
+            Stream metaFileStream,
             File? replacingFile = null)
         {
             List<ErrorViewModel> errors = [];
@@ -67,9 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             errors.AddRange(await ValidateDataFileTypes(
                 dataFileName,
-                dataFileStreamProvider,
+                dataFileStream,
                 metaFileName,
-                metaFileStreamProvider));
+                metaFileStream));
 
             return errors;
         }
@@ -81,23 +81,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile metaFile,
             File? replacingFile = null)
         {
+            await using var dataFileStream = dataFile.OpenReadStream();
+            await using var metaFileStream = metaFile.OpenReadStream();
+
             return await ValidateDataFilesForUpload(
                 releaseVersionId,
                 dataSetFileName,
                 dataFile.FileName,
                 dataFile.Length,
-                () => Task.FromResult(dataFile.OpenReadStream()),
+                dataFileStream,
                 metaFile.FileName,
                 metaFile.Length,
-                () => Task.FromResult(metaFile.OpenReadStream()),
+                metaFileStream,
                 replacingFile);
         }
 
         public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
             Guid releaseVersionId,
             ArchiveDataSetFile archiveDataSet,
-            Func<Task<Stream>> dataFileStreamProvider,
-            Func<Task<Stream>> metaFileStreamProvider,
+            Stream dataFileStream,
+            Stream metaFileStream,
             File? replacingFile = null)
         {
             return await ValidateDataFilesForUpload(
@@ -105,10 +108,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 archiveDataSet.DataSetName,
                 archiveDataSet.DataFileName,
                 archiveDataSet.DataFileSize,
-                dataFileStreamProvider,
+                dataFileStream,
                 archiveDataSet.MetaFileName,
                 archiveDataSet.MetaFileSize,
-                metaFileStreamProvider,
+                metaFileStream,
                 replacingFile);
         }
 
@@ -280,18 +283,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<List<ErrorViewModel>> ValidateDataFileTypes(
             string dataFileName,
-            Func<Task<Stream>> dataFileStreamProvider,
+            Stream dataFileStream,
             string metaFileName,
-            Func<Task<Stream>> metaFileStreamProvider)
+            Stream metaFileStream)
         {
             List<ErrorViewModel> errors = [];
 
-            if (!await _fileTypeService.IsValidCsvFile(dataFileStreamProvider, dataFileName))
+            if (!await _fileTypeService.IsValidCsvFile(dataFileStream, dataFileName))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFileName));
             }
 
-            if (!await _fileTypeService.IsValidCsvFile(metaFileStreamProvider, metaFileName))
+            if (!await _fileTypeService.IsValidCsvFile(metaFileStream, metaFileName))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(metaFileName));
             }

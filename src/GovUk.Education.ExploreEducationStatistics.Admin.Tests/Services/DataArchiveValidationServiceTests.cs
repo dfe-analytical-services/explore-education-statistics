@@ -26,8 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UploadedZippedDatafileIsValid()
         {
             var releaseVersionId = Guid.NewGuid();
-            var fileTypeService = new Mock<IFileTypeService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
 
             var service = SetupDataArchiveValidationService(
                 fileTypeService: fileTypeService.Object,
@@ -37,8 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             fileUploadsValidatorService.Setup(mock => mock.ValidateDataFilesForUpload(
                 releaseVersionId,
                 It.IsAny<ArchiveDataSetFile>(),
-                It.IsAny<Task<Stream>>, // @MarkFix I cannot mock this to save my life
-                It.IsAny<Task<Stream>>,
+                It.IsAny<Stream>(),
+                It.IsAny<Stream>(),
                 null))
                 .ReturnsAsync([]);
 
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             Assert.True(result.IsRight);
 
-            VerifyAllMocks(fileTypeService);
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
         }
 
         [Fact]
