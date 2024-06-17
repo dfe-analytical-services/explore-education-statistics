@@ -3,7 +3,6 @@
 exports[`Details renders correctly 1`] = `
 <details id="details-tag-test-details"
          class="govuk-details"
-         role="group"
 >
   <summary class="govuk-details__summary"
            aria-controls="test-details"
@@ -30,7 +29,6 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
 <details id="details-tag-test-details"
          class="govuk-details"
          open
-         role="group"
 >
   <summary class="govuk-details__summary"
            aria-controls="test-details"
