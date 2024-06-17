@@ -1499,6 +1499,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Published)]
+        [InlineData(DataSetVersionStatus.Deprecated)]
+        [InlineData(DataSetVersionStatus.Withdrawn)]
+        public async Task DeleteRelease_ReleaseIsLinkedToApiDataSetsWhichCannotBeDeleted(DataSetVersionStatus dataSetVersionStatus)
+        {
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid()
+            };
+
+            DataSet dataSet = _dataFixture
+                .DefaultDataSet();
+
+            var dataSetVersions = _dataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithStatus(dataSetVersionStatus)
+                .GenerateList(3);
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+
+            dataSetVersionService.Setup(mock => mock.GetDataSetVersions(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersions);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(
+                    context,
+                    dataSetVersionService: dataSetVersionService.Object);
+
+                var result = await releaseService.DeleteRelease(releaseVersion.Id);
+
+                VerifyAllMocks(dataSetVersionService);
+
+                result.AssertBadRequest(ReleaseDeletionPlanMustBeValid);
+            }
+        }
+
         [Fact]
         public async Task DeleteRelease_ProcessorReturns400_Returns400()
         {

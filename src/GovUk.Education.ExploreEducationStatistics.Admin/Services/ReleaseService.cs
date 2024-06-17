@@ -223,11 +223,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion) // only allows unapproved amendments to be removed
+                .OnSuccessDo(async () => await GetDeleteReleasePlan(releaseVersionId)
+                    .OnSuccess<ActionResult, DeleteReleasePlan, Unit>(plan =>
+                        !plan.Valid ? ValidationActionResult(ReleaseDeletionPlanMustBeValid) : Unit.Instance))
+                .OnSuccessDo(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId))
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersionId))
-                .OnSuccessDo(async releaseVersion =>
+                .OnSuccessVoid(async releaseVersion =>
                 {
                     // NOTE: As only removing unapproved amendments, releaseVersion.Release will not be orphaned
                     // and associated item in releaseVersion.Publication.ReleaseSeries will also not be orphaned
@@ -271,9 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: releaseVersionId);
-                })
-                .OnSuccessVoid(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId));
-
+                });
         }
 
         public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
