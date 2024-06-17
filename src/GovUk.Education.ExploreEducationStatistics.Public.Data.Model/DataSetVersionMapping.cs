@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -40,6 +41,49 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
             builder.HasIndex(mapping => new { mapping.TargetDataSetVersionId })
                 .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId")
                 .IsUnique();
+            
+            builder.OwnsOne(v => v.Locations, locations =>
+            {
+                locations.ToJson();
+                locations.OwnsMany(l => l.Mappings, locationMappings =>
+                {
+                    locationMappings.OwnsMany(mapping => mapping.Mappings, locationMapping =>
+                    {
+                        locationMapping.OwnsOne(lm => lm.Source);
+                        locationMapping.Property(lm => lm.Type)
+                            .HasConversion(new EnumToEnumValueConverter<MappingType>());
+                    });
+                });
+                
+                locations.OwnsMany(locations => locations.Targets, locationTargets =>
+                {
+                    locationTargets.OwnsMany(mapping => mapping.Options);
+                });
+            });
+
+            builder.OwnsOne(mapping => mapping.Filters, filters =>
+            {
+                filters.ToJson();
+                
+                filters.OwnsMany(f => f.Mappings, filterMapping =>
+                {
+                    filterMapping.OwnsOne(mapping => mapping.Source);
+                    filterMapping.Property(mapping => mapping.Type)
+                        .HasConversion(new EnumToEnumValueConverter<MappingType>());
+                    
+                    filterMapping.OwnsMany(mapping => mapping.Options, filterOptionMapping =>
+                    {
+                        filterOptionMapping.OwnsOne(mapping => mapping.Source);
+                        filterOptionMapping.Property(mapping => mapping.Type)
+                            .HasConversion(new EnumToEnumValueConverter<MappingType>());
+                    });
+                });
+                
+                filters.OwnsMany(f => f.Targets, filterTarget =>
+                {
+                    filterTarget.OwnsMany(mapping => mapping.Options);
+                });
+            });
         }
     }
 }
