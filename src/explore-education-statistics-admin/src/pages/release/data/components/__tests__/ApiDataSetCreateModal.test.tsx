@@ -1,4 +1,4 @@
-import ApiDataSetCreateModal from '@admin/pages/release/api-data-sets/components/ApiDataSetCreateModal';
+import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import _apiDataSetCandidateService, {
   ApiDataSetCandidate,
 } from '@admin/services/apiDataSetCandidateService';
@@ -43,7 +43,7 @@ describe('ApiDataSetCreateModal', () => {
 
     expect(
       await screen.findByText(
-        /No API data sets can be created as there are no candidates data files available/,
+        /No API data sets can be created as there are no candidate data files available/,
       ),
     ).toBeInTheDocument();
 

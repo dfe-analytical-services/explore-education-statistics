@@ -1,11 +1,7 @@
 import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import ReleaseApiDataSetsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetsPage';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
-import {
-  releaseApiDataSetsRoute,
-  ReleaseRouteParams,
-} from '@admin/routes/releaseRoutes';
+import ReleaseApiDataSetsSection from '@admin/pages/release/data/components/ReleaseApiDataSetsSection';
 import _apiDataSetCandidateService, {
   ApiDataSetCandidate,
 } from '@admin/services/apiDataSetCandidateService';
@@ -16,7 +12,7 @@ import { GlobalPermissions } from '@admin/services/authService';
 import { Release } from '@admin/services/releaseService';
 import render, { CustomRenderResult } from '@common-test/render';
 import { screen, within } from '@testing-library/react';
-import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetCandidateService');
@@ -24,7 +20,7 @@ jest.mock('@admin/services/apiDataSetCandidateService');
 const apiDataSetCandidateService = jest.mocked(_apiDataSetCandidateService);
 const apiDataSetService = jest.mocked(_apiDataSetService);
 
-describe('ReleaseApiDataSetsPage', () => {
+describe('ReleaseApiDataSetsSection', () => {
   const testBauUser: User = {
     id: 'user-id-1',
     name: 'BAU user',
@@ -238,18 +234,8 @@ describe('ReleaseApiDataSetsPage', () => {
     return render(
       <AuthContextTestProvider user={user}>
         <ReleaseContextProvider release={release}>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
-                publicationId: testRelease.publicationId,
-                releaseId: testRelease.id,
-              }),
-            ]}
-          >
-            <Route
-              path={releaseApiDataSetsRoute.path}
-              component={ReleaseApiDataSetsPage}
-            />
+          <MemoryRouter>
+            <ReleaseApiDataSetsSection />
           </MemoryRouter>
         </ReleaseContextProvider>
       </AuthContextTestProvider>,

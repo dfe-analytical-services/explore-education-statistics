@@ -1,15 +1,18 @@
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Modal from '@common/components/Modal';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect } from 'react';
 
 interface Props {
   children?: ReactNode;
   className?: string;
   cancelText?: string;
   confirmText?: string;
+  hiddenCancellingText?: string;
+  hiddenConfirmingText?: string;
   open?: boolean;
   showCancel?: boolean;
   title: string;
@@ -20,11 +23,13 @@ interface Props {
   onExit?(): void | Promise<void>;
 }
 
-const ModalConfirm = ({
+export default function ModalConfirm({
   cancelText = 'Cancel',
   children,
   className,
   confirmText = 'Confirm',
+  hiddenCancellingText = 'Cancelling',
+  hiddenConfirmingText = 'Confirming',
   open: initialOpen = false,
   showCancel = true,
   title,
@@ -33,42 +38,65 @@ const ModalConfirm = ({
   onExit,
   onCancel = onExit,
   onConfirm,
-}: Props) => {
+}: Props) {
   const isMounted = useMountedRef();
-  const [isDisabled, toggleDisabled] = useToggle(false);
-  const [open, toggleOpen] = useToggle(initialOpen);
+
+  const [isOpen, toggleOpen] = useToggle(initialOpen);
+  const [isCancelling, toggleCancelling] = useToggle(false);
+  const [isConfirming, toggleConfirming] = useToggle(false);
+
+  const isCompleting = isCancelling || isConfirming;
 
   useEffect(() => {
     toggleOpen(initialOpen);
   }, [initialOpen, toggleOpen]);
 
-  const handleAction = (callback?: () => void | Promise<void>) => async () => {
-    if (!callback) {
+  const handleCancel = useCallback(async () => {
+    if (!onCancel) {
       toggleOpen.off();
       return;
     }
-    if (isDisabled || !isMounted.current) {
+
+    if (isCompleting || !isMounted.current) {
       return;
     }
 
-    toggleDisabled.on();
+    toggleCancelling.on();
 
-    await callback();
+    await onCancel();
 
-    // Callback may finish after
-    // component has been unmounted.
     if (isMounted.current) {
-      toggleDisabled.off();
+      toggleCancelling.off();
       toggleOpen.off();
     }
-  };
+  }, [isCompleting, isMounted, onCancel, toggleCancelling, toggleOpen]);
+
+  const handleConfirm = useCallback(async () => {
+    if (!onConfirm) {
+      toggleOpen.off();
+      return;
+    }
+
+    if (isCompleting || !isMounted.current) {
+      return;
+    }
+
+    toggleConfirming.on();
+
+    await onConfirm();
+
+    if (isMounted.current) {
+      toggleConfirming.off();
+      toggleOpen.off();
+    }
+  }, [isCompleting, isMounted, onConfirm, toggleConfirming, toggleOpen]);
 
   return (
     <Modal
       className={className}
-      closeOnOutsideClick={!isDisabled}
-      closeOnEsc={!isDisabled}
-      open={open}
+      closeOnOutsideClick={!isCompleting}
+      closeOnEsc={!isCompleting}
+      open={isOpen}
       title={title}
       triggerButton={triggerButton}
       underlayClass={underlayClass}
@@ -77,22 +105,30 @@ const ModalConfirm = ({
     >
       {children}
 
-      <ButtonGroup>
+      <ButtonGroup className="govuk-!-margin-top-6">
         {showCancel && (
           <Button
+            disabled={isConfirming}
             variant="secondary"
-            onClick={handleAction(onCancel)}
-            disabled={isDisabled}
+            onClick={handleCancel}
           >
             {cancelText}
           </Button>
         )}
-        <Button onClick={handleAction(onConfirm)} disabled={isDisabled}>
+
+        <Button disabled={isCancelling} onClick={handleConfirm}>
           {confirmText}
         </Button>
+
+        <LoadingSpinner
+          alert
+          inline
+          hideText
+          loading={isCompleting}
+          size="sm"
+          text={isCancelling ? hiddenCancellingText : hiddenConfirmingText}
+        />
       </ButtonGroup>
     </Modal>
   );
-};
-
-export default ModalConfirm;
+}

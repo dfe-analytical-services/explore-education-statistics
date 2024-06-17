@@ -1,6 +1,6 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import ReleaseApiDataSetDetailsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetDetailsPage';
+import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   releaseApiDataSetDetailsRoute,

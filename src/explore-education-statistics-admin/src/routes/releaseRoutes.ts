@@ -1,12 +1,12 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
-import ReleaseApiDataSetDetailsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetDetailsPage';
-import ReleaseApiDataSetsPage from '@admin/pages/release/api-data-sets/ReleaseApiDataSetsPage';
+import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
 import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
+import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
 import ReleaseDataBlockCreatePage from '@admin/pages/release/datablocks/ReleaseDataBlockCreatePage';
 import ReleaseDataBlockEditPage from '@admin/pages/release/datablocks/ReleaseDataBlockEditPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
@@ -72,7 +72,7 @@ export const releaseDataRoute: ReleaseRouteProps = {
 };
 
 export const releaseAncillaryFilesRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data#file-uploads',
+  path: `/publication/:publicationId/release/:releaseId/data#${releaseDataPageTabIds.fileUploads}`,
   title: 'Data and files',
   component: ReleaseDataPage,
 };
@@ -99,6 +99,20 @@ export const releaseDataFileReplacementCompleteRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data/:fileId/replacement-complete',
   title: 'Replacement complete',
   component: ReleaseDataFileReplacementCompletePage,
+};
+
+export const releaseApiDataSetsRoute: ReleaseRouteProps = {
+  path: `/publication/:publicationId/release/:releaseId/data#${releaseDataPageTabIds.apiDataSets}`,
+  title: 'API data sets',
+  component: ReleaseDataPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId',
+  title: 'API data set details',
+  component: ReleaseApiDataSetDetailsPage,
+  protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseFootnotesRoute: ReleaseRouteProps = {
@@ -159,18 +173,4 @@ export const releasePreReleaseAccessRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/prerelease-access',
   title: 'Pre-release access',
   component: ReleasePreReleaseAccessPage,
-};
-
-export const releaseApiDataSetsRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets',
-  title: 'API data sets',
-  component: ReleaseApiDataSetsPage,
-  protectionAction: permissions => permissions.isBauUser,
-};
-
-export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId',
-  title: 'API data set details',
-  component: ReleaseApiDataSetDetailsPage,
-  protectionAction: permissions => permissions.isBauUser,
 };

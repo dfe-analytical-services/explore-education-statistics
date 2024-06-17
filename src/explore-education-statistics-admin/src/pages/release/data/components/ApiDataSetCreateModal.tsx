@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import ApiDataSetCreateForm, {
   ApiDataSetCreateFormValues,
-} from '@admin/pages/release/api-data-sets/components/ApiDataSetCreateForm';
+} from '@admin/pages/release/data/components/ApiDataSetCreateForm';
 import apiDataSetCandidateQueries from '@admin/queries/apiDataSetCandidateQueries';
 import {
   releaseApiDataSetDetailsRoute,
@@ -86,8 +86,8 @@ export default function ApiDataSetCreateModal({
       ) : (
         <>
           <WarningMessage>
-            No API data sets can be created as there are no candidates data
-            files available. New candidate data files can be uploaded in the{' '}
+            No API data sets can be created as there are no candidate data files
+            available. New candidate data files can be uploaded in the{' '}
             <Link
               to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
                 publicationId,

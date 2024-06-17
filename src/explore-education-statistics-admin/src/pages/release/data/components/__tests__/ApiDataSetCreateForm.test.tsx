@@ -1,6 +1,6 @@
 import ApiDataSetCreateForm, {
   ApiDataSetCreateFormProps,
-} from '@admin/pages/release/api-data-sets/components/ApiDataSetCreateForm';
+} from '@admin/pages/release/data/components/ApiDataSetCreateForm';
 import { ApiDataSetCandidate } from '@admin/services/apiDataSetCandidateService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';

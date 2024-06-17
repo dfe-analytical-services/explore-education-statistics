@@ -1,12 +1,12 @@
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import ApiDataSetCreateModal from '@admin/pages/release/api-data-sets/components/ApiDataSetCreateModal';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import DraftApiDataSetsTable, {
   DraftApiDataSetSummary,
-} from '@admin/pages/release/api-data-sets/components/DraftApiDataSetsTable';
+} from '@admin/pages/release/data/components/DraftApiDataSetsTable';
 import LiveApiDataSetsTable, {
   LiveApiDataSetSummary,
-} from '@admin/pages/release/api-data-sets/components/LiveApiDataSetsTable';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+} from '@admin/pages/release/data/components/LiveApiDataSetsTable';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -14,7 +14,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
-export default function ReleaseApiDataSetsPage() {
+export default function ReleaseApiDataSetsSection() {
   const { release } = useReleaseContext();
   const { user } = useAuthContext();
 

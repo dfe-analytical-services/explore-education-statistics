@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import styles from './LoadingSpinner.module.scss';
 
 interface Props {
@@ -25,6 +25,26 @@ const LoadingSpinner = ({
   size = 'xl',
   text,
 }: Props) => {
+  const [alertText, setAlertText] = useState('');
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!alert || !text) {
+      return () => clearTimeout(timeout);
+    }
+
+    if (loading) {
+      // Set alert text with a delay so that screen readers
+      // detect the change and announce it correctly.
+      timeout = setTimeout(() => setAlertText(text), 300);
+    } else {
+      setAlertText('');
+    }
+
+    return () => clearTimeout(timeout);
+  }, [alert, loading, text]);
+
   return (
     <>
       {loading ? (
@@ -47,7 +67,7 @@ const LoadingSpinner = ({
             role={alert ? 'alert' : undefined}
             className={classNames({ 'govuk-visually-hidden': hideText })}
           >
-            {text}
+            {alert ? alertText : text}
           </span>
         </div>
       ) : (

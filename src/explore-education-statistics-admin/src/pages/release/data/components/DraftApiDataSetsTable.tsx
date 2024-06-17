@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
-import getVersionStatusTagColour from '@admin/pages/release/api-data-sets/utils/getVersionStatusColour';
-import getVersionStatusText from '@admin/pages/release/api-data-sets/utils/getVersionStatusText';
+import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
+import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
+import getDataSetVersionStatusText from '@admin/pages/release/data/components/utils/getDataSetVersionStatusText';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
@@ -10,7 +11,6 @@ import {
   ApiDataSetSummary,
 } from '@admin/services/apiDataSetService';
 import ButtonGroup from '@common/components/ButtonGroup';
-import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -70,7 +70,7 @@ export default function DraftApiDataSetsTable({
               <td className="govuk-!-padding-left-1">
                 <Tag
                   className={styles.versionTag}
-                  colour={getVersionStatusTagColour(draftVersion.status)}
+                  colour={getDataSetVersionStatusTagColour(draftVersion.status)}
                 >
                   {`v${draftVersion.version}`}
                 </Tag>
@@ -89,8 +89,10 @@ export default function DraftApiDataSetsTable({
               ) : null}
               <td>{dataSet.title}</td>
               <td>
-                <Tag colour={getVersionStatusTagColour(draftVersion.status)}>
-                  {getVersionStatusText(draftVersion.status)}
+                <Tag
+                  colour={getDataSetVersionStatusTagColour(draftVersion.status)}
+                >
+                  {getDataSetVersionStatusText(draftVersion.status)}
                 </Tag>
               </td>
               <td>
@@ -98,12 +100,6 @@ export default function DraftApiDataSetsTable({
                   className="govuk-!-margin-bottom-0"
                   horizontalSpacing="m"
                 >
-                  {draftVersion.status !== 'Processing' && (
-                    <ButtonText variant="warning">
-                      Remove draft
-                      <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
-                    </ButtonText>
-                  )}
                   <Link
                     to={generatePath<ReleaseDataSetRouteParams>(
                       releaseApiDataSetDetailsRoute.path,
@@ -114,9 +110,20 @@ export default function DraftApiDataSetsTable({
                       },
                     )}
                   >
-                    View / edit draft
+                    {draftVersion.version === '1.0'
+                      ? 'View details'
+                      : 'View details / edit draft'}
                     <VisuallyHidden>for {dataSet.title}</VisuallyHidden>
                   </Link>
+                  {draftVersion.status !== 'Processing' && (
+                    <DeleteDraftVersionButton
+                      dataSet={dataSet}
+                      dataSetVersion={draftVersion}
+                    >
+                      Delete draft
+                      <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
+                    </DeleteDraftVersionButton>
+                  )}
                 </ButtonGroup>
               </td>
             </tr>

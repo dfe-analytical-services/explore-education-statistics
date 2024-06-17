@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
-import getVersionStatusTagColour from '@admin/pages/release/api-data-sets/utils/getVersionStatusColour';
-import getVersionStatusText from '@admin/pages/release/api-data-sets/utils/getVersionStatusText';
+import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
+import getDataSetVersionStatusText from '@admin/pages/release/data/components/utils/getDataSetVersionStatusText';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -38,12 +38,12 @@ export default function ApiDataSetVersionSummaryList({
     <SummaryList id={id} testId={testId}>
       <SummaryListItem term="Version">
         <Tag
-          colour={getVersionStatusTagColour(dataSetVersion.status)}
+          colour={getDataSetVersionStatusTagColour(dataSetVersion.status)}
         >{`v${dataSetVersion.version}`}</Tag>
       </SummaryListItem>
       <SummaryListItem term="Status">
-        <Tag colour={getVersionStatusTagColour(dataSetVersion.status)}>
-          {getVersionStatusText(dataSetVersion.status)}
+        <Tag colour={getDataSetVersionStatusTagColour(dataSetVersion.status)}>
+          {getDataSetVersionStatusText(dataSetVersion.status)}
         </Tag>
       </SummaryListItem>
       <SummaryListItem term="Release">

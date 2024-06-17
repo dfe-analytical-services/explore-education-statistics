@@ -1,7 +1,8 @@
 import DraftApiDataSetsTable, {
   DraftApiDataSetSummary,
-} from '@admin/pages/release/api-data-sets/components/DraftApiDataSetsTable';
-import { render as baseRender, screen, within } from '@testing-library/react';
+} from '@admin/pages/release/data/components/DraftApiDataSetsTable';
+import baseRender from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -122,12 +123,12 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row1Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 1 title',
+        name: 'View details / edit draft for Data set 1 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-1`);
     expect(
       within(row1Cells[4]).getByRole('button', {
-        name: 'Remove draft for Data set 1 title',
+        name: 'Delete draft for Data set 1 title',
       }),
     ).toBeInTheDocument();
 
@@ -142,13 +143,13 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row2Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 2 title',
+        name: 'View details / edit draft for Data set 2 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-2`);
 
     expect(
       within(row2Cells[4]).getByRole('button', {
-        name: 'Remove draft for Data set 2 title',
+        name: 'Delete draft for Data set 2 title',
       }),
     ).toBeInTheDocument();
 
@@ -163,11 +164,13 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row3Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 3 title',
+        name: 'View details for Data set 3 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-3`);
     expect(
-      within(row3Cells[4]).queryByRole('button', { name: /Remove draft/ }),
+      within(row3Cells[4]).queryByRole('button', {
+        name: /Delete draft/,
+      }),
     ).not.toBeInTheDocument();
 
     // Row 4
@@ -181,13 +184,13 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row4Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 4 title',
+        name: 'View details for Data set 4 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-4`);
 
     expect(
       within(row4Cells[4]).getByRole('button', {
-        name: 'Remove draft for Data set 4 title',
+        name: 'Delete draft for Data set 4 title',
       }),
     ).toBeInTheDocument();
 
@@ -202,13 +205,13 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row5Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 5 title',
+        name: 'View details for Data set 5 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-5`);
 
     expect(
       within(row5Cells[4]).getByRole('button', {
-        name: 'Remove draft for Data set 5 title',
+        name: 'Delete draft for Data set 5 title',
       }),
     ).toBeInTheDocument();
 
@@ -223,13 +226,13 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row6Cells[4]).getByRole('link', {
-        name: 'View / edit draft for Data set 6 title',
+        name: 'View details for Data set 6 title',
       }),
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-6`);
 
     expect(
       within(row6Cells[4]).getByRole('button', {
-        name: 'Remove draft for Data set 6 title',
+        name: 'Delete draft for Data set 6 title',
       }),
     ).toBeInTheDocument();
   });
