@@ -404,17 +404,8 @@ Add headline text block to Content page
     user waits until data upload is completed    ${SUBJECT_NAME}-updated
 
 Publish the release immediately
-    user clicks radio    Approved for publication
-    user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
-    user clicks radio    Immediately
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-month    12
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    2500
-    user clicks button    Update status
-    user waits until h2 is visible    Sign off    %{RELEASE_COMPLETE_WAIT}
-    user checks summary list contains    Current status    Approved
-    user waits for release process status to be    Complete    %{RELEASE_COMPLETE_WAIT}
-    user reloads page
-    user checks page does not contain button    Edit release status
+    user clicks link    Sign off
+    user approves release for immediate publication
 
 
 
