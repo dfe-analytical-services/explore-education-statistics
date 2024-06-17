@@ -18,6 +18,10 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
 
     public DataSetVersion TargetDataSetVersion { get; set; } = null!;
 
+    public Locations Locations { get; set; } = null!;
+
+    public Filters Filters { get; set; } = null!;
+
     public DateTimeOffset Created { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
@@ -64,56 +68,22 @@ public abstract class LeafMapping<TEntry>
     public MappingType Type { get; set; }
 
     public TEntry Source { get; set; } = null!;
+    
+    public int? TargetId { get; set; }
 }
 
-/// <summary>
-///     Represents a source entity from the original DataSetVersion where
-///     it has been decided that no mapping exists in the next DataSetVersion.
-/// </summary>
-public class NoTargetLeafMapping<TEntry> : LeafMapping<TEntry>
-    where TEntry : Entry;
-
-/// <summary>
-///     Represents a source entity from the original DataSetVersion where
-///     a target entity in the next DataSetVersion has been identified as
-///     a mapping target.
-/// </summary>
-public class HasTargetLeafMapping<TEntry> : LeafMapping<TEntry>
-    where TEntry : Entry
-{
-    public int TargetId { get; set; }
-}
-
-public abstract class ParentMapping<TEntry, TOption>
+public abstract class ParentMapping<TEntry, TOption, TOptionMapping>
     where TEntry : Entry
     where TOption : Entry
+    where TOptionMapping : LeafMapping<TOption> 
 {
     public MappingType Type { get; set; }
 
     public TEntry Source { get; set; } = null!;
 
-    public List<LeafMapping<TOption>> Options { get; set; } = [];
-}
-
-/// <summary>
-///     Represents a source parent entity with child options from the
-///     original DataSetVersion where it has been decided that no mapping
-///     exists in the next DataSetVersion.
-/// </summary>
-public class NoTargetParentMapping<TEntry, TOption> : ParentMapping<TEntry, TOption>
-    where TEntry : Entry
-    where TOption : Entry;
-
-/// <summary>
-///     Represents a source parent entity with child options from the original
-///     DataSetVersion where a target entity in the next DataSetVersion has
-///     been identified as a mapping target.
-/// </summary>
-public class HasTargetParentMapping<TEntry, TOption> : ParentMapping<TEntry, TOption>
-    where TEntry : Entry
-    where TOption : Entry
-{
-    public int TargetId { get; set; }
+    public List<TOptionMapping> Options { get; set; } = [];
+    
+    public int? TargetId { get; set; }
 }
 
 public class LocationOption : Entry
@@ -129,11 +99,13 @@ public class LocationOption : Entry
     protected string? Ukprn { get; set; }
 }
 
+public class LocationMapping : LeafMapping<LocationOption>;
+
 public class LocationMappings
 {
     public GeographicLevel Level { get; set; }
 
-    public List<LeafMapping<LocationOption>> Mappings { get; set; } = [];
+    public List<LocationMapping> Mappings { get; set; } = [];
 }
 
 public class LocationTargets
@@ -146,7 +118,7 @@ public class LocationTargets
 public class Locations
 {
     public List<LocationMappings> Mappings { get; set; }
-    
+
     public List<LocationTargets> Targets { get; set; }
 }
 
@@ -159,9 +131,13 @@ public class FilterTarget : Filter
     public List<FilterOption> Options { get; set; } = [];
 }
 
+public class FilterOptionMapping : LeafMapping<FilterOption>;
+
+public class FilterMapping : ParentMapping<Filter, FilterOption, FilterOptionMapping>;
+
 public class Filters
 {
-    public List<ParentMapping<Filter, FilterOption>> Mappings { get; set; } = [];
+    public List<FilterMapping> Mappings { get; set; } = [];
 
     public List<FilterTarget> Targets { get; set; } = [];
 }

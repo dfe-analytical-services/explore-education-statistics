@@ -27,6 +27,7 @@ public class PublicDataDbContext : DbContext
     public DbSet<DataSet> DataSets { get; init; } = null!;
     public DbSet<DataSetVersion> DataSetVersions { get; init; } = null!;
     public DbSet<DataSetVersionImport> DataSetVersionImports { get; init; } = null!;
+    public DbSet<DataSetVersionMapping> DataSetVersionMappings { get; init; } = null!;
     public DbSet<GeographicLevelMeta> GeographicLevelMetas { get; init; } = null!;
     public DbSet<LocationMeta> LocationMetas { get; init; } = null!;
     public DbSet<LocationOptionMeta> LocationOptionMetas { get; init; } = null!;
