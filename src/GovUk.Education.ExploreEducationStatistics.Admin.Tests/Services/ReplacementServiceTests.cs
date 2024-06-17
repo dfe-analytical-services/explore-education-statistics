@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
@@ -23,9 +19,17 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -1696,6 +1700,105 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementInvalid()
+        {
+            DataSet dataSet = _fixture
+                .DefaultDataSet();
+
+            DataSetVersion dataSetVersion = _fixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet);
+
+            Content.Model.ReleaseVersion releaseVersion = _fixture
+                .DefaultReleaseVersion();
+
+            var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion()
+                .WithId(releaseVersion.Id)
+                .Generate();
+
+            var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .Generate(2)
+                .ToTuple2();
+
+            File originalFile = _fixture
+                .DefaultFile()
+                .WithSubjectId(originalReleaseSubject.SubjectId)
+                .WithType(FileType.Data)
+                .WithPublicApiDataSetId(dataSet.Id)
+                .WithPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion());
+
+            File replacementFile = _fixture
+                .DefaultFile()
+                .WithSubjectId(replacementReleaseSubject.SubjectId)
+                .WithType(FileType.Data);
+
+            var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .ForIndex(0, rv => rv.SetFile(originalFile))
+                .ForIndex(1, rv => rv.SetFile(replacementFile))
+                .Generate(2)
+                .ToTuple2();
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
+                originalFile.PublicApiDataSetId!.Value,
+                originalFile.PublicApiDataSetVersion!, 
+                It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersion);
+
+            var locationRepository = new Mock<ILocationRepository>(Strict);
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<Location>());
+
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(
+                    contentDbContext,
+                    statisticsDbContext,
+                    dataSetVersionService: dataSetVersionService.Object,
+                    timePeriodService: timePeriodService.Object,
+                    locationRepository: locationRepository.Object);
+
+                var result = await replacementService.GetReplacementPlan(
+                    releaseVersionId: releaseVersion.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                VerifyAllMocks(dataSetVersionService);
+
+                var replacementPlan = result.AssertRight();
+
+                Assert.True(replacementPlan.IsLinkedToApiDataSetVersion);
+                Assert.NotNull(replacementPlan.LinkedApiDataSetVersion);
+                Assert.Equal(dataSet.Id, replacementPlan.LinkedApiDataSetVersion.DataSetId);
+                Assert.Equal(dataSet.Title, replacementPlan.LinkedApiDataSetVersion.DataSetName);
+                Assert.Equal(dataSetVersion.Id, replacementPlan.LinkedApiDataSetVersion.DataSetVersionId);
+                Assert.Equal(dataSetVersion.Version, replacementPlan.LinkedApiDataSetVersion.Version);
+                Assert.Equal(dataSetVersion.Status, replacementPlan.LinkedApiDataSetVersion.Status);
+                Assert.True(replacementPlan.LinkedApiDataSetVersion.Valid);
+
+                Assert.False(replacementPlan.Valid);
+            }
+        }
+
+        [Fact]
         public async Task GetReplacementPlan_AllReplacementDataPresent_ReplacementValid()
         {
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
@@ -1713,7 +1816,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = originalReleaseSubject.SubjectId
+                SubjectId = originalReleaseSubject.SubjectId,
+                PublicApiDataSetId = null,
+                PublicApiDataSetVersion = null
             };
 
             var replacementFile = new File
@@ -2267,6 +2372,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(footnoteForSubjectPlan.Valid);
 
+                Assert.False(replacementPlan.IsLinkedToApiDataSetVersion);
+                Assert.Null(replacementPlan.LinkedApiDataSetVersion);
+
                 Assert.True(replacementPlan.Valid);
             }
         }
@@ -2590,6 +2698,97 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     timePeriodService);
 
                 Assert.Equal("Replacement file has no link with the original file", exception.Message);
+            }
+        }
+
+        [Fact]
+        public async Task Replace_FileIsLinkedToPublicApiDataSet_ValidationProblem()
+        {
+            DataSet dataSet = _fixture
+                .DefaultDataSet();
+
+            DataSetVersion dataSetVersion = _fixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet);
+
+            Content.Model.ReleaseVersion releaseVersion = _fixture
+                .DefaultReleaseVersion();
+
+            var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion()
+                .WithId(releaseVersion.Id)
+                .Generate();
+
+            var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statsReleaseVersion)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .Generate(2)
+                .ToTuple2();
+
+            File originalFile = _fixture
+                .DefaultFile()
+                .WithSubjectId(originalReleaseSubject.SubjectId)
+                .WithType(FileType.Data)
+                .WithPublicApiDataSetId(dataSet.Id)
+                .WithPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion());
+
+            File replacementFile = _fixture
+                .DefaultFile()
+                .WithSubjectId(replacementReleaseSubject.SubjectId)
+                .WithType(FileType.Data);
+
+            var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .ForIndex(0, rv => rv.SetFile(originalFile))
+                .ForIndex(1, rv => rv.SetFile(replacementFile))
+                .Generate(2)
+                .ToTuple2();
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
+                originalFile.PublicApiDataSetId!.Value,
+                originalFile.PublicApiDataSetVersion!,
+                It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersion);
+
+            var locationRepository = new Mock<ILocationRepository>(Strict);
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<Location>());
+
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(
+                    contentDbContext,
+                    statisticsDbContext,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object,
+                    dataSetVersionService: dataSetVersionService.Object);
+
+                var result = await replacementService.Replace(
+                    releaseVersionId: releaseVersion.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                VerifyAllMocks(
+                    locationRepository,
+                    timePeriodService,
+                    dataSetVersionService);
+
+                result.AssertBadRequest(ReplacementMustBeValid);
             }
         }
 

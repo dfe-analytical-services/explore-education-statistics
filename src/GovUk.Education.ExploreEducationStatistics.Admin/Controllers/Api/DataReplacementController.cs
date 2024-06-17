@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(Guid releaseVersionId,
             Guid fileId,
             Guid replacementFileId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             return await _replacementService.GetReplacementPlan(
                     releaseVersionId: releaseVersionId,
