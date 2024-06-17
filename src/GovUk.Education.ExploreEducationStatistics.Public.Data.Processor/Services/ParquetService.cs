@@ -26,7 +26,7 @@ public class ParquetService(
         logger.LogDebug("Writing data files to data set version directory '{VersionDir}'", versionDir);
 
         await using var duckDbConnection =
-            DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
+            DuckDbConnection.CreateFileConnectionReadOnly(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
         duckDbConnection.Open();
 
         await duckDbConnection.SqlBuilder(

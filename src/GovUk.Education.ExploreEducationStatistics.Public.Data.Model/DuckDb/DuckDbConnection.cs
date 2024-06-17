@@ -10,6 +10,11 @@ public class DuckDbConnection(string connectionString = DuckDBConnectionStringBu
         return new DuckDbConnection($"DataSource={filename}");
     }
 
+    public static DuckDbConnection CreateFileConnectionReadOnly(string filename)
+    {
+        return new DuckDbConnection($"DataSource={filename};access_mode=read_only");
+    }
+
     public override DuckDbCommand CreateCommand()
     {
         // Bit rubbish to do this but we don't have access to the
