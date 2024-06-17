@@ -359,8 +359,8 @@ Navigate to data upload and confirm data replacement
 Upload the larger data file via data upload
     user waits until data upload displays importing
     ...    ${SUBJECT_NAME}-updated
-    ...    data-upload-large.csv
-    ...    data-upload-large.meta.csv
+    ...    data-upload-import.csv
+    ...    data-upload-import.meta.csv
 
 Validate checklist errors and warnings(3rd release)
     user edits release status
