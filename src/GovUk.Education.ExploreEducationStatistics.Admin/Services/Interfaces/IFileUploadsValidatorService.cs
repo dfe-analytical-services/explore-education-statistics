@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
 
-        Task<List<ErrorViewModel>> ValidateDataFilesForUpload( // @MarkFix remove from here and make private?
+        Task<List<ErrorViewModel>> ValidateDataFilesForUpload( // Used by unit tests
             Guid releaseVersionId,
             string dataSetName,
             string dataFileName,

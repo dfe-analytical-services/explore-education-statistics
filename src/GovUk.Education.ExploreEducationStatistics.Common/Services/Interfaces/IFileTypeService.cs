@@ -16,7 +16,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         Task<bool> IsValidCsvFile(Stream stream, string filename);
 
         Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename);
-
-        Task<bool> IsValidCsvFile(IFormFile formFile);
     }
 }

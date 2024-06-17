@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<DataImport> Add(DataImport dataImport) // @MarkFix can remove
+        public async Task<DataImport> Add(DataImport dataImport)
         {
             var added = await _contentDbContext.DataImports.AddAsync(dataImport);
             await _contentDbContext.SaveChangesAsync();

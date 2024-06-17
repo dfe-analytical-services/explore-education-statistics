@@ -1673,10 +1673,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
-                    .Returns([]);
-
-                fileUploadsValidatorService
                     .Setup(s => s.ValidateDataFilesForUpload(
                         releaseVersion.Id,
                         subjectName,
@@ -1858,12 +1854,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         metaFormFile,
                         It.Is<File>(f => f.Id == originalDataReleaseFile.File.Id)))
                     .ReturnsAsync([]);
-
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(
-                        releaseVersion.Id,
-                        originalDataReleaseFile.Name))
-                    .Returns([]);
 
                 dataImportService
                     .Setup(s => s.Import(
@@ -2071,10 +2061,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                fileUploadsValidatorService
-                    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
-                    .Returns([]);
-
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataFilesForUpload(
                         releaseVersion.Id,
