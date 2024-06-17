@@ -87,13 +87,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 metaFile.FullName,
                 metaFile.Length);
 
-            errors.AddRange(await _fileUploadsValidatorService
-                .ValidateDataFilesForUpload(
-                    releaseVersionId,
-                    archiveDataSet,
-                    () => Task.FromResult(dataFile.Open()), // @MarkFix probably wrong
-                    () => Task.FromResult(metaFile.Open()),
-                    replacingFile));
+            await using (var dataFileStream = dataFile.Open())
+            await using (var metaFileStream = metaFile.Open())
+            {
+                errors.AddRange(await _fileUploadsValidatorService
+                    .ValidateDataFilesForUpload(
+                        releaseVersionId,
+                        archiveDataSet,
+                        dataFileStream,
+                        metaFileStream,
+                        replacingFile));
+            }
 
             if (errors.Count > 0)
             {
@@ -196,10 +200,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     metaFile.FullName,
                     metaFile.Length);
 
-                errors.AddRange(await _fileUploadsValidatorService.ValidateDataFilesForUpload(
-                            releaseVersionId, dataArchiveFile,
-                            () => Task.FromResult(dataFile.Open()),
-                            () => Task.FromResult(metaFile.Open())));
+                await using (var dataFileStream = dataFile.Open())
+                await using (var metaFileStream = metaFile.Open())
+                {
+                    errors.AddRange(await _fileUploadsValidatorService.ValidateDataFilesForUpload(
+                        releaseVersionId, dataArchiveFile,
+                        dataFileStream,
+                        metaFileStream));
+                }
 
                 // @MarkFix merge into above method call I think
                 errors.AddRange(_fileUploadsValidatorService.ValidateReleaseVersionDataSetFileName(

@@ -98,11 +98,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return encodingTypes.Any(pattern => pattern.Equals(encodingType));
         }
 
-        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename)
+        public async Task<bool> IsValidCsvFile(Stream stream, string filename)
         {
             _logger.LogDebug("Validating that {FileName} has a CSV mime type", filename);
 
-            await using var sampleLinesStream = await GetSampleLinesStream(streamProvider, CsvMimeTypeSampleLineCount);
+            using var streamReader = new StreamReader(stream);
+            await using var sampleLinesStream = await GetSampleLinesStream(streamReader, CsvMimeTypeSampleLineCount);
 
             if (sampleLinesStream == null)
             {
@@ -120,9 +121,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             _logger.LogDebug("Validating that {FileName} has a valid CSV character encoding", filename);
 
-            await using var encodingStream = await streamProvider.Invoke();
+            // To match encoding type, we want the stream to be at the beginning of the file
+            stream.SeekToBeginning();
 
-            if (!HasMatchingEncodingType(encodingStream, AllowedCsvEncodingTypes))
+            if (!HasMatchingEncodingType(stream, AllowedCsvEncodingTypes))
             {
                 _logger.LogDebug("{FileName} does not have a valid CSV content encoding", filename);
                 return false;
@@ -133,19 +135,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return true;
         }
 
+        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename)
+        {
+            await using var stream = await streamProvider.Invoke();
+            return await IsValidCsvFile(stream, filename);
+        }
+
         public async Task<bool> IsValidCsvFile(IFormFile file)
         {
-            return await IsValidCsvFile(() => Task.FromResult(file.OpenReadStream()), file.FileName);
+            await using var stream = file.OpenReadStream();
+            return await IsValidCsvFile(stream, file.FileName);
         }
 
         /// <summary>
         /// Obtain a set of sample lines of the given file, for the purposes of checking the file's mime type and
         /// content encoding.
         /// </summary>
-        private async Task<Stream?> GetSampleLinesStream(Func<Task<Stream>> fileStreamProvider, int sampleLineCount)
+        private async Task<Stream?> GetSampleLinesStream(StreamReader streamReader, int sampleLineCount)
         {
-            using var streamReader = new StreamReader(await fileStreamProvider.Invoke());
-
             var lines = new List<string>();
             
             try
