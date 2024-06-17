@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 archive);
             VerifyAllMocks(fileTypeService);
 
-            Assert.True(result.IsLeft); // @MarkFix abstract out
+            Assert.True(result.IsLeft); // @MarkFix abstract out all this stuff here
             var badRequest = (BadRequestObjectResult)result.Left;
             Assert.Equal(400, badRequest.StatusCode);
             var validationProblemViewModel = (ValidationProblemViewModel)badRequest.Value;

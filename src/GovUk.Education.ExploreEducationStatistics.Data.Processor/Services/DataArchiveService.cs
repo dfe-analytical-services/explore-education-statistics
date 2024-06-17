@@ -23,16 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var path = import.ZipFile!.Path();
 
-            await using var zipBlobFileStream = await _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, path);
+            await using var zipBlobFileStream = await _privateBlobStorageService
+                .StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
-            var dataFileName = import.File.Filename;
-            var metaFileName = import.MetaFile.Filename;
+            var dataFile = archive.GetEntry(import.File.Filename);
+            var metaFile = archive.GetEntry(import.MetaFile.Filename);
 
-            var dataFile = archive.GetEntry(dataFileName);
-            var metaFile = archive.GetEntry(metaFileName);
-
-            // @MarkFix extra validation here? Could skip if we assume validation occurred elsewhere
+            // No validation here - we assume it has been done prior to this
 
             await using (var stream = dataFile.Open())
             {

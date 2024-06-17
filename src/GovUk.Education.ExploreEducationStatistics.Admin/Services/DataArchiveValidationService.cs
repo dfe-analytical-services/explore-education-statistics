@@ -104,15 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
-            return new ArchiveDataSetFile(
-                dataSetFileName,
-                dataFile.FullName,
-                dataFile.Length,
-                metaFile.FullName,
-                metaFile.Length);
+            return archiveDataSet;
         }
 
-        public async Task<Either<ActionResult, List<ArchiveDataSetFile>>> ValidateBulkDataArchiveFile(
+        public async Task<Either<ActionResult, List<ArchiveDataSetFile>>> ValidateBulkDataArchiveFile( // @MarkFix needs unit tests
             Guid releaseVersionId,
             IFormFile zipFile)
         {
@@ -209,26 +204,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         metaFileStream));
                 }
 
-                // @MarkFix merge into above method call I think
-                errors.AddRange(_fileUploadsValidatorService.ValidateReleaseVersionDataSetFileName(
-                            releaseVersionId, dataArchiveFile.DataSetName));
-
                 results.Add(dataArchiveFile);
 
                 lastLine = !await dataSetNamesCsvReader.ReadAsync();
             }
 
-            // Check filename lengths
-            foreach (var zipArchiveEntry in archive.Entries)
-            {
-                if (zipArchiveEntry.FullName.Length > MaxFilenameLength)
-                {
-                    errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
-                        zipArchiveEntry.FullName, MaxFilenameLength));
-                }
-            }
-
-            // Check for duplicate data set names
+            // Check for duplicate data set names - because the bulk zip itself main contain duplicates!
             results
                 .GroupBy(file => file.DataSetName)
                 .Where(group => group.Count() > 1)
@@ -242,7 +223,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Check for unused files in ZIP
             if (unprocessedArchiveFiles.Count > 0)
             {
-                // @MarkFix do we want to do this - probably hit MacOs archive hidden files and fail?
                 errors.Add(ValidationMessages.GenerateErrorZipContainsUnusedFiles(
                     unprocessedArchiveFiles
                         .Select(file => file.FullName)
