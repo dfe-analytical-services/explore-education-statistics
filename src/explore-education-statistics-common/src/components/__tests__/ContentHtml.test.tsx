@@ -198,47 +198,112 @@ describe('ContentHtml', () => {
   });
 
   describe('formatting links', () => {
-    const testContentWithLinks = `Test content 
-    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools?testParam=Something">
-    EES link with uppercase characters</a> 
-    <a href="  https://gov.uk/TEST something  ">External link with whitespace, space to encode and uppercase characters</a>`;
-
-    test('formats links in content', () => {
-      render(<ContentHtml html={testContentWithLinks} />);
-
-      expect(
-        screen.getByRole('link', {
-          name: 'EES link with uppercase characters',
-        }),
-      ).toHaveAttribute(
-        'href',
-        'https://explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools?testParam=Something',
+    test('encodes special characters in urls', () => {
+      render(
+        <ContentHtml html='<a href="https://gov.uk/TEST something">External link</a>' />,
       );
 
       expect(
         screen.getByRole('link', {
-          name: 'External link with whitespace, space to encode and uppercase characters',
+          name: 'External link (opens in a new tab)',
         }),
       ).toHaveAttribute('href', 'https://gov.uk/TEST%20something');
     });
 
-    test('does not format links in content when `formatLinks` is false', () => {
-      render(<ContentHtml formatLinks={false} html={testContentWithLinks} />);
-
-      expect(
-        screen.getByRole('link', {
-          name: 'EES link with uppercase characters',
-        }),
-      ).toHaveAttribute(
-        'href',
-        'https://explore-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools?testParam=Something',
+    test('trims whitespace in urls', () => {
+      render(
+        <ContentHtml html='<a href="   https://gov.uk/TEST  ">External link</a>">External link</a>' />,
       );
 
       expect(
         screen.getByRole('link', {
-          name: 'External link with whitespace, space to encode and uppercase characters',
+          name: 'External link (opens in a new tab)',
         }),
-      ).toHaveAttribute('href', '  https://gov.uk/TEST something  ');
+      ).toHaveAttribute('href', 'https://gov.uk/TEST');
+    });
+
+    test('lower cases internal urls, excluding query params', () => {
+      render(
+        <ContentHtml html='<a href="https://explore-education-statistics.service.gov.uk/Find-Statistics?testParam=Something">Internal link</a>' />,
+      );
+
+      expect(
+        screen.getByRole('link', {
+          name: 'Internal link',
+        }),
+      ).toHaveAttribute(
+        'href',
+        'https://explore-education-statistics.service.gov.uk/find-statistics?testParam=Something',
+      );
+    });
+
+    test('does not lower case external urls', () => {
+      render(
+        <ContentHtml html='<a href="https://gov.uk/TEST">External link</a>' />,
+      );
+      expect(
+        screen.getByRole('link', {
+          name: 'External link (opens in a new tab)',
+        }),
+      ).toHaveAttribute('href', 'https://gov.uk/TEST');
+    });
+
+    test('opens external links in a new tab', () => {
+      render(
+        <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
+      );
+      const link = screen.getByRole('link', {
+        name: 'External link (opens in a new tab)',
+      });
+      expect(link).toHaveAttribute('href', 'https://gov.uk/');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    test('opens internal links in the same tab', () => {
+      render(
+        <ContentHtml html='<a href="https://explore-education-statistics.service.gov.uk/">Internal link</a>' />,
+      );
+      const link = screen.getByRole('link', {
+        name: 'Internal link',
+      });
+      expect(link).toHaveAttribute(
+        'href',
+        'https://explore-education-statistics.service.gov.uk/',
+      );
+      expect(link).not.toHaveAttribute('target', '_blank');
+      expect(link).not.toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    test('does not format links when `formatLinks` is false', () => {
+      render(
+        <ContentHtml
+          formatLinks={false}
+          html={` 
+          <a href="https://explore-education-statistics.service.gov.uk/Find-Statistics?testParam=Something">
+          Internal link</a> 
+          <a href="  https://gov.uk/TEST something  ">External link</a>`}
+        />,
+      );
+
+      expect(
+        screen.getByRole('link', {
+          name: 'Internal link',
+        }),
+      ).toHaveAttribute(
+        'href',
+        'https://explore-education-statistics.service.gov.uk/Find-Statistics?testParam=Something',
+      );
+
+      const externalLink = screen.getByRole('link', {
+        name: 'External link',
+      });
+      expect(externalLink).toHaveAttribute(
+        'href',
+        '  https://gov.uk/TEST something  ',
+      );
+      expect(externalLink).not.toHaveAttribute('target', '_blank');
+      expect(externalLink).not.toHaveAttribute('rel', 'noopener noreferrer');
     });
   });
 });
