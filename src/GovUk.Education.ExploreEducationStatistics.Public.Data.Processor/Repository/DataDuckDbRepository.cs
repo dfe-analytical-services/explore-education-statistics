@@ -30,7 +30,6 @@ public class DataDuckDbRepository(
 
         await using var duckDbConnection =
             DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
-        duckDbConnection.Open();
 
         await duckDbConnection.SqlBuilder("CREATE SEQUENCE data_seq START 1")
             .ExecuteAsync(cancellationToken: cancellationToken);

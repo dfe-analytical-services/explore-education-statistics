@@ -27,7 +27,6 @@ public class ParquetService(
 
         await using var duckDbConnection =
             DuckDbConnection.CreateFileConnectionReadOnly(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
-        duckDbConnection.Open();
 
         await duckDbConnection.SqlBuilder(
                 $"EXPORT DATABASE '{versionDir:raw}' (FORMAT PARQUET, CODEC ZSTD)")
