@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -80,6 +81,12 @@ public abstract class ProcessorFunctionsIntegrationTest
         });
 
         return (dataSetVersion, dataSetVersionImport.InstanceId);
+    }
+
+    protected DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
+    {
+        var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
+        return DuckDbConnection.CreateFileConnectionReadOnly(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
     }
 
     protected void AssertDataSetVersionDirectoryContainsOnlyFiles(
