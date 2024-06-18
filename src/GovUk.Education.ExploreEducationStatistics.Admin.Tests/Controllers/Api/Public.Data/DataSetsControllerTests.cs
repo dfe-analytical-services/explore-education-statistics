@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
@@ -486,12 +487,12 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile liveReleaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(liveReleaseVersion);
 
             ReleaseFile draftReleaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(draftReleaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -599,7 +600,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                         .Generate(1)
                 );
 
-            File file = DataFixture.DefaultFile();
+            File file = DataFixture.DefaultFile(FileType.Data);
 
             var liveReleaseVersion = publication.ReleaseVersions.Single(rv => rv.Published is not null);
 
@@ -675,7 +676,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -738,7 +739,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -851,7 +852,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -876,8 +877,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                         .Generate(1)
                 );
 
-            File file = DataFixture
-                .DefaultFile();
+            File file = DataFixture.DefaultFile(FileType.Data);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -929,7 +929,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(draftReleaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>

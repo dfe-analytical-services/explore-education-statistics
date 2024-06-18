@@ -51,6 +51,14 @@ internal class DataSetCandidateService(
             .Where(rf => rf.File.PublicApiDataSetId == null)
             .Where(rf => rf.File.ReplacedById == null)
             .Where(rf => rf.File.ReplacingId == null)
+            .Join(
+                contentDbContext.DataImports,
+                rf => rf.FileId,
+                di => di.FileId,
+                (rf, di) => new { ReleaseFile = rf, DataImport = di }
+            )
+            .Where(tuple => tuple.DataImport.Status == DataImportStatus.COMPLETE)
+            .Select(tuple => tuple.ReleaseFile)
             .Select(rf => new DataSetCandidateViewModel
             {
                 ReleaseFileId = rf.Id,

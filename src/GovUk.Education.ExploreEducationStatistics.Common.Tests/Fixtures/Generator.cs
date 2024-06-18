@@ -15,7 +15,7 @@ public class Generator<T> where T : class
 {
     private readonly Faker _faker;
     private readonly Func<int>? _seeder;
-    private readonly DataFixture? _fixture;
+    private readonly DataFixture _fixture;
 
     private Func<T> _factory = Activator.CreateInstance<T>;
 
@@ -32,7 +32,7 @@ public class Generator<T> where T : class
     {
         _faker = faker ?? new Faker();
         _seeder = seeder;
-        _fixture = fixture;
+        _fixture = fixture ?? new DataFixture();
     }
 
     /// <summary>
@@ -219,7 +219,7 @@ public class Generator<T> where T : class
             : 0;
     }
 
-    private T GenerateSingle(int index, int? fixtureTypeIndex, int? fixtureIndex)
+    private T GenerateSingle(int index, int fixtureTypeIndex, int fixtureIndex)
     {
         if (_seeder is not null)
         {
@@ -236,10 +236,10 @@ public class Generator<T> where T : class
                 _faker,
                 instance,
                 new SetterContext(
-                    index: index,
-                    fixture: _fixture,
-                    fixtureTypeIndex: fixtureTypeIndex,
-                    fixtureIndex: fixtureIndex
+                    Index: index,
+                    Fixture: _fixture,
+                    FixtureTypeIndex: fixtureTypeIndex,
+                    FixtureIndex: fixtureIndex
                 )
             );
         }
@@ -292,10 +292,10 @@ public class Generator<T> where T : class
                     _faker,
                     instance,
                     new SetterContext(
-                        index: index,
-                        fixture: _fixture,
-                        fixtureTypeIndex: fixtureTypeIndex,
-                        fixtureIndex: fixtureIndex
+                        Index: index,
+                        Fixture: _fixture,
+                        FixtureTypeIndex: fixtureTypeIndex,
+                        FixtureIndex: fixtureIndex
                     )
                 );
             }
@@ -309,9 +309,9 @@ public class Generator<T> where T : class
     private void InvokeFinalizers(T instance) =>
         _finalizers.ForEach(finalizer => finalizer(instance, _faker));
 
-    private int? NextFixtureTypeIndex() => _fixture?.NextTypeIndex<T>();
+    private int NextFixtureTypeIndex() => _fixture.NextTypeIndex<T>();
 
-    private int? NextFixtureIndex() => _fixture?.NextIndex();
+    private int NextFixtureIndex() => _fixture.NextIndex();
 
     private interface ISetter
     {

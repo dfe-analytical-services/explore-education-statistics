@@ -1,5 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -38,7 +38,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithPublication(DataFixture
                         .DefaultPublication()))
-                .WithFile(DataFixture.DefaultFile());
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
             {
@@ -126,8 +126,8 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         [InlineData(DataSetVersionStatus.Cancelled)]
         public async Task Success_SubsequentDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
         {
-            File liveFile = DataFixture.DefaultFile();
-            File draftFile = DataFixture.DefaultFile();
+            File liveFile = DataFixture.DefaultFile(FileType.Data);
+            File draftFile = DataFixture.DefaultFile(FileType.Data);
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
@@ -370,7 +370,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithPublication(DataFixture
                         .DefaultPublication()))
-                .WithFile(DataFixture.DefaultFile());
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
             {

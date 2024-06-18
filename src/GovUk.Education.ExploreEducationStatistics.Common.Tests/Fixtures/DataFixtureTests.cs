@@ -45,8 +45,8 @@ public class DataFixtureTests
     public void Generator_Single_GenerateRandomIsDeterministic()
     {
         var fixture = new DataFixture();
-
         var generator = fixture.Generator<Person>();
+
         var items = generator
             .ForInstance(s => s
                 .Set(p => p.FirstName, "Test person"))
@@ -99,7 +99,7 @@ public class DataFixtureTests
 
         var items = generator
             .ForInstance(s => s
-                .Set(p => p.FirstName, (faker, _, context) => $"Jane {context.Index}"))
+                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.Index}"))
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -111,6 +111,69 @@ public class DataFixtureTests
         Assert.Equal("Jane 0", items[0].FirstName);
         Assert.Equal("Jane 1", items[1].FirstName);
         Assert.Equal("Jane 2", items[2].FirstName);
+    }
+
+    [Fact]
+    public void Generator_Single_DefaultDataFixture_Index_IncrementsFromZeroOnMultipleGenerates()
+    {
+        var generator = new Generator<Person>();
+
+        var items = generator
+            .ForInstance(s => s
+                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.Index}"))
+            .GenerateList(3);
+
+        Assert.Equal("Jane 0", items[0].FirstName);
+        Assert.Equal("Jane 1", items[1].FirstName);
+        Assert.Equal("Jane 2", items[2].FirstName);
+
+        items = generator.GenerateList(3);
+
+        Assert.Equal("Jane 0", items[0].FirstName);
+        Assert.Equal("Jane 1", items[1].FirstName);
+        Assert.Equal("Jane 2", items[2].FirstName);
+    }
+
+    [Fact]
+    public void Generator_Single_DefaultDataFixture_FixtureIndex_IncrementSharedAcrossMultipleGenerates()
+    {
+        var generator = new Generator<Person>();
+
+        var items = generator
+            .ForInstance(s => s
+                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}"))
+            .GenerateList(3);
+
+        Assert.Equal("Jane 0", items[0].FirstName);
+        Assert.Equal("Jane 1", items[1].FirstName);
+        Assert.Equal("Jane 2", items[2].FirstName);
+
+        items = generator.GenerateList(3);
+
+        Assert.Equal("Jane 3", items[0].FirstName);
+        Assert.Equal("Jane 4", items[1].FirstName);
+        Assert.Equal("Jane 5", items[2].FirstName);
+    }
+
+    [Fact]
+    public void Generator_Single_BuiltInDataFixture_FixtureTypeIndex_IncrementSharedAcrossMultipleGenerates()
+    {
+        var generator = new Generator<Person>();
+
+        var items = generator
+            .ForInstance(s => s
+                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}"))
+            .GenerateList(3);
+
+        Assert.Equal("Jane 0", items[0].FirstName);
+        Assert.Equal("Jane 1", items[1].FirstName);
+        Assert.Equal("Jane 2", items[2].FirstName);
+
+        items = generator.GenerateList(3);
+
+        Assert.Equal("Jane 3", items[0].FirstName);
+        Assert.Equal("Jane 4", items[1].FirstName);
+        Assert.Equal("Jane 5", items[2].FirstName);
     }
 
     [Fact]
@@ -325,6 +388,35 @@ public class DataFixtureTests
     }
 
     [Fact]
+    public void Generate_Multiple_DefaultDataFixtures_FixtureTypeIndex_IncrementIndependently()
+    {
+        // Instantiate generators without a shared `DataFixture` instance,
+        // meaning each generator gets its own default instance.
+        var persons = new Generator<Person>()
+            .ForInstance(s => s
+                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
+                .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureTypeIndex}"))
+            .GenerateList(3);
+
+        Assert.Equal("Jane 0", persons[0].FirstName);
+        Assert.Equal("Jane 1", persons[1].FirstName);
+        Assert.Equal("Jane 2", persons[2].FirstName);
+
+        Assert.Equal("Doe 0", persons[0].LastName);
+        Assert.Equal("Doe 1", persons[1].LastName);
+        Assert.Equal("Doe 2", persons[2].LastName);
+
+        var companies = new Generator<Company>()
+            .ForInstance(s => s
+                .Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureTypeIndex}"))
+            .GenerateList(3);
+
+        Assert.Equal("Acme 0", companies[0].Name);
+        Assert.Equal("Acme 1", companies[1].Name);
+        Assert.Equal("Acme 2", companies[2].Name);
+    }
+
+    [Fact]
     public void Generate_Multiple_FixtureIndex_IncrementsForGeneratorsOfAnyType()
     {
         var fixture = new DataFixture();
@@ -350,11 +442,42 @@ public class DataFixtureTests
                 .Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureIndex}"))
             .GenerateList(3);
 
-        // FixtureTypeIndex increments when generators
+        // FixtureIndex increments when generators
         // of any type generate new instances.
         Assert.Equal("Acme 3", companies[0].Name);
         Assert.Equal("Acme 4", companies[1].Name);
         Assert.Equal("Acme 5", companies[2].Name);
+    }
+
+    [Fact]
+    public void Generate_Multiple_DefaultDataFixtures_FixtureIndex_IncrementIndependently()
+    {
+        // Instantiate generators without a shared `DataFixture` instance,
+        // meaning each generator gets its own default instance.
+        var persons = new Generator<Person>()
+            .ForInstance(s => s
+                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}")
+                .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureIndex}"))
+            .GenerateList(3);
+
+        Assert.Equal("Jane 0", persons[0].FirstName);
+        Assert.Equal("Jane 1", persons[1].FirstName);
+        Assert.Equal("Jane 2", persons[2].FirstName);
+
+        Assert.Equal("Doe 0", persons[0].LastName);
+        Assert.Equal("Doe 1", persons[1].LastName);
+        Assert.Equal("Doe 2", persons[2].LastName);
+
+        var companies = new Generator<Company>()
+            .ForInstance(s => s
+                .Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureIndex}"))
+            .GenerateList(3);
+
+        // FixtureIndex increments when generators
+        // of any type generate new instances.
+        Assert.Equal("Acme 0", companies[0].Name);
+        Assert.Equal("Acme 1", companies[1].Name);
+        Assert.Equal("Acme 2", companies[2].Name);
     }
 
     [Fact]
