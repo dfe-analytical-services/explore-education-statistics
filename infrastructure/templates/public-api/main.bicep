@@ -69,7 +69,7 @@ param deployContainerApp bool = true
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
 param updatePsqlFlexibleServer bool = false
 
-@description('Public URLs of other components in the service.')
+@description('Public URLs of othecntr components in the service.')
 param publicUrls {
   contentApi: string
 }?

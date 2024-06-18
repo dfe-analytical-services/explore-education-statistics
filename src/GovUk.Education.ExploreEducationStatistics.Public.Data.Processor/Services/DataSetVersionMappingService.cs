@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
 internal class DataSetVersionMappingService(
+    IDataSetMetaService dataSetMetaService,
     PublicDataDbContext publicDataDbContext)
     : IDataSetVersionMappingService
 {
@@ -15,68 +16,65 @@ internal class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        var liveVersionId = await publicDataDbContext
+        var liveVersion = (await publicDataDbContext
             .DataSetVersions
             .Where(dsv => dsv.Id == nextDataSetVersionId)
-            .Select(dsv => dsv.DataSet.LatestLiveVersionId!.Value)
-            .SingleAsync(cancellationToken);
+            .Select(dsv => dsv.DataSet.LatestLiveVersion)
+            .SingleAsync(cancellationToken))!;
 
-        var mappings = await BuildMappings(
-            liveVersionId,
-            nextDataSetVersionId,
+        var nextVersion = await publicDataDbContext
+            .DataSetVersions
+            .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
+
+        var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMetaForMappings(
+            dataSetVersionId: nextDataSetVersionId,
             cancellationToken);
 
-        publicDataDbContext.DataSetVersionMappings.Add(mappings);
+        var sourceLocationMeta =
+            await GetLocationMeta(liveVersion.Id, cancellationToken);
+
+        var locationMappings = CreateLocationMappings(
+            sourceLocationMeta,
+            nextVersionMeta.Locations);
+
+        var sourceFilterMeta =
+            await GetFilterMeta(liveVersion.Id, cancellationToken);
+
+        var filterMappings = CreateFilterMappings(
+            sourceFilterMeta,
+            nextVersionMeta.Filters);
+
+        nextVersion.MetaSummary = nextVersionMeta.MetaSummary;
+
+        publicDataDbContext.DataSetVersionMappings.Add(new DataSetVersionMapping
+        {
+            SourceDataSetVersionId = liveVersion.Id,
+            TargetDataSetVersionId = nextDataSetVersionId,
+            Locations = locationMappings,
+            Filters = filterMappings
+        });
+
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
         return Unit.Instance;
     }
 
-    private async Task<DataSetVersionMapping> BuildMappings(
-        Guid sourceVersionId,
-        Guid targetVersionId,
-        CancellationToken cancellationToken)
+    private Locations CreateLocationMappings(
+        List<LocationMeta> sourceLocationMeta,
+        List<(LocationMeta, List<LocationOptionMetaRow>)> targetLocationMeta)
     {
-        var locationMappings = await CreateLocationMappings(
-            sourceVersionId,
-            targetVersionId,
-            cancellationToken);
-
-        var filterMappings = await CreateFilterMappings(
-            sourceVersionId,
-            targetVersionId,
-            cancellationToken);
-
-        return new DataSetVersionMapping
-        {
-            SourceDataSetVersionId = sourceVersionId,
-            TargetDataSetVersionId = targetVersionId,
-            Locations = locationMappings,
-            Filters = filterMappings
-        };
-    }
-
-    private async Task<Locations> CreateLocationMappings(
-        Guid sourceVersionId,
-        Guid targetVersionId,
-        CancellationToken cancellationToken)
-    {
-        var sourceLocationMeta =
-            await GetLocationMeta(cancellationToken, sourceVersionId);
-
-        var targetLocationMeta =
-            await GetLocationMeta(cancellationToken, targetVersionId);
-
         var locationMappings = sourceLocationMeta
-            .Select(level => new LocationMappings
+            .OrderBy(level => level.Level)
+            .Select(level => new LocationLevelMappings
             {
-                Level    = level.Level,
+                Level = level.Level,
                 Mappings = level
                     .Options
-                    .Select(location => new LocationMapping
+                    .OrderBy(location => location.Label)
+                    .Select(location => new LocationOptionMapping
                     {
                         Source = new LocationOption
                         {
-                            Id = location.Id,
+                            Key = $"Source level {level.Level} location {location.Label}",
                             Label = location.Label,
                         },
                         Type = MappingType.None
@@ -86,83 +84,89 @@ internal class DataSetVersionMappingService(
             .ToList();
 
         var locationTargets = targetLocationMeta
-            .Select(level =>
+            .Select(meta => (
+                levelMeta: meta.Item1,
+                optionsMeta: meta.Item2))
+            .OrderBy(meta => meta.levelMeta.Level)
+            .Select(meta => new LocationTargets
             {
-                return new LocationTargets
-                {
-                    Level = level.Level,
-                    Options = level
-                        .Options
-                        .Select(location => new LocationOption { Id = location.Id, Label = location.Label })
-                        .ToList()
-                };
+                Level = meta.levelMeta.Level,
+                Options = meta
+                    .optionsMeta
+                    .OrderBy(location => location.Label)
+                    .Select(location => new LocationOption
+                    {
+                        Key = $"Target level {meta.levelMeta.Level} location {location.Label}",
+                        Label = location.Label
+                    })
+                    .ToList()
             })
             .ToList();
-        
-        return new Locations
-        {
-            Mappings = locationMappings,
-            Targets = locationTargets
-        };
+
+        return new Locations {Mappings = locationMappings, Targets = locationTargets};
     }
 
-    private async Task<Filters> CreateFilterMappings(
-        Guid sourceVersionId,
-        Guid targetVersionId,
-        CancellationToken cancellationToken)
+    private Filters CreateFilterMappings(
+        List<FilterMeta> sourceFilterMeta,
+        List<(FilterMeta, List<FilterOptionMeta>)> targetFilterMeta)
     {
-        var sourceFilterMeta = await GetFilterMeta(sourceVersionId, cancellationToken);
-        var targetFilterMeta = await GetFilterMeta(targetVersionId, cancellationToken);
-
         var filterMappings = sourceFilterMeta
             .Select(filter => new FilterMapping
             {
-                Source = new Filter {Id = filter.Id, Label = filter.Label},
+                Source = new Filter {Key = $"Source filter {filter.Label}", Label = filter.Label},
                 Options = filter
                     .Options
                     .Select(option => new FilterOptionMapping
                     {
-                        Source = new FilterOption {Id = option.Id, Label = option.Label}
+                        Source = new FilterOption
+                        {
+                            Key = $"Source filter {filter.Label} option {option.Label}", Label = option.Label
+                        }
                     })
                     .ToList()
             })
             .ToList();
 
         var filterTargets = targetFilterMeta
-            .Select(filter => new FilterTarget
+            .Select(meta => (
+                filterMeta: meta.Item1,
+                optionsMeta: meta.Item2))
+            .Select(meta => new FilterTarget
             {
-                Id = filter.Id,
-                Label = filter.Label,
-                Options = filter
-                    .Options
-                    .Select(option => new FilterOption {Id = option.Id, Label = option.Label})
+                Key = $"Target filter {meta.filterMeta.Label}",
+                Label = meta.filterMeta.Label,
+                Options = meta.optionsMeta
+                    .Select(option => new FilterOption
+                    {
+                        Key = $"Target filter {meta.filterMeta.Label} option {option.Label}", Label = option.Label
+                    })
                     .ToList()
             })
             .ToList();
-        
-        var filters = new Filters
-        {
-            Mappings = filterMappings,
-            Targets = filterTargets
-        };
+
+        var filters = new Filters {Mappings = filterMappings, Targets = filterTargets};
 
         return filters;
     }
 
     private async Task<List<LocationMeta>> GetLocationMeta(
-        CancellationToken cancellationToken,
-        Guid dataSetVersionId) =>
-        await publicDataDbContext
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        return await publicDataDbContext
             .LocationMetas
             .AsNoTracking()
+            .Include(levelMeta => levelMeta.Options)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
+    }
 
     private async Task<List<FilterMeta>> GetFilterMeta(Guid sourceVersionId, CancellationToken cancellationToken)
     {
         return await publicDataDbContext
             .FilterMetas
             .AsNoTracking()
+            .Include(filterMeta => filterMeta.Options)
             .Where(meta => meta.DataSetVersionId == sourceVersionId)
             .ToListAsync(cancellationToken);
     }

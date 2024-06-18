@@ -83,7 +83,17 @@ public abstract class ProcessorFunctionsIntegrationTest
             .WithStatus(status ?? DataSetVersionStatus.Processing)
             .WithImports(() => [dataSetVersionImport])
             .WithVersionNumber(major: versionNumberMajor, minor: versionNumberMinor)
-            .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+            .FinishWith(dsv =>
+            {
+                if (status == DataSetVersionStatus.Published)
+                {
+                    dsv.DataSet.LatestLiveVersion = dsv;    
+                }
+                else
+                {
+                    dsv.DataSet.LatestDraftVersion = dsv;
+                }
+            });
 
         await AddTestData<PublicDataDbContext>(context =>
         {

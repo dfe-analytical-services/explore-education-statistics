@@ -41,7 +41,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
             builder.HasIndex(mapping => new { mapping.TargetDataSetVersionId })
                 .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId")
                 .IsUnique();
-            
+
             builder.OwnsOne(v => v.Locations, locations =>
             {
                 locations.ToJson();
@@ -54,7 +54,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
                             .HasConversion(new EnumToEnumValueConverter<MappingType>());
                     });
                 });
-                
+
                 locations.OwnsMany(locations => locations.Targets, locationTargets =>
                 {
                     locationTargets.OwnsMany(mapping => mapping.Options);
@@ -64,13 +64,13 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
             builder.OwnsOne(mapping => mapping.Filters, filters =>
             {
                 filters.ToJson();
-                
+
                 filters.OwnsMany(f => f.Mappings, filterMapping =>
                 {
                     filterMapping.OwnsOne(mapping => mapping.Source);
                     filterMapping.Property(mapping => mapping.Type)
                         .HasConversion(new EnumToEnumValueConverter<MappingType>());
-                    
+
                     filterMapping.OwnsMany(mapping => mapping.Options, filterOptionMapping =>
                     {
                         filterOptionMapping.OwnsOne(mapping => mapping.Source);
@@ -78,7 +78,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
                             .HasConversion(new EnumToEnumValueConverter<MappingType>());
                     });
                 });
-                
+
                 filters.OwnsMany(f => f.Targets, filterTarget =>
                 {
                     filterTarget.OwnsMany(mapping => mapping.Options);
@@ -101,7 +101,7 @@ public enum MappingType
 
 public abstract class Entry
 {
-    public int Id { get; set; }
+    public string Key { get; set; }
 
     public string Label { get; set; } = string.Empty;
 }
@@ -112,21 +112,21 @@ public abstract class LeafMapping<TEntry>
     public MappingType Type { get; set; }
 
     public TEntry Source { get; set; } = null!;
-    
+
     public int? TargetId { get; set; }
 }
 
 public abstract class ParentMapping<TEntry, TOption, TOptionMapping>
     where TEntry : Entry
     where TOption : Entry
-    where TOptionMapping : LeafMapping<TOption> 
+    where TOptionMapping : LeafMapping<TOption>
 {
     public MappingType Type { get; set; }
 
     public TEntry Source { get; set; } = null!;
 
     public List<TOptionMapping> Options { get; set; } = [];
-    
+
     public int? TargetId { get; set; }
 }
 
@@ -143,13 +143,13 @@ public class LocationOption : Entry
     protected string? Ukprn { get; set; }
 }
 
-public class LocationMapping : LeafMapping<LocationOption>;
+public class LocationOptionMapping : LeafMapping<LocationOption>;
 
-public class LocationMappings
+public class LocationLevelMappings
 {
     public GeographicLevel Level { get; set; }
 
-    public List<LocationMapping> Mappings { get; set; } = [];
+    public List<LocationOptionMapping> Mappings { get; set; } = [];
 }
 
 public class LocationTargets
@@ -161,7 +161,7 @@ public class LocationTargets
 
 public class Locations
 {
-    public List<LocationMappings> Mappings { get; set; }
+    public List<LocationLevelMappings> Mappings { get; set; }
 
     public List<LocationTargets> Targets { get; set; }
 }

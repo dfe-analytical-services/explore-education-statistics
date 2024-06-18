@@ -4,10 +4,6 @@ internal static class ActivityNames
 {
     public const string CopyCsvFiles = nameof(CopyCsvFilesFunction.CopyCsvFiles);
     public const string ImportMetadata = nameof(ImportMetadataFunction.ImportMetadata);
-
-    public const string CreateMappings = nameof(ProcessNextDataSetVersionFunction.CreateMappings);
-
-    public const string HandleProcessingFailure = nameof(HandleProcessingFailureFunction.HandleProcessingFailure);
     
     public const string CreateMappings = nameof(ImportMetadataFunction.ImportMetadata);
 
@@ -19,4 +15,6 @@ internal static class ActivityNames
 
     public const string CompleteNextDataSetVersionMappingProcessing = 
         nameof(ProcessNextDataSetVersionFunction.CompleteNextDataSetVersionMappingProcessing);
+
+    public const string HandleProcessingFailure = nameof(HandleProcessingFailureFunction.HandleProcessingFailure);
 }
