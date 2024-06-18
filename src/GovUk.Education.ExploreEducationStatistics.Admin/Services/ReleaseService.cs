@@ -53,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
-        private readonly IDataSetVersionService _dataSetVersionService;
         private readonly IProcessorClient _processorClient;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
@@ -75,7 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
-            IDataSetVersionService dataSetVersionService,
             IProcessorClient processorClient,
             IGuidGenerator guidGenerator,
             IBlobCacheService cacheService)
@@ -94,7 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
-            _dataSetVersionService = dataSetVersionService;
             _processorClient = processorClient;
             _guidGenerator = guidGenerator;
             _cacheService = cacheService;

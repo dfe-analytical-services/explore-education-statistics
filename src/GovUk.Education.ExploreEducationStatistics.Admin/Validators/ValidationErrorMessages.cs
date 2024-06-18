@@ -92,9 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Release
         ReleaseTypeInvalid,
 
-        // Release deletion
-        ReleaseDeletionPlanMustBeValid,
-
         // Release approval
         ReleaseNotApproved,
         PublishedReleaseCannotBeUnapproved,
