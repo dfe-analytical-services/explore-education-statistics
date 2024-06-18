@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Func<Task<Stream>> fileStreamProvider,
             bool isMetaFile)
         {
-            if (!await _fileTypeService.IsValidCsvFile(fileStreamProvider, file.Filename))
+            if (!await _fileTypeService.IsValidCsvFile(fileStreamProvider, file.Filename, file.ContentLength))
             {
                 return ListOf(isMetaFile
                     ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())

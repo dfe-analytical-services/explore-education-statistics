@@ -19,10 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             string dataSetName,
             string dataFileName,
-            long dataFileSize,
+            long dataFileLength,
             Stream dataFileStream,
             string metaFileName,
-            long metaFileSize,
+            long metaFileLength,
             Stream metaFileStream,
             File? replacingFile = null);
 
