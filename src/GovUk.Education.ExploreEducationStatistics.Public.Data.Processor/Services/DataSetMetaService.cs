@@ -25,28 +25,64 @@ public class DataSetMetaService(
     ITimePeriodsDuckDbRepository timePeriodsDuckDbRepository
 ) : IDataSetMetaService
 {
-    public async Task CreateDataSetVersionMeta(
+    public async Task<(
+        List<(FilterMeta, List<FilterOptionMeta>)> filters,
+        List<(LocationMeta, List<LocationOptionMetaRow>)> locations,
+        DataSetVersionMetaSummary metaSummary
+        )> ReadDataSetVersionMetaForMappings(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        var dataSetVersion = await publicDataDbContext.DataSetVersions
-            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken: cancellationToken);
+        var dataSetVersion = await GetDataSetVersion(dataSetVersionId, cancellationToken);
 
         await using var duckDbConnection =
             DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
         duckDbConnection.Open();
 
-        var columns = (await duckDbConnection.SqlBuilder(
-                    $"DESCRIBE SELECT * FROM '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}'")
-                .QueryAsync<(string ColumnName, string ColumnType)>(cancellationToken: cancellationToken))
-            .Select(row => row.ColumnName)
-            .ToList();
+        var allowedColumns = await GetAllowedColumns(cancellationToken, duckDbConnection, dataSetVersion);
 
-        var allowedColumns = columns.ToHashSet();
+        var metaFileRows = await GetMetaFileRows(cancellationToken, duckDbConnection, dataSetVersion);
 
-        var metaFileRows = (await duckDbConnection.SqlBuilder(
-                $"SELECT * FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'")
-            .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)).AsList();
+        var filterMeta = await filterMetaRepository.ReadFilterMetas(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken);
+        
+        var geographicLevelMeta = await geographicLevelMetaRepository.ReadGeographicLevelMeta(
+            duckDbConnection,
+            dataSetVersion,
+            cancellationToken);
+
+        var locationMeta = await locationMetaRepository.ReadLocationMetas(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken);
+
+        var timePeriodMetas = await timePeriodMetaRepository.ReadTimePeriodMetas(
+            duckDbConnection,
+            dataSetVersion,
+            cancellationToken);
+        
+        var metaSummary = BuildMetaSummary(timePeriodMetas, metaFileRows, allowedColumns, geographicLevelMeta);
+
+        return (filterMeta, locationMeta, metaSummary);
+    }
+
+    public async Task CreateDataSetVersionMeta(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        var dataSetVersion = await GetDataSetVersion(dataSetVersionId, cancellationToken);
+
+        await using var duckDbConnection =
+            DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
+        duckDbConnection.Open();
+
+        var allowedColumns = await GetAllowedColumns(cancellationToken, duckDbConnection, dataSetVersion);
+
+        var metaFileRows = await GetMetaFileRows(cancellationToken, duckDbConnection, dataSetVersion);
 
         await filterMetaRepository.CreateFilterMetas(
             duckDbConnection,
@@ -103,6 +139,34 @@ public class DataSetMetaService(
             cancellationToken);
     }
 
+    private async Task<List<MetaFileRow>> GetMetaFileRows(CancellationToken cancellationToken,
+        DuckDbConnection duckDbConnection, DataSetVersion dataSetVersion) =>
+        (await duckDbConnection
+            .SqlBuilder($"SELECT * FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'")
+            .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken))
+        .AsList();
+
+    private async Task<HashSet<string>> GetAllowedColumns(CancellationToken cancellationToken,
+        DuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion)
+    {
+        var columns = (await duckDbConnection.SqlBuilder(
+                    $"DESCRIBE SELECT * FROM '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}'")
+                .QueryAsync<(string ColumnName, string ColumnType)>(cancellationToken: cancellationToken))
+            .Select(row => row.ColumnName)
+            .ToList();
+
+        var allowedColumns = columns.ToHashSet();
+        return allowedColumns;
+    }
+
+    private async Task<DataSetVersion> GetDataSetVersion(Guid dataSetVersionId, CancellationToken cancellationToken) =>
+        await publicDataDbContext
+            .DataSetVersions
+            .SingleAsync(
+                dsv => dsv.Id == dataSetVersionId,
+                cancellationToken);
+
     private static DataSetVersionMetaSummary BuildMetaSummary(
         IList<TimePeriodMeta> timePeriodMetas,
         IList<MetaFileRow> metaFileRows,
@@ -121,7 +185,7 @@ public class DataSetMetaService(
                 {
                     Period = timePeriodMetas[^1].Period,
                     Code = timePeriodMetas[^1].Code
-                },
+                }
             },
             Filters = metaFileRows
                 .Where(row => row.ColType == MetaFileRow.ColumnType.Filter
@@ -143,13 +207,11 @@ public class DataSetMetaService(
     private async Task<int> CountCsvRows(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
-    {
-        return await duckDbConnection.SqlBuilder(
+        CancellationToken cancellationToken) =>
+        await duckDbConnection.SqlBuilder(
             $"""
              SELECT COUNT(*)
              FROM '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}'
              """
         ).QuerySingleAsync<int>(cancellationToken: cancellationToken);
-    }
 }

@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
@@ -22,6 +21,23 @@ public class LocationMetaRepository(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationMetaRepository
 {
+    public async Task<List<(LocationMeta, List<LocationOptionMetaRow>)>> ReadLocationMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns,
+        CancellationToken cancellationToken)
+    {
+        var levels = ListLocationLevels(allowedColumns);
+
+        var metas = GetLocationMetas(dataSetVersion, levels);
+
+        return await metas
+            .ToAsyncEnumerable()
+            .SelectAwait(async meta =>
+                (meta, await GetLocationOptionMetas(duckDbConnection, dataSetVersion, cancellationToken, meta)))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task CreateLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
@@ -30,40 +46,15 @@ public class LocationMetaRepository(
     {
         var levels = ListLocationLevels(allowedColumns);
 
-        var metas = levels
-            .Select(level => new LocationMeta
-            {
-                DataSetVersionId = dataSetVersion.Id,
-                Level = level,
-            })
-            .ToList();
+        var metas = GetLocationMetas(dataSetVersion, levels);
 
         publicDataDbContext.LocationMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         foreach (var meta in metas)
         {
-            var nameCol = meta.Level.CsvNameColumn();
-            var codeCols = meta.Level.CsvCodeColumns();
-            string[] cols = [..codeCols, nameCol];
-
-            var options = (await duckDbConnection.SqlBuilder(
-                        $"""
-                         SELECT {cols.JoinToString(", "):raw}
-                         FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
-                         WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
-                         GROUP BY {cols.JoinToString(", "):raw}
-                         ORDER BY {cols.JoinToString(", "):raw}
-                         """
-                    ).QueryAsync(cancellationToken: cancellationToken)
-                )
-                .Cast<IDictionary<string, object?>>()
-                .Select(row => row.ToDictionary(
-                    kv => kv.Key,
-                    kv => (string)kv.Value!
-                ))
-                .Select(row => MapLocationOptionMeta(row, meta.Level).ToRow())
-                .ToList();
+            var options =
+                await GetLocationOptionMetas(duckDbConnection, dataSetVersion, cancellationToken, meta);
 
             var optionTable = publicDataDbContext
                 .GetTable<LocationOptionMetaRow>()
@@ -152,17 +143,52 @@ public class LocationMetaRepository(
         }
     }
 
-    private static List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
+    private async Task<List<LocationOptionMetaRow>> GetLocationOptionMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken,
+        LocationMeta meta)
     {
-        return
-        [
-            .. allowedColumns
-                .Where(CsvColumnsToGeographicLevel.ContainsKey)
-                .Select(col => CsvColumnsToGeographicLevel[col])
-                .Distinct()
-                .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
-        ];
+        var nameCol = meta.Level.CsvNameColumn();
+        var codeCols = meta.Level.CsvCodeColumns();
+        string[] cols = [..codeCols, nameCol];
+
+        return (await duckDbConnection.SqlBuilder(
+                    $"""
+                     SELECT {cols.JoinToString(", "):raw}
+                     FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                     WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
+                     GROUP BY {cols.JoinToString(", "):raw}
+                     ORDER BY {cols.JoinToString(", "):raw}
+                     """
+                ).QueryAsync(cancellationToken: cancellationToken)
+            )
+            .Cast<IDictionary<string, object?>>()
+            .Select(row => row.ToDictionary(
+                kv => kv.Key,
+                kv => (string)kv.Value!
+            ))
+            .Select(row => MapLocationOptionMeta(row, meta.Level).ToRow())
+            .ToList();
     }
+
+    private static List<LocationMeta> GetLocationMetas(DataSetVersion dataSetVersion, List<GeographicLevel> levels) =>
+        levels
+            .Select(level => new LocationMeta
+            {
+                DataSetVersionId = dataSetVersion.Id,
+                Level = level
+            })
+            .ToList();
+
+    private static List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns) =>
+    [
+        .. allowedColumns
+            .Where(CsvColumnsToGeographicLevel.ContainsKey)
+            .Select(col => CsvColumnsToGeographicLevel[col])
+            .Distinct()
+            .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
+    ];
 
     private static LocationOptionMeta MapLocationOptionMeta(
         IDictionary<string, string> row,

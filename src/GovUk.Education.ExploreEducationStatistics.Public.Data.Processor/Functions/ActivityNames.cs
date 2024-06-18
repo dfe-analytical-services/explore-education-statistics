@@ -4,6 +4,9 @@ internal static class ActivityNames
 {
     public const string CopyCsvFiles = nameof(CopyCsvFilesFunction.CopyCsvFiles);
     public const string ImportMetadata = nameof(ImportMetadataFunction.ImportMetadata);
+
+    public const string CreateMappings = nameof(ImportMetadataFunction.ImportMetadata);
+
     public const string HandleProcessingFailure = nameof(HandleProcessingFailureFunction.HandleProcessingFailure);
 
     public const string ImportData = nameof(ProcessInitialDataSetVersionFunction.ImportData);

@@ -33,7 +33,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(ProcessorFunctionsI
             string[] expectedActivitySequence =
             [
                 ActivityNames.CopyCsvFiles,
-                ActivityNames.ImportMetadata,
+                ActivityNames.CreateMappings,
                 ActivityNames.CompleteProcessing,
             ];
 
