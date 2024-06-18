@@ -21,8 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -190,30 +188,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccessDo(_userService.CheckCanDeleteReleaseVersion)
-                .OnSuccess(async () => await _dataSetVersionService.GetDataSetVersions(releaseVersionId, cancellationToken))
-                .OnSuccess(dataSetVersions =>
+                .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
+                .OnSuccess(_ =>
                 {
                     var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseVersionId)
                         .Select(m => new IdTitleViewModel(m.Id, m.Title))
                         .ToList();
 
-                    var dataSetVersionDeletePlans = dataSetVersions
-                        .Select(dsv => new DeleteApiDataSetVersionPlan
-                        {
-                            DataSetId = dsv.DataSet.Id,
-                            DataSetTitle = dsv.DataSet.Title,
-                            Id = dsv.Id,
-                            Version = dsv.Version,
-                            Status = dsv.Status
-                        })
-                        .ToList();
-
                     return new DeleteReleasePlan
                     {
-                        ScheduledMethodologies = methodologiesScheduledWithRelease,
-                        ApiDataSetVersions = dataSetVersionDeletePlans
+                        ScheduledMethodologies = methodologiesScheduledWithRelease
                     };
                 });
         }
@@ -223,9 +208,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion) // only allows unapproved amendments to be removed
-                .OnSuccessDo(async () => await GetDeleteReleaseVersionPlan(releaseVersionId)
-                    .OnSuccess<ActionResult, DeleteReleasePlan, Unit>(plan =>
-                        !plan.Valid ? ValidationActionResult(ReleaseDeletionPlanMustBeValid) : Unit.Instance))
                 .OnSuccessDo(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId))
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
@@ -680,24 +662,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DeleteReleasePlan
     {
         public IReadOnlyList<IdTitleViewModel> ScheduledMethodologies { get; init; } = [];
-
-        public IReadOnlyList<DeleteApiDataSetVersionPlan> ApiDataSetVersions { get; init; } = [];
-
-        public bool Valid => ApiDataSetVersions.All(dsv => dsv.Valid);
-    }
-
-    public class DeleteApiDataSetVersionPlan
-    {
-        public Guid DataSetId { get; init; }
-
-        public string DataSetTitle { get; init; } = null!;
-
-        public Guid Id { get; init; }
-
-        public string Version { get; init; } = null!;
-
-        public DataSetVersionStatus Status { get; init; }
-
-        public bool Valid => Status.IsDeletableState();
     }
 }

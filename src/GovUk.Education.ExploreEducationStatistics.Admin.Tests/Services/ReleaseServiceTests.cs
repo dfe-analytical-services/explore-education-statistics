@@ -1127,14 +1127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet();
-
-            var dataSetVersions = _dataFixture
-                .DefaultDataSetVersion()
-                .WithDataSet(dataSet)
-                .GenerateList(3);
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1148,24 +1140,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
-
-            dataSetVersionService.Setup(mock => mock.GetDataSetVersions(releaseBeingDeleted.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(dataSetVersions);
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
-                    dataSetVersionService: dataSetVersionService.Object);
+                var releaseService = BuildReleaseService(context);
 
                 var result = await releaseService.GetDeleteReleaseVersionPlan(releaseBeingDeleted.Id);
 
-                VerifyAllMocks(dataSetVersionService);
-
                 var plan = result.AssertRight();
-
-                // Assert that the delete plan is valid
-                Assert.True(plan.Valid);
 
                 // Assert that only the 2 Methodologies that were scheduled with the Release being deleted are flagged
                 // up in the Plan.
@@ -1175,110 +1156,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Methodology 1 with alternative title", methodology1.Title);
                 Assert.Equal("Methodology 2 with owned Publication title", methodology2.Title);
-
-                // Assert that the linked API data set versions are flagged up in the plan
-                Assert.Equal(dataSetVersions.Count, plan.ApiDataSetVersions.Count);
-
-                var expectedDataSetVersionDeletePlans = dataSetVersions
-                    .Select(dsv => new DeleteApiDataSetVersionPlan
-                    {
-                        DataSetId = dsv.DataSet.Id,
-                        DataSetTitle = dsv.DataSet.Title,
-                        Id = dsv.Id,
-                        Version = dsv.Version,
-                        Status = dsv.Status
-                    })
-                    .ToList();
-
-                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan => Assert.True(dataSetVersionDeletePlan.Valid));
-
-                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan =>
-                    Assert.Contains(expectedDataSetVersionDeletePlans, expectedPlan => 
-                        expectedPlan.DataSetId == dataSetVersionDeletePlan.DataSetId 
-                        && expectedPlan.DataSetTitle == dataSetVersionDeletePlan.DataSetTitle
-                        && expectedPlan.Id == dataSetVersionDeletePlan.Id
-                        && expectedPlan.Version == dataSetVersionDeletePlan.Version
-                        && expectedPlan.Status == dataSetVersionDeletePlan.Status));
-            }
-        }
-
-        [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task GetDeleteReleaseVersionPlan_ReleaseIsLinkedToApiDataSetsWhichCannotBeDeleted(
-            DataSetVersionStatus dataSetVersionStatus)
-        {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            };
-
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet();
-
-            var dataSetVersions = _dataFixture
-                .DefaultDataSetVersion()
-                .WithDataSet(dataSet)
-                .WithStatus(dataSetVersionStatus)
-                .GenerateList(3);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
-
-            dataSetVersionService.Setup(mock => mock.GetDataSetVersions(releaseVersion.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(dataSetVersions);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var releaseService = BuildReleaseService(context,
-                    dataSetVersionService: dataSetVersionService.Object);
-
-                var result = await releaseService.GetDeleteReleaseVersionPlan(releaseVersion.Id);
-
-                VerifyAllMocks(dataSetVersionService);
-
-                var plan = result.AssertRight();
-
-                // Assert that the delete plan is NOT valid
-                Assert.False(plan.Valid);
-
-                // Assert that the linked API data set versions, which cannot be deleted, are flagged up in the plan
-                Assert.Equal(dataSetVersions.Count, plan.ApiDataSetVersions.Count);
-
-                var expectedDataSetVersionDeletePlans = dataSetVersions
-                    .Select(dsv => new DeleteApiDataSetVersionPlan
-                    {
-                        DataSetId = dsv.DataSet.Id,
-                        DataSetTitle = dsv.DataSet.Title,
-                        Id = dsv.Id,
-                        Version = dsv.Version,
-                        Status = dsv.Status
-                    })
-                    .ToList();
-
-                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan => Assert.False(dataSetVersionDeletePlan.Valid));
-
-                Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan =>
-                    Assert.Contains(expectedDataSetVersionDeletePlans, expectedPlan =>
-                        expectedPlan.DataSetId == dataSetVersionDeletePlan.DataSetId
-                        && expectedPlan.DataSetTitle == dataSetVersionDeletePlan.DataSetTitle
-                        && expectedPlan.Id == dataSetVersionDeletePlan.Id
-                        && expectedPlan.Version == dataSetVersionDeletePlan.Version
-                        && expectedPlan.Status == dataSetVersionDeletePlan.Status));
             }
         }
 
         [Fact]
-        public async Task DeleteRelease()
+        public async Task DeleteReleaseVersion()
         {
             var publication = new Publication();
 
@@ -1499,56 +1381,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task DeleteRelease_ReleaseIsLinkedToApiDataSetsWhichCannotBeDeleted(DataSetVersionStatus dataSetVersionStatus)
-        {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            };
-
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet();
-
-            var dataSetVersions = _dataFixture
-                .DefaultDataSetVersion()
-                .WithDataSet(dataSet)
-                .WithStatus(dataSetVersionStatus)
-                .GenerateList(3);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
-
-            dataSetVersionService.Setup(mock => mock.GetDataSetVersions(releaseVersion.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(dataSetVersions);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var releaseService = BuildReleaseService(
-                    context,
-                    dataSetVersionService: dataSetVersionService.Object);
-
-                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
-
-                VerifyAllMocks(dataSetVersionService);
-
-                result.AssertBadRequest(ReleaseDeletionPlanMustBeValid);
-            }
-        }
-
         [Fact]
-        public async Task DeleteRelease_ProcessorReturns400_Returns400()
+        public async Task DeleteReleaseVersion_ProcessorReturns400_Returns400()
         {
             var releaseVersion = new ReleaseVersion
             {
@@ -1623,7 +1457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task DeleteRelease_ProcessorThrows_Throws()
+        public async Task DeleteReleaseVersion_ProcessorThrows_Throws()
         {
             var releaseVersion = new ReleaseVersion
             {
