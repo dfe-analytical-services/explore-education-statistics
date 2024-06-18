@@ -356,7 +356,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
                 Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
                 Assert.Null(deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan);
-                Assert.False(deleteDataFilePlan.IsLinkedToApiDataSetVersion);
                 Assert.True(deleteDataFilePlan.Valid);
             }
         }
@@ -445,7 +444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.DataSetVersionId);
                 Assert.Equal(dataSetVersion.Version, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Version);
                 Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Status);
-                Assert.True(deleteDataFilePlan.IsLinkedToApiDataSetVersion);
+                Assert.False(deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Valid);
                 Assert.False(deleteDataFilePlan.Valid);
             }
         }
@@ -840,7 +839,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 validationProblem.AssertHasError(
                     expectedPath: "fileId",
-                    expectedCode: ValidationMessages.CannotRemoveDataFileLinkedToApiDataSet.Code);
+                    expectedCode: ValidationMessages.CannotDeleteApiDataSetFile.Code);
             }
         }
 

@@ -481,7 +481,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         DataSetName = tuple.apiDataSetVersion.DataSet.Title,
                         DataSetVersionId = tuple.apiDataSetVersion.Id,
                         Version = tuple.apiDataSetVersion.Version,
-                        Status = tuple.apiDataSetVersion.Status
+                        Status = tuple.apiDataSetVersion.Status,
+                        Valid = false
                     };
 
                     return new DeleteDataFilePlan
@@ -490,7 +491,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         SubjectId = tuple.subject.Id,
                         DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseVersionId, tuple.subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
-                        IsLinkedToApiDataSetVersion = tuple.apiDataSetVersion is not null,
                         LinkedApiDataSetVersionDeletionPlan = linkedApiDataSetVersionDeletionPlan
                     };
                 });
@@ -666,8 +666,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
                 {
-                    Code = ValidationMessages.CannotRemoveDataFileLinkedToApiDataSet.Code,
-                    Message = ValidationMessages.CannotRemoveDataFileLinkedToApiDataSet.Message,
+                    Code = ValidationMessages.CannotDeleteApiDataSetFile.Code,
+                    Message = ValidationMessages.CannotDeleteApiDataSetFile.Message,
                     Detail = new InvalidErrorDetail<Guid>(file.PublicApiDataSetId.Value),
                     Path = "fileId"
                 });
@@ -707,18 +707,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public List<Guid> FootnoteIds { get; init; } = null!;
 
-        public bool IsLinkedToApiDataSetVersion { get; init; }
-
         public DeleteApiDataSetVersionPlan? LinkedApiDataSetVersionDeletionPlan { get; init; }
 
-        public bool Valid => !IsLinkedToApiDataSetVersion;
+        public bool Valid => LinkedApiDataSetVersionDeletionPlan?.Valid ?? true;
     }
 
     public class DeleteApiDataSetVersionPlan
     {
         public Guid DataSetId { get; init; }
-
         public string DataSetName { get; init; } = null!;
+
 
         public Guid DataSetVersionId { get; init; }
 
@@ -726,7 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public DataSetVersionStatus Status { get; init; }
 
-        public bool Valid => Status.IsDeletableState();
+        public bool Valid { get; init; }
     }
 
     public class DeleteReleasePlan
