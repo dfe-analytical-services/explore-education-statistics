@@ -41,10 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             string dataSetName,
             string dataFileName,
-            long dataFileSize,
+            long dataFileLength,
             Stream dataFileStream,
             string metaFileName,
-            long metaFileSize,
+            long metaFileLength,
             Stream metaFileStream,
             File? replacingFile = null)
         {
@@ -60,15 +60,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 replacingFile));
 
             errors.AddRange(ValidateDataSetFileSizes(
-                dataFileSize,
+                dataFileLength,
                 dataFileName,
-                metaFileSize,
+                metaFileLength,
                 metaFileName));
 
             errors.AddRange(await ValidateDataSetFileTypes(
                 dataFileName,
+                dataFileLength,
                 dataFileStream,
                 metaFileName,
+                metaFileLength,
                 metaFileStream));
 
             return errors;
@@ -88,10 +90,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseVersionId: releaseVersionId,
                 dataSetName: dataSetFileName,
                 dataFileName:dataFile.FileName,
-                dataFileSize:dataFile.Length,
+                dataFileLength:dataFile.Length,
                 dataFileStream: dataFileStream,
                 metaFileName:metaFile.FileName,
-                metaFileSize:metaFile.Length,
+                metaFileLength:metaFile.Length,
                 metaFileStream: metaFileStream,
                 replacingFile: replacingFile);
         }
@@ -107,10 +109,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseVersionId: releaseVersionId,
                 dataSetName: archiveDataSet.DataSetName,
                 dataFileName: archiveDataSet.DataFileName,
-                dataFileSize: archiveDataSet.DataFileSize,
+                dataFileLength: archiveDataSet.DataFileSize,
                 dataFileStream: dataFileStream,
                 metaFileName: archiveDataSet.MetaFileName,
-                metaFileSize: archiveDataSet.MetaFileSize,
+                metaFileLength: archiveDataSet.MetaFileSize,
                 metaFileStream: metaFileStream,
                 replacingFile: replacingFile);
         }
@@ -283,18 +285,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<List<ErrorViewModel>> ValidateDataSetFileTypes(
             string dataFileName,
+            long dataFileLength,
             Stream dataFileStream,
             string metaFileName,
+            long metaFileLength,
             Stream metaFileStream)
         {
             List<ErrorViewModel> errors = [];
 
-            if (!await _fileTypeService.IsValidCsvFile(dataFileStream, dataFileName))
+            if (!await _fileTypeService.IsValidCsvFile(dataFileStream, dataFileName, dataFileLength))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFileName));
             }
 
-            if (!await _fileTypeService.IsValidCsvFile(metaFileStream, metaFileName))
+            if (!await _fileTypeService.IsValidCsvFile(metaFileStream, metaFileName, metaFileLength))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(metaFileName));
             }
