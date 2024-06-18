@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<string> GetMimeType(IFormFile file)
         {
             // The Mime project is generally very good at determining mime types from file contents
-            var mimeType = GetMimeTypeUsingMimeProject(file.OpenReadStream());
+            var mimeType = GetMimeTypeUsingMimeProject(file.OpenReadStream(), file.Length);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
-            var mimeType = GetMimeTypeUsingMimeProject(file.OpenReadStream());
+            await using var stream = file.OpenReadStream();
+            var mimeType = GetMimeTypeUsingMimeProject(stream, file.Length);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -75,13 +76,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
         {
-            var encodingType = GetMimeEncoding(file.OpenReadStream());
+            var encodingType = GetMimeEncoding(file.OpenReadStream(), file.Length);
             return encodingTypes.Any(pattern => pattern.Equals(encodingType));
         }
 
-        public async Task<bool> HasMatchingMimeType(Stream stream, IEnumerable<Regex> mimeTypes)
+        public async Task<bool> HasMatchingMimeType(Stream stream, long streamLength, IEnumerable<Regex> mimeTypes)
         {
-            var mimeType = GetMimeTypeUsingMimeProject(stream);
+            var mimeType = GetMimeTypeUsingMimeProject(stream, streamLength);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -92,13 +93,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }
 
-        public bool HasMatchingEncodingType(Stream stream, IEnumerable<string> encodingTypes)
+        public bool HasMatchingEncodingType(Stream stream, long streamLength, IEnumerable<string> encodingTypes)
         {
-            var encodingType = GetMimeEncoding(stream);
+            var encodingType = GetMimeEncoding(stream, streamLength);
             return encodingTypes.Any(pattern => pattern.Equals(encodingType));
         }
 
-        public async Task<bool> IsValidCsvFile(Stream stream, string filename)
+        public async Task<bool> IsValidCsvFile(Stream stream, string filename, long fileLength)
         {
             _logger.LogDebug("Validating that {FileName} has a CSV mime type", filename);
 
@@ -111,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 return false;
             }
             
-            if (!await HasMatchingMimeType(sampleLinesStream, AllowedCsvMimeTypes))
+            if (!await HasMatchingMimeType(sampleLinesStream, sampleLinesStream.Length, AllowedCsvMimeTypes))
             {
                 _logger.LogDebug("{FileName} does not have a valid CSV mime type", filename);
                 return false;
@@ -124,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             // To match encoding type, we want the stream to be at the beginning of the file
             stream.SeekToBeginning();
 
-            if (!HasMatchingEncodingType(stream, AllowedCsvEncodingTypes))
+            if (!HasMatchingEncodingType(stream, fileLength, AllowedCsvEncodingTypes))
             {
                 _logger.LogDebug("{FileName} does not have a valid CSV content encoding", filename);
                 return false;
@@ -135,16 +136,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return true;
         }
 
-        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename)
+        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename, long fileLength)
         {
             await using var stream = await streamProvider.Invoke();
-            return await IsValidCsvFile(stream, filename);
+            return await IsValidCsvFile(stream, filename, fileLength);
         }
 
         public async Task<bool> IsValidCsvFile(IFormFile file)
         {
             await using var stream = file.OpenReadStream();
-            return await IsValidCsvFile(stream, file.FileName);
+            return await IsValidCsvFile(stream, file.FileName, file.Length);
         }
 
         /// <summary>
@@ -189,10 +190,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return lineStream;
         }
 
-        private string GetMimeTypeUsingMimeProject(Stream stream)
+        private string GetMimeTypeUsingMimeProject(Stream stream, long streamLength)
         {
             // The Mime project is generally very good at determining mime types from file contents
-            return GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_TYPE);
+            return GuessMagicInfo(stream, streamLength, MagicOpenFlags.MAGIC_MIME_TYPE);
         }
 
         private async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
@@ -201,20 +202,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await stream.GetFileTypeAsync();
         }
 
-        private string GetMimeEncoding(Stream stream)
+        private string GetMimeEncoding(Stream stream, long streamLength)
         {
-            return GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_ENCODING);
+            return GuessMagicInfo(stream, streamLength, MagicOpenFlags.MAGIC_MIME_ENCODING);
         }
 
-        private string GuessMagicInfo(Stream fileStream, MagicOpenFlags flag)
+        private string GuessMagicInfo(Stream fileStream, long streamLength, MagicOpenFlags flag)
         {
-            using var reader = new StreamReader(fileStream);
-
             var dbPath = _configuration.GetValue<string>("MagicFilePath");
             var magic = new Magic(flag, dbPath);
 
-            var bufferSize = reader.BaseStream.Length >= 1024 ? 1024 : (int) reader.BaseStream.Length;
-            return magic.Read(reader.BaseStream, bufferSize);
+            var bufferSize = streamLength >= 1024 ? 1024 : (int) streamLength;
+            return magic.Read(fileStream, bufferSize);
         }
 
         private bool IsMimeTypeNullOrZip(string mimeType)

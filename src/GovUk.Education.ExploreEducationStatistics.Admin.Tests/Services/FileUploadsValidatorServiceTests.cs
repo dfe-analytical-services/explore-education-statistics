@@ -137,10 +137,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                     .ReturnsAsync(true);
 
                 var result = await service.ValidateDataSetFilesForUpload(
@@ -162,9 +162,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using var context = InMemoryApplicationDbContext();
             var (service, fileTypeService) = BuildService(context);
 
-            fileTypeService.Setup(mock => mock.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+            fileTypeService.Setup(mock => mock.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                 .ReturnsAsync(true);
-            fileTypeService.Setup(mock => mock.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+            fileTypeService.Setup(mock => mock.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                 .ReturnsAsync(true);
 
             var results = await service.ValidateDataSetFilesForUpload(
@@ -187,10 +187,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv", 0).Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                     .ReturnsAsync(true);
 
                 var result = await service.ValidateDataSetFilesForUpload(
@@ -212,11 +212,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (service, fileTypeService) = BuildService(context);
 
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                 .ReturnsAsync(false);
 
             fileTypeService
-                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                 .ReturnsAsync(true);
 
             var result = await service.ValidateDataSetFilesForUpload(
@@ -239,10 +239,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                     .ReturnsAsync(false);
 
                 var result = await service.ValidateDataSetFilesForUpload(
@@ -282,10 +282,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), metaFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                     .ReturnsAsync(true);
 
                 var result = await service.ValidateDataSetFilesForUpload(
@@ -328,10 +328,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                     .ReturnsAsync(true);
 
                 var result = await service.ValidateDataSetFilesForUpload(
@@ -382,10 +382,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                     .ReturnsAsync(() => true);
 
                 var result = await service.ValidateDataSetFilesForUpload(
@@ -439,10 +439,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), dataFile.FileName, dataFile.Length))
                     .ReturnsAsync(true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName, metaFile.Length))
                     .ReturnsAsync(true);
 
                 var result = await service.ValidateDataSetFilesForUpload(
@@ -463,11 +463,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), "test.csv"))
+                        IsValidCsvFile(It.IsAny<Stream>(), "test.csv", 1024))
                     .ReturnsAsync(true); // @MarkFix correct?
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv"))
+                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv", 1024))
                     .ReturnsAsync(true); // @MarkFix correct?
 
                 var (service, _) = BuildService(
@@ -501,11 +501,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), "test.txt"))
+                .IsValidCsvFile(It.IsAny<Stream>(), "test.txt", 1048576))
                 .ReturnsAsync(false); // @MarkFix correct?
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv"))
+                .IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv", 1024))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             var (service, _) = BuildService(
@@ -532,11 +532,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), "test.csv"))
+                .IsValidCsvFile(It.IsAny<Stream>(), "test.csv", 1048576))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), "test.meta.txt"))
+                .IsValidCsvFile(It.IsAny<Stream>(), "test.meta.txt", 1024))
                 .ReturnsAsync(false); // @MarkFix correct?
 
             var (service, _) = BuildService(
@@ -565,11 +565,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.DataFileName))
+                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.DataFileName, archiveFile.DataFileSize))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.MetaFileName))
+                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.MetaFileName, archiveFile.MetaFileSize))
                 .ReturnsAsync(false); // @MarkFix correct?
 
             var (service, _) = BuildService(
@@ -617,11 +617,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.DataFileName))
+                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.DataFileName, archiveFile.DataFileSize))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.MetaFileName))
+                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.MetaFileName, archiveFile.MetaFileSize))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             var (service, _) = BuildService(
@@ -646,11 +646,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), "test.csv"))
+                .IsValidCsvFile(It.IsAny<Stream>(), "test.csv", 0))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv"))
+                .IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv", 1024))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             var (service, _) = BuildService(
@@ -684,11 +684,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.DataFileName))
+                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.DataFileName, archiveFile.DataFileSize))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             fileTypeService.Setup(mock => mock
-                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.MetaFileName))
+                .IsValidCsvFile(It.IsAny<Stream>(), archiveFile.MetaFileName, archiveFile.MetaFileSize))
                 .ReturnsAsync(true); // @MarkFix correct?
 
             var (service, _) = BuildService(
@@ -728,11 +728,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), releaseFile.File.Filename))
+                        IsValidCsvFile(It.IsAny<Stream>(), releaseFile.File.Filename, 1048576))
                     .ReturnsAsync(true);
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv"))
+                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv", 1024))
                     .ReturnsAsync(true);
 
                 var (service, _) = BuildService(
@@ -777,11 +777,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), releaseFile.File.Filename))
+                        IsValidCsvFile(It.IsAny<Stream>(), releaseFile.File.Filename, 1048576))
                     .ReturnsAsync(true); // @MarkFix correct?
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv"))
+                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv", 1024))
                     .ReturnsAsync(true); // @MarkFix correct?
 
                 var (service, _) = BuildService(
@@ -834,11 +834,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), "another.csv"))
+                        IsValidCsvFile(It.IsAny<Stream>(), "another.csv", 1048576))
                     .ReturnsAsync(true); // @MarkFix correct?
 
                 fileTypeService.Setup(mock => mock.
-                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv"))
+                        IsValidCsvFile(It.IsAny<Stream>(), "test.meta.csv", 1024))
                     .ReturnsAsync(true); // @MarkFix correct?
 
                 var (service, _) = BuildService(
