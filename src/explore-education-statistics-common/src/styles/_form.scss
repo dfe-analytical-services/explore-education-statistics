@@ -6,3 +6,9 @@
 .govuk-textarea[disabled] {
   cursor: not-allowed;
 }
+
+// Hide the clear button on search inputs as they
+// are not keyboard accessible, see EES-5210.
+[type='search']::-webkit-search-cancel-button {
+  appearance: none;
+}
