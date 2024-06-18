@@ -144,8 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseDataFileService
                 .UploadAsZip(releaseVersionId: releaseVersionId,
                     zipFormFile: zipFile,
-                    replacingFileId: replacingFileId,
-                    subjectName: subjectName)
+                    subjectName: subjectName,
+                    replacingFileId: replacingFileId)
                 .HandleFailuresOrOk();
         }
 

@@ -283,7 +283,8 @@ public class DataSetFileService : IDataSetFileService
             containerName: BlobContainers.PublicReleaseFiles,
             path: releaseFile.PublicPath());
 
-        using var dataFileReader = new StreamReader(await datafileStreamProvider.Invoke());
+        await using var stream = await datafileStreamProvider.Invoke();
+        using var dataFileReader = new StreamReader(stream);
         using var csvReader = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
         await csvReader.ReadAsync();
         csvReader.ReadHeader();
