@@ -5,6 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public interface IGeographicLevelMetaRepository
 {
+    Task<GeographicLevelMeta> ReadGeographicLevelMeta(
+        IDuckDbConnection duckDb,
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken = default);
+    
     Task<GeographicLevelMeta> CreateGeographicLevelMeta(
         IDuckDbConnection duckDb,
         DataSetVersion dataSetVersion,
