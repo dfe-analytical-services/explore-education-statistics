@@ -42,31 +42,17 @@ export default function ContentHtml({
   const cleanHtml = useMemo(() => {
     const opts: SanitizeHtmlOptions = {
       ...sanitizeOptions,
-      transformTags: {
-        ...sanitizeOptions?.transformTags,
-        ...(formatLinks && {
-          a: (tagName, attribs) => {
-            return {
-              tagName,
-              attribs: {
-                ...attribs,
-                href: formatContentLink(attribs.href),
-              },
-            };
-          },
-        }),
-      },
+      transformTags: sanitizeOptions?.transformTags,
     };
 
     return sanitizeHtml(html, opts);
-  }, [formatLinks, html, sanitizeOptions]);
+  }, [html, sanitizeOptions]);
 
   const parsedContent = parseHtmlString(cleanHtml, {
     replace: (node: DOMNode) => {
       if (!(node instanceof Element)) {
         return undefined;
       }
-
       if (
         getGlossaryEntry &&
         node.name === 'a' &&
@@ -92,6 +78,21 @@ export default function ContentHtml({
         return isMounted && typeof text === 'string'
           ? transformFeaturedTableLinks(node.attribs.href, text)
           : undefined;
+      }
+
+      if (formatLinks && node.name === 'a') {
+        const url = formatContentLink(node.attribs.href);
+        const text = domToReact(node.children);
+
+        return !node.attribs.href.includes(
+          'explore-education-statistics.service.gov.uk',
+        ) && typeof node.attribs['data-featured-table'] === 'undefined' ? (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {text} (opens in a new tab)
+          </a>
+        ) : (
+          <a href={url}>{text}</a>
+        );
       }
 
       if (node.name === 'figure' && node.attribs.class === 'table') {

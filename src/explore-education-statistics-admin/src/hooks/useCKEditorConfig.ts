@@ -134,15 +134,6 @@ const useCKEditorConfig = ({
               url?.match(/\/data-tables\/fast-track\/[a-zA-Z-0-9-]/),
             attributes: { 'data-featured-table': '' },
           },
-          openInNewTab: {
-            mode: 'manual',
-            label: 'Open in a new tab',
-            defaultValue: false,
-            attributes: {
-              target: '_blank',
-              rel: 'noopener noreferrer',
-            },
-          },
         },
         defaultProtocol: 'https://',
       },
