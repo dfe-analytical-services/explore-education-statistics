@@ -80,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             badRequest.AssertValidationProblem(expectedValidationErrors);
             return either.Left;
         }
+
         public static ValidationProblemViewModel AssertBadRequestWithValidationProblem<TRight>(this Either<ActionResult, TRight> either)
         {
             var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>(); 

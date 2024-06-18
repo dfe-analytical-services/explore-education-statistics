@@ -16,11 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
-        Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(
+        Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId, 
             CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseVersionId);
+        Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
 

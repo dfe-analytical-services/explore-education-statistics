@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(
+        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId, 
             CancellationToken cancellationToken = default)
         {
@@ -203,8 +203,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(dsv => new DeleteApiDataSetVersionPlan
                         {
                             DataSetId = dsv.DataSet.Id,
-                            DataSetName = dsv.DataSet.Title,
-                            DataSetVersionId = dsv.Id,
+                            DataSetTitle = dsv.DataSet.Title,
+                            Id = dsv.Id,
                             Version = dsv.Version,
                             Status = dsv.Status
                         })
@@ -218,12 +218,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseVersionId)
+        public Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId)
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion) // only allows unapproved amendments to be removed
-                .OnSuccessDo(async () => await GetDeleteReleasePlan(releaseVersionId)
+                .OnSuccessDo(async () => await GetDeleteReleaseVersionPlan(releaseVersionId)
                     .OnSuccess<ActionResult, DeleteReleasePlan, Unit>(plan =>
                         !plan.Valid ? ValidationActionResult(ReleaseDeletionPlanMustBeValid) : Unit.Instance))
                 .OnSuccessDo(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId))
@@ -690,9 +690,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         public Guid DataSetId { get; init; }
 
-        public string DataSetName { get; init; } = null!;
+        public string DataSetTitle { get; init; } = null!;
 
-        public Guid DataSetVersionId { get; init; }
+        public Guid Id { get; init; }
 
         public string Version { get; init; } = null!;
 

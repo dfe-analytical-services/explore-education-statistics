@@ -61,10 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseVersionId:guid}")]
-        public async Task<ActionResult> DeleteRelease(Guid releaseVersionId)
+        public async Task<ActionResult> DeleteReleaseVersion(Guid releaseVersionId)
         {
             return await _releaseService
-                .DeleteRelease(releaseVersionId)
+                .DeleteReleaseVersion(releaseVersionId)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
 
@@ -237,12 +237,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleasePlan(
+        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId,
             CancellationToken cancellationToken)
         {
             return await _releaseService
-                .GetDeleteReleasePlan(releaseVersionId, cancellationToken)
+                .GetDeleteReleaseVersionPlan(releaseVersionId, cancellationToken)
                 .HandleFailuresOrOk();
         }
 

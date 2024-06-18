@@ -1082,7 +1082,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetDeleteReleasePlan()
+        public async Task GetDeleteReleaseVersionPlan()
         {
             var releaseBeingDeleted = new ReleaseVersion
             {
@@ -1158,7 +1158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context,
                     dataSetVersionService: dataSetVersionService.Object);
 
-                var result = await releaseService.GetDeleteReleasePlan(releaseBeingDeleted.Id);
+                var result = await releaseService.GetDeleteReleaseVersionPlan(releaseBeingDeleted.Id);
 
                 VerifyAllMocks(dataSetVersionService);
 
@@ -1183,8 +1183,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Select(dsv => new DeleteApiDataSetVersionPlan
                     {
                         DataSetId = dsv.DataSet.Id,
-                        DataSetName = dsv.DataSet.Title,
-                        DataSetVersionId = dsv.Id,
+                        DataSetTitle = dsv.DataSet.Title,
+                        Id = dsv.Id,
                         Version = dsv.Version,
                         Status = dsv.Status
                     })
@@ -1195,8 +1195,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan =>
                     Assert.Contains(expectedDataSetVersionDeletePlans, expectedPlan => 
                         expectedPlan.DataSetId == dataSetVersionDeletePlan.DataSetId 
-                        && expectedPlan.DataSetName == dataSetVersionDeletePlan.DataSetName
-                        && expectedPlan.DataSetVersionId == dataSetVersionDeletePlan.DataSetVersionId
+                        && expectedPlan.DataSetTitle == dataSetVersionDeletePlan.DataSetTitle
+                        && expectedPlan.Id == dataSetVersionDeletePlan.Id
                         && expectedPlan.Version == dataSetVersionDeletePlan.Version
                         && expectedPlan.Status == dataSetVersionDeletePlan.Status));
             }
@@ -1207,7 +1207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Deprecated)]
         [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task GetDeleteReleasePlan_ReleaseIsLinkedToApiDataSetsWhichCannotBeDeleted(
+        public async Task GetDeleteReleaseVersionPlan_ReleaseIsLinkedToApiDataSetsWhichCannotBeDeleted(
             DataSetVersionStatus dataSetVersionStatus)
         {
             var releaseVersion = new ReleaseVersion
@@ -1242,7 +1242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context,
                     dataSetVersionService: dataSetVersionService.Object);
 
-                var result = await releaseService.GetDeleteReleasePlan(releaseVersion.Id);
+                var result = await releaseService.GetDeleteReleaseVersionPlan(releaseVersion.Id);
 
                 VerifyAllMocks(dataSetVersionService);
 
@@ -1258,8 +1258,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Select(dsv => new DeleteApiDataSetVersionPlan
                     {
                         DataSetId = dsv.DataSet.Id,
-                        DataSetName = dsv.DataSet.Title,
-                        DataSetVersionId = dsv.Id,
+                        DataSetTitle = dsv.DataSet.Title,
+                        Id = dsv.Id,
                         Version = dsv.Version,
                         Status = dsv.Status
                     })
@@ -1270,8 +1270,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.All(plan.ApiDataSetVersions, dataSetVersionDeletePlan =>
                     Assert.Contains(expectedDataSetVersionDeletePlans, expectedPlan =>
                         expectedPlan.DataSetId == dataSetVersionDeletePlan.DataSetId
-                        && expectedPlan.DataSetName == dataSetVersionDeletePlan.DataSetName
-                        && expectedPlan.DataSetVersionId == dataSetVersionDeletePlan.DataSetVersionId
+                        && expectedPlan.DataSetTitle == dataSetVersionDeletePlan.DataSetTitle
+                        && expectedPlan.Id == dataSetVersionDeletePlan.Id
                         && expectedPlan.Version == dataSetVersionDeletePlan.Version
                         && expectedPlan.Status == dataSetVersionDeletePlan.Status));
             }
@@ -1388,7 +1388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cacheService: cacheService.Object,
                     processorClient: processorClient.Object);
 
-                var result = await releaseService.DeleteRelease(releaseVersion.Id);
+                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
 
                 releaseDataFilesService.Verify(mock =>
                     mock.DeleteAll(releaseVersion.Id, false), Times.Once);
@@ -1539,7 +1539,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     context,
                     dataSetVersionService: dataSetVersionService.Object);
 
-                var result = await releaseService.DeleteRelease(releaseVersion.Id);
+                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
 
                 VerifyAllMocks(dataSetVersionService);
 
@@ -1606,7 +1606,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cacheService: cacheService.Object,
                     processorClient: processorClient.Object);
 
-                var result = await releaseService.DeleteRelease(releaseVersion.Id);
+                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
 
                 VerifyAllMocks(cacheService,
                     releaseDataFilesService,
@@ -1672,7 +1672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cacheService: cacheService.Object,
                     processorClient: processorClient.Object);
 
-                await Assert.ThrowsAsync<HttpRequestException>(async () => await releaseService.DeleteRelease(releaseVersion.Id));
+                await Assert.ThrowsAsync<HttpRequestException>(async () => await releaseService.DeleteReleaseVersion(releaseVersion.Id));
 
                 VerifyAllMocks(cacheService,
                     releaseDataFilesService,

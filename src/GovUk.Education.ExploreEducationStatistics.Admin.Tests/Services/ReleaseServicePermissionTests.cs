@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetDeleteReleasePlan()
+        public async Task GetDeleteReleaseVersionPlan()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_releaseVersion, CanDeleteSpecificRelease)
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService.Object);
-                        return service.GetDeleteReleasePlan(_releaseVersion.Id);
+                        return service.GetDeleteReleaseVersionPlan(_releaseVersion.Id);
                     }
                 );
         }
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService.Object);
-                        return service.DeleteRelease(_releaseVersion.Id);
+                        return service.DeleteReleaseVersion(_releaseVersion.Id);
                     }
                 );
         }
