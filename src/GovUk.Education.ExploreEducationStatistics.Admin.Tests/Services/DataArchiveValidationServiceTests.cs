@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileUploadsValidatorService: fileUploadsValidatorService.Object);
             var archive = CreateFormFileFromResource("data-zip-valid.zip");
 
-            fileUploadsValidatorService.Setup(mock => mock.ValidateDataFilesForUpload(
+            fileUploadsValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
                 releaseVersionId,
                 It.IsAny<ArchiveDataSetFile>(),
                 It.IsAny<Stream>(),

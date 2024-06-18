@@ -1681,7 +1681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataFilesForUpload(
+                    .Setup(s => s.ValidateDataSetFilesForUpload(
                         releaseVersion.Id,
                         subjectName,
                         dataFormFile,
@@ -1856,7 +1856,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataFilesForUpload(
+                    .Setup(s => s.ValidateDataSetFilesForUpload(
                         releaseVersion.Id,
                         originalDataReleaseFile.Name, // @MarkFix double check this
                         dataFormFile,
@@ -2072,7 +2072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateDataFilesForUpload(
+                    .Setup(s => s.ValidateDataSetFilesForUpload(
                         releaseVersion.Id,
                         subjectName,
                         dataFormFile,
