@@ -95,7 +95,6 @@ const Details = ({
       className={classNames('govuk-details', className)}
       open={open}
       ref={ref}
-      role={onMounted('group')}
       data-testid={testId}
     >
       <summary
