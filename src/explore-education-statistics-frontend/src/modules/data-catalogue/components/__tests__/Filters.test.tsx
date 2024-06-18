@@ -10,7 +10,7 @@ describe('Filters', () => {
   test('renders the default filters', () => {
     render(<Filters themes={testThemes} onChange={noop} />);
 
-    const themesSelect = screen.getByLabelText('Theme');
+    const themesSelect = screen.getByLabelText('Filter by Theme');
     const themes = within(themesSelect).getAllByRole(
       'option',
     ) as HTMLOptionElement[];
@@ -28,7 +28,7 @@ describe('Filters', () => {
     expect(themes[2]).toHaveValue('theme-2');
     expect(themes[2].selected).toBe(false);
 
-    const publicationsSelect = screen.getByLabelText('Publication');
+    const publicationsSelect = screen.getByLabelText('Filter by Publication');
     const publications = within(publicationsSelect).getAllByRole(
       'option',
     ) as HTMLOptionElement[];
@@ -38,7 +38,7 @@ describe('Filters', () => {
     expect(publications[0]).toHaveValue('all');
     expect(publications[0].selected).toBe(true);
 
-    const releasesSelect = screen.getByLabelText('Releases');
+    const releasesSelect = screen.getByLabelText('Filter by Releases');
     const releases = within(releasesSelect).getAllByRole(
       'option',
     ) as HTMLOptionElement[];
@@ -84,7 +84,7 @@ describe('Filters', () => {
       />,
     );
 
-    const releasesSelect = screen.getByLabelText('Releases');
+    const releasesSelect = screen.getByLabelText('Filter by Releases');
     const releases = within(releasesSelect).getAllByRole(
       'option',
     ) as HTMLOptionElement[];
@@ -106,13 +106,13 @@ describe('Filters', () => {
   test('disables the publication filter when there is no themeId', () => {
     render(<Filters themes={testThemes} onChange={noop} />);
 
-    expect(screen.getByLabelText('Publication')).toBeDisabled();
+    expect(screen.getByLabelText('Filter by Publication')).toBeDisabled();
   });
 
   test('enables the publication filter when there is a themeId', () => {
     render(<Filters themes={testThemes} themeId="theme-2" onChange={noop} />);
 
-    expect(screen.getByLabelText('Publication')).not.toBeDisabled();
+    expect(screen.getByLabelText('Filter by Publication')).not.toBeDisabled();
   });
 
   test('calls the onChange handler when the theme filter is changed', async () => {
@@ -123,7 +123,9 @@ describe('Filters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    await user.selectOptions(screen.getByLabelText('Theme'), ['theme-1']);
+    await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+      'theme-1',
+    ]);
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'themeId',
@@ -144,7 +146,7 @@ describe('Filters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    await user.selectOptions(screen.getByLabelText('Publication'), [
+    await user.selectOptions(screen.getByLabelText('Filter by Publication'), [
       'publication-2',
     ]);
 
@@ -168,7 +170,9 @@ describe('Filters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    await user.selectOptions(screen.getByLabelText('Releases'), ['release-1']);
+    await user.selectOptions(screen.getByLabelText('Filter by Releases'), [
+      'release-1',
+    ]);
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'releaseId',
@@ -202,7 +206,7 @@ describe('Filters', () => {
   test('sets the initial value for the theme filter', () => {
     render(<Filters themes={testThemes} themeId="theme-2" onChange={noop} />);
 
-    expect(screen.getByLabelText('Theme')).toHaveValue('theme-2');
+    expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
   });
 
   test('sets the initial value for the publication filter', () => {
@@ -216,7 +220,9 @@ describe('Filters', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Publication')).toHaveValue('publication-2');
+    expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
+      'publication-2',
+    );
   });
 
   test('sets the initial value for the release filter', () => {
@@ -231,6 +237,8 @@ describe('Filters', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Releases')).toHaveValue('release-2');
+    expect(screen.getByLabelText('Filter by Releases')).toHaveValue(
+      'release-2',
+    );
   });
 });

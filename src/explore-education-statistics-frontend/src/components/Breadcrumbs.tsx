@@ -10,7 +10,6 @@ export interface BreadcrumbsProps {
 
 const Breadcrumbs = ({ breadcrumbs = [] }: BreadcrumbsProps) => {
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
-
   return (
     <nav className="govuk-breadcrumbs" aria-label="Breadcrumb">
       <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
