@@ -249,10 +249,14 @@ Validate prerelease has not started for Analyst user
     user checks nth breadcrumb contains    2    Pre-release access
 
     ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
+    log    ${tomorrow}
     ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2
+    log    ${day_after_tomorrow}
 
     ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
+    log    ${time_start}
     ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
+    log    ${time_end}
     user checks page contains
     ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
 
