@@ -17,6 +17,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsFlat}
         onSubmit={noop}
       />,
@@ -96,6 +97,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsNested}
         onSubmit={noop}
       />,
@@ -172,6 +174,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testSchools}
         onSubmit={noop}
       />,
@@ -191,6 +194,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testSchools}
         onSubmit={noop}
       />,
@@ -248,6 +252,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsFlat}
         onSubmit={noop}
       />,
@@ -288,6 +293,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsNested}
         onSubmit={noop}
       />,
@@ -321,6 +327,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsFlat}
         onSubmit={noop}
       />,
@@ -345,6 +352,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsFlat}
         onSubmit={noop}
         initialValues={['region-2', 'local-authority-1', 'local-authority-3']}
@@ -364,6 +372,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsNested}
         onSubmit={noop}
         initialValues={['local-authority-1', 'local-authority-3']}
@@ -395,6 +404,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testSingleLocation}
         onSubmit={noop}
       />,
@@ -441,6 +451,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testSingleLocationNested}
         onSubmit={noop}
       />,
@@ -472,6 +483,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsFlat}
         onSubmit={handleSubmit}
       />,
@@ -497,6 +509,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
+        stepHeading="Choose locations"
         options={testLocationsNested}
         onSubmit={handleSubmit}
       />,
@@ -516,89 +529,5 @@ describe('LocationFiltersForm', () => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
       expect(handleSubmit).toHaveBeenCalledWith(expected);
     });
-  });
-
-  test('sets the step heading to `Choose locations` if multiple location types', () => {
-    render(
-      <LocationFiltersForm
-        {...testWizardStepProps}
-        options={testLocationsFlat}
-        onSubmit={noop}
-      />,
-    );
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Step 1 (current) Choose locations',
-      }),
-    ).toBeInTheDocument();
-  });
-
-  test('sets the step heading based on location type if only one type', () => {
-    const testSingleLocationType: SubjectMeta['locations'] = {
-      country: {
-        legend: 'Country',
-        options: [
-          {
-            id: 'country-1',
-            label: 'Country 1',
-            value: 'country-1',
-          },
-          {
-            id: 'country-2',
-            label: 'Country 2',
-            value: 'country-2',
-          },
-        ],
-      },
-    };
-
-    render(
-      <LocationFiltersForm
-        {...testWizardStepProps}
-        options={testSingleLocationType}
-        onSubmit={noop}
-      />,
-    );
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Step 1 (current) Choose Countries',
-      }),
-    ).toBeInTheDocument();
-  });
-
-  test('sets the step heading to `Choose locations` if single location type is not in the locationLevelsMap', () => {
-    const testSingleLocationTypeUnknown: SubjectMeta['locations'] = {
-      unknownType: {
-        legend: 'Unknown',
-        options: [
-          {
-            id: 'unknown-1',
-            label: 'Unknown 1',
-            value: 'unknown-1',
-          },
-          {
-            id: 'unknown-2',
-            label: 'Unknown 2',
-            value: 'unknown-2',
-          },
-        ],
-      },
-    };
-
-    render(
-      <LocationFiltersForm
-        {...testWizardStepProps}
-        options={testSingleLocationTypeUnknown}
-        onSubmit={noop}
-      />,
-    );
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Step 1 (current) Choose locations',
-      }),
-    ).toBeInTheDocument();
   });
 });

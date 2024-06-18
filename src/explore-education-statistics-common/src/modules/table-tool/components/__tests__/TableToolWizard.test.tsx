@@ -219,9 +219,7 @@ describe('TableToolWizard', () => {
     const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
     expect(stepHeadings).toHaveLength(1);
-    expect(stepHeadings[0]).toHaveTextContent(
-      'Step 1 (current) Choose a publication',
-    );
+    expect(stepHeadings[0]).toHaveTextContent('Step 1 Choose a publication');
 
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
   });
@@ -317,9 +315,7 @@ describe('TableToolWizard', () => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
       expect(stepHeadings).toHaveLength(1);
-      expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current) Select a data set',
-      );
+      expect(stepHeadings[0]).toHaveTextContent('Step 1 Select a data set');
     });
   });
 
@@ -357,9 +353,7 @@ describe('TableToolWizard', () => {
       expect(stepHeadings[1]).toHaveTextContent('Step 2 Select a data set');
       expect(stepHeadings[2]).toHaveTextContent('Step 3 Choose locations');
       expect(stepHeadings[3]).toHaveTextContent('Step 4 Choose time period');
-      expect(stepHeadings[4]).toHaveTextContent(
-        'Step 5 (current) Choose your filters',
-      );
+      expect(stepHeadings[4]).toHaveTextContent('Step 5 Choose your filters');
 
       // Step 1
 
@@ -652,6 +646,149 @@ describe('TableToolWizard', () => {
       expect(
         screen.getByRole('link', {
           name: 'Select at least one option from school type',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('location step heading', () => {
+    test('sets the step heading to `Choose locations` if multiple location types', () => {
+      render(
+        <TableToolWizard
+          themeMeta={testThemeMeta}
+          initialState={{
+            initialStep: 3,
+            subjectMeta: testSubjectMeta,
+            subjects: [testSubjects[0]],
+            featuredTables: [],
+            query: {
+              publicationId: 'publication-1',
+              subjectId: 'subject-1',
+              locationIds: ['barnet', 'barnsley'],
+              timePeriod: {
+                startYear: 2013,
+                startCode: 'AY',
+                endYear: 2014,
+                endCode: 'AY',
+              },
+              filters: ['ethnicity-major-asian-total'],
+              indicators: ['authorised-absence-sessions'],
+            },
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Step 3 Choose locations',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('sets the step heading based on location type if only one type', () => {
+      const testSingleLocationType: SubjectMeta['locations'] = {
+        country: {
+          legend: 'Country',
+          options: [
+            {
+              id: 'country-1',
+              label: 'Country 1',
+              value: 'country-1',
+            },
+            {
+              id: 'country-2',
+              label: 'Country 2',
+              value: 'country-2',
+            },
+          ],
+        },
+      };
+
+      render(
+        <TableToolWizard
+          themeMeta={testThemeMeta}
+          initialState={{
+            initialStep: 3,
+            subjectMeta: {
+              ...testSubjectMeta,
+              locations: testSingleLocationType,
+            },
+            subjects: [testSubjects[0]],
+            featuredTables: [],
+            query: {
+              publicationId: 'publication-1',
+              subjectId: 'subject-1',
+              locationIds: ['barnet', 'barnsley'],
+              timePeriod: {
+                startYear: 2013,
+                startCode: 'AY',
+                endYear: 2014,
+                endCode: 'AY',
+              },
+              filters: ['ethnicity-major-asian-total'],
+              indicators: ['authorised-absence-sessions'],
+            },
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Step 3 Choose Countries',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('sets the step heading to `Choose locations` if single location type is not in the locationLevelsMap', () => {
+      const testSingleLocationTypeUnknown: SubjectMeta['locations'] = {
+        unknownType: {
+          legend: 'Unknown',
+          options: [
+            {
+              id: 'unknown-1',
+              label: 'Unknown 1',
+              value: 'unknown-1',
+            },
+            {
+              id: 'unknown-2',
+              label: 'Unknown 2',
+              value: 'unknown-2',
+            },
+          ],
+        },
+      };
+
+      render(
+        <TableToolWizard
+          themeMeta={testThemeMeta}
+          initialState={{
+            initialStep: 3,
+            subjectMeta: {
+              ...testSubjectMeta,
+              locations: testSingleLocationTypeUnknown,
+            },
+            subjects: [testSubjects[0]],
+            featuredTables: [],
+            query: {
+              publicationId: 'publication-1',
+              subjectId: 'subject-1',
+              locationIds: ['barnet', 'barnsley'],
+              timePeriod: {
+                startYear: 2013,
+                startCode: 'AY',
+                endYear: 2014,
+                endCode: 'AY',
+              },
+              filters: ['ethnicity-major-asian-total'],
+              indicators: ['authorised-absence-sessions'],
+            },
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Step 3 Choose locations',
         }),
       ).toBeInTheDocument();
     });

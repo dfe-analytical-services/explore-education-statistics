@@ -30,12 +30,14 @@ export type TimePeriodFormSubmitHandler = (
 interface Props extends InjectedWizardProps {
   initialValues?: Partial<TimePeriodQuery>;
   options: SubjectMeta['timePeriod']['options'];
+  stepTitle: string;
   onSubmit: TimePeriodFormSubmitHandler;
 }
 
 const TimePeriodForm = ({
   initialValues = {},
   options,
+  stepTitle,
   onSubmit,
   ...stepProps
 }: Props) => {
@@ -93,7 +95,7 @@ const TimePeriodForm = ({
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
-      Choose time period
+      {stepTitle}
     </WizardStepHeading>
   );
 

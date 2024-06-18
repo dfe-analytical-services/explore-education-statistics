@@ -158,6 +158,7 @@ export default function DataCataloguePageCurrent({
                 publicationId: state.query.publication?.id ?? '',
               }}
               showSupersededPublications
+              stepTitle="Choose a publication"
               onSubmit={handlePublicationFormSubmit}
               themes={themes}
               renderSummaryAfter={
