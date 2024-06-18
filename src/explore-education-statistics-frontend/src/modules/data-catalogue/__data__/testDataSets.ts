@@ -81,6 +81,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       indicators: ['Indicator 1', 'Indicator 2'],
     },
     latestData: true,
+    isSuperseded: false,
     publication: {
       id: 'publication-1',
       title: 'Publication 1',
@@ -114,6 +115,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       indicators: ['Indicator 1', 'Indicator 2'],
     },
     latestData: true,
+    isSuperseded: false,
     publication: {
       id: 'publication-1',
       title: 'Publication 1',
@@ -147,6 +149,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       indicators: ['Indicator 1', 'Indicator 2'],
     },
     latestData: true,
+    isSuperseded: false,
     publication: {
       id: 'publication-2',
       title: 'Publication 2',
@@ -188,6 +191,7 @@ export const testDataSetFile: DataSetFile = {
   release: {
     id: 'release-id',
     isLatestPublishedRelease: true,
+    isSuperseded: false,
     publication: {
       id: 'publication-id',
       slug: 'publication-slug',

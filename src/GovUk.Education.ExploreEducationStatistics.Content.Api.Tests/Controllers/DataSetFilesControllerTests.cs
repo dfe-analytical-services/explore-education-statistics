@@ -1740,6 +1740,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     () => Assert.Equal(theme.Title, viewModel.Theme.Title),
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
                         viewModel.LatestData),
+                    () => Assert.Equal(publication.SupersededBy != null
+                                       && publication.SupersededBy.LatestPublishedReleaseVersionId != null,
+                            viewModel.IsSuperseded),
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
                     () => Assert.Equal(releaseFile.File.PublicApiDataSetId, viewModel.Api?.Id),
                     () => Assert.Equal(
@@ -1850,7 +1853,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         }
     }
 
-
     public class GetDataSetFileTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
     {
         public override async Task InitializeAsync()
@@ -1925,6 +1927,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             Assert.Equal(releaseFile.ReleaseVersion.Slug, viewModel.Release.Slug);
             Assert.Equal(releaseFile.ReleaseVersion.Type, viewModel.Release.Type);
             Assert.True(viewModel.Release.IsLatestPublishedRelease);
+            Assert.False(viewModel.Release.IsSuperseded);
             Assert.Equal(releaseFile.ReleaseVersion.Published, viewModel.Release.Published);
 
             Assert.Equal(publication.Id, viewModel.Release.Publication.Id);

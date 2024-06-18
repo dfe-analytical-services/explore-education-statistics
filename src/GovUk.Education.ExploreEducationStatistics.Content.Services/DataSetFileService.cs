@@ -130,6 +130,8 @@ public class DataSetFileService : IDataSetFileService
                 },
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
+                IsSuperseded = result.Value.ReleaseVersion.Publication.SupersededBy != null
+                    && result.Value.ReleaseVersion.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
                 Published = result.Value.ReleaseVersion.Published!.Value,
                 LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value.File),
@@ -178,6 +180,7 @@ public class DataSetFileService : IDataSetFileService
     {
         var releaseFile = await _contentDbContext.ReleaseFiles
             .Include(rf => rf.ReleaseVersion.Publication.Topic.Theme)
+            .Include(rf => rf.ReleaseVersion.Publication.SupersededBy)
             .Include(rf => rf.File)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetId
@@ -215,6 +218,8 @@ public class DataSetFileService : IDataSetFileService
                 IsLatestPublishedRelease =
                     releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
                     releaseFile.ReleaseVersionId,
+                IsSuperseded = releaseFile.ReleaseVersion.Publication.SupersededBy != null
+                    && releaseFile.ReleaseVersion.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
                 Published = releaseFile.ReleaseVersion.Published!.Value,
                 LastUpdated = releaseFile.Published!.Value,
                 Publication = new DataSetFilePublicationViewModel
