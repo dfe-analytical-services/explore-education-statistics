@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
 
-        Task<List<ErrorViewModel>> ValidateDataFilesForUpload( // Used by unit tests
+        Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload( // Used by unit tests
             Guid releaseVersionId,
             string dataSetName,
             string dataFileName,
@@ -26,21 +26,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Stream metaFileStream,
             File? replacingFile = null);
 
-        Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
+        Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
             string dataSetFileName,
             IFormFile dataFile,
             IFormFile metaFile,
             File? replacingFile = null);
 
-        Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
+        Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
             ArchiveDataSetFile archiveDataSet,
             Stream dataFileStream,
             Stream metaFileStream,
             File? replacingFile = null);
 
-        List<ErrorViewModel> ValidateReleaseVersionDataSetFileName(Guid releaseVersionId,
+        List<ErrorViewModel> ValidateDataSetName(Guid releaseVersionId,
             string name);
     }
 }

@@ -39,8 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
             IFormFile zipFormFile,
-            Guid? replacingFileId = null,
-            string? subjectName = null);
+            string? subjectName = null,
+            Guid? replacingFileId = null);
 
         Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(Guid releaseVersionId, IFormFile bulkZipFormFile);
     }

@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (service, _) = BuildService(contentDbContext);
 
-            var result = service.ValidateReleaseVersionDataSetFileName(Guid.NewGuid(), "Subject & Title");
+            var result = service.ValidateDataSetName(Guid.NewGuid(), "Subject & Title");
 
             //result.AssertBadRequest(SubjectTitleCannotContainSpecialCharacters); // @MarkFix
         }
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var (service, _) = BuildService(contentDbContext);
 
-                var result = service.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, "Subject Title");
+                var result = service.ValidateDataSetName(releaseVersion.Id, "Subject Title");
 
                 //result.AssertBadRequest(SubjectTitleMustBeUnique); // @MarkFix
             }
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                     .ReturnsAsync(true);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     Guid.NewGuid(),
                     "Data set name",
                     dataFile, metaFile);
@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             fileTypeService.Setup(mock => mock.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                 .ReturnsAsync(true);
 
-            var results = await service.ValidateDataFilesForUpload(
+            var results = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 "Data set name",
                 dataFile, metaFile);
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                     .ReturnsAsync(true);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     Guid.NewGuid(),
                     "Data set name",
                     dataFile, metaFile);
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                 .ReturnsAsync(true);
 
-            var result = await service.ValidateDataFilesForUpload(
+            var result = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 "Data set name",
                 dataFile, metaFile);
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                     .ReturnsAsync(false);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     Guid.NewGuid(),
                     "Data set name",
                     dataFile, metaFile);
@@ -288,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream(), metaFile.FileName))
                     .ReturnsAsync(true);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
                     releaseFile.Name,
                     dataFile, metaFile);
@@ -334,7 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                     .ReturnsAsync(true);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
                     releaseFile.Name,
                     dataFile, metaFile, fileBeingReplaced);
@@ -388,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                     .ReturnsAsync(() => true);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
                     releaseFiles.GetItemByIndex(0).Name, // @MarkFix fix
                     dataFile, metaFile, fileBeingReplaced);
@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream(), metaFile.FileName))
                     .ReturnsAsync(true);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     releaseVersionId,
                     "Data set name",
                     dataFile, metaFile);
@@ -482,7 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test.meta.csv",
                     1024);
 
-                var result = await service.ValidateDataFilesForUpload(
+                var result = await service.ValidateDataSetFilesForUpload(
                     Guid.NewGuid(),
                     archiveFile,
                     Mock.Of<Stream>(),
@@ -514,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var archiveFile = CreateArchiveDataSet("Data set name", "test.txt", "test.meta.csv");
 
-            var result = await service.ValidateDataFilesForUpload(
+            var result = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 archiveFile,
                 Mock.Of<Stream>(),
@@ -545,7 +545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var archiveFile = CreateArchiveDataSet("Data set name", "test.csv", "test.meta.txt");
 
-            var result = await service.ValidateDataFilesForUpload(
+            var result = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 archiveFile,
                 Mock.Of<Stream>(),
@@ -576,7 +576,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 fileTypeService: fileTypeService.Object);
 
-            var errors = await service.ValidateDataFilesForUpload(
+            var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 archiveFile,
                 Mock.Of<Stream>(),
@@ -592,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
             var (service, _) = BuildService(contentDbContext);
 
-            var result = service.ValidateDataFilesForUpload(
+            var result = service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 "Data set name",
                 "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.csv",
@@ -628,7 +628,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 fileTypeService: fileTypeService.Object);
 
-            var errors = await service.ValidateDataFilesForUpload(
+            var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 archiveFile,
                 Mock.Of<Stream>(),
@@ -657,7 +657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 fileTypeService: fileTypeService.Object);
 
-            var result = await service.ValidateDataFilesForUpload(
+            var result = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 "Data set name",
                 "test.csv", 0,
@@ -695,7 +695,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 fileTypeService: fileTypeService.Object);
 
-            var errors = await service.ValidateDataFilesForUpload(
+            var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
                 archiveFile,
                 Mock.Of<Stream>(),
@@ -741,7 +741,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var archiveFile = CreateArchiveDataSet(releaseFile.Name, "test.csv", "test.meta.csv");
 
-                var errors = await service.ValidateDataFilesForUpload(
+                var errors = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
                     archiveFile,
                     Mock.Of<Stream>(),
@@ -791,7 +791,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // The replacement file here has the same name as the one it is replacing, so this should be ok.
                 var archiveFile = CreateArchiveDataSet(releaseFile.Name, "test.csv", "test.meta.csv");
 
-                var errors = await service.ValidateDataFilesForUpload(
+                var errors = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
                     archiveFile,
                     Mock.Of<Stream>(),
@@ -850,7 +850,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // in this Release after the replacement is complete.
                 var archiveFile = CreateArchiveDataSet("Data set name", "another.csv", "test.meta.csv");
 
-                var errors = await service.ValidateDataFilesForUpload(
+                var errors = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
                     archiveFile,
                     Mock.Of<Stream>(),

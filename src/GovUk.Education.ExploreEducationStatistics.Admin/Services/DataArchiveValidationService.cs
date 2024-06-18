@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileTypeService _fileTypeService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
 
-        private const int MaxFilenameLength = 150;
+        private const int MaxFilenameSize = 150;
 
         private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
             new()
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await using (var metaFileStream = metaFile.Open())
             {
                 errors.AddRange(await _fileUploadsValidatorService
-                    .ValidateDataFilesForUpload(
+                    .ValidateDataSetFilesForUpload(
                         releaseVersionId,
                         archiveDataSet,
                         dataFileStream,
@@ -122,9 +122,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var unprocessedArchiveFiles = archive.Entries.ToList();
 
-            var dataSetNamesEntry = archive.GetEntry("dataset_names.csv");
+            var dataSetNamesFile = archive.GetEntry("dataset_names.csv");
 
-            if (dataSetNamesEntry == null)
+            if (dataSetNamesFile == null)
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
                     {
@@ -133,11 +133,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
             }
 
-            unprocessedArchiveFiles.Remove(dataSetNamesEntry);
+            unprocessedArchiveFiles.Remove(dataSetNamesFile);
 
-            var dataSetNamesStream = dataSetNamesEntry.Open();
-            var dataSetNamesReader = new StreamReader(dataSetNamesStream);
-            var dataSetNamesCsvReader = new CsvReader(dataSetNamesReader, CultureInfo.InvariantCulture);
+            await using var dataSetNamesStream = dataSetNamesFile.Open();
+            using var dataSetNamesReader = new StreamReader(dataSetNamesStream);
+            using var dataSetNamesCsvReader = new CsvReader(dataSetNamesReader, CultureInfo.InvariantCulture);
 
             try
             {
@@ -179,32 +179,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     errors.Add(ValidationMessages.GenerateErrorDataFileNotFoundInZip($"{filename}.csv"));
                 }
+                else
+                {
+                    unprocessedArchiveFiles.Remove(dataFile);
+                }
 
                 if (metaFile == null)
                 {
                     errors.Add(ValidationMessages.GenerateErrorMetaFileNotFoundInZip($"{filename}.meta.csv"));
                 }
-
-                unprocessedArchiveFiles.Remove(dataFile);
-                unprocessedArchiveFiles.Remove(metaFile);
-
-                var dataArchiveFile = new ArchiveDataSetFile(
-                    datasetName,
-                    dataFile.FullName,
-                    dataFile.Length,
-                    metaFile.FullName,
-                    metaFile.Length);
-
-                await using (var dataFileStream = dataFile.Open())
-                await using (var metaFileStream = metaFile.Open())
+                else
                 {
-                    errors.AddRange(await _fileUploadsValidatorService.ValidateDataFilesForUpload(
-                        releaseVersionId, dataArchiveFile,
-                        dataFileStream,
-                        metaFileStream));
+                    unprocessedArchiveFiles.Remove(metaFile);
                 }
 
-                results.Add(dataArchiveFile);
+                if (dataFile != null && metaFile != null)
+                {
+                    var dataArchiveFile = new ArchiveDataSetFile(
+                        datasetName,
+                        dataFile.FullName,
+                        dataFile.Length,
+                        metaFile.FullName,
+                        metaFile.Length);
+
+                    await using (var dataFileStream = dataFile.Open())
+                    await using (var metaFileStream = metaFile.Open())
+                    {
+                        errors.AddRange(await _fileUploadsValidatorService.ValidateDataSetFilesForUpload(
+                            releaseVersionId, dataArchiveFile,
+                            dataFileStream,
+                            metaFileStream));
+                    }
+
+                    results.Add(dataArchiveFile);
+                }
 
                 lastLine = !await dataSetNamesCsvReader.ReadAsync();
             }
@@ -251,10 +259,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             List<ErrorViewModel> errors = [];
 
-            if (file.FileName.Length > MaxFilenameLength)
+            if (file.FileName.Length > MaxFilenameSize)
             {
                 errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
-                        file.FileName, MaxFilenameLength));
+                        file.FileName, MaxFilenameSize));
             }
 
             if (!file.FileName.ToLower().EndsWith(".zip"))

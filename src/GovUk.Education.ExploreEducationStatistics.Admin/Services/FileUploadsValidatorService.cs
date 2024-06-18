@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
+        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
             string dataSetName,
             string dataFileName,
@@ -50,22 +50,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             List<ErrorViewModel> errors = [];
 
-            errors.AddRange(ValidateReleaseVersionDataSetFileName(
+            errors.AddRange(ValidateDataSetName(
                 releaseVersionId, dataSetName));
 
-            errors.AddRange(ValidateDataFileNames(
+            errors.AddRange(ValidateDataSetFileNames(
                 releaseVersionId,
                 dataFileName: dataFileName,
                 metaFileName: metaFileName,
                 replacingFile));
 
-            errors.AddRange(ValidateDataFileSizes(
+            errors.AddRange(ValidateDataSetFileSizes(
                 dataFileSize,
                 dataFileName,
                 metaFileSize,
                 metaFileName));
 
-            errors.AddRange(await ValidateDataFileTypes(
+            errors.AddRange(await ValidateDataSetFileTypes(
                 dataFileName,
                 dataFileStream,
                 metaFileName,
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errors;
         }
 
-        public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
+        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
             string dataSetFileName,
             IFormFile dataFile,
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await using var dataFileStream = dataFile.OpenReadStream();
             await using var metaFileStream = metaFile.OpenReadStream();
 
-            return await ValidateDataFilesForUpload(
+            return await ValidateDataSetFilesForUpload(
                 releaseVersionId: releaseVersionId,
                 dataSetName: dataSetFileName,
                 dataFileName:dataFile.FileName,
@@ -96,14 +96,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 replacingFile: replacingFile);
         }
 
-        public async Task<List<ErrorViewModel>> ValidateDataFilesForUpload(
+        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
             ArchiveDataSetFile archiveDataSet,
             Stream dataFileStream,
             Stream metaFileStream,
             File? replacingFile = null)
         {
-            return await ValidateDataFilesForUpload(
+            return await ValidateDataSetFilesForUpload(
                 releaseVersionId: releaseVersionId,
                 dataSetName: archiveDataSet.DataSetName,
                 dataFileName: archiveDataSet.DataFileName,
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public List<ErrorViewModel> ValidateReleaseVersionDataSetFileName(Guid releaseVersionId,
+        public List<ErrorViewModel> ValidateDataSetName(Guid releaseVersionId,
             string name)
         {
             List<ErrorViewModel> errors = [];
@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                            && rf.File.Type == type);
         }
 
-        private List<ErrorViewModel> ValidateDataFileNames(
+        private List<ErrorViewModel> ValidateDataSetFileNames(
             Guid releaseVersionId,
             string dataFileName,
             string metaFileName,
@@ -259,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errors;
         }
 
-        private static List<ErrorViewModel> ValidateDataFileSizes(
+        private static List<ErrorViewModel> ValidateDataSetFileSizes(
             long dataFileSize,
             string dataFileName,
             long metaFileSize,
@@ -281,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errors;
         }
 
-        private async Task<List<ErrorViewModel>> ValidateDataFileTypes(
+        private async Task<List<ErrorViewModel>> ValidateDataSetFileTypes(
             string dataFileName,
             Stream dataFileStream,
             string metaFileName,

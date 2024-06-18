@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseVersionId, subjectName, replacingFile);
 
                             var errors = await _fileUploadsValidatorService
-                                .ValidateDataFilesForUpload(
+                                .ValidateDataSetFilesForUpload(
                                     releaseVersionId,
                                     dataSetFileName,
                                     dataFormFile,
@@ -328,8 +328,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
             IFormFile zipFormFile,
-            Guid? replacingFileId = null,
-            string? subjectName = null)
+            string? subjectName = null,
+            Guid? replacingFileId = null)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
