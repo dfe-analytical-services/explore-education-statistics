@@ -179,16 +179,15 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
-                .WithFile(DataFixture.DefaultFile(FileType.Data)
-                    .WithPublicApiDataSetId(Guid.NewGuid())
-                );
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             var releaseVersion = release.Versions.Single();
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithFile(dataImport.File)
-                .WithReleaseVersion(releaseVersion);
+                .WithReleaseVersion(releaseVersion)
+                .WithPublicApiDataSetId(Guid.NewGuid());
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {

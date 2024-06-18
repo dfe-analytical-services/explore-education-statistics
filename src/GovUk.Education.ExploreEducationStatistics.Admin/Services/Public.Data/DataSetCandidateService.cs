@@ -48,7 +48,7 @@ internal class DataSetCandidateService(
             .AsNoTracking()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Where(rf => rf.File.Type == FileType.Data)
-            .Where(rf => rf.File.PublicApiDataSetId == null)
+            .Where(rf => rf.PublicApiDataSetId == null)
             .Where(rf => rf.File.ReplacedById == null)
             .Where(rf => rf.File.ReplacingId == null)
             .Join(

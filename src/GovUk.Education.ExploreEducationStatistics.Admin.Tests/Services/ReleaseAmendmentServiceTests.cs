@@ -314,6 +314,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     ],
                     Published = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    PublicApiDataSetId = Guid.NewGuid(),
+                    PublicApiDataSetVersion = "1.0.0",
                 },
                 new()
                 {
@@ -1157,7 +1159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(originalReleaseRole.DeletedById, amendedReleaseRole.DeletedById);
         }
 
-        private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile,
+        private static void AssertAmendedReleaseFileCorrect(
+            ReleaseFile originalFile,
+            ReleaseFile amendmentDataFile,
             ReleaseVersion amendment)
         {
             // Assert it's a new link table entry between the Release amendment and the data file reference
@@ -1169,6 +1173,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(originalFile.Published!.Value, amendmentDataFile.Published!.Value, TimeSpan.FromMinutes(1));
             originalFile.FilterSequence.AssertDeepEqualTo(amendmentDataFile.FilterSequence);
             originalFile.IndicatorSequence.AssertDeepEqualTo(amendmentDataFile.IndicatorSequence);
+
+            Assert.Equal(originalFile.PublicApiDataSetId, amendmentDataFile.PublicApiDataSetId);
+            Assert.Equal(originalFile.PublicApiDataSetVersion, amendmentDataFile.PublicApiDataSetVersion);
 
             // And assert that the file referenced is the SAME file reference as linked from the original Release's
             // link table entry

@@ -680,15 +680,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
-                    .WithFiles(_fixture.DefaultFile(FileType.Data)
-                        .ForIndex(0, s => s
-                            .SetPublicApiDataSetId(Guid.NewGuid())
-                            .SetPublicApiDataSetVersion(major: 1, minor: 0))
-                        .ForIndex(1, s => s
-                            .SetPublicApiDataSetId(Guid.NewGuid())
-                            .SetPublicApiDataSetVersion(major: 2, minor: 0))
-                        .GenerateList(5))
-                    .GenerateList();
+                    .WithFile(() => _fixture.DefaultFile(FileType.Data))
+                    .ForIndex(0, s => s
+                        .SetPublicApiDataSetId(Guid.NewGuid())
+                        .SetPublicApiDataSetVersion(major: 1, minor: 0))
+                    .ForIndex(1, s => s
+                        .SetPublicApiDataSetId(Guid.NewGuid())
+                        .SetPublicApiDataSetVersion(major: 2, minor: 0))
+                    .GenerateList(5);
 
                 await TestApp.AddTestData<ContentDbContext>(context =>
                 {
@@ -710,7 +709,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = releaseVersionFiles
-                    .Where(rf => rf.File.PublicApiDataSetId.HasValue)
+                    .Where(rf => rf.PublicApiDataSetId.HasValue)
                     .OrderBy(rf => rf.Name)
                     .ToList();
 
@@ -733,14 +732,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
-                    .WithFiles(_fixture.DefaultFile(FileType.Data)
-                        .ForIndex(0, s => s
-                            .SetPublicApiDataSetId(Guid.NewGuid())
-                            .SetPublicApiDataSetVersion(major: 1, minor: 1))
-                        .ForIndex(1, s => s
-                            .SetPublicApiDataSetId(Guid.NewGuid())
-                            .SetPublicApiDataSetVersion(major: 2, minor: 0))
-                        .GenerateList(5))
+                    .WithFile(() => _fixture.DefaultFile(FileType.Data))
+                    .ForIndex(0, s => s
+                        .SetPublicApiDataSetId(Guid.NewGuid())
+                        .SetPublicApiDataSetVersion(major: 1, minor: 1))
+                    .ForIndex(1, s => s
+                        .SetPublicApiDataSetId(Guid.NewGuid())
+                        .SetPublicApiDataSetVersion(major: 2, minor: 0))
                     .GenerateList();
 
                 await TestApp.AddTestData<ContentDbContext>(context =>
@@ -1723,7 +1721,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var releaseVersion = releaseFile.ReleaseVersion;
                 var publication = releaseVersion.Publication;
                 var theme = publication.Topic.Theme;
-                var publicApiDataSetVersion = releaseFile.File.PublicApiDataSetVersion;
 
                 Assert.Multiple(
                     () => Assert.Equal(releaseFile.FileId, viewModel.FileId),
@@ -1741,12 +1738,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
                         viewModel.LatestData),
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
-                    () => Assert.Equal(releaseFile.File.PublicApiDataSetId, viewModel.Api?.Id),
-                    () => Assert.Equal(
-                        publicApiDataSetVersion is not null
-                            ? $"{publicApiDataSetVersion.Major}.{publicApiDataSetVersion.Minor}"
-                            : null,
-                        viewModel.Api?.Version)
+                    () => Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api?.Id),
+                    () => Assert.Equal(releaseFile.PublicApiVersionString, viewModel.Api?.Version)
                 );
             });
         }
@@ -1803,6 +1796,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithPublicApiDataSetId(Guid.NewGuid())
+                .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithTimePeriodRange(
@@ -1810,8 +1805,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             .WithStart("2000", TimeIdentifier.CalendarYear)
                             .WithEnd("2001", TimeIdentifier.CalendarYear)
                         ))
-                    .WithPublicApiDataSetId(Guid.NewGuid())
-                    .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 );
 
             await TestApp.StartAzurite();
@@ -1870,6 +1863,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithPublicApiDataSetId(Guid.NewGuid())
+                .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithTimePeriodRange(
@@ -1877,8 +1872,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             .WithStart("2000", TimeIdentifier.CalendarYear)
                             .WithEnd("2001", TimeIdentifier.CalendarYear)
                         ))
-                    .WithPublicApiDataSetId(Guid.NewGuid())
-                    .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 );
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -1933,9 +1926,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             Assert.Equal(publication.Topic.Theme.Title, viewModel.Release.Publication.ThemeTitle);
 
             Assert.NotNull(viewModel.Api);
-            Assert.Equal(file.PublicApiDataSetId, viewModel.Api.Id);
+            Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api.Id);
             Assert.Equal(
-                $"{file.PublicApiDataSetVersion!.Major}.{file.PublicApiDataSetVersion.Minor}",
+                $"{releaseFile.PublicApiDataSetVersion!.Major}.{releaseFile.PublicApiDataSetVersion.Minor}",
                 viewModel.Api.Version);
 
             var dataSetFileMeta = file.DataSetFileMeta;
