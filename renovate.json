@@ -66,6 +66,12 @@
       "matchPackageNames": ["node"],
       "groupName": "Node version",
       "enabled": false
+    },
+    {
+      "matchPackageNames": ["azure-bicep-resource"],
+      "groupName": "Azure Bicep resources",
+      "description": "Prevent unofficial resource versions being suggested",
+      "enabled": false
     }
   ]
 }
