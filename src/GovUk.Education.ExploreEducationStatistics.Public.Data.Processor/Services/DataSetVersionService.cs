@@ -56,12 +56,12 @@ internal class DataSetVersionService(
     public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.RequireTransaction(() => 
-            await GetDataSetVersion(dataSetVersionId, cancellationToken)
+        return await publicDataDbContext.RequireTransaction(() =>
+            GetDataSetVersion(dataSetVersionId, cancellationToken)
                 .OnSuccessDo(CheckCanDeleteDataSetVersion)
                 .OnSuccessDo(async dataSetVersion => await UpdateReleaseFiles(dataSetVersion, cancellationToken))
                 .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
-                .OnSuccessVoid(DeleteParquetFiles)
+                .OnSuccessVoid(DeleteParquetFiles));
     }
 
     private async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(Guid dataSetVersionId,
@@ -99,7 +99,6 @@ internal class DataSetVersionService(
             .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.Version)
             .ToListAsync(cancellationToken);
 
-
         foreach (var releaseFile in releaseFiles)
         {
             releaseFile.PublicApiDataSetId = null;
@@ -119,21 +118,6 @@ internal class DataSetVersionService(
             publicDataDbContext.DataSets.Remove(dataSetVersion.DataSet);
             await publicDataDbContext.SaveChangesAsync(cancellationToken);
         }
-    }
-
-    private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
-    {
-        return await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .SingleOrNotFoundAsync(rf => rf.Id == dataSetVersion.ReleaseFileId, cancellationToken);
-    }
-
-    private async Task UpdateFilePublicApiDataSetId(ReleaseFile releaseFile, CancellationToken cancellationToken)
-    {
-        releaseFile.File.PublicApiDataSetId = null;
-        releaseFile.File.PublicApiDataSetVersion = null;
-        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private void DeleteParquetFiles(DataSetVersion dataSetVersion)
@@ -215,7 +199,7 @@ internal class DataSetVersionService(
                     .OnSuccessDo(async dataSetVersion =>
                         await CreateDataSetVersionImport(dataSetVersion, instanceId, cancellationToken))
                     .OnSuccessDo(async dataSetVersion =>
-                        await UpdateFilePublicDataSetVersionId(releaseFile, dataSetVersion, cancellationToken))
+                        await UpdateReleaseFilePublicDataSetVersionId(releaseFile, dataSetVersion, cancellationToken))
                     .OnSuccess(dataSetVersion =>
                         (dataSetId: dataSetVersion.DataSetId, dataSetVersionId: dataSetVersion.Id))));
     }
@@ -368,13 +352,13 @@ internal class DataSetVersionService(
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task UpdateFilePublicDataSetVersionId(
+    private async Task UpdateReleaseFilePublicDataSetVersionId(
         ReleaseFile releaseFile,
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
-        releaseFile.File.PublicApiDataSetId = dataSetVersion.DataSetId;
-        releaseFile.File.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
+        releaseFile.PublicApiDataSetId = dataSetVersion.DataSetId;
+        releaseFile.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }        
     

@@ -1,8 +1,13 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.DurableTask;
-using Microsoft.DurableTask.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -11,30 +16,25 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessNextDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class ProcessNextDataSetVersionFunctionTests(
+    ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    public class ProcessNextDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ProcessNextDataSetVersionTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessNextDataSetVersionFunctionTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             var mockOrchestrationContext = DefaultMockOrchestrationContext();
-
-            // Expect an entity lock to be acquired for calling the ImportMetadata activity
-            var mockEntityFeature = new Mock<TaskOrchestrationEntityFeature>(MockBehavior.Strict);
-            mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
-            mockOrchestrationContext.SetupGet(context => context.Entities)
-                .Returns(mockEntityFeature.Object);
-
             var activitySequence = new MockSequence();
 
             string[] expectedActivitySequence =
             [
                 ActivityNames.CopyCsvFiles,
                 ActivityNames.CreateMappings,
-                ActivityNames.CompleteProcessing,
+                ActivityNames.CompleteNextDataSetVersionMappingProcessing,
             ];
 
             foreach (var activityName in expectedActivitySequence)
@@ -49,7 +49,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(ProcessorFunctionsI
 
             await ProcessNextDataSetVersion(mockOrchestrationContext.Object);
 
-            VerifyAllMocks(mockOrchestrationContext, mockEntityFeature);
+            VerifyAllMocks(mockOrchestrationContext);
         }
 
         [Fact]
@@ -85,7 +85,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(ProcessorFunctionsI
             var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
             await function.ProcessNextDataSetVersion(
                 orchestrationContext,
-                new ProcessDataSetVersionContext {DataSetVersionId = Guid.NewGuid()});
+                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
         }
 
         private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(
@@ -108,6 +108,171 @@ public abstract class ProcessNextDataSetVersionFunctionTests(ProcessorFunctionsI
                 .Returns(isReplaying);
 
             return mock;
+        }
+    }
+
+    public class CreateMappingsProcessingTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : ProcessInitialDataSetVersionFunctionTests(fixture)
+    {
+        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ImportingMetadata;
+
+        [Fact]
+        public async Task Success()
+        {
+            var (initialDataSetVersion, _) = await CreateDataSet(DataSetVersionImportStage.Completing);
+
+            // TODO EES-4945 - amend metadata below for the initial DataSetVersion to partially match
+            // metadata from ProcessorTestData.AbsenceSchool.
+
+            var initialLocationMeta = DataFixture
+                .DefaultLocationMeta()
+                .WithDataSetVersionId(initialDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetLevel(GeographicLevel.LocalAuthority)
+                    .SetOptions(DataFixture
+                        .DefaultLocationLocalAuthorityOptionMeta()
+                        .GenerateList(2)
+                        .Select(meta => meta as LocationOptionMeta)
+                        .ToList()))
+                .ForIndex(1, s => s
+                    .SetLevel(GeographicLevel.RscRegion)
+                    .SetOptions(DataFixture
+                        .DefaultLocationRscRegionOptionMeta()
+                        .GenerateList(2)
+                        .Select(meta => meta as LocationOptionMeta)
+                        .ToList()))
+                .GenerateList();
+
+            var initialFilterMeta = DataFixture
+                .DefaultFilterMeta()
+                .WithDataSetVersionId(initialDataSetVersion.Id)
+                .WithOptions(() => DataFixture
+                    .DefaultFilterOptionMeta()
+                    .GenerateList(2))
+                .GenerateList(2);
+
+            var initialIndicatorMeta = DataFixture
+                .DefaultIndicatorMeta()
+                .WithDataSetVersionId(initialDataSetVersion.Id)
+                .GenerateList(2);
+
+            var initialTimePeriodMeta = DataFixture
+                .DefaultTimePeriodMeta()
+                .WithDataSetVersionId(initialDataSetVersion.Id)
+                .GenerateList(4);
+
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.LocationMetas.AddRange(initialLocationMeta);
+                context.FilterMetas.AddRange(initialFilterMeta);
+                context.IndicatorMetas.AddRange(initialIndicatorMeta);
+                context.TimePeriodMetas.AddRange(initialTimePeriodMeta);
+            });
+
+            var dataSet = await GetDbContext<PublicDataDbContext>().DataSets.SingleAsync(dataSet =>
+                dataSet.Id == initialDataSetVersion.DataSet.Id);
+
+            var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
+                dataSet: dataSet,
+                importStage: Stage.PreviousStage(),
+                versionNumberMajor: 1,
+                versionNumberMinor: 1);
+
+            SetupCsvDataFilesForDataSetVersion(ProcessorTestData.AbsenceSchool, nextDataSetVersion);
+
+            await CreateMappings(instanceId);
+
+            var updatedDataSetVersion = GetDbContext<PublicDataDbContext>()
+                .DataSetVersions
+                .Single(dsv => dsv.Id == nextDataSetVersion.Id);
+
+            // Assert that the MetaSummary has been generated correctly from the CSV.
+            var metaSummary = updatedDataSetVersion.MetaSummary;
+            Assert.NotNull(metaSummary);
+            
+            Assert.Equal(
+                ProcessorTestData
+                    .AbsenceSchool
+                    .ExpectedGeographicLevels
+                    .Order(),
+                metaSummary.GeographicLevels.Order());
+            
+            Assert.Equal(
+                ProcessorTestData
+                    .AbsenceSchool
+                    .ExpectedFilters
+                    .Select(f => f.Label)
+                    .Order(),
+                metaSummary.Filters.Order());
+            
+            Assert.Equal(
+                ProcessorTestData
+                    .AbsenceSchool
+                    .ExpectedIndicators
+                    .Select(i => i.Label)
+                    .Order(),
+                metaSummary.Indicators.Order());
+            
+            Assert.Equal(
+                new TimePeriodRange
+                {
+                    Start = TimePeriodRangeBound.Create(ProcessorTestData.AbsenceSchool.ExpectedTimePeriods[0]),
+                    End = TimePeriodRangeBound.Create(ProcessorTestData.AbsenceSchool.ExpectedTimePeriods[^1])
+                },
+                metaSummary.TimePeriodRange);
+
+            // TODO EES-4945 - implement checks for successful extraction of metadata.
+        }
+
+        private async Task CreateMappings(Guid instanceId)
+        {
+            var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
+            await function.CreateMappings(instanceId, CancellationToken.None);
+        }
+    }
+
+    public class CompleteNextDataSetVersionMappingProcessingTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : ProcessNextDataSetVersionFunctionTests(fixture)
+    {
+        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
+
+        [Fact]
+        public async Task Success()
+        {
+            var (initialDataSetVersion, _) = await CreateDataSet(DataSetVersionImportStage.Completing);
+
+            var dataSet = await GetDbContext<PublicDataDbContext>().DataSets.SingleAsync(dataSet =>
+                dataSet.Id == initialDataSetVersion.DataSet.Id);
+
+            var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
+                dataSet: dataSet,
+                importStage: Stage.PreviousStage(),
+                versionNumberMajor: 1,
+                versionNumberMinor: 1);
+
+            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
+            Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion));
+
+            await CompleteProcessing(instanceId);
+
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+            var savedImport = await publicDataDbContext.DataSetVersionImports
+                .Include(i => i.DataSetVersion)
+                .SingleAsync(i => i.InstanceId == instanceId);
+
+            Assert.Equal(Stage, savedImport.Stage);
+            savedImport.Completed.AssertUtcNow();
+
+            Assert.Equal(DataSetVersionStatus.Mapping, savedImport.DataSetVersion.Status);
+        }
+
+        private async Task CompleteProcessing(Guid instanceId)
+        {
+            var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
+            await function.CompleteNextDataSetVersionMappingProcessing(instanceId, CancellationToken.None);
         }
     }
 }

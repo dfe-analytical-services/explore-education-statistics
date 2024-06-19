@@ -181,7 +181,6 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             typeof(DeleteDataSetVersionFunction),
             typeof(CopyCsvFilesFunction),
             typeof(ImportMetadataFunction),
-            typeof(CompleteProcessingFunction),
             typeof(HandleProcessingFailureFunction),
             typeof(HealthCheckFunctions),
         ];

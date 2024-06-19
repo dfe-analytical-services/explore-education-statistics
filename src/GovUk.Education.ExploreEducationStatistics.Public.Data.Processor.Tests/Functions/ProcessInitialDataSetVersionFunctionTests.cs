@@ -64,7 +64,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
                 ActivityNames.ImportMetadata,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
-                ActivityNames.CompleteProcessing,
+                ActivityNames.CompleteInitialDataSetVersionProcessing,
             ];
 
             foreach (var activityName in expectedActivitySequence)
@@ -411,8 +411,9 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
             await processInitialDataSetVersionFunction.WriteDataFiles(instanceId, CancellationToken.None);
         }
     }
-
-    public class CompleteProcessingTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    
+    public class CompleteInitialDataSetVersionProcessingTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessInitialDataSetVersionFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
