@@ -236,7 +236,7 @@ def get_current_time(offset_days: int = 0, timezone: str = "Europe/London") -> d
 
 def format_datetime_as_desired(dt: datetime.datetime) -> str:
     # Format the datetime as "19 June 2024 at 00:00"
-    formatted_time = dt.strftime("%d %B %Y at 00:00")
+    formatted_time = dt.strftime("%d %B %Y ")
     return formatted_time
 
 def user_should_be_at_top_of_page():
