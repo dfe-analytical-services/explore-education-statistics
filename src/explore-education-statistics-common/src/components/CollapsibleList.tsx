@@ -1,8 +1,16 @@
 import ButtonText from '@common/components/ButtonText';
+import styles from '@common/components/CollapsibleList.module.scss';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React, { Children, createElement, ReactNode } from 'react';
-import VisuallyHidden from './VisuallyHidden';
+import React, {
+  Children,
+  cloneElement,
+  createElement,
+  ReactElement,
+  ReactNode,
+  useRef,
+} from 'react';
 
 interface BaseProps {
   buttonClassName?: string;
@@ -43,7 +51,30 @@ const CollapsibleList = ({
 }: Props) => {
   const [collapsed, toggleCollapsed] = useToggle(isCollapsed);
 
-  const listItems = Children.toArray(children);
+  const firstItemRef = useRef<HTMLElement>(null);
+  const firstHiddenItemRef = useRef<HTMLElement>(null);
+
+  const getItemProperties = (index: number) => {
+    if (index === 0) {
+      return {
+        className: styles.focusableItem,
+        ref: firstItemRef,
+        tabIndex: -1,
+      };
+    }
+    if (collapseAfter === index) {
+      return {
+        className: styles.focusableItem,
+        ref: firstHiddenItemRef,
+        tabIndex: -1,
+      };
+    }
+    return undefined;
+  };
+
+  const listItems = Children.toArray(children).map((item, index) =>
+    cloneElement(item as ReactElement, getItemProperties(index)),
+  );
 
   const renderedListItems = collapsed
     ? listItems.slice(0, collapseAfter > 0 ? collapseAfter : 0)
@@ -76,7 +107,18 @@ const CollapsibleList = ({
           className={classNames('govuk-!-display-none-print', buttonClassName, {
             'govuk-!-margin-bottom-4': !buttonClassName,
           })}
-          onClick={toggleCollapsed}
+          onClick={() => {
+            if (collapsed) {
+              toggleCollapsed.off();
+              // Timeout to make sure the list item is shown before focusing it.
+              setTimeout(() => {
+                firstHiddenItemRef.current?.focus();
+              }, 0);
+            } else {
+              toggleCollapsed.on();
+              firstItemRef.current?.focus();
+            }
+          }}
         >
           {collapsed
             ? `Show ${collapsedCount} ${collapseAfter > 0 ? 'more' : ''} ${
