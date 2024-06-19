@@ -141,6 +141,12 @@ Validate prerelease has not started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
+
+    ${current_datetime}    get current time    offset_days=2    timezone=Europe/London
+    Log    ${current_datetime}
+    ${formatted_datetime}    Format Datetime As Desired    ${current_datetime}
+    Log    ${formatted_datetime}
+
     ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1    Europe/London
     ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
 
@@ -247,6 +253,11 @@ Validate prerelease has not started for Analyst user
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
+
+    ${current_datetime}    get current time    offset_days=2    timezone=Europe/London
+    Log    ${current_datetime}
+    ${formatted_datetime}    Format Datetime As Desired    ${current_datetime}
+    Log    ${formatted_datetime}
 
     ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
     log    ${tomorrow}
