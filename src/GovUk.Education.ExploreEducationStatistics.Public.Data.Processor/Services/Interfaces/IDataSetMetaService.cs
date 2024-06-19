@@ -4,11 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 public interface IDataSetMetaService
 {
-    Task<(
-        List<(FilterMeta, List<FilterOptionMeta>)> filters,
-        List<(LocationMeta, List<LocationOptionMetaRow>)> locations,
-        DataSetVersionMetaSummary metaSummary
-        )> ReadDataSetVersionMetaForMappings(
+    Task<DataSetVersionMappingMeta> ReadDataSetVersionMetaForMappings(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 
@@ -16,3 +12,8 @@ public interface IDataSetMetaService
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 }
+
+public record DataSetVersionMappingMeta(
+    List<(FilterMeta, List<FilterOptionMeta>)> Filters,
+    List<(LocationMeta, List<LocationOptionMetaRow>)> Locations,
+    DataSetVersionMetaSummary MetaSummary);

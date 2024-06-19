@@ -25,11 +25,7 @@ public class DataSetMetaService(
     ITimePeriodsDuckDbRepository timePeriodsDuckDbRepository
 ) : IDataSetMetaService
 {
-    public async Task<(
-        List<(FilterMeta, List<FilterOptionMeta>)> filters,
-        List<(LocationMeta, List<LocationOptionMetaRow>)> locations,
-        DataSetVersionMetaSummary metaSummary
-        )> ReadDataSetVersionMetaForMappings(
+    public async Task<DataSetVersionMappingMeta> ReadDataSetVersionMetaForMappings(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
@@ -67,7 +63,7 @@ public class DataSetMetaService(
         
         var metaSummary = BuildMetaSummary(timePeriodMetas, metaFileRows, allowedColumns, geographicLevelMeta);
 
-        return (filterMeta, locationMeta, metaSummary);
+        return new DataSetVersionMappingMeta(filterMeta, locationMeta, metaSummary);
     }
 
     public async Task CreateDataSetVersionMeta(

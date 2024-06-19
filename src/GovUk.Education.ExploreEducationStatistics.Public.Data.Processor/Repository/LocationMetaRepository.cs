@@ -172,23 +172,26 @@ public class LocationMetaRepository(
             .ToList();
     }
 
-    private static List<LocationMeta> GetLocationMetas(DataSetVersion dataSetVersion, List<GeographicLevel> levels) =>
-        levels
+    private static List<LocationMeta> GetLocationMetas(DataSetVersion dataSetVersion, List<GeographicLevel> levels)
+    {
+        return levels
             .Select(level => new LocationMeta
             {
                 DataSetVersionId = dataSetVersion.Id,
                 Level = level
             })
             .ToList();
+    }
 
-    private static List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns) =>
-    [
-        .. allowedColumns
+    private static List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
+    {
+        return allowedColumns
             .Where(CsvColumnsToGeographicLevel.ContainsKey)
             .Select(col => CsvColumnsToGeographicLevel[col])
             .Distinct()
             .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
-    ];
+            .ToList();
+    }
 
     private static LocationOptionMeta MapLocationOptionMeta(
         IDictionary<string, string> row,
