@@ -12,11 +12,18 @@ param containerAppImageName string
 
 @minLength(2)
 @maxLength(32)
-@description('Specifies the name of the container app.')
+@description('Specifies the name of the Container App.')
 param containerAppName string
 
 @description('Specifies the container port.')
 param containerAppTargetPort int = 8080
+
+@description('The CORS policy to use for the Container App.')
+param corsPolicy {
+  allowedHeaders: string[]?
+  allowedMethods: string[]?
+  allowedOrigins: string[]?
+}
 
 @description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
 @allowed([
@@ -88,7 +95,7 @@ param volumeMounts {
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 
-resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
+resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   name: containerApplicationName
   location: location
   identity: {
@@ -106,6 +113,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
         external: true
         targetPort: containerAppTargetPort
         allowInsecure: false
+        corsPolicy: corsPolicy
         traffic: [
           {
             latestRevision: true
@@ -123,7 +131,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
     template: {
       containers: [
         {
-          name: containerAppName 
+          name: containerAppName
           image: containerImageName
           env: appSettings
           resources: {
