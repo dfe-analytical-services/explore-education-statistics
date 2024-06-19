@@ -229,6 +229,15 @@ def format_datetime(datetime: datetime, strf: str) -> str:
 
     return datetime.strftime(strf)
 
+def get_current_time(offset_days: int = 0, timezone: str = "Europe/London") -> datetime.datetime:
+    tz = pytz.timezone(timezone)
+    current_time = datetime.datetime.now(tz) + datetime.timedelta(days=offset_days)
+    return current_time
+
+def format_datetime_as_desired(dt: datetime.datetime) -> str:
+    # Format the datetime as "19 June 2024 at 00:00"
+    formatted_time = dt.strftime("%d %B %Y at 00:00")
+    return formatted_time
 
 def user_should_be_at_top_of_page():
     (x, y) = sl().get_window_position()
