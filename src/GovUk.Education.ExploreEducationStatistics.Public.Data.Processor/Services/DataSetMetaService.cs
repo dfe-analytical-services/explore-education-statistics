@@ -48,6 +48,8 @@ public class DataSetMetaService(
                 $"SELECT * FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'")
             .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)).AsList();
 
+        await using var transaction = await publicDataDbContext.Database.BeginTransactionAsync(cancellationToken);
+
         await filterMetaRepository.CreateFilterMetas(
             duckDbConnection,
             dataSetVersion,
@@ -101,6 +103,8 @@ public class DataSetMetaService(
             duckDbConnection,
             dataSetVersion,
             cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
     }
 
     private static DataSetVersionMetaSummary BuildMetaSummary(

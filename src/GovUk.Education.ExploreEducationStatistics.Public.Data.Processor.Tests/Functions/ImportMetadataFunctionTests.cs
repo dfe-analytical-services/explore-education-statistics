@@ -10,10 +10,12 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using InterpolatedSql.Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
@@ -25,13 +27,20 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ImportingMetadata;
 
-        public static readonly TheoryData<ProcessorTestData> Data = new()
+        public static readonly TheoryData<ProcessorTestData> TestDataFiles = new()
         {
             ProcessorTestData.AbsenceSchool,
         };
 
+        public static readonly TheoryData<ProcessorTestData, int> TestDataFilesWithMetaInsertBatchSize =
+            new()
+            {
+                { ProcessorTestData.AbsenceSchool, 1 },
+                { ProcessorTestData.AbsenceSchool, 1000 },
+            };
+
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task Success(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -84,7 +93,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task DataSetVersionMeta_CorrectGeographicLevels(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -104,12 +113,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
-        public async Task DataSetVersionMeta_CorrectLocations(ProcessorTestData testData)
+        [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
+        public async Task DataSetVersionMeta_CorrectLocations(ProcessorTestData testData, int metaInsertBatchSize)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
 
-            await ImportMetadata(testData, dataSetVersion, instanceId);
+            await ImportMetadata(testData, dataSetVersion, instanceId, metaInsertBatchSize);
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -150,7 +159,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task DataSetVersionMeta_CorrectTimePeriods(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -179,20 +188,23 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
-        public async Task DataSetVersionMeta_CorrectFilters(ProcessorTestData testData)
+        [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
+        public async Task DataSetVersionMeta_CorrectFilters(ProcessorTestData testData, int metaInsertBatchSize)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
 
-            await ImportMetadata(testData, dataSetVersion, instanceId);
+            await ImportMetadata(testData, dataSetVersion, instanceId, metaInsertBatchSize);
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualFilters = await publicDataDbContext.FilterMetas
-                .Include(filterMeta => filterMeta.Options.OrderBy(o => o.Label))
+                .Include(fm => fm.Options.OrderBy(o => o.Label))
+                .ThenInclude(fom => fom.MetaLinks)
                 .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
                 .OrderBy(fm => fm.Label)
                 .ToListAsync();
+
+            var globalOptionIndex = 0;
 
             Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
             Assert.All(testData.ExpectedFilters,
@@ -219,12 +231,18 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                                     o => o.Metas,
                                     o => o.MetaLinks
                                 ));
+
+                            var actualOptionLink = actualOption.MetaLinks
+                                .Single(link => link.MetaId == actualFilter.Id);
+
+                            // Expect the PublicId to be encoded based on the sequence of option links inserted across all filters
+                            Assert.Equal(SqidEncoder.Encode(++globalOptionIndex), actualOptionLink.PublicId);
                         });
                 });
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task DataSetVersionMeta_CorrectIndicators(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -253,7 +271,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectLocationOptions(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -288,7 +306,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectTimePeriods(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -317,7 +335,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectFilterOptions(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -338,6 +356,8 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .GroupBy(o => o.FilterId)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
+            var globalOptionIndex = 0;
+
             Assert.Equal(testData.ExpectedFilters.Count, actualOptionsByFilterId.Count);
             Assert.All(testData.ExpectedFilters,
                 expectedFilter =>
@@ -351,12 +371,16 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                             var actualOption = actualOptions[index];
                             Assert.Equal(expectedOption.Label, actualOption.Label);
                             Assert.Equal(expectedFilter.PublicId, actualOption.FilterId);
+
+                            // Expect the PublicId to be that of the option link which in turn is expected to be encoded
+                            // based on the sequence of option links inserted across all filters
+                            Assert.Equal(SqidEncoder.Encode(++globalOptionIndex), actualOption.PublicId);
                         });
                 });
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectIndicators(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
@@ -397,9 +421,17 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         private async Task ImportMetadata(
             ProcessorTestData testData,
             DataSetVersion dataSetVersion,
-            Guid instanceId)
+            Guid instanceId,
+            int? metaInsertBatchSize = null)
         {
             SetupCsvDataFilesForDataSetVersion(testData, dataSetVersion);
+
+            // Override default app settings if provided
+            if (metaInsertBatchSize.HasValue)
+            {
+                var appSettingsOptions = GetRequiredService<IOptions<AppSettingsOptions>>();
+                appSettingsOptions.Value.MetaInsertBatchSize = metaInsertBatchSize.Value;
+            }
 
             var function = GetRequiredService<ImportMetadataFunction>();
             await function.ImportMetadata(instanceId, CancellationToken.None);

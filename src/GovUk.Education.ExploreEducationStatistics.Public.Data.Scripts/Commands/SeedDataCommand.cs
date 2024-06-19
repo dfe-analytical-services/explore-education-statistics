@@ -108,19 +108,31 @@ public class SeedDataCommand : ICommand
 
         LinqToDBForEFTools.Initialize();
 
+        // Clear any tables and restart any sequences in case we're re-running the command
         var tables = dbContext.Model.GetEntityTypes()
             .Select(type => type.GetTableName())
             .Distinct()
-            .Cast<string>()
+            .OfType<string>()
             .ToList();
 
-        // Clear any tables in case we're re-running the command
         foreach (var table in tables)
         {
 #pragma warning disable EF1002
             await dbContext.Database.ExecuteSqlRawAsync(
 #pragma warning restore EF1002
                 $"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""",
+                cancellationToken: cancellationToken
+            );
+        }
+
+        var sequences = dbContext.Model.GetSequences();
+
+        foreach (var sequence in sequences)
+        {
+#pragma warning disable EF1002
+            await dbContext.Database.ExecuteSqlRawAsync(
+#pragma warning restore EF1002
+                $"""ALTER SEQUENCE "{sequence.Name}" RESTART WITH 1;""",
                 cancellationToken: cancellationToken
             );
         }
@@ -450,7 +462,10 @@ public class SeedDataCommand : ICommand
                     .InsertWhenNotMatched()
                     .MergeAsync(_cancellationToken);
 
-                var startIndex = await _dbContext.FilterOptionMetaLinks.CountAsync(token: _cancellationToken) + 1;
+                var startIndex = await _dbContext.NextSequenceValue(
+                    PublicDataDbContext.FilterOptionMetaLinkSequence,
+                    _cancellationToken
+                );
 
                 var current = 0;
                 const int batchSize = 1000;
@@ -473,6 +488,7 @@ public class SeedDataCommand : ICommand
                     var links = await optionTable
                         .Where(o =>
                             batchRowKeys.Contains(o.Label + ',' + (o.IsAggregate == true ? "True" : "")))
+                        .OrderBy(o => o.Label)
                         .Select((option, index) => new FilterOptionMetaLink
                         {
                             PublicId = SqidEncoder.Encode(batchStartIndex + index),
@@ -497,6 +513,12 @@ public class SeedDataCommand : ICommand
                         $"Inserted incorrect number of filter option meta links for {meta.PublicId}. " +
                         $"Inserted: {insertedLinks}, expected: {options.Count}");
                 }
+
+                await _dbContext.SetSequenceValue(
+                    PublicDataDbContext.FilterOptionMetaLinkSequence,
+                    startIndex + insertedLinks - 1,
+                    _cancellationToken
+                );
             }
         }
 
@@ -586,7 +608,10 @@ public class SeedDataCommand : ICommand
                             .Where(o => !existingRowKeys.Contains(o.GetRowKey()))
                             .ToList();
 
-                        var startIndex = await _dbContext.LocationOptionMetas.CountAsync(token: _cancellationToken) + 1;
+                        var startIndex = await _dbContext.NextSequenceValue(
+                            PublicDataDbContext.LocationOptionMetasIdSequence,
+                            _cancellationToken
+                        );
 
                         foreach (var option in newOptions)
                         {
@@ -594,7 +619,16 @@ public class SeedDataCommand : ICommand
                             option.PublicId = SqidEncoder.Encode(option.Id);
                         }
 
-                        await optionTable.BulkCopyAsync(newOptions, cancellationToken: _cancellationToken);
+                        await optionTable.BulkCopyAsync(
+                            new BulkCopyOptions { KeepIdentity = true },
+                            newOptions,
+                            cancellationToken: _cancellationToken);
+
+                        await _dbContext.SetSequenceValue(
+                            PublicDataDbContext.LocationOptionMetasIdSequence,
+                            startIndex - 1,
+                            _cancellationToken
+                        );
                     }
 
                     var links = await optionTable
