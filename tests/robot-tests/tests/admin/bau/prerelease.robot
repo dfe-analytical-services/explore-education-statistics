@@ -142,10 +142,12 @@ Validate prerelease has not started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${current_datetime}    get current time    offset_days=2    timezone=Europe/London
-    Log    ${current_datetime}
-    ${formatted_datetime}    Format Datetime As Desired    ${current_datetime}
-    Log    ${formatted_datetime}
+    ${tomorrow_datetime}    get current time    offset_days=1    timezone=Europe/London
+
+    ${dayafter_tomorrow_datetime}    get current time    offset_days=2    timezone=Europe/London
+
+    ${formatted_datetime}    format datetime as desired    ${tomorrow_datetime}
+    
 
     ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1    Europe/London
     ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
@@ -153,7 +155,7 @@ Validate prerelease has not started
     ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
     ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
     user checks page contains
-    ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
+    ...    Pre-release access will be available from ${formatted_datetime} until it is published on ${time_end}.
 
 Go to prerelease access page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
