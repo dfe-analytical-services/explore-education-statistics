@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
@@ -33,47 +35,68 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
         [InlineData(DataSetVersionStatus.Mapping)]
         [InlineData(DataSetVersionStatus.Draft)]
         [InlineData(DataSetVersionStatus.Cancelled)]
-        public async Task Success(DataSetVersionStatus dataSetVersionStatus)
+        public async Task ReleaseVersionIsLinkedToOldFileWithApiDataSet(DataSetVersionStatus dataSetVersionStatus)
         {
+            Publication publication = DataFixture.DefaultPublication();
+
+            Release release = DataFixture.DefaultRelease();
+
+            ReleaseVersion previousReleaseVersion = DataFixture.DefaultReleaseVersion()
+                .WithPublication(publication)
+                .WithRelease(release)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTime.UtcNow)
+                .WithVersion(0);
+
             ReleaseVersion targetReleaseVersion = DataFixture.DefaultReleaseVersion()
-                .WithPublication(DataFixture.DefaultPublication());
+                .WithPublication(publication)
+                .WithRelease(release)
+                .WithVersion(1);
 
-            ReleaseVersion otherReleaseVersion = DataFixture.DefaultReleaseVersion()
-                .WithPublication(DataFixture.DefaultPublication());
+            File oldFile = DataFixture.DefaultFile(FileType.Data);
 
-            var targetFiles = DataFixture.DefaultFile()
-                .GenerateList(3);
+            ReleaseFile previousReleaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(previousReleaseVersion)
+                .WithFile(oldFile);
 
-            File otherFile = DataFixture.DefaultFile();
-
-            var targetReleaseFiles = DataFixture.DefaultReleaseFile()
+            ReleaseFile targetReleaseFileWithOldFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(targetReleaseVersion)
-                .ForIndex(0, rf => rf.SetFile(targetFiles[0]))
-                .ForIndex(1, rf => rf.SetFile(targetFiles[1]))
-                .ForIndex(2, rf => rf.SetFile(targetFiles[2]))
-                .GenerateList();
+                .WithFile(oldFile);
 
-            ReleaseFile otherReleaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(otherReleaseVersion)
-                .WithFile(otherFile);
+            var targetReleaseFilesWithNewFiles = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(targetReleaseVersion)
+                .WithFile(() => DataFixture.DefaultFile(FileType.Data))
+                .GenerateList(3);
 
             await AddTestData<ContentDbContext>(context =>
             {
-                context.ReleaseFiles.AddRange([..targetReleaseFiles, otherReleaseFile]);
+                context.ReleaseFiles.AddRange([previousReleaseFile, targetReleaseFileWithOldFile, .. targetReleaseFilesWithNewFiles]);
             });
+
+            DataSet otherDataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publication.Id);
 
             var targetDataSets = DataFixture
                 .DefaultDataSet()
                 .WithStatusDraft()
-                .WithPublicationId(targetReleaseVersion.PublicationId)
+                .WithPublicationId(publication.Id)
                 .GenerateList(3);
 
-            DataSet otherDataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusDraft()
-                .WithPublicationId(otherReleaseVersion.PublicationId);
+            await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange([otherDataSet, .. targetDataSets]));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange([..targetDataSets, otherDataSet]));
+            DataSetVersion otherDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusPublished()
+                .WithDataSet(otherDataSet)
+                .WithImports(() => DataFixture
+                    .DefaultDataSetVersionImport()
+                    .WithStage(DataSetVersionImportStage.Completing)
+                    .Generate(1))
+                .WithReleaseFileId(previousReleaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
             var targetDataSetVersions = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -83,43 +106,38 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                     .DefaultDataSetVersionImport()
                     .Generate(1))
                 .ForIndex(0, dsv => dsv
-                    .SetReleaseFileId(targetReleaseFiles[0].Id)
+                    .SetReleaseFileId(targetReleaseFilesWithNewFiles[0].Id)
                     .SetDataSet(targetDataSets[0]))
                 .ForIndex(1, dsv => dsv
-                    .SetReleaseFileId(targetReleaseFiles[1].Id)
+                    .SetReleaseFileId(targetReleaseFilesWithNewFiles[1].Id)
                     .SetDataSet(targetDataSets[1]))
                 .ForIndex(2, dsv => dsv
-                    .SetReleaseFileId(targetReleaseFiles[2].Id)
+                    .SetReleaseFileId(targetReleaseFilesWithNewFiles[2].Id)
                     .SetDataSet(targetDataSets[2]))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv)
                 .GenerateList();
 
-            DataSetVersion otherDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0, 0)
-                .WithStatusDraft()
-                .WithDataSet(otherDataSet)
-                .WithImports(() => DataFixture
-                    .DefaultDataSetVersionImport()
-                    .Generate(1))
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
             await AddTestData<PublicDataDbContext>(context =>
             {
-                context.DataSetVersions.AddRange([..targetDataSetVersions, otherDataSetVersion]);
-                context.DataSets.UpdateRange([..targetDataSets, otherDataSet]);
+                context.DataSetVersions.AddRange([otherDataSetVersion, .. targetDataSetVersions]);
+                context.DataSets.UpdateRange([otherDataSet, .. targetDataSets]);
             });
 
-            foreach (var (targetFile, index) in targetFiles.WithIndex())
+            previousReleaseFile.PublicApiDataSetId = otherDataSet.Id;
+            previousReleaseFile.PublicApiDataSetVersion = otherDataSetVersion.FullSemanticVersion();
+            targetReleaseFileWithOldFile.PublicApiDataSetId = previousReleaseFile.PublicApiDataSetId;
+            targetReleaseFileWithOldFile.PublicApiDataSetVersion = previousReleaseFile.PublicApiDataSetVersion;
+
+            foreach (var (targetReleaseFileWithNewFile, index) in targetReleaseFilesWithNewFiles.WithIndex())
             {
-                targetFile.PublicApiDataSetId = targetDataSets[index].Id;
-                targetFile.PublicApiDataSetVersion = targetDataSetVersions[index].FullSemanticVersion();
+                targetReleaseFileWithNewFile.PublicApiDataSetId = targetDataSets[index].Id;
+                targetReleaseFileWithNewFile.PublicApiDataSetVersion = targetDataSetVersions[index].FullSemanticVersion();
             }
 
-            otherFile.PublicApiDataSetId = otherDataSet.Id;
-            otherFile.PublicApiDataSetVersion = otherDataSetVersion.FullSemanticVersion();
-
-            await AddTestData<ContentDbContext>(context => context.Files.UpdateRange([..targetFiles, otherFile]));
+            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.UpdateRange([
+                previousReleaseFile,
+                targetReleaseFileWithOldFile,
+                ..targetReleaseFilesWithNewFiles]));
 
             foreach (var targetDataSetVersion in targetDataSetVersions)
             {
@@ -144,7 +162,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             {
                 var targetDataSet = targetDataSets[i];
                 var targetDataSetVersion = targetDataSetVersions[i];
-                var targetReleaseFile = targetReleaseFiles[i];
+                var targetReleaseFileWithNewFile = targetReleaseFilesWithNewFiles[i];
 
                 // Assert that the TARGET parquet data set folder, linked to the release version being deleted, is now removed
                 var targetDataSetDirectory = Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(targetDataSetVersion));
@@ -157,28 +175,16 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 Assert.Null(await publicDataDbContext.DataSetVersions.SingleOrDefaultAsync(dsv => dsv.Id == targetDataSetVersion.Id));
 
                 // Assert that the TARGET Data Set Version metadata is deleted
-                Assert.False(await publicDataDbContext.FilterMetas
-                        .AnyAsync(fm => fm.DataSetVersionId == targetDataSetVersion.Id));
-                Assert.False(await publicDataDbContext.FilterOptionMetaLinks
-                        .AnyAsync(foml => targetDataSetVersion.FilterMetas.Contains(foml.Meta)));
-                Assert.False(await publicDataDbContext.LocationMetas
-                        .AnyAsync(fm => fm.DataSetVersionId == targetDataSetVersion.Id));
-                Assert.False(await publicDataDbContext.LocationOptionMetaLinks
-                        .AnyAsync(loml => targetDataSetVersion.LocationMetas.Contains(loml.Meta)));
-                Assert.False(await publicDataDbContext.IndicatorMetas
-                        .AnyAsync(fm => fm.DataSetVersionId == targetDataSetVersion.Id));
-                Assert.False(await publicDataDbContext.GeographicLevelMetas
-                        .AnyAsync(fm => fm.DataSetVersionId == targetDataSetVersion.Id));
-                Assert.False(await publicDataDbContext.TimePeriodMetas
-                        .AnyAsync(fm => fm.DataSetVersionId == targetDataSetVersion.Id));
+                await AssertMetadataIsDeleted(publicDataDbContext, targetDataSetVersion);
 
                 // Assert that the TARGET Data Set Version Import has been deleted
                 Assert.Null(await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(dsvi => dsvi.Id == targetDataSetVersion.Imports.Single().Id));
 
                 // Assert that the TARGET Release File has been unassociated with its Public API DataSet
-                var targetFile = await contentDataDbContext.Files.SingleAsync(f => f.Id == targetReleaseFile.FileId);
-                Assert.Null(targetFile.PublicApiDataSetId);
-                Assert.Null(targetFile.PublicApiDataSetVersion);
+                var targetReleaseFile = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == targetReleaseFileWithNewFile.Id);
+
+                Assert.Null(targetReleaseFile.PublicApiDataSetId);
+                Assert.Null(targetReleaseFile.PublicApiDataSetVersion);
             }
 
             // Below are the Assertions for the OTHER data set linked to the NON-TARGET release version. NOTHING should be deleted
@@ -193,7 +199,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 entry => new DirectoryInfo(entry).Name == $"v{otherDataSetVersion.Version}");
 
             var otherDataSetVersionFolderEntries = Directory.GetFileSystemEntries(otherDataSetVersionFolder);
-            Assert.Single(otherDataSetVersionFolderEntries, entry => new FileInfo(entry).Name == "version1.txt");
+            Assert.Single(otherDataSetVersionFolderEntries, entry => new System.IO.FileInfo(entry).Name == "version1.txt");
 
             // Assert that the OTHER Data Set has NOT been deleted
             Assert.NotNull(await publicDataDbContext.DataSets.SingleAsync(ds => ds.Id == otherDataSet.Id));
@@ -202,28 +208,265 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             Assert.NotNull(await publicDataDbContext.DataSetVersions.SingleAsync(dsv => dsv.Id == otherDataSetVersion.Id));
 
             // Assert that the OTHER Data Set Version metadata is NOT deleted
-            Assert.True(await publicDataDbContext.FilterMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == otherDataSetVersion.Id));
-            Assert.True(await publicDataDbContext.FilterOptionMetaLinks
-                    .AnyAsync(foml => otherDataSetVersion.FilterMetas.Contains(foml.Meta)));
-            Assert.True(await publicDataDbContext.LocationMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == otherDataSetVersion.Id));
-            Assert.True(await publicDataDbContext.LocationOptionMetaLinks
-                    .AnyAsync(loml => otherDataSetVersion.LocationMetas.Contains(loml.Meta)));
-            Assert.True(await publicDataDbContext.IndicatorMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == otherDataSetVersion.Id));
-            Assert.True(await publicDataDbContext.GeographicLevelMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == otherDataSetVersion.Id));
-            Assert.True(await publicDataDbContext.TimePeriodMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == otherDataSetVersion.Id));
+            await AssertMetadataIsNotDeleted(publicDataDbContext, otherDataSetVersion);
 
             // Assert that the OTHER Data Set Version Import has NOT been deleted
             Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi => dsvi.Id == otherDataSetVersion.Imports.Single().Id));
 
-            // Assert that the OTHER Release File is still associated with its Public API DataSet
-            var otherFilePostDelete = await contentDataDbContext.Files.SingleAsync(f => f.Id == otherReleaseFile.FileId);
-            Assert.Equal(otherDataSet.Id, otherFilePostDelete.PublicApiDataSetId);
-            Assert.Equal(otherDataSetVersion.FullSemanticVersion(), otherFilePostDelete.PublicApiDataSetVersion);
+            // Assert that the PREVIOUS Release File is still associated with its Public API DataSet
+            var previousReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == previousReleaseFile.Id);
+            Assert.Equal(otherDataSet.Id, previousReleaseFilePostDelete.PublicApiDataSetId);
+            Assert.Equal(otherDataSetVersion.FullSemanticVersion(), previousReleaseFilePostDelete.PublicApiDataSetVersion);
+
+            // Assert that the TARGET Release File, which points to the OLD File, is still associated with its Public API DataSet
+            var targetReleaseFileWithOldFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == targetReleaseFileWithOldFile.Id);
+            Assert.Equal(otherDataSet.Id, previousReleaseFilePostDelete.PublicApiDataSetId);
+            Assert.Equal(otherDataSetVersion.FullSemanticVersion(), previousReleaseFilePostDelete.PublicApiDataSetVersion);
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        [InlineData(DataSetVersionStatus.Cancelled)]
+        public async Task ReleaseVersionIsLinkedToSubsequentDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
+        {
+            Publication publication = DataFixture.DefaultPublication();
+
+            Release release1 = DataFixture.DefaultRelease();
+
+            Release release2 = DataFixture.DefaultRelease();
+
+            ReleaseVersion release1Version1 = DataFixture.DefaultReleaseVersion()
+                .WithPublication(publication)
+                .WithRelease(release1)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTime.UtcNow)
+                .WithVersion(0);
+
+            ReleaseVersion release2Version1 = DataFixture.DefaultReleaseVersion()
+                .WithPublication(publication)
+                .WithRelease(release2)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTime.UtcNow)
+                .WithVersion(0);
+
+            ReleaseVersion release2Version2 = DataFixture.DefaultReleaseVersion()
+                .WithPublication(publication)
+                .WithRelease(release2)
+                .WithVersion(1);
+
+            ReleaseFile release1Version1ReleaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(release1Version1)
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            ReleaseFile release2Version1ReleaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(release2Version1)
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            ReleaseFile release2Version2ReleaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(release2Version2)
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.AddRange(
+                    release1Version1ReleaseFile,
+                    release2Version1ReleaseFile,
+                    release2Version2ReleaseFile);
+            });
+
+            DataSet release1Version1DataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publication.Id);
+
+            DataSet release2Version1DataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publication.Id);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(
+                release1Version1DataSet,
+                release2Version1DataSet));
+
+            DataSetVersion release1Version1DataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusPublished()
+                .WithDataSet(release1Version1DataSet)
+                .WithImports(() => DataFixture
+                    .DefaultDataSetVersionImport()
+                    .WithStage(DataSetVersionImportStage.Completing)
+                    .Generate(1))
+                .WithReleaseFileId(release1Version1ReleaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion release2Version1DataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0, 0)
+                .WithStatusPublished()
+                .WithDataSet(release2Version1DataSet)
+                .WithImports(() => DataFixture
+                    .DefaultDataSetVersionImport()
+                    .WithStage(DataSetVersionImportStage.Completing)
+                    .Generate(1))
+                .WithReleaseFileId(release2Version1ReleaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion release2Version2DataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(2, 0, 0)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(release1Version1DataSet) // This is the 2nd Data Set Version of the series
+                .WithImports(() => DataFixture
+                    .DefaultDataSetVersionImport()
+                    .Generate(1))
+                .WithReleaseFileId(release2Version2ReleaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(
+                    release1Version1DataSetVersion,
+                    release2Version1DataSetVersion,
+                    release2Version2DataSetVersion);
+
+                context.DataSets.UpdateRange(
+                    release1Version1DataSet,
+                    release2Version1DataSet);
+            });
+
+            release1Version1ReleaseFile.PublicApiDataSetId = release1Version1DataSet.Id;
+            release1Version1ReleaseFile.PublicApiDataSetVersion = release1Version1DataSetVersion.FullSemanticVersion();
+            release2Version1ReleaseFile.PublicApiDataSetId = release2Version1DataSet.Id;
+            release2Version1ReleaseFile.PublicApiDataSetVersion = release2Version1DataSetVersion.FullSemanticVersion();
+            release2Version2ReleaseFile.PublicApiDataSetId = release1Version1DataSet.Id; // Same Data Set series as release1version1
+            release2Version2ReleaseFile.PublicApiDataSetVersion = release2Version2DataSetVersion.FullSemanticVersion();
+
+            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.UpdateRange(
+                release1Version1ReleaseFile,
+                release2Version1ReleaseFile,
+                release2Version2ReleaseFile));
+
+            var allDataSetVersions = new List<DataSetVersion>() {
+                release1Version1DataSetVersion,
+                release2Version1DataSetVersion,
+                release2Version2DataSetVersion };
+
+            foreach (var dataSetVersion in allDataSetVersions)
+            {
+                var dataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
+                Directory.CreateDirectory(dataSetVersionDirectory);
+                await System.IO.File.Create(Path.Combine(dataSetVersionDirectory, $"{dataSetVersion.Version}.txt")).DisposeAsync();
+            }
+
+            var response = await BulkDeleteDataSetVersions(release2Version2.Id);
+
+            response.AssertNoContent();
+
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+            await using var contentDataDbContext = GetDbContext<ContentDbContext>();
+
+            // Assert that the parquet folder for the new, DRAFT, API Data Set Version linked to the release version being deleted, is now deleted
+            var release2Version2DataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(release2Version2DataSetVersion);
+            Assert.False(Directory.Exists(release2Version2DataSetVersionDirectory));
+
+            // Assert that the parent parquet folder for the API Data Set, linked to the release version being deleted, has NOT been deleted
+            var release1Version1DataSetDirectory = Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(release2Version2DataSetVersion));
+            Assert.True(Directory.Exists(release1Version1DataSetDirectory!.FullName));
+
+            // Assert that the parquet folder, and its contents, for the API Data Set Version linked to Release 1 Version 1, has NOT been deleted
+            var release1Version1DataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(release1Version1DataSetVersion);
+            Assert.True(Directory.Exists(release1Version1DataSetVersionDirectory));
+
+            var release1Version1DataSetVersionDirectoryEntries = Directory.GetFileSystemEntries(release1Version1DataSetVersionDirectory);
+            Assert.Single(release1Version1DataSetVersionDirectoryEntries, entry => new System.IO.FileInfo(entry).Name == $"{release1Version1DataSetVersion.Version}.txt");
+
+            // Assert that the parquet folder, and its contents, for the API Data Set Version linked to Release 2 Version 1, has NOT been deleted
+            var release2Version1DataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(release2Version1DataSetVersion);
+            Assert.True(Directory.Exists(release2Version1DataSetVersionDirectory));
+
+            var release2Version1DataSetVersionDirectoryEntries = Directory.GetFileSystemEntries(release2Version1DataSetVersionDirectory);
+            Assert.Single(release2Version1DataSetVersionDirectoryEntries, entry => new System.IO.FileInfo(entry).Name == $"{release2Version1DataSetVersion.Version}.txt");
+
+            // Assert that the TARGET API Data Set, linked to the release version being deleted, has NOT been deleted
+            Assert.NotNull(await publicDataDbContext.DataSets.SingleOrDefaultAsync(ds => ds.Id == release1Version1DataSet.Id));
+
+            // Assert that the OTHER Data Set has NOT been deleted
+            Assert.NotNull(await publicDataDbContext.DataSets.SingleAsync(ds => ds.Id == release2Version1DataSet.Id));
+
+            // Assert that the TARGET Data Set Version has been deleted
+            Assert.Null(await publicDataDbContext.DataSetVersions.SingleOrDefaultAsync(dsv => dsv.Id == release2Version2DataSetVersion.Id));
+
+            // Assert that the OTHER Data Set Versions have NOT been deleted
+            Assert.NotNull(await publicDataDbContext.DataSetVersions.SingleAsync(dsv => dsv.Id == release1Version1DataSetVersion.Id));
+            Assert.NotNull(await publicDataDbContext.DataSetVersions.SingleAsync(dsv => dsv.Id == release2Version1DataSetVersion.Id));
+
+            // Assert that the TARGET Data Set Version metadata is deleted
+            await AssertMetadataIsDeleted(publicDataDbContext, release2Version2DataSetVersion);
+
+            // Assert that the OTHER Data Set Versions metadata has NOT been deleted
+            await AssertMetadataIsNotDeleted(publicDataDbContext, release1Version1DataSetVersion);
+            await AssertMetadataIsNotDeleted(publicDataDbContext, release2Version1DataSetVersion);
+
+            // Assert that the TARGET Data Set Version Import has been deleted
+            Assert.Null(await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(dsvi => dsvi.Id == release2Version2DataSetVersion.Imports.Single().Id));
+
+            // Assert that the OTHER Data Set Version Imports have NOT been deleted
+            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi => dsvi.Id == release1Version1DataSetVersion.Imports.Single().Id));
+            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi => dsvi.Id == release2Version1DataSetVersion.Imports.Single().Id));
+
+            // Assert that the TARGET Release File has been unassociated with its Public API DataSet
+            var targetReleaseFile = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release2Version2ReleaseFile.Id);
+
+            Assert.Null(targetReleaseFile.PublicApiDataSetId);
+            Assert.Null(targetReleaseFile.PublicApiDataSetVersion);
+
+            // Assert that the OTHER Release Files are still associated with their Public API DataSets
+            var release1Version1ReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release1Version1ReleaseFile.Id);
+            var release2Version1ReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release2Version1ReleaseFile.Id);
+
+            Assert.Equal(release1Version1DataSet.Id, release1Version1ReleaseFilePostDelete.PublicApiDataSetId);
+            Assert.Equal(release1Version1DataSetVersion.FullSemanticVersion(), release1Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
+            Assert.Equal(release2Version1DataSet.Id, release2Version1ReleaseFilePostDelete.PublicApiDataSetId);
+            Assert.Equal(release2Version1DataSetVersion.FullSemanticVersion(), release2Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
+        }
+
+        private static async Task AssertMetadataIsDeleted(PublicDataDbContext publicDataDbContext, DataSetVersion dataSetVersion)
+        {
+            Assert.False(await publicDataDbContext.FilterMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.FilterOptionMetaLinks
+                    .AnyAsync(foml => dataSetVersion.FilterMetas.Contains(foml.Meta)));
+            Assert.False(await publicDataDbContext.LocationMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.LocationOptionMetaLinks
+                    .AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta)));
+            Assert.False(await publicDataDbContext.IndicatorMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.GeographicLevelMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.False(await publicDataDbContext.TimePeriodMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+        }
+
+        private static async Task AssertMetadataIsNotDeleted(PublicDataDbContext publicDataDbContext, DataSetVersion dataSetVersion)
+        {
+            Assert.True(await publicDataDbContext.FilterMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.True(await publicDataDbContext.FilterOptionMetaLinks
+                    .AnyAsync(foml => dataSetVersion.FilterMetas.Contains(foml.Meta)));
+            Assert.True(await publicDataDbContext.LocationMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.True(await publicDataDbContext.LocationOptionMetaLinks
+                    .AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta)));
+            Assert.True(await publicDataDbContext.IndicatorMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.True(await publicDataDbContext.GeographicLevelMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+            Assert.True(await publicDataDbContext.TimePeriodMetas
+                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
         }
 
         [Theory]
@@ -231,14 +474,14 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Deprecated)]
         [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task VersionCanNotBeDeleted_FirstVersion_Returns400(DataSetVersionStatus dataSetVersionStatus)
+        public async Task DataSetVersionCanNotBeDeleted_FirstVersion_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
                .WithPublication(DataFixture.DefaultPublication());
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .WithFile(DataFixture.DefaultFile());
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
             {
@@ -247,7 +490,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
-                .WithPublicationId(releaseVersion.Id)
+                .WithPublicationId(releaseVersion.Publication.Id)
                 .WithStatusDraft();
 
             await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
@@ -280,14 +523,14 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Deprecated)]
         [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task VersionCanNotBeDeleted_SubsequentVersion_Returns400(DataSetVersionStatus dataSetVersionStatus)
+        public async Task DataSetVersionCanNotBeDeleted_SubsequentVersion_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
                .WithPublication(DataFixture.DefaultPublication());
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .WithFile(DataFixture.DefaultFile());
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
             {
@@ -296,7 +539,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
-                .WithPublicationId(releaseVersion.Id)
+                .WithPublicationId(releaseVersion.Publication.Id)
                 .WithStatusPublished();
 
             await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));

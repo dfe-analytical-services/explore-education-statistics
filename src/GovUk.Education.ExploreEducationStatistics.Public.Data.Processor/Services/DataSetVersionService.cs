@@ -59,33 +59,23 @@ internal class DataSetVersionService(
 
     public async Task<Either<ActionResult, Unit>> BulkDeleteVersions(Guid releaseVersionId, CancellationToken cancellationToken = default)
     {
-        var strategy = contentDbContext.Database.CreateExecutionStrategy();
+        return await contentDbContext.RequireTransaction(() =>
+            GetReleaseFiles(releaseVersionId, cancellationToken)
+                .OnSuccessCombineWith(async releaseFiles => await GetDataSetVersions(releaseFiles, cancellationToken))
+                .OnSuccess(releaseFilesAndDataSetVersions =>
+                {
+                    var (releaseFiles, dataSetVersions) = releaseFilesAndDataSetVersions;
 
-        return await strategy.ExecuteAsync(
-            async () =>
-            {
-                using var transactionScope = new TransactionScope(
-                    TransactionScopeOption.Required,
-                    new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
-                    TransactionScopeAsyncFlowOption.Enabled);
-
-                return await GetReleaseFiles(releaseVersionId, cancellationToken)
-                    .OnSuccessCombineWith(async releaseFiles => await GetDataSetVersions(releaseFiles, cancellationToken))
-                    .OnSuccess(releaseFilesAndDataSetVersions =>
-                    {
-                        var (releaseFiles, dataSetVersions) = releaseFilesAndDataSetVersions;
-
-                        return CheckCanDeleteDataSetVersions(dataSetVersions)
-                            .OnSuccess(() => (releaseFiles, dataSetVersions));
-                    })
-                    .OnSuccessDo(async releaseFilesAndDataSetVersions => await UnlinkFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles, cancellationToken))
-                    .OnSuccessDo(async releaseFilesAndDataSetVersions => await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
-                    .OnSuccessVoid(releaseFilesAndDataSetVersions => DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions))
-                    .OnSuccessVoid(transactionScope.Complete);
-            });
+                    return CheckCanDeleteDataSetVersions(dataSetVersions)
+                        .OnSuccess(() => (releaseFiles, dataSetVersions));
+                })
+                .OnSuccessDo(async releaseFilesAndDataSetVersions => await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles, cancellationToken))
+                .OnSuccessDo(async releaseFilesAndDataSetVersions => await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
+                .OnSuccessVoid(releaseFilesAndDataSetVersions => DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions)));
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
+    public async Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.RequireTransaction(() =>
@@ -168,23 +158,19 @@ internal class DataSetVersionService(
             .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.Version)
             .ToListAsync(cancellationToken);
 
-        foreach (var releaseFile in releaseFiles)
-        {
-            releaseFile.PublicApiDataSetId = null;
-            releaseFile.PublicApiDataSetVersion = null;
-        }
-
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+        await UnlinkReleaseFilesFromApiDataSets(releaseFiles, cancellationToken);
     }
 
     private async Task DeleteDataSetVersions(IReadOnlyList<DataSetVersion> dataSetVersions, CancellationToken cancellationToken)
     {
-        var dataSets = dataSetVersions.Select(dsv => dsv.DataSet);
+        var dataSetsWithNoOtherVersions = dataSetVersions
+            .Where(dsv => dsv.IsFirstVersion)
+            .Select(dsv => dsv.DataSet);
 
         publicDataDbContext.DataSetVersions.RemoveRange(dataSetVersions);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        publicDataDbContext.DataSets.RemoveRange(dataSets);
+        publicDataDbContext.DataSets.RemoveRange(dataSetsWithNoOtherVersions);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -208,46 +194,34 @@ internal class DataSetVersionService(
     }
 
     private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
+    CancellationToken cancellationToken)
     {
         return await contentDbContext.ReleaseFiles
             .Include(rf => rf.File)
             .SingleOrNotFoundAsync(rf => rf.Id == dataSetVersion.ReleaseFileId, cancellationToken);
     }
 
-    private async Task UnlinkFilesFromApiDataSets(IReadOnlyList<ReleaseFile> releaseFiles, CancellationToken cancellationToken)
+    private async Task UnlinkReleaseFilesFromApiDataSets(IReadOnlyList<ReleaseFile> releaseFiles, CancellationToken cancellationToken)
     {
         foreach (var releaseFile in releaseFiles)
         {
-            UnlinkFileFromApiDataSet(releaseFile);
+            UnlinkReleaseFileFromApiDataSet(releaseFile);
         }
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task UnlinkFileFromApiDataSet(ReleaseFile releaseFile, CancellationToken cancellationToken)
+    private static void UnlinkReleaseFileFromApiDataSet(ReleaseFile releaseFile)
     {
-        UnlinkFileFromApiDataSet(releaseFile);
-
-        await contentDbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private static void UnlinkFileFromApiDataSet(ReleaseFile releaseFile)
-    {
-        releaseFile.File.PublicApiDataSetId = null;
-        releaseFile.File.PublicApiDataSetVersion = null;
+        releaseFile.PublicApiDataSetId = null;
+        releaseFile.PublicApiDataSetVersion = null;
     }
 
     private void DeleteDuckDbFiles(IReadOnlyList<DataSetVersion> dataSetVersions)
     {
-        var dataSetDirectories = dataSetVersions
-            .Select(GetDataSetDirectory)
-            .Distinct()
-            .ToList();
-
-        foreach (var dataSetDirectory in dataSetDirectories)
+        foreach (var dataSetVersion in dataSetVersions)
         {
-            DeleteDirectoryIfExists(dataSetDirectory);
+            DeleteDuckDbFiles(dataSetVersion);
         }
     }
 
