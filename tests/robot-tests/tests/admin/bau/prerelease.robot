@@ -147,15 +147,19 @@ Validate prerelease has not started
     ${dayafter_tomorrow_datetime}    get current time    offset_days=2    timezone=Europe/London
 
     ${formatted_datetime}    format datetime as desired    ${tomorrow_datetime}
+    log     ${formatted_datetime}
+    ${expected_datetime}=    set variable    ${formatted_datetime}
+    log     ${expected_datetime}
+     ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
+    log     ${day_after_tomorrow}
+    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
+
+    Sleep    2
+    
+    user checks page contains    
+    ...    Pre-release access will be available from ${expected_datetime} until it is published on ${time_end}.
     
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1    Europe/London
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
-
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
-    user checks page contains
-    ...    Pre-release access will be available from ${formatted_datetime} until it is published on ${time_end}.
 
 Go to prerelease access page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
