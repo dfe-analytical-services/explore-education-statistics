@@ -25,10 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DataSetFileMeta? DataSetFileMeta { get; set; }
 
-        public Guid? PublicApiDataSetId { get; set; }
-
-        public SemVersion? PublicApiDataSetVersion { get; set; }
-
         public Guid? ReplacedById { get; set; }
 
         public File? ReplacedBy { get; set; }
@@ -48,9 +44,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public User? CreatedBy { get; set; }
 
         public Guid? CreatedById { get; set; }
-
-        public string? PublicApiVersionString => PublicApiDataSetVersion is not null
-                ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}"
-                : null;
     }
 }

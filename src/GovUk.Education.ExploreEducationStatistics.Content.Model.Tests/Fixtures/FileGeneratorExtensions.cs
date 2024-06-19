@@ -49,23 +49,6 @@ public static class FileGeneratorExtensions
         Guid replacedById)
         => generator.ForInstance(s => s.SetReplacedById(replacedById));
 
-    public static Generator<File> WithPublicApiDataSetId(
-        this Generator<File> generator,
-        Guid publicDataSetId)
-        => generator.ForInstance(s => s.SetPublicApiDataSetId(publicDataSetId));
-
-    public static Generator<File> WithPublicApiDataSetVersion(
-        this Generator<File> generator,
-        int major,
-        int minor,
-        int patch = 0)
-        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(major, minor, patch));
-
-    public static Generator<File> WithPublicApiDataSetVersion(
-        this Generator<File> generator,
-        SemVersion version)
-        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(version));
-
     public static Generator<File> WithRootPath(
         this Generator<File> generator,
         Guid rootPath)
@@ -170,25 +153,6 @@ public static class FileGeneratorExtensions
         this InstanceSetters<File> setters,
         Guid replacedById)
         => setters.Set(f => f.ReplacedById, replacedById);
-
-    public static InstanceSetters<File> SetPublicApiDataSetId(
-        this InstanceSetters<File> setters,
-        Guid publicDataSetId)
-        => setters.Set(f => f.PublicApiDataSetId, publicDataSetId);
-
-    public static InstanceSetters<File> SetPublicApiDataSetVersion(
-        this InstanceSetters<File> setters,
-        int major,
-        int minor,
-        int patch = 0)
-        => setters.Set(
-            f => f.PublicApiDataSetVersion,
-            new SemVersion(major: major, minor: minor, patch: patch));
-
-    public static InstanceSetters<File> SetPublicApiDataSetVersion(
-        this InstanceSetters<File> setters,
-        SemVersion version)
-        => setters.Set(f => f.PublicApiDataSetVersion, version);
 
     public static InstanceSetters<File> SetReplacing(
         this InstanceSetters<File> setters,

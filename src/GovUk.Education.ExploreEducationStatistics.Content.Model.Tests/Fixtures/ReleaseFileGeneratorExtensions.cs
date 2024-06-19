@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -89,6 +90,23 @@ public static class ReleaseFileGeneratorExtensions
         List<IndicatorGroupSequenceEntry> sequence)
         => generator.ForInstance(s => s.SetIndicatorSequence(sequence));
 
+    public static Generator<ReleaseFile> WithPublicApiDataSetId(
+        this Generator<ReleaseFile> generator,
+        Guid publicApiDataSetId)
+        => generator.ForInstance(s => s.SetPublicApiDataSetId(publicApiDataSetId));
+
+    public static Generator<ReleaseFile> WithPublicApiDataSetVersion(
+        this Generator<ReleaseFile> generator,
+        SemVersion version)
+        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(version));
+
+    public static Generator<ReleaseFile> WithPublicApiDataSetVersion(
+        this Generator<ReleaseFile> generator,
+        int major,
+        int minor,
+        int patch = 0)
+        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(major, minor, patch));
+
     public static InstanceSetters<ReleaseFile> SetFile(
         this InstanceSetters<ReleaseFile> setters,
         File file)
@@ -141,4 +159,23 @@ public static class ReleaseFileGeneratorExtensions
         this InstanceSetters<ReleaseFile> setters,
         List<IndicatorGroupSequenceEntry> sequence)
         => setters.Set(rf => rf.IndicatorSequence, sequence);
+
+    public static InstanceSetters<ReleaseFile> SetPublicApiDataSetId(
+        this InstanceSetters<ReleaseFile> setters,
+        Guid publicApiDataSetId)
+        => setters.Set(rf => rf.PublicApiDataSetId, publicApiDataSetId);
+
+    public static InstanceSetters<ReleaseFile> SetPublicApiDataSetVersion(
+        this InstanceSetters<ReleaseFile> setters,
+        int major,
+        int minor,
+        int patch = 0)
+        => setters.Set(
+            rf => rf.PublicApiDataSetVersion,
+            new SemVersion(major: major, minor: minor, patch: patch));
+
+    public static InstanceSetters<ReleaseFile> SetPublicApiDataSetVersion(
+        this InstanceSetters<ReleaseFile> setters,
+        SemVersion version)
+        => setters.Set(rf => rf.PublicApiDataSetVersion, version);
 }

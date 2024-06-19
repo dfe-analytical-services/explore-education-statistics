@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -21,6 +22,14 @@ public class ReleaseFile
     public string? Summary { get; set; }
 
     public int Order { get; set; }
+
+    public Guid? PublicApiDataSetId { get; set; }
+
+    public SemVersion? PublicApiDataSetVersion { get; set; }
+
+    public string? PublicApiVersionString => PublicApiDataSetVersion is not null
+        ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}"
+        : null;
 
     public List<FilterSequenceEntry>? FilterSequence { get; set; }
 
