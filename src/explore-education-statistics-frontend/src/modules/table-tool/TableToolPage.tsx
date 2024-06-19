@@ -22,6 +22,8 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
+const defaultPageTitle = 'Create your own tables';
+
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
 );
@@ -48,6 +50,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   const router = useRouter();
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
   const [currentStep, setCurrentStep] = useState<number | undefined>(undefined);
+  const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
 
   useEffect(() => {
     // Intercept the back button and activate the appropriate step
@@ -140,7 +143,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   ]);
 
   return (
-    <Page title="Create your own tables" caption="Table Tool" wide>
+    <Page
+      // Don't include the default meta title after intitial step to prevent too much screen reader noise.
+      includeDefaultMetaTitle={pageTitle === defaultPageTitle}
+      metaTitle={pageTitle}
+      title={defaultPageTitle}
+      caption="Table Tool"
+      wide
+    >
       <p>
         Choose the data and area of interest you want to explore and then use
         filters to create your table.
@@ -175,6 +185,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         finalStep={({
           query,
           selectedPublication: selectedPublicationDetails,
+          stepTitle,
           table,
           tableHeaders,
           onReorder,
@@ -184,7 +195,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
               {wizardStepProps => (
                 <>
                   <WizardStepHeading {...wizardStepProps} isActive>
-                    Explore data
+                    {stepTitle}
                   </WizardStepHeading>
 
                   {table &&
@@ -213,7 +224,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         onPublicationStepBack={async () => {
           await router.push('/data-tables', undefined, { shallow: true });
         }}
-        onStepChange={() => setCurrentStep(undefined)}
+        onStepChange={() => {
+          setCurrentStep(undefined);
+        }}
+        onStepSubmit={({ nextStepNumber, nextStepTitle }) =>
+          setPageTitle(
+            `Step ${nextStepNumber}: ${nextStepTitle} - ${defaultPageTitle}`,
+          )
+        }
         onSubjectFormSubmit={async ({ publication, release, subjectId }) => {
           await router.push(
             `/data-tables/${publication.slug}/${release.slug}?subjectId=${subjectId}`,

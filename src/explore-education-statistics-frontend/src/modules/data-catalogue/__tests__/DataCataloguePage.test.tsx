@@ -120,12 +120,9 @@ describe('DataCataloguePage', () => {
   test('renders the page correctly with themes and publications', async () => {
     const { user } = render(<DataCataloguePage themes={testThemes} />);
 
-    expect(screen.getByText('Choose a publication')).toBeInTheDocument();
-
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     const themeRadios = within(
       screen.getByRole('group', { name: 'Select a theme' }),
@@ -169,10 +166,9 @@ describe('DataCataloguePage', () => {
 
     const { user } = render(<DataCataloguePage themes={testThemes} />);
 
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 1
 
@@ -184,16 +180,12 @@ describe('DataCataloguePage', () => {
     await user.click(step1.getByRole('radio', { name: 'Publication title 1' }));
     await user.click(step1.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 2
 
@@ -218,16 +210,12 @@ describe('DataCataloguePage', () => {
     await user.click(releaseRadios[0]);
     await user.click(step2.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-3')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: /Step 3 Choose files to download/ }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 3
 
@@ -284,16 +272,12 @@ describe('DataCataloguePage', () => {
     await user.click(step1.getByRole('radio', { name: 'Publication title 1' }));
     await user.click(step1.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 2
 
@@ -319,10 +303,9 @@ describe('DataCataloguePage', () => {
       <DataCataloguePage themes={testThemesSuperseded} />,
     );
 
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 1
 
@@ -332,16 +315,12 @@ describe('DataCataloguePage', () => {
     await user.click(step1.getByRole('radio', { name: 'Publication title 1' }));
     await user.click(step1.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 2
 
@@ -365,10 +344,9 @@ describe('DataCataloguePage', () => {
 
     render(<DataCataloguePage themes={testThemes} />);
 
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 1
     expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
@@ -382,14 +360,12 @@ describe('DataCataloguePage', () => {
         releases={testReleases}
       />,
     );
-    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     const step2 = within(screen.getByTestId('wizardStep-2'));
 
@@ -412,18 +388,16 @@ describe('DataCataloguePage', () => {
         subjects={testSubjects}
       />,
     );
-    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-3')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: /Step 3 Choose files to download/ }),
+    ).toHaveAttribute('aria-current', 'step');
+
     const step3 = within(screen.getByTestId('wizardStep-3'));
 
     expect(screen.getByText('Choose files to download')).toBeInTheDocument();

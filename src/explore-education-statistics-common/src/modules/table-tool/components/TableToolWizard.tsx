@@ -1,4 +1,6 @@
 import SubmitError from '@common/components/form/util/SubmitError';
+import WarningMessage from '@common/components/WarningMessage';
+import locationLevelsMap from '@common/utils/locationLevelsMap';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
@@ -31,13 +33,23 @@ import publicationService, {
 } from '@common/services/publicationService';
 import tableBuilderService, {
   FeaturedTable,
+  LocationOption,
   ReleaseTableDataQuery,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
+import React, {
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useImmer } from 'use-immer';
-import WarningMessage from '@common/components/WarningMessage';
+import { Dictionary } from 'lodash';
+
+const defaultLocationStepTitle = 'Choose locations';
+const defaultDataSetStepTitle = 'Select a data set';
 
 export interface InitialTableToolState {
   initialStep: number;
@@ -62,12 +74,14 @@ interface TableToolState extends InitialTableToolState {
 export interface FinalStepRenderProps {
   query?: ReleaseTableDataQuery;
   selectedPublication?: SelectedPublication;
+  stepTitle: string;
   table?: FullTable;
   tableHeaders?: TableHeadersConfig;
   onReorder: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 
 export interface TableToolWizardProps {
+  currentStep?: number;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   hidePublicationStep?: boolean;
   initialState?: Partial<InitialTableToolState>;
@@ -76,10 +90,16 @@ export interface TableToolWizardProps {
   scrollOnMount?: boolean;
   showTableQueryErrorDownload?: boolean;
   themeMeta?: Theme[];
-  currentStep?: number;
   onPublicationFormSubmit?: (publication: PublicationTreeSummary) => void;
   onPublicationStepBack?: () => void;
   onStepChange?: (nextStep: number, previousStep: number) => void;
+  onStepSubmit?: ({
+    nextStepNumber,
+    nextStepTitle,
+  }: {
+    nextStepNumber: number;
+    nextStepTitle: string;
+  }) => void;
   onSubjectFormSubmit?(params: {
     publication: SelectedPublication;
     release: SelectedPublication['selectedRelease'];
@@ -95,6 +115,7 @@ export interface TableToolWizardProps {
 }
 
 export default function TableToolWizard({
+  currentStep,
   finalStep,
   hidePublicationStep,
   initialState = {},
@@ -103,10 +124,10 @@ export default function TableToolWizard({
   scrollOnMount,
   showTableQueryErrorDownload = true,
   themeMeta = [],
-  currentStep,
   onPublicationFormSubmit,
   onPublicationStepBack,
   onStepChange,
+  onStepSubmit,
   onSubjectFormSubmit,
   onSubjectStepBack,
   onSubmit,
@@ -136,6 +157,24 @@ export default function TableToolWizard({
   });
   const [reorderedTableHeaders, setReorderedTableHeaders] =
     useState<TableHeadersConfig>();
+  const locationStepNumber = hidePublicationStep ? 2 : 3;
+  const [locationStepTitle, setLocationStepTitle] = useState<string>(
+    initialState.initialStep === locationStepNumber && initialState.subjectMeta
+      ? getLocationsStepTitle(initialState.subjectMeta?.locations)
+      : defaultLocationStepTitle,
+  );
+  const [dataSetStepTitle, setDataSetStepTitle] = useState<string>(
+    defaultDataSetStepTitle,
+  );
+
+  const stepTitles = {
+    publication: 'Choose a publication',
+    dataSet: dataSetStepTitle,
+    location: locationStepTitle,
+    timePeriod: 'Choose time period',
+    filter: 'Choose your filters',
+    final: 'Explore data',
+  };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publication,
@@ -151,6 +190,11 @@ export default function TableToolWizard({
       await publicationService.getLatestPublicationReleaseSummary(
         publication.slug,
       );
+
+    const updatedDataSetTitle =
+      featuredTables.length > 0
+        ? 'Select a data set or featured table'
+        : defaultDataSetStepTitle;
 
     updateState(draft => {
       draft.subjects = subjects;
@@ -171,17 +215,29 @@ export default function TableToolWizard({
         },
       };
     });
+
+    setDataSetStepTitle(updatedDataSetTitle);
+    onStepSubmit?.({ nextStepNumber: 2, nextStepTitle: updatedDataSetTitle });
   };
 
-  const handleSubjectStepBack = () => {
+  const handlePublicationStepBack = () => {
+    onPublicationStepBack?.();
+    onStepSubmit?.({
+      nextStepNumber: 1,
+      nextStepTitle: stepTitles.publication,
+    });
+  };
+
+  const handleDataSetStepBack = () => {
     updateState(draft => {
       draft.query.subjectId = '';
     });
 
     onSubjectStepBack?.(state.selectedPublication);
+    onStepSubmit?.({ nextStepNumber: 2, nextStepTitle: dataSetStepTitle });
   };
 
-  const handleSubjectFormSubmit: DataSetFormSubmitHandler = async ({
+  const handleDataSetFormSubmit: DataSetFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     if (state.selectedPublication) {
@@ -199,6 +255,11 @@ export default function TableToolWizard({
 
     setReorderedTableHeaders(undefined);
 
+    const updatedLocationsTitle = getLocationsStepTitle(
+      nextSubjectMeta.locations,
+    );
+    setLocationStepTitle(updatedLocationsTitle);
+
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
       draft.query.subjectId = selectedSubjectId;
@@ -207,6 +268,8 @@ export default function TableToolWizard({
       draft.query.locationIds = [];
       draft.query.timePeriod = undefined;
     });
+
+    onStepSubmit?.({ nextStepNumber: 3, nextStepTitle: updatedLocationsTitle });
   };
 
   const handleLocationStepBack = async () => {
@@ -220,6 +283,8 @@ export default function TableToolWizard({
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
     });
+
+    onStepSubmit?.({ nextStepNumber: 3, nextStepTitle: locationStepTitle });
   };
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler =
@@ -260,6 +325,11 @@ export default function TableToolWizard({
           draft.query.timePeriod = undefined;
         }
       });
+
+      onStepSubmit?.({
+        nextStepNumber: 4,
+        nextStepTitle: stepTitles.timePeriod,
+      });
     };
 
   const handleTimePeriodStepBack = async () => {
@@ -273,6 +343,11 @@ export default function TableToolWizard({
 
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
+    });
+
+    onStepSubmit?.({
+      nextStepNumber: 4,
+      nextStepTitle: stepTitles.timePeriod,
     });
   };
 
@@ -326,6 +401,8 @@ export default function TableToolWizard({
           endCode,
         };
       });
+
+      onStepSubmit?.({ nextStepNumber: 5, nextStepTitle: stepTitles.filter });
     };
 
   const handleFiltersStepBack = async () => {
@@ -342,6 +419,8 @@ export default function TableToolWizard({
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
     });
+
+    onStepSubmit?.({ nextStepNumber: 5, nextStepTitle: stepTitles.filter });
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
@@ -380,6 +459,8 @@ export default function TableToolWizard({
         tableHeaders,
       };
     });
+
+    onStepSubmit?.({ nextStepNumber: 6, nextStepTitle: stepTitles.final });
   };
 
   const orderedTableHeaders: TableHeadersConfig | undefined = useMemo(() => {
@@ -423,7 +504,7 @@ export default function TableToolWizard({
             }}
           >
             {!hidePublicationStep && (
-              <WizardStep size="l" onBack={onPublicationStepBack}>
+              <WizardStep size="l" onBack={handlePublicationStepBack}>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
@@ -431,6 +512,7 @@ export default function TableToolWizard({
                       publicationId: state.query.publicationId ?? '',
                       themeId: '',
                     }}
+                    stepTitle={stepTitles.publication}
                     themes={themeMeta}
                     renderSummaryAfter={
                       state.selectedPublication?.isSuperseded &&
@@ -451,7 +533,7 @@ export default function TableToolWizard({
                 )}
               </WizardStep>
             )}
-            <WizardStep size="l" onBack={handleSubjectStepBack}>
+            <WizardStep size="l" onBack={handleDataSetStepBack}>
               {stepProps => (
                 <DataSetStep
                   {...stepProps}
@@ -459,9 +541,10 @@ export default function TableToolWizard({
                   loadingFastTrack={loadingFastTrack}
                   renderFeaturedTableLink={renderFeaturedTableLink}
                   release={state.selectedPublication?.selectedRelease}
+                  stepTitle={stepTitles.dataSet}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
-                  onSubmit={handleSubjectFormSubmit}
+                  onSubmit={handleDataSetFormSubmit}
                 />
               )}
             </WizardStep>
@@ -471,6 +554,7 @@ export default function TableToolWizard({
                   {...stepProps}
                   initialValues={state.query.locationIds}
                   options={state.subjectMeta.locations}
+                  stepTitle={stepTitles.location}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}
@@ -481,6 +565,7 @@ export default function TableToolWizard({
                   {...stepProps}
                   initialValues={state.query.timePeriod}
                   options={state.subjectMeta.timePeriod.options}
+                  stepTitle={stepTitles.timePeriod}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
               )}
@@ -494,6 +579,7 @@ export default function TableToolWizard({
                     filters: state.query.filters,
                   }}
                   selectedPublication={state.selectedPublication}
+                  stepTitle={stepTitles.filter}
                   subject={
                     state.subjects.filter(
                       subject => subject.id === state.query.subjectId,
@@ -510,6 +596,7 @@ export default function TableToolWizard({
               finalStep({
                 query: state.query,
                 selectedPublication: state.selectedPublication,
+                stepTitle: stepTitles.final,
                 table: state.response?.table,
                 tableHeaders: orderedTableHeaders,
                 onReorder: reordered => setReorderedTableHeaders(reordered),
@@ -521,4 +608,16 @@ export default function TableToolWizard({
       )}
     </ConfirmContextProvider>
   );
+}
+
+function getLocationsStepTitle(
+  locations: Dictionary<{
+    legend: string;
+    options: LocationOption[];
+  }>,
+) {
+  const levelKeys = Object.keys(locations);
+  return levelKeys.length === 1 && locationLevelsMap[levelKeys[0]]
+    ? `Choose ${locationLevelsMap[levelKeys[0]].plural}`
+    : defaultLocationStepTitle;
 }

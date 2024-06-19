@@ -34,8 +34,6 @@ describe('Wizard', () => {
     const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
-
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
@@ -95,7 +93,6 @@ describe('Wizard', () => {
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
-    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
   });
 
@@ -159,7 +156,6 @@ describe('Wizard', () => {
     const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
@@ -168,7 +164,6 @@ describe('Wizard', () => {
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveAttribute('aria-current', 'step');
   });
 
   test('calling `setCurrentStep` with a step greater than the last step will not change the wizard', async () => {
@@ -193,14 +188,12 @@ describe('Wizard', () => {
     const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
     await userEvent.click(screen.getByRole('button', { name: 'Go to step 4' }));
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
@@ -227,7 +220,6 @@ describe('Wizard', () => {
     const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
@@ -236,7 +228,6 @@ describe('Wizard', () => {
     );
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
@@ -268,7 +259,6 @@ describe('Wizard', () => {
 
     // Still on same step
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
@@ -278,7 +268,6 @@ describe('Wizard', () => {
       expect(step2).toBeVisible();
     });
     expect(step3).toBeVisible();
-    expect(step3).toHaveAttribute('aria-current', 'step');
   });
 
   test('calling `goToPreviousStep` render prop moves wizard to previous step', async () => {
@@ -302,7 +291,6 @@ describe('Wizard', () => {
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
-    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
 
     await userEvent.click(
@@ -310,7 +298,6 @@ describe('Wizard', () => {
     );
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
@@ -335,7 +322,6 @@ describe('Wizard', () => {
     const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
@@ -344,7 +330,6 @@ describe('Wizard', () => {
     );
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
@@ -379,16 +364,14 @@ describe('Wizard', () => {
     // Still on same step
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
-    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
 
     // Moved to next step
     await waitFor(() => {
-      expect(step1).toHaveAttribute('aria-current', 'step');
+      expect(step1).toBeVisible();
+      expect(step2).not.toBeVisible();
+      expect(step3).not.toBeVisible();
     });
-    expect(step1).toBeVisible();
-    expect(step2).not.toBeVisible();
-    expect(step3).not.toBeVisible();
   });
 
   test('calling `goToPreviousStep` with a task sets correct loading render props', async () => {
@@ -464,7 +447,6 @@ describe('Wizard', () => {
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
-    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
 
     await userEvent.click(
@@ -474,7 +456,6 @@ describe('Wizard', () => {
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveAttribute('aria-current', 'step');
   });
 
   test('calling `goToNextStep` on last step does not change wizard', async () => {
@@ -499,7 +480,6 @@ describe('Wizard', () => {
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveAttribute('aria-current', 'step');
 
     await userEvent.click(
       screen.getByRole('button', { name: 'Go to next step' }),
@@ -508,7 +488,6 @@ describe('Wizard', () => {
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveAttribute('aria-current', 'step');
   });
 
   test('calling `goToNextStep` with a task will not transition the wizard until it completes', async () => {
@@ -540,14 +519,12 @@ describe('Wizard', () => {
 
     // Still on same step
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
     // Moved to next step
     await waitFor(() => expect(step2).toBeVisible());
     expect(step1).toBeVisible();
-    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
   });
 
@@ -724,7 +701,6 @@ describe('Wizard', () => {
     const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
@@ -733,7 +709,6 @@ describe('Wizard', () => {
     await waitFor(() => {
       expect(step1).toBeVisible();
       expect(step2).toBeVisible();
-      expect(step2).toHaveAttribute('aria-current', 'step');
       expect(step3).not.toBeVisible();
     });
   });
@@ -810,11 +785,9 @@ describe('Wizard', () => {
     const step1 = screen.getByTestId('wizardStep-1');
     const step2 = screen.getByTestId('wizardStep-2');
 
-    await waitFor(() => expect(step1).not.toHaveAttribute('aria-current'));
-    expect(step2).toHaveAttribute('aria-current', 'step');
+    await waitFor(() => expect(step1).toBeVisible());
 
-    await waitFor(() => expect(step1).toHaveAttribute('aria-current'));
-    expect(step2).not.toHaveAttribute('aria-current');
+    await waitFor(() => expect(step2).not.toBeVisible());
 
     expect(handleBack).toHaveBeenCalledTimes(1);
   });

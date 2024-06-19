@@ -42,7 +42,6 @@ const WizardStep = ({
 
   return (
     <li
-      aria-current={isActive ? 'step' : undefined}
       className={classNames(styles.step, {
         [styles.stepActive]: isActive,
         [styles.stepHidden]: stepNumber > currentStep,
