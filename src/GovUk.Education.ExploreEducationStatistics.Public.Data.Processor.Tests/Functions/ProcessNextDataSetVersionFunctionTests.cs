@@ -216,7 +216,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
             var expectedLocationMappings = initialLocationMeta
                 .OrderBy(levelMeta => levelMeta.Level)
-                .Select(levelMeta => new LocationLevelMappings
+                .Select(levelMeta => new LocationLevelMappingPlan
                 {
                     Level = levelMeta.Level,
                     Mappings = levelMeta
@@ -234,7 +234,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 })
                 .ToList();
 
-            mappings.Locations.Mappings.AssertDeepEqualTo(expectedLocationMappings);
+            mappings.LocationMappingPlan.Mappings.AssertDeepEqualTo(expectedLocationMappings);
         }
 
         [Fact]
@@ -257,10 +257,10 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 .LocationsByGeographicLevel
                 .Select(levelMeta => (level: levelMeta.Level, options: levelMeta.Options))
                 .OrderBy(levelMeta => levelMeta.level)
-                .Select(levelMeta => new LocationTargets
+                .Select(levelMeta => new LocationLevelMappingCandidates
                 {
                     Level = levelMeta.level,
-                    Options = levelMeta
+                    Candidates = levelMeta
                         .options
                         .Order()
                         .Select(option => new LocationOption
@@ -272,7 +272,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 })
                 .ToList();
 
-            mappings.Locations.Targets.AssertDeepEqualTo(expectedLocationTargets);
+            mappings.LocationMappingPlan.Candidates.AssertDeepEqualTo(expectedLocationTargets);
         }
 
         [Fact]
@@ -325,7 +325,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 })
                 .ToList();
 
-            mappings.Filters.Mappings.AssertDeepEqualTo(expectedFilterMappings);
+            mappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
         }
 
         [Fact]
@@ -347,7 +347,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 .AbsenceSchool
                 .FiltersAndOptions
                 .OrderBy(filterAndOptions => filterAndOptions.Label)
-                .Select(filterAndOptions => new FilterTarget
+                .Select(filterAndOptions => new FilterMappingCandidate
                 {
                     Key = $"Target filter {filterAndOptions.Label}",
                     Label = filterAndOptions.Label,
@@ -363,7 +363,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 })
                 .ToList();
 
-            mappings.Filters.Targets.AssertDeepEqualTo(expectedFilterTargets);
+            mappings.FilterMappingPlan.Candidates.AssertDeepEqualTo(expectedFilterTargets);
         }
 
         private async Task CreateMappings(Guid instanceId)

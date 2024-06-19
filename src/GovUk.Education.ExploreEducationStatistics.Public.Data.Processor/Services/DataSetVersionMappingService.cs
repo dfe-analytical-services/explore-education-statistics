@@ -50,21 +50,21 @@ internal class DataSetVersionMappingService(
         {
             SourceDataSetVersionId = liveVersion.Id,
             TargetDataSetVersionId = nextDataSetVersionId,
-            Locations = locationMappings,
-            Filters = filterMappings
+            LocationMappingPlan = locationMappings,
+            FilterMappingPlan = filterMappings
         });
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
         return Unit.Instance;
     }
 
-    private Locations CreateLocationMappings(
+    private LocationMappingPlan CreateLocationMappings(
         List<LocationMeta> sourceLocationMeta,
         List<(LocationMeta, List<LocationOptionMetaRow>)> targetLocationMeta)
     {
         var locationMappings = sourceLocationMeta
             .OrderBy(level => level.Level)
-            .Select(level => new LocationLevelMappings
+            .Select(level => new LocationLevelMappingPlan
             {
                 Level = level.Level,
                 Mappings = level
@@ -88,10 +88,10 @@ internal class DataSetVersionMappingService(
                 levelMeta: meta.Item1,
                 optionsMeta: meta.Item2))
             .OrderBy(meta => meta.levelMeta.Level)
-            .Select(meta => new LocationTargets
+            .Select(meta => new LocationLevelMappingCandidates
             {
                 Level = meta.levelMeta.Level,
-                Options = meta
+                Candidates = meta
                     .optionsMeta
                     .OrderBy(location => location.Label)
                     .Select(location => new LocationOption
@@ -103,10 +103,10 @@ internal class DataSetVersionMappingService(
             })
             .ToList();
 
-        return new Locations {Mappings = locationMappings, Targets = locationTargets};
+        return new LocationMappingPlan {Mappings = locationMappings, Candidates = locationTargets};
     }
 
-    private Filters CreateFilterMappings(
+    private FilterMappingPlan CreateFilterMappings(
         List<FilterMeta> sourceFilterMeta,
         List<(FilterMeta, List<FilterOptionMeta>)> targetFilterMeta)
     {
@@ -131,7 +131,7 @@ internal class DataSetVersionMappingService(
             .Select(meta => (
                 filterMeta: meta.Item1,
                 optionsMeta: meta.Item2))
-            .Select(meta => new FilterTarget
+            .Select(meta => new FilterMappingCandidate
             {
                 Key = $"Target filter {meta.filterMeta.Label}",
                 Label = meta.filterMeta.Label,
@@ -144,7 +144,7 @@ internal class DataSetVersionMappingService(
             })
             .ToList();
 
-        var filters = new Filters {Mappings = filterMappings, Targets = filterTargets};
+        var filters = new FilterMappingPlan {Mappings = filterMappings, Candidates = filterTargets};
 
         return filters;
     }

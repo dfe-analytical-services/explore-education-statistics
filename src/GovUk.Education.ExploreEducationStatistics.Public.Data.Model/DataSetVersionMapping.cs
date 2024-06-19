@@ -19,9 +19,9 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
 
     public DataSetVersion TargetDataSetVersion { get; set; } = null!;
 
-    public Locations Locations { get; set; } = null!;
+    public LocationMappingPlan LocationMappingPlan { get; set; } = null!;
 
-    public Filters Filters { get; set; } = null!;
+    public FilterMappingPlan FilterMappingPlan { get; set; } = null!;
 
     public DateTimeOffset Created { get; set; }
 
@@ -42,7 +42,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
                 .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId")
                 .IsUnique();
 
-            builder.OwnsOne(v => v.Locations, locations =>
+            builder.OwnsOne(v => v.LocationMappingPlan, locations =>
             {
                 locations.ToJson();
                 locations.OwnsMany(l => l.Mappings, locationMappings =>
@@ -55,13 +55,13 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
                     });
                 });
 
-                locations.OwnsMany(locations => locations.Targets, locationTargets =>
+                locations.OwnsMany(locations => locations.Candidates, locationTargets =>
                 {
-                    locationTargets.OwnsMany(mapping => mapping.Options);
+                    locationTargets.OwnsMany(mapping => mapping.Candidates);
                 });
             });
 
-            builder.OwnsOne(mapping => mapping.Filters, filters =>
+            builder.OwnsOne(mapping => mapping.FilterMappingPlan, filters =>
             {
                 filters.ToJson();
 
@@ -79,7 +79,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
                     });
                 });
 
-                filters.OwnsMany(f => f.Targets, filterTarget =>
+                filters.OwnsMany(f => f.Candidates, filterTarget =>
                 {
                     filterTarget.OwnsMany(mapping => mapping.Options);
                 });
@@ -113,7 +113,7 @@ public abstract class LeafMapping<TEntry>
 
     public TEntry Source { get; set; } = null!;
 
-    public int? TargetId { get; set; }
+    public string? CandidateKey { get; set; }
 }
 
 public abstract class ParentMapping<TEntry, TOption, TOptionMapping>
@@ -127,7 +127,7 @@ public abstract class ParentMapping<TEntry, TOption, TOptionMapping>
 
     public List<TOptionMapping> Options { get; set; } = [];
 
-    public int? TargetId { get; set; }
+    public string? CandidateKey { get; set; }
 }
 
 public class LocationOption : Entry
@@ -145,32 +145,32 @@ public class LocationOption : Entry
 
 public class LocationOptionMapping : LeafMapping<LocationOption>;
 
-public class LocationLevelMappings
+public class LocationLevelMappingPlan
 {
     public GeographicLevel Level { get; set; }
 
     public List<LocationOptionMapping> Mappings { get; set; } = [];
 }
 
-public class LocationTargets
+public class LocationLevelMappingCandidates
 {
     public GeographicLevel Level { get; set; }
 
-    public List<LocationOption> Options { get; set; } = [];
+    public List<LocationOption> Candidates { get; set; } = [];
 }
 
-public class Locations
+public class LocationMappingPlan
 {
-    public List<LocationLevelMappings> Mappings { get; set; }
+    public List<LocationLevelMappingPlan> Mappings { get; set; }
 
-    public List<LocationTargets> Targets { get; set; }
+    public List<LocationLevelMappingCandidates> Candidates { get; set; }
 }
 
 public class FilterOption : Entry;
 
 public class Filter : Entry;
 
-public class FilterTarget : Filter
+public class FilterMappingCandidate : Filter
 {
     public List<FilterOption> Options { get; set; } = [];
 }
@@ -179,9 +179,9 @@ public class FilterOptionMapping : LeafMapping<FilterOption>;
 
 public class FilterMapping : ParentMapping<Filter, FilterOption, FilterOptionMapping>;
 
-public class Filters
+public class FilterMappingPlan
 {
     public List<FilterMapping> Mappings { get; set; } = [];
 
-    public List<FilterTarget> Targets { get; set; } = [];
+    public List<FilterMappingCandidate> Candidates { get; set; } = [];
 }
