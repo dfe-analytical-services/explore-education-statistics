@@ -72,6 +72,7 @@ public static class ProcessorHostBuilder
                     .AddScoped<IDataSetService, DataSetService>()
                     .AddScoped<IDataSetVersionService, DataSetVersionService>()
                     .AddScoped<IDataSetMetaService, DataSetMetaService>()
+                    .AddScoped<IDataSetVersionMappingService, DataSetVersionMappingService>()
                     .AddScoped<IDataDuckDbRepository, DataDuckDbRepository>()
                     .AddScoped<IFilterOptionsDuckDbRepository, FilterOptionsDuckDbRepository>()
                     .AddScoped<IIndicatorsDuckDbRepository, IndicatorsDuckDbRepository>()

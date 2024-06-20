@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class ProcessNextDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
-    IDataSetMetaService dataSetMetaService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionMappingService mappingService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(nameof(ProcessNextDataSetVersion))]
     public async Task ProcessNextDataSetVersion(
@@ -50,16 +50,7 @@ public class ProcessNextDataSetVersionFunction(
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingMetadata, cancellationToken);
-
-        var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMetaForMappings(
-                dataSetVersionId: dataSetVersionImport.DataSetVersionId,
-                cancellationToken);
-
-        var dataSetVersion = dataSetVersionImport.DataSetVersion;
-        dataSetVersion.MetaSummary = nextVersionMeta.MetaSummary;
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-
-        // TODO EES-4945 - implement the creation of mappings here.
+        await mappingService.CreateMappings(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(ActivityNames.CompleteNextDataSetVersionMappingProcessing)]
