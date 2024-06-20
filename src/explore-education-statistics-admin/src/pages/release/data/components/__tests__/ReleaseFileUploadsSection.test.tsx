@@ -4,7 +4,6 @@ import _releaseAncillaryFileService, {
 } from '@admin/services/releaseAncillaryFileService';
 import render from '@common-test/render';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
@@ -124,7 +123,7 @@ describe('ReleaseFileUploadsSection', () => {
     test('clicking delete file button shows modal to confirm deletion', async () => {
       releaseAncillaryFileService.listFiles.mockResolvedValue(testFiles);
 
-      renderPage();
+      const { user } = renderPage();
 
       await waitFor(() => {
         expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
@@ -139,7 +138,7 @@ describe('ReleaseFileUploadsSection', () => {
         }),
       ).toBeInTheDocument();
 
-      await userEvent.click(
+      await user.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete file',
         }),
@@ -162,7 +161,7 @@ describe('ReleaseFileUploadsSection', () => {
         testFiles[0],
       ]);
 
-      renderPage();
+      const { user } = renderPage();
 
       await waitFor(() => {
         expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
@@ -172,7 +171,7 @@ describe('ReleaseFileUploadsSection', () => {
 
       const sections = screen.getAllByTestId('accordionSection');
 
-      await userEvent.click(
+      await user.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete file',
         }),
@@ -188,7 +187,7 @@ describe('ReleaseFileUploadsSection', () => {
 
       expect(releaseAncillaryFileService.deleteFile).not.toHaveBeenCalled();
 
-      await userEvent.click(
+      await user.click(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Confirm',
         }),
@@ -224,15 +223,15 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('shows validation message when no `file` selected', async () => {
-      renderPage();
+      const { user } = renderPage();
 
-      await userEvent.click(screen.getByLabelText('Upload file'));
+      await user.click(screen.getByLabelText('Upload file'));
       fireEvent.change(screen.getByLabelText('Upload file'), {
         target: {
           value: null,
         },
       });
-      await userEvent.tab();
+      await user.click(screen.getByRole('button', { name: 'Add file' }));
 
       await waitFor(
         () => {
@@ -250,13 +249,13 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('shows validation message when `file` uploaded is an empty file', async () => {
-      renderPage();
+      const { user } = renderPage();
 
-      await userEvent.upload(
+      await user.upload(
         screen.getByLabelText('Upload file'),
         new File([''], 'test.txt'),
       );
-      await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
+      await user.click(screen.getByRole('button', { name: 'Add file' }));
 
       await waitFor(() => {
         expect(
@@ -268,9 +267,9 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('cannot submit with invalid values', async () => {
-      renderPage();
+      const { user } = renderPage();
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Add file',
         }),
@@ -313,15 +312,15 @@ describe('ReleaseFileUploadsSection', () => {
         created: '2021-05-25T00:00:00',
       });
 
-      renderPage();
+      const { user } = renderPage();
 
       const file = new File(['test'], 'test-file.txt');
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
+      await user.type(screen.getByLabelText('Title'), 'Test title');
+      await user.type(screen.getByLabelText('Summary'), 'Test summary');
 
-      await userEvent.upload(screen.getByLabelText('Upload file'), file);
-      await userEvent.click(
+      await user.upload(screen.getByLabelText('Upload file'), file);
+      await user.click(
         screen.getByRole('button', {
           name: 'Add file',
         }),
@@ -359,15 +358,15 @@ describe('ReleaseFileUploadsSection', () => {
         newTestFile,
       ]);
 
-      renderPage();
+      const { user } = renderPage();
 
       const file = new File(['test'], 'test-file.docx');
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
-      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
-      await userEvent.upload(screen.getByLabelText('Upload file'), file);
+      await user.type(screen.getByLabelText('Title'), 'Test file 3');
+      await user.type(screen.getByLabelText('Summary'), 'Test summary 3');
+      await user.upload(screen.getByLabelText('Upload file'), file);
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Add file',
         }),

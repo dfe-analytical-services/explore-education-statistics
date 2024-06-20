@@ -4,9 +4,9 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import _methodologyNoteService, {
   MethodologyNote,
 } from '@admin/services/methodologyNoteService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/methodologyNoteService');
 const methodologyNoteService = _methodologyNoteService as jest.Mocked<
@@ -151,7 +151,7 @@ describe('MethodologyNotesSection', () => {
 
   describe('adding a note', () => {
     test('shows validation error if no note given and does not submit', async () => {
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
@@ -159,7 +159,7 @@ describe('MethodologyNotesSection', () => {
         </EditingContextProvider>,
       );
 
-      await userEvent.click(screen.getByRole('button', { name: 'Add note' }));
+      await user.click(screen.getByRole('button', { name: 'Add note' }));
 
       await waitFor(() => {
         expect(
@@ -167,8 +167,8 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(screen.getByLabelText('New methodology note'));
-      await userEvent.tab();
+      await user.click(screen.getByLabelText('New methodology note'));
+      await user.click(screen.getByRole('button', { name: 'Save note' }));
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
         expect(
@@ -178,7 +178,7 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(screen.getByRole('button', { name: 'Save note' }));
+      await user.click(screen.getByRole('button', { name: 'Save note' }));
       expect(methodologyNoteService.create).not.toHaveBeenCalled();
     });
 
@@ -194,7 +194,7 @@ describe('MethodologyNotesSection', () => {
         ...newNote,
         id: 'note-4',
       });
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
@@ -202,7 +202,7 @@ describe('MethodologyNotesSection', () => {
         </EditingContextProvider>,
       );
 
-      await userEvent.click(screen.getByRole('button', { name: 'Add note' }));
+      await user.click(screen.getByRole('button', { name: 'Add note' }));
 
       await waitFor(() => {
         expect(
@@ -210,11 +210,11 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('New methodology note'),
         'New note',
       );
-      await userEvent.click(screen.getByRole('button', { name: 'Save note' }));
+      await user.click(screen.getByRole('button', { name: 'Save note' }));
 
       await waitFor(() => {
         expect(methodologyNoteService.create).toHaveBeenCalledWith(
@@ -243,7 +243,7 @@ describe('MethodologyNotesSection', () => {
 
   describe('editing a note', () => {
     test('shows validation error if note or date removed and does not submit', async () => {
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
@@ -252,7 +252,7 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      await userEvent.click(
+      await user.click(
         within(notes[0]).getByRole('button', { name: 'Edit note' }),
       );
 
@@ -262,8 +262,8 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Edit methodology note'));
-      await userEvent.tab();
+      await user.clear(screen.getByLabelText('Edit methodology note'));
+      await user.click(screen.getByRole('button', { name: 'Update note' }));
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
         expect(
@@ -273,11 +273,11 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Day'));
-      await userEvent.clear(screen.getByLabelText('Month'));
-      await userEvent.clear(screen.getByLabelText('Year'));
+      await user.clear(screen.getByLabelText('Day'));
+      await user.clear(screen.getByLabelText('Month'));
+      await user.clear(screen.getByLabelText('Year'));
 
-      await userEvent.tab();
+      await user.click(screen.getByRole('button', { name: 'Update note' }));
       await waitFor(() => {
         expect(
           screen.getByRole('link', {
@@ -286,9 +286,7 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Update note' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Update note' }));
 
       expect(methodologyNoteService.edit).not.toHaveBeenCalled();
     });
@@ -302,7 +300,7 @@ describe('MethodologyNotesSection', () => {
         ...updatedNote,
         id: 'note-1',
       });
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
@@ -311,7 +309,7 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      await userEvent.click(
+      await user.click(
         within(notes[0]).getByRole('button', { name: 'Edit note' }),
       );
 
@@ -321,20 +319,18 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Edit methodology note'),
         ' edited',
       );
-      await userEvent.clear(screen.getByLabelText('Day'));
-      await userEvent.type(screen.getByLabelText('Day'), '31');
-      await userEvent.clear(screen.getByLabelText('Month'));
-      await userEvent.type(screen.getByLabelText('Month'), '12');
-      await userEvent.clear(screen.getByLabelText('Year'));
-      await userEvent.type(screen.getByLabelText('Year'), '2022');
+      await user.clear(screen.getByLabelText('Day'));
+      await user.type(screen.getByLabelText('Day'), '31');
+      await user.clear(screen.getByLabelText('Month'));
+      await user.type(screen.getByLabelText('Month'), '12');
+      await user.clear(screen.getByLabelText('Year'));
+      await user.type(screen.getByLabelText('Year'), '2022');
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Update note' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Update note' }));
       await waitFor(() => {
         expect(methodologyNoteService.edit).toHaveBeenCalledWith(
           'note-1',
@@ -352,7 +348,7 @@ describe('MethodologyNotesSection', () => {
 
   describe('removing notes', () => {
     test('shows the confirm modal when clicking the Remove button', async () => {
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
@@ -361,7 +357,7 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      await userEvent.click(
+      await user.click(
         within(notes[0]).getByRole('button', { name: 'Remove note' }),
       );
 
@@ -382,7 +378,7 @@ describe('MethodologyNotesSection', () => {
     });
 
     test('successfully removes a note', async () => {
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
@@ -391,11 +387,11 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      await userEvent.click(
+      await user.click(
         within(notes[0]).getByRole('button', { name: 'Remove note' }),
       );
 
-      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await user.click(screen.getByRole('button', { name: 'Confirm' }));
       await waitFor(() => {
         expect(methodologyNoteService.delete).toHaveBeenCalledWith(
           'note-1',

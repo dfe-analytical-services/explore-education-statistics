@@ -1,17 +1,17 @@
 import AncillaryFileForm, {
   AncillaryFileFormProps,
 } from '@admin/pages/release/data/components/AncillaryFileForm';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
 describe('AncillaryFileForm', () => {
   test('shows validation message if `title` field is empty', async () => {
-    render(<AncillaryFileForm onSubmit={noop} />);
+    const { user } = render(<AncillaryFileForm onSubmit={noop} />);
 
-    await userEvent.clear(screen.getByLabelText('Title'));
-    await userEvent.tab();
+    await user.clear(screen.getByLabelText('Title'));
+    await user.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(
@@ -23,7 +23,7 @@ describe('AncillaryFileForm', () => {
   });
 
   test('shows validation message if `title` field is not unique to other files', async () => {
-    render(
+    const { user } = render(
       <AncillaryFileForm
         files={[
           {
@@ -43,9 +43,9 @@ describe('AncillaryFileForm', () => {
       />,
     );
 
-    await userEvent.clear(screen.getByLabelText('Title'));
-    await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-    await userEvent.tab();
+    await user.clear(screen.getByLabelText('Title'));
+    await user.type(screen.getByLabelText('Title'), 'Test title');
+    await user.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(
@@ -57,10 +57,10 @@ describe('AncillaryFileForm', () => {
   });
 
   test('shows validation message if `summary` field is empty', async () => {
-    render(<AncillaryFileForm onSubmit={noop} />);
+    const { user } = render(<AncillaryFileForm onSubmit={noop} />);
 
-    await userEvent.clear(screen.getByLabelText('Summary'));
-    await userEvent.tab();
+    await user.clear(screen.getByLabelText('Summary'));
+    await user.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(
@@ -74,10 +74,10 @@ describe('AncillaryFileForm', () => {
   test('shows validation message if `file` field contains an empty file', async () => {
     const testFile = new File([''], 'test.txt');
 
-    render(<AncillaryFileForm onSubmit={noop} />);
+    const { user } = render(<AncillaryFileForm onSubmit={noop} />);
 
-    await userEvent.upload(screen.getByLabelText('Upload file'), testFile);
-    await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
+    await user.upload(screen.getByLabelText('Upload file'), testFile);
+    await user.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(
@@ -89,9 +89,9 @@ describe('AncillaryFileForm', () => {
   });
 
   test('shows validation messages if submitted form is invalid', async () => {
-    render(<AncillaryFileForm onSubmit={noop} />);
+    const { user } = render(<AncillaryFileForm onSubmit={noop} />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
+    await user.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(
@@ -111,18 +111,18 @@ describe('AncillaryFileForm', () => {
   test('successfully submitting form calls `onSubmit` handler', async () => {
     const handleSubmit = jest.fn();
 
-    render(<AncillaryFileForm onSubmit={handleSubmit} />);
+    const { user } = render(<AncillaryFileForm onSubmit={handleSubmit} />);
 
-    await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-    await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
+    await user.type(screen.getByLabelText('Title'), 'Test title');
+    await user.type(screen.getByLabelText('Summary'), 'Test summary');
 
     const testFile = new File(['test'], 'test.txt');
 
-    await userEvent.upload(screen.getByLabelText('Upload file'), testFile);
+    await user.upload(screen.getByLabelText('Upload file'), testFile);
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
+    await user.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith<

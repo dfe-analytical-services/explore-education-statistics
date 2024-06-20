@@ -1,7 +1,7 @@
 import PublicationForm from '@admin/pages/publication/components/PublicationForm';
 import _publicationService from '@admin/services/publicationService';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -12,14 +12,15 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationForm', () => {
   test('shows validation error when there is no title', async () => {
-    render(<PublicationForm topicId="topic-id" onSubmit={noop} />);
+    const { user } = render(
+      <PublicationForm topicId="topic-id" onSubmit={noop} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByLabelText('Publication title'));
-    await userEvent.tab();
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
 
     await waitFor(() => {
       expect(
@@ -31,14 +32,15 @@ describe('PublicationForm', () => {
   });
 
   test('shows validation error when there is no summary', async () => {
-    render(<PublicationForm topicId="topic-id" onSubmit={noop} />);
+    const { user } = render(
+      <PublicationForm topicId="topic-id" onSubmit={noop} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication summary')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByLabelText('Publication summary'));
-    await userEvent.tab();
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
 
     await waitFor(() => {
       expect(
@@ -50,25 +52,15 @@ describe('PublicationForm', () => {
   });
 
   test('shows validation errors when there are no contact details', async () => {
-    render(<PublicationForm topicId="topic-id" onSubmit={noop} />);
+    const { user } = render(
+      <PublicationForm topicId="topic-id" onSubmit={noop} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByLabelText('Team name')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByLabelText('Team name'));
-    await userEvent.tab();
-
-    await userEvent.click(screen.getByLabelText('Team email address'));
-    await userEvent.tab();
-
-    await userEvent.click(screen.getByLabelText('Contact name'));
-    await userEvent.tab();
-
-    await userEvent.click(
-      screen.getByLabelText('Contact telephone (optional)'),
-    );
-    await userEvent.tab();
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
 
     await waitFor(() => {
       expect(
@@ -96,7 +88,9 @@ describe('PublicationForm', () => {
   test.each([' 0abcdefg ', '01234 4567a', '_12345678', '01234 5678 !'])(
     'show validation error when contact tel no "%s" contains non-numeric or non-whitespace characters',
     async telNo => {
-      render(<PublicationForm topicId="topic-id" onSubmit={noop} />);
+      const { user } = render(
+        <PublicationForm topicId="topic-id" onSubmit={noop} />,
+      );
 
       await waitFor(() => {
         expect(
@@ -104,11 +98,13 @@ describe('PublicationForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
-      await userEvent.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Save publication' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -131,7 +127,9 @@ describe('PublicationForm', () => {
   ])(
     'show validation error when contact tel no "%s" is DfE enquiries number',
     async telNo => {
-      render(<PublicationForm topicId="topic-id" onSubmit={noop} />);
+      const { user } = render(
+        <PublicationForm topicId="topic-id" onSubmit={noop} />,
+      );
 
       await waitFor(() => {
         expect(
@@ -139,11 +137,13 @@ describe('PublicationForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
-      await userEvent.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Save publication' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -161,7 +161,9 @@ describe('PublicationForm', () => {
   test.each([' 0123456 ', '0', '012', '0123 56'])(
     'show validation error when contact tel no "%s" is less than 8 characters',
     async telNo => {
-      render(<PublicationForm topicId="topic-id" onSubmit={noop} />);
+      const { user } = render(
+        <PublicationForm topicId="topic-id" onSubmit={noop} />,
+      );
 
       await waitFor(() => {
         expect(
@@ -169,11 +171,13 @@ describe('PublicationForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
-      await userEvent.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Save publication' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -186,17 +190,19 @@ describe('PublicationForm', () => {
   );
 
   test('show validation error when contact email is not valid', async () => {
-    render(<PublicationForm topicId="topic-id" onSubmit={noop} />);
+    const { user } = render(
+      <PublicationForm topicId="topic-id" onSubmit={noop} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByLabelText('Team email address')).toBeInTheDocument();
     });
 
-    await userEvent.type(
+    await user.type(
       screen.getByLabelText('Team email address'),
       'not a valid email',
     );
-    await userEvent.tab();
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
 
     await waitFor(() => {
       expect(
@@ -210,7 +216,9 @@ describe('PublicationForm', () => {
   test('cannot submit with invalid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(<PublicationForm topicId="topic-id" onSubmit={handleSubmit} />);
+    const { user } = render(
+      <PublicationForm topicId="topic-id" onSubmit={handleSubmit} />,
+    );
 
     await waitFor(() => {
       expect(
@@ -220,9 +228,7 @@ describe('PublicationForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Save publication' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
 
     await waitFor(() => {
       expect(handleSubmit).not.toHaveBeenCalled();
@@ -232,38 +238,35 @@ describe('PublicationForm', () => {
   test('can submit with valid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(<PublicationForm topicId="topic-id" onSubmit={handleSubmit} />);
+    const { user } = render(
+      <PublicationForm topicId="topic-id" onSubmit={handleSubmit} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
     });
 
-    await userEvent.type(
-      screen.getByLabelText('Publication title'),
-      'Test title',
-    );
+    await user.type(screen.getByLabelText('Publication title'), 'Test title');
 
-    await userEvent.type(
+    await user.type(
       screen.getByLabelText('Publication summary'),
       'Test summary',
     );
 
-    await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
-    await userEvent.type(
+    await user.type(screen.getByLabelText('Team name'), 'Test team');
+    await user.type(
       screen.getByLabelText('Team email address'),
       'team@test.com',
     );
-    await userEvent.type(screen.getByLabelText('Contact name'), 'John Smith');
-    await userEvent.type(
+    await user.type(screen.getByLabelText('Contact name'), 'John Smith');
+    await user.type(
       screen.getByLabelText('Contact telephone (optional)'),
       '0123456789',
     );
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Save publication' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
 
     await waitFor(() => {
       expect(publicationService.createPublication).toHaveBeenCalledWith({
@@ -283,34 +286,31 @@ describe('PublicationForm', () => {
   test('can submit without a contact tel no', async () => {
     const handleSubmit = jest.fn();
 
-    render(<PublicationForm topicId="topic-id" onSubmit={handleSubmit} />);
+    const { user } = render(
+      <PublicationForm topicId="topic-id" onSubmit={handleSubmit} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
     });
 
-    await userEvent.type(
-      screen.getByLabelText('Publication title'),
-      'Test title',
-    );
+    await user.type(screen.getByLabelText('Publication title'), 'Test title');
 
-    await userEvent.type(
+    await user.type(
       screen.getByLabelText('Publication summary'),
       'Test summary',
     );
 
-    await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
-    await userEvent.type(
+    await user.type(screen.getByLabelText('Team name'), 'Test team');
+    await user.type(
       screen.getByLabelText('Team email address'),
       'team@test.com',
     );
-    await userEvent.type(screen.getByLabelText('Contact name'), 'John Smith');
+    await user.type(screen.getByLabelText('Contact name'), 'John Smith');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Save publication' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Save publication' }));
 
     await waitFor(() => {
       expect(publicationService.createPublication).toHaveBeenCalledWith({

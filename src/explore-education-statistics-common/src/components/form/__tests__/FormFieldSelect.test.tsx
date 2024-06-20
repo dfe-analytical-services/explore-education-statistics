@@ -2,9 +2,9 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import Yup from '@common/validation/yup';
+import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import React from 'react';
 
 describe('FormFieldSelect', () => {
@@ -133,7 +133,7 @@ describe('FormFieldSelect', () => {
   });
 
   test('changing options changes the select value', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: '',
@@ -157,7 +157,7 @@ describe('FormFieldSelect', () => {
 
     expect(select.value).toBe('');
 
-    await userEvent.selectOptions(select, '1');
+    await user.selectOptions(select, '1');
 
     await waitFor(() => {
       expect(select.value).toBe('1');
@@ -165,74 +165,8 @@ describe('FormFieldSelect', () => {
   });
 
   describe('error messages', () => {
-    test('does not display validation message when select is untouched', async () => {
-      render(
-        <FormProvider
-          initialValues={{
-            test: '',
-          }}
-          validationSchema={Yup.object({
-            test: Yup.string().required('Select an option'),
-          })}
-        >
-          <FormFieldSelect
-            name="test"
-            id="select"
-            label="Test values"
-            options={[
-              { value: '', label: '' },
-              { value: '1', label: 'Option 1' },
-              { value: '2', label: 'Option 2' },
-              { value: '3', label: 'Option 3' },
-            ]}
-          />
-        </FormProvider>,
-      );
-
-      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
-    });
-
-    test('displays validation message when an invalid option is selected', async () => {
-      render(
-        <FormProvider
-          initialValues={{
-            test: '1',
-          }}
-          validationSchema={Yup.object({
-            test: Yup.string().required('Select an option'),
-          })}
-        >
-          <FormFieldSelect
-            name="test"
-            id="select"
-            label="Test values"
-            options={[
-              { value: '', label: '' },
-              { value: '1', label: 'Option 1' },
-              { value: '2', label: 'Option 2' },
-              { value: '3', label: 'Option 3' },
-            ]}
-          />
-        </FormProvider>,
-      );
-
-      const select = screen.getByLabelText('Test values') as HTMLInputElement;
-
-      expect(select.value).toBe('1');
-      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
-
-      await userEvent.selectOptions(select, '');
-
-      await userEvent.tab();
-
-      await waitFor(() => {
-        expect(select.value).toBe('');
-        expect(screen.queryByText('Select an option')).toBeInTheDocument();
-      });
-    });
-
     test('displays validation message when form is submitted', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -265,53 +199,62 @@ describe('FormFieldSelect', () => {
 
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
       });
     });
 
-    test('does not display validation message when `showError` is false and invalid option is selected', async () => {
-      render(
+    test('updates validation message when values change after form is submitted', async () => {
+      const { user } = render(
         <FormProvider
           initialValues={{
-            test: '1',
+            test: '',
           }}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
         >
-          <FormFieldSelect
-            name="test"
-            id="select"
-            label="Test values"
-            showError={false}
-            options={[
-              { value: '', label: '' },
-              { value: '1', label: 'Option 1' },
-              { value: '2', label: 'Option 2' },
-              { value: '3', label: 'Option 3' },
-            ]}
-          />
+          <Form
+            id="testForm"
+            showErrorSummary={false}
+            onSubmit={Promise.resolve}
+          >
+            <FormFieldSelect
+              name="test"
+              id="customId"
+              label="Test values"
+              hint="Test hint"
+              options={[
+                { value: '', label: '' },
+                { value: '1', label: 'Option 1' },
+                { value: '2', label: 'Option 2' },
+                { value: '3', label: 'Option 3' },
+              ]}
+            />
+            <button type="submit">Submit</button>
+          </Form>
         </FormProvider>,
       );
 
-      const select = screen.getByLabelText('Test values') as HTMLInputElement;
-
-      expect(select.value).toBe('1');
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      await userEvent.selectOptions(select, '');
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
-        expect(select.value).toBe('');
+        expect(screen.getByText('Select an option')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Test values'), '1');
+
+      await waitFor(() => {
         expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
       });
     });
 
     test('does not display validation message when `showError` is false and form is submitted', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -348,7 +291,7 @@ describe('FormFieldSelect', () => {
       expect(select.value).toBe('');
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByText('Submit'));
+      await user.click(screen.getByText('Submit'));
 
       await waitFor(() => {
         expect(select.value).toBe('');

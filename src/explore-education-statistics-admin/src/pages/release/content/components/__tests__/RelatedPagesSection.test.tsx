@@ -3,9 +3,9 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import _releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
 import { generateEditableRelease } from '@admin-test/generators/releaseContentGenerators';
 import { BasicLink } from '@common/services/publicationService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/releaseContentRelatedInformationService');
 const releaseContentRelatedInformationService =
@@ -60,8 +60,7 @@ describe('RelatedPagesSection', () => {
     });
 
     test('shows the form when click the add button', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <RelatedPagesSection release={testRelease} />
         </EditingContextProvider>,
@@ -82,8 +81,7 @@ describe('RelatedPagesSection', () => {
     });
 
     test('shows a validation error when no title is set', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <RelatedPagesSection release={testRelease} />
         </EditingContextProvider>,
@@ -94,7 +92,7 @@ describe('RelatedPagesSection', () => {
       );
 
       await user.click(screen.getByLabelText('Title'));
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Create link' }));
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -107,8 +105,7 @@ describe('RelatedPagesSection', () => {
     });
 
     test('shows a validation error when no url is set', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <RelatedPagesSection release={testRelease} />
         </EditingContextProvider>,
@@ -119,7 +116,7 @@ describe('RelatedPagesSection', () => {
       );
 
       await user.click(screen.getByLabelText('Link URL'));
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Create link' }));
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -132,8 +129,7 @@ describe('RelatedPagesSection', () => {
     });
 
     test('shows a validation error when the url is invalid', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <RelatedPagesSection release={testRelease} />
         </EditingContextProvider>,
@@ -143,8 +139,8 @@ describe('RelatedPagesSection', () => {
         screen.getByRole('button', { name: 'Add related page link' }),
       );
 
-      await userEvent.type(screen.getByLabelText('Link URL'), 'Not a url');
-      await userEvent.tab();
+      await user.type(screen.getByLabelText('Link URL'), 'Not a url');
+      await user.click(screen.getByRole('button', { name: 'Create link' }));
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -164,8 +160,8 @@ describe('RelatedPagesSection', () => {
       releaseContentRelatedInformationService.create.mockResolvedValue(
         newLinks,
       );
-      const user = userEvent.setup();
-      render(
+
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <RelatedPagesSection release={testRelease} />
         </EditingContextProvider>,
@@ -206,8 +202,8 @@ describe('RelatedPagesSection', () => {
 
     test('successfully removes a link', async () => {
       releaseContentRelatedInformationService.delete.mockResolvedValue([]);
-      const user = userEvent.setup();
-      render(
+
+      const { user } = render(
         <EditingContextProvider editingMode="edit">
           <RelatedPagesSection release={testRelease} />
         </EditingContextProvider>,

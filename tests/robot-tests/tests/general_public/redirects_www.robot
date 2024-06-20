@@ -15,5 +15,5 @@ Verify that routes with www are redirected without them
     user checks url equals    %{PUBLIC_URL}/
 
     user navigates to public frontend with www    %{PUBLIC_URL}/data-catalogue/
-    user waits until page contains    Browse our open data
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue

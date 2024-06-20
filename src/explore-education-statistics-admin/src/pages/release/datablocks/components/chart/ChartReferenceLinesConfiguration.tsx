@@ -1,6 +1,6 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration.module.scss';
 import { ChartAxisConfigurationFormValues } from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration';
-import ChartReferenceLineForm from '@admin/pages/release/datablocks/components/chart/ChartReferenceLineConfigurationForm';
+import ChartReferenceLineConfigurationForm from '@admin/pages/release/datablocks/components/chart/ChartReferenceLineConfigurationForm';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
 
@@ -145,7 +145,7 @@ export default function ChartReferenceLinesConfiguration({
             {filteredReferenceLines.map((referenceLine, index) => (
               <tr key={`line-${index.toString()}`}>
                 {isEqual(referenceLine, editingLine) ? (
-                  <ChartReferenceLineForm
+                  <ChartReferenceLineConfigurationForm
                     axisDefinition={axisDefinition}
                     axisPositionOptions={majorAxisOptions}
                     chartType={chartType}
@@ -210,7 +210,7 @@ export default function ChartReferenceLinesConfiguration({
             ))}
             {showAddNewLineForm && !editingLine && (
               <tr>
-                <ChartReferenceLineForm
+                <ChartReferenceLineConfigurationForm
                   axisDefinition={axisDefinition}
                   axisPositionOptions={filteredOptions}
                   chartType={chartType}

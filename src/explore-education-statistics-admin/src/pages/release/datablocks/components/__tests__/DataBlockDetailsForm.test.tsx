@@ -1,8 +1,8 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/datablocks/components/DataBlockDetailsForm';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -33,11 +33,9 @@ describe('DataBlockDetailsForm', () => {
   });
 
   test('shows validation error if name is empty', async () => {
-    const user = userEvent.setup();
-    render(<DataBlockDetailsForm onSubmit={noop} />);
+    const { user } = render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    await user.click(screen.getByLabelText('Name'));
-    await user.tab();
+    await user.click(screen.getByRole('button', { name: 'Save data block' }));
 
     expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
@@ -47,11 +45,9 @@ describe('DataBlockDetailsForm', () => {
   });
 
   test('shows validation error if table title is empty', async () => {
-    const user = userEvent.setup();
-    render(<DataBlockDetailsForm onSubmit={noop} />);
+    const { user } = render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    await user.click(screen.getByLabelText('Table title'));
-    await user.tab();
+    await user.click(screen.getByRole('button', { name: 'Save data block' }));
 
     expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
@@ -61,8 +57,7 @@ describe('DataBlockDetailsForm', () => {
   });
 
   test('shows validation error if no name when featured table checkbox is checked', async () => {
-    const user = userEvent.setup();
-    render(<DataBlockDetailsForm onSubmit={noop} />);
+    const { user } = render(<DataBlockDetailsForm onSubmit={noop} />);
 
     await user.click(
       screen.getByLabelText('Set as a featured table for this publication'),
@@ -70,8 +65,7 @@ describe('DataBlockDetailsForm', () => {
 
     expect(screen.getByLabelText('Featured table name')).toBeInTheDocument();
 
-    await user.click(screen.getByLabelText('Featured table name'));
-    await user.tab();
+    await user.click(screen.getByRole('button', { name: 'Save data block' }));
 
     expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
@@ -81,8 +75,7 @@ describe('DataBlockDetailsForm', () => {
   });
 
   test('shows validation error if featured table name is entirely a whitespace string', async () => {
-    const user = userEvent.setup();
-    render(
+    const { user } = render(
       <DataBlockDetailsForm
         initialValues={{
           name: 'Test name',
@@ -113,9 +106,9 @@ describe('DataBlockDetailsForm', () => {
   });
 
   test('shows validation error if no description when featured table checkbox is checked', async () => {
-    render(<DataBlockDetailsForm onSubmit={noop} />);
+    const { user } = render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    await userEvent.click(
+    await user.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
@@ -123,8 +116,7 @@ describe('DataBlockDetailsForm', () => {
       screen.getByLabelText('Featured table description'),
     ).toBeInTheDocument();
 
-    await userEvent.click(screen.getByLabelText('Featured table description'));
-    await userEvent.tab();
+    await user.click(screen.getByRole('button', { name: 'Save data block' }));
 
     await waitFor(() => {
       expect(
@@ -136,8 +128,7 @@ describe('DataBlockDetailsForm', () => {
   });
 
   test('submitting form with invalid values and featured table checked shows error messages', async () => {
-    const user = userEvent.setup();
-    render(<DataBlockDetailsForm onSubmit={noop} />);
+    const { user } = render(<DataBlockDetailsForm onSubmit={noop} />);
 
     await user.click(
       screen.getByLabelText('Set as a featured table for this publication'),
@@ -170,8 +161,7 @@ describe('DataBlockDetailsForm', () => {
   });
 
   test('submitting form with invalid values and featured table unchecked shows error messages', async () => {
-    const user = userEvent.setup();
-    render(<DataBlockDetailsForm onSubmit={noop} />);
+    const { user } = render(<DataBlockDetailsForm onSubmit={noop} />);
 
     await user.click(screen.getByRole('button', { name: 'Save data block' }));
 
@@ -189,8 +179,8 @@ describe('DataBlockDetailsForm', () => {
 
   test('successfully submits form with valid values', async () => {
     const handleSubmit = jest.fn();
-    const user = userEvent.setup();
-    render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
+
+    const { user } = render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
 
     await user.type(screen.getByLabelText('Name'), 'Test name');
     await user.type(screen.getByLabelText('Table title'), 'Test title');
@@ -228,8 +218,8 @@ describe('DataBlockDetailsForm', () => {
 
   test('trim featured table name and description values', async () => {
     const handleSubmit = jest.fn();
-    const user = userEvent.setup();
-    render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
+
+    const { user } = render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
 
     await user.type(screen.getByLabelText('Name'), 'Test name');
     await user.type(screen.getByLabelText('Table title'), 'Test title');

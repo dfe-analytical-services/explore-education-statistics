@@ -1,8 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
+import render from '@common-test/render';
 
 describe('MethodologySummaryForm', () => {
   test('renders the form with initial values', () => {
@@ -30,7 +30,7 @@ describe('MethodologySummaryForm', () => {
   });
 
   test('shows validation error when select alternative title type and no title given', async () => {
-    render(
+    const { user } = render(
       <MethodologySummaryForm
         id="id"
         initialValues={{
@@ -44,10 +44,11 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('Set an alternative title'));
-    await userEvent.clear(screen.getByLabelText('Enter methodology title'));
-    await userEvent.tab();
-
+    await user.click(screen.getByLabelText('Set an alternative title'));
+    await user.clear(screen.getByLabelText('Enter methodology title'));
+    await user.click(
+      screen.getByRole('button', { name: 'Update methodology' }),
+    );
     await waitFor(() => {
       expect(
         screen.getByText('Enter a methodology title', {
@@ -59,7 +60,7 @@ describe('MethodologySummaryForm', () => {
 
   test('submits successfully with an alternative title', async () => {
     const handleSubmit = jest.fn();
-    render(
+    const { user } = render(
       <MethodologySummaryForm
         id="id"
         initialValues={{
@@ -73,14 +74,14 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('Set an alternative title'));
-    await userEvent.clear(screen.getByLabelText('Enter methodology title'));
-    await userEvent.type(
+    await user.click(screen.getByLabelText('Set an alternative title'));
+    await user.clear(screen.getByLabelText('Enter methodology title'));
+    await user.type(
       screen.getByLabelText('Enter methodology title'),
       'an alternative title',
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Update methodology' }),
     );
 
@@ -91,7 +92,7 @@ describe('MethodologySummaryForm', () => {
 
   test('submits successfully with the publication title', async () => {
     const handleSubmit = jest.fn();
-    render(
+    const { user } = render(
       <MethodologySummaryForm
         id="id"
         initialValues={{
@@ -105,7 +106,7 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Update methodology' }),
     );
 
@@ -116,7 +117,7 @@ describe('MethodologySummaryForm', () => {
 
   test('submits successfully when change back to publication title from an alternative title', async () => {
     const handleSubmit = jest.fn();
-    render(
+    const { user } = render(
       <MethodologySummaryForm
         id="id"
         initialValues={{
@@ -130,9 +131,9 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('Use publication title'));
+    await user.click(screen.getByLabelText('Use publication title'));
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Update methodology' }),
     );
 

@@ -474,7 +474,9 @@ describe('ChartConfiguration', () => {
       'below',
     ]);
 
-    await user.tab();
+    await user.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(

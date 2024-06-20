@@ -21,7 +21,7 @@ import { ObjectSchema } from 'yup';
 
 interface FormValues {
   publicationId: string;
-  themeId?: string;
+  themeId?: string | null;
 }
 
 export type PublicationFormSubmitHandler = (values: {
@@ -40,10 +40,7 @@ interface Props extends InjectedWizardProps {
 }
 
 const PublicationForm = ({
-  initialValues = {
-    publicationId: '',
-    themeId: '',
-  },
+  initialValues,
   showSupersededPublications = false,
   stepTitle,
   themes,
@@ -106,11 +103,13 @@ const PublicationForm = ({
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
       publicationId: Yup.string().required('Choose a publication'),
-      themeId: Yup.string().test(
-        'theme',
-        'Choose a theme',
-        value => !(!publications.length && !value),
-      ),
+      themeId: Yup.string()
+        .nullable()
+        .test(
+          'theme',
+          'Choose a theme',
+          value => !(!publications.length && !value),
+        ),
     });
   }, [publications.length]);
 
@@ -148,9 +147,11 @@ const PublicationForm = ({
                   name="publicationSearch"
                   onChange={event => {
                     setSearchTerm(event.target.value);
-                    setSelectedThemeId('');
-                    resetField('themeId');
-                    resetField('publicationId');
+                    if (searchTerm !== event.target.value) {
+                      setSelectedThemeId('');
+                      resetField('themeId');
+                      resetField('publicationId');
+                    }
                   }}
                   onKeyPress={event => {
                     if (event.key === 'Enter') {
