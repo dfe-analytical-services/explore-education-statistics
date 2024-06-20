@@ -457,21 +457,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _context.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckFileExists(fileId))
-                .OnSuccessCombineWith(file => _statisticsDbContext.Subject
-                    .FirstOrNotFoundAsync(s => s.Id == file.SubjectId))
+                .OnSuccess(() => CheckReleaseFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
+                .OnSuccessCombineWith(releaseFile => _statisticsDbContext.Subject
+                    .FirstOrNotFoundAsync(s => s.Id == releaseFile.File.SubjectId))
                 .OnSuccess(async tuple =>
                 {
-                    var (file, subject) = tuple;
+                    var (releaseFile, subject) = tuple;
 
-                    return await GetLinkedDataSetVersion(file, cancellationToken)
-                        .OnSuccess(apiDataSetVersion => (file, subject, apiDataSetVersion));
+                    return await GetLinkedDataSetVersion(releaseFile, cancellationToken)
+                        .OnSuccess(apiDataSetVersion => (releaseFile, subject, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
                 {
                     var footnotes =
                         await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
-                            subjectId: tuple.file.SubjectId);
+                            subjectId: tuple.releaseFile.File.SubjectId);
 
                     var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null 
                     ? null 
@@ -501,14 +501,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckFileExists(fileId))
-                .OnSuccessDo(file => CheckCanDeleteDataFiles(releaseVersionId, file))
-                .OnSuccessDo(async file =>
+                .OnSuccess(() => CheckReleaseFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
+                .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
+                .OnSuccessDo(async releaseFile =>
                 {
                     // Delete any replacement that might exist
-                    if (file.ReplacedById.HasValue)
+                    if (releaseFile.File.ReplacedById.HasValue)
                     {
-                        return await RemoveDataFiles(releaseVersionId, file.ReplacedById.Value);
+                        return await RemoveDataFiles(releaseVersionId, releaseFile.File.ReplacedById.Value);
                     }
 
                     return Unit.Instance;
@@ -555,13 +555,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId);
         }
 
-        private async Task<Either<ActionResult, File>> CheckFileExists(Guid id)
+        private async Task<Either<ActionResult, ReleaseFile>> CheckReleaseFileExists(Guid releaseVersionId, Guid fileId)
         {
-            return await _persistenceHelper.CheckEntityExists<File>(id)
-                .OnSuccess(file => file.Type != FileType.Data
-                    ? new Either<ActionResult, File>(
-                        ValidationActionResult(FileTypeMustBeData))
-                    : file);
+            return await _context.ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
+                .Where(rf => rf.FileId == fileId)
+                .SingleOrNotFoundAsync()
+                .OnSuccess(rf => rf.File.Type != FileType.Data
+                    ? new Either<ActionResult, ReleaseFile>(ValidationActionResult(FileTypeMustBeData))
+                    : rf);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(string slug,
@@ -632,24 +635,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
-            File file,
+            ReleaseFile releaseFile,
             CancellationToken cancellationToken = default)
         {
-            if (file.PublicApiDataSetId is null)
+            if (releaseFile.PublicApiDataSetId is null)
             {
                 return (DataSetVersion)null!;
             }
 
             return await _dataSetVersionService.GetDataSetVersion(
-                file.PublicApiDataSetId.Value, 
-                file.PublicApiDataSetVersion!, 
+                releaseFile.PublicApiDataSetId.Value,
+                releaseFile.PublicApiDataSetVersion!, 
                 cancellationToken)
                 .OnSuccess(dsv => (DataSetVersion?)dsv);
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, File file)
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile)
         {
-            var import = await _dataImportService.GetImport(file.Id);
+            var import = await _dataImportService.GetImport(releaseFile.FileId);
             var importStatus = import?.Status ?? DataImportStatus.NOT_FOUND;
 
             if (!importStatus.IsFinished())
@@ -662,14 +665,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            if (file.PublicApiDataSetId is not null)
+            if (releaseFile.PublicApiDataSetId is not null)
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
                 {
-                    Code = ValidationMessages.CannotDeleteApiDataSetFile.Code,
-                    Message = ValidationMessages.CannotDeleteApiDataSetFile.Message,
-                    Detail = new InvalidErrorDetail<Guid>(file.PublicApiDataSetId.Value),
-                    Path = "fileId"
+                    Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
+                    Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
+                    Detail = new InvalidErrorDetail<Guid>(releaseFile.PublicApiDataSetId.Value)
                 });
             }
 

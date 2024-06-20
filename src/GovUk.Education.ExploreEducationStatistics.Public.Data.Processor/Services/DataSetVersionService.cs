@@ -115,7 +115,7 @@ internal class DataSetVersionService(
     private static Either<ActionResult, Unit> CheckCanDeleteDataSetVersions(IReadOnlyList<DataSetVersion> dataSetVersions)
     {
         var versionsWhichCanNotBeDeleted = dataSetVersions
-            .Where(dsv => !dsv.CanBeDeleted())
+            .Where(dsv => !dsv.CanBeDeleted)
             .Select(dsv => dsv.Id)
             .ToList();
 

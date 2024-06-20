@@ -309,13 +309,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithSubjectId(subject.Id)
                 .WithType(FileType.Data);
 
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.Add(file);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.Add(subject);
@@ -379,7 +384,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             File file = _dataFixture
                 .DefaultFile()
                 .WithSubjectId(subject.Id)
-                .WithType(FileType.Data)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file)
                 .WithPublicApiDataSetId(dataSet.Id)
                 .WithPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion());
 
@@ -389,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.Add(file);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.Add(subject);
@@ -401,8 +411,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
 
             dataSetVersionService.Setup(service => service.GetDataSetVersion(
-                    file.PublicApiDataSetId!.Value, 
-                    file.PublicApiDataSetVersion!, 
+                    releaseFile.PublicApiDataSetId!.Value,
+                    releaseFile.PublicApiDataSetVersion!, 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataSetVersion);
 
@@ -452,29 +462,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.Add(file);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.Add(subject);
@@ -545,29 +554,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles_FileImporting()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.Add(file);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -596,44 +604,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles_ReplacementExists()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var replacementSubject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject replacementSubject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
 
-            var replacementFile = new File
-            {
-                Filename = "replacement.csv",
-                Type = FileType.Data,
-                SubjectId = replacementSubject.Id,
-                Replacing = file
-            };
+            File replacementFile = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(replacementSubject.Id)
+                .WithType(FileType.Data)
+                .WithReplacing(file);
 
             file.ReplacedBy = replacementFile;
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
+
+            ReleaseFile replacementReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(replacementFile);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.AddRange(file, replacementFile);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.AddRange(subject, replacementSubject);
@@ -683,7 +691,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
+                var releaseService = BuildReleaseService(
+                    context,
                     statisticsDbContext,
                     cacheService: cacheService.Object,
                     dataBlockService: dataBlockService.Object,
@@ -692,10 +701,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
 
-                var result = await releaseService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
+                var result = await releaseService.RemoveDataFiles(
+                    releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                VerifyAllMocks(cacheService,
+                VerifyAllMocks(
+                    cacheService,
                     dataBlockService,
                     dataImportService,
                     footnoteRepository,
@@ -727,43 +738,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles_ReplacementFileImporting()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var replacementSubject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject replacementSubject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
 
-            var replacementFile = new File
-            {
-                Filename = "replacement.csv",
-                Type = FileType.Data,
-                SubjectId = replacementSubject.Id,
-                Replacing = file
-            };
+            File replacementFile = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(replacementSubject.Id)
+                .WithType(FileType.Data)
+                .WithReplacing(file);
 
             file.ReplacedBy = replacementFile;
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
+
+            ReleaseFile replacementReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(replacementFile);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.AddRange(file, replacementFile);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -802,7 +813,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             File file = _dataFixture
                 .DefaultFile()
-                .WithType(FileType.Data)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file)
                 .WithPublicApiDataSetId(Guid.NewGuid())
                 .WithPublicApiDataSetVersion(1, 0);
 
@@ -811,7 +827,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.Add(file);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -838,8 +854,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var validationProblem = actionResult.AssertBadRequestWithValidationProblem();
 
                 validationProblem.AssertHasError(
-                    expectedPath: "fileId",
-                    expectedCode: ValidationMessages.CannotDeleteApiDataSetFile.Code);
+                    expectedPath: null,
+                    expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
             }
         }
 
