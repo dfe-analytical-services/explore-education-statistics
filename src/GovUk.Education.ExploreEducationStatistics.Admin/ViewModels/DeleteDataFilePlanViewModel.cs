@@ -17,9 +17,7 @@ public record DeleteDataFilePlanViewModel
 
     public List<Guid> FootnoteIds { get; init; } = null!;
 
-    public bool IsLinkedToApiDataSetVersion { get; init; }
-
     public DeleteApiDataSetVersionPlanViewModel? LinkedApiDataSetVersionDeletionPlan { get; init; }
 
-    public bool Valid => !IsLinkedToApiDataSetVersion;
+    public bool Valid => LinkedApiDataSetVersionDeletionPlan?.Valid ?? true;
 }

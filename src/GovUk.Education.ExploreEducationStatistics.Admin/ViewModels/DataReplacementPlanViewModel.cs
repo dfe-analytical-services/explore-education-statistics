@@ -14,14 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; init; } = [];
         public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
-        public bool IsLinkedToApiDataSetVersion { get; init; }
         public DeleteApiDataSetVersionPlanViewModel? LinkedApiDataSetVersion { get; init; }
         public Guid OriginalSubjectId { get; init; }
         public Guid ReplacementSubjectId { get; init; }
 
         public bool Valid => DataBlocks.All(info => info.Valid)
                              && Footnotes.All(info => info.Valid)
-                             && !IsLinkedToApiDataSetVersion;
+                             && (LinkedApiDataSetVersion?.Valid ?? true);
 
         /**
          * Trimmed down version of the data replacement plan that
@@ -33,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             {
                 DataBlocks = DataBlocks.Select(block => block.ToSummary()),
                 Footnotes = Footnotes.Select(footnote => footnote.ToSummary()),
-                IsLinkedToApiDataSetVersion = IsLinkedToApiDataSetVersion,
                 LinkedApiDataSetVersion = LinkedApiDataSetVersion,
                 OriginalSubjectId = OriginalSubjectId,
                 ReplacementSubjectId = ReplacementSubjectId

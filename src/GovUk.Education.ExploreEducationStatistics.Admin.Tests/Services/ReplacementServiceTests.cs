@@ -1725,9 +1725,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             File originalFile = _fixture
                 .DefaultFile()
                 .WithSubjectId(originalReleaseSubject.SubjectId)
-                .WithType(FileType.Data)
-                .WithPublicApiDataSetId(dataSet.Id)
-                .WithPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion());
+                .WithType(FileType.Data);
 
             File replacementFile = _fixture
                 .DefaultFile()
@@ -1736,15 +1734,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .ForIndex(0, rv => rv.SetFile(originalFile))
+                .ForIndex(0, rv => 
+                    rv.SetFile(originalFile)
+                    .SetPublicApiDataSetId(dataSet.Id)
+                    .SetPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
                 .Generate(2)
                 .ToTuple2();
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
             dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
-                originalFile.PublicApiDataSetId!.Value,
-                originalFile.PublicApiDataSetVersion!, 
+                originalReleaseFile.PublicApiDataSetId!.Value,
+                originalReleaseFile.PublicApiDataSetVersion!, 
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataSetVersion);
 
@@ -1785,14 +1786,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var replacementPlan = result.AssertRight();
 
-                Assert.True(replacementPlan.IsLinkedToApiDataSetVersion);
                 Assert.NotNull(replacementPlan.LinkedApiDataSetVersion);
                 Assert.Equal(dataSet.Id, replacementPlan.LinkedApiDataSetVersion.DataSetId);
                 Assert.Equal(dataSet.Title, replacementPlan.LinkedApiDataSetVersion.DataSetName);
                 Assert.Equal(dataSetVersion.Id, replacementPlan.LinkedApiDataSetVersion.DataSetVersionId);
                 Assert.Equal(dataSetVersion.Version, replacementPlan.LinkedApiDataSetVersion.Version);
                 Assert.Equal(dataSetVersion.Status, replacementPlan.LinkedApiDataSetVersion.Status);
-                Assert.True(replacementPlan.LinkedApiDataSetVersion.Valid);
+                Assert.False(replacementPlan.LinkedApiDataSetVersion.Valid);
 
                 Assert.False(replacementPlan.Valid);
             }
@@ -1816,9 +1816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = originalReleaseSubject.SubjectId,
-                PublicApiDataSetId = null,
-                PublicApiDataSetVersion = null
+                SubjectId = originalReleaseSubject.SubjectId
             };
 
             var replacementFile = new File
@@ -2372,7 +2370,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(footnoteForSubjectPlan.Valid);
 
-                Assert.False(replacementPlan.IsLinkedToApiDataSetVersion);
                 Assert.Null(replacementPlan.LinkedApiDataSetVersion);
 
                 Assert.True(replacementPlan.Valid);
@@ -2727,9 +2724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             File originalFile = _fixture
                 .DefaultFile()
                 .WithSubjectId(originalReleaseSubject.SubjectId)
-                .WithType(FileType.Data)
-                .WithPublicApiDataSetId(dataSet.Id)
-                .WithPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion());
+                .WithType(FileType.Data);
 
             File replacementFile = _fixture
                 .DefaultFile()
@@ -2738,15 +2733,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .ForIndex(0, rv => rv.SetFile(originalFile))
+                .ForIndex(0, rv => 
+                    rv.SetFile(originalFile)
+                    .SetPublicApiDataSetId(dataSet.Id)
+                    .SetPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
                 .Generate(2)
                 .ToTuple2();
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
             dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
-                originalFile.PublicApiDataSetId!.Value,
-                originalFile.PublicApiDataSetVersion!,
+                originalReleaseFile.PublicApiDataSetId!.Value,
+                originalReleaseFile.PublicApiDataSetVersion!,
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataSetVersion);
 

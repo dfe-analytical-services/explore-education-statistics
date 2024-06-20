@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -17,5 +16,5 @@ public record DeleteApiDataSetVersionPlanViewModel
 
     public DataSetVersionStatus Status { get; init; }
 
-    public bool Valid => Status.IsDeletableState();
+    public bool Valid { get; init; }
 }

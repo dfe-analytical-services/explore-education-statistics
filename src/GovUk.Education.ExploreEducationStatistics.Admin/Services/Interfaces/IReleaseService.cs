@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId, 
             CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseVersionId);
+        Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
 

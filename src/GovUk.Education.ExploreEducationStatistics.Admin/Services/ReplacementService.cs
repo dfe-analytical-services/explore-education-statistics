@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (originalReleaseFile, replacementReleaseFile) = tuple;
 
-                    return await GetLinkedDataSetVersion(originalReleaseFile.File, cancellationToken)
+                    return await GetLinkedDataSetVersion(originalReleaseFile, cancellationToken)
                         .OnSuccess(apiDataSetVersion => (originalReleaseFile, replacementReleaseFile, apiDataSetVersion));
                 })
                 .OnSuccess(async tuple =>
@@ -123,17 +123,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         DataSetName = tuple.apiDataSetVersion.DataSet.Title,
                         DataSetVersionId = tuple.apiDataSetVersion.Id,
                         Version = tuple.apiDataSetVersion.Version,
-                        Status = tuple.apiDataSetVersion.Status
+                        Status = tuple.apiDataSetVersion.Status,
+                        Valid = false,
                     };
 
                     return new DataReplacementPlanViewModel
                     {
                         DataBlocks = dataBlocks,
                         Footnotes = footnotes,
-                        IsLinkedToApiDataSetVersion = linkedApiDataSetVersionDeletionPlan is not null,
                         LinkedApiDataSetVersion = linkedApiDataSetVersionDeletionPlan,
                         OriginalSubjectId = originalSubjectId,
-                        ReplacementSubjectId = replacementSubjectId
+                        ReplacementSubjectId = replacementSubjectId,
                     };
                 });
         }
@@ -209,17 +209,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
-            File file,
+            ReleaseFile releaseFile,
             CancellationToken cancellationToken = default)
         {
-            if (file.PublicApiDataSetId is null)
+            if (releaseFile.PublicApiDataSetId is null)
             {
                 return (DataSetVersion)null!;
             }
 
             return await _dataSetVersionService.GetDataSetVersion(
-                file.PublicApiDataSetId.Value,
-                file.PublicApiDataSetVersion!,
+                releaseFile.PublicApiDataSetId.Value,
+                releaseFile.PublicApiDataSetVersion!,
                 cancellationToken)
                 .OnSuccess(dsv => (DataSetVersion?)dsv);
         }
