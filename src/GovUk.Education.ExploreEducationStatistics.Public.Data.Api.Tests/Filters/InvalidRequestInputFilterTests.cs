@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Filters;
 
-public class InvalidRequestInputResultFilterTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     [Fact]
     public async Task TestPersonBody_Returns200()

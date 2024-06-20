@@ -16,20 +16,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Filters;
 /// validation error response. Importantly, this filter fixes the error paths to
 /// point to invalid part of the request and adds error codes
 /// </summary>
-public class InvalidRequestInputResultFilter : IResultFilter
+public class InvalidRequestInputFilter : IAsyncActionFilter
 {
-    public void OnResultExecuting(ResultExecutingContext context)
+    public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         if (context.ModelState.IsValid)
         {
-            return;
+            return next();
         }
 
         // A filter or endpoint has already created our standard
         // validation error response. We can bail early.
         if (context.Result is BadRequestObjectResult { Value: ValidationProblemViewModel })
         {
-            return;
+            return next();
         }
 
         var errorEntries = context.ModelState
@@ -56,7 +56,7 @@ public class InvalidRequestInputResultFilter : IResultFilter
 
         if (errors.Count == 0)
         {
-            return;
+            return next();
         }
 
         var problemDetailsFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
@@ -67,10 +67,8 @@ public class InvalidRequestInputResultFilter : IResultFilter
         );
 
         context.Result = new BadRequestObjectResult(ValidationProblemViewModel.Create(problemDetails, errors));
-    }
 
-    public void OnResultExecuted(ResultExecutedContext context)
-    {
+        return Task.CompletedTask;
     }
 
     private static bool TryGetJsonError(

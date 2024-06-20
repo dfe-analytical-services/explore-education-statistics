@@ -11,6 +11,6 @@ public static class MvcOptionsExtensions
         options.ModelBindingMessageProvider
             .SetMissingRequestBodyRequiredValueAccessor(() => ValidationMessages.NotEmptyBody.Message);
 
-        options.Filters.Add<InvalidRequestInputResultFilter>();
+        options.Filters.Add<InvalidRequestInputFilter>();
     }
 }
