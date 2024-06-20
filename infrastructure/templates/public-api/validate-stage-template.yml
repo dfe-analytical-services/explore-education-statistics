@@ -17,8 +17,8 @@ stages:
   - stage: ${{parameters.stageName}}
     displayName: 'Validate ${{parameters.environment}} Infrastructure'
     # Prevent this stage from running in parallel with the same deploy stage in other ongoing runs of this pipeline.
-    # Instead, multiple executions of this stage will be queued and run sequentially in the order that their pipelines 
-    # were triggered.  
+    # Instead, multiple executions of this stage will be queued and run sequentially in the order that their pipelines
+    # were triggered.
     lockBehavior: sequential
     condition: ${{parameters.condition}}
     variables:
@@ -52,7 +52,6 @@ stages:
                 --parameters \
                     subscription='$(subscription)' \
                     resourceTags='$(resourceTags)' \
-                    publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
