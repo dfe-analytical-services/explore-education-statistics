@@ -23,6 +23,10 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
 
     public FilterMappingPlan FilterMappingPlan { get; set; } = null!;
 
+    public bool LocationMappingsComplete { get; set; }
+    
+    public bool FilterMappingsComplete { get; set; }
+    
     public DateTimeOffset Created { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
@@ -170,7 +174,7 @@ public class FilterOption : Entry;
 
 public class Filter : Entry;
 
-public class FilterMappingCandidate : Filter
+public class FilterMappingCandidate : Entry
 {
     public List<FilterOption> Options { get; set; } = [];
 }

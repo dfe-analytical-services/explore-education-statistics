@@ -20,8 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     TargetDataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Filters = table.Column<string>(type: "jsonb", nullable: false),
-                    Locations = table.Column<string>(type: "jsonb", nullable: false)
+                    FilterMappingPlan = table.Column<string>(type: "jsonb", nullable: false),
+                    LocationMappingPlan = table.Column<string>(type: "jsonb", nullable: false),
+                    FilterMappingsComplete = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    LocationMappingsComplete = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {

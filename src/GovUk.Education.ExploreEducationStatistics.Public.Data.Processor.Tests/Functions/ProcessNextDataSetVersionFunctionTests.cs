@@ -213,6 +213,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
             Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
             Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
+            Assert.False(mappings.LocationMappingsComplete);
 
             var expectedLocationMappings = initialLocationMeta
                 .OrderBy(levelMeta => levelMeta.Level)
@@ -300,6 +301,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
             Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
             Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
+            Assert.False(mappings.FilterMappingsComplete);
 
             var expectedFilterMappings = initialFilterMeta
                 .OrderBy(filter => filter.Label)
