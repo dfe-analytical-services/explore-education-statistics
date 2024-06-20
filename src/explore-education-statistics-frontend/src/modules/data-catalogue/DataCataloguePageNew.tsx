@@ -498,12 +498,14 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                                 <Tag>{releaseTypes[selectedRelease.type]}</Tag>
                                 <Tag
                                   colour={
-                                    selectedRelease.latestRelease
+                                    selectedRelease.latestRelease &&
+                                    !selectedPublication.isSuperseded
                                       ? undefined
                                       : 'orange'
                                   }
                                 >
-                                  {selectedRelease.latestRelease
+                                  {selectedRelease.latestRelease &&
+                                  !selectedPublication.isSuperseded
                                     ? 'This is the latest data'
                                     : 'This is not the latest data'}
                                 </Tag>

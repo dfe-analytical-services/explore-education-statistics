@@ -82,6 +82,7 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                         Indicators = ["Indicator 1"],
                     },
                     LatestData = true,
+                    IsSuperseded = false,
                     Published = DateTime.UtcNow,
                 }
             ],

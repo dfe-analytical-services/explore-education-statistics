@@ -142,7 +142,7 @@ export default function DataSetFilePage({
       ) : (
         <>
           <div className={styles.info} data-testid="data-set-file-info">
-            {release.isLatestPublishedRelease ? (
+            {release.isLatestPublishedRelease && !release.isSuperseded ? (
               <Tag className="govuk-!-margin-right-5">Latest data</Tag>
             ) : (
               <Tag className="govuk-!-margin-right-5" colour="orange">

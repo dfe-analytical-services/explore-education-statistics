@@ -26,6 +26,8 @@ public record DataSetFileSummaryViewModel
 
     public required bool LatestData { get; init; }
 
+    public required bool IsSuperseded { get; init; }
+
     public required DateTime Published { get; init; }
 
     public DateTime LastUpdated { get; init; }

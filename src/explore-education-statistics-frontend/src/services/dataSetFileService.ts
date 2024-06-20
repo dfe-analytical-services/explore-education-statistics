@@ -42,6 +42,7 @@ export interface DataSetFile {
   release: {
     id: string;
     isLatestPublishedRelease: boolean;
+    isSuperseded: boolean;
     publication: {
       id: string;
       slug: string;
@@ -79,6 +80,7 @@ export interface DataSetFileSummary {
     title: string;
   };
   latestData: boolean;
+  isSuperseded: boolean;
   published: Date;
   lastUpdated: string;
   api?: DataSetFileApi;
