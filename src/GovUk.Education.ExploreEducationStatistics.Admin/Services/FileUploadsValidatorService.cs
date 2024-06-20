@@ -67,10 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             errors.AddRange(await ValidateDataSetFileTypes(
                 dataFileName,
-                dataFileLength,
                 dataFileStream,
                 metaFileName,
-                metaFileLength,
                 metaFileStream));
 
             return errors;
@@ -285,20 +283,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<List<ErrorViewModel>> ValidateDataSetFileTypes(
             string dataFileName,
-            long dataFileLength,
             Stream dataFileStream,
             string metaFileName,
-            long metaFileLength,
             Stream metaFileStream)
         {
             List<ErrorViewModel> errors = [];
 
-            if (!await _fileTypeService.IsValidCsvFile(dataFileStream, dataFileName, dataFileLength))
+            if (!await _fileTypeService.IsValidCsvFile(dataFileStream))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFileName));
             }
 
-            if (!await _fileTypeService.IsValidCsvFile(metaFileStream, metaFileName, metaFileLength))
+            if (!await _fileTypeService.IsValidCsvFile(metaFileStream))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(metaFileName));
             }
