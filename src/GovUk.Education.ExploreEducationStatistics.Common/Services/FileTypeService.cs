@@ -5,12 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MimeDetective.Extensions;
 using FileType = MimeDetective.FileType;
 
@@ -18,38 +16,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public class FileTypeService : IFileTypeService
     {
-        /// <summary>
-        /// Number of lines to use as a content sample when validating a CSV file's Mime type.
-        /// </summary>
-        /// <remarks>
-        /// Without limiting this, the entire file contents is used in determining whether or not the given file is
-        /// of type application/csv by the Mime library.
-        ///</remarks>
-        private const int CsvMimeTypeSampleLineCount = 1000;
-        
         public static readonly Regex[] AllowedCsvMimeTypes = {
-            new Regex(@"^(application|text)/csv$"),
-            new Regex(@"^text/plain$")
+            new ("^(application|text)/csv$"),
+            new ("^text/plain$")
         };
 
-        public static readonly string[] AllowedCsvEncodingTypes = {
+        public static readonly string[] AllowedCsvEncodingTypes = [
             "us-ascii",
             "utf-8"
-        };
+        ];
 
-        private readonly ILogger<FileTypeService> _logger;
         private readonly IConfiguration _configuration;
 
-        public FileTypeService(ILogger<FileTypeService> logger, IConfiguration configuration)
+        public FileTypeService(IConfiguration configuration)
         {
-            _logger = logger;
             _configuration = configuration;
         }
 
         public async Task<string> GetMimeType(IFormFile file)
         {
             // The Mime project is generally very good at determining mime types from file contents
-            var mimeType = GetMimeTypeUsingMimeProject(file.OpenReadStream(), file.Length);
+            await using var stream = file.OpenReadStream();
+            var mimeType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_TYPE);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -63,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
             await using var stream = file.OpenReadStream();
-            var mimeType = GetMimeTypeUsingMimeProject(stream, file.Length);
+            var mimeType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_TYPE);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -76,124 +64,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
         {
-            var encodingType = GetMimeEncoding(file.OpenReadStream(), file.Length);
+            using var stream = file.OpenReadStream();
+            var encodingType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_ENCODING);
             return encodingTypes.Any(pattern => pattern.Equals(encodingType));
         }
 
-        public async Task<bool> HasMatchingMimeType(Stream stream, long streamLength, IEnumerable<Regex> mimeTypes)
+        public async Task<bool> IsValidCsvFile(Stream stream)
         {
-            var mimeType = GetMimeTypeUsingMimeProject(stream, streamLength);
+            var sampleBuffer = new byte[1024];
+            var sampleBufferSize = await stream.ReadAsync(sampleBuffer, 0, 1024);
 
-            if (IsMimeTypeNullOrZip(mimeType))
+            var magicFilePath = _configuration.GetValue<string>("MagicFilePath");
+
+            // @MarkFix do we need more than 1024 bytes? - like first 1000 lines like previously? - test it
+            var magicTypeContext = new Magic(MagicOpenFlags.MAGIC_MIME_TYPE, magicFilePath);
+            var mimeType = magicTypeContext.Read(sampleBuffer, sampleBufferSize);
+            if (!AllowedCsvMimeTypes.Any(pattern => pattern.Match(mimeType).Success))
             {
-                var fileType = await GetMimeTypeUsingMimeDetective(stream);
-                mimeType = fileType?.Mime ?? mimeType;
-            }
-
-            return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
-        }
-
-        public bool HasMatchingEncodingType(Stream stream, long streamLength, IEnumerable<string> encodingTypes)
-        {
-            var encodingType = GetMimeEncoding(stream, streamLength);
-            return encodingTypes.Any(pattern => pattern.Equals(encodingType));
-        }
-
-        public async Task<bool> IsValidCsvFile(Stream stream, string filename, long fileLength)
-        {
-            _logger.LogDebug("Validating that {FileName} has a CSV mime type", filename);
-
-            using var streamReader = new StreamReader(stream);
-            await using var sampleLinesStream = await GetSampleLinesStream(streamReader, CsvMimeTypeSampleLineCount);
-
-            if (sampleLinesStream == null)
-            {
-                _logger.LogError("Unable to get sample lines for checking the mime type of {FileName}", filename);
-                return false;
-            }
-            
-            if (!await HasMatchingMimeType(sampleLinesStream, sampleLinesStream.Length, AllowedCsvMimeTypes))
-            {
-                _logger.LogDebug("{FileName} does not have a valid CSV mime type", filename);
                 return false;
             }
 
-            _logger.LogDebug("{FileName} has a valid CSV mime type", filename);
+            var magicEncodingContext = new Magic(MagicOpenFlags.MAGIC_MIME_ENCODING, magicFilePath);
+            var encodingType = magicEncodingContext.Read(sampleBuffer, sampleBufferSize);
 
-            _logger.LogDebug("Validating that {FileName} has a valid CSV character encoding", filename);
-
-            // To match encoding type, we want the stream to be at the beginning of the file
-            stream.SeekToBeginning();
-
-            if (!HasMatchingEncodingType(stream, fileLength, AllowedCsvEncodingTypes))
-            {
-                _logger.LogDebug("{FileName} does not have a valid CSV content encoding", filename);
-                return false;
-            }
-
-            _logger.LogDebug("{FileName} has a valid CSV content encoding", filename);
-            
-            return true;
+            return AllowedCsvEncodingTypes.Contains(encodingType);
         }
 
-        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename, long fileLength)
+        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider)
         {
             await using var stream = await streamProvider.Invoke();
-            return await IsValidCsvFile(stream, filename, fileLength);
-        }
-
-        public async Task<bool> IsValidCsvFile(IFormFile file)
-        {
-            await using var stream = file.OpenReadStream();
-            return await IsValidCsvFile(stream, file.FileName, file.Length);
-        }
-
-        /// <summary>
-        /// Obtain a set of sample lines of the given file, for the purposes of checking the file's mime type and
-        /// content encoding.
-        /// </summary>
-        private async Task<Stream?> GetSampleLinesStream(StreamReader streamReader, int sampleLineCount)
-        {
-            var lines = new List<string>();
-            
-            try
-            {
-                var linesRead = 0;
-
-                while (linesRead < sampleLineCount && !streamReader.EndOfStream)
-                {
-                    var nextLine = await streamReader.ReadLineAsync();
-
-                    if (nextLine == null)
-                    {
-                        _logger.LogError("Unable to read next sample line {LineNumber} from CSV", linesRead + 1);
-                        break;
-                    }
-                    
-                    lines.Add(nextLine);
-                    linesRead++;
-                }
-                
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Unable to read sample lines from CSV - {ErrorMessage}", e.Message);
-                return null;
-            }
-
-            var lineStream = new MemoryStream();
-            var writer = new StreamWriter(lineStream);
-            await writer.WriteAsync(lines.JoinToString('\n'));
-            await writer.FlushAsync();
-            lineStream.Position = 0;
-
-            return lineStream;
-        }
-
-        private string GetMimeTypeUsingMimeProject(Stream stream, long streamLength)
-        {
-            // The Mime project is generally very good at determining mime types from file contents
-            return GuessMagicInfo(stream, streamLength, MagicOpenFlags.MAGIC_MIME_TYPE);
+            return await IsValidCsvFile(stream);
         }
 
         private async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
@@ -202,25 +102,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await stream.GetFileTypeAsync();
         }
 
-        private string GetMimeEncoding(Stream stream, long streamLength)
-        {
-            return GuessMagicInfo(stream, streamLength, MagicOpenFlags.MAGIC_MIME_ENCODING);
-        }
-
-        private string GuessMagicInfo(Stream fileStream, long streamLength, MagicOpenFlags flag)
+        private string GuessMagicInfo(Stream fileStream,  MagicOpenFlags flag)
         {
             var dbPath = _configuration.GetValue<string>("MagicFilePath");
             var magic = new Magic(flag, dbPath);
 
-            var bufferSize = streamLength >= 1024 ? 1024 : (int) streamLength;
-            return magic.Read(fileStream, bufferSize);
+            // I have no idea why wrapping the Stream as a StreamReader is necessary, but it is.
+            using var streamReader = new StreamReader(fileStream);
+            return magic.Read(streamReader.BaseStream, 1024); // Read handles if buffer size is < 1024
         }
 
         private bool IsMimeTypeNullOrZip(string mimeType)
         {
-            return mimeType == null ||
-                   mimeType == "application/octet-stream" ||
-                   mimeType == "application/zip";
+            return mimeType == "application/octet-stream"
+                   || mimeType == "application/zip";
         }
     }
 }
