@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 
@@ -12,8 +12,3 @@ public interface IDataSetMetaService
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 }
-
-public record DataSetVersionMappingMeta(
-    List<(FilterMeta, List<FilterOptionMeta>)> Filters,
-    List<(LocationMeta, List<LocationOptionMetaRow>)> Locations,
-    DataSetVersionMetaSummary MetaSummary);

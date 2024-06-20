@@ -61,8 +61,10 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async _ => await processorClient.CreateNextDataSetVersion(dataSetId: dataSetId,
-                releaseFileId: releaseFileId, cancellationToken: cancellationToken))
+            .OnSuccess(async _ => await processorClient.CreateNextDataSetVersion(
+                dataSetId: dataSetId,
+                releaseFileId: releaseFileId, 
+                cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await publicDataDbContext
                 .DataSetVersions
                 .SingleAsync(
@@ -74,7 +76,9 @@ public class DataSetVersionService(
     public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccessVoid(async () => await processorClient.DeleteDataSetVersion(dataSetVersionId, cancellationToken));
+            .OnSuccessVoid(async () => await processorClient.DeleteDataSetVersion(
+                dataSetVersionId: dataSetVersionId, 
+                cancellationToken: cancellationToken));
     }
 
     private static DataSetVersionSummaryViewModel MapDraftSummaryVersion(DataSetVersion dataSetVersion)

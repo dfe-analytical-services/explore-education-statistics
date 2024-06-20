@@ -24,17 +24,19 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class DataSetVersionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetVersionsControllerTests(
+    TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
-    public class CreateNextVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class CreateNextVersionTests(
+        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
         {
             var nextReleaseFileId = Guid.NewGuid();
-            
+
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished();
@@ -66,7 +68,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     var savedDataSet = await TestApp.GetDbContext<PublicDataDbContext>()
                         .DataSets
                         .SingleAsync(ds => ds.Id == dataSet.Id);
-                    
+
                     nextVersion = DataFixture
                         .DefaultDataSetVersion()
                         .WithStatusMapping()
@@ -93,44 +95,46 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var response = await CreateNextVersion(
                 dataSetId: dataSet.Id,
-                releasFileId: nextReleaseFileId,
+                releaseFileId: nextReleaseFileId,
                 client);
 
-            var content = response.AssertOk<DataSetVersionSummaryViewModel>();
+            var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
 
-            Assert.NotNull(content);
-            Assert.Equal(content.Id, nextVersion!.Id);
-            Assert.Equal(content.Version, nextVersion!.Version);
-            Assert.Equal(content.Status, nextVersion!.Status);
-            Assert.Equal(content.Type, nextVersion!.VersionType);
+            Assert.NotNull(nextVersion);
+            Assert.Equal(viewModel.Id, nextVersion.Id);
+            Assert.Equal(viewModel.Version, nextVersion.Version);
+            Assert.Equal(viewModel.Status, nextVersion.Status);
+            Assert.Equal(viewModel.Type, nextVersion.VersionType);
         }
 
         private async Task<HttpResponseMessage> CreateNextVersion(
             Guid dataSetId,
-            Guid releasFileId,
+            Guid releaseFileId,
             HttpClient? client = null)
         {
             client ??= BuildApp().CreateClient();
 
             var uri = new Uri(BaseUrl, UriKind.Relative);
 
-            return await client.PostAsync(uri, new JsonNetContent(new NextDataSetVersionCreateRequest
-            {
-                DataSetId = dataSetId,
-                ReleaseFileId = releasFileId
-            }));
+            return await client.PostAsync(uri,
+                new JsonNetContent(new NextDataSetVersionCreateRequest
+                {
+                    DataSetId = dataSetId,
+                    ReleaseFileId = releaseFileId
+                }));
         }
     }
-    
-    public class DeleteVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+
+    public class DeleteVersionTests(
+        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
         {
             var dataSetVersionId = Guid.NewGuid();
-            
+
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
-            
+
             processorClient
                 .Setup(c => c.DeleteDataSetVersion(
                     dataSetVersionId,
@@ -228,12 +232,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                         new ValidationProblemViewModel
                         {
                             Errors = new ErrorViewModel[]
+                            {
+                                new()
                                 {
-                                    new() {
-                                       Code = "error code",
-                                       Path = "error path"
-                                    }
+                                    Code = "error code",
+                                    Path = "error path"
                                 }
+                            }
                         })));
 
             var client = BuildApp(processorClient.Object).CreateClient();
@@ -276,10 +281,12 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     dataSetVersion.Id,
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException());
-            
+
             var client = BuildApp(processorClient.Object).CreateClient();
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await DeleteVersion(dataSetVersion.Id, client));
+            var exception =
+                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await DeleteVersion(dataSetVersion.Id, client));
             Assert.IsType<HttpRequestException>(exception.InnerException);
         }
 

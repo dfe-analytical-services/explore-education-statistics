@@ -19,6 +19,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
     where TFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture
 {
     protected readonly DataFixture DataFixture = new();
+
     private readonly IHost _host = fixture
         .ConfigureTestHostBuilder()
         .Build();
@@ -43,10 +44,10 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
 
-    protected void ClearTestData<TDbContext>() where TDbContext : DbContext
+    protected async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
         var context = GetDbContext<TDbContext>();
-        context.ClearTestData();
+        await context.ClearTestData();
     }
 
     protected void ResetDbContext<TDbContext>() where TDbContext : DbContext

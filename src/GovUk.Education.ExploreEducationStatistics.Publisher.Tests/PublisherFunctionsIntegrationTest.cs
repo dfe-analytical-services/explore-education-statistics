@@ -15,13 +15,19 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests;
 
-public abstract class PublisherFunctionsIntegrationTest
-    : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>
+public abstract class PublisherFunctionsIntegrationTest(
+    FunctionsIntegrationTestFixture fixture)
+    : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
 {
-    protected PublisherFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
+    public async Task InitializeAsync()
     {
         ResetDbContext<ContentDbContext>();
-        ClearTestData<PublicDataDbContext>();
+        await ClearTestData<PublicDataDbContext>();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 }
 
@@ -71,7 +77,8 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
 
     protected override IEnumerable<Type> GetFunctionTypes()
     {
-        return [
+        return
+        [
             typeof(NotifyChangeFunction),
             typeof(PublishImmediateReleaseContentFunction),
             typeof(PublishMethodologyFilesFunction),

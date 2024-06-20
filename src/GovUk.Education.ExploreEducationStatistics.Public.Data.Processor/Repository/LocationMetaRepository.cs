@@ -21,21 +21,25 @@ public class LocationMetaRepository(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationMetaRepository
 {
-    public async Task<List<(LocationMeta, List<LocationOptionMetaRow>)>> ReadLocationMetas(
+    public async Task<IDictionary<LocationMeta, List<LocationOptionMetaRow>>> ReadLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken)
     {
-        var levels = ListLocationLevels(allowedColumns);
-
-        var metas = GetLocationMetas(dataSetVersion, levels);
+        var metas = GetLocationMetas(dataSetVersion, allowedColumns);
 
         return await metas
             .ToAsyncEnumerable()
-            .SelectAwait(async meta =>
-                (meta, await GetLocationOptionMetas(duckDbConnection, dataSetVersion, cancellationToken, meta)))
-            .ToListAsync(cancellationToken);
+            .ToDictionaryAwaitAsync(
+                keySelector: ValueTask.FromResult,
+                elementSelector: async meta =>
+                    await GetLocationOptionMetas(
+                        duckDbConnection,
+                        dataSetVersion,
+                        cancellationToken,
+                        meta),
+                cancellationToken);
     }
 
     public async Task CreateLocationMetas(
@@ -44,9 +48,7 @@ public class LocationMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        var levels = ListLocationLevels(allowedColumns);
-
-        var metas = GetLocationMetas(dataSetVersion, levels);
+        var metas = GetLocationMetas(dataSetVersion, allowedColumns);
 
         publicDataDbContext.LocationMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -173,8 +175,12 @@ public class LocationMetaRepository(
             .ToList();
     }
 
-    private static List<LocationMeta> GetLocationMetas(DataSetVersion dataSetVersion, List<GeographicLevel> levels)
+    private static List<LocationMeta> GetLocationMetas(
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns)
     {
+        var levels = ListLocationLevels(allowedColumns);
+
         return levels
             .Select(level => new LocationMeta
             {

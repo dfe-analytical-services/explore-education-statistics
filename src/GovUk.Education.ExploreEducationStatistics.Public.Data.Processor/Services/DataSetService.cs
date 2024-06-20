@@ -28,14 +28,16 @@ public class DataSetService(
         Guid instanceId,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.RequireTransaction(async () => 
+        return await publicDataDbContext.RequireTransaction(async () =>
             await GetReleaseFile(request.ReleaseFileId, cancellationToken)
                 .OnSuccess(releaseFile => CreateDataSet(releaseFile, cancellationToken))
-                .OnSuccess(dataSet => dataSetVersionService.CreateInitialVersion(
-                    dataSetId: dataSet.Id,
-                    releaseFileId: request.ReleaseFileId,
-                    instanceId: instanceId,
-                    cancellationToken)));
+                .OnSuccess(dataSet => dataSetVersionService
+                    .CreateInitialVersion(
+                        dataSetId: dataSet.Id,
+                        releaseFileId: request.ReleaseFileId,
+                        instanceId: instanceId,
+                        cancellationToken)
+                    .OnSuccess(dataSetVersionId => (dataSet.Id, dataSetVersionId))));
     }
 
     private async Task<DataSet> CreateDataSet(

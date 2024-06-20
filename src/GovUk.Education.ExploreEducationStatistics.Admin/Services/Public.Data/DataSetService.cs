@@ -246,14 +246,19 @@ internal class DataSetService(
 
     private static IdTitleViewModel MapReleaseVersion(ReleaseVersion releaseVersion)
     {
-        return new IdTitleViewModel {Id = releaseVersion.Id, Title = releaseVersion.Title,};
+        return new IdTitleViewModel
+        {
+            Id = releaseVersion.Id,
+            Title = releaseVersion.Title,
+        };
     }
 
     private static IdTitleViewModel MapVersionFile(ReleaseFile releaseFile)
     {
         return new IdTitleViewModel
         {
-            Id = releaseFile.File.DataSetFileId!.Value, Title = releaseFile.Name ?? string.Empty,
+            Id = releaseFile.File.DataSetFileId!.Value,
+            Title = releaseFile.Name ?? string.Empty,
         };
     }
 

@@ -32,16 +32,10 @@ internal class ProcessorClient(
         Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
-        await AddBearerToken(cancellationToken);
+        var request = new DataSetCreateRequest { ReleaseFileId = releaseFileId };
 
-        var request = new DataSetCreateRequest 
-        {
-            ReleaseFileId = releaseFileId
-        };
-
-        return await HandlePost<DataSetCreateRequest, CreateDataSetResponseViewModel>(
+        return await SendPost<DataSetCreateRequest, CreateDataSetResponseViewModel>(
             "api/CreateDataSet",
-            "Creating data set",
             request,
             cancellationToken);
     }
@@ -51,11 +45,14 @@ internal class ProcessorClient(
         Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
-        var request = new NextDataSetVersionCreateRequest {ReleaseFileId = releaseFileId, DataSetId = dataSetId};
+        var request = new NextDataSetVersionCreateRequest
+        {
+            ReleaseFileId = releaseFileId,
+            DataSetId = dataSetId
+        };
 
-        return await HandlePost<NextDataSetVersionCreateRequest, CreateDataSetResponseViewModel>(
+        return await SendPost<NextDataSetVersionCreateRequest, CreateDataSetResponseViewModel>(
             "api/CreateNextDataSetVersion",
-            "Creating next data set version",
             request,
             cancellationToken);
     }
@@ -64,45 +61,38 @@ internal class ProcessorClient(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        return await HandleDelete(
+        return await SendDelete(
             $"api/DeleteDataSetVersion/{dataSetVersionId}",
-            "Deleting data set version",
             cancellationToken);
     }
 
-    private async Task<Either<ActionResult, TResponse>> HandlePost<TRequest, TResponse>(
+    private async Task<Either<ActionResult, TResponse>> SendPost<TRequest, TResponse>(
         string url,
-        string actionDescription,
         TRequest request,
         CancellationToken cancellationToken = default)
         where TResponse : class
     {
-        return await HandleRequest<TResponse>(() =>
+        return await SendRequest<TResponse>(() =>
                 httpClient.PostAsJsonAsync(
                     url,
                     request,
                     cancellationToken: cancellationToken),
-            actionDescription,
             cancellationToken);
     }
 
-    private async Task<Either<ActionResult, Unit>> HandleDelete(
+    private async Task<Either<ActionResult, Unit>> SendDelete(
         string url,
-        string actionDescription,
         CancellationToken cancellationToken = default)
     {
-        return await HandleRequest<Unit>(
-                () => httpClient.DeleteAsync(
-                    url,
-                    cancellationToken: cancellationToken),
-                actionDescription,
-                cancellationToken)
-            .OnSuccessVoid();
+        return await SendRequest<Unit>(
+            () => httpClient.DeleteAsync(
+                url,
+                cancellationToken: cancellationToken),
+            cancellationToken);
     }
 
-    private async Task<Either<ActionResult, TResponse>> HandleRequest<TResponse>(
+    private async Task<Either<ActionResult, TResponse>> SendRequest<TResponse>(
         Func<Task<HttpResponseMessage>> requestFunction,
-        string actionDescription,
         CancellationToken cancellationToken = default)
         where TResponse : class
     {
@@ -119,14 +109,20 @@ internal class ProcessorClient(
                         await response.Content
                             .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
                     );
-                case HttpStatusCode.NotFound:
-                    return new NotFoundResult();
                 default:
-                    var message = await response.Content.ReadAsStringAsync(cancellationToken);
-                    logger.LogError($"""
-                                     Failed while performing action "{actionDescription}" with status code:
-                                     {response.StatusCode}. Message: {message}
-                                     """);
+                    var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                    var request = response.RequestMessage!;
+
+                    logger.LogError("""
+                                    Request {Method} {AbsolutePath} failed with status code {StatusCode}.
+
+                                    Body: {Body}
+                                    """,
+                        request.Method,
+                        request.RequestUri!.AbsolutePath,
+                        response.StatusCode,
+                        body);
+
                     response.EnsureSuccessStatusCode();
                     break;
             }
@@ -137,9 +133,7 @@ internal class ProcessorClient(
             return (Unit.Instance as TResponse)!;
         }
 
-        var content = await response.Content.ReadFromJsonAsync<TResponse>(
-            cancellationToken: cancellationToken
-        );
+        var content = await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
 
         return content
                ?? throw new Exception("Could not deserialize the response from the Public Data Processor.");

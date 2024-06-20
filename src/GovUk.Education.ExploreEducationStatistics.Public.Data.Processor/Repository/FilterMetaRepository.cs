@@ -16,26 +16,29 @@ public class FilterMetaRepository(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : IFilterMetaRepository
 {
-    public async Task<List<(FilterMeta, List<FilterOptionMeta>)>> ReadFilterMetas(
+    public async Task<IDictionary<FilterMeta, List<FilterOptionMeta>>> ReadFilterMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        var metas = await ReadFilterMeta(duckDbConnection, dataSetVersion, allowedColumns, cancellationToken);
+        var metas = await ReadFilterMeta(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken);
 
-        return await metas.ToAsyncEnumerable()
-            .SelectAwait(async meta =>
-                {
-                    var optionMetas = await ReadFilterOptionMeta(
+        return await metas
+            .ToAsyncEnumerable()
+            .ToDictionaryAwaitAsync(
+                keySelector: ValueTask.FromResult,
+                elementSelector: async meta =>
+                    await ReadFilterOptionMeta(
                         duckDbConnection,
                         dataSetVersion,
                         meta,
-                        cancellationToken);
-
-                    return (meta, optionMetas);
-                })
-            .ToListAsync(cancellationToken);
+                        cancellationToken),
+                cancellationToken);
     }
 
     public async Task CreateFilterMetas(

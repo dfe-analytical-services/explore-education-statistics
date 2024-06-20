@@ -30,37 +30,33 @@ public static class ValidationMessages
         Message: "The data file must have a corresponding metadata file."
     );
 
+    public static readonly LocalizableMessage FileNotInDataSetPublication = new(
+        Code: nameof(FileNotInDataSetPublication),
+        Message: "The file must belong to the same publication as the data set."
+    );
+
+    public static readonly LocalizableMessage FileMustBeInDifferentRelease = new(
+        Code: nameof(FileMustBeInDifferentRelease),
+        Message: "The file must be in a different release to previous data set versions."
+    );
+
     public static readonly LocalizableMessage DataSetVersionCanNotBeDeleted = new(
         Code: nameof(DataSetVersionCanNotBeDeleted),
         Message: $"The data set version is not in a '{DataSetVersionStatus.Draft}' status, so cannot be deleted."
+    );
+
+    public static readonly LocalizableMessage DataSetNotFound = new(
+        Code: nameof(DataSetNotFound),
+        Message: "The data set could not be found."
     );
 
     public static readonly LocalizableMessage DataSetMustHaveNoExistingVersions = new(
         Code: nameof(DataSetMustHaveNoExistingVersions),
         Message: "The data set must have no existing versions when creating the initial version."
     );
-    
-    public static readonly LocalizableMessage DataSetNotFound = new(
-        Code: nameof(DataSetNotFound),
-        Message: "The data set must exist."
-    );
 
-    public static readonly LocalizableMessage DataSetMustHaveLiveDataSetVersion = new(
-        Code: nameof(DataSetMustHaveLiveDataSetVersion),
+    public static readonly LocalizableMessage DataSetNoLiveVersion = new(
+        Code: nameof(DataSetNoLiveVersion),
         Message: "The data set must have a live version."
-    );
-
-    public static readonly LocalizableMessage NextReleaseFileMustBeForSamePublicationAsDataSet = new(
-        Code: nameof(NextReleaseFileMustBeForSamePublicationAsDataSet),
-        Message: "The file must belong to the same publication as the data set."
-    );
-
-    /// <summary>
-    /// This rule ensures that we're not creating the next data set version based on a release file that is an
-    /// amendment of the release that the currently live data set version   
-    /// </summary>
-    public static readonly LocalizableMessage ReleaseFileMustBeFromDifferentReleaseToHistoricalVersions = new(
-        Code: nameof(ReleaseFileMustBeFromDifferentReleaseToHistoricalVersions),
-        Message: "The release file must be from a different release than the currently live data set version."
     );
 }

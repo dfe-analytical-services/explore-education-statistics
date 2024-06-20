@@ -36,17 +36,19 @@ public class CreateNextDataSetVersionFunction(
                 instanceId,
                 cancellationToken: cancellationToken
             ))
-            .OnSuccess(async tuple =>
+            .OnSuccess(async dataSetVersionId =>
             {
                 await ProcessNextDataSetVersion(
                     client,
-                    dataSetVersionId: tuple.dataSetVersionId,
+                    dataSetVersionId: dataSetVersionId,
                     instanceId: instanceId,
                     cancellationToken);
 
                 return new CreateDataSetResponseViewModel
                 {
-                    DataSetId = tuple.dataSetId, DataSetVersionId = tuple.dataSetVersionId, InstanceId = instanceId
+                    DataSetId = request.DataSetId,
+                    DataSetVersionId = dataSetVersionId,
+                    InstanceId = instanceId
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
@@ -60,9 +62,9 @@ public class CreateNextDataSetVersionFunction(
     {
         const string orchestratorName = nameof(ProcessNextDataSetVersionFunction.ProcessNextDataSetVersion);
 
-        var input = new ProcessDataSetVersionContext {DataSetVersionId = dataSetVersionId};
+        var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
-        var options = new StartOrchestrationOptions {InstanceId = instanceId.ToString()};
+        var options = new StartOrchestrationOptions { InstanceId = instanceId.ToString() };
 
         logger.LogInformation(
             "Scheduling '{OrchestratorName}' (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",

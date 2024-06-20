@@ -121,7 +121,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
-    public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+    public class Startup(
+        IConfiguration configuration,
+        IHostEnvironment hostEnvironment)
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
@@ -574,7 +576,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
-                        new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
+                        new OpenApiInfo
+                        {
+                            Title = "Explore education statistics - Admin API",
+                            Version = "v1"
+                        });
                     c.CustomSchemaIds((type) => type.FullName);
                     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
@@ -591,10 +597,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             {
                                 Reference = new OpenApiReference
                                 {
-                                    Type = ReferenceType.SecurityScheme, Id = "Bearer"
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
                                 }
                             },
-                            new[] {string.Empty}
+                            new[] { string.Empty }
                         }
                     });
                 });
@@ -762,7 +769,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
     internal class NoOpDataSetVersionService : IDataSetVersionService
     {
         public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
-            Guid releaseVersionId, CancellationToken cancellationToken)
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
@@ -772,7 +780,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid dataSetId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
+        public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
+            CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }

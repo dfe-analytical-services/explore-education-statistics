@@ -27,7 +27,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
     public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
         var context = this.GetDbContext<TDbContext, Startup>();
-        context.ClearTestData();
+        await context.ClearTestData();
     }
 
     public async Task ClearAllTestData()

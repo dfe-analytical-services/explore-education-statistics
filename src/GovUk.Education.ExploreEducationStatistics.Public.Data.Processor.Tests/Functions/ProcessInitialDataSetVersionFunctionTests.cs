@@ -25,7 +25,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class ProcessInitialDataSetVersionFunctionTests(
+    ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private readonly string[] _allDataSetVersionFiles =
@@ -42,7 +43,8 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
         TimePeriodsTable.ParquetFile
     ];
 
-    public class ProcessInitialDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ProcessInitialDataSetVersionTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessInitialDataSetVersionFunctionTests(fixture)
     {
         [Fact]
@@ -115,7 +117,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
             var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
             await function.ProcessInitialDataSetVersion(
                 orchestrationContext,
-                new ProcessDataSetVersionContext {DataSetVersionId = Guid.NewGuid()});
+                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
         }
 
         private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(
@@ -141,7 +143,8 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
         }
     }
 
-    public class ImportDataTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ImportDataTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessInitialDataSetVersionFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ImportingData;
@@ -363,7 +366,8 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
         }
     }
 
-    public class WriteDataFilesTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class WriteDataFilesTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessInitialDataSetVersionFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.WritingDataFiles;
@@ -411,7 +415,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(ProcessorFunctio
             await processInitialDataSetVersionFunction.WriteDataFiles(instanceId, CancellationToken.None);
         }
     }
-    
+
     public class CompleteInitialDataSetVersionProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessInitialDataSetVersionFunctionTests(fixture)

@@ -16,16 +16,17 @@ using Testcontainers.PostgreSql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 
-public abstract class ProcessorFunctionsIntegrationTest
-    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>, IDisposable
+public abstract class ProcessorFunctionsIntegrationTest(
+    FunctionsIntegrationTestFixture fixture)
+    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
 {
-    protected ProcessorFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
+    public async Task InitializeAsync()
     {
         ResetDbContext<ContentDbContext>();
-        ClearTestData<PublicDataDbContext>();
+        await ClearTestData<PublicDataDbContext>();
     }
 
-    public void Dispose()
+    public Task DisposeAsync()
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
 
@@ -34,9 +35,12 @@ public abstract class ProcessorFunctionsIntegrationTest
         {
             Directory.Delete(testInstanceDataFilesDirectory, recursive: true);
         }
+
+        return Task.CompletedTask;
     }
 
-    protected void SetupCsvDataFilesForDataSetVersion(ProcessorTestData processorTestData, DataSetVersion dataSetVersion)
+    protected void SetupCsvDataFilesForDataSetVersion(ProcessorTestData processorTestData,
+        DataSetVersion dataSetVersion)
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
 
@@ -67,23 +71,23 @@ public abstract class ProcessorFunctionsIntegrationTest
 
     protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersionAndImport(
         DataSet dataSet,
-        DataSetVersionImportStage importStage, 
+        DataSetVersionImportStage importStage,
         DataSetVersionStatus? status = null,
         Guid? releaseFileId = null,
-        int versionNumberMajor = 1,
-        int versionNumberMinor = 0)
+        int versionMajor = 1,
+        int versionMinor = 0)
     {
         DataSetVersionImport dataSetVersionImport = DataFixture
             .DefaultDataSetVersionImport()
             .WithStage(importStage);
-        
+
         DataSetVersion dataSetVersion = DataFixture
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
             .WithReleaseFileId(releaseFileId ?? Guid.NewGuid())
             .WithStatus(status ?? DataSetVersionStatus.Processing)
             .WithImports(() => [dataSetVersionImport])
-            .WithVersionNumber(major: versionNumberMajor, minor: versionNumberMinor)
+            .WithVersionNumber(major: versionMajor, minor: versionMinor)
             .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
         await AddTestData<PublicDataDbContext>(context =>
@@ -147,9 +151,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             {
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    {
-                        "CoreStorage", _azuriteContainer.GetConnectionString()
-                    }
+                    { "CoreStorage", _azuriteContainer.GetConnectionString() }
                 });
             })
             .ConfigureServices(services =>

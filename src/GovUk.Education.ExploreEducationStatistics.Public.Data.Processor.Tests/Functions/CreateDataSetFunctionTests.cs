@@ -21,10 +21,12 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class CreateDataSetFunctionTests(
+    ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    public class CreateDataSetTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateDataSetTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateDataSetFunctionTests(fixture)
     {
         [Fact]
@@ -114,9 +116,9 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             // Assert the processing orchestrator was scheduled with the correct arguments
             Assert.NotNull(processInitialDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
-            Assert.Equal(new ProcessDataSetVersionContext {DataSetVersionId = dataSetVersion.Id},
+            Assert.Equal(new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersion.Id },
                 processInitialDataSetVersionContext);
-            Assert.Equal(new StartOrchestrationOptions {InstanceId = dataSetVersionImport.InstanceId.ToString()},
+            Assert.Equal(new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
                 startOrchestrationOptions);
         }
 
@@ -254,7 +256,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             DurableTaskClient? durableTaskClient = null)
         {
             var function = GetRequiredService<CreateDataSetFunction>();
-            return await function.CreateDataSet(new DataSetCreateRequest {ReleaseFileId = releaseFileId},
+            return await function.CreateDataSet(new DataSetCreateRequest { ReleaseFileId = releaseFileId },
                 durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
                 CancellationToken.None);
         }

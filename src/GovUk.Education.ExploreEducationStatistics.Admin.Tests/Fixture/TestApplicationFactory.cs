@@ -30,7 +30,7 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
     public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
         var context = GetDbContext<TDbContext>();
-        context.ClearTestData();
+        await context.ClearTestData();
     }
 
     protected override IHostBuilder CreateHostBuilder()

@@ -21,10 +21,12 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class CreateNextDataSetVersionFunctionTests(
+    ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    public class CreateNextDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateNextDataSetVersionTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateNextDataSetVersionFunctionTests(fixture)
     {
         [Fact]
@@ -69,7 +71,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
                 .Include(ds => ds.Versions)
                 .ThenInclude(dsv => dsv.Imports)
                 .ToListAsync());
-            
+
             // Assert that the existing data set is left in its Published state and that its
             // name, summary and other properties that were created during its first creation
             // are untouched.
@@ -83,7 +85,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             Assert.NotNull(updatedDataSet.LatestDraftVersion);
             Assert.NotEqual(liveDataSetVersion.Id, updatedDataSet.LatestDraftVersion!.Id);
             Assert.Equal(liveDataSetVersion.Id, updatedDataSet.LatestLiveVersion!.Id);
-            
+
             // Assert the data set has a new version and that it is the latest draft version.
             Assert.Equal(2, updatedDataSet.Versions.Count);
             var nextDataSetVersion = updatedDataSet
@@ -91,31 +93,31 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
                 .OrderBy(v => v.FullSemanticVersion())
                 .Last();
             Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
-            
+
             Assert.Equal(nextReleaseFile.Id, nextDataSetVersion.ReleaseFileId);
             Assert.Equal(updatedDataSet.Id, nextDataSetVersion.DataSetId);
             Assert.Equal(DataSetVersionStatus.Processing, nextDataSetVersion.Status);
             Assert.Empty(nextDataSetVersion.Notes);
             Assert.Equal(1, nextDataSetVersion.VersionMajor);
             Assert.Equal(1, nextDataSetVersion.VersionMinor);
-            
+
             // Assert a single import was created.
             var dataSetVersionImport = Assert.Single(nextDataSetVersion.Imports);
             Assert.Equal(nextDataSetVersion.Id, dataSetVersionImport.DataSetVersionId);
             Assert.NotEqual(Guid.Empty, dataSetVersionImport.InstanceId);
             Assert.Equal(DataSetVersionImportStage.Pending, dataSetVersionImport.Stage);
-            
+
             // Assert the response view model values match the created data set version and import.
             Assert.Equal(updatedDataSet.Id, responseViewModel.DataSetId);
             Assert.Equal(nextDataSetVersion.Id, responseViewModel.DataSetVersionId);
             Assert.Equal(dataSetVersionImport.InstanceId, responseViewModel.InstanceId);
-            
+
             // Assert the processing orchestrator was scheduled with the correct arguments
             Assert.NotNull(processNextDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
-            Assert.Equal(new ProcessDataSetVersionContext {DataSetVersionId = nextDataSetVersion.Id},
+            Assert.Equal(new ProcessDataSetVersionContext { DataSetVersionId = nextDataSetVersion.Id },
                 processNextDataSetVersionContext);
-            Assert.Equal(new StartOrchestrationOptions {InstanceId = dataSetVersionImport.InstanceId.ToString()},
+            Assert.Equal(new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
                 startOrchestrationOptions);
         }
 
@@ -125,86 +127,89 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             var result = await CreateNextDataSetVersion(
                 dataSetId: Guid.NewGuid(),
                 releaseFileId: Guid.Empty);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasNotEmptyError(
                 nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst());
         }
-        
+
         [Fact]
         public async Task DataSetIdIsEmpty_ReturnsValidationProblem()
         {
             var result = await CreateNextDataSetVersion(
                 dataSetId: Guid.Empty,
                 releaseFileId: Guid.NewGuid());
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasNotEmptyError(
                 nameof(NextDataSetVersionCreateRequest.DataSetId).ToLowerFirst());
         }
-        
+
         [Fact]
         public async Task DataSetIdIsNotFound_ReturnsValidationProblem()
         {
+            var subjectId = Guid.NewGuid();
+            
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithApprovalStatus(ReleaseApprovalStatus.Draft))
-                .WithFiles(DataFixture.DefaultFile()
-                    .WithSubjectId(Guid.NewGuid())
-                    .ForIndex(0, s => s.SetType(FileType.Data))
-                    .ForIndex(1, s => s.SetType(FileType.Metadata))
-                    .Generate(2))
+                .WithFiles([
+                    DataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithSubjectId(subjectId),
+                    DataFixture
+                        .DefaultFile(FileType.Metadata)
+                        .WithSubjectId(subjectId)
+                ])
                 .GenerateList()
                 .ToTuple2();
-        
+
             await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
-            });
+                context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile));
 
             var result = await CreateNextDataSetVersion(
                 dataSetId: Guid.NewGuid(),
                 releaseFileId: releaseFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(NextDataSetVersionCreateRequest.DataSetId).ToLowerFirst(),
-                expectedCode: ValidationMessages.FileNotFound.Code);
+                expectedCode: ValidationMessages.DataSetNotFound.Code);
         }
-        
+
         [Fact]
         public async Task ReleaseFileIdIsNotFound_ReturnsValidationProblem()
         {
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
-            
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: Guid.NewGuid());
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileNotFound.Code);
         }
-        
+
         [Fact]
         public async Task ReleaseFileIdHasDataSetVersion_ReturnsValidationProblem()
         {
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
-            
+
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile());
-        
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
             await AddTestData<ContentDbContext>(context =>
             {
                 context.ReleaseFiles.Add(releaseFile);
             });
-            
+
             // Create another DataSet and DataSetVersion which already references the ReleaseFile's Id.
             DataSet otherDataSet = DataFixture.DefaultDataSet();
 
@@ -218,44 +223,50 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
                 context.SaveChanges();
                 context.DataSetVersions.Add(otherDataSetVersion);
             });
-        
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
         }
-        
+
         [Fact]
         public async Task ReleaseVersionNotDraft_ReturnsValidationProblem()
         {
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
 
+            var subjectId = Guid.NewGuid();
+            
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithApprovalStatus(ReleaseApprovalStatus.Approved))
-                .WithFiles(DataFixture.DefaultFile()
-                    .ForIndex(0, s => s.SetType(FileType.Data))
-                    .ForIndex(1, s => s.SetType(FileType.Metadata))
-                    .Generate(2))
+                .WithFiles([
+                    DataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithSubjectId(subjectId),
+                    DataFixture
+                        .DefaultFile(FileType.Metadata)
+                        .WithSubjectId(subjectId)
+                ])
                 .GenerateList()
                 .ToTuple2();
-        
+
             await AddTestData<ContentDbContext>(context =>
             {
                 context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
             });
-        
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileReleaseVersionNotDraft.Code
@@ -266,76 +277,75 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
         public async Task ReleaseFileTypeNotData_ReturnsValidationProblem()
         {
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
-        
+
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile()
-                    .WithType(FileType.Ancillary));
-        
+                .WithFile(DataFixture.DefaultFile(FileType.Ancillary));
+
             await AddTestData<ContentDbContext>(context =>
             {
                 context.ReleaseFiles.Add(releaseFile);
             });
-        
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileTypeNotData.Code
             );
         }
-        
+
         [Fact]
         public async Task ReleaseFileHasNoMetaFile_ReturnsValidationProblem()
         {
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
-            
+
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile());
-        
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
             await AddTestData<ContentDbContext>(context =>
             {
                 context.ReleaseFiles.Add(releaseFile);
             });
-        
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.NoMetadataFile.Code
             );
         }
 
-        [Fact] 
+        [Fact]
         public async Task DataSetAndReleaseFileFromDifferentPublications_ReturnsValidationProblem()
         {
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
-            
+
             // Add ReleaseFiles for a different Publication.
             var (releaseFile, _) = await AddDataAndMetadataFiles(publicationId: Guid.NewGuid());
-        
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
-                expectedCode: ValidationMessages.NextReleaseFileMustBeForSamePublicationAsDataSet.Code
+                expectedCode: ValidationMessages.FileNotInDataSetPublication.Code
             );
         }
-        
-        [Fact] 
+
+        [Fact]
         public async Task DataSetWithoutLiveVersion_ReturnsValidationProblem()
         {
             DataSet dataSet = DataFixture
@@ -343,22 +353,22 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
                 .WithStatusPublished();
 
             await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-            
+
             var (releaseFile, _) = await AddDataAndMetadataFiles(dataSet.PublicationId);
-        
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(NextDataSetVersionCreateRequest.DataSetId).ToLowerFirst(),
-                expectedCode: ValidationMessages.DataSetMustHaveLiveDataSetVersion.Code
+                expectedCode: ValidationMessages.DataSetNoLiveVersion.Code
             );
         }
 
-        [Fact] 
+        [Fact]
         public async Task ReleaseFileInSameReleaseSeriesAsCurrentLiveVersion_ReturnsValidationProblem()
         {
             var (dataSet, liveDataSetVersion) = await AddDataSetAndLatestLiveVersion();
@@ -366,7 +376,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             var currentReleaseFile = GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .Single(releaseFile => releaseFile.Id == liveDataSetVersion.ReleaseFileId);
-            
+
             var releaseVersion = await GetDbContext<ContentDbContext>()
                 .ReleaseVersions
                 .SingleAsync(releaseVersion => releaseVersion.Id == currentReleaseFile.ReleaseVersionId);
@@ -375,16 +385,20 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
                 .DefaultReleaseVersion()
                 .WithReleaseId(releaseVersion.ReleaseId)
                 .WithPublicationId(dataSet.PublicationId);
+
+            var subjectId = Guid.NewGuid();
             
             var (nextDataFile, nextMetaFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseAmendment)
-                .WithFiles(DataFixture
-                    .DefaultFile()
-                    .ForIndex(0, s => s.SetType(FileType.Data))
-                    .ForIndex(1, s => s.SetType(FileType.Metadata))
-                    .WithSubjectId(Guid.NewGuid())
-                    .Generate(2))
+                .WithFiles([
+                    DataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithSubjectId(subjectId),
+                    DataFixture
+                        .DefaultFile(FileType.Metadata)
+                        .WithSubjectId(subjectId)
+                ])
                 .GenerateList()
                 .ToTuple2();
 
@@ -392,31 +406,27 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
             {
                 context.ReleaseFiles.AddRange(nextDataFile, nextMetaFile);
             });
-        
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: nextDataFile.Id);
-        
+
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-        
+
             validationProblem.AssertHasError(
                 expectedPath: nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
-                expectedCode: ValidationMessages.ReleaseFileMustBeFromDifferentReleaseToHistoricalVersions.Code
+                expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
             );
         }
 
         private async Task<(DataSet, DataSetVersion)> AddDataSetAndLatestLiveVersion()
         {
-            Publication publication = DataFixture
-                .DefaultPublication();
-            
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
-                .WithPublicationId(publication.Id)
                 .WithStatusPublished();
 
             await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-                
+
             var dataSetVersion = await AddLatestLiveDataSetVersion(dataSet);
             return (dataSet, dataSetVersion);
         }
@@ -424,7 +434,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
         private async Task<DataSetVersion> AddLatestLiveDataSetVersion(DataSet dataSet)
         {
             var (dataFile, _) = await AddDataAndMetadataFiles(dataSet.PublicationId);
-            
+
             DataSetVersion liveDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(1, 0)
@@ -441,31 +451,33 @@ public abstract class CreateNextDataSetVersionFunctionTests(ProcessorFunctionsIn
                 context.DataSetVersions.Add(liveDataSetVersion);
                 context.DataSets.Update(dataSet);
             });
-            
+
             return liveDataSetVersion;
         }
 
         private async Task<(ReleaseFile, ReleaseFile)> AddDataAndMetadataFiles(Guid publicationId)
         {
+            var subjectId = Guid.NewGuid();
+            
             var (dataFile, metaFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture
                     .DefaultReleaseVersion()
                     .WithPublicationId(publicationId))
-                .WithFiles(DataFixture
-                    .DefaultFile()
-                    .ForIndex(0, s => s.SetType(FileType.Data))
-                    .ForIndex(1, s => s.SetType(FileType.Metadata))
-                    .WithSubjectId(Guid.NewGuid())
-                    .Generate(2))
+                .WithFiles([
+                    DataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithSubjectId(subjectId),
+                    DataFixture
+                        .DefaultFile(FileType.Metadata)
+                        .WithSubjectId(subjectId)
+                ])
                 .GenerateList()
                 .ToTuple2();
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(dataFile, metaFile);
-            });
-            
+            await AddTestData<ContentDbContext>(context => 
+                context.ReleaseFiles.AddRange(dataFile, metaFile));
+
             return (dataFile, metaFile);
         }
 

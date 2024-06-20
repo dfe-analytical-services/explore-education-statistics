@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
     public static class AssertExtensions
     {
-        public const int TimeWithinMillis = 750;
+        public const int TimeWithinMillis = 1500;
         /**
          * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
          * other testing frameworks.

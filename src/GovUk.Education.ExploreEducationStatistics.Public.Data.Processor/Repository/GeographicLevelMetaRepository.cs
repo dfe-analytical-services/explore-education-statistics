@@ -18,7 +18,7 @@ public class GeographicLevelMetaRepository(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return GetGeographicLevelMetas(duckDbConnection, dataSetVersion, cancellationToken);
+        return GetGeographicLevelMeta(duckDbConnection, dataSetVersion, cancellationToken);
     }
 
     public async Task<GeographicLevelMeta> CreateGeographicLevelMeta(
@@ -26,7 +26,7 @@ public class GeographicLevelMetaRepository(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        var meta = await GetGeographicLevelMetas(duckDbConnection, dataSetVersion, cancellationToken);
+        var meta = await GetGeographicLevelMeta(duckDbConnection, dataSetVersion, cancellationToken);
 
         publicDataDbContext.GeographicLevelMetas.Add(meta);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -34,7 +34,9 @@ public class GeographicLevelMetaRepository(
         return meta;
     }
 
-    private async Task<GeographicLevelMeta> GetGeographicLevelMetas(IDuckDbConnection duckDbConnection, DataSetVersion dataSetVersion,
+    private async Task<GeographicLevelMeta> GetGeographicLevelMeta(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
         var geographicLevels =

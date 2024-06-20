@@ -39,7 +39,7 @@ public class DatabaseHelper : IDatabaseHelper
         where TDbContext : DbContext
     {
         var strategy = context.Database.CreateExecutionStrategy();
-        
+
         return strategy.Execute(async () =>
         {
             // We use a delegate context here to allow us to retry on failure successfully when defining our own
@@ -49,7 +49,7 @@ public class DatabaseHelper : IDatabaseHelper
             await using var transaction = await ctxDelegate.Database.BeginTransactionAsync();
 
             var result = await transactionalUnit.Invoke(ctxDelegate);
-            
+
             await transaction.CommitAsync();
             await ctxDelegate.Database.CloseConnectionAsync();
 
@@ -58,7 +58,7 @@ public class DatabaseHelper : IDatabaseHelper
     }
 
     public Task DoInTransaction<TDbContext>(
-        TDbContext context, 
+        TDbContext context,
         Action<TDbContext> transactionalUnit)
         where TDbContext : DbContext
     {
@@ -70,13 +70,13 @@ public class DatabaseHelper : IDatabaseHelper
     }
 
     public Task<TResult> DoInTransaction<TDbContext, TResult>(
-        TDbContext context, 
+        TDbContext context,
         Func<TDbContext, TResult> transactionalUnit)
         where TDbContext : DbContext
     {
         return DoInTransaction(context, ctx => Task.FromResult(transactionalUnit.Invoke(ctx)));
     }
-    
+
     public Task ExecuteWithExclusiveLock<TDbContext>(
         TDbContext dbContext,
         string lockName,
@@ -85,7 +85,9 @@ public class DatabaseHelper : IDatabaseHelper
     {
         return DoInTransaction(dbContext, async ctx =>
         {
+#pragma warning disable EF1002
             await ctx.Database.ExecuteSqlRawAsync($"exec sp_getapplock '{lockName}', 'exclusive'");
+#pragma warning restore EF1002
             await action.Invoke(ctx);
         });
     }

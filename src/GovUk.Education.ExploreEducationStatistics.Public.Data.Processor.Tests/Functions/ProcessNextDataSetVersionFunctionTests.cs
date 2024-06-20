@@ -176,8 +176,8 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
             var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
                 dataSet: dataSet,
                 importStage: Stage.PreviousStage(),
-                versionNumberMajor: 1,
-                versionNumberMinor: 1);
+                versionMajor: 1,
+                versionMinor: 1);
 
             SetupCsvDataFilesForDataSetVersion(ProcessorTestData.AbsenceSchool, nextDataSetVersion);
 
@@ -190,14 +190,14 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
             // Assert that the MetaSummary has been generated correctly from the CSV.
             var metaSummary = updatedDataSetVersion.MetaSummary;
             Assert.NotNull(metaSummary);
-            
+
             Assert.Equal(
                 ProcessorTestData
                     .AbsenceSchool
                     .ExpectedGeographicLevels
                     .Order(),
                 metaSummary.GeographicLevels.Order());
-            
+
             Assert.Equal(
                 ProcessorTestData
                     .AbsenceSchool
@@ -205,7 +205,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                     .Select(f => f.Label)
                     .Order(),
                 metaSummary.Filters.Order());
-            
+
             Assert.Equal(
                 ProcessorTestData
                     .AbsenceSchool
@@ -213,7 +213,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                     .Select(i => i.Label)
                     .Order(),
                 metaSummary.Indicators.Order());
-            
+
             Assert.Equal(
                 new TimePeriodRange
                 {
@@ -249,8 +249,8 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
             var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
                 dataSet: dataSet,
                 importStage: Stage.PreviousStage(),
-                versionNumberMajor: 1,
-                versionNumberMinor: 1);
+                versionMajor: 1,
+                versionMinor: 1);
 
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion));

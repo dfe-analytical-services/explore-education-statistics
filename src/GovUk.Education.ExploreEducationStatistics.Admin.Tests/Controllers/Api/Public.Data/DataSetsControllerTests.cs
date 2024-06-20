@@ -32,11 +32,13 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerTests(
+    TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-sets";
 
-    public class ListDataSetsTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class ListDataSetsTests(
+        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task PublicationHasSingleDataSet_Success_CorrectViewModel()
@@ -451,9 +453,9 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             var queryParams = new Dictionary<string, string?>
             {
-                {"page", page?.ToString()},
-                {"pageSize", pageSize?.ToString()},
-                {"publicationId", publicationId.ToString()},
+                { "page", page?.ToString() },
+                { "pageSize", pageSize?.ToString() },
+                { "publicationId", publicationId.ToString() },
             };
 
             var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
@@ -462,7 +464,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         }
     }
 
-    public class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class GetDataSetTests(
+        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -906,7 +909,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         }
     }
 
-    public class CreateDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class CreateDataSetTests(
+        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -965,7 +969,9 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                     return new CreateDataSetResponseViewModel
                     {
-                        DataSetId = dataSet.Id, DataSetVersionId = dataSetVersion.Id, InstanceId = Guid.NewGuid()
+                        DataSetId = dataSet.Id,
+                        DataSetVersionId = dataSetVersion.Id,
+                        InstanceId = Guid.NewGuid()
                     };
                 });
 
@@ -1015,8 +1021,18 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             ErrorViewModel[] processorErrors =
             [
-                new ErrorViewModel {Code = "TestError1", Message = "Test message 1", Path = "releaseFileId"},
-                new ErrorViewModel {Code = "TestError2", Message = "Test message 2", Path = "releaseFileId"}
+                new ErrorViewModel
+                {
+                    Code = "TestError1",
+                    Message = "Test message 1",
+                    Path = "releaseFileId"
+                },
+                new ErrorViewModel
+                {
+                    Code = "TestError2",
+                    Message = "Test message 2",
+                    Path = "releaseFileId"
+                }
             ];
 
             processorClient
@@ -1049,10 +1065,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         {
             client ??= BuildApp().CreateClient();
 
-            var request = new DataSetCreateRequest
-            {
-                ReleaseFileId = releaseFileId
-            };
+            var request = new DataSetCreateRequest { ReleaseFileId = releaseFileId };
 
             return await client.PostAsJsonAsync(BaseUrl, request);
         }

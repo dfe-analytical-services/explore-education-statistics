@@ -40,15 +40,28 @@ public static class DbContextTransactionExtensions
         return await strategy.ExecuteAsync(
             async () =>
             {
-                using var transactionScope = new TransactionScope(
-                    TransactionScopeOption.Required,
-                    new TransactionOptions {IsolationLevel = IsolationLevel.ReadCommitted},
-                    TransactionScopeAsyncFlowOption.Enabled);
-
+                using var transactionScope = CreateTransactionScope();
                 var result = await transactionalUnit.Invoke();
                 transactionScope.Complete();
                 return result;
             });
+    }
+
+    /// <summary>
+    /// See the description for <see cref="RequireTransaction{TDbContext,TResult}"/>.
+    /// The only difference with this method is that it accepts a Func that does not have
+    /// a return value.
+    /// </summary>
+    public static async Task RequireTransaction<TDbContext>(
+        this TDbContext context,
+        Func<Task> transactionalUnit)
+        where TDbContext : DbContext
+    {
+        await RequireTransaction(context, async () =>
+        {
+            await transactionalUnit.Invoke();
+            return Unit.Instance;
+        });
     }
 
     /// <summary>
@@ -81,33 +94,20 @@ public static class DbContextTransactionExtensions
         return await strategy.ExecuteAsync(
             async () =>
             {
-                using var transactionScope = new TransactionScope(
-                    TransactionScopeOption.Required,
-                    new TransactionOptions {IsolationLevel = IsolationLevel.ReadCommitted},
-                    TransactionScopeAsyncFlowOption.Enabled);
-
+                using var transactionScope = CreateTransactionScope();
                 return await transactionalUnit
                     .Invoke()
                     .OnSuccessDo(transactionScope.Complete);
             });
     }
-    
-    /// <summary>
-    ///
-    /// See the description for <see cref="RequireTransaction{TDbContext,TResult}"/>.
-    /// The only difference with this method is that it accepts a Func that does not have
-    /// a return value.
-    /// 
-    /// </summary>
-    public static async Task RequireTransaction<TDbContext>(
-        this TDbContext context,
-        Func<Task> transactionalUnit)
-        where TDbContext : DbContext
+
+    private static TransactionScope CreateTransactionScope(
+        TransactionScopeOption transactionScopeOption = TransactionScopeOption.Required,
+        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
     {
-        await RequireTransaction(context, async () =>
-        {
-            await transactionalUnit.Invoke();
-            return Unit.Instance;
-        });
+        return new(
+            scopeOption: transactionScopeOption,
+            transactionOptions: new TransactionOptions { IsolationLevel = isolationLevel },
+            asyncFlowOption: TransactionScopeAsyncFlowOption.Enabled);
     }
 }
