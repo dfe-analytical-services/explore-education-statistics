@@ -22,8 +22,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -1397,25 +1395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
-            var cacheService = new Mock<IBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
-
-            releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
-
-            releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
-
-            releaseSubjectRepository.Setup(mock =>
-                mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
-
-            cacheService
-                .Setup(mock => mock.DeleteCacheFolderAsync(
-                    ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
-                .Returns(Task.CompletedTask);
 
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
@@ -1433,20 +1413,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
-                    releaseDataFileService: releaseDataFilesService.Object,
-                    releaseFileService: releaseFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
-                    cacheService: cacheService.Object,
+                var releaseService = BuildReleaseService(
+                    context,
                     processorClient: processorClient.Object);
 
                 var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
 
-                VerifyAllMocks(cacheService,
-                    releaseDataFilesService,
-                    releaseFileService,
-                    processorClient
-                );
+                VerifyAllMocks(processorClient);
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -1472,25 +1445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
-            var cacheService = new Mock<IBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
-
-            releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
-
-            releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
-
-            releaseSubjectRepository.Setup(mock =>
-                mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
-
-            cacheService
-                .Setup(mock => mock.DeleteCacheFolderAsync(
-                    ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
-                .Returns(Task.CompletedTask);
 
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
@@ -1499,20 +1454,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
-                    releaseDataFileService: releaseDataFilesService.Object,
-                    releaseFileService: releaseFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
-                    cacheService: cacheService.Object,
+                var releaseService = BuildReleaseService(
+                    context,
                     processorClient: processorClient.Object);
 
                 await Assert.ThrowsAsync<HttpRequestException>(async () => await releaseService.DeleteReleaseVersion(releaseVersion.Id));
 
-                VerifyAllMocks(cacheService,
-                    releaseDataFilesService,
-                    releaseFileService,
-                    processorClient
-                );
+                VerifyAllMocks(processorClient);
             }
         }
 
@@ -2040,7 +1988,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
-            IDataSetVersionService? dataSetVersionService = null,
             IProcessorClient? processorClient = null,
             IBlobCacheService? cacheService = null)
         {
@@ -2065,7 +2012,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
-                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
                 processorClient ?? Mock.Of<IProcessorClient>(Strict),
                 new SequentialGuidGenerator(),
                 cacheService ?? Mock.Of<IBlobCacheService>(Strict)

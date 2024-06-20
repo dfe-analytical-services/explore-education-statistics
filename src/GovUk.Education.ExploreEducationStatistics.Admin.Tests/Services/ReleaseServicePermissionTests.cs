@@ -22,7 +22,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -315,7 +314,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IFootnoteRepository>(),
                 Mock.Of<IDataBlockService>(),
                 Mock.Of<IReleaseSubjectRepository>(),
-                Mock.Of<IDataSetVersionService>(),
                 Mock.Of<IProcessorClient>(),
                 new SequentialGuidGenerator(),
                 Mock.Of<IBlobCacheService>()
