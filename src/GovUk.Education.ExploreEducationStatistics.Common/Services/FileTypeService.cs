@@ -45,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<string> GetMimeType(IFormFile file)
         {
-            // The Mime project is generally very good at determining mime types from file contents
-            var mimeType = GetMimeTypeUsingMimeProject(file.OpenReadStream());
+            await using var stream = file.OpenReadStream();
+            var mimeType = GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_TYPE);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -59,7 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
-            var mimeType = GetMimeTypeUsingMimeProject(file.OpenReadStream());
+            await using var stream = file.OpenReadStream();
+            var mimeType = GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_TYPE);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -72,13 +73,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
         {
-            var encodingType = GetMimeEncoding(file.OpenReadStream());
-            return encodingTypes.Any(pattern => pattern.Equals(encodingType));
+            using var stream = file.OpenReadStream();
+            var encodingType = GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_ENCODING);
+            return encodingTypes.Contains(encodingType);
         }
 
         public async Task<bool> HasMatchingMimeType(Stream stream, IEnumerable<Regex> mimeTypes)
         {
-            var mimeType = GetMimeTypeUsingMimeProject(stream);
+            var mimeType = GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_TYPE);
 
             if (IsMimeTypeNullOrZip(mimeType))
             {
@@ -91,8 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public bool HasMatchingEncodingType(Stream stream, IEnumerable<string> encodingTypes)
         {
-            var encodingType = GetMimeEncoding(stream);
-            return encodingTypes.Any(pattern => pattern.Equals(encodingType));
+            var encodingType = GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_ENCODING);
+            return encodingTypes.Contains(encodingType);
         }
 
         public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename)
@@ -166,21 +168,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return lineStream;
         }
 
-        private string GetMimeTypeUsingMimeProject(Stream stream)
-        {
-            // The Mime project is generally very good at determining mime types from file contents
-            return GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_TYPE);
-        }
-
         private async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
         {
             // Mime Detective is much better at zip files
             return await stream.GetFileTypeAsync();
-        }
-
-        private string GetMimeEncoding(Stream stream)
-        {
-            return GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_ENCODING);
         }
 
         private string GuessMagicInfo(Stream fileStream, MagicOpenFlags flag)
@@ -196,9 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private bool IsMimeTypeNullOrZip(string mimeType)
         {
-            return mimeType == null ||
-                   mimeType == "application/octet-stream" ||
-                   mimeType == "application/zip";
+            return mimeType is "application/octet-stream" or "application/zip";
         }
     }
 }
