@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
+        public async Task Upload_UploadsTheFiles_Returns_Ok()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Call the method under test
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var result = await controller.AddDataFilesAsync(releaseVersionId: _releaseVersionId,
+            var result = await controller.Upload(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
                 subjectName: "Subject name",
                 file: dataFile,
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
+        public async Task Upload_UploadsTheFiles_Returns_ValidationProblem()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
             // Call the method under test
-            var result = await controller.AddDataFilesAsync(releaseVersionId: _releaseVersionId,
+            var result = await controller.Upload(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
                 subjectName: "Subject name",
                 file: dataFile,
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task DeleteDataFilesAsync_Returns_OK()
+        public async Task DeleteDataFiles_Returns_OK()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task DeleteDataFilesAsync_Returns_ValidationProblem()
+        public async Task DeleteDataFiles_Returns_ValidationProblem()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task CancelFileImportButNotAllowed()
+        public async Task CancelFileImport_Forbidden()
         {
             var importService = new Mock<IDataImportService>(Strict);
 

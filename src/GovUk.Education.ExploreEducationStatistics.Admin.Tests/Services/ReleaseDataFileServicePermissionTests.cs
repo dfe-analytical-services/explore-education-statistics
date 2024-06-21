@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -186,6 +185,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             zipFormFile: new Mock<IFormFile>().Object,
                             subjectName: "",
                             replacingFileId: null);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task UploadAsBulkZip()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(userService: userService.Object);
+                        return service.UploadAsBulkZip(
+                            releaseVersionId: _releaseVersion.Id,
+                            bulkZipFormFile: new Mock<IFormFile>().Object);
                     }
                 );
         }

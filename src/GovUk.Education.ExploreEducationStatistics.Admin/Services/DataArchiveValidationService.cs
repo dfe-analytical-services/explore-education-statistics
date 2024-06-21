@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileTypeService _fileTypeService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
 
-        private const int MaxFilenameSize = 150;
+        public const int MaxFilenameSize = 150;
 
         private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
             new()
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return archiveDataSet;
         }
 
-        public async Task<Either<ActionResult, List<ArchiveDataSetFile>>> ValidateBulkDataArchiveFile( // @MarkFix needs unit tests
+        public async Task<Either<ActionResult, List<ArchiveDataSetFile>>> ValidateBulkDataArchiveFile(
             Guid releaseVersionId,
             IFormFile zipFile)
         {
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             try
             {
-                await dataSetNamesCsvReader.ReadAsync(); // @MarkFix what happens if headers but no data here?
+                await dataSetNamesCsvReader.ReadAsync();
                 dataSetNamesCsvReader.ReadHeader();
             }
             catch (ReaderException e)
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             using var csvDataReader = new CsvDataReader(dataSetNamesCsvReader);
 
-            var lastLine = false; // Assume one row of data // @MarkFix yeah? test it
+            var lastLine = false; // Assume one row of data
 
             while (!lastLine)
             {
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Check for duplicate data set names - because the bulk zip itself main contain duplicates!
             results
-                .GroupBy(file => file.DataSetName)
+                .GroupBy(file => file.DataSetFileName)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key)
                 .ForEach(duplicateDatasetName =>

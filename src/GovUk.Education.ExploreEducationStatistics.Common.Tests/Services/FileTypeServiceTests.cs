@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -96,145 +96,154 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         };
         
         [Fact]
-        public void GetMimeType_Doc()
+        public async Task GetMimeType_Doc()
         {
-            AssertMimeTypeCorrect(Doc);
+            await AssertMimeTypeCorrect(Doc);
         }
         
         [Fact]
-        public void GetMimeType_Docx()
+        public async Task GetMimeType_Docx()
         {
-            AssertMimeTypeCorrect(Docx);
+            await AssertMimeTypeCorrect(Docx);
         }
         
         [Fact]
-        public void GetMimeType_Ods()
+        public async Task GetMimeType_Ods()
         {
-            AssertMimeTypeCorrect(Ods);
+            await AssertMimeTypeCorrect(Ods);
         }
         
         [Fact]
-        public void GetMimeType_Odt()
+        public async Task GetMimeType_Odt()
         {
-            AssertMimeTypeCorrect(Odt);
+            await AssertMimeTypeCorrect(Odt);
         }
         
         [Fact]
-        public void GetMimeType_Xls()
+        public async Task GetMimeType_Xls()
         {
-            AssertMimeTypeCorrect(Xls);
+            await AssertMimeTypeCorrect(Xls);
         }
         
         [Fact]
-        public void GetMimeType_Xlsx()
+        public async Task GetMimeType_Xlsx()
         {
-            AssertMimeTypeCorrect(Xlsx);
+            await AssertMimeTypeCorrect(Xlsx);
         }
 
         [Fact]
-        public void GetMimeType_Xlsx2()
+        public async Task GetMimeType_Xlsx2()
         {
-            AssertMimeTypeCorrect(Xlsx2);
+            await AssertMimeTypeCorrect(Xlsx2);
         }
 
         [Fact]
-        public void GetMimeType_Csv()
+        public async Task GetMimeType_Csv()
         {
-            AssertMimeTypeCorrect(Csv);
+            await AssertMimeTypeCorrect(Csv);
         }
         
         [Fact]
-        public void GetMimeType_Pdf()
+        public async Task GetMimeType_Pdf()
         {
-            AssertMimeTypeCorrect(Pdf);
+            await AssertMimeTypeCorrect(Pdf);
         }
         
         [Fact]
-        public void GetMimeType_Bmp()
+        public async Task GetMimeType_Bmp()
         {
-            AssertMimeTypeCorrect(Bmp);
+            await AssertMimeTypeCorrect(Bmp);
         }
         
         [Fact]
-        public void GetMimeType_Jpg()
+        public async Task GetMimeType_Jpg()
         {
-            AssertMimeTypeCorrect(Jpg);
+            await AssertMimeTypeCorrect(Jpg);
         }
         
         [Fact]
-        public void GetMimeType_Gif()
+        public async Task GetMimeType_Gif()
         {
-            AssertMimeTypeCorrect(Gif);
+            await AssertMimeTypeCorrect(Gif);
         }
         
         [Fact]
-        public void GetMimeType_Png()
+        public async Task GetMimeType_Png()
         {
-            AssertMimeTypeCorrect(Png);
+            await AssertMimeTypeCorrect(Png);
         }
 
         [Fact]
-        public void GetMimeType_Svg()
+        public async Task GetMimeType_Svg()
         {
-            AssertMimeTypeCorrect(Svg);
+            await AssertMimeTypeCorrect(Svg);
         }
 
         [Fact]
-        public void GetMimeType_Svg_NoXml()
+        public async Task GetMimeType_Svg_NoXml()
         {
-            AssertMimeTypeCorrect(SvgNoXml);
+            await AssertMimeTypeCorrect(SvgNoXml);
         }
 
         [Fact]
-        public void GetMimeType_Txt()
+        public async Task GetMimeType_Txt()
         {
-            AssertMimeTypeCorrect(Txt);
+            await AssertMimeTypeCorrect(Txt);
         }
         
         [Fact]
-        public void ValidChartFileUploads()
+        public async Task HasMatchingMimeType_ValidChartFileUploads()
         {
             // test that all image files are valid for chart file uploads and not others
-            AllTypes.ForEach(type =>
+            foreach (var type in AllTypes)
             {
                 var expectedToSucceed = ImageTypes.Contains(type);
-                AssertHasMatchingMimeType(type, FileTypeValidationUtils.AllowedChartFileTypes.ToList(), expectedToSucceed);
-            });
+                await AssertHasMatchingMimeType(type, AllowedChartFileTypes.ToList(), expectedToSucceed);
+            }
         }
         
         [Fact]
-        public void ValidAncillaryFileUploads()
+        public async Task HasMatchingMimeType_ValidAncillaryFileUploads()
         {
             // check that all types are valid for ancillary file uploads
-            AllTypes.ForEach(type =>
+            foreach (var type in AllTypes)
             {
-                AssertHasMatchingMimeType(type, AllowedAncillaryFileTypes.ToList(), true);
-            });
+                await AssertHasMatchingMimeType(type, AllowedAncillaryFileTypes.ToList(), true);
+            }
         }
         
         [Fact]
-        public void ValidCsvFileUploads()
+        public async Task HasMatchingMimeType_ValidCsvFileUploads()
         {
             // check that csv file types (either explicitly detected as application/csv / text/csv or indirectly as
             // text/plain) are valid for data and metadata file uploads
-            AllTypes.ForEach(type =>
+            foreach (var type in AllTypes)
             {
                 var expectedToSucceed = CsvTypes.Contains(type);
-                AssertHasMatchingMimeType(type, AllowedCsvMimeTypes.ToList(), expectedToSucceed);
-            });
+                await AssertHasMatchingMimeType(type, AllowedCsvMimeTypes.ToList(), expectedToSucceed);
+            }
         }
         
         [Fact]
-        public void ValidArchiveFileUploads()
+        public async Task HasMatchingMimeType_ValidArchiveFileUploads()
         {
-            AllTypes.ForEach(type =>
+            foreach (var type in AllTypes)
             {
                 var expectedToSucceed = ArchiveTypes.Contains(type);
-                AssertHasMatchingMimeType(type, AllowedArchiveMimeTypes.ToList(), expectedToSucceed);
-            });
+                await AssertHasMatchingMimeType(type, AllowedArchiveMimeTypes.ToList(), expectedToSucceed);
+            }
         }
-        
-        private static void AssertMimeTypeCorrect(FileInfo fileInfo)
+
+        // @MarkFix HasMatchingEncodingType_ValidCsv
+        // @MarkFix HasMatchingEncodingType_ValidZip
+
+        // @MarkFix IsValidCsvFile_Valid
+        // @MarkFix IsValidCsvFile_Valid_VeryShortCsvFile
+        // @MarkFix IsValidCsvFile_Valid_VeryLongHeaderRow
+        // @MarkFix IsValidCsvFile_InvalidMimeType
+        // @MarkFix IsValidCsvFile_InvalidEncoding
+
+        private static async Task AssertMimeTypeCorrect(FileInfo fileInfo)
         {
             var service = BuildService();
 
@@ -246,13 +255,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
             
-            var result = service.GetMimeType(formFile.Object).Result;
+            var result = await service.GetMimeType(formFile.Object);
             
             Assert.True(fileInfo.ExpectedMimeTypes.Contains(result), 
                 "Expected " + result + " to be contained in the expected mime types list");
         }
         
-        private static void AssertHasMatchingMimeType(FileInfo fileInfo, List<Regex> availableMimeTypes,
+        private static async Task AssertHasMatchingMimeType(FileInfo fileInfo, List<Regex> availableMimeTypes,
             bool expectedToSucceed)
         {
             var service = BuildService();
@@ -265,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
             
-            var result = service.HasMatchingMimeType(formFile.Object, availableMimeTypes).Result;
+            var result = await service.HasMatchingMimeType(formFile.Object, availableMimeTypes);
             
             Assert.Equal(expectedToSucceed, result);
         }
