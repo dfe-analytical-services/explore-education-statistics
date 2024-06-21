@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -492,6 +491,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.Files.FindAsync(zipFile.Id));
             }
         }
+
+        // @MarkFix Delete_DoNotRemoveSourceZipIfOtherFilesFromZipStillExist
 
         [Fact]
         public async Task DeleteAll()
@@ -1858,7 +1859,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileUploadsValidatorService
                     .Setup(s => s.ValidateDataSetFilesForUpload(
                         releaseVersion.Id,
-                        originalDataReleaseFile.Name, // @MarkFix double check this
+                        originalDataReleaseFile.Name,
                         dataFormFile,
                         metaFormFile,
                         It.Is<File>(f => f.Id == originalDataReleaseFile.File.Id)))
@@ -2202,10 +2203,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                //fileUploadsValidatorService // @MarkFix needed? I think not
-                //    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
-                //    .Returns([]);
-
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(
                         releaseVersion.Id,
@@ -2385,19 +2382,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                //fileUploadsValidatorService
-                //    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id, subjectName))
-                //    .Returns([]);
-
-                //fileUploadsValidatorService
-                //    .Setup(s => s.ValidateDataFilesForUpload(
-                //        releaseVersion.Id,
-                //        archiveFile,
-                //        Mock.Of<Stream>(),
-                //        Mock.Of<Stream>(),
-                //        null))
-                //    .ReturnsAsync([]);
-
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(
                         releaseVersion.Id, subjectName, zipFormFile, null))
@@ -2551,24 +2535,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                //fileUploadsValidatorService
-                //    .Setup(s => s.ValidateReleaseVersionDataSetFileName(releaseVersion.Id,
-                //        originalDataReleaseFile.Name))
-                //    .Returns([]);
-
-                //fileUploadsValidatorService
-                //    .Setup(s => s.ValidateDataFilesForUpload(
-                //        releaseVersion.Id,
-                //        archiveFile,
-                //        Mock.Of<Stream>(),
-                //        Mock.Of<Stream>(),
-                //        It.Is<File>(file => file.Id == originalDataReleaseFile.File.Id)))
-                //    .ReturnsAsync([]);
-
                 dataArchiveValidationService
                     .Setup(s => s.ValidateDataArchiveFile(
                         releaseVersion.Id, originalDataReleaseFile.Name, zipFormFile,
-                        It.Is<File>(file => file.Filename == originalDataReleaseFile.File.Filename))) // @MarkFix probably want to check this
+                        It.Is<File>(file => file.Filename == originalDataReleaseFile.File.Filename)))
                     .ReturnsAsync(new Either<ActionResult, ArchiveDataSetFile>(archiveFile));
 
                 dataImportService
@@ -2688,6 +2658,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == metaFile.Id));
             }
         }
+
+        // @MarkFix UploadAsBulkZip_Valid
+        // @MarkFix UploadAsBulkZip_Order
+        // @MarkFix UploadAsBulkZip_Replacing
 
         private ReleaseDataFileService SetupReleaseDataFileService(
             ContentDbContext contentDbContext,

@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -76,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             var magicFilePath = _configuration.GetValue<string>("MagicFilePath");
 
-            // @MarkFix do we need more than 1024 bytes? - like first 1000 lines like previously? - test it
             // Check mime type
             var magicTypeContext = new Magic(MagicOpenFlags.MAGIC_MIME_TYPE, magicFilePath);
             var mimeType = magicTypeContext.Read(sampleBuffer, sampleBufferSize);
@@ -90,12 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var encodingType = magicEncodingContext.Read(sampleBuffer, sampleBufferSize);
 
             return AllowedCsvEncodingTypes.Contains(encodingType);
-        }
-
-        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider)
-        {
-            await using var stream = await streamProvider.Invoke();
-            return await IsValidCsvFile(stream);
         }
 
         private async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)

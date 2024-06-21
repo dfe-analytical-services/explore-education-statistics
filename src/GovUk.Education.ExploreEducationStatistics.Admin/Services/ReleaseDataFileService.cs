@@ -380,7 +380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 contentLength: archiveDataSet.DataFileSize,
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
-                                name: archiveDataSet.DataSetName,
+                                name: archiveDataSet.DataSetFileName,
                                 replacingDataFile: replacingFile,
                                 source: zipFile,
                                 order: releaseDataFileOrder);
@@ -415,7 +415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             return BuildDataFileViewModel(
                                 dataReleaseFile: dataReleaseFile,
                                 metaFile: metaFile,
-                                archiveDataSet.DataSetName,
+                                archiveDataSet.DataSetFileName,
                                 dataImport.TotalRows,
                                 dataImport.Status,
                                 permissions);
@@ -465,7 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 contentLength: archiveFile.DataFileSize,
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
-                                name: archiveFile.DataSetName,
+                                name: archiveFile.DataSetFileName,
                                 source: bulkZipFile,
                                 order: releaseDataFileOrder);
 
@@ -496,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 BuildDataFileViewModel(
                                     dataReleaseFile: dataReleaseFile,
                                     metaFile: metaFile,
-                                    archiveFile.DataSetName,
+                                    archiveFile.DataSetFileName,
                                     dataImport.TotalRows,
                                     dataImport.Status,
                                     permissions));

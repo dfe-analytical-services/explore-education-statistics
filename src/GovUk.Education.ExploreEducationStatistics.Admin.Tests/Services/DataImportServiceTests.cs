@@ -286,25 +286,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
+
+            var sourceFile = new File
+            {
+                Filename = "data.zip",
+                Type = FileType.DataZip,
+                SubjectId = null,
+            };
+
             var dataFile = new File
             {
                 Filename = "data.csv",
                 Type = FileType.Data,
-                SubjectId = subjectId
+                SubjectId = subjectId,
+                Source = sourceFile,
             };
 
             var metaFile = new File
             {
                 Filename = "data.meta.csv",
                 Type = FileType.Metadata,
-                SubjectId = subjectId
+                SubjectId = subjectId,
+                Source = sourceFile,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Files.AddRangeAsync(dataFile, metaFile);
+                await contentDbContext.Files.AddRangeAsync(sourceFile, dataFile, metaFile);
             }
 
             var dataProcessorClient = new Mock<IDataProcessorClient>(Strict);
@@ -317,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
                     dataProcessorClient: dataProcessorClient.Object);
 
-                var result = await service.Import(subjectId, dataFile, metaFile);
+                var result = await service.Import(subjectId, dataFile, metaFile, sourceFile);
 
                 MockUtils.VerifyAllMocks(dataProcessorClient);
 
@@ -326,6 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectId, result.SubjectId);
                 Assert.Equal(DataImportStatus.QUEUED, result.Status);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+                Assert.Equal(dataFile.SourceId, result.ZipFileId);
             }
         }
 
