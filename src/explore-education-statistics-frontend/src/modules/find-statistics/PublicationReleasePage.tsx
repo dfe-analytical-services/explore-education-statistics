@@ -30,6 +30,8 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import getTargetRelation from '@common/utils/url/getTargetRelation';
+import buildRel from '@common/utils/url/buildRel';
 
 interface Props {
   release: Release;
@@ -342,7 +344,22 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                           }) => (
                             <li key={id} data-testid="other-release-item">
                               {isLegacyLink ? (
-                                <a href={legacyLinkUrl}>{description}</a>
+                                <a
+                                  href={legacyLinkUrl}
+                                  rel={buildRel(
+                                    getTargetRelation(legacyLinkUrl ?? '') ===
+                                      'internal-public'
+                                      ? []
+                                      : [
+                                          'external',
+                                          'noopener',
+                                          'noreferrer',
+                                          'nofollow',
+                                        ],
+                                  )}
+                                >
+                                  {description}
+                                </a>
                               ) : (
                                 <Link
                                   to={`/find-statistics/${release.publication.slug}/${releaseSlug}`}
@@ -401,7 +418,21 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     {release.relatedInformation &&
                       release.relatedInformation.map(link => (
                         <li key={link.id}>
-                          <a href={link.url}>{link.description}</a>
+                          <a
+                            href={link.url}
+                            rel={buildRel(
+                              getTargetRelation(link.url) === 'internal-public'
+                                ? []
+                                : [
+                                    'external',
+                                    'noopener',
+                                    'noreferrer',
+                                    'nofollow',
+                                  ],
+                            )}
+                          >
+                            {link.description}
+                          </a>
                         </li>
                       ))}
                   </ul>
