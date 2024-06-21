@@ -60,25 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return encodingTypes.Contains(encodingType);
         }
 
-        public async Task<bool> HasMatchingMimeType(Stream stream, IEnumerable<Regex> mimeTypes)
-        {
-            var mimeType = GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_TYPE);
-
-            if (IsMimeTypeNullOrZip(mimeType))
-            {
-                var fileType = await GetMimeTypeUsingMimeDetective(stream);
-                mimeType = fileType?.Mime ?? mimeType;
-            }
-
-            return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
-        }
-
-        public bool HasMatchingEncodingType(Stream stream, IEnumerable<string> encodingTypes)
-        {
-            var encodingType = GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_ENCODING);
-            return encodingTypes.Contains(encodingType);
-        }
-
         public async Task<bool> IsValidCsvFile(Stream stream)
         {
             var sampleBuffer = new byte[1024];
@@ -86,7 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             var magicFilePath = configuration.GetValue<string>("MagicFilePath");
 
-            // @MarkFix check this works rather than the previous 1000 line check
             // Check mime type
             var magicTypeContext = new Magic(MagicOpenFlags.MAGIC_MIME_TYPE, magicFilePath);
             var mimeType = magicTypeContext.Read(sampleBuffer, sampleBufferSize);
@@ -114,15 +94,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await stream.GetFileTypeAsync();
         }
 
-        private string GuessMagicInfo(Stream fileStream, MagicOpenFlags flag)
+        private string GuessMagicInfo(Stream stream, MagicOpenFlags flag)
         {
-            using var reader = new StreamReader(fileStream);
+            var magicFilePath = configuration.GetValue<string>("MagicFilePath");
+            var magicContext = new Magic(flag, magicFilePath);
 
-            var dbPath = configuration.GetValue<string>("MagicFilePath");
-            var magic = new Magic(flag, dbPath);
-
-            var bufferSize = reader.BaseStream.Length >= 1024 ? 1024 : (int) reader.BaseStream.Length;
-            return magic.Read(reader.BaseStream, bufferSize);
+            // Wrapping in a StreamReader is necessary with DeflateStreams - stream of a file in a zip - in order
+            // for magicContext.Read to work correctly. Why? No idea.
+            using var reader = new StreamReader(stream);
+            return magicContext.Read(reader.BaseStream, 1024); // Read method hands if size < 1024
         }
 
         private bool IsMimeTypeNullOrZip(string mimeType)
