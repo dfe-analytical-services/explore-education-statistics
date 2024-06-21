@@ -92,6 +92,7 @@ const ReleaseDataUploadsSection = ({
     );
 
     setActiveFileId('');
+
     setDataFiles(
       dataFiles.map(file =>
         file.fileName !== dataFile.fileName
@@ -104,16 +105,24 @@ const ReleaseDataUploadsSection = ({
             },
       ),
     );
+
+    // @MarkFix when bulk importing multiple data sets that finish around the same time, getDataFilePermissions
+    // appears to be called for all files, but I believe most changes are getting overwritten except the last update,
+    // all subjects but one will still show the `Cancel` button when they should show the `Delete files` etc. buttons.
+    // I'm inclined to think setDataFiles needs to be rewritten with useState such that we can do
+    // `setDataFiles((prevFiles : DataFile[]) => [code to update data files permissions here])`
+    console.log('dataFiles: ', dataFiles);
   };
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
-      let newFiles: DataFile[] = [];
-      if (!values.subjectTitle) {
-        return;
-      }
+      const newFiles: DataFile[] = [];
+
       switch (values.uploadType) {
-        case 'csv':
+        case 'csv': {
+          if (!values.subjectTitle) {
+            return;
+          }
           newFiles.push(
             await releaseDataFileService.uploadDataFiles(releaseId, {
               title: values.subjectTitle,
@@ -122,7 +131,11 @@ const ReleaseDataUploadsSection = ({
             }),
           );
           break;
-        case 'zip':
+        }
+        case 'zip': {
+          if (!values.subjectTitle) {
+            return;
+          }
           newFiles.push(
             await releaseDataFileService.uploadZipDataFile(releaseId, {
               title: values.subjectTitle,
@@ -130,6 +143,7 @@ const ReleaseDataUploadsSection = ({
             }),
           );
           break;
+        }
         case 'bulkZip':
           newFiles.push(
             ...(await releaseDataFileService.uploadBulkZipDataFile(
@@ -138,7 +152,9 @@ const ReleaseDataUploadsSection = ({
             )),
           );
           break;
-        // @MarkFix default case?
+        default:
+          console.error("This shouldn't happen!"); // @MarkFix
+          break;
       }
       setActiveFileId(newFiles[0].id); // @MarkFix we want to open all new files really - but do we care?
       setDataFiles([...dataFiles, ...newFiles]);

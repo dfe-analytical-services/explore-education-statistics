@@ -48,9 +48,9 @@ function baseErrorMappings(
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'zipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
-          DataZipMustBeZipFile: 'Choose a valid ZIP file', // @MarkFix This error is gone! Replaced by ZipFilenameMustEndDotZip and MustBeZipFile
+          // @MarkFix I think we should be able to remove all these, as the backend now provides both code and message? - same for csv and zip fileTypes
+          DataZipMustBeZipFile: 'Choose a valid ZIP file',
           DataBulkZipFileMustHaveManifest: 'ZIP file must contain a manifest',
-          // @MarkFix add errors here
           // DataZipFileDoesNotContainCsvFiles:
           //   'ZIP file does not contain any CSV files',
           // DataFilenameNotUnique: 'Choose a unique ZIP data file name',
@@ -79,7 +79,7 @@ function baseErrorMappings(
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'zipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
-          DataZipMustBeZipFile: 'Choose a valid ZIP file', // @MarkFix This error is gone! Replaced by ZipFilenameMustEndDotZip and MustBeZipFile
+          DataZipMustBeZipFile: 'Choose a valid ZIP file',
           DataZipFileCanOnlyContainTwoFiles:
             'ZIP file can only contain two CSV files',
           DataZipFileDoesNotContainCsvFiles:
@@ -176,7 +176,7 @@ export default function DataFileUploadForm({
       subjectTitle: Yup.string(),
       uploadType: Yup.string().oneOf(['csv', 'zip', 'bulkZip']).defined(),
       zipFile: Yup.file().when('uploadType', {
-        is: 'zip',
+        is: 'zip' || 'bulkZip',
         then: s =>
           s
             .required('Choose a zip file')
@@ -187,23 +187,26 @@ export default function DataFileUploadForm({
 
     if (!isDataReplacement) {
       return schema.shape({
-        subjectTitle: Yup.string()
-          .required('Enter a subject title')
-          .test({
-            name: 'unique',
-            message: 'Enter a unique subject title',
-            test(value: string) {
-              if (!value) {
-                return true;
-              }
+        subjectTitle: Yup.string().when('uploadType', {
+          is: (uploadType: FileType) =>
+            uploadType === 'csv' || uploadType === 'zip',
+          then: s =>
+            s.required('Enter a subject title').test({
+              name: 'unique',
+              message: 'Enter a unique subject title',
+              test(value: string) {
+                if (!value) {
+                  return true;
+                }
 
-              return (
-                dataFiles?.find(
-                  f => f.title.toUpperCase() === value.toUpperCase(),
-                ) === undefined
-              );
-            },
-          }),
+                return (
+                  dataFiles?.find(
+                    f => f.title.toUpperCase() === value.toUpperCase(),
+                  ) === undefined
+                );
+              },
+            }),
+        }),
       });
     }
 
@@ -219,7 +222,10 @@ export default function DataFileUploadForm({
 
   return (
     <FormProvider
-      errorMappings={getErrorMappings()}
+      //errorMappings={getErrorMappings()}
+      fallbackErrorMapping={error => {
+
+      }}
       initialValues={
         isDataReplacement
           ? defaultInitialValues
@@ -228,20 +234,22 @@ export default function DataFileUploadForm({
       resetAfterSubmit
       validationSchema={validationSchema}
     >
-      {({ formState, reset }) => {
+      {({ formState, reset, getValues }) => {
+        const uploadType = getValues('uploadType');
         return (
           <Form id="dataFileUploadForm" onSubmit={onSubmit}>
             <div style={{ position: 'relative' }}>
               {formState.isSubmitting && (
                 <LoadingSpinner text="Uploading files" overlay />
               )}
-              {!isDataReplacement && ( // @MarkFix hide if bulkZip?
-                <FormFieldTextInput<DataFileUploadFormValues>
-                  name="subjectTitle"
-                  label="Subject title"
-                  className="govuk-!-width-two-thirds"
-                />
-              )}
+              {!isDataReplacement &&
+                (uploadType === 'csv' || uploadType === 'zip') && (
+                  <FormFieldTextInput<DataFileUploadFormValues>
+                    name="subjectTitle"
+                    label="Subject title"
+                    className="govuk-!-width-two-thirds"
+                  />
+                )}
 
               <FormFieldRadioGroup<DataFileUploadFormValues>
                 name="uploadType"
