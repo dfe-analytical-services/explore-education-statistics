@@ -86,6 +86,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
+        /// <summary>
+        /// Returns true if the type is considered 'simple' i.e. it can be
+        /// represented as a single value e.g. a string, number, date, etc.
+        /// </summary>
+        public static bool IsSimple(this Type type)
+        {
+            var underlyingType = type.GetUnderlyingType();
+
+            return underlyingType.IsPrimitive
+                || underlyingType.IsEnum
+                || underlyingType == typeof(string)
+                || underlyingType == typeof(decimal)
+                || underlyingType == typeof(DateTime)
+                || underlyingType == typeof(DateTimeOffset)
+                || underlyingType == typeof(TimeSpan)
+                || underlyingType == typeof(Uri)
+                || underlyingType == typeof(Guid);
+        }
+
+        /// <summary>
+        /// Returns true if the type is considered 'complex' i.e. it cannot be
+        /// represented as a single value e.g. an object, list, etc.
+        /// This is the opposite of <see cref="IsSimple"/>.
+        /// </summary>
+        public static bool IsComplex(this Type type) => !type.IsSimple();
+
         public static bool IsNullableType(this Type type)
             => Nullable.GetUnderlyingType(type) is not null;
 

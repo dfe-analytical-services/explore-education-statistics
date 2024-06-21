@@ -145,6 +145,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
         }
 
+        public class IsSimpleTests
+        {
+            public static readonly TheoryData<Type> SimpleTypes = new()
+            {
+                typeof(int),
+                typeof(int?),
+                typeof(double),
+                typeof(double?),
+                typeof(bool),
+                typeof(bool?),
+                typeof(char),
+                typeof(char?),
+                typeof(string),
+                typeof(decimal),
+                typeof(decimal?),
+                typeof(TestEnum),
+                typeof(TestEnum?),
+                typeof(DateTime),
+                typeof(DateTime?),
+                typeof(DateTimeOffset),
+                typeof(DateTimeOffset?),
+                typeof(TimeSpan),
+                typeof(Uri),
+                typeof(Guid),
+                typeof(Guid?),
+            };
+
+            public static readonly TheoryData<Type> ComplexTypes = new()
+            {
+                typeof(List<string>),
+                typeof(ISet<string>),
+                typeof(TypeExtensionsTests),
+                typeof(Type),
+                typeof(TestStruct),
+                typeof(TestStruct?),
+
+            };
+
+            [Theory]
+            [MemberData(nameof(SimpleTypes))]
+            public void SimpleType_ReturnsTrue(Type simpleType)
+            {
+                Assert.True(simpleType.IsSimple());
+            }
+            
+            [Theory]
+            [MemberData(nameof(ComplexTypes))]
+            public void ComplexType_ReturnsFalse(Type complexType)
+            {
+                Assert.False(complexType.IsSimple());
+            }
+        }
+
+        public class IsComplexTests
+        {
+            [Theory]
+            [MemberData(nameof(IsSimpleTests.SimpleTypes), MemberType = typeof(IsSimpleTests))]
+            public void SimpleType_ReturnsFalse(Type simpleType)
+            {
+                Assert.False(simpleType.IsComplex());
+            }
+
+            [Theory]
+            [MemberData(nameof(IsSimpleTests.ComplexTypes), MemberType = typeof(IsSimpleTests))]
+            public void ComplexType_ReturnsTrue(Type complexType)
+            {
+                Assert.True(complexType.IsComplex());
+            }
+        }
+
         public class IsNullableTypeTests
         {
             [Theory]
@@ -246,8 +316,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             public NullableReferenceTypeClass? NullableReferenceType { get; set; }
         };
 
-        private enum TestEnum
-        {
-        }
+        private enum TestEnum;
+
+        private struct TestStruct;
     }
 }
