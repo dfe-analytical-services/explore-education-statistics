@@ -1,0 +1,13 @@
+.glossarySection {
+  display: grid;
+  text-wrap: nowrap;
+}
+
+.boundaryTypes {
+  grid-template-columns: 1fr 1fr;
+}
+
+.boundaryLevels {
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 0 2rem;
+}
