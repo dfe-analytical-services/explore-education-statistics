@@ -46,7 +46,7 @@ Verify that routes with www are redirected without them
     user waits until page contains    Explore education statistics
     user checks url equals    %{PUBLIC_URL}/
 
-    user navigates to public frontend    %{PUBLIC_URL_WITH_WWW}/data-catalogue/
+    user navigates to public frontend with www    %{PUBLIC_URL}/data-catalogue/
     user waits until page contains    Browse our open data
     user checks url equals    %{PUBLIC_URL}/data-catalogue
 
