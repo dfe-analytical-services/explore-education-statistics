@@ -263,11 +263,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 dataFormFile,
                                 metaFormFile,
                                 replacingFile))
-                        .OnSuccessCombineWith(replacingFile =>
-                            ValidateSubjectName(releaseVersionId, subjectName, replacingFile))
-                        .OnSuccess(async replacingFileAndSubjectName =>
+                        .OnSuccess(async replacingFile =>
                         {
-                            var (replacingFile, validSubjectName) = replacingFileAndSubjectName;
+                            var dataSetFileName = await GetReleaseVersionDataSetFileName(
+                                releaseVersionId,
+                                subjectName,
+                                replacingFile);
+                            // @MarkFix dataSetFileName not validated
 
                             var subjectId =
                                 await _releaseVersionRepository
@@ -282,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 contentLength: dataFormFile.Length,
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
-                                name: validSubjectName,
+                                name: dataSetFileName,
                                 replacingDataFile: replacingFile,
                                 order: releaseDataFileOrder);
 
@@ -306,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             return BuildDataFileViewModel(dataFile: dataFile,
                                 metaFile: metaFile,
-                                validSubjectName,
+                                dataSetFileName,
                                 dataImport.TotalRows,
                                 dataImport.Status,
                                 permissions);
@@ -327,9 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
                         {
-                            return await ValidateSubjectName(releaseVersionId, subjectName, replacingFile)
-                                .OnSuccess(validSubjectName =>
-                                    _dataArchiveValidationService.ValidateDataArchiveFile(zipFormFile)
+                            return await _dataArchiveValidationService.ValidateDataArchiveFile(zipFormFile)
                                         .OnSuccess(async archiveFile =>
                                         {
                                             return await _fileUploadsValidatorService
@@ -338,6 +338,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                     replacingFile)
                                                 .OnSuccess(async () =>
                                                 {
+                                                    var dataSetFileName = await GetReleaseVersionDataSetFileName(
+                                                        releaseVersionId,
+                                                        subjectName,
+                                                        replacingFile);
+                                                    // @MarkFix dataSetFileName not validated
+
                                                     var subjectId = await _releaseVersionRepository
                                                         .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
@@ -358,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         contentLength: archiveFile.DataFileSize,
                                                         type: FileType.Data,
                                                         createdById: _userService.GetUserId(),
-                                                        name: validSubjectName,
+                                                        name: dataSetFileName,
                                                         replacingDataFile: replacingFile,
                                                         source: zipFile,
                                                         order: releaseDataFileOrder);
@@ -384,12 +390,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     return BuildDataFileViewModel(dataFile: dataFile,
                                                         metaFile: metaFile,
-                                                        validSubjectName,
+                                                        dataSetFileName,
                                                         dataImport.TotalRows,
                                                         dataImport.Status,
                                                         permissions);
                                                 });
-                                        }));
+                                        });
                         });
                 });
         }
@@ -471,12 +477,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseVersionId,
-            string? subjectName,
-            File? replacingFile)
+        // Some endpoints can be used in two scenarios: 1. To create brand new data set files and 2. to do replacements
+        // of existing data set files. This method fetches the release version data set file name based on the scenario
+        private async Task<string> GetReleaseVersionDataSetFileName(
+            Guid releaseVersionId,
+            string? subjectName = null,
+            File? replacingFile = null)
         {
             if (replacingFile != null)
             {
+                if (subjectName != null)
+                {
+                    throw new ArgumentException("subjectName and replacingFile shouldn't both be provided");
+                }
+
                 if (replacingFile.Type != FileType.Data)
                 {
                     throw new ArgumentException("replacingFile.Type should equal FileType.Data");
@@ -488,11 +502,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (subjectName == null)
             {
-                throw new ArgumentException("Original subjects cannot have null subject name");
+                throw new ArgumentException("New data set files cannot have a null subject name");
             }
 
-            return await _fileUploadsValidatorService.ValidateSubjectName(releaseVersionId, subjectName)
-                .OnSuccess(async () => await Task.FromResult(subjectName));
+            return subjectName;
         }
 
         private async Task UploadFileToStorage(
