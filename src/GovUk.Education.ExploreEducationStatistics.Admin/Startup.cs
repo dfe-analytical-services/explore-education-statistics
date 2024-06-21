@@ -1,8 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using Azure.Core;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -49,6 +46,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -74,6 +72,11 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using Semver;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -83,6 +86,7 @@ using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
+using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using IContentMethodologyService =
     GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
@@ -115,11 +119,6 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
-using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
-using Microsoft.AspNetCore.Mvc;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -499,6 +498,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
             services.AddTransient<IEmailService, EmailService>();
 
+            services.AddTransient<IBoundaryDataService, BoundaryDataService>();
+            services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
+            services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
@@ -776,10 +778,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
-        
+
         public Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
-            Guid dataSetId, 
-            SemVersion version, 
+            Guid dataSetId,
+            SemVersion version,
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, DataSetVersion>(new NotFoundResult()));
