@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -14,7 +13,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
 
         Task<bool> IsValidCsvFile(Stream stream);
-
-        Task<bool> IsValidCsvFile(IFormFile file);
     }
 }

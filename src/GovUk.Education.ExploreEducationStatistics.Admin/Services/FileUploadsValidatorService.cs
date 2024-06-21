@@ -213,12 +213,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileTypes(IFormFile dataFile, IFormFile metaFile)
         {
-            if (!await _fileTypeService.IsValidCsvFile(dataFile))
+            await using var dataFileStream = dataFile.OpenReadStream();
+            if (!await _fileTypeService.IsValidCsvFile(dataFileStream))
             {
                 return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
-            if (!await _fileTypeService.IsValidCsvFile(metaFile))
+            await using var metaFileStream = metaFile.OpenReadStream();
+            if (!await _fileTypeService.IsValidCsvFile(metaFileStream))
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
