@@ -86,9 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(async releaseVersion => await _userService.CheckCanUpdateReleaseVersion(releaseVersion, ignoreCheck: forceDelete))
+                .OnSuccess(async releaseVersion =>
+                    await _userService.CheckCanUpdateReleaseVersion(releaseVersion, ignoreCheck: forceDelete))
                 .OnSuccess(async _ =>
-                    await fileIds.Select(fileId => _releaseFileService.CheckFileExists(releaseVersionId: releaseVersionId,
+                    await fileIds.Select(fileId => _releaseFileService.CheckFileExists(
+                            releaseVersionId: releaseVersionId,
                             fileId: fileId,
                             FileType.Data))
                         .OnSuccessAll())
@@ -130,7 +132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _fileRepository.Delete(file.Id);
                             await _fileRepository.Delete(metaFile.Id);
 
-                            if (file.SourceId.HasValue)
+                            if (file.SourceId.HasValue
+                                // Only delete source zip file if all files associated with the zip have been removed
+                                && !await _contentDbContext.Files.AnyAsync(f => f.SourceId == file.SourceId.Value))
                             {
                                 var zipFile = await _fileRepository.Get(file.SourceId.Value);
                                 await _privateBlobStorageService.DeleteBlob(
@@ -194,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(releaseVersion => _userService.CheckCanUpdateReleaseVersion(releaseVersion))
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     if (fileIds.Distinct().Count() != fileIds.Count)
