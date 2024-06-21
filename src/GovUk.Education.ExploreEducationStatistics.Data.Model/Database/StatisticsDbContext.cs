@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -8,6 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
@@ -81,8 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         /// we created an abstract base class with a type parameter).
         /// </summary>
         protected StatisticsDbContext(
-            DbContextOptions options, 
-            int? timeout, 
+            DbContextOptions options,
+            int? timeout,
             bool updateTimestamps = true) : base(options)
         {
             Configure(timeout, updateTimestamps);
@@ -102,6 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             }
         }
 
+        public DbSet<BoundaryData> BoundaryData { get; set; } = null!;
         public DbSet<BoundaryLevel> BoundaryLevel { get; set; } = null!;
         public DbSet<Filter> Filter { get; set; } = null!;
         public DbSet<FilterFootnote> FilterFootnote { get; set; } = null!;
@@ -129,6 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConfigureBoundaryData(modelBuilder);
             ConfigureBoundaryLevel(modelBuilder);
             ConfigureIndicator(modelBuilder);
             ConfigureGeoJson(modelBuilder);
@@ -150,6 +152,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
+        }
+
+        private static void ConfigureBoundaryData(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.Id)
+                .UseIdentityColumn();
+
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.Code)
+                .HasMaxLength(9)
+                .IsRequired();
+
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<BoundaryData>()
+                .HasOne(boundaryData => boundaryData.BoundaryLevel)
+                .WithMany()
+                .IsRequired();
+
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.GeoJson)
+                .IsRequired();
         }
 
         private void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
