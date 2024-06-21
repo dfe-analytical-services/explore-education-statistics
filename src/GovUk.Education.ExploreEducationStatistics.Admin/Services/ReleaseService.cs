@@ -36,6 +36,8 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Methodolog
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
+using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -457,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _context.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckReleaseFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
+                .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessCombineWith(releaseFile => _statisticsDbContext.Subject
                     .FirstOrNotFoundAsync(s => s.Id == releaseFile.File.SubjectId))
                 .OnSuccess(async tuple =>
@@ -478,8 +480,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     : new DeleteApiDataSetVersionPlan
                     {
                         DataSetId = tuple.apiDataSetVersion.DataSetId,
-                        DataSetName = tuple.apiDataSetVersion.DataSet.Title,
-                        DataSetVersionId = tuple.apiDataSetVersion.Id,
+                        DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
+                        Id = tuple.apiDataSetVersion.Id,
                         Version = tuple.apiDataSetVersion.Version,
                         Status = tuple.apiDataSetVersion.Status,
                         Valid = false
@@ -491,7 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         SubjectId = tuple.subject.Id,
                         DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseVersionId, tuple.subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
-                        LinkedApiDataSetVersionDeletionPlan = linkedApiDataSetVersionDeletionPlan
+                        DeleteApiDataSetVersionPlan = linkedApiDataSetVersionDeletionPlan
                     };
                 });
         }
@@ -501,14 +503,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccess(() => CheckReleaseFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
+                .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
                 .OnSuccessDo(async releaseFile =>
                 {
                     // Delete any replacement that might exist
                     if (releaseFile.File.ReplacedById.HasValue)
                     {
-                        return await RemoveDataFiles(releaseVersionId, releaseFile.File.ReplacedById.Value);
+                        return await RemoveDataFiles(
+                            releaseVersionId: releaseVersionId, 
+                            fileId: releaseFile.File.ReplacedById.Value);
                     }
 
                     return Unit.Instance;
@@ -555,7 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId);
         }
 
-        private async Task<Either<ActionResult, ReleaseFile>> CheckReleaseFileExists(Guid releaseVersionId, Guid fileId)
+        private async Task<Either<ActionResult, ReleaseFile>> CheckReleaseDataFileExists(Guid releaseVersionId, Guid fileId)
         {
             return await _context.ReleaseFiles
                 .Include(rf => rf.File)
@@ -647,7 +651,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseFile.PublicApiDataSetId.Value,
                 releaseFile.PublicApiDataSetVersion!, 
                 cancellationToken)
-                .OnSuccess(dsv => (DataSetVersion?)dsv);
+                .OnSuccess(dsv => (DataSetVersion?)dsv)
+                .OnFailureDo(_ => throw new ApplicationException(
+                    $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
         }
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile)
@@ -671,7 +677,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
                     Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
-                    Detail = new InvalidErrorDetail<Guid>(releaseFile.PublicApiDataSetId.Value)
+                    Detail = new ApiDataSetErrorDetail(releaseFile.PublicApiDataSetId.Value)
                 });
             }
 
@@ -709,18 +715,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public List<Guid> FootnoteIds { get; init; } = null!;
 
-        public DeleteApiDataSetVersionPlan? LinkedApiDataSetVersionDeletionPlan { get; init; }
+        public DeleteApiDataSetVersionPlan? DeleteApiDataSetVersionPlan { get; init; }
 
-        public bool Valid => LinkedApiDataSetVersionDeletionPlan?.Valid ?? true;
+        public bool Valid => DeleteApiDataSetVersionPlan?.Valid ?? true;
     }
 
     public class DeleteApiDataSetVersionPlan
     {
         public Guid DataSetId { get; init; }
-        public string DataSetName { get; init; } = null!;
 
+        public string DataSetTitle { get; init; } = null!;
 
-        public Guid DataSetVersionId { get; init; }
+        public Guid Id { get; init; }
 
         public string Version { get; init; } = null!;
 

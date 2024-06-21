@@ -46,6 +46,7 @@ using static Moq.MockBehavior;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -336,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var footnote = new Footnote { Id = Guid.NewGuid() };
             footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
-                .ReturnsAsync(new List<Footnote>([footnote]));
+                .ReturnsAsync([footnote]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -360,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
                 Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
                 Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
-                Assert.Null(deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan);
+                Assert.Null(deleteDataFilePlan.DeleteApiDataSetVersionPlan);
                 Assert.True(deleteDataFilePlan.Valid);
             }
         }
@@ -422,7 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var footnote = new Footnote { Id = Guid.NewGuid() };
             footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
-                .ReturnsAsync(new List<Footnote>([footnote]));
+                .ReturnsAsync([footnote]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -448,13 +449,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
                 Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
                 Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
-                Assert.NotNull(deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan);
-                Assert.Equal(dataSet.Id, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.DataSetId);
-                Assert.Equal(dataSet.Title, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.DataSetName);
-                Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.DataSetVersionId);
-                Assert.Equal(dataSetVersion.Version, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Version);
-                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Status);
-                Assert.False(deleteDataFilePlan.LinkedApiDataSetVersionDeletionPlan.Valid);
+                Assert.NotNull(deleteDataFilePlan.DeleteApiDataSetVersionPlan);
+                Assert.Equal(dataSet.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetId);
+                Assert.Equal(dataSet.Title, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetTitle);
+                Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Id);
+                Assert.Equal(dataSetVersion.Version, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Version);
+                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Status);
+                Assert.False(deleteDataFilePlan.DeleteApiDataSetVersionPlan.Valid);
                 Assert.False(deleteDataFilePlan.Valid);
             }
         }
@@ -849,13 +850,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(dataImportService);
 
-                var actionResult = result.AssertBadRequest();
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-                var validationProblem = actionResult.AssertBadRequestWithValidationProblem();
-
-                validationProblem.AssertHasError(
+                var errorDetail = validationProblem.AssertHasError(
                     expectedPath: null,
                     expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
+
+                var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(errorDetail.Detail);
+
+                Assert.Equal(releaseFile.PublicApiDataSetId, apiDataSetErrorDetail.DataSetId);
             }
         }
 
