@@ -16,7 +16,7 @@ module.exports = {
         ],
       },
     ],
-    additionalSitemaps: [`${process.env.PROD_PUBLIC_URL}server-sitemap.xml`],
+    additionalSitemaps: [`${process.env.PROD_PUBLIC_URL}/server-sitemap.xml`],
   },
   transform: async (config, path) => {
     if (path === '/') {
