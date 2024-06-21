@@ -17,7 +17,7 @@ function appendBasicAuthCredentialsToPublic() {
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 15 * 60 * 1000,
+  timeout: process.env.CI ? 60 * 15 * 1000 : 15 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
