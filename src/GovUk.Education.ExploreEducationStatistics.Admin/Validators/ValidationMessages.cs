@@ -200,17 +200,17 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage DataFilenameNotUnique = new(
-        Code: "DataFilenameNotUnique",
-        Message: "Data filename '{0}' isn't unique to this release."
+    public static readonly LocalizableMessage FilenameNotUnique = new(
+        Code: "FilenameNotUnique",
+        Message: "Filename '{0}' of FileType {1} isn't unique to this release."
     );
 
-    public static ErrorViewModel GenerateErrorDataFilenameNotUnique(string filename)
+    public static ErrorViewModel GenerateErrorFilenameNotUnique(string filename, FileType type)
     {
         return new ErrorViewModel
         {
-            Code = DataFilenameNotUnique.Code,
-            Message = string.Format(DataFilenameNotUnique.Message, filename),
+            Code = FilenameNotUnique.Code,
+            Message = string.Format(FilenameNotUnique.Message, filename, type.ToString()),
         };
     }
 
