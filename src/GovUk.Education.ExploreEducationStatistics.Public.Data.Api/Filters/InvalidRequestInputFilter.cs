@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -32,26 +32,46 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
             return next();
         }
 
-        var errorEntries = context.ModelState
+        var invalidModelState = context.ModelState
             .Where(kv => kv.Value?.ValidationState is ModelValidationState.Invalid)
             .Cast<KeyValuePair<string, ModelStateEntry>>()
-            .ToList();
+            .ToDictionary();
 
         var errors = new List<ErrorViewModel>();
 
-        if (TryGetJsonError(errorEntries, out var jsonError))
+        if (TryGetJsonError(invalidModelState, out var jsonError))
         {
             errors.Add(jsonError);
         }
 
-        if (TryGetEmptyBodyError(errorEntries, out var emptyBodyError))
+        if (TryGetEmptyBodyError(invalidModelState, out var emptyBodyError))
         {
             errors.Add(emptyBodyError);
         }
 
-        if (TryGetRequiredFieldError(errorEntries, context.ActionDescriptor, out var requiredFieldError))
+        // There can be error entries for the controller method's parameters
+        // which need to be filtered out first (which otherwise leak internals).
+        var invalidErrorKeys = context.ActionDescriptor
+            .Parameters
+            .Where(param => param.ParameterType.IsComplex())
+            .Select(param => param.Name)
+            .ToHashSet();
+
+        invalidModelState = invalidModelState
+            .Where(entry => !invalidErrorKeys.Contains(entry.Key))
+            .ToDictionary(
+                kv => FormatErrorKey(kv.Key),
+                kv => kv.Value
+            );
+
+        if (TryGetRequiredFieldError(invalidModelState, out var requiredFieldError))
         {
             errors.Add(requiredFieldError);
+        }
+
+        if (TryGetInvalidValueError(invalidModelState, out var invalidValueError))
+        {
+            errors.Add(invalidValueError);
         }
 
         if (errors.Count == 0)
@@ -72,7 +92,7 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
     }
 
     private static bool TryGetJsonError(
-        IEnumerable<KeyValuePair<string, ModelStateEntry>> errorEntries,
+        IDictionary<string, ModelStateEntry> errorEntries,
         [NotNullWhen(true)] out ErrorViewModel? error)
     {
         var modelError = errorEntries
@@ -87,8 +107,8 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
 
         error = new ErrorViewModel
         {
-            Code = ValidationMessages.InvalidInput.Code,
-            Message = ValidationMessages.InvalidInput.Message,
+            Code = ValidationMessages.InvalidValue.Code,
+            Message = ValidationMessages.InvalidValue.Message,
             Path = GetJsonPath(modelError)
         };
 
@@ -115,10 +135,10 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
     }
 
     private static bool TryGetEmptyBodyError(
-        IEnumerable<KeyValuePair<string, ModelStateEntry>> errorEntries,
+        IDictionary<string, ModelStateEntry> modelState,
         [NotNullWhen(true)] out ErrorViewModel? error)
     {
-        if (!errorEntries.Any(entry => entry.Value.Errors
+        if (!modelState.Any(entry => entry.Value.Errors
                 .Any(e => e.ErrorMessage == ValidationMessages.NotEmptyBody.Message)))
         {
             error = null;
@@ -135,30 +155,20 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
     }
 
     private static bool TryGetRequiredFieldError(
-        IEnumerable<KeyValuePair<string, ModelStateEntry>> errorEntries,
-        ActionDescriptor actionDescriptor,
+        IDictionary<string, ModelStateEntry> modelState,
         [NotNullWhen(true)] out ErrorViewModel? error)
     {
-        var actionParams = actionDescriptor.Parameters
-            .Where(param => param.BindingInfo?.BindingSource == BindingSource.Body
-                            || param.BindingInfo?.BindingSource == BindingSource.Form)
-            .Select(param => param.Name)
-            .ToHashSet();
-
-        var requiredFieldError = errorEntries
-            // There are entries for the controller method's parameters which
-            // need to be filtered out first. We don't want to show errors
-            // for these parameters as they leak internals to API users.
-            .Where(entry => !actionParams.Contains(entry.Key))
+        var requiredFieldErrorKey = modelState
             // This isn't the ideal way of determining if we have a required field error.
             // Despite trying a few things (including using localization files), there didn't
             // seem to be an easy way to change the default error message for `RequiredAttribute`.
             // In the interest of time, this approach will have to do.
             // TODO: Work out better way to modify default data annotation error messages
             .FirstOrDefault(entry => entry.Value.Errors
-                .Any(e => e.ErrorMessage.StartsWith("The") && e.ErrorMessage.EndsWith("field is required.")));
+                .Any(e => e.ErrorMessage.StartsWith("The") && e.ErrorMessage.EndsWith("field is required.")))
+            .Key;
 
-        if (requiredFieldError.Equals(default(KeyValuePair<string, ModelStateEntry>)))
+        if (requiredFieldErrorKey.IsNullOrEmpty())
         {
             error = null;
             return false;
@@ -168,9 +178,55 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
         {
             Code = ValidationMessages.RequiredField.Code,
             Message = ValidationMessages.RequiredField.Message,
-            Path = requiredFieldError.Key
+            Path = requiredFieldErrorKey
         };
 
         return true;
+    }
+
+    private static bool TryGetInvalidValueError(
+        IDictionary<string, ModelStateEntry> modelState,
+        [NotNullWhen(true)] out ErrorViewModel? error)
+    {
+        var invalidValueErrorKey = modelState
+            .FirstOrDefault(entry => entry.Value.Errors
+                .Any(e => e.ErrorMessage == ValidationMessages.InvalidValue.Message))
+            .Key;
+
+        if (invalidValueErrorKey.IsNullOrEmpty())
+        {
+            error = null;
+            return false;
+        }
+
+        error = new ErrorViewModel
+        {
+            Code = ValidationMessages.InvalidValue.Code,
+            Message = ValidationMessages.InvalidValue.Message,
+            Path = invalidValueErrorKey
+        };
+
+        return true;
+    }
+
+    private static string FormatErrorKey(string errorKey)
+    {
+        if (errorKey.IsNullOrEmpty())
+        {
+            return errorKey;
+        }
+
+        // Assume that the error key is camelCased already
+        if (errorKey[0] != '$' && !char.IsUpper(errorKey[0]))
+        {
+            return errorKey;
+        }
+
+        // The error key is PascalCased, so we have to camelCase it
+        var parts = errorKey.Split('.');
+
+        return parts
+            .Select(part => part.ToLowerFirst())
+            .JoinToString('.');
     }
 }

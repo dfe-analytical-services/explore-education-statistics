@@ -11,6 +11,18 @@ public static class MvcOptionsExtensions
         options.ModelBindingMessageProvider
             .SetMissingRequestBodyRequiredValueAccessor(() => ValidationMessages.NotEmptyBody.Message);
 
+        options.ModelBindingMessageProvider
+            .SetValueIsInvalidAccessor(_ => ValidationMessages.InvalidValue.Message);
+
+        options.ModelBindingMessageProvider
+            .SetAttemptedValueIsInvalidAccessor((_, _) => ValidationMessages.InvalidValue.Message);
+
+        options.ModelBindingMessageProvider
+            .SetUnknownValueIsInvalidAccessor(_ => ValidationMessages.InvalidValue.Message);
+
+        options.ModelBindingMessageProvider
+            .SetMissingBindRequiredValueAccessor(_ => ValidationMessages.InvalidValue.Message);
+
         options.Filters.Add<InvalidRequestInputFilter>();
     }
 }

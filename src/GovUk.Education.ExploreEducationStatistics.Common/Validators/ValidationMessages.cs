@@ -11,9 +11,9 @@ public static class ValidationMessages
         Message: "Must be one of the allowed values."
     );
 
-    public static readonly LocalizableMessage InvalidInput = new(
-        Code: "InvalidInput",
-        Message: "The input is not valid. Check that it is in the expected format."
+    public static readonly LocalizableMessage InvalidValue = new(
+        Code: "InvalidValue",
+        Message: "Must be a valid value. Check that the type and format are correct."
     );
 
     public static readonly LocalizableMessage NotEmptyBody = new(

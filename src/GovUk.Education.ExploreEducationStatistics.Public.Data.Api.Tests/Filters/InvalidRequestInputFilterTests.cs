@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Filte
 public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     [Fact]
-    public async Task TestPersonBody_Returns200()
+    public async Task TestPersonBody_ValidBody_Returns200()
     {
         var client = BuildApp().CreateClient();
 
@@ -24,7 +24,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
                 Name = "Test name"
             });
 
-        response.AssertOk();
+        var person = response.AssertOk<TestPerson>();
+
+        Assert.Equal("Test name", person.Name);
     }
 
     [Theory]
@@ -47,7 +49,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var error = validationProblem.AssertHasInvalidInputError(path);
 
-        Assert.Equal(ValidationMessages.InvalidInput.Message, error.Message);
+        Assert.Equal(ValidationMessages.InvalidValue.Message, error.Message);
     }
 
     [Fact]
@@ -89,6 +91,26 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
     }
 
+    [Fact]
+    public async Task TestGroupBody_ValidBody_Returns200()
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.PostAsJsonAsync(
+            requestUri: nameof(TestController.TestGroupBody),
+            value: new TestGroup
+            {
+                Owner = new TestPerson
+                {
+                    Name = "Test name"
+                }
+            });
+
+        var group = response.AssertOk<TestGroup>();
+
+        Assert.Equal("Test name", group.Owner.Name);
+    }
+
     [Theory]
     [InlineData("{}", "")]
     [InlineData("{ \"owner\": 123 }", "owner")]
@@ -111,7 +133,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var error = validationProblem.AssertHasInvalidInputError(path);
 
-        Assert.Equal(ValidationMessages.InvalidInput.Message, error.Message);
+        Assert.Equal(ValidationMessages.InvalidValue.Message, error.Message);
     }
 
     [Fact]
@@ -153,6 +175,115 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
     }
 
+    [Theory]
+    [InlineData("?name=Test+name", "Test name")]
+    [InlineData("?name=Test+name&age=30", "Test name", 30)]
+    [InlineData("?name=123", "123")]
+    [InlineData("?name=true", "true")]
+    [InlineData("?name=", "")]
+    public async Task TestPersonQuery_ValidQuery_Returns200(string query, string expectedName, int? expectedAge = null)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
+
+        var person = response.AssertOk<TestPerson>();
+
+        Assert.Equal(expectedName, person.Name);
+        Assert.Equal(expectedAge, person.Age);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("?firstName=Test+name")]
+    public async Task TestPersonQuery_RequiredField_Returns400(string query)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
+
+        var validationProblem = response.AssertValidationProblem();
+
+        Assert.Single(validationProblem.Errors);
+
+        var error = validationProblem.AssertHasRequiredFieldError("name");
+
+        Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
+    }
+
+    [Theory]
+    [InlineData("?name=Test&age=ten")]
+    public async Task TestPersonQuery_InvalidValue_Returns400(string query)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
+
+        var validationProblem = response.AssertValidationProblem();
+
+        Assert.Single(validationProblem.Errors);
+
+        var error = validationProblem.AssertHasInvalidValueError("age");
+
+        Assert.Equal(ValidationMessages.InvalidValue.Message, error.Message);
+    }
+
+    [Theory]
+    [InlineData("?owner.name=Test+name", "Test name")]
+    [InlineData("?owner.name=Test+name&owner.age=30", "Test name", 30)]
+    [InlineData("?owner.name=123", "123")]
+    [InlineData("?owner.name=true", "true")]
+    [InlineData("?owner.name=", "")]
+    public async Task TestGroupQuery_ValidQuery_Returns200(string query, string expectedName, int? expectedAge = null)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
+
+        var group = response.AssertOk<TestGroup>();
+
+        Assert.Equal(expectedName, group.Owner.Name);
+        Assert.Equal(expectedAge, group.Owner.Age);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("?owner=Test")]
+    [InlineData("?owner.namee=Test")]
+    [InlineData("?owner.firstName=Test")]
+    [InlineData("?name=Test")]
+    public async Task TestGroupQuery_RequiredField_Returns400(string query)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
+
+        var validationProblem = response.AssertValidationProblem();
+
+        Assert.Single(validationProblem.Errors);
+
+        var error = validationProblem.AssertHasRequiredFieldError("owner");
+
+        Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
+    }
+
+    [Theory]
+    [InlineData("?owner.name=Test&owner.age=ten")]
+    public async Task TestGroupQuery_InvalidValue_Returns400(string query)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
+
+        var validationProblem = response.AssertValidationProblem();
+
+        Assert.Single(validationProblem.Errors);
+
+        var error = validationProblem.AssertHasInvalidValueError("owner.age");
+
+        Assert.Equal(ValidationMessages.InvalidValue.Message, error.Message);
+    }
+
     [ApiController]
     private class TestController : ControllerBase
     {
@@ -167,11 +298,25 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         {
             return Ok(testGroup);
         }
+
+        [HttpGet(nameof(TestPersonQuery))]
+        public ActionResult TestPersonQuery([FromQuery] TestPerson testPerson)
+        {
+            return Ok(testPerson);
+        }
+
+        [HttpGet(nameof(TestGroupQuery))]
+        public ActionResult TestGroupQuery([FromQuery] TestGroup testGroup)
+        {
+            return Ok(testGroup);
+        }
     }
 
     private class TestPerson
     {
         public required string Name { get; init; }
+
+        public int? Age { get; init; }
     }
 
     private class TestGroup
