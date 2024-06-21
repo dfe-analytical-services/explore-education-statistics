@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (service, _) = BuildService(contentDbContext);
 
-            var result = service.ValidateDataSetName(Guid.NewGuid(), "Subject & Title");
+            var result = service.ValidateDataSetName(Guid.NewGuid(), "Subject & Title", false);
 
             //result.AssertBadRequest(SubjectTitleCannotContainSpecialCharacters); // @MarkFix
         }
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var (service, _) = BuildService(contentDbContext);
 
-                var result = service.ValidateDataSetName(releaseVersion.Id, "Subject Title");
+                var result = service.ValidateDataSetName(releaseVersion.Id, "Subject Title", false);
 
                 //result.AssertBadRequest(SubjectTitleMustBeUnique); // @MarkFix
             }
