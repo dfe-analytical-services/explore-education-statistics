@@ -54,11 +54,6 @@ public class BoundaryDataController : ControllerBase
     [HttpPatch("boundary-data/levels")]
     public async Task<ActionResult> UpdateBoundaryLevel(BoundaryLevelUpdateRequest updateRequest)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         await _boundaryLevelService.UpdateLabel(updateRequest.Id, updateRequest.Label);
 
         return NoContent();

@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 : _context.BoundaryLevel.SingleOrDefaultAsync(level => level.Id == id);
         }
 
-        public async Task<BoundaryLevel> Update(
+        public async Task Update(
             long id,
             string label)
         {
@@ -45,8 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
             level.Label = label;
             await _context.SaveChangesAsync();
-
-            return level;
         }
 
         public IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels)

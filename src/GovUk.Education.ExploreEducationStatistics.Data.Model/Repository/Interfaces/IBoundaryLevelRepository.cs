@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
             string label,
             DateTime published);
 
-        Task<BoundaryLevel> Update(
+        Task Update(
             long id,
             string label);
 

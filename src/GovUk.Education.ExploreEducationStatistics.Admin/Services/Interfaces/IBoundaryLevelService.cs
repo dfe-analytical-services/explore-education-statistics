@@ -10,7 +10,7 @@ public interface IBoundaryLevelService
 
     Task<BoundaryLevelViewModel> Get(long id);
 
-    Task<BoundaryLevelViewModel> UpdateLabel(
+    Task UpdateLabel(
         long id,
         string label);
 }

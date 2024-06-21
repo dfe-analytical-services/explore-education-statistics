@@ -36,7 +36,7 @@ public class BoundaryLevelService : IBoundaryLevelService
         return Map(boundaryLevel);
     }
 
-    public async Task<BoundaryLevelViewModel> UpdateLabel(
+    public async Task UpdateLabel(
         long id,
         string label)
     {
@@ -45,9 +45,12 @@ public class BoundaryLevelService : IBoundaryLevelService
             throw new ArgumentNullException(nameof(id));
         }
 
-        return string.IsNullOrWhiteSpace(label)
-            ? throw new ArgumentNullException(nameof(label))
-            : Map(await _boundaryLevelRepository.Update(id, label));
+        if (string.IsNullOrWhiteSpace(label))
+        {
+            throw new ArgumentNullException(nameof(label));
+        }
+
+        await _boundaryLevelRepository.Update(id, label);
     }
 
     private static BoundaryLevelViewModel Map(BoundaryLevel boundaryLevel)
