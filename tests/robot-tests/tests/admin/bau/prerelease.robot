@@ -1,6 +1,7 @@
 *** Settings ***
 Library             Collections
 Library             ../../libs/admin_api.py
+Library             ../../libs/utilities.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/tables-common.robot
@@ -18,6 +19,7 @@ ${PUBLICATION_NAME}=                        UI tests - prerelease %{RUN_IDENTIFI
 ${DATABLOCK_NAME}=                          UI test table
 ${DATABLOCK_FEATURED_NAME}=                 UI test featured table name
 ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}=    UI test featured table description
+${DEFAULT_TIME}=                            at 00:00
 
 
 *** Test Cases ***
@@ -141,13 +143,24 @@ Validate prerelease has not started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1    Europe/London
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
+    ${tomorrow_datetime}    get current time    offset_days=1    timezone=Europe/London
 
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
+    ${dayafter_tomorrow_datetime}    get current time    offset_days=2    timezone=Europe/London
+
+    ${formatted_datetime}    format datetime as desired    ${tomorrow_datetime}
+    log     ${formatted_datetime}
+    ${expected_datetime}=    set variable    ${formatted_datetime}
+    log     ${expected_datetime}
+     ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
+    log     ${day_after_tomorrow}
     ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
-    user checks page contains
-    ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
+
+    Sleep    2
+    
+    user checks page contains    
+    ...    Pre-release access will be available from ${expected_datetime} until it is published on ${time_end}.
+    
+
 
 Go to prerelease access page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
@@ -248,13 +261,19 @@ Validate prerelease has not started for Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
+    ${tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S     1
     ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2
 
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
+    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y
     ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
+
+    ${tomorrow_date}=    Set Variable    ${time_start}
+    ${tomorrow_time}=    Set Variable    ${DEFAULT_TIME}
+
+    ${expected_tomorrow_time}=    Set Variable   ${tomorrow_date} ${tomorrow_time}
+    Log To Console    ${expected_tomorrow_time}
     user checks page contains
-    ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
+    ...    Pre-release access will be available from ${expected_tomorrow_time} until it is published on ${time_end}.
 
 Start prerelease
     user changes to bau1
