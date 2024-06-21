@@ -15,6 +15,7 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
+import targetRelation from '@common/utils/url/getTargetRelation';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -69,29 +70,33 @@ export default function ContentHtml({
         ) : undefined;
       }
 
-      if (
-        transformFeaturedTableLinks &&
-        node.name === 'a' &&
-        typeof node.attribs['data-featured-table'] !== 'undefined'
-      ) {
-        const text = domToReact(node.children);
-        return isMounted && typeof text === 'string'
-          ? transformFeaturedTableLinks(node.attribs.href, text)
-          : undefined;
-      }
+      if (node.name === 'a') {
+        const target = node.attribs.href;
 
-      if (formatLinks && node.name === 'a') {
-        const url = formatContentLink(node.attribs.href);
-        const text = domToReact(node.children);
+        if (
+          transformFeaturedTableLinks &&
+          typeof node.attribs['data-featured-table'] !== 'undefined'
+        ) {
+          const text = domToReact(node.children);
+          return isMounted && typeof text === 'string'
+            ? transformFeaturedTableLinks(target, text)
+            : undefined;
+        }
 
-        return !url?.includes('explore-education-statistics.service.gov.uk') &&
-          typeof node.attribs['data-featured-table'] === 'undefined' ? (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {text} (opens in a new tab)
-          </a>
-        ) : (
-          <a href={url}>{text}</a>
-        );
+        if (formatLinks) {
+          const url = formatContentLink(target);
+          const text = domToReact(node.children);
+
+          return targetRelation(target, process.env.PUBLIC_URL) !==
+            'internal-public' &&
+            typeof node.attribs['data-featured-table'] === 'undefined' ? (
+            <a href={url} target="_blank" rel="noopener noreferrer nofollow">
+              {text} (opens in a new tab)
+            </a>
+          ) : (
+            <a href={url}>{text}</a>
+          );
+        }
       }
 
       if (node.name === 'figure' && node.attribs.class === 'table') {

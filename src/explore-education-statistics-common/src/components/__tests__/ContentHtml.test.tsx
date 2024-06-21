@@ -6,6 +6,17 @@ import { GlossaryEntry } from '@common/services/types/glossary';
 import { within } from '@testing-library/dom';
 
 describe('ContentHtml', () => {
+  const OLD_ENV = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = { ...OLD_ENV };
+  });
+
+  afterAll(() => {
+    process.env = OLD_ENV;
+  });
+
   test('renders correctly with required props', () => {
     render(<ContentHtml html="<p>Test text</p>" />);
 
@@ -248,19 +259,31 @@ describe('ContentHtml', () => {
       ).toHaveAttribute('href', 'https://gov.uk/TEST');
     });
 
-    test('opens external links in a new tab', () => {
-      render(
-        <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
-      );
+    test.each([
+      ['https://gov.uk/'],
+      [
+        'https://admin.explore-education-statistics.service.gov.uk/publication/abc/release/123/content',
+      ],
+      ['https://www.dev.explore-education-statistics.service.gov.uk/'],
+    ])('opens external links in a new tab', (target: string) => {
+      render(<ContentHtml html={`<a href="${target}">External link</a>`} />);
+
       const link = screen.getByRole('link', {
         name: 'External link (opens in a new tab)',
       });
-      expect(link).toHaveAttribute('href', 'https://gov.uk/');
+      expect(link).toHaveAttribute('href', target);
       expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+
+      const rel = link.getAttribute('rel');
+      expect(rel).toContain('noopener');
+      expect(rel).toContain('noreferrer');
+      expect(rel).toContain('nofollow');
     });
 
     test('opens internal links in the same tab', () => {
+      process.env.PUBLIC_URL =
+        'https://explore-education-statistics.service.gov.uk';
+
       render(
         <ContentHtml html='<a href="https://explore-education-statistics.service.gov.uk/">Internal link</a>' />,
       );
@@ -272,7 +295,11 @@ describe('ContentHtml', () => {
         'https://explore-education-statistics.service.gov.uk/',
       );
       expect(link).not.toHaveAttribute('target', '_blank');
-      expect(link).not.toHaveAttribute('rel', 'noopener noreferrer');
+      const rel = link.getAttribute('rel');
+      if (rel !== null) {
+        expect(rel).not.toContain('noopener');
+        expect(rel).not.toContain('noreferrer');
+      }
     });
 
     test('does not format links when `formatLinks` is false', () => {
@@ -303,7 +330,11 @@ describe('ContentHtml', () => {
         '  https://gov.uk/TEST something  ',
       );
       expect(externalLink).not.toHaveAttribute('target', '_blank');
-      expect(externalLink).not.toHaveAttribute('rel', 'noopener noreferrer');
+      const rel = externalLink.getAttribute('rel');
+      if (rel !== null) {
+        expect(rel).not.toContain('noopener');
+        expect(rel).not.toContain('noreferrer');
+      }
     });
   });
 });
