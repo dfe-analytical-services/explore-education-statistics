@@ -95,8 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 import.MetaFile.Path());
 
             return await
-                ValidateCsvFileType(import.MetaFile, metaFileStreamProvider, true)
-                    .OnSuccess(() => ValidateCsvFileType(import.File, dataFileStreamProvider, false))
+                ValidateCsvFileType(metaFileStreamProvider, true)
+                    .OnSuccess(() => ValidateCsvFileType(dataFileStreamProvider, false))
                     .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
                     .OnSuccess(async _ =>
                     {
@@ -117,11 +117,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFileType(
-            File file,
             Func<Task<Stream>> fileStreamProvider,
             bool isMetaFile)
         {
-            if (!await _fileTypeService.IsValidCsvFile(fileStreamProvider, file.Filename))
+            await using var stream = await fileStreamProvider.Invoke();
+
+            if (!await _fileTypeService.IsValidCsvFile(stream))
             {
                 return ListOf(isMetaFile
                     ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())
