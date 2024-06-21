@@ -8,9 +8,9 @@ public record DeleteApiDataSetVersionPlanViewModel
 {
     public Guid DataSetId { get; init; }
 
-    public string DataSetName { get; init; } = null!;
+    public string DataSetTitle { get; init; } = null!;
 
-    public Guid DataSetVersionId { get; init; }
+    public Guid Id { get; init; }
 
     public string Version { get; init; } = null!;
 

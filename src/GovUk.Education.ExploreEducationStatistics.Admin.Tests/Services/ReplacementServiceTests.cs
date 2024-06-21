@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -1788,8 +1787,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotNull(replacementPlan.LinkedApiDataSetVersion);
                 Assert.Equal(dataSet.Id, replacementPlan.LinkedApiDataSetVersion.DataSetId);
-                Assert.Equal(dataSet.Title, replacementPlan.LinkedApiDataSetVersion.DataSetName);
-                Assert.Equal(dataSetVersion.Id, replacementPlan.LinkedApiDataSetVersion.DataSetVersionId);
+                Assert.Equal(dataSet.Title, replacementPlan.LinkedApiDataSetVersion.DataSetTitle);
+                Assert.Equal(dataSetVersion.Id, replacementPlan.LinkedApiDataSetVersion.Id);
                 Assert.Equal(dataSetVersion.Version, replacementPlan.LinkedApiDataSetVersion.Version);
                 Assert.Equal(dataSetVersion.Status, replacementPlan.LinkedApiDataSetVersion.Status);
                 Assert.False(replacementPlan.LinkedApiDataSetVersion.Valid);

@@ -120,8 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     : new DeleteApiDataSetVersionPlanViewModel
                     {
                         DataSetId = tuple.apiDataSetVersion.DataSetId,
-                        DataSetName = tuple.apiDataSetVersion.DataSet.Title,
-                        DataSetVersionId = tuple.apiDataSetVersion.Id,
+                        DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
+                        Id = tuple.apiDataSetVersion.Id,
                         Version = tuple.apiDataSetVersion.Version,
                         Status = tuple.apiDataSetVersion.Status,
                         Valid = false,

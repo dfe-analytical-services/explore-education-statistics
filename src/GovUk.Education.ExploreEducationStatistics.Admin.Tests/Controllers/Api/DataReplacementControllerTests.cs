@@ -63,8 +63,8 @@ public abstract class DataReplacementControllerTests
                 LinkedApiDataSetVersion = new DeleteApiDataSetVersionPlanViewModel
                 {
                     DataSetId = Guid.NewGuid(),
-                    DataSetName = "my data set",
-                    DataSetVersionId = Guid.NewGuid(),
+                    DataSetTitle = "my data set",
+                    Id = Guid.NewGuid(),
                     Version = "v1.0",
                     Status = DataSetVersionStatus.Draft,
                     Valid = false
