@@ -50,24 +50,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             List<ErrorViewModel> errors = [];
 
-            errors.AddRange(ValidateDataSetName(
+            errors.AddRange(ValidateDataSetFileName(
                 releaseVersionId,
                 dataSetName,
                 isReplacement: replacingFile != null));
 
-            errors.AddRange(ValidateDataSetFileNames(
+            errors.AddRange(ValidateDataFileNames(
                 releaseVersionId,
                 dataFileName: dataFileName,
                 metaFileName: metaFileName,
                 replacingFile));
 
-            errors.AddRange(ValidateDataSetFileSizes(
+            errors.AddRange(ValidateDataFileSizes(
                 dataFileLength,
                 dataFileName,
                 metaFileLength,
                 metaFileName));
 
-            errors.AddRange(await ValidateDataSetFileTypes(
+            errors.AddRange(await ValidateDataFileTypes(
                 dataFileName,
                 dataFileStream,
                 metaFileName,
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await ValidateDataSetFilesForUpload(
                 releaseVersionId: releaseVersionId,
-                dataSetName: archiveDataSet.DataSetName,
+                dataSetName: archiveDataSet.DataSetFileName,
                 dataFileName: archiveDataSet.DataFileName,
                 dataFileLength: archiveDataSet.DataFileSize,
                 dataFileStream: dataFileStream,
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public List<ErrorViewModel> ValidateDataSetName(
+        private List<ErrorViewModel> ValidateDataSetFileName(
             Guid releaseVersionId,
             string name,
             bool isReplacement)
@@ -164,16 +164,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(ValidationMessages.GenerateErrorDataSetFileNameShouldNotContainSpecialCharacters(name));
             }
 
-            var subjectNameExists = _context.ReleaseFiles
-                .Include(rf => rf.File)
-                .Any(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.Type == FileType.Data
-                    && rf.Name == name
-                    && !isReplacement);
-            if (subjectNameExists)
+            if (!isReplacement)
             {
-                errors.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldBeUnique(name));
+                var subjectNameExists = _context.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Any(rf =>
+                        rf.ReleaseVersionId == releaseVersionId
+                        && rf.File.Type == FileType.Data
+                        && rf.Name == name);
+
+                if (subjectNameExists)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldBeUnique(name));
+                }
             }
 
             return errors;
@@ -204,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                            && rf.File.Type == type);
         }
 
-        private List<ErrorViewModel> ValidateDataSetFileNames(
+        private List<ErrorViewModel> ValidateDataFileNames(
             Guid releaseVersionId,
             string dataFileName,
             string metaFileName,
@@ -264,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errors;
         }
 
-        private static List<ErrorViewModel> ValidateDataSetFileSizes(
+        private static List<ErrorViewModel> ValidateDataFileSizes(
             long dataFileSize,
             string dataFileName,
             long metaFileSize,
@@ -286,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errors;
         }
 
-        private async Task<List<ErrorViewModel>> ValidateDataSetFileTypes(
+        private async Task<List<ErrorViewModel>> ValidateDataFileTypes(
             string dataFileName,
             Stream dataFileStream,
             string metaFileName,

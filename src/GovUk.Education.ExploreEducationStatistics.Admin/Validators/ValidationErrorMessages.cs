@@ -55,9 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileSizeLimitExceeded,
 
         // Data file
-        SubjectTitleCannotBeEmpty,
-        SubjectTitleCannotContainSpecialCharacters,
-        SubjectTitleMustBeUnique,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         FileTypeMustBeData,
@@ -68,11 +65,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Data zip file
         DataZipFileCanOnlyContainTwoFiles,
         DataZipFileDoesNotContainCsvFiles,
-        DataZipContentFilenamesTooLong,
 
         // Meta file
         UnableToFindMetadataFileToDelete,
-        MetaFilenameTooLong,
 
         // Data replacement
         ReplacementMustBeValid,

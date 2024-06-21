@@ -3,20 +3,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 public class ArchiveDataSetFile
 {
     public ArchiveDataSetFile(
-        string dataSetName,
+        string dataSetFileName,
         string dataFileName,
         long dataFileSize,
         string metaFileName,
         long metaFileSize)
     {
-        DataSetName = dataSetName;
+        DataSetFileName = dataSetFileName;
         DataFileName = dataFileName;
         DataFileSize = dataFileSize;
         MetaFileName = metaFileName;
         MetaFileSize = metaFileSize;
     }
 
-    public string DataSetName;
+    public string DataSetFileName;
 
     private string _dataFileName;
     public string DataFileName

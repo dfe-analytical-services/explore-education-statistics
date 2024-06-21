@@ -30,9 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var dataFile = archive.GetEntry(import.File.Filename);
             var metaFile = archive.GetEntry(import.MetaFile.Filename);
 
-            // No validation here - we assume it has been done prior to this
-
-            await using (var stream = dataFile.Open())
+            await using (var stream = dataFile!.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
@@ -41,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     contentType: ContentTypes.Csv);
             }
 
-            await using (var stream = metaFile.Open())
+            await using (var stream = metaFile!.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,

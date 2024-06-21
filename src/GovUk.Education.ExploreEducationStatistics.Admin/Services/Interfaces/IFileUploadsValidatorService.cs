@@ -13,8 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFileUploadsValidatorService
     {
-        Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
-
         Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload( // Used by unit tests
             Guid releaseVersionId,
             string dataSetName,
@@ -40,9 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Stream metaFileStream,
             File? replacingFile = null);
 
-        List<ErrorViewModel> ValidateDataSetName(
-            Guid releaseVersionId,
-            string name,
-            bool isReplacement);
+        Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
     }
 }
