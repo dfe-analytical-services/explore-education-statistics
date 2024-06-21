@@ -196,14 +196,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private bool IsFileExisting(Guid releaseVersionId,
             FileType type,
-            string name)
+            string? filename)
         {
             return _context
                 .ReleaseFiles
                 .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId)
                 .ToList()
-                .Any(rf => String.Equals(rf.File.Filename, name, CurrentCultureIgnoreCase)
+                .Any(rf => string.Equals(rf.File.Filename, filename, CurrentCultureIgnoreCase)
                            && rf.File.Type == type);
         }
 
@@ -258,10 +258,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     metaFileName, MaxFilenameSize));
             }
 
+            // Original uploads are not unique if the ReleaseFile exists.
+            // Replacement uploads are not unique if the ReleaseFile exists AND the new data filename is not the same
+            // as the file being replaced.
             if (IsFileExisting(releaseVersionId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
-                errors.Add(ValidationMessages.GenerateErrorDataFilenameNotUnique(dataFileName));
+                errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(dataFileName, FileType.Data));
+            }
+
+            // @MarkFix Do we care whether meta files aren't unique? They're not downloaded by the public?
+            var replacingMetaFile = _context.Files
+                .SingleOrDefault(f => f.Type == Metadata
+                                      && replacingFile != null
+                                      && f.SubjectId == replacingFile.SubjectId);
+            if (IsFileExisting(releaseVersionId, Metadata, metaFileName) &&
+                (replacingMetaFile == null || replacingMetaFile.Filename != metaFileName))
+            {
+                errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(metaFileName, Metadata));
             }
 
             return errors;

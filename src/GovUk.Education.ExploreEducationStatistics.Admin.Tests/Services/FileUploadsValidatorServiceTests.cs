@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using AngleSharp.Common;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -13,13 +14,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ResponseErrorAssertUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -29,25 +31,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         private readonly DataFixture _fixture = new();
 
-        // @MarkFix ValidateDataSetFilesForUpload_Success
-        // @MarkFix ValidateDataSetFilesForUpload_Replacement
-        // @MarkFix ValidateDataSetFilesForUpload_DataSetFileNameCannotBeEmpty
-        // @MarkFix ValidateDataSetFilesForUpload_DataSetFileNameCannotContainSpecialCharacters
-        // @MarkFix ValidateDataSetFilesForUpload_DataSetFileNameShouldBeUnique
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesCannotHaveSameName (I think this is necessary)
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesCannotContainSpecialCharacters
-        // @MarkFix ValidateDataSetFilesForUpload_DataFileMustEndDotCsv
-        // @MarkFix ValidateDataSetFilesForUpload_MetaFileMustEndDotMetaDotCsv
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFileNamesTooLong
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFileNamesNotUnique
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesShouldNotBeSizeZero
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesShouldBeValidCsvFile
-        // @MarkFix ValidateDataSetFilesForUpload_ReplacementErrors (Not sure what we want here? See existing tests maybe?)
-
         [Fact]
-        public async Task ValidateDataFilesForUpload_Valid() // @MarkFix
+        public async Task ValidateDataFilesForUpload_Valid()
         {
-            await using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryContentDbContext())
             {
                 var (service, fileTypeService) = BuildService(context);
 
@@ -63,11 +50,190 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ValidateDataSetFilesForUpload(
                     Guid.NewGuid(),
-                    "Data set name",
-                    dataFile, metaFile);
+                    "DataSetFile name",
+                    dataFile.FileName,
+                    dataFile.Length,
+                    dataFile.OpenReadStream(),
+                    metaFile.FileName,
+                    metaFile.Length,
+                    metaFile.OpenReadStream());
                 VerifyAllMocks(fileTypeService);
 
                 Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_Valid_Replacement()
+        {
+            var releaseVersionId = Guid.NewGuid();
+
+            var replacingReleaseFile = new ReleaseFile
+            {
+                ReleaseVersionId = releaseVersionId,
+                Name = "Data set name",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "test.csv",
+                },
+            };
+
+            var replacingReleaseMetaFile = new ReleaseFile
+            {
+                ReleaseVersionId = releaseVersionId,
+                File = new File
+                {
+                    Type = Metadata,
+                    Filename = "test.meta.csv",
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                context.ReleaseFiles.AddRange(replacingReleaseFile, replacingReleaseMetaFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                var (service, fileTypeService) = BuildService(context);
+
+                var dataFile = CreateFormFileMock(replacingReleaseFile.File.Filename).Object;
+                var metaFile = CreateFormFileMock(replacingReleaseMetaFile.File.Filename).Object;
+
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+
+                var result = await service.ValidateDataSetFilesForUpload(
+                    Guid.NewGuid(),
+                    replacingReleaseFile.Name,
+                    dataFile.FileName,
+                    dataFile.Length,
+                    dataFile.OpenReadStream(),
+                    metaFile.FileName,
+                    metaFile.Length,
+                    metaFile.OpenReadStream(),
+                    replacingReleaseFile.File);
+
+                VerifyAllMocks(fileTypeService);
+
+                Assert.Empty(result);
+            }
+        }
+
+        // @MarkFix ValidateDataSetFilesForUpload_DataSetFileNameCannotBeEmpty
+        // @MarkFix ValidateDataSetFilesForUpload_DataSetFileNameCannotContainSpecialCharacters
+        // @MarkFix ValidateDataSetFilesForUpload_DataSetFileNameShouldBeUnique
+        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesCannotHaveSameName (I think this is necessary)
+        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesCannotContainSpecialCharacters
+        // @MarkFix ValidateDataSetFilesForUpload_DataFileMustEndDotCsv
+        // @MarkFix ValidateDataSetFilesForUpload_MetaFileMustEndDotMetaDotCsv
+        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFileNamesTooLong
+        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFileNamesNotUnique
+        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesShouldNotBeSizeZero
+        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesShouldBeValidCsvFile
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_Replacement_FilesnamesNotUnique()
+        {
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var otherReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                Name = "Data set name",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "usedfilename.csv",
+                    SubjectId = Guid.NewGuid(),
+                },
+            };
+
+            var otherMetaReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = new File
+                {
+                    Type = Metadata,
+                    Filename = "usedfilename.meta.csv",
+                    SubjectId = otherReleaseFile.File.SubjectId,
+                },
+            };
+
+            var replacingReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                Name = "Data set name",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "test.csv",
+                    SubjectId = Guid.NewGuid(),
+                },
+            };
+
+            var replacingReleaseMetaFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = new File
+                {
+                    Type = Metadata,
+                    Filename = "test.meta.csv",
+                    SubjectId = replacingReleaseFile.File.SubjectId,
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                context.ReleaseFiles.AddRange(
+                    otherReleaseFile, otherMetaReleaseFile,
+                    replacingReleaseFile, replacingReleaseMetaFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+
+                var (service, fileTypeService) = BuildService(context);
+
+                var dataFile = CreateFormFileMock(replacingReleaseFile.File.Filename).Object;
+                var metaFile = CreateFormFileMock(replacingReleaseMetaFile.File.Filename).Object;
+
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+
+                var errors = await service.ValidateDataSetFilesForUpload(
+                    releaseVersion.Id,
+                    replacingReleaseFile.Name,
+                    "usedfilename.csv",
+                    dataFile.Length,
+                    dataFile.OpenReadStream(),
+                    "usedfilename.meta.csv",
+                    metaFile.Length,
+                    metaFile.OpenReadStream(),
+                    replacingReleaseFile.File);
+
+                VerifyAllMocks(fileTypeService);
+
+                AssertHasErrors(errors, [
+                    ValidationMessages.GenerateErrorFilenameNotUnique("usedfilename.csv", FileType.Data),
+                    ValidationMessages.GenerateErrorFilenameNotUnique("usedfilename.meta.csv", Metadata),
+                ]);
             }
         }
 
@@ -85,14 +251,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.ReleaseFiles.Add(dataReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var (service, _) = BuildService(contentDbContext);
 
@@ -108,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataFile = CreateFormFileMock("test.csv", 0).Object;
             var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
-            await using var context = InMemoryApplicationDbContext();
+            await using var context = InMemoryContentDbContext();
             var (service, fileTypeService) = BuildService(context);
 
             fileTypeService.Setup(mock => mock.IsValidCsvFile(dataFile.OpenReadStream()))
@@ -128,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_MetadataFileIsEmpty() // @MarkFix
         {
-            await using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryContentDbContext())
             {
                 var (service, fileTypeService) = BuildService(context);
 
@@ -157,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataFile = CreateFormFileMock("test.csv").Object;
             var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
-            await using var context = InMemoryApplicationDbContext();
+            await using var context = InMemoryContentDbContext();
             var (service, fileTypeService) = BuildService(context);
 
             fileTypeService
@@ -180,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_MetadataFileNotCsv() // @MarkFix
         {
-            await using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryContentDbContext())
             {
                 var (service, fileTypeService) = BuildService(context);
 
@@ -217,13 +383,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var (service, fileTypeService) = BuildService(context);
 
@@ -262,13 +428,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var (service, fileTypeService) = BuildService(context);
 
@@ -313,14 +479,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.ReleaseFiles.AddRange(releaseFiles);
 
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var (service, fileTypeService) = BuildService(context);
 
@@ -353,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.ReleaseFiles.AddRange(new ReleaseFile
                 {
@@ -377,7 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var (service, fileTypeService) = BuildService(context);
 
@@ -407,7 +573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataArchiveEntriesForUpload_Valid() // @MarkFix possible removal of this stuff has there is one method now
         {
-            await using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryContentDbContext())
             {
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -445,7 +611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ValidateDataArchiveEntriesForUpload_DataFileNotCsv() // @MarkFix removal prospect
         {
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -476,7 +642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ValidateDataArchiveEntriesForUpload_MetadataFileNotCsv() // @MarkFix removal prospect
         {
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -509,7 +675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archiveFile = CreateArchiveDataSet("Data set name", "test.csv", "meta.csv");
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -538,7 +704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ValidateDataFilesForUpload_DataFilenameTooLong() // @MarkFix
         {
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
             var (service, _) = BuildService(contentDbContext);
 
             var result = service.ValidateDataSetFilesForUpload(
@@ -561,7 +727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.meta.csv");
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -590,7 +756,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ValidateDataFilesForUpload_DataFileIsEmpty() // @MarkFix
         {
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -628,7 +794,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 metaFileSize: 0);
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
             var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -666,13 +832,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -715,13 +881,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
@@ -772,13 +938,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.ReleaseFiles.AddRange(releaseFiles);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var fileTypeService = new Mock<IFileTypeService>(Strict);
 
