@@ -40,7 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Stream metaFileStream,
             File? replacingFile = null);
 
-        List<ErrorViewModel> ValidateDataSetName(Guid releaseVersionId,
-            string name);
+        List<ErrorViewModel> ValidateDataSetName(
+            Guid releaseVersionId,
+            string name,
+            bool isReplacement);
     }
 }

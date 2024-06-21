@@ -51,7 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<ErrorViewModel> errors = [];
 
             errors.AddRange(ValidateDataSetName(
-                releaseVersionId, dataSetName));
+                releaseVersionId,
+                dataSetName,
+                isReplacement: replacingFile != null));
 
             errors.AddRange(ValidateDataSetFileNames(
                 releaseVersionId,
@@ -141,8 +143,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public List<ErrorViewModel> ValidateDataSetName(Guid releaseVersionId,
-            string name)
+        public List<ErrorViewModel> ValidateDataSetName(
+            Guid releaseVersionId,
+            string name,
+            bool isReplacement)
         {
             List<ErrorViewModel> errors = [];
 
@@ -165,7 +169,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Any(rf =>
                     rf.ReleaseVersionId == releaseVersionId
                     && rf.File.Type == FileType.Data
-                    && rf.Name == name);
+                    && rf.Name == name
+                    && !isReplacement);
             if (subjectNameExists)
             {
                 errors.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldBeUnique(name));

@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             using var stream = file.OpenReadStream();
             var encodingType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_ENCODING);
-            return encodingTypes.Any(pattern => pattern.Equals(encodingType));
+            return encodingTypes.Contains(encodingType);
         }
 
         public async Task<bool> IsValidCsvFile(Stream stream)
@@ -77,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var magicFilePath = _configuration.GetValue<string>("MagicFilePath");
 
             // @MarkFix do we need more than 1024 bytes? - like first 1000 lines like previously? - test it
+            // Check mime type
             var magicTypeContext = new Magic(MagicOpenFlags.MAGIC_MIME_TYPE, magicFilePath);
             var mimeType = magicTypeContext.Read(sampleBuffer, sampleBufferSize);
             if (!AllowedCsvMimeTypes.Any(pattern => pattern.Match(mimeType).Success))
@@ -84,6 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 return false;
             }
 
+            // Check encoding
             var magicEncodingContext = new Magic(MagicOpenFlags.MAGIC_MIME_ENCODING, magicFilePath);
             var encodingType = magicEncodingContext.Read(sampleBuffer, sampleBufferSize);
 
