@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MimeDetective.Extensions;
 using FileType = MimeDetective.FileType;
 
@@ -28,21 +27,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private const int CsvMimeTypeSampleLineCount = 1000;
         
         public static readonly Regex[] AllowedCsvMimeTypes = {
-            new Regex(@"^(application|text)/csv$"),
-            new Regex(@"^text/plain$")
+            new ("^(application|text)/csv$"),
+            new ("^text/plain$"),
         };
 
-        public static readonly string[] AllowedCsvEncodingTypes = {
+        public static readonly string[] AllowedCsvEncodingTypes = [
             "us-ascii",
-            "utf-8"
-        };
+            "utf-8",
+        ];
 
-        private readonly ILogger<FileTypeService> _logger;
         private readonly IConfiguration _configuration;
 
-        public FileTypeService(ILogger<FileTypeService> logger, IConfiguration configuration)
+        public FileTypeService(IConfiguration configuration)
         {
-            _logger = logger;
             _configuration = configuration;
         }
 
@@ -100,36 +97,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename)
         {
-            _logger.LogDebug("Validating that {FileName} has a CSV mime type", filename);
-
             await using var sampleLinesStream = await GetSampleLinesStream(streamProvider, CsvMimeTypeSampleLineCount);
 
             if (sampleLinesStream == null)
             {
-                _logger.LogError("Unable to get sample lines for checking the mime type of {FileName}", filename);
                 return false;
             }
             
             if (!await HasMatchingMimeType(sampleLinesStream, AllowedCsvMimeTypes))
             {
-                _logger.LogDebug("{FileName} does not have a valid CSV mime type", filename);
                 return false;
             }
-
-            _logger.LogDebug("{FileName} has a valid CSV mime type", filename);
-
-            _logger.LogDebug("Validating that {FileName} has a valid CSV character encoding", filename);
 
             await using var encodingStream = await streamProvider.Invoke();
 
             if (!HasMatchingEncodingType(encodingStream, AllowedCsvEncodingTypes))
             {
-                _logger.LogDebug("{FileName} does not have a valid CSV content encoding", filename);
                 return false;
             }
 
-            _logger.LogDebug("{FileName} has a valid CSV content encoding", filename);
-            
             return true;
         }
 
@@ -158,7 +144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
                     if (nextLine == null)
                     {
-                        _logger.LogError("Unable to read next sample line {LineNumber} from CSV", linesRead + 1);
                         break;
                     }
                     
@@ -169,7 +154,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Unable to read sample lines from CSV - {ErrorMessage}", e.Message);
                 return null;
             }
 

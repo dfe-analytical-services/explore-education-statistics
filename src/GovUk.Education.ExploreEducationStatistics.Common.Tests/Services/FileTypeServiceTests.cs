@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileTypeService;
@@ -279,7 +278,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static FileTypeService BuildService(IConfiguration? configuration = null)
         {
             return new FileTypeService(
-                Mock.Of<ILogger<FileTypeService>>(),
                 configuration ?? DefaultConfiguration()
             );
         }
