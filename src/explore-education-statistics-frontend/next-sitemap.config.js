@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.PUBLIC_URL,
+  siteUrl: process.env.PROD_PUBLIC_URL,
   sitemapSize: 5000,
   exclude: ['/server-sitemap.xml'],
   generateRobotsTxt: true,
@@ -16,7 +16,7 @@ module.exports = {
         ],
       },
     ],
-    additionalSitemaps: [`${process.env.PUBLIC_URL}server-sitemap.xml`],
+    additionalSitemaps: [`${process.env.PROD_PUBLIC_URL}server-sitemap.xml`],
   },
   transform: async (config, path) => {
     if (path === '/') {
