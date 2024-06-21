@@ -37,8 +37,8 @@ public class LocationMetaRepository(
                     await GetLocationOptionMetas(
                         duckDbConnection,
                         dataSetVersion,
-                        cancellationToken,
-                        meta),
+                        meta,
+                        cancellationToken),
                 cancellationToken);
     }
 
@@ -55,8 +55,11 @@ public class LocationMetaRepository(
 
         foreach (var meta in metas)
         {
-            var options =
-                await GetLocationOptionMetas(duckDbConnection, dataSetVersion, cancellationToken, meta);
+            var options = await GetLocationOptionMetas(
+                duckDbConnection,
+                dataSetVersion,
+                meta,
+                cancellationToken);
 
             var optionTable = publicDataDbContext
                 .GetTable<LocationOptionMetaRow>()
@@ -149,8 +152,8 @@ public class LocationMetaRepository(
     private async Task<List<LocationOptionMetaRow>> GetLocationOptionMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken,
-        LocationMeta meta)
+        LocationMeta meta,
+        CancellationToken cancellationToken)
     {
         var nameCol = meta.Level.CsvNameColumn();
         var codeCols = meta.Level.CsvCodeColumns();

@@ -150,24 +150,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(
         [Fact]
         public async Task DataSetIdIsNotFound_ReturnsValidationProblem()
         {
-            var subjectId = Guid.NewGuid();
-            
-            var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithApprovalStatus(ReleaseApprovalStatus.Draft))
-                .WithFiles([
-                    DataFixture
-                        .DefaultFile(FileType.Data)
-                        .WithSubjectId(subjectId),
-                    DataFixture
-                        .DefaultFile(FileType.Metadata)
-                        .WithSubjectId(subjectId)
-                ])
-                .GenerateList()
-                .ToTuple2();
-
-            await AddTestData<ContentDbContext>(context =>
-                context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile));
+            var (releaseFile, _) = await AddDataAndMetadataFiles(Guid.NewGuid());
 
             var result = await CreateNextDataSetVersion(
                 dataSetId: Guid.NewGuid(),

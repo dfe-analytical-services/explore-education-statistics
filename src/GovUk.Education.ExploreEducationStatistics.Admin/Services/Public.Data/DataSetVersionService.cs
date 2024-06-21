@@ -46,15 +46,6 @@ public class DataSetVersionService(
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> FileHasVersion(
-        Guid releaseFileId,
-        CancellationToken cancellationToken = default)
-    {
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .AnyAsync(dsv => dsv.ReleaseFileId == releaseFileId, cancellationToken);
-    }
-
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
@@ -63,7 +54,7 @@ public class DataSetVersionService(
         return await userService.CheckIsBauUser()
             .OnSuccess(async _ => await processorClient.CreateNextDataSetVersion(
                 dataSetId: dataSetId,
-                releaseFileId: releaseFileId, 
+                releaseFileId: releaseFileId,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await publicDataDbContext
                 .DataSetVersions
@@ -73,11 +64,12 @@ public class DataSetVersionService(
             .OnSuccess(MapDraftSummaryVersion);
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
             .OnSuccessVoid(async () => await processorClient.DeleteDataSetVersion(
-                dataSetVersionId: dataSetVersionId, 
+                dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken));
     }
 

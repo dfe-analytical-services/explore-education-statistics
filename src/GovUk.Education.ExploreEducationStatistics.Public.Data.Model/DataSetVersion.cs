@@ -11,8 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
-    public const string FirstVersionString = "1.0";
-    
     public Guid Id { get; init; }
 
     public required Guid DataSetId { get; set; }
@@ -71,7 +69,7 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public string Version => $"{VersionMajor}.{VersionMinor}";
 
-    public bool IsFirstVersion => Version == FirstVersionString;
+    public bool IsFirstVersion => Version == "1.0";
 
     public SemVersion FullSemanticVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 

@@ -246,14 +246,11 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
             var dataSet = await GetDbContext<PublicDataDbContext>().DataSets.SingleAsync(dataSet =>
                 dataSet.Id == initialDataSetVersion.DataSet.Id);
 
-            var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
+            var (_, instanceId) = await CreateDataSetVersionAndImport(
                 dataSet: dataSet,
                 importStage: Stage.PreviousStage(),
                 versionMajor: 1,
                 versionMinor: 1);
-
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion));
 
             await CompleteProcessing(instanceId);
 

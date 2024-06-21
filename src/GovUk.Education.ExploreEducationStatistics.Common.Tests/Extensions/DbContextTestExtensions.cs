@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ public static class DbContextTestExtensions
         {
             var tables = context.Model.GetEntityTypes()
                 .Select(type => type.GetTableName())
+                .OfType<string>()
                 .Distinct()
                 .ToList();
 

@@ -22,7 +22,7 @@ public class FilterMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        var metas = await ReadFilterMeta(
+        var metas = await GetFilterMetas(
             duckDbConnection,
             dataSetVersion,
             allowedColumns,
@@ -33,7 +33,7 @@ public class FilterMetaRepository(
             .ToDictionaryAwaitAsync(
                 keySelector: ValueTask.FromResult,
                 elementSelector: async meta =>
-                    await ReadFilterOptionMeta(
+                    await GetFilterOptionMeta(
                         duckDbConnection,
                         dataSetVersion,
                         meta,
@@ -47,14 +47,18 @@ public class FilterMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        var metas = await ReadFilterMeta(duckDbConnection, dataSetVersion, allowedColumns, cancellationToken);
+        var metas = await GetFilterMetas(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken);
 
         publicDataDbContext.FilterMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         foreach (var meta in metas)
         {
-            var options = await ReadFilterOptionMeta(
+            var options = await GetFilterOptionMeta(
                 duckDbConnection,
                 dataSetVersion,
                 meta,
@@ -132,7 +136,7 @@ public class FilterMetaRepository(
         }
     }
 
-    private async Task<List<FilterMeta>> ReadFilterMeta(
+    private async Task<List<FilterMeta>> GetFilterMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
@@ -160,7 +164,7 @@ public class FilterMetaRepository(
             .ToList();
     }
 
-    private async Task<List<FilterOptionMeta>> ReadFilterOptionMeta(
+    private async Task<List<FilterOptionMeta>> GetFilterOptionMeta(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         FilterMeta meta,

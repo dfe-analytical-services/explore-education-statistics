@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -107,7 +108,7 @@ public static class DbContextTransactionExtensions
     {
         return new(
             scopeOption: transactionScopeOption,
-            transactionOptions: new TransactionOptions { IsolationLevel = isolationLevel },
+            transactionOptions: new TransactionOptions {IsolationLevel = isolationLevel},
             asyncFlowOption: TransactionScopeAsyncFlowOption.Enabled);
     }
 }

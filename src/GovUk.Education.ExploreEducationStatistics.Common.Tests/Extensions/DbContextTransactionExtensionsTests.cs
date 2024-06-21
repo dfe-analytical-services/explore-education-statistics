@@ -91,7 +91,9 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task Succeed()
             {
-                await GetDbContext1().RequireTransaction(() =>
+                await using var dbContext1 = GetDbContext1();
+
+                await dbContext1.RequireTransaction(() =>
                     WriteToAllDbContexts());
 
                 AssertEntitiesInAllDbContexts();
@@ -100,7 +102,9 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task SucceedWithEither()
             {
-                await GetDbContext1().RequireTransaction(async () =>
+                await using var dbContext1 = GetDbContext1();
+
+                await dbContext1.RequireTransaction(async () =>
                 {
                     await WriteToAllDbContexts();
                     return new Either<int, string>("success!");
@@ -112,8 +116,10 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task Fail()
             {
+                await using var dbContext1 = GetDbContext1();
+
                 await Assert.ThrowsAsync<SimulateFailureException>(() =>
-                    GetDbContext1().RequireTransaction(async () =>
+                    dbContext1.RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts();
                         throw new SimulateFailureException();
@@ -125,7 +131,9 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task FailWithEither()
             {
-                await GetDbContext1().RequireTransaction(async () =>
+                await using var dbContext1 = GetDbContext1();
+
+                await dbContext1.RequireTransaction(async () =>
                 {
                     await WriteToAllDbContexts();
                     return new Either<int, string>(1);
@@ -142,10 +150,12 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task SucceedWithinNestedTransaction()
             {
-                await GetDbContext1().RequireTransaction(async () =>
+                await using var dbContext1 = GetDbContext1();
+
+                await dbContext1.RequireTransaction(async () =>
                 {
                     await WriteToAllDbContexts(1);
-                    await GetDbContext1().RequireTransaction(() => WriteToAllDbContexts(2));
+                    await dbContext1.RequireTransaction(() => WriteToAllDbContexts(2));
                 });
 
                 AssertEntitiesInAllDbContexts(1);
@@ -155,13 +165,17 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task SucceedWithinNestedTransaction_MultipleContextsRequestTransaction()
             {
-                await GetDbContext1().RequireTransaction(async () =>
+                await using var dbContext1 = GetDbContext1();
+                await using var dbContext2 = GetDbContext2();
+                await using var dbContext3WithoutRetry = GetDbContext3WithoutRetry();
+
+                await dbContext1.RequireTransaction(async () =>
                 {
                     await WriteToAllDbContexts();
-                    await GetDbContext2().RequireTransaction(async () =>
+                    await dbContext2.RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts(2);
-                        await GetDbContext3WithoutRetry().RequireTransaction(
+                        await dbContext3WithoutRetry.RequireTransaction(
                             () => WriteToAllDbContexts(3));
                     });
                 });
@@ -174,11 +188,15 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task TransactionInitiatedByNonRetryDbContext_ThrowsException()
             {
+                await using var dbContext2 = GetDbContext2();
+                await using var dbContext3WithoutRetry = GetDbContext3WithoutRetry();
+
                 await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    GetDbContext3WithoutRetry().RequireTransaction(async () =>
+                    dbContext3WithoutRetry.RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts();
-                        await GetDbContext2().RequireTransaction(() => WriteToAllDbContexts(2));
+                        // ReSharper disable once AccessToDisposedClosure
+                        await dbContext2.RequireTransaction(() => WriteToAllDbContexts(2));
                     }));
 
                 AssertNoEntitiesInAnyDbContexts();
@@ -187,11 +205,14 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task FailWithinNestedTransaction()
             {
+                await using var dbContext1 = GetDbContext1();
+
                 await Assert.ThrowsAsync<SimulateFailureException>(() =>
-                    GetDbContext1().RequireTransaction(async () =>
+                    dbContext1.RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts();
-                        await GetDbContext1().RequireTransaction(async () =>
+                        // ReSharper disable once AccessToDisposedClosure
+                        await dbContext1.RequireTransaction(async () =>
                         {
                             await WriteToAllDbContexts(2);
                             throw new SimulateFailureException();
@@ -204,10 +225,13 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task FailWithinNestedTransaction_WithEither()
             {
-                await GetDbContext1().RequireTransaction(async () =>
+                await using var dbContext1 = GetDbContext1();
+                await using var dbContext2 = GetDbContext1();
+
+                await dbContext1.RequireTransaction(async () =>
                 {
                     await WriteToAllDbContexts();
-                    return await GetDbContext2().RequireTransaction(async () =>
+                    return await dbContext2.RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts(2);
                         return new Either<int, string>(1);
@@ -220,11 +244,14 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task FailAtTopLevelWithNestedTransaction()
             {
-                await Assert.ThrowsAsync<SimulateFailureException>(() => GetDbContext1()
+                await using var dbContext1 = GetDbContext1();
+
+                await Assert.ThrowsAsync<SimulateFailureException>(() => dbContext1
                     .RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts();
-                        await GetDbContext1().RequireTransaction(() => WriteToAllDbContexts(2));
+                        // ReSharper disable once AccessToDisposedClosure
+                        await dbContext1.RequireTransaction(() => WriteToAllDbContexts(2));
                         throw new SimulateFailureException();
                     }));
 
@@ -234,10 +261,12 @@ public abstract class DbContextTransactionExtensionsTests
             [Fact]
             public async Task FailAtTopLevelWithNestedTransaction_WithEither()
             {
-                await GetDbContext1().RequireTransaction(async () =>
+                await using var dbContext1 = GetDbContext1();
+
+                await dbContext1.RequireTransaction(async () =>
                 {
                     await WriteToAllDbContexts();
-                    await GetDbContext1().RequireTransaction(() => WriteToAllDbContexts(2));
+                    await dbContext1.RequireTransaction(() => WriteToAllDbContexts(2));
                     return new Either<int, string>(1);
                 });
 
@@ -248,24 +277,32 @@ public abstract class DbContextTransactionExtensionsTests
 
     private void AssertEntitiesInAllDbContexts(int expectedId = 1)
     {
-        Assert.NotNull(GetDbContext1()
-            .Entities
-            .SingleOrDefaultAsync(entity => entity.Id == expectedId));
+        using var dbContext1 = GetDbContext1();
+        using var dbContext2 = GetDbContext2();
+        using var dbContext3 = GetDbContext3WithoutRetry();
 
-        Assert.NotNull(GetDbContext2()
+        Assert.NotNull(dbContext1
             .Entities
-            .SingleOrDefaultAsync(entity => entity.Id == expectedId));
+            .SingleOrDefault(entity => entity.Id == expectedId));
 
-        Assert.NotNull(GetDbContext3WithoutRetry()
+        Assert.NotNull(dbContext2
             .Entities
-            .SingleOrDefaultAsync(entity => entity.Id == expectedId));
+            .SingleOrDefault(entity => entity.Id == expectedId));
+
+        Assert.NotNull(dbContext3
+            .Entities
+            .SingleOrDefault(entity => entity.Id == expectedId));
     }
 
     private void AssertNoEntitiesInAnyDbContexts()
     {
-        Assert.Empty(GetDbContext1().Entities);
-        Assert.Empty(GetDbContext2().Entities);
-        Assert.Empty(GetDbContext3WithoutRetry().Entities);
+        using var dbContext1 = GetDbContext1();
+        using var dbContext2 = GetDbContext2();
+        using var dbContext3 = GetDbContext3WithoutRetry();
+
+        Assert.Empty(dbContext1.Entities);
+        Assert.Empty(dbContext2.Entities);
+        Assert.Empty(dbContext3.Entities);
     }
 
     internal class TestEntity
@@ -328,11 +365,11 @@ public abstract class DbContextTransactionExtensionsTests
         var dbContext1 = _testApp.Services.GetRequiredService<TestDbContext1>();
         var dbContext2 = _testApp.Services.GetRequiredService<TestDbContext2>();
         var dbContext3WithoutRetry = _testApp.Services.GetRequiredService<TestDbContext3WithoutRetry>();
-        await dbContext1.Entities.AddAsync(new TestEntity { Id = id });
+        await dbContext1.Entities.AddAsync(new TestEntity {Id = id});
         await dbContext1.SaveChangesAsync();
-        await dbContext2.Entities.AddAsync(new TestEntity { Id = id });
+        await dbContext2.Entities.AddAsync(new TestEntity {Id = id});
         await dbContext2.SaveChangesAsync();
-        await dbContext3WithoutRetry.Entities.AddAsync(new TestEntity { Id = id });
+        await dbContext3WithoutRetry.Entities.AddAsync(new TestEntity {Id = id});
         await dbContext3WithoutRetry.SaveChangesAsync();
     }
 
