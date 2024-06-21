@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface IGeoJsonRepository
     {
-        Dictionary<string, GeoJson> FindByBoundaryLevelAndCodes(long boundaryLevelId, IEnumerable<string> codes);
+        Dictionary<string, BoundaryData> FindByBoundaryLevelAndCodes(long boundaryLevelId, IEnumerable<string> codes);
     }
 }

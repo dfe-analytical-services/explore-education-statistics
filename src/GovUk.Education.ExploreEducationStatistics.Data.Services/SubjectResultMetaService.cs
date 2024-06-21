@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -25,6 +20,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Data.ViewModels.LocationViewModelBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -220,13 +220,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     pair => pair.Value);
         }
 
-        private async Task<Dictionary<GeographicLevel, Dictionary<string, GeoJson>>> GetGeoJson(
+        private async Task<Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>> GetGeoJson(
             List<Location> locations,
             long? boundaryLevelId)
         {
             if (!boundaryLevelId.HasValue)
             {
-                return new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
+                return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>();
             }
 
             // TODO EES-3328 This could soon be irrelevant if boundary level is about to be removed from the query
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var boundaryLevel = await _boundaryLevelRepository.Get(boundaryLevelId.Value);
             if (boundaryLevel == null)
             {
-                return new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
+                return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>();
             }
 
             var locationsMatchingLevel =
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
             var geoJson = _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, codes);
 
-            return new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>
+            return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>
             {
                 {
                     boundaryLevel.Level,

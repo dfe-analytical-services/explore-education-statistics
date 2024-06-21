@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 
@@ -10,7 +11,7 @@ public static class LocationViewModelBuilder
     public static Dictionary<GeographicLevel, List<LocationAttributeViewModel>> BuildLocationAttributeViewModels(
         IList<Location> locations,
         Dictionary<GeographicLevel, List<string>>? hierarchies,
-        Dictionary<GeographicLevel, Dictionary<string, GeoJson>>? geoJson = null)
+        Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>? geoJson = null)
     {
         var locationAttributes = locations.GetLocationAttributesHierarchical(hierarchies);
         return locationAttributes.ToDictionary(
@@ -24,7 +25,7 @@ public static class LocationViewModelBuilder
 
     private static List<LocationAttributeViewModel> BuildLocationAttributeViewModels(
         IEnumerable<LocationAttributeNode> locationAttributes,
-        IReadOnlyDictionary<string, GeoJson>? geoJsonByCode)
+        IReadOnlyDictionary<string, BoundaryData>? geoJsonByCode)
     {
         return DeduplicateLocationViewModels(
             locationAttributes
@@ -36,7 +37,7 @@ public static class LocationViewModelBuilder
 
     private static LocationAttributeViewModel BuildLocationAttributeViewModel(
         LocationAttributeNode locationAttributeNode,
-        IReadOnlyDictionary<string, GeoJson>? geoJsonByCode)
+        IReadOnlyDictionary<string, BoundaryData>? geoJsonByCode)
     {
         var locationAttribute = locationAttributeNode.Attribute;
         return locationAttributeNode.IsLeaf
@@ -52,14 +53,22 @@ public static class LocationViewModelBuilder
 
     private static LocationAttributeViewModel BuildLocationAttributeLeafViewModel(
         LocationAttributeNode locationAttributeNode,
-        IReadOnlyDictionary<string, GeoJson>? geoJsonByCode)
+        IReadOnlyDictionary<string, BoundaryData>? geoJsonByCode)
     {
         var locationAttribute = locationAttributeNode.Attribute;
         var code = locationAttribute.GetCodeOrFallback();
 
         var geoJson = code.IsNullOrEmpty()
             ? null
-            : geoJsonByCode?.GetValueOrDefault(code)?.Deserialized;
+            : geoJsonByCode?.GetValueOrDefault(code)?.Feature;
+
+        if (geoJson != null)
+        {
+            var (featureName, featureCode) = BoundaryDataUtils.GetFeatureDetails(geoJson.Properties);
+
+            geoJson.Properties.Add("Code", featureCode);
+            geoJson.Properties.Add("Name", featureName);
+        }
 
         return new LocationAttributeViewModel
         {
