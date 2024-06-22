@@ -64,7 +64,7 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
                 kv => kv.Value
             );
 
-        if (TryGetRequiredFieldError(invalidModelState, out var requiredFieldError))
+        if (TryGetRequiredValueError(invalidModelState, out var requiredFieldError))
         {
             errors.Add(requiredFieldError);
         }
@@ -154,7 +154,7 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
         return true;
     }
 
-    private static bool TryGetRequiredFieldError(
+    private static bool TryGetRequiredValueError(
         IDictionary<string, ModelStateEntry> modelState,
         [NotNullWhen(true)] out ErrorViewModel? error)
     {
@@ -176,8 +176,8 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
 
         error = new ErrorViewModel
         {
-            Code = ValidationMessages.RequiredField.Code,
-            Message = ValidationMessages.RequiredField.Message,
+            Code = ValidationMessages.RequiredValue.Code,
+            Message = ValidationMessages.RequiredValue.Message,
             Path = requiredFieldErrorKey
         };
 

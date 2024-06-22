@@ -357,13 +357,13 @@ public static class ValidationProblemViewModelTestExtensions
         );
     }
 
-    public static ErrorViewModel AssertHasRequiredFieldError(
+    public static ErrorViewModel AssertHasRequiredValueError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath)
     {
         return validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.RequiredField.Code
+            expectedCode: ValidationMessages.RequiredValue.Code
         );
     }
 

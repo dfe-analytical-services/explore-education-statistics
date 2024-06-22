@@ -71,7 +71,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     }
 
     [Fact]
-    public async Task TestPersonBody_RequiredField_Returns400()
+    public async Task TestPersonBody_RequiredValue_Returns400()
     {
         var client = BuildApp().CreateClient();
 
@@ -86,9 +86,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         Assert.Single(validationProblem.Errors);
 
-        var error = validationProblem.AssertHasRequiredFieldError("name");
+        var error = validationProblem.AssertHasRequiredValueError("name");
 
-        Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
+        Assert.Equal(ValidationMessages.RequiredValue.Message, error.Message);
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     }
 
     [Fact]
-    public async Task TestGroupBody_RequiredField_Returns400()
+    public async Task TestGroupBody_RequiredValue_Returns400()
     {
         var client = BuildApp().CreateClient();
 
@@ -170,9 +170,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         Assert.Single(validationProblem.Errors);
 
-        var error = validationProblem.AssertHasRequiredFieldError("owner.name");
+        var error = validationProblem.AssertHasRequiredValueError("owner.name");
 
-        Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
+        Assert.Equal(ValidationMessages.RequiredValue.Message, error.Message);
     }
 
     [Theory]
@@ -196,7 +196,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Theory]
     [InlineData("")]
     [InlineData("?firstName=Test+name")]
-    public async Task TestPersonQuery_RequiredField_Returns400(string query)
+    public async Task TestPersonQuery_RequiredValue_Returns400(string query)
     {
         var client = BuildApp().CreateClient();
 
@@ -206,9 +206,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         Assert.Single(validationProblem.Errors);
 
-        var error = validationProblem.AssertHasRequiredFieldError("name");
+        var error = validationProblem.AssertHasRequiredValueError("name");
 
-        Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
+        Assert.Equal(ValidationMessages.RequiredValue.Message, error.Message);
     }
 
     [Theory]
@@ -252,7 +252,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("?owner.namee=Test")]
     [InlineData("?owner.firstName=Test")]
     [InlineData("?name=Test")]
-    public async Task TestGroupQuery_RequiredField_Returns400(string query)
+    public async Task TestGroupQuery_RequiredValue_Returns400(string query)
     {
         var client = BuildApp().CreateClient();
 
@@ -262,9 +262,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         Assert.Single(validationProblem.Errors);
 
-        var error = validationProblem.AssertHasRequiredFieldError("owner");
+        var error = validationProblem.AssertHasRequiredValueError("owner");
 
-        Assert.Equal(ValidationMessages.RequiredField.Message, error.Message);
+        Assert.Equal(ValidationMessages.RequiredValue.Message, error.Message);
     }
 
     [Theory]

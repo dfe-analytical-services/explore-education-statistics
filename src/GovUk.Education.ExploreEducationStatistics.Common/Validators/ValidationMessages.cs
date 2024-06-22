@@ -21,8 +21,8 @@ public static class ValidationMessages
         Message: "The request body must not be empty."
     );
 
-    public static readonly LocalizableMessage RequiredField = new(
-        Code: "RequiredField",
-        Message: "The field is required."
+    public static readonly LocalizableMessage RequiredValue = new(
+        Code: "RequiredValue",
+        Message: "A value is required for this field."
     );
 }
