@@ -105,33 +105,51 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
             return false;
         }
 
-        error = new ErrorViewModel
-        {
-            Code = ValidationMessages.InvalidValue.Code,
-            Message = ValidationMessages.InvalidValue.Message,
-            Path = GetJsonPath(modelError)
-        };
+        error = GetJsonError(modelError);
 
         return true;
     }
 
-    private static string GetJsonPath(ModelError error)
+    private static ErrorViewModel GetJsonError(ModelError error)
     {
         List<string> paths = [];
 
         var currentException = error.Exception;
+        var completed = false;
 
-        while (currentException is not null)
+        while (!completed)
         {
             if (currentException is JsonException { Path: not null } jsonException)
             {
                 paths.Add(jsonException.Path);
             }
 
-            currentException = currentException.InnerException;
+            if (currentException?.InnerException is not null)
+            {
+                currentException = currentException.InnerException;
+            }
+            else
+            {
+                completed = true;
+            }
         }
 
-        return JsonPathUtils.Concat(paths);
+        // Not ideal, but there isn't any better way of figuring out if we have this type
+        // of JsonException as they don't provide any error codes or other identifier.
+        var message = currentException is not null
+                      && currentException.Message.StartsWith("The JSON property")
+                      && currentException.Message.Contains(
+                          "could not be mapped to any .NET member contained in type"
+                      )
+            ? ValidationMessages.UnknownField
+            : ValidationMessages.InvalidValue;
+
+        return new ErrorViewModel
+        {
+            Code = message.Code,
+            Message = message.Message,
+            Path = JsonPathUtils.Concat(paths)
+        };
     }
 
     private static bool TryGetEmptyBodyError(

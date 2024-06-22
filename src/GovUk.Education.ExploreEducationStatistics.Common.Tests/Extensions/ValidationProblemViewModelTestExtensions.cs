@@ -377,6 +377,16 @@ public static class ValidationProblemViewModelTestExtensions
         );
     }
 
+    public static ErrorViewModel AssertHasUnknownFieldError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath)
+    {
+        return validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.UnknownField.Code
+        );
+    }
+
     public static ErrorViewModel AssertHasError(
         this ValidationProblemViewModel validationProblem,
         string? expectedPath,

@@ -86,6 +86,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
 
                 // This must be false to allow `JsonExceptionResultFilter` to work correctly,
                 // otherwise, JsonExceptions can't be identified. Also, this prevents

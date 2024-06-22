@@ -25,4 +25,9 @@ public static class ValidationMessages
         Code: "RequiredValue",
         Message: "A value is required for this field."
     );
+
+    public static readonly LocalizableMessage UnknownField = new(
+        Code: "UnknownField",
+        Message: "The field was not expected in the request and should be removed."
+    );
 }

@@ -33,9 +33,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("{}", "")]
     [InlineData("{ \"name\": 123 }", "name")]
     [InlineData("{ \"name\": true }", "name")]
-    [InlineData("{ \"firstName\": \"test\" }", "")]
-    [InlineData("{ \"firstName\": 123 }", "")]
-    public async Task TestPersonBody_InvalidJson_Returns400(string body, string path)
+    public async Task TestPersonBody_InvalidInput_Returns400(string body, string path)
     {
         var client = BuildApp().CreateClient();
 
@@ -50,6 +48,27 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         var error = validationProblem.AssertHasInvalidInputError(path);
 
         Assert.Equal(ValidationMessages.InvalidValue.Message, error.Message);
+    }
+
+    [Theory]
+    [InlineData("{ \"firstName\": \"test\" }", "firstName")]
+    [InlineData("{ \"firstName\": 123 }", "firstName")]
+    [InlineData("{ \"name\": \"Test\", \"lastName\": \"Last\"  }", "lastName")]
+    public async Task TestPersonBody_UnknownFields_Returns400(string body, string path)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.PostAsync(
+            requestUri: nameof(TestController.TestPersonBody),
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+
+        var validationProblem = response.AssertValidationProblem();
+
+        Assert.Single(validationProblem.Errors);
+
+        var error = validationProblem.AssertHasUnknownFieldError(path);
+
+        Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
     }
 
     [Fact]
@@ -117,9 +136,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("{ \"owner\": {} }", "owner")]
     [InlineData("{ \"owner\": { \"name\": 123 } }", "owner.name")]
     [InlineData("{ \"owner\": { \"name\": true } }", "owner.name")]
-    [InlineData("{ \"owner\": { \"firstName\": \"test\" } }", "owner")]
-    [InlineData("{ \"owner\": { \"firstName\": 123 } }", "owner")]
-    public async Task TestGroupBody_InvalidJson_Returns400(string body, string path)
+    public async Task TestGroupBody_InvalidInput_Returns400(string body, string path)
     {
         var client = BuildApp().CreateClient();
 
@@ -134,6 +151,27 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         var error = validationProblem.AssertHasInvalidInputError(path);
 
         Assert.Equal(ValidationMessages.InvalidValue.Message, error.Message);
+    }
+
+    [Theory]
+    [InlineData("{ \"owner\": { \"firstName\": \"test\" } }", "owner.firstName")]
+    [InlineData("{ \"owner\": { \"firstName\": 123 } }", "owner.firstName")]
+    [InlineData("{ \"owner\": { \"name\": \"Test\", \"lastName\": \"Last\" } }", "owner.lastName")]
+    public async Task TestGroupBody_InvalidJson_Returns400(string body, string path)
+    {
+        var client = BuildApp().CreateClient();
+
+        var response = await client.PostAsync(
+            requestUri: nameof(TestController.TestGroupBody),
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+
+        var validationProblem = response.AssertValidationProblem();
+
+        Assert.Single(validationProblem.Errors);
+
+        var error = validationProblem.AssertHasUnknownFieldError(path);
+
+        Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
     }
 
     [Fact]
