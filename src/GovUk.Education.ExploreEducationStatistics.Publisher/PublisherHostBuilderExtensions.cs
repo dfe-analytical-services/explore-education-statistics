@@ -30,7 +30,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
+using IMethodologyService =
+    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
@@ -72,7 +73,8 @@ public static class PublisherHostBuilderExtensions
                     .AddDbContext<ContentDbContext>(options =>
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
-                            providerOptions => SqlServerDbContextOptionsBuilderExtensions.EnableCustomRetryOnFailure(providerOptions)))
+                            providerOptions =>
+                                SqlServerDbContextOptionsBuilderExtensions.EnableCustomRetryOnFailure(providerOptions)))
                     .AddDbContext<StatisticsDbContext>(options =>
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
@@ -125,8 +127,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
-                    
-                    .Configure<AppSettingOptions>(configuration.GetSection(AppSettingOptions.AppSettings));
+                    .Configure<AppSettingsOptions>(configuration.GetSection(AppSettingsOptions.AppSettings));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)
@@ -137,7 +138,7 @@ public static class PublisherHostBuilderExtensions
                 {
                     services.AddScoped<IDataSetPublishingService, NoOpDataSetPublishingService>();
                 }
-                
+
                 // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
                 // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
                 // being done from Publisher directly, and so these DI dependencies should eventually be removed.

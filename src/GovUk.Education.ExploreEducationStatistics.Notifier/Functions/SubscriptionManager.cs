@@ -19,8 +19,9 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 {
-    public class SubscriptionManager(ILogger<SubscriptionManager> logger,
-        IOptions<AppSettingOptions> appSettingOptions,
+    public class SubscriptionManager(
+        ILogger<SubscriptionManager> logger,
+        IOptions<AppSettingsOptions> appSettingsOptions,
         IOptions<GovUkNotifyOptions> govUkNotifyOptions,
         ITokenService tokenService,
         IEmailService emailService,
@@ -28,13 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
         INotificationClientProvider notificationClientProvider,
         IValidator<NewPendingSubscriptionRequest> requestValidator)
     {
-        private readonly AppSettingOptions _appSettingOptions = appSettingOptions.Value;
+        private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
         private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
         private readonly ITokenService _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         private readonly IEmailService _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         private readonly IStorageTableService _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
         private readonly INotificationClientProvider _notificationClientProvider = notificationClientProvider ??
-                                                                                   throw new ArgumentNullException(nameof(notificationClientProvider));
+            throw new ArgumentNullException(nameof(notificationClientProvider));
 
         [Function("RequestPendingSubscription")]
         // ReSharper disable once UnusedMember.Global
@@ -79,12 +80,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 
                             var confirmationValues = new Dictionary<string, dynamic>
                             {
-                                {
-                                    "publication_name", subscription.Subscriber.Title
-                                },
+                                { "publication_name", subscription.Subscriber.Title },
                                 {
                                     "unsubscribe_link",
-                                    $"{_appSettingOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                                    $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
                                 }
                             };
 
@@ -105,12 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 
                         var values = new Dictionary<string, dynamic>
                         {
-                            {
-                                "publication_name", req.Title
-                            },
+                            { "publication_name", req.Title },
                             {
                                 "verification_link",
-                                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
+                                $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
                             }
                         };
 
@@ -220,12 +217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 
                     var values = new Dictionary<string, dynamic>
                     {
-                        {
-                            "publication_name", sub.Title
-                        },
+                        { "publication_name", sub.Title },
                         {
                             "unsubscribe_link",
-                            $"{_appSettingOptions.PublicAppUrl}/subscriptions/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                            $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
                         }
                     };
 
