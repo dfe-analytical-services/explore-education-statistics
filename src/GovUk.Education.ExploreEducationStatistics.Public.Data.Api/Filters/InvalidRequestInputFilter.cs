@@ -20,14 +20,18 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
 {
     public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        if (context.ModelState.IsValid)
+        // A filter or endpoint has already created our standard
+        // validation error response. We can bail early.
+        if (context.Result is BadRequestObjectResult { Value: ValidationProblemViewModel })
         {
             return next();
         }
 
-        // A filter or endpoint has already created our standard
-        // validation error response. We can bail early.
-        if (context.Result is BadRequestObjectResult { Value: ValidationProblemViewModel })
+        var errors = new List<ErrorViewModel>();
+
+        errors.AddRange(GetUnknownQueryParameterErrors(context));
+
+        if (context.ModelState.IsValid && errors.Count == 0)
         {
             return next();
         }
@@ -36,8 +40,6 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
             .Where(kv => kv.Value?.ValidationState is ModelValidationState.Invalid)
             .Cast<KeyValuePair<string, ModelStateEntry>>()
             .ToDictionary();
-
-        var errors = new List<ErrorViewModel>();
 
         if (TryGetJsonError(invalidModelState, out var jsonError))
         {
@@ -89,6 +91,21 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
         context.Result = new BadRequestObjectResult(ValidationProblemViewModel.Create(problemDetails, errors));
 
         return Task.CompletedTask;
+    }
+
+    private static List<ErrorViewModel> GetUnknownQueryParameterErrors(
+        ActionExecutingContext context)
+    {
+        return context.HttpContext.Request
+            .Query
+            .Where(param => !context.ModelState.ContainsKey(param.Key))
+            .Select(param => new ErrorViewModel
+            {
+                Code = ValidationMessages.UnknownField.Code,
+                Message = ValidationMessages.UnknownField.Message,
+                Path = param.Key
+            })
+            .ToList();
     }
 
     private static bool TryGetJsonError(
