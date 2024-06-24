@@ -11,7 +11,7 @@ interface ExternalityProps {
 }
 
 export default function getPropsForExternality(
-  url: string | URL,
+  url: string,
   text?: string,
   rel?: string,
 ): ExternalityProps {
