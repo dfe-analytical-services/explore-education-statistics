@@ -99,7 +99,7 @@ Change secondary statistics
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
     user waits until page finishes loading
-    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}     %{WAIT_MEDIUM}
+    user checks page contains element        id:${SECONDARY_STATS_TABLE_TAB_ID}
     user checks page contains    Data Block 2 title
     user checks page contains button    Change secondary stats
     user checks page contains button    Remove secondary stats
