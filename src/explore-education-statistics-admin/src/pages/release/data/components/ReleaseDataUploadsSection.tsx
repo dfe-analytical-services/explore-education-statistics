@@ -48,7 +48,7 @@ const ReleaseDataUploadsSection = ({
   onDataFilesChange,
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
-  const [activeFileId, setActiveFileId] = useState<string>();
+  const [activeFileIds, setActiveFileIds] = useState<string[]>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const { value: initialDataFiles = [], isLoading } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFiles(releaseId),
@@ -89,7 +89,7 @@ const ReleaseDataUploadsSection = ({
       dataFile.id,
     );
 
-    setActiveFileId('');
+    setActiveFileIds([]);
 
     setDataFiles(currentDataFiles =>
       currentDataFiles.map(file =>
@@ -147,7 +147,7 @@ const ReleaseDataUploadsSection = ({
           console.error("This shouldn't happen!"); // @MarkFix
           break;
       }
-      setActiveFileId(newFiles[0].id); // @MarkFix we want to open all new files really - but do we care?
+      setActiveFileIds(newFiles.map(file => file.id));
       setDataFiles(currentDataFiles => [...currentDataFiles, ...newFiles]);
     },
     [releaseId],
@@ -215,7 +215,7 @@ const ReleaseDataUploadsSection = ({
                 key={dataFile.title}
                 heading={dataFile.title}
                 headingTag="h3"
-                open={dataFile.id === activeFileId}
+                open={activeFileIds?.includes(dataFile.id)}
               >
                 <div style={{ position: 'relative' }}>
                   {dataFile.isDeleting && (
