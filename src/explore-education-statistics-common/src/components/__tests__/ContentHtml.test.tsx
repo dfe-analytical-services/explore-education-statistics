@@ -6,17 +6,6 @@ import { GlossaryEntry } from '@common/services/types/glossary';
 import { within } from '@testing-library/dom';
 
 describe('ContentHtml', () => {
-  const OLD_ENV = process.env;
-
-  beforeEach(() => {
-    jest.resetModules();
-    process.env = { ...OLD_ENV };
-  });
-
-  afterAll(() => {
-    process.env = OLD_ENV;
-  });
-
   test('renders correctly with required props', () => {
     render(<ContentHtml html="<p>Test text</p>" />);
 
@@ -281,9 +270,6 @@ describe('ContentHtml', () => {
     });
 
     test('opens internal links in the same tab', () => {
-      process.env.PUBLIC_URL =
-        'https://explore-education-statistics.service.gov.uk';
-
       render(
         <ContentHtml html='<a href="https://explore-education-statistics.service.gov.uk/">Internal link</a>' />,
       );

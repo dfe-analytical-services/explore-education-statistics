@@ -9,7 +9,7 @@ describe('DataSetFileUsage', () => {
     render(
       <DataSetFileUsage
         hasApiDataSet={false}
-        tableToolLink="test-table-tool-link"
+        tableToolLink="https://test-table-tool-link"
         onDownload={noop}
       />,
     );
@@ -24,7 +24,7 @@ describe('DataSetFileUsage', () => {
 
     expect(
       screen.getByRole('link', { name: 'View or create your own tables' }),
-    ).toHaveAttribute('href', 'test-table-tool-link');
+    ).toHaveAttribute('href', 'https://test-table-tool-link');
 
     expect(
       screen.queryByRole('link', { name: 'API documentation' }),
@@ -35,7 +35,7 @@ describe('DataSetFileUsage', () => {
     render(
       <DataSetFileUsage
         hasApiDataSet
-        tableToolLink="test-table-tool-link"
+        tableToolLink="https://test-table-tool-link"
         onDownload={noop}
       />,
     );
@@ -50,13 +50,13 @@ describe('DataSetFileUsage', () => {
 
     expect(
       screen.getByRole('link', { name: 'View or create your own tables' }),
-    ).toHaveAttribute('href', 'test-table-tool-link');
+    ).toHaveAttribute('href', 'https://test-table-tool-link');
 
     expect(
       screen.getByRole('link', {
         name: 'API documentation',
       }),
-    ).toHaveAttribute('href', 'TODO-GUIDANCE-URL');
+    ).toHaveAttribute('href', 'https://todo-guidance-url');
   });
 
   test('clicking the download button calls the `onDownload` handler', async () => {
@@ -65,7 +65,7 @@ describe('DataSetFileUsage', () => {
     const { user } = render(
       <DataSetFileUsage
         hasApiDataSet
-        tableToolLink="test-table-tool-link"
+        tableToolLink="https://test-table-tool-link"
         onDownload={handleDownload}
       />,
     );
