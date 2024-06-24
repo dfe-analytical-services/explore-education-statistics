@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
 
-        private const int MaxFilenameSize = 150;
+        public const int MaxFilenameSize = 150;
         private const int MaxFileSize = int.MaxValue; // 2GB
 
         public FileUploadsValidatorService(IFileTypeService fileTypeService,
@@ -267,16 +267,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(dataFileName, FileType.Data));
             }
 
-            // @MarkFix Do we care whether meta files aren't unique? They're not downloaded by the public?
-            var replacingMetaFile = _context.Files
-                .SingleOrDefault(f => f.Type == Metadata
-                                      && replacingFile != null
-                                      && f.SubjectId == replacingFile.SubjectId);
-            if (IsFileExisting(releaseVersionId, Metadata, metaFileName) &&
-                (replacingMetaFile == null || replacingMetaFile.Filename != metaFileName))
-            {
-                errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(metaFileName, Metadata));
-            }
+            // NOTE: We allow duplicate meta file names - only data file are included in public Data
+            // Catalogue zips. Files are stored in blob storage by GUID, so no worries about duplicate names
+            // there
 
             return errors;
         }
