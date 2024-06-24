@@ -29,7 +29,10 @@ describe('getExternality', () => {
     expect(getExternality('https://stackoverflow.com/')).toBe('external');
   });
 
-  test('returns internal for relative URL', () => {
-    expect(getExternality('/find-statistics')).toBe('internal');
-  });
+  test.each(['/find-statistics', '?page1'])(
+    'returns internal for relative URL',
+    (url: string) => {
+      expect(getExternality(url)).toBe('internal');
+    },
+  );
 });

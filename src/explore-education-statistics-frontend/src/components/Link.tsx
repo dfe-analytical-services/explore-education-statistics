@@ -27,7 +27,7 @@ const Link = ({
   rel: originalRel,
   ...props
 }: LinkProps) => {
-  const { url, target, rel } = getPropsForExternality(
+  const { target, rel } = getPropsForExternality(
     to.toString(),
     undefined,
     originalRel,
@@ -36,7 +36,7 @@ const Link = ({
   return (
     <RouterLink
       {...props}
-      href={url}
+      href={to}
       target={target}
       prefetch={prefetch}
       scroll={scroll}
