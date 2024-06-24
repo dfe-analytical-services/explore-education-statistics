@@ -11,6 +11,16 @@ describe('formatContentLink', () => {
     );
   });
 
+  test('converts Admin EES links to lowercase', () => {
+    expect(
+      formatContentLink(
+        'https://adMIN.exploRe-eduCation-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools',
+      ),
+    ).toEqual(
+      'https://admin.explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools',
+    );
+  });
+
   test('does not convert query params on EES links to lowercase', () => {
     expect(
       formatContentLink(

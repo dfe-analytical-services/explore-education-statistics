@@ -1,6 +1,5 @@
 import { OmitStrict } from '@common/types';
-import getTargetRelation from '@common/utils/url/getTargetRelation';
-import buildRel from '@common/utils/url/buildRel';
+import getPropsForExternality from '@common/utils/url/getPropsForExternality';
 import classNames from 'classnames';
 import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
@@ -25,21 +24,24 @@ const Link = ({
   to,
   unvisited = false,
   testId,
+  rel: originalRel,
   ...props
 }: LinkProps) => {
+  const { url, target, rel } = getPropsForExternality(
+    to.toString(),
+    undefined,
+    originalRel,
+  );
+
   return (
     <RouterLink
       {...props}
-      href={to}
+      href={url}
+      target={target}
       prefetch={prefetch}
       scroll={scroll}
       shallow={shallow}
-      rel={buildRel(
-        getTargetRelation(to.toString()) === 'internal-public'
-          ? []
-          : ['noopener', 'noreferrer', 'nofollow', 'external'],
-        props.rel,
-      )}
+      rel={rel}
       className={classNames(
         'govuk-link',
         {

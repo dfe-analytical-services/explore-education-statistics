@@ -1,17 +1,24 @@
+import getExternality, { Externality } from './getExternality';
+
 // Format links in content to ensure they are valid.
 // Make sure any internal links are lower case, excluding query params.
-export default function formatContentLink(urlString: string) {
+export default function formatContentLink(
+  url: string | URL,
+  externality?: Externality,
+) {
   try {
-    const url = new URL(urlString);
+    const formattedUrl = new URL(url);
+
     if (
-      url.origin
-        .toLowerCase()
-        .includes('explore-education-statistics.service.gov.uk')
+      ['internal', 'external-admin'].includes(
+        externality ?? getExternality(url),
+      )
     ) {
-      url.pathname = url.pathname.toLowerCase();
+      formattedUrl.pathname = formattedUrl.pathname.toLowerCase();
     }
-    return url.href;
+
+    return formattedUrl.href;
   } catch {
-    return urlString;
+    return url.toString();
   }
 }
