@@ -1,6 +1,5 @@
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import styles from '@common/components/ContentHtml.module.scss';
-import formatContentLink from '@common/utils/url/formatContentLink';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -15,7 +14,7 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
-import targetRelation from '@common/utils/url/getTargetRelation';
+import getPropsForExternality from '@common/utils/url/getPropsForExternality';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -71,7 +70,7 @@ export default function ContentHtml({
       }
 
       if (node.name === 'a') {
-        const target = node.attribs.href;
+        const targetUrl = node.attribs.href;
 
         if (
           transformFeaturedTableLinks &&
@@ -79,22 +78,25 @@ export default function ContentHtml({
         ) {
           const text = domToReact(node.children);
           return isMounted && typeof text === 'string'
-            ? transformFeaturedTableLinks(target, text)
+            ? transformFeaturedTableLinks(targetUrl, text)
             : undefined;
         }
 
         if (formatLinks) {
-          const url = formatContentLink(target);
           const text = domToReact(node.children);
+          const { url, target, rel, externality } =
+            getPropsForExternality(targetUrl);
 
-          return targetRelation(target, process.env.PUBLIC_URL) !==
-            'internal-public' &&
+          return externality !== 'internal' &&
             typeof node.attribs['data-featured-table'] === 'undefined' ? (
-            <a href={url} target="_blank" rel="noopener noreferrer nofollow">
+            // eslint-disable-next-line react/jsx-no-target-blank
+            <a href={url} target={target} rel={rel}>
               {text} (opens in a new tab)
             </a>
           ) : (
-            <a href={url}>{text}</a>
+            <a href={url} rel={rel}>
+              {text}
+            </a>
           );
         }
       }
