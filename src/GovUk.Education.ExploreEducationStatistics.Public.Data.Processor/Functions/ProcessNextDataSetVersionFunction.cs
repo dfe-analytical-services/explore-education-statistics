@@ -29,6 +29,7 @@ public class ProcessNextDataSetVersionFunction(
         {
             await context.CallActivity(ActivityNames.CopyCsvFiles, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CreateMappings, logger, context.InstanceId);
+            await context.CallActivity(ActivityNames.ApplyAutoMappings, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CompleteNextDataSetVersionMappingProcessing, logger,
                 context.InstanceId);
         }
@@ -49,8 +50,18 @@ public class ProcessNextDataSetVersionFunction(
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingMetadata, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.CreatingMappings, cancellationToken);
         await mappingService.CreateMappings(dataSetVersionImport.DataSetVersionId, cancellationToken);
+    }
+
+    [Function(ActivityNames.ApplyAutoMappings)]
+    public async Task ApplyAutoMappings(
+        [ActivityTrigger] Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.AutoMapping, cancellationToken);
+        await mappingService.ApplyAutoMappings(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(ActivityNames.CompleteNextDataSetVersionMappingProcessing)]

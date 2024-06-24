@@ -8,4 +8,8 @@ public interface IDataSetVersionMappingService
     Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default);
+
+    Task ApplyAutoMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default);
 }
