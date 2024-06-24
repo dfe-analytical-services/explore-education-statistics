@@ -24,7 +24,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
 import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
 import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
@@ -49,18 +49,27 @@ const ReleaseDataUploadsSection = ({
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [activeFileId, setActiveFileId] = useState<string>();
-  const {
-    value: dataFiles = [],
-    setState: setDataFilesState,
-    isLoading,
-  } = useAsyncHandledRetry(
+  const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
+  const { value: initialDataFiles = [], isLoading } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFiles(releaseId),
     [releaseId],
   );
 
+  // Store the data files on state so we can reliably update them
+  // when the permissions/status change.
+  useEffect(() => {
+    if (!isLoading) {
+      setDataFiles(initialDataFiles);
+    }
+  }, [initialDataFiles, isLoading, setDataFiles]);
+
+  useEffect(() => {
+    onDataFilesChange?.(dataFiles);
+  }, [dataFiles, onDataFilesChange]);
+
   const setFileDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
-    setDataFiles(
-      dataFiles.map(file =>
+    setDataFiles(currentDataFiles =>
+      currentDataFiles.map(file =>
         file.fileName !== dataFile.file.fileName
           ? file
           : {
@@ -70,17 +79,6 @@ const ReleaseDataUploadsSection = ({
       ),
     );
   };
-
-  const setDataFiles = useCallback(
-    (nextDataFiles: DataFile[]) => {
-      setDataFilesState({ value: nextDataFiles });
-
-      if (onDataFilesChange) {
-        onDataFilesChange(nextDataFiles);
-      }
-    },
-    [onDataFilesChange, setDataFilesState],
-  );
 
   const handleStatusChange = async (
     dataFile: DataFile,
@@ -93,8 +91,8 @@ const ReleaseDataUploadsSection = ({
 
     setActiveFileId('');
 
-    setDataFiles(
-      dataFiles.map(file =>
+    setDataFiles(currentDataFiles =>
+      currentDataFiles.map(file =>
         file.fileName !== dataFile.fileName
           ? file
           : {
@@ -105,13 +103,6 @@ const ReleaseDataUploadsSection = ({
             },
       ),
     );
-
-    // @MarkFix when bulk importing multiple data sets that finish around the same time, getDataFilePermissions
-    // appears to be called for all files, but I believe most changes are getting overwritten except the last update,
-    // all subjects but one will still show the `Cancel` button when they should show the `Delete files` etc. buttons.
-    // I'm inclined to think setDataFiles needs to be rewritten with useState such that we can do
-    // `setDataFiles((prevFiles : DataFile[]) => [code to update data files permissions here])`
-    console.log('dataFiles: ', dataFiles);
   };
 
   const handleSubmit = useCallback(
@@ -157,9 +148,9 @@ const ReleaseDataUploadsSection = ({
           break;
       }
       setActiveFileId(newFiles[0].id); // @MarkFix we want to open all new files really - but do we care?
-      setDataFiles([...dataFiles, ...newFiles]);
+      setDataFiles(currentDataFiles => [...currentDataFiles, ...newFiles]);
     },
-    [dataFiles, releaseId, setDataFiles],
+    [releaseId],
   );
 
   return (
@@ -315,7 +306,9 @@ const ReleaseDataUploadsSection = ({
             try {
               await releaseDataFileService.deleteDataFiles(releaseId, file.id);
 
-              setDataFiles(dataFiles.filter(dataFile => dataFile !== file));
+              setDataFiles(currentDataFiles =>
+                currentDataFiles.filter(dataFile => dataFile.id !== file.id),
+              );
             } catch (err) {
               logger.error(err);
               setFileDeleting(deleteDataFile, false);
