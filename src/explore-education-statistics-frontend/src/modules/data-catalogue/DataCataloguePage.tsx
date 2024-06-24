@@ -50,6 +50,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import compact from 'lodash/compact';
 import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 
@@ -278,6 +279,13 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
       includeDefaultMetaTitle={pageTitle === defaultPageTitle}
       metaTitle={pageTitle}
     >
+      <Head>
+        <link
+          rel="canonical"
+          href={`${process.env.PUBLIC_URL}data-catalogue`}
+          key="canonical"
+        />
+      </Head>
       <NotificationBanner title="This page has changed">
         Following user feedback we've made some changes to this page to make our
         data sets easier to find, if you have any comments on the new design
@@ -664,6 +672,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
         },
       };
     }
+    return {
+      redirect: {
+        destination: `/data-catalogue`,
+        permanent: true,
+      },
+    };
   }
 
   await queryClient.prefetchQuery(
