@@ -154,7 +154,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
       data-testid={testId}
       ref={ref}
     >
-      <ul className="govuk-tabs__list" role="tablist">
+      <ul className="govuk-tabs__list" role={onMedia('tablist')}>
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;
 
@@ -164,7 +164,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                 'govuk-tabs__list-item--selected': selectedTabIndex === index,
               })}
               key={sectionId}
-              role="presentation"
+              role={onMedia('presentation')}
             >
               <a
                 aria-controls={onMedia(sectionId)}
@@ -173,7 +173,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                 className="govuk-tabs__tab"
                 href={`#${sectionId}`}
                 id={`${sectionId}-tab`}
-                tabIndex={selectedTabIndex !== index ? -1 : undefined}
+                tabIndex={onMedia(selectedTabIndex !== index ? -1 : undefined)}
                 onClick={event => {
                   event.preventDefault();
                   selectTab(index);

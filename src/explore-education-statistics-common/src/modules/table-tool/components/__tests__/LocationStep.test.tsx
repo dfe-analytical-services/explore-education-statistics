@@ -19,13 +19,14 @@ describe('LocationStep', () => {
       <LocationStep
         {...testWizardStepProps}
         options={testLocationsFlat}
+        stepTitle="Choose locations"
         onSubmit={noop}
       />,
     );
 
     expect(
       screen.getByRole('group', {
-        name: 'Step 1 (current) Choose locations',
+        name: 'Step 1 Choose locations',
       }),
     ).toBeInTheDocument();
   });
@@ -36,6 +37,7 @@ describe('LocationStep', () => {
         {...testWizardStepPropsInActive}
         options={testLocationsFlat}
         initialValues={['country-1', 'region-1', 'region-2']}
+        stepTitle="Choose locations"
         onSubmit={noop}
       />,
     );
@@ -64,6 +66,7 @@ describe('LocationStep', () => {
         {...testWizardStepPropsInActive}
         options={testLocationsNested}
         initialValues={['country-1', 'local-authority-1', 'local-authority-3']}
+        stepTitle="Choose locations"
         onSubmit={noop}
       />,
     );

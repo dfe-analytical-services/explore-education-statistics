@@ -59,6 +59,8 @@ describe('DataSetFileDetails', () => {
     expect(
       modal.getByRole('heading', { name: 'Accredited official statistics' }),
     ).toBeInTheDocument();
-    expect(modal.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+    expect(
+      modal.getByRole('button', { name: 'Close modal' }),
+    ).toBeInTheDocument();
   });
 });

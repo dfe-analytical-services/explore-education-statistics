@@ -624,6 +624,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                 FilterSequence = originalFile.FilterSequence,
                 IndicatorSequence = originalFile.IndicatorSequence,
                 Published = originalFile.Published,
+                PublicApiDataSetId = originalFile.PublicApiDataSetId,
+                PublicApiDataSetVersion = originalFile.PublicApiDataSetVersion,
             })
             .ToList();
 

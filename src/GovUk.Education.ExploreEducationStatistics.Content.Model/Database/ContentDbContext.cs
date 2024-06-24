@@ -409,6 +409,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         v => v.HasValue
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
+                entity.Property(f => f.PublicApiDataSetVersion)
+                    .HasMaxLength(20)
+                    .HasConversion(
+                        v => v.ToString(),
+                        v => SemVersion.Parse(v, SemVersionStyles.Strict, 20)
+                    );
+
+                entity.HasIndex(rf => new
+                {
+                    rf.ReleaseVersionId,
+                    rf.FileId,
+                })
+                .IsUnique();
+
+                entity.HasIndex(rf => new
+                {
+                    rf.ReleaseVersionId,
+                    rf.PublicApiDataSetId,
+                    rf.PublicApiDataSetVersion
+                })
+                .IsUnique();
             });
         }
 
@@ -440,19 +461,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .HasConversion( // You might want to use EF8 JSON support instead of this
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
-
-                entity.Property(f => f.PublicApiDataSetVersion)
-                    .HasMaxLength(20)
-                    .HasConversion(
-                        v => v.ToString(),
-                        v => SemVersion.Parse(v, SemVersionStyles.Strict, 20)
-                    );
-
-                entity.HasIndex(f => new
-                    {
-                        PublicDataSetId = f.PublicApiDataSetId, PublicDataSetVersion = f.PublicApiDataSetVersion
-                    })
-                    .IsUnique();
             });
         }
 

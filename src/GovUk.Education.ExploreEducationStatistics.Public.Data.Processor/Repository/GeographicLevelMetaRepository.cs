@@ -26,6 +26,7 @@ public class GeographicLevelMetaRepository(
                  """
             ).QueryAsync<string>(cancellationToken: cancellationToken))
             .Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider)
+            .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
             .ToList();
 
         var meta = new GeographicLevelMeta

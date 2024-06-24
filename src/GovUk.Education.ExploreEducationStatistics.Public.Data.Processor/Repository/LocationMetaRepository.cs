@@ -113,7 +113,8 @@ public class LocationMetaRepository(
                         .Where(o => !existingRowKeys.Contains(o.GetRowKey()))
                         .ToList();
 
-                    var startIndex = await publicDataDbContext.LocationOptionMetas.CountAsync(token: cancellationToken);
+                    var startIndex =
+                        await publicDataDbContext.LocationOptionMetas.CountAsync(token: cancellationToken) + 1;
 
                     foreach (var option in newOptions)
                     {

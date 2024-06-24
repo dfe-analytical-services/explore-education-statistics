@@ -282,6 +282,7 @@ public class SeedDataCommand : ICommand
                      """
                 ).QueryAsync<string>(cancellationToken: _cancellationToken))
                 .Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider)
+                .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
                 .ToList();
 
             var timePeriods = (await _duckDbConnection.SqlBuilder(
@@ -449,7 +450,7 @@ public class SeedDataCommand : ICommand
                     .InsertWhenNotMatched()
                     .MergeAsync(_cancellationToken);
 
-                var startIndex = await _dbContext.FilterOptionMetaLinks.CountAsync(token: _cancellationToken);
+                var startIndex = await _dbContext.FilterOptionMetaLinks.CountAsync(token: _cancellationToken) + 1;
 
                 var current = 0;
                 const int batchSize = 1000;
@@ -585,7 +586,7 @@ public class SeedDataCommand : ICommand
                             .Where(o => !existingRowKeys.Contains(o.GetRowKey()))
                             .ToList();
 
-                        var startIndex = await _dbContext.LocationOptionMetas.CountAsync(token: _cancellationToken);
+                        var startIndex = await _dbContext.LocationOptionMetas.CountAsync(token: _cancellationToken) + 1;
 
                         foreach (var option in newOptions)
                         {

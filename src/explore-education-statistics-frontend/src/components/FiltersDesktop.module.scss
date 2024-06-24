@@ -1,0 +1,10 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.desktopFilters {
+  @include govuk-media-query($from: tablet) {
+    max-height: 100vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+  }
+}

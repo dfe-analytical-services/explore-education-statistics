@@ -13,7 +13,6 @@ import _dataSetFileService from '@frontend/services/dataSetFileService';
 import { testReleases } from '@frontend/modules/data-catalogue/__data__/testReleases';
 import { testThemes } from '@frontend/modules/data-catalogue/__data__/testThemes';
 import { screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { produce } from 'immer';
 import mockRouter from 'next-router-mock';
@@ -119,14 +118,11 @@ describe('DataCataloguePage', () => {
   ];
 
   test('renders the page correctly with themes and publications', async () => {
-    render(<DataCataloguePage themes={testThemes} />);
+    const { user } = render(<DataCataloguePage themes={testThemes} />);
 
-    expect(screen.getByText('Choose a publication')).toBeInTheDocument();
-
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     const themeRadios = within(
       screen.getByRole('group', { name: 'Select a theme' }),
@@ -142,7 +138,7 @@ describe('DataCataloguePage', () => {
       }),
     ).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Theme title 1' }));
+    await user.click(screen.getByRole('radio', { name: 'Theme title 1' }));
 
     // Check there is only one radio for the publication
     await waitFor(() => {
@@ -168,12 +164,11 @@ describe('DataCataloguePage', () => {
     publicationService.listReleases.mockResolvedValue(testReleases);
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
-    render(<DataCataloguePage themes={testThemes} />);
+    const { user } = render(<DataCataloguePage themes={testThemes} />);
 
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 1
 
@@ -181,22 +176,16 @@ describe('DataCataloguePage', () => {
 
     expect(step1.getByText('Choose a publication')).toBeInTheDocument();
 
-    await userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
-    await userEvent.click(
-      step1.getByRole('radio', { name: 'Publication title 1' }),
-    );
-    await userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+    await user.click(step1.getByRole('radio', { name: 'Theme title 1' }));
+    await user.click(step1.getByRole('radio', { name: 'Publication title 1' }));
+    await user.click(step1.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 2
 
@@ -218,19 +207,15 @@ describe('DataCataloguePage', () => {
     expect(releaseRadios[1]).toEqual(step2.getByLabelText('Release title 2'));
     expect(releaseRadios[2]).toEqual(step2.getByLabelText('Release title 1'));
 
-    await userEvent.click(releaseRadios[0]);
-    await userEvent.click(step2.getByRole('button', { name: 'Next step' }));
+    await user.click(releaseRadios[0]);
+    await user.click(step2.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-3')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: /Step 3 Choose files to download/ }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 3
 
@@ -251,10 +236,10 @@ describe('DataCataloguePage', () => {
       step3.getByLabelText('Subject 3 (csv, 30 Mb)'),
     );
 
-    await userEvent.click(fileCheckboxes[1]);
-    await userEvent.click(fileCheckboxes[2]);
+    await user.click(fileCheckboxes[1]);
+    await user.click(fileCheckboxes[2]);
 
-    await userEvent.click(
+    await user.click(
       step3.getByRole('button', { name: 'Download selected files' }),
     );
 
@@ -276,27 +261,23 @@ describe('DataCataloguePage', () => {
         slug: 'test-publication-2',
       };
     });
-    render(<DataCataloguePage themes={testThemesSuperseded} />);
+    const { user } = render(
+      <DataCataloguePage themes={testThemesSuperseded} />,
+    );
 
     // Step 1
 
     const step1 = within(screen.getByTestId('wizardStep-1'));
-    await userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
-    await userEvent.click(
-      step1.getByRole('radio', { name: 'Publication title 1' }),
-    );
-    await userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+    await user.click(step1.getByRole('radio', { name: 'Theme title 1' }));
+    await user.click(step1.getByRole('radio', { name: 'Publication title 1' }));
+    await user.click(step1.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 2
 
@@ -318,33 +299,28 @@ describe('DataCataloguePage', () => {
       };
     });
 
-    render(<DataCataloguePage themes={testThemesSuperseded} />);
-
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
+    const { user } = render(
+      <DataCataloguePage themes={testThemesSuperseded} />,
     );
+
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 1
 
     const step1 = within(screen.getByTestId('wizardStep-1'));
 
-    await userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
-    await userEvent.click(
-      step1.getByRole('radio', { name: 'Publication title 1' }),
-    );
-    await userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+    await user.click(step1.getByRole('radio', { name: 'Theme title 1' }));
+    await user.click(step1.getByRole('radio', { name: 'Publication title 1' }));
+    await user.click(step1.getByRole('button', { name: 'Next step' }));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 2
 
@@ -368,10 +344,9 @@ describe('DataCataloguePage', () => {
 
     render(<DataCataloguePage themes={testThemes} />);
 
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     // Step 1
     expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
@@ -385,14 +360,12 @@ describe('DataCataloguePage', () => {
         releases={testReleases}
       />,
     );
-    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     const step2 = within(screen.getByTestId('wizardStep-2'));
 
@@ -415,18 +388,16 @@ describe('DataCataloguePage', () => {
         subjects={testSubjects}
       />,
     );
-    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-3')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Choose a release' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: /Step 3 Choose files to download/ }),
+    ).toHaveAttribute('aria-current', 'step');
+
     const step3 = within(screen.getByTestId('wizardStep-3'));
 
     expect(screen.getByText('Choose files to download')).toBeInTheDocument();
@@ -502,9 +473,11 @@ describe('DataCataloguePage', () => {
         ),
       ).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(screen.getByText('30 data sets')).toBeInTheDocument();
-      });
+      await waitFor(() =>
+        expect(screen.getByTestId('total-results')).toHaveTextContent(
+          '30 data sets',
+        ),
+      );
 
       expect(
         screen.getByText('Page 1 of 3, showing all available data sets'),
@@ -582,11 +555,13 @@ describe('DataCataloguePage', () => {
 
       render(<DataCataloguePage newDesign />);
 
-      await waitFor(() => {
-        expect(screen.getByText('30 data sets')).toBeInTheDocument();
-      });
+      await waitFor(() =>
+        expect(screen.getByTestId('total-results')).toHaveTextContent(
+          '30 data sets',
+        ),
+      );
 
-      const themesSelect = screen.getByLabelText('Theme');
+      const themesSelect = screen.getByLabelText('Filter by Theme');
       const themes = within(themesSelect).getAllByRole(
         'option',
       ) as HTMLOptionElement[];
@@ -604,10 +579,10 @@ describe('DataCataloguePage', () => {
       expect(themes[2]).toHaveValue('theme-2');
       expect(themes[2].selected).toBe(false);
 
-      const publicationsSelect = screen.getByLabelText('Publication');
+      const publicationsSelect = screen.getByLabelText('Filter by Publication');
       expect(publicationsSelect).toBeDisabled();
 
-      const releasesSelect = screen.getByLabelText('Releases');
+      const releasesSelect = screen.getByLabelText('Filter by Releases');
       const releases = within(releasesSelect).getAllByRole(
         'option',
       ) as HTMLOptionElement[];
@@ -634,25 +609,35 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
-        expect(screen.getByLabelText('Publication')).toBeDisabled();
+        expect(screen.getByLabelText('Filter by Publication')).toBeDisabled();
         expect(
-          within(screen.getByLabelText('Publication')).getAllByRole('option'),
+          within(screen.getByLabelText('Filter by Publication')).getAllByRole(
+            'option',
+          ),
         ).toHaveLength(1);
 
-        userEvent.selectOptions(screen.getByLabelText('Theme'), ['theme-2']);
+        user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+          'theme-2',
+        ]);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
       });
       test('populates and enables the publications dropdown', async () => {
-        const publicationsSelect = screen.getByLabelText('Publication');
+        const publicationsSelect = screen.getByLabelText(
+          'Filter by Publication',
+        );
         expect(publicationsSelect).not.toBeDisabled();
 
         const publications = within(publicationsSelect).getAllByRole(
@@ -719,22 +704,28 @@ describe('DataCataloguePage', () => {
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
         publicationService.listReleases.mockResolvedValue(testReleases);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
-        userEvent.selectOptions(screen.getByLabelText('Theme'), ['theme-2']);
+        user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+          'theme-2',
+        ]);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(publicationService.listReleases).not.toHaveBeenCalled();
 
         // Select publication
-        userEvent.selectOptions(screen.getByLabelText('Publication'), [
+        user.selectOptions(screen.getByLabelText('Filter by Publication'), [
           'publication-2',
         ]);
 
@@ -748,7 +739,7 @@ describe('DataCataloguePage', () => {
           'publication-slug-2',
         );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
         const updatedReleases = within(releasesSelect).getAllByRole(
           'option',
         ) as HTMLOptionElement[];
@@ -863,23 +854,29 @@ describe('DataCataloguePage', () => {
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
         publicationService.listReleases.mockResolvedValue(testReleases);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
 
         // Select theme
-        userEvent.selectOptions(screen.getByLabelText('Theme'), ['theme-2']);
+        user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+          'theme-2',
+        ]);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         // Select publication
-        userEvent.selectOptions(screen.getByLabelText('Publication'), [
+        user.selectOptions(screen.getByLabelText('Filter by Publication'), [
           'publication-2',
         ]);
 
@@ -887,11 +884,13 @@ describe('DataCataloguePage', () => {
           expect(screen.getByText('1 data set')).toBeInTheDocument();
         });
 
-        userEvent.selectOptions(releasesSelect, ['release-1']);
+        user.selectOptions(releasesSelect, ['release-1']);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -923,6 +922,10 @@ describe('DataCataloguePage', () => {
         expect(
           screen.getByRole('button', { name: 'Reset filters' }),
         ).toBeInTheDocument();
+
+        await waitFor(() =>
+          expect(screen.getByTestId('release-info')).toBeInTheDocument(),
+        );
 
         const releaseInfo = within(screen.getByTestId('release-info'));
 
@@ -957,15 +960,17 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
 
-        userEvent.selectOptions(releasesSelect, ['all']);
+        user.selectOptions(releasesSelect, ['all']);
 
         await waitFor(() => {
           expect(releasesSelect).toHaveValue('all');
@@ -978,7 +983,7 @@ describe('DataCataloguePage', () => {
           },
         });
 
-        userEvent.selectOptions(releasesSelect, ['latest']);
+        user.selectOptions(releasesSelect, ['latest']);
 
         await waitFor(() => {
           expect(releasesSelect).toHaveValue('latest');
@@ -1005,21 +1010,22 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
-
-        await userEvent.type(
-          screen.getByLabelText('Search data sets'),
-          'find me',
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
         );
-        await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await user.type(screen.getByLabelText('Search data sets'), 'find me');
+        await user.click(screen.getByRole('button', { name: 'Search' }));
+
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
       });
 
       test('updates the data sets list', async () => {
@@ -1063,13 +1069,17 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        expect(screen.getByLabelText('Theme')).toHaveValue('theme-2');
+        expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
 
-        const publicationsSelect = screen.getByLabelText('Publication');
+        const publicationsSelect = screen.getByLabelText(
+          'Filter by Publication',
+        );
         expect(publicationsSelect).not.toBeDisabled();
 
         const publications = within(publicationsSelect).getAllByRole(
@@ -1089,7 +1099,9 @@ describe('DataCataloguePage', () => {
         expect(publications[2]).toHaveValue('publication-3');
         expect(publications[2].selected).toBe(false);
 
-        expect(screen.getByLabelText('Releases')).toHaveValue('latest');
+        expect(screen.getByLabelText('Filter by Releases')).toHaveValue(
+          'latest',
+        );
 
         expect(
           screen.getByRole('button', {
@@ -1115,23 +1127,27 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        expect(screen.getByLabelText('Theme')).toHaveValue('theme-2');
-        expect(screen.getByLabelText('Publication')).toHaveValue(
+        expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
+        expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
           'publication-2',
         );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
         const releases = within(releasesSelect).getAllByRole(
           'option',
         ) as HTMLOptionElement[];
         expect(releases).toHaveLength(4);
 
         await waitFor(() => {
-          expect(screen.getByLabelText('Releases')).toHaveValue('release-3');
+          expect(screen.getByLabelText('Filter by Releases')).toHaveValue(
+            'release-3',
+          );
         });
 
         expect(releases[0]).toHaveTextContent('All releases');
@@ -1185,23 +1201,27 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        expect(screen.getByLabelText('Theme')).toHaveValue('theme-2');
-        expect(screen.getByLabelText('Publication')).toHaveValue(
+        expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
+        expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
           'publication-2',
         );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
         const releases = within(releasesSelect).getAllByRole(
           'option',
         ) as HTMLOptionElement[];
         expect(releases).toHaveLength(4);
 
         await waitFor(() => {
-          expect(screen.getByLabelText('Releases')).toHaveValue('release-1');
+          expect(screen.getByLabelText('Filter by Releases')).toHaveValue(
+            'release-1',
+          );
         });
 
         expect(releases[0]).toHaveTextContent('All releases');
@@ -1253,28 +1273,32 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
           query: { publicationId: 'publication-2', themeId: 'theme-2' },
         });
 
-        expect(screen.getByLabelText('Theme')).toHaveValue('theme-2');
-        expect(screen.getByLabelText('Publication')).toHaveValue(
+        expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
+        expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
           'publication-2',
         );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
         const releases = within(releasesSelect).getAllByRole(
           'option',
         ) as HTMLOptionElement[];
         expect(releases).toHaveLength(4);
 
         await waitFor(() => {
-          expect(screen.getByLabelText('Releases')).toHaveValue('release-3');
+          expect(screen.getByLabelText('Filter by Releases')).toHaveValue(
+            'release-3',
+          );
         });
 
         expect(releases[0]).toHaveTextContent('All releases');
@@ -1325,13 +1349,19 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        expect(screen.getByLabelText('Theme')).toHaveValue('all');
-        expect(screen.getByLabelText('Publication')).toHaveValue('all');
-        expect(screen.getByLabelText('Releases')).toHaveValue('latest');
+        expect(screen.getByLabelText('Filter by Theme')).toHaveValue('all');
+        expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
+          'all',
+        );
+        expect(screen.getByLabelText('Filter by Releases')).toHaveValue(
+          'latest',
+        );
 
         expect(
           screen.getByRole('button', {
@@ -1355,13 +1385,19 @@ describe('DataCataloguePage', () => {
 
         render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
-        expect(screen.getByLabelText('Theme')).toHaveValue('all');
-        expect(screen.getByLabelText('Publication')).toHaveValue('all');
-        expect(screen.getByLabelText('Releases')).toHaveValue('latest');
+        expect(screen.getByLabelText('Filter by Theme')).toHaveValue('all');
+        expect(screen.getByLabelText('Filter by Publication')).toHaveValue(
+          'all',
+        );
+        expect(screen.getByLabelText('Filter by Releases')).toHaveValue(
+          'latest',
+        );
 
         expect(
           screen.queryByRole('button', { name: 'Reset filters' }),
@@ -1383,31 +1419,37 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        const themesSelect = screen.getByLabelText('Theme');
+        const themesSelect = screen.getByLabelText('Filter by Theme');
         expect(themesSelect).toHaveValue('theme-2');
 
-        const publicationsSelect = screen.getByLabelText('Publication');
+        const publicationsSelect = screen.getByLabelText(
+          'Filter by Publication',
+        );
         expect(publicationsSelect).not.toBeDisabled();
         expect(publicationsSelect).toHaveValue('all');
         expect(within(publicationsSelect).getAllByRole('option')).toHaveLength(
           3,
         );
 
-        userEvent.click(
+        user.click(
           screen.getByRole('button', {
             name: 'Remove filter: Theme Theme title 2',
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1441,23 +1483,27 @@ describe('DataCataloguePage', () => {
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
         publicationService.listReleases.mockResolvedValue(testReleases);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        const themesSelect = screen.getByLabelText('Theme');
+        const themesSelect = screen.getByLabelText('Filter by Theme');
         expect(themesSelect).toHaveValue('theme-2');
 
-        const publicationsSelect = screen.getByLabelText('Publication');
+        const publicationsSelect = screen.getByLabelText(
+          'Filter by Publication',
+        );
         expect(publicationsSelect).not.toBeDisabled();
         expect(publicationsSelect).toHaveValue('publication-2');
         expect(within(publicationsSelect).getAllByRole('option')).toHaveLength(
           3,
         );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
         await waitFor(() => {
           expect(releasesSelect).toHaveValue('release-1');
         });
@@ -1474,15 +1520,17 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
 
-        userEvent.click(
+        user.click(
           screen.getByRole('button', {
             name: 'Remove filter: Theme Theme title 2',
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1534,16 +1582,20 @@ describe('DataCataloguePage', () => {
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
         publicationService.listReleases.mockResolvedValue(testReleases);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        const publicationsSelect = screen.getByLabelText('Publication');
+        const publicationsSelect = screen.getByLabelText(
+          'Filter by Publication',
+        );
         expect(publicationsSelect).toHaveValue('publication-2');
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
         await waitFor(() => {
           expect(releasesSelect).toHaveValue('release-1');
         });
@@ -1554,15 +1606,17 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
 
-        await userEvent.click(
+        await user.click(
           screen.getByRole('button', {
             name: 'Remove filter: Publication Publication title 2',
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1600,24 +1654,30 @@ describe('DataCataloguePage', () => {
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
         publicationService.listReleases.mockResolvedValue(testReleases);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        const releasesSelect = screen.getByLabelText('Releases');
+        const releasesSelect = screen.getByLabelText('Filter by Releases');
         await waitFor(() => {
           expect(releasesSelect).toHaveValue('release-1');
         });
 
-        await userEvent.click(
+        await user.click(
           screen.getByRole('button', {
             name: 'Remove filter: Release Release title 1',
           }),
         );
 
-        expect(await screen.findByText('30 data sets')).toBeInTheDocument();
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1646,21 +1706,25 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
-        userEvent.click(
+        user.click(
           screen.getByRole('button', {
             name: 'Remove filter: Search find me',
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1690,11 +1754,13 @@ describe('DataCataloguePage', () => {
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
         publicationService.listReleases.mockResolvedValue(testReleases);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(
           screen.getByRole('button', {
@@ -1714,15 +1780,17 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
 
-        await userEvent.click(
+        await user.click(
           screen.getByRole('button', {
             name: 'Reset filters',
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1763,13 +1831,15 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
-        userEvent.click(screen.getByLabelText('A to Z'));
+        user.click(screen.getByLabelText('A to Z'));
 
         await waitFor(() => {
           expect(mockRouter).toMatchObject({
@@ -1790,23 +1860,22 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
-
-        await userEvent.type(
-          screen.getByLabelText('Search data sets'),
-          'Find me',
-        );
-        await await userEvent.click(
-          screen.getByRole('button', { name: 'Search' }),
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('2 data sets')).toBeInTheDocument();
-        });
+        await user.type(screen.getByLabelText('Search data sets'), 'Find me');
+        await await user.click(screen.getByRole('button', { name: 'Search' }));
+
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '2 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1828,26 +1897,30 @@ describe('DataCataloguePage', () => {
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-        render(<DataCataloguePage newDesign />);
+        const { user } = render(<DataCataloguePage newDesign />);
 
-        await waitFor(() => {
-          expect(screen.getByText('1 data set')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '1 data set',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
           query: { orderBy: 'relevance' },
         });
 
-        await userEvent.click(
+        await user.click(
           screen.getByRole('button', {
             name: 'Remove filter: Search Find me',
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        await waitFor(() =>
+          expect(screen.getByTestId('total-results')).toHaveTextContent(
+            '30 data sets',
+          ),
+        );
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1864,21 +1937,23 @@ describe('DataCataloguePage', () => {
       });
       publicationService.getPublicationTree.mockResolvedValue(testThemes);
 
-      render(<DataCataloguePage newDesign />);
+      const { user } = render(<DataCataloguePage newDesign />);
 
-      expect(await screen.findByText('30 data sets')).toBeInTheDocument();
-
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Filter results' }),
+      await waitFor(() =>
+        expect(screen.getByTestId('total-results')).toHaveTextContent(
+          '30 data sets',
+        ),
       );
+
+      await user.click(screen.getByRole('button', { name: 'Filter results' }));
 
       expect(await screen.findByText('Back to results')).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
 
-      expect(modal.getByLabelText('Theme')).toBeInTheDocument();
-      expect(modal.getByLabelText('Publication')).toBeInTheDocument();
-      expect(modal.getByLabelText('Releases')).toBeInTheDocument();
+      expect(modal.getByLabelText('Filter by Theme')).toBeInTheDocument();
+      expect(modal.getByLabelText('Filter by Publication')).toBeInTheDocument();
+      expect(modal.getByLabelText('Filter by Releases')).toBeInTheDocument();
       expect(
         modal.getByRole('button', { name: 'Back to results' }),
       ).toBeInTheDocument();

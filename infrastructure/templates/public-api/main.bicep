@@ -72,7 +72,8 @@ param updatePsqlFlexibleServer bool = false
 @description('Public URLs of other components in the service.')
 param publicUrls {
   contentApi: string
-}?
+  publicApp: string
+}
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
@@ -261,6 +262,13 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+    corsPolicy: {
+      allowedOrigins: [
+        publicUrls.publicApp
+        'http://localhost:3000'
+        'http://127.0.0.1'
+      ]
+    }
     volumeMounts: [
       {
         volumeName: dataFilesFileShareMountName
@@ -291,7 +299,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       }
       {
         name: 'ContentApi__Url'
-        value: publicUrls!.contentApi
+        value: publicUrls.contentApi
       }
       {
         name: 'MiniProfiler__Enabled'

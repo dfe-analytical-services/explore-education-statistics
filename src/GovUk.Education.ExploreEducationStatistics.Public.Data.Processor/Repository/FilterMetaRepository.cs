@@ -79,7 +79,7 @@ public class FilterMetaRepository(
                 .InsertWhenNotMatched()
                 .MergeAsync(cancellationToken);
 
-            var startIndex = await publicDataDbContext.FilterOptionMetaLinks.CountAsync(token: cancellationToken);
+            var startIndex = await publicDataDbContext.FilterOptionMetaLinks.CountAsync(token: cancellationToken) + 1;
 
             var current = 0;
             const int batchSize = 1000;

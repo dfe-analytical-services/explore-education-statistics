@@ -8,7 +8,6 @@ import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import mockRouter from 'next-router-mock';
-import userEvent from '@testing-library/user-event';
 
 let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
@@ -57,15 +56,9 @@ describe('FindStatisticsPage', () => {
     );
 
     expect(relatedInformationLinks).toHaveLength(3);
-    expect(relatedInformationLinks[0]).toHaveTextContent(
-      'Education statistics: data catalogue',
-    );
-    expect(relatedInformationLinks[1]).toHaveTextContent(
-      'Education statistics: methodology',
-    );
-    expect(relatedInformationLinks[2]).toHaveTextContent(
-      'Education statistics: glossary',
-    );
+    expect(relatedInformationLinks[0]).toHaveTextContent('Data catalogue');
+    expect(relatedInformationLinks[1]).toHaveTextContent('Methodology');
+    expect(relatedInformationLinks[2]).toHaveTextContent('Glossary');
   });
 
   test('renders correctly with publications', async () => {
@@ -91,10 +84,6 @@ describe('FindStatisticsPage', () => {
     });
 
     expect(
-      screen.getByRole('heading', { name: '30 results' }),
-    ).toBeInTheDocument();
-
-    expect(
       screen.getByText('Page 1 of 3, showing all publications'),
     ).toBeInTheDocument();
 
@@ -110,65 +99,69 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
     expect(sortOptions[2]).not.toBeChecked();
 
-    expect(screen.getByLabelText('Search')).toBeInTheDocument();
+    expect(screen.getByLabelText('Search publications')).toBeInTheDocument();
 
-    const themeFilterGroup = within(
-      screen.getByRole('group', { name: 'Filter by theme' }),
-    );
-    const themeOptions = themeFilterGroup.getAllByRole('radio');
-    expect(themeOptions).toHaveLength(5);
-    expect(themeOptions[0]).toEqual(
-      themeFilterGroup.getByLabelText('All themes'),
-    );
-    expect(themeOptions[0]).toBeChecked();
-    expect(themeOptions[1]).toEqual(themeFilterGroup.getByLabelText('Theme 1'));
-    expect(themeOptions[1]).not.toBeChecked();
-    expect(themeOptions[2]).toEqual(themeFilterGroup.getByLabelText('Theme 2'));
-    expect(themeOptions[2]).not.toBeChecked();
-    expect(themeOptions[3]).toEqual(themeFilterGroup.getByLabelText('Theme 3'));
-    expect(themeOptions[3]).not.toBeChecked();
-    expect(themeOptions[4]).toEqual(themeFilterGroup.getByLabelText('Theme 4'));
-    expect(themeOptions[4]).not.toBeChecked();
+    const themesSelect = screen.getByLabelText('Filter by Theme');
+    const themes = within(themesSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(themes).toHaveLength(5);
 
-    expect(
-      screen.getByRole('button', { name: /Release type/ }),
-    ).toBeInTheDocument();
+    expect(themes[0]).toHaveTextContent('All');
+    expect(themes[0]).toHaveValue('all');
+    expect(themes[0].selected).toBe(true);
 
-    const releaseTypeFilterGroup = within(
-      screen.getByRole('group', { name: 'Filter by release type' }),
+    expect(themes[1]).toHaveTextContent('Theme 1');
+    expect(themes[1]).toHaveValue('theme-1');
+    expect(themes[1].selected).toBe(false);
+
+    expect(themes[2]).toHaveTextContent('Theme 2');
+    expect(themes[2]).toHaveValue('theme-2');
+    expect(themes[2].selected).toBe(false);
+
+    expect(themes[3]).toHaveTextContent('Theme 3');
+    expect(themes[3]).toHaveValue('theme-3');
+    expect(themes[3].selected).toBe(false);
+
+    expect(themes[4]).toHaveTextContent('Theme 4');
+    expect(themes[4]).toHaveValue('theme-4');
+    expect(themes[4].selected).toBe(false);
+
+    const releaseTypesSelect = screen.getByLabelText('Filter by Release type');
+    const releaseTypes = within(releaseTypesSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(releaseTypes).toHaveLength(7);
+
+    expect(releaseTypes[0]).toHaveTextContent('All release types');
+    expect(releaseTypes[0]).toHaveValue('all');
+    expect(releaseTypes[0].selected).toBe(true);
+
+    expect(releaseTypes[1]).toHaveTextContent('Accredited official statistics');
+    expect(releaseTypes[1]).toHaveValue('AccreditedOfficialStatistics');
+    expect(releaseTypes[1].selected).toBe(false);
+
+    expect(releaseTypes[2]).toHaveTextContent('Official statistics');
+    expect(releaseTypes[2]).toHaveValue('OfficialStatistics');
+    expect(releaseTypes[2].selected).toBe(false);
+
+    expect(releaseTypes[3]).toHaveTextContent(
+      'Official statistics in development',
     );
-    const releaseTypeOptions = releaseTypeFilterGroup.getAllByRole('radio');
-    expect(releaseTypeOptions).toHaveLength(7);
-    expect(releaseTypeOptions[0]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Show all'),
-    );
-    expect(releaseTypeOptions[0]).toBeChecked();
-    expect(releaseTypeOptions[1]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Accredited official statistics'),
-    );
-    expect(releaseTypeOptions[1]).not.toBeChecked();
-    expect(releaseTypeOptions[2]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Official statistics'),
-    );
-    expect(releaseTypeOptions[2]).not.toBeChecked();
-    expect(releaseTypeOptions[3]).toEqual(
-      releaseTypeFilterGroup.getByLabelText(
-        'Official statistics in development',
-      ),
-    );
-    expect(releaseTypeOptions[3]).not.toBeChecked();
-    expect(releaseTypeOptions[4]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Experimental statistics'),
-    );
-    expect(releaseTypeOptions[4]).not.toBeChecked();
-    expect(releaseTypeOptions[5]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Ad hoc statistics'),
-    );
-    expect(releaseTypeOptions[5]).not.toBeChecked();
-    expect(releaseTypeOptions[6]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Management information'),
-    );
-    expect(releaseTypeOptions[6]).not.toBeChecked();
+    expect(releaseTypes[3]).toHaveValue('OfficialStatisticsInDevelopment');
+    expect(releaseTypes[3].selected).toBe(false);
+
+    expect(releaseTypes[4]).toHaveTextContent('Experimental statistics');
+    expect(releaseTypes[4]).toHaveValue('ExperimentalStatistics');
+    expect(releaseTypes[4].selected).toBe(false);
+
+    expect(releaseTypes[5]).toHaveTextContent('Ad hoc statistics');
+    expect(releaseTypes[5]).toHaveValue('AdHocStatistics');
+    expect(releaseTypes[5].selected).toBe(false);
+
+    expect(releaseTypes[6]).toHaveTextContent('Management information');
+    expect(releaseTypes[6]).toHaveValue('ManagementInformation');
+    expect(releaseTypes[6].selected).toBe(false);
 
     const publicationsList = within(screen.getByTestId('publicationsList'));
     expect(publicationsList.getAllByRole('listitem')).toHaveLength(3);
@@ -248,11 +241,11 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Find me' }),
+      screen.getByRole('button', { name: 'Remove filter: Search Find me' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     const publicationsList = within(screen.getByTestId('publicationsList'));
@@ -287,11 +280,13 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('0 pages, filtered by:')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Cannot find me' }),
+      screen.getByRole('button', {
+        name: 'Remove filter: Search Cannot find me',
+      }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     expect(
@@ -317,11 +312,11 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Theme 2' }),
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     const publicationsList = within(screen.getByTestId('publicationsList'));
@@ -353,18 +348,16 @@ describe('FindStatisticsPage', () => {
       await screen.findByText('There are no matching results.'),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole('heading', { name: '0 results' }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('0 results')).toBeInTheDocument();
 
     expect(screen.getByText('0 pages, filtered by:')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Theme 2' }),
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
@@ -386,11 +379,13 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Ad hoc statistics' }),
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type Ad hoc statistics',
+      }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     const publicationsList = within(screen.getByTestId('publicationsList'));
@@ -428,12 +423,12 @@ describe('FindStatisticsPage', () => {
 
     expect(
       screen.getByRole('button', {
-        name: 'Remove filter: Experimental statistics',
+        name: 'Remove filter: Release type Experimental statistics',
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
@@ -457,19 +452,21 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: find me' }),
+      screen.getByRole('button', { name: 'Remove filter: Search find me' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Ad hoc statistics' }),
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type Ad hoc statistics',
+      }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Theme 1' }),
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 1' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     const publicationsList = within(screen.getByTestId('publicationsList'));
@@ -492,12 +489,8 @@ describe('FindStatisticsPage', () => {
 
     render(<FindStatisticsPage />);
 
-    expect(
-      screen.getByRole('group', { name: 'Filter by theme' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('group', { name: 'Filter by release type' }),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Filter by Theme')).toBeInTheDocument();
+    expect(screen.getByLabelText('Filter by Release type')).toBeInTheDocument();
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
@@ -509,20 +502,14 @@ describe('FindStatisticsPage', () => {
       paging: testPaging,
     });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Filter results' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Filter results' }));
 
     const modal = within(screen.getByRole('dialog'));
 
-    expect(
-      modal.getByRole('group', { name: 'Filter by theme' }),
-    ).toBeInTheDocument();
-    expect(
-      modal.getByRole('group', { name: 'Filter by release type' }),
-    ).toBeInTheDocument();
+    expect(modal.getByLabelText('Filter by Theme')).toBeInTheDocument();
+    expect(modal.getByLabelText('Filter by Release type')).toBeInTheDocument();
     expect(
       modal.getByRole('button', { name: 'Back to results' }),
     ).toBeInTheDocument();
@@ -545,7 +532,7 @@ describe('FindStatisticsPage', () => {
         paging: { ...testPaging, totalPages: 1, totalResults: 1 },
       });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('30 results')).toBeInTheDocument();
@@ -560,7 +547,9 @@ describe('FindStatisticsPage', () => {
     ).toHaveLength(3);
 
     // Add release type filter
-    await userEvent.click(screen.getByLabelText('Ad hoc statistics'));
+    await user.selectOptions(screen.getByLabelText('Filter by Release type'), [
+      'AdHocStatistics',
+    ]);
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
@@ -573,17 +562,21 @@ describe('FindStatisticsPage', () => {
 
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Ad hoc statistics' }),
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type Ad hoc statistics',
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(2);
 
     // Add theme filter
-    await userEvent.click(screen.getByLabelText('Theme 1'));
+    await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+      'theme-1',
+    ]);
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
@@ -596,13 +589,15 @@ describe('FindStatisticsPage', () => {
 
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Ad hoc statistics' }),
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type Ad hoc statistics',
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Theme 1' }),
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 1' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
@@ -628,7 +623,7 @@ describe('FindStatisticsPage', () => {
         paging: testPaging,
       });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('1 result')).toBeInTheDocument();
@@ -637,23 +632,23 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
       screen.getByRole('button', {
-        name: 'Remove filter: Accredited official statistics',
+        name: 'Remove filter: Release type Accredited official statistics',
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Theme 2' }),
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(1);
 
     // remove release type filter
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
-        name: 'Remove filter: Accredited official statistics',
+        name: 'Remove filter: Release type Accredited official statistics',
       }),
     );
 
@@ -669,14 +664,14 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
-        name: 'Remove filter: Accredited official statistics',
+        name: 'Remove filter: Release type Accredited official statistics',
       }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Theme 2' }),
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     expect(
@@ -684,8 +679,8 @@ describe('FindStatisticsPage', () => {
     ).toHaveLength(2);
 
     // Remove theme filter
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Remove filter: Theme 2' }),
+    await user.click(
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 2' }),
     );
 
     expect(mockRouter).toMatchObject({
@@ -702,14 +697,14 @@ describe('FindStatisticsPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
-        name: 'Remove filter: Accredited official statistics',
+        name: 'Remove filter: Release type Accredited official statistics',
       }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Remove filter: Theme 2' }),
+      screen.queryByRole('button', { name: 'Remove filter: Theme Theme 2' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Clear all filters' }),
+      screen.queryByRole('button', { name: 'Reset filters' }),
     ).not.toBeInTheDocument();
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
@@ -727,7 +722,7 @@ describe('FindStatisticsPage', () => {
         paging: { ...testPaging, totalPages: 1, totalResults: 2 },
       });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('30 results')).toBeInTheDocument();
@@ -741,8 +736,8 @@ describe('FindStatisticsPage', () => {
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(3);
 
-    await userEvent.type(screen.getByLabelText('Search'), 'Find me');
-    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await user.type(screen.getByLabelText('Search publications'), 'Find me');
+    await user.click(screen.getByRole('button', { name: 'Search' }));
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
@@ -754,10 +749,10 @@ describe('FindStatisticsPage', () => {
     });
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Find me' }),
+      screen.getByRole('button', { name: 'Remove filter: Search Find me' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
   });
 
@@ -774,7 +769,7 @@ describe('FindStatisticsPage', () => {
         paging: testPaging,
       });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('1 result')).toBeInTheDocument();
@@ -783,19 +778,19 @@ describe('FindStatisticsPage', () => {
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
       screen.getByRole('button', {
-        name: 'Remove filter: Find me',
+        name: 'Remove filter: Search Find me',
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(1);
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
-        name: 'Remove filter: Find me',
+        name: 'Remove filter: Search Find me',
       }),
     );
 
@@ -812,10 +807,10 @@ describe('FindStatisticsPage', () => {
       screen.getByText('Page 1 of 3, showing all publications'),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Remove filter: Find me' }),
+      screen.queryByRole('button', { name: 'Remove filter: Search Find me' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Clear all filters' }),
+      screen.queryByRole('button', { name: 'Reset filters' }),
     ).not.toBeInTheDocument();
     expect(
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
@@ -828,7 +823,7 @@ describe('FindStatisticsPage', () => {
       paging: testPaging,
     });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('30 results')).toBeInTheDocument();
@@ -846,7 +841,7 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
     expect(sortOptions[2]).not.toBeChecked();
 
-    await userEvent.click(sortGroup.getByLabelText('A to Z'));
+    await user.click(sortGroup.getByLabelText('A to Z'));
 
     await waitFor(() => {
       expect(mockRouter).toMatchObject({
@@ -874,7 +869,7 @@ describe('FindStatisticsPage', () => {
         paging: { ...testPaging, totalPages: 1, totalResults: 2 },
       });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('30 results')).toBeInTheDocument();
@@ -896,15 +891,15 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
     expect(sortOptions[2]).not.toBeChecked();
 
-    await userEvent.type(screen.getByLabelText('Search'), 'Find me');
-    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await user.type(screen.getByLabelText('Search publications'), 'Find me');
+    await user.click(screen.getByRole('button', { name: 'Search' }));
 
     await waitFor(() => {
       expect(screen.getByText('2 results')).toBeInTheDocument();
     });
 
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Find me' }),
+      screen.getByRole('button', { name: 'Remove filter: Search Find me' }),
     ).toBeInTheDocument();
 
     const updatedSortOptions = sortGroup.getAllByRole('radio');
@@ -935,7 +930,7 @@ describe('FindStatisticsPage', () => {
         paging: testPaging,
       });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('1 result')).toBeInTheDocument();
@@ -955,9 +950,9 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[3]).toEqual(sortGroup.getByLabelText('Relevance'));
     expect(sortOptions[3]).toBeChecked();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
-        name: 'Remove filter: Find me',
+        name: 'Remove filter: Search Find me',
       }),
     );
 
@@ -975,7 +970,7 @@ describe('FindStatisticsPage', () => {
     expect(updatedSortOptions[2]).not.toBeChecked();
   });
 
-  test('clear all filters', async () => {
+  test('Reset filters', async () => {
     mockRouter.setCurrentUrl(
       '/find-statistics?releaseType=AdHocStatistics&search=find+me&themeId=theme-1',
     );
@@ -989,7 +984,7 @@ describe('FindStatisticsPage', () => {
         paging: testPaging,
       });
 
-    render(<FindStatisticsPage />);
+    const { user } = render(<FindStatisticsPage />);
 
     await waitFor(() => {
       expect(screen.getByText('2 results')).toBeInTheDocument();
@@ -997,24 +992,24 @@ describe('FindStatisticsPage', () => {
 
     expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: find me' }),
+      screen.getByRole('button', { name: 'Remove filter: Search find me' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Ad hoc statistics' }),
+      screen.getByRole('button', {
+        name: 'Remove filter: Release type Ad hoc statistics',
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove filter: Theme 1' }),
+      screen.getByRole('button', { name: 'Remove filter: Theme Theme 1' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Clear all filters' }),
+      screen.getByRole('button', { name: 'Reset filters' }),
     ).toBeInTheDocument();
 
     const publicationsList = within(screen.getByTestId('publicationsList'));
     expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Clear all filters' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Reset filters' }));
 
     await waitFor(() => {
       expect(screen.getByText('30 results')).toBeInTheDocument();
@@ -1028,18 +1023,18 @@ describe('FindStatisticsPage', () => {
       screen.getByText('Page 1 of 3, showing all publications'),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Remove filter: find me' }),
+      screen.queryByRole('button', { name: 'Remove filter: Search find me' }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
-        name: 'Remove filter: Ad hoc statistics',
+        name: 'Remove filter: Release type Ad hoc statistics',
       }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Remove filter: Theme 1' }),
+      screen.queryByRole('button', { name: 'Remove filter: Theme Theme 1' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Clear all filters' }),
+      screen.queryByRole('button', { name: 'Reset filters' }),
     ).not.toBeInTheDocument();
   });
 });

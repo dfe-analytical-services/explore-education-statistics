@@ -17,7 +17,7 @@ import _tableBuilderService, {
   FeaturedTable,
   Subject,
 } from '@common/services/tableBuilderService';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
@@ -306,12 +306,14 @@ describe('PreReleaseTableToolPage', () => {
 
     renderPage();
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(await screen.findByText('Step 1')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Step 1 Select a data set',
+      }),
+    ).toHaveAttribute('aria-current', 'step');
+
     const step1 = within(screen.getByTestId('wizardStep-1'));
 
     expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
@@ -331,12 +333,11 @@ describe('PreReleaseTableToolPage', () => {
 
     renderPage();
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(await screen.findByText('Step 1')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Select a data set' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     const step1 = within(screen.getByTestId('wizardStep-1'));
 
@@ -373,12 +374,11 @@ describe('PreReleaseTableToolPage', () => {
       ),
     ]);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-5')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-    });
+    expect(await screen.findByText('Step 5')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Step 5 Explore data' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
       /Number of authorised absence sessions for 'Absence by characteristic'/,

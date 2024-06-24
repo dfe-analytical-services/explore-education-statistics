@@ -10,6 +10,7 @@ import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import ButtonLink from '@frontend/components/ButtonLink';
 import NotificationBanner from '@common/components/NotificationBanner';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import { releaseTypes } from '@common/services/types/releaseType';
 import { Theme } from '@common/services/publicationService';
 import { useMobileMedia } from '@common/hooks/useMedia';
@@ -29,18 +30,20 @@ import {
 import Filters from '@frontend/modules/data-catalogue/components/Filters';
 import SearchForm from '@frontend/components/SearchForm';
 import { getParamsFromQuery } from '@frontend/modules/data-catalogue/utils/createDataSetFileListRequest';
-import styles from '@frontend/modules/data-catalogue/DataCataloguePage.module.scss';
 import publicationQueries from '@frontend/queries/publicationQueries';
-import FilterClearButton from '@frontend/components/FilterClearButton';
+import FilterResetButton from '@frontend/components/FilterResetButton';
 import FiltersMobile from '@frontend/components/FiltersMobile';
+import FiltersDesktop from '@frontend/components/FiltersDesktop';
 import getUpdatedQueryParams from '@frontend/modules/data-catalogue/utils/getUpdatedQueryParams';
 import SortControls, { SortOption } from '@frontend/components/SortControls';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { ParsedUrlQuery } from 'querystring';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
+
+const defaultPageTitle = 'Data catalogue';
 
 export interface DataCataloguePageQuery {
   dataSetType?: DataSetType;
@@ -62,6 +65,8 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isMedia: isMobileMedia } = useMobileMedia();
+
+  const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
 
   const {
     dataSetType,
@@ -120,6 +125,12 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
   ]).join(', ');
 
   const updateQueryParams = async (nextQuery: DataCataloguePageQuery) => {
+    // When a query param is changed for the first time Next announces the page title,
+    // even if it hasn't changed.
+    // Set the title here so it's more useful the just announcing the default title.
+    // Have to set it before the route change otherwise the previous title will be announced.
+    // It won't be reannounced on subsequent query param changes.
+    setPageTitle(`${defaultPageTitle} - Search results`);
     await router.push(
       {
         pathname: '/data-catalogue',
@@ -210,7 +221,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
     });
   };
 
-  const handleClearFilter = async ({
+  const handleResetFilter = async ({
     filterType,
   }: {
     filterType: DataSetFileFilter | 'all';
@@ -225,7 +236,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
 
     logEvent({
       category: 'Data catalogue',
-      action: `Clear ${filterType} filter`,
+      action: `Reset ${filterType} filter`,
     });
   };
 
@@ -242,15 +253,16 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
     });
   };
 
+  const totalResultsMessage = `${totalResults} ${
+    totalResults !== 1 ? 'data sets' : 'data set'
+  }`;
+
   return (
     <Page
-      title="Data catalogue"
-      breadcrumbLabel="Data catalogue"
-      metaTitle={
-        totalPages && totalPages > 1
-          ? `Data catalogue (page ${page} of ${totalPages})`
-          : undefined
-      }
+      title={defaultPageTitle}
+      // Don't include the default meta title when filtered to prevent too much screen reader noise.
+      includeDefaultMetaTitle={pageTitle === defaultPageTitle}
+      metaTitle={pageTitle}
     >
       <NotificationBanner title="This page has changed">
         Following user feedback we've made some changes to this page to make our
@@ -289,7 +301,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
       </div>
       <hr />
       <div className="govuk-grid-row">
-        <div className={`govuk-grid-column-one-third ${styles.desktopFilters}`}>
+        <FiltersDesktop>
           <SearchForm
             label="Search data sets"
             value={searchTerm}
@@ -310,28 +322,28 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                 publications={publications}
                 releaseId={releaseId}
                 releases={releases}
-                showClearFiltersButton={!isMobileMedia && isFiltered}
+                showResetFiltersButton={!isMobileMedia && isFiltered}
                 showTypeFilter={showTypeFilter}
                 themeId={themeId}
                 themes={themes}
                 onChange={handleChangeFilter}
-                onClearFilters={() => handleClearFilter({ filterType: 'all' })}
+                onResetFilters={() => handleResetFilter({ filterType: 'all' })}
               />
             </LoadingSpinner>
           )}
-        </div>
+        </FiltersDesktop>
         <div className="govuk-grid-column-two-thirds">
           <div className="dfe-border-bottom">
             <h2
-              aria-live="polite"
-              aria-atomic="true"
+              aria-hidden
               className="govuk-!-margin-bottom-2"
               data-testid="total-results"
             >
-              {`${totalResults} ${
-                totalResults !== 1 ? 'data sets' : 'data set'
-              }`}
+              {totalResultsMessage}
             </h2>
+            {/* Using ScreenReaderMessage here as the message is announced twice if have
+            aria-live etc on the h2. */}
+            <ScreenReaderMessage message={totalResultsMessage} />
 
             <div className="dfe-flex dfe-justify-content--space-between dfe-align-items-start">
               <p className="govuk-!-margin-bottom-2">
@@ -354,7 +366,7 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
 
               {isMobileMedia && isFiltered && (
                 <ButtonText
-                  onClick={() => handleClearFilter({ filterType: 'all' })}
+                  onClick={() => handleResetFilter({ filterType: 'all' })}
                 >
                   Reset filters
                 </ButtonText>
@@ -364,36 +376,36 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
             {isFiltered && (
               <div className="govuk-!-padding-bottom-2 dfe-flex dfe-flex-wrap ">
                 {searchTerm && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Search"
                     name={searchTerm}
                     onClick={() =>
-                      handleClearFilter({ filterType: 'searchTerm' })
+                      handleResetFilter({ filterType: 'searchTerm' })
                     }
                   />
                 )}
                 {selectedTheme && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Theme"
                     name={selectedTheme.title}
-                    onClick={() => handleClearFilter({ filterType: 'themeId' })}
+                    onClick={() => handleResetFilter({ filterType: 'themeId' })}
                   />
                 )}
                 {selectedPublication && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Publication"
                     name={selectedPublication.title}
                     onClick={() =>
-                      handleClearFilter({ filterType: 'publicationId' })
+                      handleResetFilter({ filterType: 'publicationId' })
                     }
                   />
                 )}
                 {selectedRelease && (
-                  <FilterClearButton
+                  <FilterResetButton
                     filterType="Release"
                     name={selectedRelease.title}
                     onClick={() =>
-                      handleClearFilter({ filterType: 'releaseId' })
+                      handleResetFilter({ filterType: 'releaseId' })
                     }
                   />
                 )}
@@ -486,12 +498,14 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                                 <Tag>{releaseTypes[selectedRelease.type]}</Tag>
                                 <Tag
                                   colour={
-                                    selectedRelease.latestRelease
+                                    selectedRelease.latestRelease &&
+                                    !selectedPublication.isSuperseded
                                       ? undefined
                                       : 'orange'
                                   }
                                 >
-                                  {selectedRelease.latestRelease
+                                  {selectedRelease.latestRelease &&
+                                  !selectedPublication.isSuperseded
                                     ? 'This is the latest data'
                                     : 'This is not the latest data'}
                                 </Tag>
@@ -575,6 +589,9 @@ export default function DataCataloguePageNew({ showTypeFilter }: Props) {
                 shallow
                 totalPages={totalPages}
                 onClick={pageNumber => {
+                  // Make sure the page title is updated before the route change,
+                  // otherwise the wrong page number is announced.
+                  setPageTitle(`${defaultPageTitle} - page ${pageNumber}`);
                   logEvent({
                     category: 'Data catalogue',
                     action: `Pagination clicked`,

@@ -187,8 +187,8 @@ public class DataSetService(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
-        releaseFile.File.PublicApiDataSetId = dataSetVersion.DataSetId;
-        releaseFile.File.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
+        releaseFile.PublicApiDataSetId = dataSetVersion.DataSetId;
+        releaseFile.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 

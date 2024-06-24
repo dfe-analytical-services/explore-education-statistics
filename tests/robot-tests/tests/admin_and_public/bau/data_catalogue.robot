@@ -178,6 +178,10 @@ Validate Related information section and links exist
     ...    /find-statistics
     ...    ${relatedInformation}
     user checks page contains link with text and url
+    ...    Methodology
+    ...    /methodology
+    ...    ${relatedInformation}
+    user checks page contains link with text and url
     ...    Glossary
     ...    /glossary
     ...    ${relatedInformation}
@@ -194,8 +198,8 @@ Validate data sets list
     user checks element contains    ${dataSet}    ${PUBLICATION_NAME}
     user checks element contains    ${dataSet}    ${RELEASE_NAME}
 
-    user clicks button    Show more details
-    user clicks button containing text    Download data set
+    user clicks button    Show more details    ${dataSet}
+    user clicks button containing text    Download data set    ${dataSet}
 
 Validate zip contains correct files
     [Documentation]    EES-4147
@@ -210,15 +214,19 @@ Validate sort controls exist
 
 Validate theme filter exists
     user checks select contains option    id:filters-form-theme    All themes
+    user checks selected option label     id:filters-form-theme    All themes
     user checks select contains option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks select contains option    id:filters-form-theme    ${ROLE_PERMISSIONS_THEME_TITLE}
 
 Validate publication filter exists
     user checks select contains option    id:filters-form-publication    All publications
+    user checks selected option label     id:filters-form-publication    All publications
 
 Validate release filter exists
     user checks select contains option    id:filters-form-release    Latest releases
+    user checks selected option label     id:filters-form-release    Latest releases
     user checks select contains option    id:filters-form-release    All releases
+    
 
 Filter by theme
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -240,6 +248,7 @@ Remove theme filter
     user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks selected option label     id:filters-form-theme    All themes
 
 Remove publication filter
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -248,6 +257,7 @@ Remove publication filter
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user checks selected option label     id:filters-form-publication    All publications
 
 Remove release filter
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -257,8 +267,9 @@ Remove release filter
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user checks selected option label     id:filters-form-release    All releases
 
-Clear all filters
+Reset all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
@@ -272,6 +283,10 @@ Clear all filters
     user checks page does not contain button    pupil
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    Reset filters
+
+    user checks selected option label     id:filters-form-theme    All themes
+    user checks selected option label     id:filters-form-publication    All publications
+    user checks selected option label     id:filters-form-release    Latest releases
 
 Searching
     user clicks element    id:searchForm-search

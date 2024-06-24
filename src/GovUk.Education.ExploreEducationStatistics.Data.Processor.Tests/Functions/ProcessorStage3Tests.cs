@@ -106,12 +106,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -328,12 +326,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         var unexpectedImportedObservation = _fixture
@@ -462,14 +458,12 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16,
-                importedRows: 4,
-                lastProcessedRowIndex: 3
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
+            .WithImportedRows(4)
+            .WithLastProcessedRowIndex(3)
             .Generate();
 
         var alreadyImportedObservations = _fixture
@@ -617,14 +611,12 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16,
-                importedRows: 10,
-                lastProcessedRowIndex: 9
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
+            .WithImportedRows(10)
+            .WithLastProcessedRowIndex(9)
             .Generate();
 
         var alreadyImportedObservations = _fixture
@@ -767,12 +759,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 8
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(8)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -917,14 +907,12 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 8,
-                importedRows: 4,
-                lastProcessedRowIndex: 6
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(8)
+            .WithImportedRows(4)
+            .WithLastProcessedRowIndex(6)
             .Generate();
 
         // Generate already-imported Observations with alternating CsvRow numbers
@@ -1080,12 +1068,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1226,12 +1212,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(CANCELLED)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1365,12 +1349,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("additional-filters-and-indicators")
+            .WithDefaultFiles("additional-filters-and-indicators")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1539,12 +1521,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(subject.Id)
-            .WithFiles("small-csv-with-special-data")
+            .WithDefaultFiles("small-csv-with-special-data")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 5,
-                expectedImportedRows: 5
-            )
+            .WithTotalRows(5)
+            .WithExpectedImportedRows(5)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))

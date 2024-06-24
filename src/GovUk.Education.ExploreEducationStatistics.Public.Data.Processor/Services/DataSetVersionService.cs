@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -23,7 +22,8 @@ internal class DataSetVersionService(
     IDataSetVersionPathResolver dataSetVersionPathResolver
 ) : IDataSetVersionService
 {
-    public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
+    public async Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
         var strategy = contentDbContext.Database.CreateExecutionStrategy();
@@ -38,12 +38,7 @@ internal class DataSetVersionService(
 
                 return await GetDataSetVersion(dataSetVersionId, cancellationToken)
                     .OnSuccessDo(CheckCanDeleteDataSetVersion)
-                    .OnSuccessDo(async dataSetVersion => await GetReleaseFile(dataSetVersion, cancellationToken)
-                        .OnSuccessVoid(async releaseFile =>
-                            await UpdateFilePublicApiDataSetId(releaseFile, cancellationToken))
-                        .OnFailureDo(_ =>
-                            throw new KeyNotFoundException(
-                                $"The expected 'ReleaseFile', with ID '{dataSetVersion.ReleaseFileId}', was not found.")))
+                    .OnSuccessDo(async dataSetVersion => await UpdateReleaseFiles(dataSetVersion, cancellationToken))
                     .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
                     .OnSuccessVoid(DeleteParquetFiles)
                     .OnSuccessVoid(transactionScope.Complete);
@@ -60,7 +55,7 @@ internal class DataSetVersionService(
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
-    private Either<ActionResult, Unit> CheckCanDeleteDataSetVersion(DataSetVersion dataSetVersion)
+    private static Either<ActionResult, Unit> CheckCanDeleteDataSetVersion(DataSetVersion dataSetVersion)
     {
         if (dataSetVersion.CanBeDeleted)
         {
@@ -76,6 +71,25 @@ internal class DataSetVersionService(
         });
     }
 
+    private async Task UpdateReleaseFiles(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        var releaseFiles = await contentDbContext.ReleaseFiles
+            .Where(rf => rf.PublicApiDataSetId == dataSetVersion.DataSetId)
+            .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.Version)
+            .ToListAsync(cancellationToken);
+
+
+        foreach (var releaseFile in releaseFiles)
+        {
+            releaseFile.PublicApiDataSetId = null;
+            releaseFile.PublicApiDataSetVersion = null;
+        }
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task DeleteDataSetVersion(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
     {
         publicDataDbContext.DataSetVersions.Remove(dataSetVersion);
@@ -86,21 +100,6 @@ internal class DataSetVersionService(
             publicDataDbContext.DataSets.Remove(dataSetVersion.DataSet);
             await publicDataDbContext.SaveChangesAsync(cancellationToken);
         }
-    }
-
-    private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
-    {
-        return await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .SingleOrNotFoundAsync(rf => rf.Id == dataSetVersion.ReleaseFileId, cancellationToken);
-    }
-
-    private async Task UpdateFilePublicApiDataSetId(ReleaseFile releaseFile, CancellationToken cancellationToken)
-    {
-        releaseFile.File.PublicApiDataSetId = null;
-        releaseFile.File.PublicApiDataSetVersion = null;
-        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private void DeleteParquetFiles(DataSetVersion dataSetVersion)

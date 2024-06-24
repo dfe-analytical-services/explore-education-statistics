@@ -13,6 +13,8 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}             UI tests - release status %{RUN_IDENTIFIER}
 ${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_DATAFILES}   ${PUBLICATION_NAME} -  datafiles-updated
+${SUBJECT_NAME}         	Dates test subject
 
 
 *** Test Cases ***
@@ -40,6 +42,8 @@ Validate checklist errors and warnings
     ...    Release must contain a key statistic or a non-empty headline text block
 
     user checks page does not contain testid    releaseChecklist-success
+
+
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -257,6 +261,153 @@ Approve the adopted methodology amendment and verify the warning disappears
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
+
+Publish new release from adopted publication and make an amendment
+    user navigates to publication page from dashboard    ${ADOPTED_PUBLICATION_NAME}
+    user creates release from publication page    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1    2200
+    user navigates to content page   ${ADOPTED_PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+    user clicks link    Sign off
+    user approves release for immediate publication
+
+    user navigates to admin dashboard    Bau1
+    user creates amendment for release    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1 2200/01
+
+Verify the checklist errors and warnings for amendment
+    user edits release status
+    user checks checklist warnings contains
+     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    No data files uploaded
+    user checks checklist warnings contains link    A public pre-release access list has not been created
+
+    user checks checklist errors contains link
+     ...    A public release note for this amendment is required, add this near the top of the content page
+    user checks page does not contain testid    releaseChecklist-success
+
+Navigate to contents page and add a release note
+    user clicks link    Content
+    user waits until h2 is visible    ${ADOPTED_PUBLICATION_NAME}
+    user waits until page contains button    Add a summary text block
+    user clicks button    Add note
+    user enters text into element    id:create-release-note-form-reason    Test release note one
+    user clicks button    Save note
+
+Publish the release immediately
+    user clicks link    Sign off
+    user approves release for immediate publication
+
+Create third release
+    ${DATA_FILES_PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME_DATAFILES}
+    user creates test release via api    ${DATA_FILES_PUBLICATION_ID}    FY    2300
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME_DATAFILES}
+    ...    Financial year 2300-01
+
+Upload data files
+    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user clicks link    Data and files
+    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
+    user waits until page contains accordion section    Dates test subject
+    user opens accordion section    Dates test subject
+
+    ${section}=    user gets accordion section content element    Dates test subject
+    user clicks link    Replace data    ${section}
+
+    user waits until h2 is visible    Data file details
+    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+
+Navigate to data replacement page
+    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
+    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
+    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
+    user clicks button    Upload data files
+
+    user waits until page contains element    testid:Replacement Subject title
+    user reloads page
+    user checks table column heading contains    1    1    Original file
+    user checks table column heading contains    1    2    Replacement file
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
+
+Validate checklist errors
+    user edits release status
+
+    user checks checklist errors contains
+    ...    3 issues that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    All data file replacements must be completed
+    user checks checklist errors contains link
+    ...    All summary information must be completed on the data guidance page
+    user checks checklist errors contains link
+    ...    Release must contain a key statistic or a non-empty headline text block
+
+    user checks page does not contain testid    releaseChecklist-success
+
+Navigate to data upload and confirm data replacement
+    user clicks link    Data and files
+    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
+    user waits until page contains accordion section    Dates test subject
+    user opens accordion section    Dates test subject
+
+    ${section}=    user gets accordion section content element    Dates test subject
+    user clicks link    Replace data    ${section}
+    user waits until page contains    Footnotes: OK
+    user waits until page contains    Data blocks: OK
+    user waits until button is enabled    Confirm data replacement
+    user clicks button    Confirm data replacement
+    user waits until h2 is visible    Data replacement complete    %{WAIT_MEDIUM}
+
+Upload the larger data file via data upload
+    user waits until data upload displays importing
+    ...    ${SUBJECT_NAME}-updated
+    ...    data-upload-import.csv
+    ...    data-upload-import.meta.csv
+
+Validate checklist errors (3rd release)
+    user edits release status
+
+    user checks checklist errors contains
+    ...    3 issues that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    All data imports must be completed
+    user checks checklist errors contains link
+    ...    All summary information must be completed on the data guidance page
+    user checks checklist errors contains link
+    ...    Release must contain a key statistic or a non-empty headline text block
+    user checks page does not contain testid    releaseChecklist-success
+
+Add data guidance to subject
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${SUBJECT_NAME}
+    user waits until page contains accordion section    ${SUBJECT_NAME}-updated
+    user reloads page
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    ${SUBJECT_NAME} Main guidance content
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}-updated
+    ...    ${SUBJECT_NAME} Main guidance content
+
+Save data guidance (third release)
+    user clicks button    Save guidance
+    user waits for caches to expire       #prevent intermittent failure in pipeline - data guidance to be saved  before navigating to content page
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+    user waits until data upload is completed    ${SUBJECT_NAME}-updated
+
+Publish the release immediately
+    user clicks link    Sign off
+    user approves release for immediate publication
+
+
 
 
 *** Keywords ***

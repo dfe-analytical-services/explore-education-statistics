@@ -95,9 +95,7 @@ describe('DataBlockPageTabs', () => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
       expect(stepHeadings).toHaveLength(1);
-      expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current) Select a data set',
-      );
+      expect(stepHeadings[0]).toHaveTextContent('Step 1 Select a data set');
 
       expect(screen.getByTestId('wizardStep-1')).toBeVisible();
       expect(screen.getByTestId('wizardStep-2')).not.toBeVisible();
@@ -147,9 +145,7 @@ describe('DataBlockPageTabs', () => {
       expect(stepHeadings[1]).toHaveTextContent('Step 2 Choose locations');
       expect(stepHeadings[2]).toHaveTextContent('Step 3 Choose time period');
       expect(stepHeadings[3]).toHaveTextContent('Step 4 Choose your filters');
-      expect(stepHeadings[4]).toHaveTextContent(
-        'Step 5 (current) Update data block',
-      );
+      expect(stepHeadings[4]).toHaveTextContent('Step 5 Update data block');
 
       expect(screen.getByLabelText('Name')).toHaveValue('Test data block');
       expect(screen.getByLabelText('Table title')).toHaveValue('Test title');
@@ -207,9 +203,7 @@ describe('DataBlockPageTabs', () => {
 
       expect(stepHeadings).toHaveLength(2);
       expect(stepHeadings[0]).toHaveTextContent('Step 1 Select a data set');
-      expect(stepHeadings[1]).toHaveTextContent(
-        'Step 2 (current) Choose locations',
-      );
+      expect(stepHeadings[1]).toHaveTextContent('Step 2 Choose locations');
     });
   });
 
@@ -249,9 +243,7 @@ describe('DataBlockPageTabs', () => {
 
       expect(stepHeadings).toHaveLength(2);
       expect(stepHeadings[0]).toHaveTextContent('Step 1 Select a data set');
-      expect(stepHeadings[1]).toHaveTextContent(
-        'Step 2 (current) Choose locations',
-      );
+      expect(stepHeadings[1]).toHaveTextContent('Step 2 Choose locations');
     });
   });
 
