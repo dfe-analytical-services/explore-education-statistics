@@ -3,22 +3,20 @@ import getExternality, { Externality } from './getExternality';
 // Format links in content to ensure they are valid.
 // Make sure any internal links are lower case, excluding query params.
 export default function formatContentLink(
-  url: string | URL,
+  urlString: string,
   externality?: Externality,
-) {
+): string {
   try {
-    const formattedUrl = new URL(url);
-
+    const url = new URL(urlString);
     if (
       ['internal', 'external-admin'].includes(
-        externality ?? getExternality(url),
+        externality ?? getExternality(urlString),
       )
     ) {
-      formattedUrl.pathname = formattedUrl.pathname.toLowerCase();
+      url.pathname = url.pathname.toLowerCase();
     }
-
-    return formattedUrl.href;
+    return url.href;
   } catch {
-    return url.toString();
+    return urlString;
   }
 }

@@ -28,4 +28,8 @@ describe('getExternality', () => {
   test('returns external for external URL', () => {
     expect(getExternality('https://stackoverflow.com/')).toBe('external');
   });
+
+  test('returns internal for relative URL', () => {
+    expect(getExternality('/find-statistics')).toBe('internal');
+  });
 });

@@ -67,6 +67,12 @@ describe('formatContentLink', () => {
     );
   });
 
+  test('converts host to lowercase but does not convert paths', () => {
+    expect(
+      formatContentLink('https://STACKoverFLOW.com/SOMETHING_UPPER_CASE'),
+    ).toEqual('https://stackoverflow.com/SOMETHING_UPPER_CASE');
+  });
+
   test('trims external links', () => {
     expect(formatContentLink('  https://gov.uk/Something  ')).toEqual(
       'https://gov.uk/Something',
