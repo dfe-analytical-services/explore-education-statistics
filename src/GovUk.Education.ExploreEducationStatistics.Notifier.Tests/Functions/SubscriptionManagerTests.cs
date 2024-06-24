@@ -38,7 +38,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task SendsSubscriptionVerificationEmail()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -57,7 +57,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test1@test.com", "subscription-verification-id",
+            mock.SendEmail(notificationClient,
+                "test1@test.com",
+                "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
@@ -76,19 +78,24 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request, new TestFunctionContext(),
+            await notifierFunction.RequestPendingSubscriptionFunc(request,
+                new TestFunctionContext(),
                 new CancellationToken());
 
         // Assert
         Assert.IsType<OkObjectResult>(result);
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test1@test.com", "subscription-verification-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "Test Publication Title 1",
-                        "https://localhost:3000/subscriptions/test-publication-slug-1/confirm-subscription/activation-code-1",
-                        null)
-                )), Times.Once);
+                mock.SendEmail(notificationClient,
+                    "test1@test.com",
+                    "subscription-verification-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(d,
+                            "Test Publication Title 1",
+                            "https://localhost:3000/subscriptions/test-publication-slug-1/confirm-subscription/activation-code-1",
+                            null)
+                    )),
+            Times.Once);
     }
 
     [Fact]
@@ -96,11 +103,14 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     {
         // Arrange (data)
         await fixture.AddTestSubscription(NotifierPendingSubscriptionsTableName,
-            new SubscriptionEntity("test-id-2", "test2@test.com", "Test Publication Title 2", "test-publication-slug-2",
+            new SubscriptionEntity("test-id-2",
+                "test2@test.com",
+                "Test Publication Title 2",
+                "test-publication-slug-2",
                 DateTime.UtcNow));
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -119,7 +129,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test2@test.com", "subscription-verification-id",
+            mock.SendEmail(notificationClient,
+                "test2@test.com",
+                "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
@@ -138,7 +150,8 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request, new TestFunctionContext(),
+            await notifierFunction.RequestPendingSubscriptionFunc(request,
+                new TestFunctionContext(),
                 new CancellationToken());
 
         // Assert
@@ -147,12 +160,16 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
         Assert.Equal(200, okResult.StatusCode);
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test2@test.com", "subscription-verification-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "Test Publication Title 2",
-                        "https://localhost:3000/subscriptions/test-publication-slug-2/confirm-subscription/activation-code-2",
-                        null)
-                )), Times.Never);
+                mock.SendEmail(notificationClient,
+                    "test2@test.com",
+                    "subscription-verification-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(d,
+                            "Test Publication Title 2",
+                            "https://localhost:3000/subscriptions/test-publication-slug-2/confirm-subscription/activation-code-2",
+                            null)
+                    )),
+            Times.Never);
     }
 
     [Fact]
@@ -160,11 +177,14 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     {
         // Arrange (data)
         await fixture.AddTestSubscription(NotifierSubscriptionsTableName,
-            new SubscriptionEntity("test-id-3", "test3@test.com", "Test Publication Title 3", "test-publication-slug-3",
+            new SubscriptionEntity("test-id-3",
+                "test3@test.com",
+                "Test Publication Title 3",
+                "test-publication-slug-3",
                 DateTime.UtcNow.AddDays(-4)));
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -183,7 +203,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test3@test.com", "subscription-confirmation-id",
+            mock.SendEmail(notificationClient,
+                "test3@test.com",
+                "subscription-confirmation-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
@@ -202,7 +224,8 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request, new TestFunctionContext(),
+            await notifierFunction.RequestPendingSubscriptionFunc(request,
+                new TestFunctionContext(),
                 new CancellationToken());
 
         // Assert
@@ -211,18 +234,23 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
         Assert.Equal(200, okResult.StatusCode);
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test3@test.com", "subscription-confirmation-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "Test Publication Title 3", null,
-                        "https://localhost:3000/subscriptions/test-publication-slug-3/confirm-unsubscription/activation-code-3")
-                )), Times.Once);
+                mock.SendEmail(notificationClient,
+                    "test3@test.com",
+                    "subscription-confirmation-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(d,
+                            "Test Publication Title 3",
+                            null,
+                            "https://localhost:3000/subscriptions/test-publication-slug-3/confirm-unsubscription/activation-code-3")
+                    )),
+            Times.Once);
     }
 
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -241,7 +269,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "subscription-verification-id",
+            mock.SendEmail(notificationClient,
+                "test@test.com",
+                "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
@@ -252,12 +282,16 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var request = new NewPendingSubscriptionRequest
         {
-            Id = "", Slug = "test-publication-slug", Email = "test@test.com", Title = "Test Publication Title"
+            Id = "",
+            Slug = "test-publication-slug",
+            Email = "test@test.com",
+            Title = "Test Publication Title"
         };
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request, new TestFunctionContext(),
+            await notifierFunction.RequestPendingSubscriptionFunc(request,
+                new TestFunctionContext(),
                 new CancellationToken());
 
         // Assert
@@ -269,7 +303,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -288,7 +322,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "subscription-verification-id",
+            mock.SendEmail(notificationClient,
+                "test@test.com",
+                "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
@@ -299,12 +335,16 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var request = new NewPendingSubscriptionRequest
         {
-            Id = "123abc", Slug = "test-publication-slug", Email = "test@test.com", Title = ""
+            Id = "123abc",
+            Slug = "test-publication-slug",
+            Email = "test@test.com",
+            Title = ""
         };
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request, new TestFunctionContext(),
+            await notifierFunction.RequestPendingSubscriptionFunc(request,
+                new TestFunctionContext(),
                 new CancellationToken());
 
         // Assert
@@ -316,7 +356,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -335,7 +375,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "subscription-verification-id",
+            mock.SendEmail(notificationClient,
+                "test@test.com",
+                "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
@@ -346,12 +388,16 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var request = new NewPendingSubscriptionRequest
         {
-            Id = "123abc", Slug = "test-publication-slug", Email = "", Title = "Test Publication Title"
+            Id = "123abc",
+            Slug = "test-publication-slug",
+            Email = "",
+            Title = "Test Publication Title"
         };
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request, new TestFunctionContext(),
+            await notifierFunction.RequestPendingSubscriptionFunc(request,
+                new TestFunctionContext(),
                 new CancellationToken());
 
         // Assert
@@ -363,7 +409,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -382,7 +428,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "subscription-verification-id",
+            mock.SendEmail(notificationClient,
+                "test@test.com",
+                "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
@@ -393,12 +441,16 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var request = new NewPendingSubscriptionRequest
         {
-            Id = "123abc", Slug = "", Email = "test@test.com", Title = "Test Publication Title"
+            Id = "123abc",
+            Slug = "",
+            Email = "test@test.com",
+            Title = "Test Publication Title"
         };
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request, new TestFunctionContext(),
+            await notifierFunction.RequestPendingSubscriptionFunc(request,
+                new TestFunctionContext(),
                 new CancellationToken());
 
         // Assert
@@ -412,12 +464,15 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     {
         // Arrange (data)
         await fixture.AddTestSubscription(NotifierPendingSubscriptionsTableName,
-            new SubscriptionEntity("test-id-4", "test4@test.com", "Test Publication Title 4", "test-publication-slug-4",
+            new SubscriptionEntity("test-id-4",
+                "test4@test.com",
+                "Test Publication Title 4",
+                "test-publication-slug-4",
                 DateTime.UtcNow.AddDays(-4)));
 
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -439,7 +494,9 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test4@test.com", "subscription-confirmation-id",
+            mock.SendEmail(notificationClient,
+                "test4@test.com",
+                "subscription-confirmation-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
 
@@ -451,19 +508,24 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         // Act
         var result =
-            await notifierFunction.VerifySubscriptionFunc(new TestFunctionContext(), "test-id-4",
+            await notifierFunction.VerifySubscriptionFunc(new TestFunctionContext(),
+                "test-id-4",
                 "verification-code-4");
 
         // Assert
         Assert.IsType<OkObjectResult>(result);
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test4@test.com", "subscription-confirmation-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "Test Publication Title 4",
-                        null,
-                        "https://localhost:3000/subscriptions/test-publication-slug-4/confirm-unsubscription/unsubscription-code-4")
-                )), Times.Once);
+                mock.SendEmail(notificationClient,
+                    "test4@test.com",
+                    "subscription-confirmation-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(d,
+                            "Test Publication Title 4",
+                            null,
+                            "https://localhost:3000/subscriptions/test-publication-slug-4/confirm-unsubscription/unsubscription-code-4")
+                    )),
+            Times.Once);
     }
 
     [Fact]
@@ -471,12 +533,15 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     {
         // Arrange (data)
         await fixture.AddTestSubscription(NotifierSubscriptionsTableName,
-            new SubscriptionEntity("test-id-5", "test5@test.com", "Test Publication Title 5", "test-publication-slug-5",
+            new SubscriptionEntity("test-id-5",
+                "test5@test.com",
+                "Test Publication Title 5",
+                "test-publication-slug-5",
                 DateTime.UtcNow.AddDays(-4)));
 
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingOptions
+        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -503,7 +568,8 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
         // Act
         var result =
-            await notifierFunction.PublicationUnsubscribeFunc(new TestFunctionContext(), "test-id-5",
+            await notifierFunction.PublicationUnsubscribeFunc(new TestFunctionContext(),
+                "test-id-5",
                 "unsubscription-code-5");
 
         var okResult = Assert.IsAssignableFrom<OkObjectResult>(result);
@@ -513,7 +579,8 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
         Assert.Equal("Test Publication Title 5", subscription.Title);
     }
 
-    private static bool AssertEmailTemplateValues(Dictionary<string, dynamic> values,
+    private static bool AssertEmailTemplateValues(
+        Dictionary<string, dynamic> values,
         string publicationName,
         string? verificationLink,
         string? unsubscribeLink)
@@ -540,8 +607,12 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
         INotificationClientProvider? notificationClientProvider = null) =>
         new(
             Mock.Of<ILogger<SubscriptionManager>>(),
-            Options.Create(new AppSettingOptions { PublicAppUrl = "https://localhost:3000" }),
-            Options.Create(new GovUkNotifyOptions { ApiKey = "", EmailTemplates = EmailTemplateOptions }),
+            Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
+            Options.Create(new GovUkNotifyOptions
+            {
+                ApiKey = "",
+                EmailTemplates = EmailTemplateOptions
+            }),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             storageTableService ?? Mock.Of<IStorageTableService>(MockBehavior.Strict),

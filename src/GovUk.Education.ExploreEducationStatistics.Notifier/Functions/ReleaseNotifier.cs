@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 public class ReleaseNotifier
 {
     private readonly ILogger<ReleaseNotifier> _logger;
-    private readonly AppSettingOptions _appSettingOptions;
+    private readonly AppSettingsOptions _appSettingsOptions;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions;
     private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
@@ -28,7 +28,7 @@ public class ReleaseNotifier
 
     public ReleaseNotifier(
         ILogger<ReleaseNotifier> logger,
-        IOptions<AppSettingOptions> appSettingOptions,
+        IOptions<AppSettingsOptions> appSettingsOptions,
         IOptions<GovUkNotifyOptions> govUkNotifyOptions,
         ITokenService tokenService,
         IEmailService emailService,
@@ -36,19 +36,18 @@ public class ReleaseNotifier
         INotificationClientProvider notificationClientProvider)
     {
         _logger = logger;
-        _appSettingOptions = appSettingOptions.Value;
+        _appSettingsOptions = appSettingsOptions.Value;
         _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
         _notificationClientProvider = notificationClientProvider
-                                 ?? throw new ArgumentNullException(nameof(notificationClientProvider));
+                                      ?? throw new ArgumentNullException(nameof(notificationClientProvider));
     }
 
     [Function("ReleaseNotifier")]
     public async Task ReleaseNotifierFunc(
-        [QueueTrigger(ReleaseNotificationQueue)]
-        ReleaseNotificationMessage msg,
+        [QueueTrigger(ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
         FunctionContext context)
     {
         _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
@@ -61,7 +60,8 @@ public class ReleaseNotifier
 
         // Send emails to subscribers of publication
         var releaseSubscriberQuery = new TableQuery<SubscriptionEntity>()
-            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
+            .Where(TableQuery.GenerateFilterCondition("PartitionKey",
+                QueryComparisons.Equal,
                 msg.PublicationId.ToString()));
         var releaseSubscriberEmails = await GetSubscriberEmails(subscribersTable, releaseSubscriberQuery);
 
@@ -78,10 +78,12 @@ public class ReleaseNotifier
         foreach (var supersededPublication in msg.SupersededPublications)
         {
             var releaseSupersededPubSubsQuery = new TableQuery<SubscriptionEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
+                .Where(TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
                     supersededPublication.Id.ToString()));
             var supersededPublicationSubscriberEmails = await GetSubscriberEmails(
-                subscribersTable, releaseSupersededPubSubsQuery);
+                subscribersTable,
+                releaseSupersededPubSubsQuery);
 
             var numSupersededSubscriberEmailsSent = 0;
 
@@ -100,7 +102,8 @@ public class ReleaseNotifier
                 numSupersededSubscriberEmailsSent++;
             }
 
-            _logger.LogInformation("Emailed {NumSupersededPublicationEmailsSent} subscribers from a superseded publication",
+            _logger.LogInformation(
+                "Emailed {NumSupersededPublicationEmailsSent} subscribers from a superseded publication",
                 numSupersededSubscriberEmailsSent);
         }
 
@@ -140,19 +143,15 @@ public class ReleaseNotifier
 
         var values = new Dictionary<string, dynamic>
         {
-            {
-                "publication_name", msg.PublicationName
-            },
-            {
-                "release_name", msg.ReleaseName
-            },
+            { "publication_name", msg.PublicationName },
+            { "release_name", msg.ReleaseName },
             {
                 "release_link",
-                $"{_appSettingOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
+                $"{_appSettingsOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
             },
             {
                 "unsubscribe_link",
-                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
             }
         };
 
@@ -181,23 +180,17 @@ public class ReleaseNotifier
 
         var values = new Dictionary<string, dynamic>
         {
-            {
-                "publication_name", msg.PublicationName
-            },
-            {
-                "release_name", msg.ReleaseName
-            },
+            { "publication_name", msg.PublicationName },
+            { "release_name", msg.ReleaseName },
             {
                 "release_link",
-                $"{_appSettingOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
+                $"{_appSettingsOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
             },
             {
                 "unsubscribe_link",
-                $"{_appSettingOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
             },
-            {
-                "superseded_publication_title", supersededPublication.Title
-            }
+            { "superseded_publication_title", supersededPublication.Title }
         };
 
         if (msg.Amendment)

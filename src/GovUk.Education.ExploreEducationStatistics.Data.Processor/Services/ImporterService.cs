@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterService : IImporterService
     {
-        private readonly AppSettingOptions _appSettingOptions;
+        private readonly AppSettingsOptions _appSettingsOptions;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ImporterLocationService _importerLocationService;
         private readonly IImporterMetaService _importerMetaService;
@@ -36,16 +36,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private const int Stage2RowCheck = 1000;
 
         public ImporterService(
-            IOptions<AppSettingOptions> appSettingOptions,
+            IOptions<AppSettingsOptions> appSettingsOptions,
             IGuidGenerator guidGenerator,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
-            IDataImportService dataImportService, 
-            ILogger<ImporterService> logger, 
-            IDatabaseHelper databaseHelper, 
+            IDataImportService dataImportService,
+            ILogger<ImporterService> logger,
+            IDatabaseHelper databaseHelper,
             IObservationBatchImporter? observationBatchImporter = null)
         {
-            _appSettingOptions = appSettingOptions.Value;
+            _appSettingsOptions = appSettingsOptions.Value;
             _guidGenerator = guidGenerator;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public Task<SubjectMeta> ImportMeta(
             List<string> metaFileCsvHeaders,
-            List<List<string>> metaFileRows, 
+            List<List<string>> metaFileRows,
             Subject subject,
             StatisticsDbContext context)
         {
@@ -70,8 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return FilterId.Equals(other.FilterId) 
-                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase) 
+                return FilterId.Equals(other.FilterId)
+                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase)
                        && string.Equals(FilterItemLabel, other.FilterItemLabel, CurrentCultureIgnoreCase);
             }
 
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return FilterId.Equals(other.FilterId) 
+                return FilterId.Equals(other.FilterId)
                        && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase);
             }
 
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Select(filterItemMeta =>
                 {
                     var (filterId, filterGroupLabel, filterItemLabel) = filterItemMeta;
-                    
+
                     var filterGroup = filterGroups.Single(fg =>
                         fg.FilterId.Equals(filterId)
                         && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
@@ -183,26 +183,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // This also lets us take advantage of the performance gains of saving new Locations in a single batch
             // rather than in separate SaveChanges() calls, which introduces quite a penalty.
             await _databaseHelper.ExecuteWithExclusiveLock(
-                context, 
-                "Importer_AddNewLocations", 
+                context,
+                "Importer_AddNewLocations",
                 ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
-        public async Task ImportObservations(DataImport import,
+        public async Task ImportObservations(
+            DataImport import,
             Func<Task<Stream>> dataFileStreamProvider,
             Func<Task<Stream>> metaFileStreamProvider,
             Subject subject,
             StatisticsDbContext context)
         {
-            var importObservationsBatchSize = _appSettingOptions.RowsPerBatch;
+            var importObservationsBatchSize = _appSettingsOptions.RowsPerBatch;
             var soleGeographicLevel = import.HasSoleGeographicLevel();
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
-            var totalBatches = Math.Ceiling((decimal) import.TotalRows!.Value / importObservationsBatchSize);
+            var totalBatches = Math.Ceiling((decimal)import.TotalRows!.Value / importObservationsBatchSize);
             var importedRowsSoFar = import.ImportedRows;
             var lastProcessedRowIndex = import.LastProcessedRowIndex ?? -1;
             var startingRowIndex = lastProcessedRowIndex + 1;
             var startingBatchIndex = startingRowIndex / importObservationsBatchSize;
-            
+
             var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
@@ -214,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
             var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
-            
+
             await CsvUtils.Batch(
                 dataFileStreamProvider,
                 importObservationsBatchSize,
@@ -226,13 +227,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     {
                         _logger.LogInformation(
                             "Import for {FileName} has finished or is being aborted, " +
-                            "so finishing importing Observations early", import.File.Filename);
+                            "so finishing importing Observations early",
+                            import.File.Filename);
                         return false;
                     }
-                    
+
                     _logger.LogInformation(
-                        "Importing Observation batch {BatchNumber} of {TotalBatches}", 
-                        batchIndex + 1, 
+                        "Importing Observation batch {BatchNumber} of {TotalBatches}",
+                        batchIndex + 1,
                         totalBatches);
 
                     // Find the subset of this batch that hasn't yet been processed. We can use the
@@ -242,26 +244,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     // changed, so that there is now some overlap between the rows in a new batch and the end of
                     // a previous batch using the old batch size. 
                     var startOfBatchRowIndex = batchIndex * importObservationsBatchSize;
-                    var firstRowIndexOfBatchToProcess = 
+                    var firstRowIndexOfBatchToProcess =
                         Math.Max(startOfBatchRowIndex, lastProcessedRowIndex + 1) - startOfBatchRowIndex;
                     var unprocessedRows = batchOfRows.GetRange(
-                        firstRowIndexOfBatchToProcess, batchOfRows.Count - firstRowIndexOfBatchToProcess);
+                        firstRowIndexOfBatchToProcess,
+                        batchOfRows.Count - firstRowIndexOfBatchToProcess);
 
                     if (unprocessedRows.Count != batchOfRows.Count)
                     {
                         _logger.LogInformation(
                             "Skipping first {SkippedRowCount} rows of batch {BatchNumber} as it is already " +
-                            "partially imported", 
+                            "partially imported",
                             batchOfRows.Count() - unprocessedRows.Count,
                             batchIndex + 1);
                     }
-                    
+
                     var allowedRows = unprocessedRows.Select((cells, rowIndex) =>
                     {
                         if (IsRowAllowed(soleGeographicLevel, cells, fixedInformationReader))
                         {
                             var csvRow = startOfBatchRowIndex + firstRowIndexOfBatchToProcess + rowIndex + 2;
-                            
+
                             return ObservationFromCsv(
                                 cells,
                                 subject,
@@ -277,19 +280,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         return null;
                     }).WhereNotNull();
 
-                    await _databaseHelper.DoInTransaction(context, async contextDelegate => 
-                        await _observationBatchImporter.ImportObservationBatch(contextDelegate, allowedRows)
+                    await _databaseHelper.DoInTransaction(context,
+                        async contextDelegate =>
+                            await _observationBatchImporter.ImportObservationBatch(contextDelegate, allowedRows)
                     );
 
                     importedRowsSoFar += allowedRows.Count();
                     lastProcessedRowIndex += unprocessedRows.Count;
 
                     await _dataImportService.Update(
-                        import.Id, 
+                        import.Id,
                         importedRows: importedRowsSoFar,
                         lastProcessedRowIndex: lastProcessedRowIndex);
-                    
-                    var percentageComplete = (double) ((batchIndex + 1) / totalBatches) * 100;
+
+                    var percentageComplete = (double)((batchIndex + 1) / totalBatches) * 100;
 
                     await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_3, percentageComplete);
 
@@ -302,7 +306,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         /// Determines if a row should be imported based on geographic level.
         /// If a file contains a sole level then any row is allowed, otherwise rows for 'solo' importable levels are ignored.
         /// </summary>
-        private static bool IsRowAllowed(bool soleGeographicLevel,
+        private static bool IsRowAllowed(
+            bool soleGeographicLevel,
             IReadOnlyList<string> rowValues,
             FixedInformationDataFileReader fixedInformationReader)
         {
@@ -351,7 +356,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }).ToList();
         }
 
-        private Guid GetLocationId(IReadOnlyList<string> rowValues, FixedInformationDataFileReader fixedInformationReader)
+        private Guid GetLocationId(
+            IReadOnlyList<string> rowValues, FixedInformationDataFileReader fixedInformationReader)
         {
             var location = fixedInformationReader.GetLocation(rowValues);
             return _importerLocationService.Get(location).Id;
@@ -400,18 +406,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var parameter = new SqlParameter("@Observations", SqlDbType.Structured)
             {
-                Value = observationsTable, TypeName = "[dbo].[ObservationType]"
+                Value = observationsTable,
+                TypeName = "[dbo].[ObservationType]"
             };
 
             await context.Database.ExecuteSqlRawAsync("EXEC [dbo].[InsertObservations] @Observations", parameter);
 
             parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
             {
-                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationFilterItemType]"
+                Value = observationsFilterItemsTable,
+                TypeName = "[dbo].[ObservationFilterItemType]"
             };
 
             await context.Database.ExecuteSqlRawAsync(
-                "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
+                "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems",
+                parameter);
         }
     }
 

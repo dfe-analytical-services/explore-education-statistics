@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
@@ -14,14 +15,18 @@ using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.GeographicLevelUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
 public class LocationMetaRepository(
     PublicDataDbContext publicDataDbContext,
+    IOptions<AppSettingsOptions> appSettingsOptions,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationMetaRepository
 {
+    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+
     public async Task CreateLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
@@ -71,13 +76,11 @@ public class LocationMetaRepository(
 
             var current = 0;
 
-            const int batchSize = 1000;
-
             while (current < options.Count)
             {
                 var batch = options
                     .Skip(current)
-                    .Take(batchSize)
+                    .Take(_appSettingsOptions.MetaInsertBatchSize)
                     .ToList();
 
                 // We create a 'row key' for each option that allows us to quickly
@@ -113,8 +116,9 @@ public class LocationMetaRepository(
                         .Where(o => !existingRowKeys.Contains(o.GetRowKey()))
                         .ToList();
 
-                    var startIndex =
-                        await publicDataDbContext.LocationOptionMetas.CountAsync(token: cancellationToken) + 1;
+                    var startIndex = await publicDataDbContext.NextSequenceValue(
+                        PublicDataDbContext.LocationOptionMetasIdSequence,
+                        cancellationToken);
 
                     foreach (var option in newOptions)
                     {
@@ -122,7 +126,15 @@ public class LocationMetaRepository(
                         option.PublicId = SqidEncoder.Encode(option.Id);
                     }
 
-                    await optionTable.BulkCopyAsync(newOptions, cancellationToken);
+                    await optionTable.BulkCopyAsync(
+                        new BulkCopyOptions { KeepIdentity = true },
+                        newOptions,
+                        cancellationToken);
+
+                    await publicDataDbContext.SetSequenceValue(
+                        PublicDataDbContext.LocationOptionMetasIdSequence,
+                        startIndex - 1,
+                        cancellationToken);
                 }
 
                 var links = await optionTable
@@ -137,7 +149,7 @@ public class LocationMetaRepository(
                 publicDataDbContext.LocationOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-                current += batchSize;
+                current += _appSettingsOptions.MetaInsertBatchSize;
             }
 
             var insertedLinks = await publicDataDbContext.LocationOptionMetaLinks

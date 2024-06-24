@@ -1,5 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -18,6 +20,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
     where TFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture
 {
     protected readonly DataFixture DataFixture = new();
+
     private readonly IHost _host = fixture
         .ConfigureTestHostBuilder()
         .Build();
@@ -42,6 +45,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
 
+    [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
     protected void ClearTestData<TDbContext>() where TDbContext : DbContext
     {
         using var context = GetDbContext<TDbContext>();
@@ -49,13 +53,19 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         var tables = context.Model.GetEntityTypes()
             .Select(type => type.GetTableName())
             .Distinct()
+            .OfType<string>()
             .ToList();
 
         foreach (var table in tables)
         {
-#pragma warning disable EF1002
-            context.Database.ExecuteSqlRaw($@"TRUNCATE TABLE ""{table}"" RESTART IDENTITY CASCADE;");
-#pragma warning restore EF1002
+            context.Database.ExecuteSqlRaw($"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""");
+        }
+
+        var sequences = context.Model.GetSequences();
+
+        foreach (var sequence in sequences)
+        {
+            context.Database.ExecuteSqlRaw($"""ALTER SEQUENCE "{sequence.Name}" RESTART WITH 1;""");
         }
     }
 

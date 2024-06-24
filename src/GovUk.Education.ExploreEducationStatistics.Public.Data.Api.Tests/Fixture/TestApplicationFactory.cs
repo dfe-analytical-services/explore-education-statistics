@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         await _postgreSqlContainer.DisposeAsync();
     }
 
+    [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
     public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
         await using var context = GetDbContext<TDbContext>();
@@ -30,12 +32,12 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         var tables = context.Model.GetEntityTypes()
             .Select(type => type.GetTableName())
             .Distinct()
-            .Cast<string>()
+            .OfType<string>()
             .ToList();
 
         foreach (var table in tables)
         {
-            await context.Database.ExecuteSqlRawAsync(@$"TRUNCATE TABLE ""{table}"" RESTART IDENTITY CASCADE;");
+            await context.Database.ExecuteSqlRawAsync($"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""");
         }
     }
 

@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 
-public class AppSettingOptions
+public class AppSettingsOptions
 {
     public const string AppSettings = "AppSettings";
 
