@@ -169,10 +169,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -310,13 +307,15 @@ public class ProcessorStage3Tests
                 .Select(f => (f.Label, f.Hint, f.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Filter one", "Hint 1", "filter_one"),
-                    ("Filter two", null, "filter_two")]);
+                    ("Filter two", null, "filter_two")
+                ]);
 
             file.DataSetFileMeta.Indicators
                 .Select(i => (i.Label, i.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Indicator one", "indicator_one"),
-                    ("Indicator two", "indicator_two")]);
+                    ("Indicator two", "indicator_two")
+                ]);
         }
     }
 
@@ -395,10 +394,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -530,10 +526,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -683,10 +676,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -822,10 +812,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -987,10 +974,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1129,16 +1113,10 @@ public class ProcessorStage3Tests
             guidGenerator,
             databaseHelper);
 
-        var observationBatchImporterMock = new Mock<TestObservationBatchImporter>
-        {
-            CallBase = true
-        };
+        var observationBatchImporterMock = new Mock<TestObservationBatchImporter> { CallBase = true };
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1260,10 +1238,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1413,10 +1388,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1584,10 +1556,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1671,7 +1640,8 @@ public class ProcessorStage3Tests
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class TestObservationBatchImporter : IObservationBatchImporter
     {
-        public virtual async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)
+        public virtual async Task ImportObservationBatch(
+            StatisticsDbContext context, IEnumerable<Observation> observations)
         {
             await context.Observation.AddRangeAsync(observations);
             await context.SaveChangesAsync();

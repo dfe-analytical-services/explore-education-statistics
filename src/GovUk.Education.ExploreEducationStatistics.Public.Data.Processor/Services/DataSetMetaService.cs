@@ -1,4 +1,5 @@
 using Dapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
@@ -97,66 +98,69 @@ public class DataSetMetaService(
             dataSetVersion,
             cancellationToken);
 
-        await filterMetaRepository.CreateFilterMetas(
-            duckDbConnection,
-            dataSetVersion,
-            allowedColumns,
-            cancellationToken);
+        await publicDataDbContext.RequireTransaction(async () =>
+        {
+            await filterMetaRepository.CreateFilterMetas(
+                duckDbConnection,
+                dataSetVersion,
+                allowedColumns,
+                cancellationToken);
 
-        await indicatorMetaRepository.CreateIndicatorMetas(
-            duckDbConnection,
-            dataSetVersion,
-            allowedColumns,
-            cancellationToken);
+            await indicatorMetaRepository.CreateIndicatorMetas(
+                duckDbConnection,
+                dataSetVersion,
+                allowedColumns,
+                cancellationToken);
 
-        var geographicLevelMeta = await geographicLevelMetaRepository.CreateGeographicLevelMeta(
-            duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
+            var geographicLevelMeta = await geographicLevelMetaRepository.CreateGeographicLevelMeta(
+                duckDbConnection,
+                dataSetVersion,
+                cancellationToken);
 
-        await locationMetaRepository.CreateLocationMetas(
-            duckDbConnection,
-            dataSetVersion,
-            allowedColumns,
-            cancellationToken);
+            await locationMetaRepository.CreateLocationMetas(
+                duckDbConnection,
+                dataSetVersion,
+                allowedColumns,
+                cancellationToken);
 
-        var timePeriodMetas = await timePeriodMetaRepository.CreateTimePeriodMetas(
-            duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
+            var timePeriodMetas = await timePeriodMetaRepository.CreateTimePeriodMetas(
+                duckDbConnection,
+                dataSetVersion,
+                cancellationToken);
 
-        dataSetVersion.MetaSummary = BuildMetaSummary(
-            timePeriodMetas,
-            metaFileRows,
-            allowedColumns,
-            geographicLevelMeta);
+            dataSetVersion.MetaSummary = BuildMetaSummary(
+                timePeriodMetas,
+                metaFileRows,
+                allowedColumns,
+                geographicLevelMeta);
 
-        dataSetVersion.TotalResults = await CountCsvRows(
-            duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
+            dataSetVersion.TotalResults = await CountCsvRows(
+                duckDbConnection,
+                dataSetVersion,
+                cancellationToken);
 
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+            await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        await indicatorsDuckDbRepository.CreateIndicatorsTable(
-            duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
+            await indicatorsDuckDbRepository.CreateIndicatorsTable(
+                duckDbConnection,
+                dataSetVersion,
+                cancellationToken);
 
-        await locationsDuckDbRepository.CreateLocationsTable(
-            duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
+            await locationsDuckDbRepository.CreateLocationsTable(
+                duckDbConnection,
+                dataSetVersion,
+                cancellationToken);
 
-        await filterOptionsDuckDbRepository.CreateFilterOptionsTable(
-            duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
+            await filterOptionsDuckDbRepository.CreateFilterOptionsTable(
+                duckDbConnection,
+                dataSetVersion,
+                cancellationToken);
 
-        await timePeriodsDuckDbRepository.CreateTimePeriodsTable(
-            duckDbConnection,
-            dataSetVersion,
-            cancellationToken);
+            await timePeriodsDuckDbRepository.CreateTimePeriodsTable(
+                duckDbConnection,
+                dataSetVersion,
+                cancellationToken);
+        });
     }
 
     private async Task<List<MetaFileRow>> GetMetaFileRows(

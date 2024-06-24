@@ -9,9 +9,9 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
-    public class StorageTableService(IOptions<AppSettingOptions> appSettingOptions) : IStorageTableService
+    public class StorageTableService(IOptions<AppSettingsOptions> appSettingsOptions) : IStorageTableService
     {
-        private readonly AppSettingOptions _appSettingOptions = appSettingOptions.Value;
+        private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
 
         public async Task UpdateSubscriber(CloudTable table, SubscriptionEntity subscription)
         {
@@ -27,9 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         public async Task<SubscriptionEntity?> RetrieveSubscriber(CloudTable table, SubscriptionEntity subscription)
         {
             // Need to define the extra columns to retrieve
-            var columns = new List<string>()
+            var columns = new List<string>
             {
-                "Verified", "Slug", "Title"
+                "Verified",
+                "Slug",
+                "Title"
             };
             var result = await table.ExecuteAsync(
                 TableOperation.Retrieve<SubscriptionEntity>(subscription.PartitionKey, subscription.RowKey, columns));
@@ -38,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 
         public async Task<CloudTable> GetTable(string storageTableName)
         {
-            var storageAccount = CloudStorageAccount.Parse(_appSettingOptions.TableStorageConnectionString);
+            var storageAccount = CloudStorageAccount.Parse(_appSettingsOptions.TableStorageConnectionString);
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference(storageTableName);
             await table.CreateIfNotExistsAsync();
@@ -49,19 +51,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         {
             var pendingSub =
                 await RetrieveSubscriber(await GetTable(NotifierPendingSubscriptionsTableName),
-                        new SubscriptionEntity(id, email));
+                    new SubscriptionEntity(id, email));
             if (pendingSub is not null)
             {
-                return new Subscription() { Subscriber = pendingSub, Status = SubscriptionStatus.SubscriptionPending };
+                return new Subscription
+                {
+                    Subscriber = pendingSub,
+                    Status = SubscriptionStatus.SubscriptionPending
+                };
             }
-            
-            var activeSubscriber = await RetrieveSubscriber(await GetTable(NotifierSubscriptionsTableName), new SubscriptionEntity(id, email));
+
+            var activeSubscriber = await RetrieveSubscriber(await GetTable(NotifierSubscriptionsTableName),
+                new SubscriptionEntity(id, email));
             if (activeSubscriber is not null)
             {
-                return new Subscription() { Subscriber = activeSubscriber, Status = SubscriptionStatus.Subscribed };
+                return new Subscription
+                {
+                    Subscriber = activeSubscriber,
+                    Status = SubscriptionStatus.Subscribed
+                };
             }
-            
-            return new Subscription() { Status = SubscriptionStatus.NotSubscribed };
+
+            return new Subscription { Status = SubscriptionStatus.NotSubscribed };
         }
     }
 }

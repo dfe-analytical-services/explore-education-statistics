@@ -136,6 +136,7 @@ Update methodology details
 Navigate to sign-off page and approve the methodology immediately
     user clicks link    Sign off
     User clicks button    Edit status
+    user waits until page finishes loading
     user clicks radio    Approved for publication
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Internal note
     user clicks radio    Immediately

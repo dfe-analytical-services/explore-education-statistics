@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 
-public class AppSettingOptions
+public class AppSettingsOptions
 {
     public const string AppSettings = "AppSettings";
 

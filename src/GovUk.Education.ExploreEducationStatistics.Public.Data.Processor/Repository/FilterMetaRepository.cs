@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
@@ -9,13 +10,17 @@ using InterpolatedSql.Dapper;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
 public class FilterMetaRepository(
     PublicDataDbContext publicDataDbContext,
+    IOptions<AppSettingsOptions> appSettingsOptions,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : IFilterMetaRepository
 {
+    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    
     public async Task<IDictionary<FilterMeta, List<FilterOptionMeta>>> ReadFilterMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
@@ -86,17 +91,18 @@ public class FilterMetaRepository(
                 .InsertWhenNotMatched()
                 .MergeAsync(cancellationToken);
 
-            var startIndex = await publicDataDbContext.FilterOptionMetaLinks.CountAsync(token: cancellationToken) + 1;
+            var startIndex = await publicDataDbContext.NextSequenceValue(
+                PublicDataDbContext.FilterOptionMetaLinkSequence,
+                cancellationToken);
 
             var current = 0;
-            const int batchSize = 1000;
 
             while (current < options.Count)
             {
                 var batchStartIndex = startIndex + current;
                 var batch = options
                     .Skip(current)
-                    .Take(batchSize)
+                    .Take(_appSettingsOptions.MetaInsertBatchSize)
                     .ToList();
 
                 // Although not necessary for filter options, we've adopted the 'row key'
@@ -109,6 +115,7 @@ public class FilterMetaRepository(
                 var links = await optionTable
                     .Where(o =>
                         batchRowKeys.Contains(o.Label + ',' + (o.IsAggregate == true ? "True" : "")))
+                    .OrderBy(o => o.Label)
                     .Select((option, index) => new FilterOptionMetaLink
                     {
                         PublicId = SqidEncoder.Encode(batchStartIndex + index),
@@ -120,7 +127,7 @@ public class FilterMetaRepository(
                 publicDataDbContext.FilterOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-                current += batchSize;
+                current += _appSettingsOptions.MetaInsertBatchSize;
             }
 
             var insertedLinks = await publicDataDbContext.FilterOptionMetaLinks
@@ -133,6 +140,11 @@ public class FilterMetaRepository(
                     $"Inserted incorrect number of filter option meta links for {meta.PublicId}. " +
                     $"Inserted: {insertedLinks}, expected: {options.Count}");
             }
+
+            await publicDataDbContext.SetSequenceValue(
+                PublicDataDbContext.FilterOptionMetaLinkSequence,
+                startIndex + insertedLinks - 1,
+                cancellationToken);
         }
     }
 

@@ -122,54 +122,6 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
         {
             var (initialDataSetVersion, _) = await CreateDataSet(DataSetVersionImportStage.Completing);
 
-            // TODO EES-4945 - amend metadata below for the initial DataSetVersion to partially match
-            // metadata from ProcessorTestData.AbsenceSchool.
-
-            var initialLocationMeta = DataFixture
-                .DefaultLocationMeta()
-                .WithDataSetVersionId(initialDataSetVersion.Id)
-                .ForIndex(0, s => s
-                    .SetLevel(GeographicLevel.LocalAuthority)
-                    .SetOptions(DataFixture
-                        .DefaultLocationLocalAuthorityOptionMeta()
-                        .GenerateList(2)
-                        .Select(meta => meta as LocationOptionMeta)
-                        .ToList()))
-                .ForIndex(1, s => s
-                    .SetLevel(GeographicLevel.RscRegion)
-                    .SetOptions(DataFixture
-                        .DefaultLocationRscRegionOptionMeta()
-                        .GenerateList(2)
-                        .Select(meta => meta as LocationOptionMeta)
-                        .ToList()))
-                .GenerateList();
-
-            var initialFilterMeta = DataFixture
-                .DefaultFilterMeta()
-                .WithDataSetVersionId(initialDataSetVersion.Id)
-                .WithOptions(() => DataFixture
-                    .DefaultFilterOptionMeta()
-                    .GenerateList(2))
-                .GenerateList(2);
-
-            var initialIndicatorMeta = DataFixture
-                .DefaultIndicatorMeta()
-                .WithDataSetVersionId(initialDataSetVersion.Id)
-                .GenerateList(2);
-
-            var initialTimePeriodMeta = DataFixture
-                .DefaultTimePeriodMeta()
-                .WithDataSetVersionId(initialDataSetVersion.Id)
-                .GenerateList(4);
-
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.LocationMetas.AddRange(initialLocationMeta);
-                context.FilterMetas.AddRange(initialFilterMeta);
-                context.IndicatorMetas.AddRange(initialIndicatorMeta);
-                context.TimePeriodMetas.AddRange(initialTimePeriodMeta);
-            });
-
             var dataSet = await GetDbContext<PublicDataDbContext>().DataSets.SingleAsync(dataSet =>
                 dataSet.Id == initialDataSetVersion.DataSet.Id);
 

@@ -216,7 +216,7 @@ def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
 
     tz = pytz.timezone("Europe/London")
 
-    return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)).astimezone().strftime(strf)
+    return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)).strftime(strf)
 
 
 def get_current_datetime(strf: str, offset_days: int = 0, timezone: str = "UTC") -> str:

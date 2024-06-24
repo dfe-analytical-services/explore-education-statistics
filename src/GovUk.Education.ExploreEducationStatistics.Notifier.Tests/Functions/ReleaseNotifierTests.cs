@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
 public class ReleaseNotifierTests
 {
-    private static readonly AppSettingOptions AppSettingOptions = new()
+    private static readonly AppSettingsOptions AppSettingsOptions = new()
     {
         BaseUrl = "https://notifier.func/api",
         PublicAppUrl = "https://public.app"
@@ -610,9 +610,9 @@ public class ReleaseNotifierTests
     {
         Assert.Equal(pubName, values["publication_name"]);
         Assert.Equal(releaseName, values["release_name"]);
-        Assert.Equal($"{AppSettingOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
+        Assert.Equal($"{AppSettingsOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
             values["release_link"]);
-        Assert.Equal($"{AppSettingOptions.PublicAppUrl}/subscriptions/{pubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
+        Assert.Equal($"{AppSettingsOptions.PublicAppUrl}/subscriptions/{pubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
 
         if (updateNote != null)
         {
@@ -643,7 +643,7 @@ public class ReleaseNotifierTests
     {
         return new ReleaseNotifier(
             Mock.Of<ILogger<ReleaseNotifier>>(),
-            Options.Create(AppSettingOptions),
+            Options.Create(AppSettingsOptions),
             Options.Create(new GovUkNotifyOptions
             {
                 ApiKey = "",

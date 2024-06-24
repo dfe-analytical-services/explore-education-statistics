@@ -162,10 +162,7 @@ public class ProcessorStage2Tests
 
         var metaFileUnderTest = scenario.GetFilenameUnderTest().Replace(".csv", ".meta.csv");
 
-        var subject = new Subject
-        {
-            Id = scenario.GetSubjectId()
-        };
+        var subject = new Subject { Id = scenario.GetSubjectId() };
 
         var import = new DataImport
         {
@@ -232,7 +229,7 @@ public class ProcessorStage2Tests
         var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions()),
+            Options.Create(new AppSettingsOptions()),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -267,10 +264,7 @@ public class ProcessorStage2Tests
         VerifyAllMocks(privateBlobStorageService);
 
         // Verify that the message will be queued to trigger the next stage.
-        Assert.Equal(new[]
-        {
-            importMessage
-        }, outputMessages);
+        Assert.Equal(new[] { importMessage }, outputMessages);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {

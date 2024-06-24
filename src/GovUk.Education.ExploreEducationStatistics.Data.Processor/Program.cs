@@ -51,7 +51,7 @@ var host = new HostBuilder()
             .AddSingleton<IDatabaseHelper, DatabaseHelper>()
             .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
             .AddSingleton<IDbContextSupplier, DbContextSupplier>()
-            .Configure<AppSettingOptions>(hostContext.Configuration.GetSection(AppSettingOptions.AppSettings));
+            .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.AppSettings));
     })
     .Build();
 
