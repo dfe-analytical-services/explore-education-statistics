@@ -37,7 +37,7 @@ internal class ProcessorClient(
         return await SendPost<DataSetCreateRequest, CreateDataSetResponseViewModel>(
             "api/CreateDataSet",
             request,
-            cancellationToken);
+            cancellationToken: cancellationToken);
     }
 
     public async Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateNextDataSetVersion(
@@ -54,7 +54,7 @@ internal class ProcessorClient(
         return await SendPost<NextDataSetVersionCreateRequest, CreateDataSetResponseViewModel>(
             "api/CreateNextDataSetVersion",
             request,
-            cancellationToken);
+            cancellationToken: cancellationToken);
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
@@ -63,12 +63,15 @@ internal class ProcessorClient(
     {
         return await SendDelete(
             $"api/DeleteDataSetVersion/{dataSetVersionId}",
-            cancellationToken);
+            response => 
+                response.StatusCode == HttpStatusCode.NotFound ? new NotFoundResult() : null,
+            cancellationToken: cancellationToken);
     }
 
     private async Task<Either<ActionResult, TResponse>> SendPost<TRequest, TResponse>(
         string url,
         TRequest request,
+        Func<HttpResponseMessage, ActionResult?>? additionalResponseValidator = null,
         CancellationToken cancellationToken = default)
         where TResponse : class
     {
@@ -77,22 +80,26 @@ internal class ProcessorClient(
                     url,
                     request,
                     cancellationToken: cancellationToken),
+            additionalResponseValidator,
             cancellationToken);
     }
 
     private async Task<Either<ActionResult, Unit>> SendDelete(
         string url,
+        Func<HttpResponseMessage, ActionResult?>? additionalResponseValidator = null,
         CancellationToken cancellationToken = default)
     {
         return await SendRequest<Unit>(
             () => httpClient.DeleteAsync(
                 url,
                 cancellationToken: cancellationToken),
+            additionalResponseValidator,
             cancellationToken);
     }
 
     private async Task<Either<ActionResult, TResponse>> SendRequest<TResponse>(
         Func<Task<HttpResponseMessage>> requestFunction,
+        Func<HttpResponseMessage, ActionResult?>? additionalResponseValidator = null,
         CancellationToken cancellationToken = default)
         where TResponse : class
     {
@@ -102,6 +109,13 @@ internal class ProcessorClient(
 
         if (!response.IsSuccessStatusCode)
         {
+            var additionalValidatorResponse = additionalResponseValidator?.Invoke(response);
+
+            if (additionalValidatorResponse is not null)
+            {
+                return additionalValidatorResponse;
+            }
+            
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:

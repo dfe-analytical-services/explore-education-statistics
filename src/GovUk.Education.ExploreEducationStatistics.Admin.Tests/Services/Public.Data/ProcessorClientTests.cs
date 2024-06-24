@@ -162,6 +162,22 @@ public class ProcessorClientTests
             var left = response.AssertLeft();
             left.AssertValidationProblem(Errors.Error1);
         }
+        
+        [Fact]
+        public async Task HttpClientNotFound_ReturnsNotFound()
+        {
+            var dataSetVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+                .Respond(HttpStatusCode.NotFound);
+
+            var response = await _processorClient.DeleteDataSetVersion(dataSetVersionId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            left.AssertNotFoundResult();
+        }
 
         [Theory]
         [InlineData(HttpStatusCode.RequestTimeout)]
@@ -171,7 +187,6 @@ public class ProcessorClientTests
         [InlineData(HttpStatusCode.Conflict)]
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
-        [InlineData(HttpStatusCode.NotFound)]
         [InlineData(HttpStatusCode.NotAcceptable)]
         public async Task HttpClientFailureStatusCode_ThrowsException(
             HttpStatusCode responseStatusCode)
