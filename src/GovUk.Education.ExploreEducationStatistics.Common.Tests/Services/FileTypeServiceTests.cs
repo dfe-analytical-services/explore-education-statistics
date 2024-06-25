@@ -47,6 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static readonly FileInfo Xlsx = new("test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         private static readonly FileInfo Xlsx2 = new("test2.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         private static readonly FileInfo Csv = new("test.csv", "text/csv");
+        private static readonly FileInfo SmallCsv = new("small-meta.csv", "text/csv");
+        private static readonly FileInfo LongHeaderRowCsv = new("long-header-row.csv", "text/csv");
         private static readonly FileInfo Txt = new("test.txt", "text/plain");
         private static readonly FileInfo Pdf = new("test.pdf", "application/pdf");
         private static readonly FileInfo Bmp = new("test.bmp", "image/bmp");
@@ -57,27 +59,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static readonly FileInfo SvgNoXml = new("test-no-xml.svg", "image/svg+xml");
         private static readonly FileInfo Zip = new("test.zip", "application/x-compressed");
         
-        private static readonly List<FileInfo> ImageTypes = new()
-        {
+        private static readonly List<FileInfo> ImageTypes =
+        [
             Bmp,
             Gif,
             Jpg,
-            Png
-        };
+            Png,
+        ];
         
-        private static readonly List<FileInfo> CsvTypes = new()
-        {
+        private static readonly List<FileInfo> CsvTypes =
+        [
             Csv,
+            SmallCsv,
+            LongHeaderRowCsv,
             Txt,
-        };
-        
-        private static readonly List<FileInfo> ArchiveTypes = new()
-        {
+        ];
+
+        private static readonly List<FileInfo> ArchiveTypes =
+        [
             Zip,
-        };
+        ];
         
-        private static readonly List<FileInfo> AllTypes = new()
-        {
+        private static readonly List<FileInfo> AllTypes =
+        [
             Doc,
             Docx,
             Ods,
@@ -86,14 +90,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Xlsx,
             Xlsx2,
             Csv,
+            SmallCsv,
+            LongHeaderRowCsv,
             Txt,
             Pdf,
             Bmp,
             Gif,
             Jpg,
             Png,
-            Zip
-        };
+            Zip,
+        ];
         
         [Fact]
         public async Task GetMimeType_Doc()
@@ -234,14 +240,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             }
         }
 
-        // @MarkFix HasMatchingEncodingType_ValidCsv
-        // @MarkFix HasMatchingEncodingType_ValidZip
+        [Fact]
+        public void HasMatchingEncodingType_ValidCsv()
+        {
+            var allowedEncodingTypes = AllowedCsvEncodingTypes;
 
-        // @MarkFix IsValidCsvFile_Valid
-        // @MarkFix IsValidCsvFile_Valid_VeryShortCsvFile
-        // @MarkFix IsValidCsvFile_Valid_VeryLongHeaderRow
-        // @MarkFix IsValidCsvFile_InvalidMimeType
-        // @MarkFix IsValidCsvFile_InvalidEncoding
+            foreach (var type in AllTypes)
+            {
+                var expectedToSucceed = CsvTypes.Contains(type);
+
+                var fileInfo = type;
+
+                var service = BuildService();
+
+                var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+
+                var formFile = new Mock<IFormFile>();
+                formFile
+                    .Setup(f => f.OpenReadStream())
+                    .Returns(() => File.OpenRead(filePath));
+
+                var result = service.HasMatchingEncodingType(formFile.Object, allowedEncodingTypes);
+
+                Assert.Equal(expectedToSucceed, result);
+            }
+        }
+
+        [Fact]
+        public void HasMatchingEncodingType_ValidZip()
+        {
+            var fileInfo = Zip;
+
+            var service = BuildService();
+
+            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+
+            var formFile = new Mock<IFormFile>();
+            formFile
+                .Setup(f => f.OpenReadStream())
+                .Returns(() => File.OpenRead(filePath));
+
+            var result = service.HasMatchingEncodingType(formFile.Object, AllowedArchiveEncodingTypes);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task IsValidCsvFile_AllTypes()
+        {
+            foreach (var type in AllTypes)
+            {
+                var expectedToSucceed = CsvTypes.Contains(type);
+
+                var fileInfo = type;
+
+                var service = BuildService();
+
+                var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+
+                await using var stream = File.OpenRead(filePath);
+
+                var result = await service.IsValidCsvFile(stream);
+
+                Assert.Equal(expectedToSucceed, result);
+            }
+        }
 
         private static async Task AssertMimeTypeCorrect(FileInfo fileInfo)
         {
