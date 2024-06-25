@@ -59,7 +59,7 @@ internal class DataSetVersionService(
 
     public async Task<Either<ActionResult, Unit>> BulkDeleteVersions(Guid releaseVersionId, CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.RequireTransaction(() =>
+        return await publicDataDbContext.RequireTransaction(() =>
             GetReleaseFiles(releaseVersionId, cancellationToken)
                 .OnSuccessCombineWith(async releaseFiles => await GetDataSetVersions(releaseFiles, cancellationToken))
                 .OnSuccess(releaseFilesAndDataSetVersions =>
@@ -191,14 +191,6 @@ internal class DataSetVersionService(
         CancellationToken cancellationToken)
     {
         return await releaseFileRepository.GetByFileType(releaseVersionId, cancellationToken, FileType.Data);
-    }
-
-    private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(DataSetVersion dataSetVersion,
-    CancellationToken cancellationToken)
-    {
-        return await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .SingleOrNotFoundAsync(rf => rf.Id == dataSetVersion.ReleaseFileId, cancellationToken);
     }
 
     private async Task UnlinkReleaseFilesFromApiDataSets(IReadOnlyList<ReleaseFile> releaseFiles, CancellationToken cancellationToken)
