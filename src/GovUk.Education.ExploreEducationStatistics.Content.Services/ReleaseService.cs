@@ -142,6 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             var files = await _releaseFileRepository.GetByFileType(
                 releaseVersion.Id, 
                 types: [FileType.Ancillary, FileType.Data]);
+            
             return files
                 .Select(rf => rf.ToPublicFileInfo())
                 .OrderBy(file => file.Name)

@@ -1,11 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -27,6 +24,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -51,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
+        private readonly IProcessorClient _processorClient;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
 
@@ -71,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
+            IProcessorClient processorClient,
             IGuidGenerator guidGenerator,
             IBlobCacheService cacheService)
         {
@@ -88,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
+            _processorClient = processorClient;
             _guidGenerator = guidGenerator;
             _cacheService = cacheService;
         }
@@ -174,7 +179,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseVersionId)
+        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleaseVersionPlan(
+            Guid releaseVersionId, 
+            CancellationToken cancellationToken = default)
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -193,11 +200,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseVersionId)
+        public Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId)
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion) // only allows unapproved amendments to be removed
+                .OnSuccessDo(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId))
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
@@ -650,6 +658,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class DeleteReleasePlan
     {
-        public List<IdTitleViewModel> ScheduledMethodologies { get; set; } = new();
+        public IReadOnlyList<IdTitleViewModel> ScheduledMethodologies { get; init; } = [];
     }
 }

@@ -1,12 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -14,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -25,9 +22,16 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -43,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
         private static readonly User User = new()
         {
             Id = Guid.NewGuid()
@@ -1075,7 +1080,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetDeleteReleasePlan()
+        public async Task GetDeleteReleaseVersionPlan()
         {
             var releaseBeingDeleted = new ReleaseVersion
             {
@@ -1137,7 +1142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = await releaseService.GetDeleteReleasePlan(releaseBeingDeleted.Id);
+                var result = await releaseService.GetDeleteReleaseVersionPlan(releaseBeingDeleted.Id);
+
                 var plan = result.AssertRight();
 
                 // Assert that only the 2 Methodologies that were scheduled with the Release being deleted are flagged
@@ -1152,7 +1158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task DeleteRelease()
+        public async Task DeleteReleaseVersion()
         {
             var publication = new Publication();
 
@@ -1232,6 +1238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var cacheService = new Mock<IBlobCacheService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
 
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
@@ -1247,15 +1254,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
                 .Returns(Task.CompletedTask);
 
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id, 
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context,
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
-                    cacheService: cacheService.Object);
+                    cacheService: cacheService.Object,
+                    processorClient: processorClient.Object);
 
-                var result = await releaseService.DeleteRelease(releaseVersion.Id);
+                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
 
                 releaseDataFilesService.Verify(mock =>
                     mock.DeleteAll(releaseVersion.Id, false), Times.Once);
@@ -1265,7 +1278,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(cacheService,
                     releaseDataFilesService,
-                    releaseFileService
+                    releaseFileService,
+                    processorClient
                 );
 
                 result.AssertRight();
@@ -1362,6 +1376,91 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId);
+            }
+        }
+
+        [Fact]
+        public async Task DeleteReleaseVersion_ProcessorReturns400_Returns400()
+        {
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var processorClient = new Mock<IProcessorClient>(Strict);
+
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BadRequestObjectResult(new ValidationProblemViewModel
+                    {
+                        Errors = new ErrorViewModel[]
+                        {
+                            new() {
+                                Path ="error path",
+                                Code = "error code"
+                            }
+                        }
+                    }));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(
+                    context,
+                    processorClient: processorClient.Object);
+
+                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
+
+                VerifyAllMocks(processorClient);
+
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertHasError(
+                    expectedPath: "error path",
+                    expectedCode: "error code");
+            }
+        }
+
+        [Fact]
+        public async Task DeleteReleaseVersion_ProcessorThrows_Throws()
+        {
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var processorClient = new Mock<IProcessorClient>(Strict);
+
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new HttpRequestException());
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(
+                    context,
+                    processorClient: processorClient.Object);
+
+                await Assert.ThrowsAsync<HttpRequestException>(async () => await releaseService.DeleteReleaseVersion(releaseVersion.Id));
+
+                VerifyAllMocks(processorClient);
             }
         }
 
@@ -1889,6 +1988,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IProcessorClient? processorClient = null,
             IBlobCacheService? cacheService = null)
         {
             var userService = AlwaysTrueUserService();
@@ -1912,6 +2012,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
+                processorClient ?? Mock.Of<IProcessorClient>(Strict),
                 new SequentialGuidGenerator(),
                 cacheService ?? Mock.Of<IBlobCacheService>(Strict)
             );
