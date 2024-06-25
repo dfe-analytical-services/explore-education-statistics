@@ -1,8 +1,8 @@
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
-import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
+import render from '@common-test/render';
 
 describe('DataFileUploadForm', () => {
   test('shows validation message when no data file selected', async () => {
@@ -125,6 +125,54 @@ describe('DataFileUploadForm', () => {
       expect(
         screen.getByText('Choose a ZIP file that is not empty', {
           selector: '#dataFileUploadForm-zipFile-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation message when no bulk ZIP file selected', async () => {
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
+
+    const file = new File([], 'test.zip', {
+      type: 'application/zip',
+    });
+
+    await user.click(screen.getByLabelText('Bulk ZIP upload'));
+    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Upload data files',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Choose a zip file that is not empty', {
+          selector: '#dataFileUploadForm-bulkZipFile-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation message when bulk ZIP file is empty', async () => {
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
+
+    const file = new File([], 'test.zip', {
+      type: 'application/zip',
+    });
+
+    await user.click(screen.getByLabelText('Bulk ZIP upload'));
+    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Upload data files',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Choose a ZIP file that is not empty', {
+          selector: '#dataFileUploadForm-bulkZipFile-error',
         }),
       ).toBeInTheDocument();
     });
