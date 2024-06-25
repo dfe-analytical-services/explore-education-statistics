@@ -35,7 +35,8 @@ public class ProcessInitialDataSetVersionFunction(
             await context.CallActivityExclusively(ActivityNames.ImportMetadata, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.WriteDataFiles, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.CompleteInitialDataSetVersionProcessing, logger, context.InstanceId);
+            await context.CallActivity(ActivityNames.CompleteInitialDataSetVersionProcessing, logger,
+                context.InstanceId);
         }
         catch (Exception e)
         {
@@ -67,7 +68,7 @@ public class ProcessInitialDataSetVersionFunction(
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.WritingDataFiles, cancellationToken);
         await parquetService.WriteDataFiles(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
-    
+
     [Function(ActivityNames.CompleteInitialDataSetVersionProcessing)]
     public async Task CompleteInitialDataSetVersionProcessing(
         [ActivityTrigger] Guid instanceId,

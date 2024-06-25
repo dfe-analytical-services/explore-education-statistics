@@ -71,7 +71,7 @@ internal class ProcessorClient(
     private async Task<Either<ActionResult, TResponse>> SendPost<TRequest, TResponse>(
         string url,
         TRequest request,
-        Func<HttpResponseMessage, ActionResult?>? additionalResponseValidator = null,
+        Func<HttpResponseMessage, ActionResult?>? customResponseHandler = null,
         CancellationToken cancellationToken = default)
         where TResponse : class
     {
@@ -80,26 +80,26 @@ internal class ProcessorClient(
                     url,
                     request,
                     cancellationToken: cancellationToken),
-            additionalResponseValidator,
+            customResponseHandler,
             cancellationToken);
     }
 
     private async Task<Either<ActionResult, Unit>> SendDelete(
         string url,
-        Func<HttpResponseMessage, ActionResult?>? additionalResponseValidator = null,
+        Func<HttpResponseMessage, ActionResult?>? customResponseHandler = null,
         CancellationToken cancellationToken = default)
     {
         return await SendRequest<Unit>(
             () => httpClient.DeleteAsync(
                 url,
                 cancellationToken: cancellationToken),
-            additionalResponseValidator,
+            customResponseHandler,
             cancellationToken);
     }
 
     private async Task<Either<ActionResult, TResponse>> SendRequest<TResponse>(
         Func<Task<HttpResponseMessage>> requestFunction,
-        Func<HttpResponseMessage, ActionResult?>? additionalResponseValidator = null,
+        Func<HttpResponseMessage, ActionResult?>? customResponseHandler = null,
         CancellationToken cancellationToken = default)
         where TResponse : class
     {
@@ -109,7 +109,7 @@ internal class ProcessorClient(
 
         if (!response.IsSuccessStatusCode)
         {
-            var additionalValidatorResponse = additionalResponseValidator?.Invoke(response);
+            var additionalValidatorResponse = customResponseHandler?.Invoke(response);
 
             if (additionalValidatorResponse is not null)
             {
