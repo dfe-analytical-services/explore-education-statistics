@@ -1365,7 +1365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .HasForeignKey("FilterMappingPlanDataSetVersionMappingId", "FilterMappingId");
                                         });
 
-                                    b2.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMapping", "Options", b3 =>
+                                    b2.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMapping", "OptionMappings", b3 =>
                                         {
                                             b3.Property<Guid>("FilterMappingPlanDataSetVersionMappingId")
                                                 .HasColumnType("uuid");
@@ -1422,7 +1422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .IsRequired();
                                         });
 
-                                    b2.Navigation("Options");
+                                    b2.Navigation("OptionMappings");
 
                                     b2.Navigation("Source")
                                         .IsRequired();
@@ -1502,7 +1502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                             b1.WithOwner()
                                 .HasForeignKey("DataSetVersionMappingId");
 
-                            b1.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationLevelMappingCandidates", "Candidates", b2 =>
+                            b1.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationLevelMappings", "Levels", b2 =>
                                 {
                                     b2.Property<Guid>("LocationMappingPlanDataSetVersionMappingId")
                                         .HasColumnType("uuid");
@@ -1523,11 +1523,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                                     b2.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOption", "Candidates", b3 =>
                                         {
-                                            b3.Property<Guid>("LocationLevelMappingCandidatesLocationMappingPlanDataSetVersionMappingId")
-                                                .HasColumnType("uuid")
-                                                .HasColumnName("LocationLevelMappingCandidatesLocationMappingPlanDataSetVersio~");
+                                            b3.Property<Guid>("LocationLevelMappingsLocationMappingPlanDataSetVersionMappingId")
+                                                .HasColumnType("uuid");
 
-                                            b3.Property<int>("LocationLevelMappingCandidatesId")
+                                            b3.Property<int>("LocationLevelMappingsId")
                                                 .HasColumnType("integer");
 
                                             b3.Property<int>("Id")
@@ -1542,43 +1541,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .IsRequired()
                                                 .HasColumnType("text");
 
-                                            b3.HasKey("LocationLevelMappingCandidatesLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingCandidatesId", "Id");
+                                            b3.HasKey("LocationLevelMappingsLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingsId", "Id");
 
                                             b3.ToTable("DataSetVersionMappings");
 
                                             b3.WithOwner()
-                                                .HasForeignKey("LocationLevelMappingCandidatesLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingCandidatesId");
+                                                .HasForeignKey("LocationLevelMappingsLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingsId");
                                         });
-
-                                    b2.Navigation("Candidates");
-                                });
-
-                            b1.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationLevelMappingPlan", "Mappings", b2 =>
-                                {
-                                    b2.Property<Guid>("LocationMappingPlanDataSetVersionMappingId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    b2.Property<int>("Level")
-                                        .HasColumnType("integer");
-
-                                    b2.HasKey("LocationMappingPlanDataSetVersionMappingId", "Id");
-
-                                    b2.ToTable("DataSetVersionMappings");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("LocationMappingPlanDataSetVersionMappingId");
 
                                     b2.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMapping", "Mappings", b3 =>
                                         {
-                                            b3.Property<Guid>("LocationLevelMappingPlanLocationMappingPlanDataSetVersionMappingId")
-                                                .HasColumnType("uuid")
-                                                .HasColumnName("LocationLevelMappingPlanLocationMappingPlanDataSetVersionMappi~");
+                                            b3.Property<Guid>("LocationLevelMappingsLocationMappingPlanDataSetVersionMappingId")
+                                                .HasColumnType("uuid");
 
-                                            b3.Property<int>("LocationLevelMappingPlanId")
+                                            b3.Property<int>("LocationLevelMappingsId")
                                                 .HasColumnType("integer");
 
                                             b3.Property<int>("Id")
@@ -1592,20 +1568,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .IsRequired()
                                                 .HasColumnType("text");
 
-                                            b3.HasKey("LocationLevelMappingPlanLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingPlanId", "Id");
+                                            b3.HasKey("LocationLevelMappingsLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingsId", "Id");
 
                                             b3.ToTable("DataSetVersionMappings");
 
                                             b3.WithOwner()
-                                                .HasForeignKey("LocationLevelMappingPlanLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingPlanId");
+                                                .HasForeignKey("LocationLevelMappingsLocationMappingPlanDataSetVersionMappingId", "LocationLevelMappingsId");
 
                                             b3.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOption", "Source", b4 =>
                                                 {
-                                                    b4.Property<Guid>("LocationOptionMappingLocationLevelMappingPlanLocationMappingPlanDataSetVersionMappingId")
+                                                    b4.Property<Guid>("LocationOptionMappingLocationLevelMappingsLocationMappingPlanDataSetVersionMappingId")
                                                         .HasColumnType("uuid")
-                                                        .HasColumnName("LocationOptionMappingLocationLevelMappingPlanLocationMappingPl~");
+                                                        .HasColumnName("LocationOptionMappingLocationLevelMappingsLocationMappingPlanD~");
 
-                                                    b4.Property<int>("LocationOptionMappingLocationLevelMappingPlanId")
+                                                    b4.Property<int>("LocationOptionMappingLocationLevelMappingsId")
                                                         .HasColumnType("integer");
 
                                                     b4.Property<int>("LocationOptionMappingId")
@@ -1619,24 +1595,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                         .IsRequired()
                                                         .HasColumnType("text");
 
-                                                    b4.HasKey("LocationOptionMappingLocationLevelMappingPlanLocationMappingPlanDataSetVersionMappingId", "LocationOptionMappingLocationLevelMappingPlanId", "LocationOptionMappingId");
+                                                    b4.HasKey("LocationOptionMappingLocationLevelMappingsLocationMappingPlanDataSetVersionMappingId", "LocationOptionMappingLocationLevelMappingsId", "LocationOptionMappingId");
 
                                                     b4.ToTable("DataSetVersionMappings");
 
                                                     b4.WithOwner()
-                                                        .HasForeignKey("LocationOptionMappingLocationLevelMappingPlanLocationMappingPlanDataSetVersionMappingId", "LocationOptionMappingLocationLevelMappingPlanId", "LocationOptionMappingId");
+                                                        .HasForeignKey("LocationOptionMappingLocationLevelMappingsLocationMappingPlanDataSetVersionMappingId", "LocationOptionMappingLocationLevelMappingsId", "LocationOptionMappingId");
                                                 });
 
                                             b3.Navigation("Source")
                                                 .IsRequired();
                                         });
 
+                                    b2.Navigation("Candidates");
+
                                     b2.Navigation("Mappings");
                                 });
 
-                            b1.Navigation("Candidates");
-
-                            b1.Navigation("Mappings");
+                            b1.Navigation("Levels");
                         });
 
                     b.Navigation("FilterMappingPlan")
