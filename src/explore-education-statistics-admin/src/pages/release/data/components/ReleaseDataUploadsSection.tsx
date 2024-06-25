@@ -1,9 +1,12 @@
 import Link from '@admin/components/Link';
+import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
+import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
 import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import {
   releaseDataFileReplaceRoute,
   ReleaseDataFileReplaceRouteParams,
@@ -21,13 +24,11 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
 import React, { useCallback, useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
-import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
-import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
+import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   publicationId: string;
@@ -50,9 +51,9 @@ const ReleaseDataUploadsSection = ({
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [activeFileIds, setActiveFileIds] = useState<string[]>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
-  const { value: initialDataFiles = [], isLoading } = useAsyncHandledRetry(
-    () => releaseDataFileService.getDataFiles(releaseId),
-    [releaseId],
+
+  const { data: initialDataFiles = [], isLoading } = useQuery(
+    releaseDataFileQueries.list(releaseId),
   );
 
   // Store the data files on state so we can reliably update them

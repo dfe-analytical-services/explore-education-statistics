@@ -41,6 +41,9 @@ const subjectErrorMappings = [
   }),
 ];
 
+// @MarkFix - check these error codes, some difference from the list give
+// and what the server returns, eg. DataFileNotFound is returned not DataFileNotFoundInZip
+
 // Error messages are returned by the server so don't need to
 // define them here, but can't leave them blank in the mapping.
 const fileErrorMappings = {
@@ -67,14 +70,15 @@ function baseErrorMappings(
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'bulkZipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
+          ...fileErrorMappings,
           ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
           BulkDataZipMustContainDatasetNamesCsv:
             'BulkDataZipMustContainDatasetNamesCsv',
           DatasetNamesCsvReaderException: 'DatasetNamesCsvReaderException',
           DatasetNamesCsvIncorrectHeaders: 'DatasetNamesCsvIncorrectHeaders',
-          DataFileNotFoundInZip: 'DataFileNotFoundInZip',
-          MetaFileNotFoundInZip: 'MetaFileNotFoundInZip',
+          DataFileNotFound: 'DataFileNotFound',
+          MetaFileNotFound: 'MetaFileNotFound',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
           BulkZipShouldContainDataSets: 'BulkZipShouldContainDataSets',
         },
@@ -224,14 +228,13 @@ export default function DataFileUploadForm({
               {formState.isSubmitting && (
                 <LoadingSpinner text="Uploading files" overlay />
               )}
-              {!isDataReplacement &&
-                (uploadType === 'csv' || uploadType === 'zip') && (
-                  <FormFieldTextInput<DataFileUploadFormValues>
-                    name="subjectTitle"
-                    label="Subject title"
-                    className="govuk-!-width-two-thirds"
-                  />
-                )}
+              {!isDataReplacement && uploadType !== 'bulkZip' && (
+                <FormFieldTextInput<DataFileUploadFormValues>
+                  name="subjectTitle"
+                  label="Subject title"
+                  className="govuk-!-width-two-thirds"
+                />
+              )}
 
               <FormFieldRadioGroup<DataFileUploadFormValues>
                 name="uploadType"
@@ -271,20 +274,23 @@ export default function DataFileUploadForm({
                       />
                     ),
                   },
-                  {
-                    label: 'Bulk ZIP upload',
-                    hint: 'To import multiple data files at once',
-                    value: 'bulkZip',
-                    hidden: isDataReplacement,
-                    conditional: (
-                      <FormFieldFileInput<DataFileUploadFormValues>
-                        hint="Must contain dataset_names.csv and pairs of csv/meta.csv data files"
-                        name="bulkZipFile"
-                        label="Upload ZIP file"
-                        accept=".zip"
-                      />
-                    ),
-                  },
+                  ...(!isDataReplacement
+                    ? [
+                        {
+                          label: 'Bulk ZIP upload',
+                          hint: 'To import multiple data files at once',
+                          value: 'bulkZip',
+                          conditional: (
+                            <FormFieldFileInput<DataFileUploadFormValues>
+                              hint="Must contain dataset_names.csv and pairs of csv/meta.csv data files"
+                              name="bulkZipFile"
+                              label="Upload bulk ZIP file"
+                              accept=".zip"
+                            />
+                          ),
+                        },
+                      ]
+                    : []),
                 ]}
                 onChange={event => {
                   setSelectedFileType(event.target.value as FileType);

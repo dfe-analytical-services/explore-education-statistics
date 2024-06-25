@@ -1,20 +1,20 @@
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
+import render from '@common-test/render';
 
 describe('DataFileUploadForm', () => {
   test('shows validation message when no data file selected', async () => {
-    render(<DataFileUploadForm onSubmit={noop} />);
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 
-    await userEvent.click(screen.getByLabelText('Upload data file'));
+    await user.click(screen.getByLabelText('Upload data file'));
     fireEvent.change(screen.getByLabelText('Upload data file'), {
       target: {
         value: null,
       },
     });
-    await userEvent.tab();
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -26,14 +26,14 @@ describe('DataFileUploadForm', () => {
   });
 
   test('shows validation message when data file is not empty', async () => {
-    render(<DataFileUploadForm onSubmit={noop} />);
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 
     const file = new File([], 'test.csv', {
       type: 'text/csv',
     });
 
-    await userEvent.upload(screen.getByLabelText('Upload data file'), file);
-    await userEvent.tab();
+    await user.upload(screen.getByLabelText('Upload data file'), file);
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -45,13 +45,13 @@ describe('DataFileUploadForm', () => {
   });
 
   test('shows validation message when no meta data file selected', async () => {
-    render(<DataFileUploadForm onSubmit={noop} />);
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 
-    await userEvent.click(screen.getByLabelText('Upload metadata file'));
+    await user.click(screen.getByLabelText('Upload metadata file'));
     fireEvent.change(screen.getByLabelText('Upload metadata file'), {
       target: { value: null },
     });
-    await userEvent.tab();
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -63,14 +63,14 @@ describe('DataFileUploadForm', () => {
   });
 
   test('shows validation message when metadata file is not empty', async () => {
-    render(<DataFileUploadForm onSubmit={noop} />);
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 
     const file = new File([], 'test.csv', {
       type: 'text/csv',
     });
 
-    await userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
-    await userEvent.tab();
+    await user.upload(screen.getByLabelText('Upload metadata file'), file);
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -82,14 +82,14 @@ describe('DataFileUploadForm', () => {
   });
 
   test('shows validation message when no ZIP file selected', async () => {
-    render(<DataFileUploadForm onSubmit={noop} />);
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 
-    await userEvent.click(screen.getByLabelText('ZIP file'));
-    await userEvent.click(screen.getByLabelText('Upload ZIP file'));
+    await user.click(screen.getByLabelText('ZIP file'));
+    await user.click(screen.getByLabelText('Upload ZIP file'));
     fireEvent.change(screen.getByLabelText('Upload ZIP file'), {
       target: { value: null },
     });
-    await userEvent.tab();
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -101,15 +101,15 @@ describe('DataFileUploadForm', () => {
   });
 
   test('shows validation message when ZIP file is empty', async () => {
-    render(<DataFileUploadForm onSubmit={noop} />);
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 
     const file = new File([], 'test.zip', {
       type: 'application/zip',
     });
 
-    await userEvent.click(screen.getByLabelText('ZIP file'));
-    await userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
-    await userEvent.tab();
+    await user.click(screen.getByLabelText('ZIP file'));
+    await user.upload(screen.getByLabelText('Upload ZIP file'), file);
+    await user.tab();
 
     await waitFor(() => {
       expect(
@@ -120,12 +120,51 @@ describe('DataFileUploadForm', () => {
     });
   });
 
+  test('shows validation message when no bulk ZIP file selected', async () => {
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
+
+    await user.click(screen.getByLabelText('Bulk ZIP upload'));
+    await user.click(screen.getByLabelText('Upload bulk ZIP file'));
+    fireEvent.change(screen.getByLabelText('Upload bulk ZIP file'), {
+      target: { value: null },
+    });
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Choose a zip file', {
+          selector: '#dataFileUploadForm-bulkZipFile-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation message when bulk ZIP file is empty', async () => {
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
+
+    const file = new File([], 'test.zip', {
+      type: 'application/zip',
+    });
+
+    await user.click(screen.getByLabelText('Bulk ZIP upload'));
+    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Choose a ZIP file that is not empty', {
+          selector: '#dataFileUploadForm-bulkZipFile-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
   test('cannot submit with invalid values when trying to upload CSV files', async () => {
     const handleSubmit = jest.fn();
 
-    render(<DataFileUploadForm onSubmit={handleSubmit} />);
+    const { user } = render(<DataFileUploadForm onSubmit={handleSubmit} />);
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
         name: 'Upload data files',
       }),
@@ -155,10 +194,10 @@ describe('DataFileUploadForm', () => {
   test('cannot submit with invalid values when trying to upload ZIP file', async () => {
     const handleSubmit = jest.fn();
 
-    render(<DataFileUploadForm onSubmit={handleSubmit} />);
+    const { user } = render(<DataFileUploadForm onSubmit={handleSubmit} />);
 
-    await userEvent.click(screen.getByLabelText('ZIP file'));
-    await userEvent.click(
+    await user.click(screen.getByLabelText('ZIP file'));
+    await user.click(
       screen.getByRole('button', {
         name: 'Upload data files',
       }),

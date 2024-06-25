@@ -22,7 +22,6 @@ export interface FormRadioProps {
   conditional?: ReactNode;
   defaultChecked?: boolean;
   disabled?: boolean;
-  hidden?: boolean;
   divider?: string;
   hiddenConditional?: boolean;
   hint?: string | ReactNode;
@@ -44,7 +43,6 @@ const FormRadio = ({
   conditional,
   defaultChecked,
   disabled = false,
-  hidden = false,
   divider,
   hiddenConditional,
   hint,
@@ -60,10 +58,6 @@ const FormRadio = ({
   onChange,
 }: FormRadioProps) => {
   const { onMounted } = useMounted(undefined, false);
-
-  if (hidden) {
-    return;
-  }
 
   /* eslint-disable jsx-a11y/role-supports-aria-props */
   return (
