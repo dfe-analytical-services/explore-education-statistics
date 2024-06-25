@@ -257,7 +257,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         .Select(option => new LocationOptionMapping
                         {
                             CandidateKey = null,
-                            Type = MappingType.None,
+                            Type = MappingType.AutoNone,
                             Source = new LocationOption
                             {
                                 Key = $"{option.Label} :: {option.ToRow().GetRowKey()}",
@@ -607,7 +607,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 Key = "LA location 2 key",
                                 Label = "LA location 2 label"
                             },
-                            Type = MappingType.None,
+                            Type = MappingType.AutoNone,
                             CandidateKey = null
                         }
                     ],
@@ -1017,7 +1017,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 Key = "Filter 1 option 2 key",
                                 Label = "Filter 1 option 2 label"
                             },
-                            Type = MappingType.None,
+                            Type = MappingType.AutoNone,
                             CandidateKey = null
                         }
                     ]
@@ -1029,7 +1029,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         Key = "Filter 2 key",
                         Label = "Filter 2 label"
                     },
-                    Type = MappingType.None,
+                    Type = MappingType.AutoNone,
                     CandidateKey = null,
                     OptionMappings =
                     [
@@ -1040,7 +1040,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 Key = "Filter 2 option 1 key",
                                 Label = "Filter 2 option 1 label"
                             },
-                            Type = MappingType.None,
+                            Type = MappingType.AutoNone,
                             CandidateKey = null,
                         }
                     ]

@@ -115,12 +115,14 @@ public enum MappingType
     ManualNone,
 
     /// <summary>
-    /// The server has automatically selected a likely mapping candidate for this source element.
+    /// The service has automatically selected a likely mapping candidate for this source element.
     /// </summary>
     AutoMapped,
 
     /// <summary>
-    /// The server has automatically indicated that no likely mapping candidate exists for this source element.
+    /// The service has automatically indicated that no likely mapping candidate exists for this
+    /// source element.  It will still take the user to confirm these and switch them to be
+    /// "ManualNone" in the process before the service indicates that the mappings are complete.
     /// </summary>
     AutoNone
 }

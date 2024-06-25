@@ -12,6 +12,12 @@ internal class DataSetVersionMappingService(
     PublicDataDbContext publicDataDbContext)
     : IDataSetVersionMappingService
 {
+    public static readonly MappingType[] IncompleteMappingTypes =
+    [
+        MappingType.None,
+        MappingType.AutoNone
+    ];
+
     public async Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -78,7 +84,7 @@ internal class DataSetVersionMappingService(
             .Levels
             .Any(level => level
                 .Mappings
-                .Any(mapping => mapping.Type == MappingType.None));
+                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Type)));
 
         mappings.FilterMappingsComplete = !mappings
             .FilterMappingPlan
@@ -87,7 +93,7 @@ internal class DataSetVersionMappingService(
                 filterMapping.Type == MappingType.None
                 || filterMapping
                     .OptionMappings
-                    .Any(optionMapping => optionMapping.Type == MappingType.None));
+                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Type)));
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -137,7 +143,7 @@ internal class DataSetVersionMappingService(
         else
         {
             mapping.CandidateKey = null;
-            mapping.Type = MappingType.None;
+            mapping.Type = MappingType.AutoNone;
         }
 
         return matchingCandidate;
@@ -205,7 +211,7 @@ internal class DataSetVersionMappingService(
                                 Key = $"{option.Label} :: {option.ToRow().GetRowKey()}",
                                 Label = option.Label,
                             },
-                            Type = MappingType.None
+                            Type = MappingType.AutoNone
                         })
                         .ToList(),
                     Candidates = candidatesForLevel
