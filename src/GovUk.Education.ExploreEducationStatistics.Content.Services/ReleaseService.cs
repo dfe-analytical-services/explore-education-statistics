@@ -139,8 +139,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private async Task<List<FileInfo>> GetDownloadFiles(ReleaseVersion releaseVersion)
         {
-            var files = await _releaseFileRepository.GetByFileType(releaseVersion.Id, FileType.Ancillary,
-                FileType.Data);
+            var files = await _releaseFileRepository.GetByFileType(
+                releaseVersion.Id, 
+                types: [FileType.Ancillary, FileType.Data]);
             return files
                 .Select(rf => rf.ToPublicFileInfo())
                 .OrderBy(file => file.Name)

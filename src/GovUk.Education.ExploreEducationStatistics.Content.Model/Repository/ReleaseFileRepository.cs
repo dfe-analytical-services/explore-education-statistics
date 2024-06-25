@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -97,6 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         }
 
         public async Task<List<ReleaseFile>> GetByFileType(Guid releaseVersionId,
+            CancellationToken cancellationToken = default,
             params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
@@ -104,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Where(releaseFile =>
                     releaseFile.ReleaseVersionId == releaseVersionId
                     && types.Contains(releaseFile.File.Type))
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId,

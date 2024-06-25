@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseVersionId,
             bool forceDelete = false)
         {
-            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, FileType.Data);
+            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Data);
 
             return await Delete(releaseVersionId,
                 releaseFiles.Select(releaseFile => releaseFile.File.Id),
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async () =>
                 {
-                    var files = await _releaseFileRepository.GetByFileType(releaseVersionId, FileType.Data);
+                    var files = await _releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Data);
 
                     // Exclude files that are replacements in progress
                     var filesExcludingReplacements = files

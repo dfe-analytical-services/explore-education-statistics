@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseVersionId, bool forceDelete = false)
         {
-            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, DeletableFileTypes);
+            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: DeletableFileTypes);
 
             return await Delete(releaseVersionId,
                 releaseFiles.Select(releaseFile => releaseFile.File.Id),
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types);
+                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: types);
 
                     return releaseFiles
                         .Select(releaseFile => releaseFile.ToFileInfo())
@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, Ancillary);
+                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: Ancillary);
 
                     var filesWithMetadata = await releaseFiles
                         .SelectAsync(async releaseFile => await ToAncillaryFileInfo(releaseFile));

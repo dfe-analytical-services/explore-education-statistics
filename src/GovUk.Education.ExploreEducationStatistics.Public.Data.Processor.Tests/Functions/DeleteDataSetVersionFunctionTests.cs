@@ -70,7 +70,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             releaseFile.PublicApiDataSetId = dataSet.Id;
             releaseFile.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
 
-            await AddTestData<ContentDbContext>(context => context.Files.Update(releaseFile.File));
+            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Update(releaseFile));
 
             var dataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
 
@@ -297,14 +297,14 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .Where(i => i.Id == liveDataSetVersion.Imports.Single().Id)
                 .ToListAsync());
 
-            // Assert that the ReleaseFile has been unassociated with the DRAFT Public API Data Set Version
+            // Assert that the DRAFT ReleaseFile has been unassociated with the DRAFT Public API Data Set Version
             var updatedDraftReleaseFile = await contentDataDbContext.ReleaseFiles
                 .SingleAsync(f => f.Id == draftReleaseFile.Id);
 
             Assert.Null(updatedDraftReleaseFile.PublicApiDataSetId);
             Assert.Null(updatedDraftReleaseFile.PublicApiDataSetVersion);
 
-            // Assert that the ReleaseFile is still associated with the LIVE Public API Data Set Version
+            // Assert that the LIVE ReleaseFile is still associated with the LIVE Public API Data Set Version
             var updatedLiveReleaseFile = await contentDataDbContext.ReleaseFiles
                 .SingleAsync(f => f.Id == liveReleaseFile.Id);
 
