@@ -274,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     file,
                     AllowedMimeTypesByFileType[DataZip]
                 )
-                || !_fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes))
+                || !_fileTypeService.HasMatchingEncodingType(file, AllowedArchiveEncodingTypes))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeZipFile(file.FileName));
             }

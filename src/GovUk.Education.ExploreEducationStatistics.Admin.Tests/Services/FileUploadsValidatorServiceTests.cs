@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseVersionId = Guid.NewGuid();
 
-            var replacingReleaseFile = new ReleaseFile
+            var toBeReplacedReleaseFile = new ReleaseFile
             {
                 ReleaseVersionId = releaseVersionId,
                 Name = "Data set name",
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var replacingReleaseMetaFile = new ReleaseFile
+            var toBeReplacedReleaseMetaFile = new ReleaseFile
             {
                 ReleaseVersionId = releaseVersionId,
                 File = new File
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contentDbContextId))
             {
-                context.ReleaseFiles.AddRange(replacingReleaseFile, replacingReleaseMetaFile);
+                context.ReleaseFiles.AddRange(toBeReplacedReleaseFile, toBeReplacedReleaseMetaFile);
                 await context.SaveChangesAsync();
             }
 
@@ -99,8 +99,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var (service, fileTypeService) = BuildService(context);
 
-                var dataFile = CreateFormFileMock(replacingReleaseFile.File.Filename).Object;
-                var metaFile = CreateFormFileMock(replacingReleaseMetaFile.File.Filename).Object;
+                // NOTE: Not necessary, but in this test case new files have same name as the files they're replacing
+                var dataFile = CreateFormFileMock(toBeReplacedReleaseFile.File.Filename).Object;
+                var metaFile = CreateFormFileMock(toBeReplacedReleaseMetaFile.File.Filename).Object;
 
                 fileTypeService
                     .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
@@ -111,14 +112,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ValidateDataSetFilesForUpload(
                     Guid.NewGuid(),
-                    replacingReleaseFile.Name,
+                    toBeReplacedReleaseFile.Name,
                     dataFile.FileName,
                     dataFile.Length,
                     dataFile.OpenReadStream(),
                     metaFile.FileName,
                     metaFile.Length,
                     metaFile.OpenReadStream(),
-                    replacingReleaseFile.File);
+                    toBeReplacedReleaseFile.File);
 
                 VerifyAllMocks(fileTypeService);
 
@@ -379,9 +380,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AssertHasErrors(errors, [
                     ValidationMessages.GenerateErrorFilenameNotUnique(
                         releaseFile.File.Filename, releaseFile.File.Type),
-                    // NOTE: We allow duplicate meta file names - only data file are included in public Data
-                    // Catalogue zips. Files are stored in blob storage by GUID, so no worries about duplicate names
-                    // there
+                    // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
+                    // zips, so meta files won't be included in the same directory by name and thereby cannot clash.
                 ]);
             }
 
@@ -482,23 +482,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithSubjectId(otherSubjectId))
                 .Generate();
 
-            var replacingSubjectId = Guid.NewGuid();
+            var toBeReplacedSubjectId = Guid.NewGuid();
 
-            var replacingReleaseFile = _fixture.DefaultReleaseFile()
+            var toBeReplacedReleaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithName("Data set name")
                 .WithFile(_fixture.DefaultFile()
                     .WithType(FileType.Data)
                     .WithFilename("test.csv")
-                    .WithSubjectId(replacingSubjectId))
+                    .WithSubjectId(toBeReplacedSubjectId))
                 .Generate();
 
-            var replacingMetaReleaseFile = _fixture.DefaultReleaseFile()
+            var toBeReplacedMetaReleaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFile(_fixture.DefaultFile()
                     .WithType(Metadata)
                     .WithFilename("test.meta.csv")
-                    .WithSubjectId(replacingSubjectId))
+                    .WithSubjectId(toBeReplacedSubjectId))
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 context.ReleaseFiles.AddRange(
                     otherReleaseFile, otherMetaReleaseFile,
-                    replacingReleaseFile, replacingMetaReleaseFile);
+                    toBeReplacedReleaseFile, toBeReplacedMetaReleaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -515,8 +515,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var (service, fileTypeService) = BuildService(context);
 
-                var dataFile = CreateFormFileMock(replacingReleaseFile.File.Filename).Object;
-                var metaFile = CreateFormFileMock(replacingMetaReleaseFile.File.Filename).Object;
+                // New files have different filenames to files being replaced, but same name as a different existing subject
+                var dataFile = CreateFormFileMock("usedfilename.csv").Object;
+                var metaFile = CreateFormFileMock("usedfilename.meta.csv").Object;
 
                 fileTypeService
                     .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
@@ -527,20 +528,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var errors = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
-                    replacingReleaseFile.Name!,
+                    toBeReplacedReleaseFile.Name!,
                     "usedfilename.csv",
                     dataFile.Length,
                     dataFile.OpenReadStream(),
                     "usedfilename.meta.csv",
                     metaFile.Length,
                     metaFile.OpenReadStream(),
-                    replacingReleaseFile.File);
+                    toBeReplacedReleaseFile.File);
 
                 VerifyAllMocks(fileTypeService);
 
                 AssertHasErrors(errors, [
                     ValidationMessages.GenerateErrorFilenameNotUnique("usedfilename.csv", FileType.Data),
-                    ValidationMessages.GenerateErrorFilenameNotUnique("usedfilename.meta.csv", Metadata),
+                    // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
+                    // zips, so meta files won't be included in the same directory by name and thereby cannot clash.
                 ]);
             }
         }

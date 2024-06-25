@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
 {
     public static class FileTypeValidationUtils
     {
-        public static readonly string[] ZipEncodingTypes = {
+        public static readonly string[] AllowedArchiveEncodingTypes = {
             "binary",
         };
 

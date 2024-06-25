@@ -267,9 +267,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(dataFileName, FileType.Data));
             }
 
-            // NOTE: We allow duplicate meta file names - only data file are included in public Data
-            // Catalogue zips. Files are stored in blob storage by GUID, so no worries about duplicate names
-            // there
+            // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
+            // zips, so meta files won't be included in the same directory by name and thereby cannot clash.
 
             return errors;
         }
