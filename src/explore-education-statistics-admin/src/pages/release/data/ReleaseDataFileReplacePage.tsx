@@ -93,8 +93,6 @@ const ReleaseDataFileReplacePage = ({
   ) => {
     let file: DataFile;
 
-    console.assert(values.uploadType !== 'bulkZip'); // @MarkFix
-
     if (values.uploadType === 'csv') {
       file = await releaseDataFileService.uploadDataFiles(releaseId, {
         replacingFileId: currentFile.id,

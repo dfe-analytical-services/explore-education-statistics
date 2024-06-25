@@ -5,13 +5,13 @@ import _releaseDataFileService, {
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import _permissionService, {
   DataFilePermissions,
 } from '@admin/services/permissionService';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
@@ -327,7 +327,7 @@ describe('ReleaseDataUploadsSection', () => {
         footnoteIds: ['footnote-1'],
       });
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -349,7 +349,7 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       ).toBeInTheDocument();
 
-      await userEvent.click(
+      await user.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete files',
         }),
@@ -411,7 +411,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
       releaseDataFileService.deleteDataFiles.mockResolvedValue();
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -433,7 +433,7 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       ).toBeInTheDocument();
 
-      await userEvent.click(
+      await user.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete files',
         }),
@@ -445,7 +445,7 @@ describe('ReleaseDataUploadsSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Confirm',
         }),
@@ -544,7 +544,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('show validation message when no subject title', async () => {
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -554,8 +554,8 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await userEvent.click(screen.getByLabelText('Subject title'));
-      await userEvent.tab();
+      await user.click(screen.getByLabelText('Subject title'));
+      await user.tab();
 
       await waitFor(() => {
         expect(
@@ -567,7 +567,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('shows validation message when non-unique subject title', async () => {
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -577,18 +577,15 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test data 1',
-      );
+      await user.type(screen.getByLabelText('Subject title'), 'Test data 1');
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
       );
 
-      await userEvent.click(screen.getByLabelText('Subject title'));
+      await user.click(screen.getByLabelText('Subject title'));
 
       await waitFor(() => {
         expect(
@@ -600,7 +597,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload CSV files', async () => {
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -610,7 +607,7 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -644,7 +641,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload ZIP file', async () => {
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -654,8 +651,8 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await userEvent.click(screen.getByLabelText('ZIP file'));
-      await userEvent.click(
+      await user.click(screen.getByLabelText('ZIP file'));
+      await user.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -689,6 +686,35 @@ describe('ReleaseDataUploadsSection', () => {
       });
     });
 
+    test('cannot submit with invalid values when trying to upload bulk ZIP file', async () => {
+      const { user } = render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await user.click(screen.getByLabelText('Bulk ZIP upload'));
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
+
+        expect(
+          screen.getByText('Choose a zip file', {
+            selector: '#dataFileUploadForm-bulkZipFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
     test('successful submit with CSV files renders with uploaded data file appended to list', async () => {
       releaseDataFileService.uploadDataFiles.mockResolvedValue(
         testUploadedDataFile,
@@ -696,7 +722,7 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -713,20 +739,14 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test title',
-      );
+      await user.type(screen.getByLabelText('Subject title'), 'Test title');
 
-      await userEvent.upload(
-        screen.getByLabelText('Upload data file'),
-        dataFile,
-      );
-      await userEvent.upload(
+      await user.upload(screen.getByLabelText('Upload data file'), dataFile);
+      await user.upload(
         screen.getByLabelText('Upload metadata file'),
         metadataFile,
       );
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -802,7 +822,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -816,15 +836,12 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test zip title',
-      );
+      await user.type(screen.getByLabelText('Subject title'), 'Test zip title');
 
-      await userEvent.click(screen.getByLabelText('ZIP file'));
+      await user.click(screen.getByLabelText('ZIP file'));
 
-      await userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
-      await userEvent.click(
+      await user.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
+      await user.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -888,6 +905,120 @@ describe('ReleaseDataUploadsSection', () => {
       );
     });
 
+    test('successful submit with ZIP file renders with uploaded data file appended to list', async () => {
+      releaseDataFileService.uploadBulkZipDataFile.mockResolvedValue([
+        testUploadedZipFile,
+        {
+          ...testUploadedZipFile,
+          id: 'zip-file-2',
+          title: 'Test zip title 2',
+          fileName: 'test-data-2.zip',
+          metaFileId: 'file-2-meta',
+          metaFileName: 'test-data-2.meta.zip',
+        },
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+
+      const { user } = render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      const zipFile = new File(['test'], 'test-data.zip', {
+        type: 'application/zip',
+      });
+
+      await user.click(screen.getByLabelText('Bulk ZIP upload'));
+
+      await user.upload(screen.getByLabelText('Upload bulk ZIP file'), zipFile);
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          releaseDataFileService.uploadBulkZipDataFile,
+        ).toHaveBeenCalledWith('release-1', zipFile);
+      });
+
+      const sections = screen.getAllByTestId('accordionSection');
+      const section1 = within(sections[0]);
+      const section2 = within(sections[1]);
+      const section3 = within(sections[2]);
+      const section4 = within(sections[3]);
+
+      expect(sections).toHaveLength(4);
+
+      expect(
+        section1.getByRole('button', { name: /Test data 1/ }),
+      ).toBeInTheDocument();
+
+      expect(
+        section2.getByRole('button', { name: /Test data 2/ }),
+      ).toBeInTheDocument();
+
+      expect(
+        section3.getByRole('button', { name: /Test zip title/ }),
+      ).toBeInTheDocument();
+      expect(section3.getByTestId('Subject title')).toHaveTextContent(
+        'Test zip title',
+      );
+      expect(section3.getByTestId('Data file')).toHaveTextContent(
+        'test-data.zip',
+      );
+      expect(section3.getByTestId('Metadata file')).toHaveTextContent(
+        'test-data.meta.zip',
+      );
+      expect(section3.getByTestId('Data file size')).toHaveTextContent(
+        '150 Kb',
+      );
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
+        'Unknown',
+      );
+      expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
+        'user1@test.com',
+      );
+      expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
+        '18 August 2020 12:00',
+      );
+
+      expect(
+        section4.getByRole('button', { name: /Test zip title 2/ }),
+      ).toBeInTheDocument();
+      expect(section4.getByTestId('Subject title')).toHaveTextContent(
+        'Test zip title 2',
+      );
+      expect(section4.getByTestId('Data file')).toHaveTextContent(
+        'test-data-2.zip',
+      );
+      expect(section4.getByTestId('Metadata file')).toHaveTextContent(
+        'test-data-2.meta.zip',
+      );
+      expect(section4.getByTestId('Data file size')).toHaveTextContent(
+        '150 Kb',
+      );
+      expect(section4.getByTestId('Number of rows')).toHaveTextContent(
+        'Unknown',
+      );
+      expect(section4.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(section4.getByTestId('Uploaded by')).toHaveTextContent(
+        'user1@test.com',
+      );
+      expect(section4.getByTestId('Date uploaded')).toHaveTextContent(
+        '18 August 2020 12:00',
+      );
+    });
+
     test('updates the number of rows after uploading CSV file when status changes', async () => {
       releaseDataFileService.uploadDataFiles.mockResolvedValue(
         testUploadedDataFile,
@@ -900,7 +1031,7 @@ describe('ReleaseDataUploadsSection', () => {
         {} as DataFilePermissions,
       );
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -917,20 +1048,14 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test title',
-      );
+      await user.type(screen.getByLabelText('Subject title'), 'Test title');
 
-      await userEvent.upload(
-        screen.getByLabelText('Upload data file'),
-        dataFile,
-      );
-      await userEvent.upload(
+      await user.upload(screen.getByLabelText('Upload data file'), dataFile);
+      await user.upload(
         screen.getByLabelText('Upload metadata file'),
         metadataFile,
       );
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -973,7 +1098,7 @@ describe('ReleaseDataUploadsSection', () => {
         {} as DataFilePermissions,
       );
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -987,15 +1112,12 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test title',
-      );
+      await user.type(screen.getByLabelText('Subject title'), 'Test title');
 
-      await userEvent.click(screen.getByLabelText('ZIP file'));
+      await user.click(screen.getByLabelText('ZIP file'));
 
-      await userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
-      await userEvent.click(
+      await user.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
+      await user.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -1107,7 +1229,7 @@ describe('ReleaseDataUploadsSection', () => {
         testUploadedDataFile,
       ]);
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1123,7 +1245,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1155,7 +1277,7 @@ describe('ReleaseDataUploadsSection', () => {
         testUploadedDataFile,
       ]);
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1171,7 +1293,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1180,7 +1302,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      await user.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
@@ -1206,7 +1328,7 @@ describe('ReleaseDataUploadsSection', () => {
         testUploadedDataFile,
       ]);
 
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1222,7 +1344,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1231,7 +1353,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      await userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+      await user.click(modal.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).not.toHaveBeenCalled();
@@ -1254,7 +1376,7 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
         testUploadedDataFile,
       ]);
-      render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1270,7 +1392,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1279,7 +1401,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      await user.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
