@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 public class DataSetVersionService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
-    IReleaseFileRepository releaseFileRepository,
     IProcessorClient processorClient,
     IUserService userService)
     : IDataSetVersionService
