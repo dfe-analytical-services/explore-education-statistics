@@ -139,12 +139,11 @@ const ReleaseDataUploadsSection = ({
           newFiles.push(
             ...(await releaseDataFileService.uploadBulkZipDataFile(
               releaseId,
-              values.zipFile as File,
+              values.bulkZipFile as File,
             )),
           );
           break;
         default:
-          console.error("This shouldn't happen!"); // @MarkFix
           break;
       }
       setActiveFileIds(newFiles.map(file => file.id));
@@ -171,7 +170,7 @@ const ReleaseDataUploadsSection = ({
             </a>
           </li>
           <li>
-            your data files meets these standards - if not you won’t be able to
+            your data files meets these standards - if not you won't be able to
             upload it to your release
           </li>
           <li>
