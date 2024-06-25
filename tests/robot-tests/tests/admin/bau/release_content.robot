@@ -99,7 +99,7 @@ Change secondary statistics
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
     user waits until page finishes loading
-    user checks page contains element        id:${SECONDARY_STATS_TABLE_TAB_ID}
+    user waits until secondary stats table tab is visible    ${SECONDARY_STATS_TABLE_TAB_ID}
     user checks page contains    Data Block 2 title
     user checks page contains button    Change secondary stats
     user checks page contains button    Remove secondary stats
@@ -246,3 +246,11 @@ Verify that validation prevents adding an invalid link
     user clicks button    Save & close
 
     user checks page does not contain    1 link has an invalid URL.
+
+
+*** Keywords ***
+
+User waits until secondary stats table tab is visible
+    [Arguments]    ${SECONDARY_STATS_TABLE_TAB_ID}    ${timeout}= %{TIMEOUT}
+    wait until keyword succeeds     ${timeout}    5 sec    Element Should Be Visible    id=${SECONDARY_STATS_TABLE_TAB_ID}
+
