@@ -2,13 +2,16 @@ import { SortDirection } from '@common/services/types/sort';
 import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
-import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
+import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePage';
 import {
   DataSetFileSortParam,
-  dataSetFileSortOptions,
-  DataSetFileSortOption,
   DataSetFileListRequest,
 } from '@frontend/services/dataSetFileService';
+import {
+  dataSetFileSortOptions,
+  DataSetFileSortOption,
+} from '@frontend/modules/data-catalogue/utils/dataSetFileSortOptions';
+
 import omitBy from 'lodash/omitBy';
 
 export default function createDataSetFileListRequest(
@@ -24,7 +27,10 @@ export default function createDataSetFileListRequest(
     themeId,
   } = getParamsFromQuery(query);
 
-  const { sort, sortDirection } = getSortParams(sortBy);
+  const { sort, sortDirection } = getSortParams({
+    sortBy,
+    filterByRelease: !!releaseId,
+  });
 
   const minSearchCharacters = 3;
   const searchTerm =
@@ -46,23 +52,34 @@ export default function createDataSetFileListRequest(
   );
 }
 
-function getSortParams(orderBy: DataSetFileSortOption): {
+function getSortParams({
+  filterByRelease,
+  sortBy,
+}: {
+  filterByRelease?: boolean;
+  sortBy: DataSetFileSortOption;
+}): {
   sort?: DataSetFileSortParam;
   sortDirection?: SortDirection;
 } {
-  if (orderBy === 'relevance') {
+  if (filterByRelease) {
+    return {
+      sort: 'natural',
+    };
+  }
+  if (sortBy === 'relevance') {
     return {
       sort: 'relevance',
       sortDirection: 'Desc',
     };
   }
-  if (orderBy === 'title') {
+  if (sortBy === 'title') {
     return {
       sort: 'title',
       sortDirection: 'Asc',
     };
   }
-  if (orderBy === 'oldest') {
+  if (sortBy === 'oldest') {
     return {
       sort: 'published',
       sortDirection: 'Asc',

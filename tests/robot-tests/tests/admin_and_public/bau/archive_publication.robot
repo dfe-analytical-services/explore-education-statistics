@@ -154,20 +154,18 @@ Generate permalink for archive-publication
 Check that archive-publication subject appears correctly on Data catalogue page
     user navigates to data catalogue page on public frontend
 
-    user clicks radio    %{TEST_THEME_NAME}
+    user chooses select option    id:filters-form-theme    %{TEST_THEME_NAME}
+    
+    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user checks select does not contain option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user waits until element is visible    id:publicationForm-publications    %{WAIT_SMALL}
+    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user chooses select option    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
 
-    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
-    user checks page does not contain element    //*[@data-testid="Radio item for ${PUBLICATION_NAME_SUPERSEDE}"]
-
-    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks button    Next step
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME_ARCHIVE}
-
-    user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
-    user checks page contains    This is the latest data
+    user checks page contains button    ${RELEASE_NAME_ARCHIVE}
+    user checks element contains    testid:release-info    ${RELEASE_NAME_ARCHIVE}
+    user checks element contains    testid:release-info    This is the latest data
+    user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
 
 Navigate to superseding-publication release on Admin site
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME_SUPERSEDE}
@@ -248,115 +246,34 @@ Check public data tables page contains superseding-publication's subject
 Check data catalogue page contains archive and superseding publication subjects
     user navigates to data catalogue page on public frontend
 
-    user clicks radio    %{TEST_THEME_NAME}
+    user chooses select option    id:filters-form-theme    %{TEST_THEME_NAME}
 
-    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
-    user checks page contains radio    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks button    Next step
+    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
+    user chooses select option    id:filters-form-release    ${RELEASE_NAME_SUPERSEDE}
 
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME_ARCHIVE}
-
-    user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
-    user checks page does not contain    This is the latest data
-
-    user clicks button    Next step
-    user waits until page contains    Choose files to download
-    user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
-
-    user checks page does not contain    This is the latest data
-    user checks page contains    This is not the latest data
-
-    user clicks button    Change publication
-    user waits until page finishes loading
-    user waits until page contains    Choose a publication
-
-    user clicks radio    %{TEST_THEME_NAME}
-    user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
-    user clicks button    Next step
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME_SUPERSEDE}
-
-    user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
-    user checks page contains    This is the latest data
-
-    user clicks button    Next step
-    user waits until page contains    Choose files to download
+    user checks page contains button    ${RELEASE_NAME_SUPERSEDE}
+    user checks element contains    testid:release-info    ${RELEASE_NAME_SUPERSEDE}
+    user checks element does not contain    testid:release-info    This is not the latest data
+    user checks element contains    testid:release-info    This is the latest data
     user waits until page contains    ${SUBJECT_NAME_SUPERSEDE}
 
-    user checks page contains    This is the latest data
-    user checks page does not contain    This is not the latest data
+    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user chooses select option    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
 
-Check data catalogue page contains superseded warning for archived publication (step one and two)
-    user navigates to data catalogue page on public frontend
+    user checks page contains button    ${RELEASE_NAME_ARCHIVE}
+    user checks element contains    testid:release-info    ${RELEASE_NAME_ARCHIVE}
+    user checks element does not contain    testid:release-info    This is the latest data
+    user checks element contains    testid:release-info    This is not the latest data
+    user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
 
-    user clicks radio    %{TEST_THEME_NAME}
+Check data set page shows 'Not the latest data' for archived publication subject
+    user clicks link   ${SUBJECT_NAME_ARCHIVE}
+    user waits until page contains    Data set from ${PUBLICATION_NAME_ARCHIVE}
+    user checks page contains    Not the latest data
 
-    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
-    user checks page contains radio    ${PUBLICATION_NAME_SUPERSEDE}
-
-    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks button    Next step
-    user waits until page finishes loading
-
-    user checks summary list contains    Publication    ${PUBLICATION_NAME_ARCHIVE}
-
-    user waits until page contains    Choose a release
-    user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
-
-    user checks page does not contain    This is the latest data
-    user checks page contains element    testid:superseded-warning
-    user checks page contains element    testid:superseded-by-link
-
-    # step 2
-    user clicks button    Next step
-    user checks page contains element    testid:superseded-warning
-    user checks page contains element    testid:superseded-by-link
-
-Check that superseded warning link takes user to superseding-publication data-catalogue step 1
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    [Tags]    Failing
-
-    user navigates to data catalogue page on public frontend
-
-    user clicks radio    %{TEST_THEME_NAME}
-
-    user scrolls to the bottom of the page
-
-    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
-
-    user checks page contains radio    ${PUBLICATION_NAME_SUPERSEDE}
-
-    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks button    Next step
-
-    user checks summary list contains    Publication    ${PUBLICATION_NAME_ARCHIVE}
-
-    user waits until page contains    Choose a release
-
-    # failing here
-    user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
-
-    user checks page contains element    testid:superseded-warning
-    user checks page contains element    testid:superseded-by-link
-
-    # step 2
-    user clicks button    Next step
-
-    user checks page contains element    testid:superseded-warning
-    user checks page contains element    testid:superseded-by-link
-
-    user clicks element    testid:superseded-by-link
-
-    user waits until h1 is visible    Browse our open data
-
-    user checks summary list contains    Publication    ${PUBLICATION_NAME_SUPERSEDE}
-    user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
-
-    user checks page does not contain element    testid:superseded-warning
-    user checks page does not contain element    testid:superseded-by-link
 
 Check archive-publication permalink has out-of-date warning
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
@@ -445,45 +362,28 @@ Check data catalogue page is correct after archive-publication has been unarchiv
 
     user navigates to data catalogue page on public frontend
 
-    user clicks radio    %{TEST_THEME_NAME}
+    user chooses select option    id:filters-form-theme    %{TEST_THEME_NAME}
 
-    user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
-    user checks page contains    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks button    Next step
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME_ARCHIVE}
+    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user chooses select option    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
 
-    user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
-    user checks page contains    This is the latest data
-
-    user clicks button    Next step
-    user waits until page contains    Choose files to download
+    user checks page contains button    ${RELEASE_NAME_ARCHIVE}
+    user checks element contains    testid:release-info    ${RELEASE_NAME_ARCHIVE}
+    user checks element does not contain    testid:release-info    This is not the latest data
+    user checks element contains    testid:release-info    This is the latest data
     user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
 
-    user checks page contains    This is the latest data
-    user checks page does not contain    This is not the latest data
+    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
+    user chooses select option    id:filters-form-release    ${RELEASE_NAME_SUPERSEDE}
 
-    user clicks button    Change publication
-    user waits until page finishes loading
-    user waits until page contains    Choose a publication
-
-    user clicks radio    %{TEST_THEME_NAME}
-    user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
-    user clicks button    Next step
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME_SUPERSEDE}
-
-    user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
-    user checks page contains    This is the latest data
-
-    user clicks button    Next step
-    user waits until page contains    Choose files to download
+    user checks page contains button    ${RELEASE_NAME_SUPERSEDE}
+    user checks element contains    testid:release-info    ${RELEASE_NAME_SUPERSEDE}
+    user checks element does not contain    testid:release-info    This is not the latest data
+    user checks element contains    testid:release-info    This is the latest data
     user waits until page contains    ${SUBJECT_NAME_SUPERSEDE}
-
-    user checks page contains    This is the latest data
-    user checks page does not contain    This is not the latest data
 
 Check archive-publication permalink no longer has out-of-date warning after archive-publication has been unarchived
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269

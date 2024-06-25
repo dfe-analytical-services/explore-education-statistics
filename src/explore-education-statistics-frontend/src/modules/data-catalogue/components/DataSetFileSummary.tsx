@@ -48,6 +48,7 @@ export default function DataSetFileSummary({
       indicators = [],
     },
     api,
+    isSuperseded,
     latestData,
     publication,
     published,
@@ -115,8 +116,10 @@ export default function DataSetFileSummary({
           <SummaryListItem term="Status">
             <TagGroup>
               {showLatestDataTag && (
-                <Tag colour={latestData ? undefined : 'orange'}>
-                  {latestData
+                <Tag
+                  colour={latestData && !isSuperseded ? undefined : 'orange'}
+                >
+                  {latestData && !isSuperseded
                     ? 'This is the latest data'
                     : 'This is not the latest data'}
                 </Tag>

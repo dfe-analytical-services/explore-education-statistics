@@ -8,11 +8,9 @@ import ButtonText from '@common/components/ButtonText';
 import { FormGroup, FormRadioGroup, FormSelect } from '@common/components/form';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
-import {
-  DataSetFileFilter,
-  DataSetType,
-} from '@frontend/services/dataSetFileService';
+import { DataSetType } from '@frontend/services/dataSetFileService';
 import styles from '@frontend/modules/data-catalogue/components/Filters.module.scss';
+import { DataSetFileFilter } from '@frontend/modules/data-catalogue/utils/dataSetFileFilters';
 import React from 'react';
 import classNames from 'classnames';
 
