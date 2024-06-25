@@ -1,10 +1,9 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -45,28 +44,10 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
 
-    [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
-    protected void ClearTestData<TDbContext>() where TDbContext : DbContext
+    protected async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
-        using var context = GetDbContext<TDbContext>();
-
-        var tables = context.Model.GetEntityTypes()
-            .Select(type => type.GetTableName())
-            .Distinct()
-            .OfType<string>()
-            .ToList();
-
-        foreach (var table in tables)
-        {
-            context.Database.ExecuteSqlRaw($"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""");
-        }
-
-        var sequences = context.Model.GetSequences();
-
-        foreach (var sequence in sequences)
-        {
-            context.Database.ExecuteSqlRaw($"""ALTER SEQUENCE "{sequence.Name}" RESTART WITH 1;""");
-        }
+        var context = GetDbContext<TDbContext>();
+        await context.ClearTestData();
     }
 
     protected void ResetDbContext<TDbContext>() where TDbContext : DbContext

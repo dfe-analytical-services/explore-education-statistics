@@ -14,15 +14,15 @@ using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribut
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class CreateDataSetFunction(
-    ILogger<CreateDataSetFunction> logger,
-    IDataSetService dataSetService,
-    IValidator<DataSetCreateRequest> requestValidator)
+public class CreateNextDataSetVersionFunction(
+    ILogger<CreateNextDataSetVersionFunction> logger,
+    IDataSetVersionService dataSetVersionService,
+    IValidator<NextDataSetVersionCreateRequest> requestValidator)
 {
-    [Function(nameof(CreateDataSet))]
-    public async Task<IActionResult> CreateDataSet(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateDataSet))] [FromBody]
-        DataSetCreateRequest request,
+    [Function(nameof(CreateNextDataSetVersion))]
+    public async Task<IActionResult> CreateNextDataSetVersion(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateNextDataSetVersion))] [FromBody]
+        NextDataSetVersionCreateRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
@@ -30,36 +30,37 @@ public class CreateDataSetFunction(
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetService.CreateDataSet(
-                request,
+            .OnSuccess(() => dataSetVersionService.CreateNextVersion(
+                dataSetId: request.DataSetId,
+                releaseFileId: request.ReleaseFileId,
                 instanceId,
                 cancellationToken: cancellationToken
             ))
-            .OnSuccess(async tuple =>
+            .OnSuccess(async dataSetVersionId =>
             {
-                await ProcessInitialDataSetVersion(
+                await ProcessNextDataSetVersion(
                     client,
-                    dataSetVersionId: tuple.dataSetVersionId,
+                    dataSetVersionId: dataSetVersionId,
                     instanceId: instanceId,
                     cancellationToken);
 
                 return new CreateDataSetResponseViewModel
                 {
-                    DataSetId = tuple.dataSetId,
-                    DataSetVersionId = tuple.dataSetVersionId,
+                    DataSetId = request.DataSetId,
+                    DataSetVersionId = dataSetVersionId,
                     InstanceId = instanceId
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
     }
 
-    private async Task ProcessInitialDataSetVersion(
+    private async Task ProcessNextDataSetVersion(
         DurableTaskClient client,
         Guid dataSetVersionId,
         Guid instanceId,
         CancellationToken cancellationToken)
     {
-        const string orchestratorName = nameof(ProcessInitialDataSetVersionFunction.ProcessInitialDataSetVersion);
+        const string orchestratorName = nameof(ProcessNextDataSetVersionFunction.ProcessNextDataSetVersion);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 

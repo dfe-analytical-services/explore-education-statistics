@@ -16,16 +16,17 @@ using Testcontainers.PostgreSql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 
-public abstract class ProcessorFunctionsIntegrationTest
-    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>, IDisposable
+public abstract class ProcessorFunctionsIntegrationTest(
+    FunctionsIntegrationTestFixture fixture)
+    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
 {
-    protected ProcessorFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
+    public async Task InitializeAsync()
     {
         ResetDbContext<ContentDbContext>();
-        ClearTestData<PublicDataDbContext>();
+        await ClearTestData<PublicDataDbContext>();
     }
 
-    public void Dispose()
+    public Task DisposeAsync()
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
 
@@ -34,9 +35,12 @@ public abstract class ProcessorFunctionsIntegrationTest
         {
             Directory.Delete(testInstanceDataFilesDirectory, recursive: true);
         }
+
+        return Task.CompletedTask;
     }
 
-    protected void SetupCsvDataFilesForDataSetVersion(ProcessorTestData processorTestData, DataSetVersion dataSetVersion)
+    protected void SetupCsvDataFilesForDataSetVersion(ProcessorTestData processorTestData,
+        DataSetVersion dataSetVersion)
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
 
@@ -62,6 +66,17 @@ public abstract class ProcessorFunctionsIntegrationTest
 
         await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
+        return await CreateDataSetVersionAndImport(dataSet, importStage, status, releaseFileId);
+    }
+
+    protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersionAndImport(
+        DataSet dataSet,
+        DataSetVersionImportStage importStage,
+        DataSetVersionStatus? status = null,
+        Guid? releaseFileId = null,
+        int versionMajor = 1,
+        int versionMinor = 0)
+    {
         DataSetVersionImport dataSetVersionImport = DataFixture
             .DefaultDataSetVersionImport()
             .WithStage(importStage);
@@ -72,6 +87,7 @@ public abstract class ProcessorFunctionsIntegrationTest
             .WithReleaseFileId(releaseFileId ?? Guid.NewGuid())
             .WithStatus(status ?? DataSetVersionStatus.Processing)
             .WithImports(() => [dataSetVersionImport])
+            .WithVersionNumber(major: versionMajor, minor: versionMinor)
             .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
         await AddTestData<PublicDataDbContext>(context =>
@@ -135,9 +151,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             {
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    {
-                        "CoreStorage", _azuriteContainer.GetConnectionString()
-                    }
+                    { "CoreStorage", _azuriteContainer.GetConnectionString() }
                 });
             })
             .ConfigureServices(services =>
@@ -145,7 +159,9 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                 services.UseInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
 
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
+                    options => options.UseNpgsql(
+                        _postgreSqlContainer.GetConnectionString(),
+                        psqlOptions => psqlOptions.EnableRetryOnFailure()));
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
@@ -162,6 +178,8 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         [
             typeof(CreateDataSetFunction),
             typeof(ProcessInitialDataSetVersionFunction),
+            typeof(CreateNextDataSetVersionFunction),
+            typeof(ProcessNextDataSetVersionFunction),
             typeof(DeleteDataSetVersionFunction),
             typeof(CopyCsvFilesFunction),
             typeof(ImportMetadataFunction),

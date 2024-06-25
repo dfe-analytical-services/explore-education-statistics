@@ -14,15 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class ProcessInitialDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
     IDataDuckDbRepository dataDuckDbRepository,
-    IParquetService parquetService,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionPathResolver dataSetVersionPathResolver,
+    IParquetService parquetService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
-    private readonly PublicDataDbContext _publicDataDbContext = publicDataDbContext;
-
     [Function(nameof(ProcessInitialDataSetVersion))]
     public async Task ProcessInitialDataSetVersion(
         [OrchestrationTrigger] TaskOrchestrationContext context,
-        ProcessInitialDataSetVersionContext input)
+        ProcessDataSetVersionContext input)
     {
         var logger = context.CreateReplaySafeLogger(nameof(ProcessInitialDataSetVersion));
 
@@ -37,7 +35,8 @@ public class ProcessInitialDataSetVersionFunction(
             await context.CallActivityExclusively(ActivityNames.ImportMetadata, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.WriteDataFiles, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.CompleteProcessing, logger, context.InstanceId);
+            await context.CallActivity(ActivityNames.CompleteInitialDataSetVersionProcessing, logger,
+                context.InstanceId);
         }
         catch (Exception e)
         {
@@ -70,8 +69,8 @@ public class ProcessInitialDataSetVersionFunction(
         await parquetService.WriteDataFiles(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
-    [Function(ActivityNames.CompleteProcessing)]
-    public async Task CompleteProcessing(
+    [Function(ActivityNames.CompleteInitialDataSetVersionProcessing)]
+    public async Task CompleteInitialDataSetVersionProcessing(
         [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
@@ -84,7 +83,8 @@ public class ProcessInitialDataSetVersionFunction(
         File.Delete(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
 
         dataSetVersion.Status = DataSetVersionStatus.Draft;
+
         dataSetVersionImport.Completed = DateTimeOffset.UtcNow;
-        await _publicDataDbContext.SaveChangesAsync(cancellationToken);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 }

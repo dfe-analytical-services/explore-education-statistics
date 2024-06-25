@@ -84,12 +84,12 @@ public static class ProcessorHostBuilder
                     .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
                     .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
-                    .AddScoped<IValidator<DataSetCreateRequest>,
-                        DataSetCreateRequest.Validator>()
                     .Configure<AppSettingsOptions>(
                         hostBuilderContext.Configuration.GetSection(AppSettingsOptions.Section))
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
+                
+                services.AddValidatorsFromAssemblyContaining<DataSetCreateRequest.Validator>();
             });
     }
 }

@@ -16,6 +16,10 @@ public static class IndicatorMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
 
+    public static Generator<IndicatorMeta> WithDataSetVersionId(this Generator<IndicatorMeta> generator,
+        Guid dataSetVersionId)
+        => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
+
     public static Generator<IndicatorMeta> WithLabel(this Generator<IndicatorMeta> generator, string label)
         => generator.ForInstance(s => s.SetLabel(label));
 
@@ -47,7 +51,12 @@ public static class IndicatorMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => setters
             .Set(m => m.DataSetVersion, dataSetVersion)
-            .Set(m => m.DataSetVersionId, dataSetVersion.Id);
+            .SetDataSetVersionId(dataSetVersion.Id);
+
+    public static InstanceSetters<IndicatorMeta> SetDataSetVersionId(
+        this InstanceSetters<IndicatorMeta> setters,
+        Guid dataSetVersionId)
+        => setters.Set(m => m.DataSetVersionId, dataSetVersionId);
 
     public static InstanceSetters<IndicatorMeta> SetLabel(
         this InstanceSetters<IndicatorMeta> setters,

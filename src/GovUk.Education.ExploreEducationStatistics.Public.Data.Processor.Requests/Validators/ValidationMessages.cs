@@ -6,32 +6,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Reque
 public static class ValidationMessages
 {
     public static readonly LocalizableMessage FileNotFound = new(
-        Code: "FileNotFound",
+        Code: nameof(FileNotFound),
         Message: "The file could not be found."
     );
 
     public static readonly LocalizableMessage FileHasApiDataSetVersion = new(
-        Code: "FileHasApiDataSetVersion",
+        Code: nameof(FileHasApiDataSetVersion),
         Message: "The file has already been used for an API data set version."
     );
 
     public static readonly LocalizableMessage FileReleaseVersionNotDraft = new(
-        Code: "FileReleaseVersionNotDraft",
+        Code: nameof(FileReleaseVersionNotDraft),
         Message: "The file must belong to a release in 'Draft' approval status."
     );
 
     public static readonly LocalizableMessage FileTypeNotData = new(
-        Code: "FileTypeNotData",
+        Code: nameof(FileTypeNotData),
         Message: "The file type must be 'Data'."
     );
 
     public static readonly LocalizableMessage NoMetadataFile = new(
-        Code: "NoMetadataFile",
+        Code: nameof(NoMetadataFile),
         Message: "The data file must have a corresponding metadata file."
     );
 
+    public static readonly LocalizableMessage FileNotInDataSetPublication = new(
+        Code: nameof(FileNotInDataSetPublication),
+        Message: "The file must belong to the same publication as the data set."
+    );
+
+    public static readonly LocalizableMessage FileMustBeInDifferentRelease = new(
+        Code: nameof(FileMustBeInDifferentRelease),
+        Message: "The file must be in a different release to previous data set versions."
+    );
+
     public static readonly LocalizableMessage DataSetVersionCanNotBeDeleted = new(
-        Code: "DataSetVersionCanNotBeDeleted",
+        Code: nameof(DataSetVersionCanNotBeDeleted),
         Message: $"The data set version is not in a '{DataSetVersionStatus.Draft}' status, so cannot be deleted."
+    );
+
+    public static readonly LocalizableMessage DataSetNotFound = new(
+        Code: nameof(DataSetNotFound),
+        Message: "The data set could not be found."
+    );
+
+    public static readonly LocalizableMessage DataSetMustHaveNoExistingVersions = new(
+        Code: nameof(DataSetMustHaveNoExistingVersions),
+        Message: "The data set must have no existing versions when creating the initial version."
+    );
+
+    public static readonly LocalizableMessage DataSetNoLiveVersion = new(
+        Code: nameof(DataSetNoLiveVersion),
+        Message: "The data set must have a live version."
     );
 }

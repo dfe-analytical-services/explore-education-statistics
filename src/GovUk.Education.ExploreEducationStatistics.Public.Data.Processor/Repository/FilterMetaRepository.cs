@@ -20,6 +20,31 @@ public class FilterMetaRepository(
     IDataSetVersionPathResolver dataSetVersionPathResolver) : IFilterMetaRepository
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    
+    public async Task<IDictionary<FilterMeta, List<FilterOptionMeta>>> ReadFilterMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns,
+        CancellationToken cancellationToken = default)
+    {
+        var metas = await GetFilterMetas(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken);
+
+        return await metas
+            .ToAsyncEnumerable()
+            .ToDictionaryAwaitAsync(
+                keySelector: ValueTask.FromResult,
+                elementSelector: async meta =>
+                    await GetFilterOptionMeta(
+                        duckDbConnection,
+                        dataSetVersion,
+                        meta,
+                        cancellationToken),
+                cancellationToken);
+    }
 
     public async Task CreateFilterMetas(
         IDuckDbConnection duckDbConnection,
@@ -27,48 +52,22 @@ public class FilterMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        var metas = (await duckDbConnection.SqlBuilder(
-                    $"""
-                     SELECT *
-                     FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
-                     WHERE "col_type" = {MetaFileRow.ColumnType.Filter.ToString()}
-                     AND "col_name" IN ({allowedColumns})
-                     """)
-                .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
-            )
-            .OrderBy(row => row.Label)
-            .Select(
-                row => new FilterMeta
-                {
-                    PublicId = row.ColName,
-                    DataSetVersionId = dataSetVersion.Id,
-                    Label = row.Label,
-                    Hint = row.FilterHint ?? string.Empty,
-                }
-            )
-            .ToList();
+        var metas = await GetFilterMetas(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken);
 
         publicDataDbContext.FilterMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         foreach (var meta in metas)
         {
-            var options = (await duckDbConnection.SqlBuilder(
-                    $"""
-                     SELECT DISTINCT "{meta.PublicId:raw}"
-                     FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true) AS data
-                     WHERE "{meta.PublicId:raw}" != ''
-                     ORDER BY "{meta.PublicId:raw}"
-                     """
-                ).QueryAsync<string>(cancellationToken: cancellationToken))
-                .Select(
-                    label => new FilterOptionMeta
-                    {
-                        Label = label,
-                        IsAggregate = label == "Total" ? true : null
-                    }
-                )
-                .ToList();
+            var options = await GetFilterOptionMeta(
+                duckDbConnection,
+                dataSetVersion,
+                meta,
+                cancellationToken);
 
             var optionTable = publicDataDbContext.GetTable<FilterOptionMeta>();
 
@@ -78,8 +77,16 @@ public class FilterMetaRepository(
                 .Merge()
                 .Using(options)
                 .On(
-                    o => new { o.Label, o.IsAggregate },
-                    o => new { o.Label, o.IsAggregate }
+                    o => new
+                    {
+                        o.Label,
+                        o.IsAggregate
+                    },
+                    o => new
+                    {
+                        o.Label,
+                        o.IsAggregate
+                    }
                 )
                 .InsertWhenNotMatched()
                 .MergeAsync(cancellationToken);
@@ -139,5 +146,57 @@ public class FilterMetaRepository(
                 startIndex + insertedLinks - 1,
                 cancellationToken);
         }
+    }
+
+    private async Task<List<FilterMeta>> GetFilterMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns,
+        CancellationToken cancellationToken)
+    {
+        return (await duckDbConnection.SqlBuilder(
+                    $"""
+                     SELECT *
+                     FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
+                     WHERE "col_type" = {MetaFileRow.ColumnType.Filter.ToString()}
+                     AND "col_name" IN ({allowedColumns})
+                     """)
+                .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
+            )
+            .OrderBy(row => row.Label)
+            .Select(
+                row => new FilterMeta
+                {
+                    PublicId = row.ColName,
+                    DataSetVersionId = dataSetVersion.Id,
+                    Label = row.Label,
+                    Hint = row.FilterHint ?? string.Empty
+                }
+            )
+            .ToList();
+    }
+
+    private async Task<List<FilterOptionMeta>> GetFilterOptionMeta(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        FilterMeta meta,
+        CancellationToken cancellationToken)
+    {
+        return (await duckDbConnection.SqlBuilder(
+                $"""
+                 SELECT DISTINCT "{meta.PublicId:raw}"
+                 FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true) AS data
+                 WHERE "{meta.PublicId:raw}" != ''
+                 ORDER BY "{meta.PublicId:raw}"
+                 """
+            ).QueryAsync<string>(cancellationToken: cancellationToken))
+            .Select(
+                label => new FilterOptionMeta
+                {
+                    Label = label,
+                    IsAggregate = label == "Total" ? true : null
+                }
+            )
+            .ToList();
     }
 }

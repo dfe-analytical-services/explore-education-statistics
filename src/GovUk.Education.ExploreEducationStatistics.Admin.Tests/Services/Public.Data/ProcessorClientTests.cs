@@ -162,7 +162,7 @@ public class ProcessorClientTests
             var left = response.AssertLeft();
             left.AssertValidationProblem(Errors.Error1);
         }
-
+        
         [Fact]
         public async Task HttpClientNotFound_ReturnsNotFound()
         {

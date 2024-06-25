@@ -5,6 +5,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 public interface IDataSetVersionService
 {
+    Task<Either<ActionResult, Guid>> CreateInitialVersion(
+        Guid dataSetId,
+        Guid releaseFileId,
+        Guid instanceId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, Guid>> CreateNextVersion(
+        Guid dataSetId,
+        Guid releaseFileId,
+        Guid instanceId,
+        CancellationToken cancellationToken = default);
+
     Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);

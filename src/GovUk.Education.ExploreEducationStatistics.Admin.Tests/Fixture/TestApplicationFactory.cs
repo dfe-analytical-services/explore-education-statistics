@@ -1,7 +1,7 @@
 #nullable enable
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -27,21 +27,10 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
         await _postgreSqlContainer.DisposeAsync();
     }
 
-    [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
     public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
-        await using var context = GetDbContext<TDbContext>();
-
-        var tables = context.Model.GetEntityTypes()
-            .Select(type => type.GetTableName())
-            .Distinct()
-            .OfType<string>()
-            .ToList();
-
-        foreach (var table in tables)
-        {
-            await context.Database.ExecuteSqlRawAsync($"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""");
-        }
+        var context = GetDbContext<TDbContext>();
+        await context.ClearTestData();
     }
 
     protected override IHostBuilder CreateHostBuilder()
@@ -51,7 +40,10 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
             .ConfigureServices(services =>
             {
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
+                    options => options
+                        .UseNpgsql(
+                            _postgreSqlContainer.GetConnectionString(),
+                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
