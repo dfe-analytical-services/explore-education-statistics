@@ -25,6 +25,7 @@ export interface DataFileUploadFormValues {
   subjectTitle?: string;
   uploadType: FileType;
   zipFile?: File | null;
+  bulkZipFile?: File | null;
 }
 
 const MAX_FILENAME_SIZE = 150;
@@ -40,35 +41,42 @@ const subjectErrorMappings = [
   }),
 ];
 
+// Error messages are returned by the server so don't need to
+// define them here, but can't leave them blank in the mapping.
+const fileErrorMappings = {
+  DataSetFileNameCannotBeEmpty: 'DataSetFileNameCannotBeEmpty',
+  DataSetFileNameShouldNotContainSpecialCharacters:
+    'DataSetFileNameShouldNotContainSpecialCharacters',
+  DataSetFileNamesShouldBeUnique: 'DataSetFileNamesShouldBeUnique',
+  DataAndMetaFilesCannotHaveSameName: 'DataAndMetaFilesCannotHaveSameName',
+  FilenameCannotContainSpacesOrSpecialCharacters:
+    'FilenameCannotContainSpacesOrSpecialCharacters',
+  FilenameMustEndDotCsv: 'FilenameMustEndDotCsv',
+  MetaFilenameMustEndDotMetaDotCsv: 'MetaFilenameMustEndDotMetaDotCsv',
+  FileNameTooLong: 'FileNameTooLong',
+  FilenameNotUnique: 'FilenameNotUnique',
+  FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
+  MustBeCsvFile: 'MustBeCsvFile',
+};
+
 function baseErrorMappings(
   fileType: FileType,
 ): FieldMessageMapper<DataFileUploadFormValues>[] {
   if (fileType === 'bulkZip') {
     return [
       mapFieldErrors<DataFileUploadFormValues>({
-        target: 'zipFile' as FieldName<DataFileUploadFormValues>,
+        target: 'bulkZipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
-          // @MarkFix I think we should be able to remove all these, as the backend now provides both code and message? - same for csv and zip fileTypes
-          DataZipMustBeZipFile: 'Choose a valid ZIP file',
-          DataBulkZipFileMustHaveManifest: 'ZIP file must contain a manifest',
-          // DataZipFileDoesNotContainCsvFiles:
-          //   'ZIP file does not contain any CSV files',
-          // DataFilenameNotUnique: 'Choose a unique ZIP data file name',
-          // DataZipFilenameTooLong: `Maximum ZIP data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          // DataFilenameTooLong: `Maximum data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          // MetaFilenameTooLong: `Maximum metadata filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          // DataZipContentFilenamesTooLong: `Maximum data and metadata filenames cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          // DataAndMetadataFilesCannotHaveTheSameName:
-          //   'ZIP data and metadata filenames cannot be the same',
-          // DataFileCannotBeEmpty: 'Choose a ZIP data file that is not empty',
-          // DataFilenameCannotContainSpacesOrSpecialCharacters:
-          //   'ZIP data filename cannot contain spaces or special characters',
-          // MetadataFileCannotBeEmpty:
-          //   'Choose a ZIP metadata file that is not empty',
-          // MetaFilenameCannotContainSpacesOrSpecialCharacters:
-          //   'ZIP metadata filename cannot contain spaces or special characters',
-          // MetaFileIsIncorrectlyNamed:
-          //   'ZIP metadata filename must end with .meta.csv',
+          ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
+          MustBeZipFile: 'MustBeZipFile',
+          BulkDataZipMustContainDatasetNamesCsv:
+            'BulkDataZipMustContainDatasetNamesCsv',
+          DatasetNamesCsvReaderException: 'DatasetNamesCsvReaderException',
+          DatasetNamesCsvIncorrectHeaders: 'DatasetNamesCsvIncorrectHeaders',
+          DataFileNotFoundInZip: 'DataFileNotFoundInZip',
+          MetaFileNotFoundInZip: 'MetaFileNotFoundInZip',
+          ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
+          BulkZipShouldContainDataSets: 'BulkZipShouldContainDataSets',
         },
       }),
     ];
@@ -79,27 +87,13 @@ function baseErrorMappings(
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'zipFile' as FieldName<DataFileUploadFormValues>,
         messages: {
-          DataZipMustBeZipFile: 'Choose a valid ZIP file',
+          ...fileErrorMappings,
+          ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
+          MustBeZipFile: 'MustBeZipFile',
           DataZipFileCanOnlyContainTwoFiles:
-            'ZIP file can only contain two CSV files',
+            'DataZipFileCanOnlyContainTwoFiles',
           DataZipFileDoesNotContainCsvFiles:
-            'ZIP file does not contain any CSV files',
-          DataFilenameNotUnique: 'Choose a unique ZIP data file name',
-          DataZipFilenameTooLong: `Maximum ZIP data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          DataFilenameTooLong: `Maximum data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          MetaFilenameTooLong: `Maximum metadata filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          DataZipContentFilenamesTooLong: `Maximum data and metadata filenames cannot exceed ${MAX_FILENAME_SIZE} characters`,
-          DataAndMetadataFilesCannotHaveTheSameName:
-            'ZIP data and metadata filenames cannot be the same',
-          DataFileCannotBeEmpty: 'Choose a ZIP data file that is not empty',
-          DataFilenameCannotContainSpacesOrSpecialCharacters:
-            'ZIP data filename cannot contain spaces or special characters',
-          MetadataFileCannotBeEmpty:
-            'Choose a ZIP metadata file that is not empty',
-          MetaFilenameCannotContainSpacesOrSpecialCharacters:
-            'ZIP metadata filename cannot contain spaces or special characters',
-          MetaFileIsIncorrectlyNamed:
-            'ZIP metadata filename must end with .meta.csv',
+            'DataZipFileDoesNotContainCsvFiles',
         },
       }),
     ];
@@ -108,28 +102,11 @@ function baseErrorMappings(
   return [
     mapFieldErrors<DataFileUploadFormValues>({
       target: 'dataFile' as FieldName<DataFileUploadFormValues>,
-      messages: {
-        DataFilenameNotUnique: 'Choose a unique data file name',
-        DataAndMetadataFilesCannotHaveTheSameName:
-          'Choose a different file name for data and metadata files',
-        DataFileCannotBeEmpty: 'Choose a data file that is not empty',
-        DataFileMustBeCsvFile: 'Data file must be a CSV with UTF-8 encoding',
-        DataFilenameCannotContainSpacesOrSpecialCharacters:
-          'Data filename cannot contain spaces or special characters',
-        DataFilenameTooLong: `Maximum data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-      },
+      messages: fileErrorMappings,
     }),
     mapFieldErrors<DataFileUploadFormValues>({
       target: 'metadataFile' as FieldName<DataFileUploadFormValues>,
-      messages: {
-        MetadataFileCannotBeEmpty: 'Choose a metadata file that is not empty',
-        MetaFileMustBeCsvFile:
-          'Metadata file must be a CSV with UTF-8 encoding',
-        MetaFilenameCannotContainSpacesOrSpecialCharacters:
-          'Metadata filename cannot contain spaces or special characters',
-        MetaFileIsIncorrectlyNamed: 'Metadata filename is incorrectly named',
-        MetaFilenameTooLong: `Maximum metadata filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
-      },
+      messages: fileErrorMappings,
     }),
   ];
 }
@@ -176,7 +153,15 @@ export default function DataFileUploadForm({
       subjectTitle: Yup.string(),
       uploadType: Yup.string().oneOf(['csv', 'zip', 'bulkZip']).defined(),
       zipFile: Yup.file().when('uploadType', {
-        is: 'zip' || 'bulkZip',
+        is: 'zip',
+        then: s =>
+          s
+            .required('Choose a zip file')
+            .minSize(0, 'Choose a ZIP file that is not empty'),
+        otherwise: s => s.nullable(),
+      }),
+      bulkZipFile: Yup.file().when('uploadType', {
+        is: 'bulkZip',
         then: s =>
           s
             .required('Choose a zip file')
@@ -222,10 +207,7 @@ export default function DataFileUploadForm({
 
   return (
     <FormProvider
-      //errorMappings={getErrorMappings()}
-      fallbackErrorMapping={error => {
-
-      }}
+      errorMappings={getErrorMappings()}
       initialValues={
         isDataReplacement
           ? defaultInitialValues
@@ -297,7 +279,7 @@ export default function DataFileUploadForm({
                     conditional: (
                       <FormFieldFileInput<DataFileUploadFormValues>
                         hint="Must contain dataset_names.csv and pairs of csv/meta.csv data files"
-                        name="zipFile"
+                        name="bulkZipFile"
                         label="Upload ZIP file"
                         accept=".zip"
                       />
