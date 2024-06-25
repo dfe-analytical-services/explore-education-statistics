@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -16,8 +17,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -38,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseDataFileServiceTest
     {
+        private readonly DataFixture _fixture = new();
+
         private readonly User _user = new()
         {
             Id = Guid.NewGuid(),
@@ -492,7 +497,134 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        // @MarkFix Delete_DoNotRemoveSourceZipIfOtherFilesFromZipStillExist
+        [Fact]
+        public async Task Delete_DoNotRemoveSourceZipIfOtherFilesFromZipStillExist()
+        {
+            var releaseVersion = _fixture.DefaultReleaseVersion()
+                .Generate();
+
+            var bulkZipFile = _fixture.DefaultFile()
+                .WithFilename("data.zip")
+                .WithType(BulkDataZip)
+                .Generate();
+
+            var subject = _fixture.DefaultSubject()
+                .Generate();
+
+            var dataFile = _fixture.DefaultFile()
+                .WithFilename("data.csv")
+                .WithType(FileType.Data)
+                .WithSubjectId(subject.Id)
+                .WithSourceId(bulkZipFile.Id)
+                .Generate();
+
+            var metaFile = _fixture.DefaultFile()
+                .WithFilename("data.meta.csv")
+                .WithType(Metadata)
+                .WithSubjectId(subject.Id)
+                .WithSourceId(bulkZipFile.Id)
+                .Generate();
+
+            var releaseDataFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(dataFile)
+                .Generate();
+
+            var releaseMetaFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(metaFile)
+                .Generate();
+
+            // otherSubject will not be deleted
+            var otherSubject = _fixture.DefaultSubject()
+                .Generate();
+
+            var otherDataFile = _fixture.DefaultFile()
+                .WithFilename("other-data.csv")
+                .WithType(FileType.Data)
+                .WithSubjectId(otherSubject.Id)
+                .WithSourceId(bulkZipFile.Id)
+                .Generate();
+
+            var otherMetaFile = _fixture.DefaultFile()
+                .WithFilename("other-data.meta.csv")
+                .WithType(Metadata)
+                .WithSubjectId(otherSubject.Id)
+                .WithSourceId(bulkZipFile.Id)
+                .Generate();
+
+            var otherReleaseDataFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(otherDataFile)
+                .Generate();
+
+            var otherReleaseMetaFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(otherMetaFile)
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+                contentDbContext.Files.AddRange(bulkZipFile, dataFile, metaFile, otherDataFile, otherMetaFile);
+                contentDbContext.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile,
+                    otherReleaseDataFile, otherReleaseMetaFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+
+            dataImportService.Setup(mock => mock.DeleteImport(dataFile.Id))
+                .Returns(Task.CompletedTask);
+
+            releaseFileService.Setup(mock => mock.CheckFileExists(releaseVersion.Id,
+                    dataFile.Id,
+                    FileType.Data))
+                .ReturnsAsync(dataFile);
+
+            privateBlobStorageService.Setup(mock => mock.DeleteBlob(
+                    PrivateReleaseFiles, dataFile.Path()))
+                .Returns(Task.CompletedTask);
+
+            privateBlobStorageService.Setup(mock => mock.DeleteBlob(
+                    PrivateReleaseFiles, metaFile.Path()))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    privateBlobStorageService: privateBlobStorageService.Object,
+                    dataImportService: dataImportService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await service.Delete(releaseVersion.Id, dataFile.Id);
+
+                Assert.True(result.IsRight);
+
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
+                    dataImportService,
+                    releaseFileService);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseDataFile.Id));
+                Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
+
+                Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(otherReleaseDataFile.Id));
+                Assert.NotNull(await contentDbContext.Files.FindAsync(otherDataFile.Id));
+
+                Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(otherReleaseMetaFile.Id));
+                Assert.NotNull(await contentDbContext.Files.FindAsync(otherMetaFile.Id));
+
+                // Zip should not be removed since otherReleaseDataFile etc. still exist
+                Assert.NotNull(await contentDbContext.Files.FindAsync(bulkZipFile.Id));
+            }
+        }
 
         [Fact]
         public async Task DeleteAll()
@@ -1192,14 +1324,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ReorderDataFiles(
                     releaseVersion.Id,
-                    new List<Guid>
-                    {
+                    [
                         releaseDataFile1.File.Id,
                         releaseDataFile2.File.Id,
                         releaseDataFile3.File.Id,
                         releaseDataFile4.File.Id,
-                        releaseDataFile5.File.Id,
-                    });
+                        releaseDataFile5.File.Id
+                    ]);
 
                 var dataFiles = result.AssertRight().ToList();
                 Assert.Equal(5, dataFiles.Count);
