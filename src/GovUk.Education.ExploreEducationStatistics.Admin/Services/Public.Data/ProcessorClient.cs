@@ -106,16 +106,16 @@ internal class ProcessorClient(
         await AddBearerToken(cancellationToken);
 
         var response = await requestFunction.Invoke();
+        
+        var customHandlerResponse = customResponseHandler?.Invoke(response);
+
+        if (customHandlerResponse is not null)
+        {
+            return customHandlerResponse;
+        }
 
         if (!response.IsSuccessStatusCode)
         {
-            var additionalValidatorResponse = customResponseHandler?.Invoke(response);
-
-            if (additionalValidatorResponse is not null)
-            {
-                return additionalValidatorResponse;
-            }
-            
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
