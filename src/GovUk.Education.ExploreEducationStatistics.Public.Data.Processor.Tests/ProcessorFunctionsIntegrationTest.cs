@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Testcontainers.Azurite;
 using Testcontainers.PostgreSql;
 
@@ -168,10 +169,20 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             {
                 services.UseInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
 
+                var loggerFactory = LoggerFactory.Create(builder =>
+                {
+                    builder
+                        .AddFilter((category, level) =>
+                            category == DbLoggerCategory.Database.Command.Name
+                            && level == LogLevel.Information)
+                        .AddConsole();
+                });
+                
                 services.AddDbContext<PublicDataDbContext>(
                     options => options.UseNpgsql(
                         _postgreSqlContainer.GetConnectionString(),
-                        psqlOptions => psqlOptions.EnableRetryOnFailure()));
+                        psqlOptions => psqlOptions.EnableRetryOnFailure())
+                        .UseLoggerFactory(loggerFactory));
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()

@@ -24,11 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static bool AssertDeepEqualTo<T>(
             this T actual,
             T expected,
+            bool ignoreCollectionOrders = false,
             Expression<Func<T, object>>[]? notEqualProperties = null)
         {
             var compareLogic = new CompareLogic();
             notEqualProperties?.ForEach(compareLogic.Config.IgnoreProperty);
             compareLogic.Config.MaxDifferences = 100;
+            compareLogic.Config.IgnoreCollectionOrder = ignoreCollectionOrders;
             var comparison = compareLogic.Compare(expected, actual);
             Assert.True(comparison.AreEqual, comparison.DifferencesString);
             notEqualProperties?.ForEach(notEqualField =>

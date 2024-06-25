@@ -136,7 +136,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 {
                     var actualLocation = actualLocations[index];
                     actualLocation.AssertDeepEqualTo(expectedLocation,
-                        AssertExtensions.Except<LocationMeta>(
+                        notEqualProperties: AssertExtensions.Except<LocationMeta>(
                             l => l.Id,
                             l => l.DataSetVersionId,
                             l => l.Options,
@@ -150,7 +150,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                         {
                             var actualOption = actualLocation.Options[optionIndex];
                             actualOption.AssertDeepEqualTo(expectedOption,
-                                AssertExtensions.Except<LocationOptionMeta>(
+                                notEqualProperties: AssertExtensions.Except<LocationOptionMeta>(
                                     o => o.Metas,
                                     o => o.MetaLinks
                                 ));
@@ -179,7 +179,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 {
                     var actualTimePeriod = actualTimePeriods[index];
                     actualTimePeriod.AssertDeepEqualTo(expectedTimePeriod,
-                        AssertExtensions.Except<TimePeriodMeta>(
+                        notEqualProperties: AssertExtensions.Except<TimePeriodMeta>(
                             tpm => tpm.Id,
                             tpm => tpm.DataSetVersionId,
                             tpm => tpm.Created
@@ -212,7 +212,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 {
                     var actualFilter = actualFilters[index];
                     actualFilter.AssertDeepEqualTo(expectedFilter,
-                        AssertExtensions.Except<FilterMeta>(
+                        notEqualProperties: AssertExtensions.Except<FilterMeta>(
                             fm => fm.Id,
                             fm => fm.DataSetVersionId,
                             fm => fm.Created,
@@ -226,7 +226,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                         {
                             var actualOption = actualFilter.Options[optionIndex];
                             actualOption.AssertDeepEqualTo(expectedOption,
-                                AssertExtensions.Except<FilterOptionMeta>(
+                                notEqualProperties: AssertExtensions.Except<FilterOptionMeta>(
                                     o => o.Id,
                                     o => o.Metas,
                                     o => o.MetaLinks
@@ -262,7 +262,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 {
                     var actualIndicator = actualIndicators[index];
                     actualIndicator.AssertDeepEqualTo(expectedIndicator,
-                        AssertExtensions.Except<IndicatorMeta>(
+                        notEqualProperties: AssertExtensions.Except<IndicatorMeta>(
                             im => im.Id,
                             im => im.DataSetVersionId,
                             im => im.Created

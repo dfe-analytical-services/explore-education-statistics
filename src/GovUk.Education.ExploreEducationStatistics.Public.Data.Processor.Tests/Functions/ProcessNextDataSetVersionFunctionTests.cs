@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -238,35 +239,31 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
             await CreateMappings(instanceId);
 
-            var mappings = GetDbContext<PublicDataDbContext>()
-                .DataSetVersionMappings
-                .Single();
+            var mappings = GetDataSetVersionMapping(nextVersion);
 
             Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
             Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
             Assert.False(mappings.LocationMappingsComplete);
 
             var expectedLocationMappingsFromSource = initialLocationMeta
-                .OrderBy(levelMeta => levelMeta.Level)
-                .Select(levelMeta => new LocationLevelMappings
-                {
-                    Level = levelMeta.Level,
-                    Mappings = levelMeta
-                        .Options
-                        .OrderBy(option => option.Label)
-                        .Select(option => new LocationOptionMapping
-                        {
-                            CandidateKey = null,
-                            Type = MappingType.AutoNone,
-                            Source = new LocationOption
-                            {
-                                Key = $"{option.Label} :: {option.ToRow().GetRowKey()}",
-                                Label = option.Label
-                            }
-                        })
-                        .ToList()
-                })
-                .ToList();
+                .ToDictionary(
+                    levelMeta => levelMeta.Level,
+                    levelMeta => new LocationLevelMappings
+                    {
+                        Mappings = levelMeta
+                            .Options
+                            .ToDictionary(
+                                keySelector: option => $"{option.Label} :: {option.ToRow().GetRowKey()}",
+                                elementSelector: option => new LocationOptionMapping
+                                {
+                                    CandidateKey = null,
+                                    Type = MappingType.AutoNone,
+                                    Source = new LocationOption
+                                    {
+                                        Label = option.Label
+                                    }
+                                })
+                    });
 
             // There should be 5 levels of mappings when combining all the source and target levels. 
             Assert.Equal(ProcessorTestData
@@ -276,64 +273,64 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                     .Order(),
                 mappings.LocationMappingPlan
                     .Levels
-                    .Select(level => level.Level)
+                    .Select(level => level.Key)
                     .Order());
 
             mappings.LocationMappingPlan.Levels.ForEach(level =>
             {
-                var matchingLevelFromSource =
-                    expectedLocationMappingsFromSource.SingleOrDefault(sourceLevel => sourceLevel.Level == level.Level);
+                var matchingLevelFromSource = expectedLocationMappingsFromSource.GetValueOrDefault(level.Key);
 
                 if (matchingLevelFromSource != null)
                 {
-                    level.Mappings.AssertDeepEqualTo(matchingLevelFromSource.Mappings);
+                    level.Value.Mappings.AssertDeepEqualTo(
+                        matchingLevelFromSource.Mappings,
+                        ignoreCollectionOrders: true);
                 }
                 else
                 {
-                    Assert.Empty(level.Mappings);
+                    Assert.Empty(level.Value.Mappings);
                 }
             });
         }
-
+        
         [Fact]
         public async Task Success_Candidates()
         {
             var (instanceId, initialVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+        
             await CreateMappings(instanceId);
 
-            var mappings = GetDbContext<PublicDataDbContext>()
-                .DataSetVersionMappings
-                .Single();
-
+            var mappings = GetDataSetVersionMapping(nextVersion);
+        
             Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
             Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
-
+        
             var expectedLocationLevels = ProcessorTestData
                 .AbsenceSchool
                 .ExpectedLocations
                 .Select(levelMeta => (level: levelMeta.Level, options: levelMeta.Options))
-                .OrderBy(levelMeta => levelMeta.level)
-                .Select(levelMeta => new LocationLevelMappings
-                {
-                    Level = levelMeta.level,
-                    Candidates = levelMeta
-                        .options
-                        .OrderBy(optionMeta => optionMeta.Label)
-                        .Select(option => new LocationOption
+                .ToDictionary(
+                    keySelector: levelMeta => levelMeta.level,
+                    elementSelector: levelMeta => 
+                        new LocationLevelMappings
                         {
-                            Key = $"{option.Label} :: {option.ToRow().GetRowKey()}",
-                            Label = option.Label
-                        })
-                        .ToList()
-                })
-                .ToList();
-
-            mappings.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLocationLevels);
+                            Candidates = levelMeta
+                                .options
+                                .ToDictionary(
+                                    keySelector: option => $"{option.Label} :: {option.ToRow().GetRowKey()}",
+                                    elementSelector: option => new LocationOption
+                                    {
+                                        Label = option.Label
+                                    })
+                        });
+        
+            mappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+                expectedLocationLevels,
+                ignoreCollectionOrders: true);
         }
     }
-
+    
     public class CreateMappingsFiltersTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateMappingsTests(fixture)
@@ -343,7 +340,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
         {
             var (instanceId, initialVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+    
             var initialFilterMeta = DataFixture
                 .DefaultFilterMeta()
                 .WithDataSetVersionId(initialVersion.Id)
@@ -351,103 +348,103 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                     .DefaultFilterOptionMeta()
                     .GenerateList(2))
                 .GenerateList(2);
-
+    
             await AddTestData<PublicDataDbContext>(context =>
                 context.FilterMetas.AddRange(initialFilterMeta));
-
+    
             await CreateMappings(instanceId);
 
-            var mappings = GetDbContext<PublicDataDbContext>()
-                .DataSetVersionMappings
-                .Single();
-
+            var mappings = GetDataSetVersionMapping(nextVersion);
+    
             Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
             Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
             Assert.False(mappings.FilterMappingsComplete);
 
             var expectedFilterMappings = initialFilterMeta
-                .OrderBy(filter => filter.Label)
-                .Select(filter => new FilterMapping
-                {
-                    CandidateKey = null,
-                    Type = MappingType.None,
-                    Source = new Filter
-                    {
-                        Key = filter.Label,
-                        Label = filter.Label
-                    },
-                    OptionMappings = filter
-                        .Options
-                        .OrderBy(option => option.Label)
-                        .Select(option => new FilterOptionMapping
+                .ToDictionary(
+                    keySelector: filter => filter.Label,
+                    elementSelector: filter =>
+                        new FilterMapping
                         {
                             CandidateKey = null,
                             Type = MappingType.None,
-                            Source = new FilterOption
+                            Source = new Filter
                             {
-                                Key = option.Label,
-                                Label = option.Label
-                            }
-                        })
-                        .ToList()
-                })
-                .ToList();
-
-            mappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
+                                Label = filter.Label
+                            },
+                            OptionMappings = filter
+                                .Options
+                                .ToDictionary(
+                                    keySelector: option => option.Label,
+                                    elementSelector: option => 
+                                        new FilterOptionMapping
+                                        {
+                                            CandidateKey = null,
+                                            Type = MappingType.None,
+                                            Source = new FilterOption
+                                            {
+                                                Label = option.Label
+                                            }
+                                        })
+                        });
+    
+            mappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                expectedFilterMappings,
+                ignoreCollectionOrders: true);
         }
-
+    
         [Fact]
         public async Task Success_Candidates()
         {
             var (instanceId, initialVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+    
             await CreateMappings(instanceId);
 
-            var mappings = GetDbContext<PublicDataDbContext>()
-                .DataSetVersionMappings
-                .Single();
-
+            var mappings = GetDataSetVersionMapping(nextVersion);
+    
             Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
             Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
-
+    
             var expectedFilterTargets = ProcessorTestData
                 .AbsenceSchool
                 .ExpectedFilters
-                .OrderBy(filterAndOptions => filterAndOptions.Label)
-                .Select(filterAndOptions => new FilterMappingCandidate
-                {
-                    Key = filterAndOptions.Label,
-                    Label = filterAndOptions.Label,
-                    Options = filterAndOptions
-                        .Options
-                        .OrderBy(optionMeta => optionMeta.Label)
-                        .Select(optionMeta => new FilterOption
+                .ToDictionary(
+                    keySelector: filterAndOptions => filterAndOptions.Label,
+                    elementSelector: filterAndOptions =>
+                        new FilterMappingCandidate
                         {
-                            Key = optionMeta.Label,
-                            Label = optionMeta.Label
-                        })
-                        .ToList()
-                })
-                .ToList();
-
-            mappings.FilterMappingPlan.Candidates.AssertDeepEqualTo(expectedFilterTargets);
+                            Label = filterAndOptions.Label,
+                            Options = filterAndOptions
+                                .Options
+                                .ToDictionary(
+                                    keySelector: optionMeta => optionMeta.Label,
+                                    elementSelector: optionMeta => 
+                                        new FilterOption
+                                        {
+                                            Label = optionMeta.Label
+                                        })
+                        });
+    
+            mappings.FilterMappingPlan.Candidates.AssertDeepEqualTo(
+                expectedFilterTargets,
+                ignoreCollectionOrders: true);
         }
     }
-
+    
     public abstract class ApplyAutoMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessNextDataSetVersionFunctionTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.AutoMapping;
-
+    
         protected async Task ApplyAutoMappings(Guid instanceId)
         {
             var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
             await function.ApplyAutoMappings(instanceId, CancellationToken.None);
         }
     }
-
+    
     public class ApplyAutoMappingsMiscTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ApplyAutoMappingsTests(fixture)
@@ -457,7 +454,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+    
             await AddTestData<PublicDataDbContext>(context =>
                 context.DataSetVersionMappings.Add(new DataSetVersionMapping
                 {
@@ -466,19 +463,19 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                     LocationMappingPlan = new LocationMappingPlan(),
                     FilterMappingPlan = new FilterMappingPlan()
                 }));
-
+    
             await ApplyAutoMappings(instanceId);
-
+    
             var savedImport = await GetDbContext<PublicDataDbContext>()
                 .DataSetVersionImports
                 .Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
-
+    
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
         }
     }
-
+    
     public class ApplyAutoMappingsLocationsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ApplyAutoMappingsTests(fixture)
@@ -488,7 +485,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+    
             // Create a mapping plan based on 2 data set versions with partially overlapping locations and levels.
             // Both have the "Local Authority" level and the "LA location 1" option, but the source has an additional
             // "LA location 2" option that the target does not, and the target has an additional "LA location 3" option
@@ -496,7 +493,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
             //
             // In addition to this, the source has a "RSC Region" level that the target does not have, and the target
             // has a "Country" level that the source does not have.
-            var mapping = new DataSetVersionMapping
+            var mappings = new DataSetVersionMapping
             {
                 SourceDataSetVersionId = originalVersion.Id,
                 TargetDataSetVersionId = nextVersion.Id,
@@ -504,172 +501,182 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 LocationMappingPlan = new LocationMappingPlan
                 {
                     Levels =
-                    [
-                        new LocationLevelMappings
-                        {
-                            Level = GeographicLevel.LocalAuthority,
-                            Mappings =
-                            [
-                                new LocationOptionMapping
+                    {
+                        { 
+                            GeographicLevel.LocalAuthority, 
+                            new LocationLevelMappings
+                            {
+                                Mappings = 
                                 {
-                                    Source = new LocationOption
                                     {
-                                        Key = "LA location 1 key",
-                                        Label = "LA location 1 label"
+                                        "LA location 1 key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new LocationOption
+                                            {
+                                                Label = "LA location 1 label"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "LA location 2 key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new LocationOption
+                                            {
+                                                Label = "LA location 2 label"
+                                            }
+                                        }
                                     }
                                 },
-                                new LocationOptionMapping
+                                Candidates =
                                 {
-                                    Source = new LocationOption
                                     {
-                                        Key = "LA location 2 key",
-                                        Label = "LA location 2 label"
-                                    }
+                                        "LA location 1 key",
+                                        new LocationOption
+                                        {
+                                            Label = "LA location 1 label"
+                                        }
+                                    },
+                                    {
+                                        "LA location 3 key",
+                                        new LocationOption
+                                        {
+                                            Label = "LA location 3 label"
+                                        }
+                                    },
                                 }
-                            ],
-                            Candidates =
-                            [
-                                new LocationOption
+                            }
+                        },
+                        { 
+                            GeographicLevel.RscRegion, 
+                            new LocationLevelMappings
+                            {
+                                Mappings = 
                                 {
-                                    Key = "LA location 1 key",
-                                    Label = "LA location 1 label"
+                                    {
+                                        "RSC location 1 key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new LocationOption
+                                            {
+                                                Label = "RSC location 1 label"
+                                            }
+                                        }
+                                    }
                                 },
-                                new LocationOption
-                                {
-                                    Key = "LA location 3 key",
-                                    Label = "LA location 3 label"
-                                }
-                            ]
+                                Candidates = []
+                            }
                         },
-                        new LocationLevelMappings
-                        {
-                            Level = GeographicLevel.RscRegion,
-                            Mappings =
-                            [
-                                new LocationOptionMapping
+                        { 
+                            GeographicLevel.Country, 
+                            new LocationLevelMappings
+                            {
+                                Mappings = [],
+                                Candidates =
                                 {
-                                    Source = new LocationOption
                                     {
-                                        Key = "RSC location 1 key",
-                                        Label = "RSC location 1 label"
+                                        "Country location 1 key",
+                                        new LocationOption
+                                        {
+                                            Label = "Country location 1 label"
+                                        }
                                     }
                                 }
-                            ],
-                            Candidates = []
-                        },
-                        new LocationLevelMappings
-                        {
-                            Level = GeographicLevel.Country,
-                            Mappings = [],
-                            Candidates =
-                            [
-                                new LocationOption
-                                {
-                                    Key = "Country location 1 key",
-                                    Label = "Country location 1 label"
-                                }
-                            ]
+                            }
                         }
-                    ]
+                    }
                 }
             };
-
+    
             await AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersionMappings.Add(mapping));
-
+                context.DataSetVersionMappings.Add(mappings));
+    
             await ApplyAutoMappings(instanceId);
+    
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+    
+            Assert.False(updatedMappings.LocationMappingsComplete);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
-
-            Assert.False(mappings.LocationMappingsComplete);
-
-            List<LocationLevelMappings> expectedLevelMappings =
-            [
-                new LocationLevelMappings
+            Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new() 
+            {
                 {
-                    Level = GeographicLevel.LocalAuthority,
-                    Mappings =
-                    [
-                        new LocationOptionMapping
+                    GeographicLevel.LocalAuthority, 
+                    new LocationLevelMappings
+                    {
+                        Mappings =
                         {
-                            Source = new LocationOption
                             {
-                                Key = "LA location 1 key",
-                                Label = "LA location 1 label"
+                                "LA location 1 key",
+                                new LocationOptionMapping
+                                    {
+                                        Source = new LocationOption { Label = "LA location 1 label" },
+                                        Type = MappingType.AutoMapped,
+                                        CandidateKey = "LA location 1 key"
+                                    }
                             },
-                            Type = MappingType.AutoMapped,
-                            CandidateKey = "LA location 1 key"
+                            {
+                                "LA location 2 key",
+                                new LocationOptionMapping
+                                    {
+                                        Source = new LocationOption { Label = "LA location 2 label" },
+                                        Type = MappingType.AutoNone,
+                                        CandidateKey = null
+                                    }
+                            }
                         },
-                        new LocationOptionMapping
+                        Candidates =
                         {
-                            Source = new LocationOption
-                            {
-                                Key = "LA location 2 key",
-                                Label = "LA location 2 label"
-                            },
-                            Type = MappingType.AutoNone,
-                            CandidateKey = null
+                            { "LA location 1 key", new LocationOption { Label = "LA location 1 label" } },
+                            { "LA location 3 key", new LocationOption { Label = "LA location 3 label" } },
                         }
-                    ],
-                    Candidates =
-                    [
-                        new LocationOption
+                    }
+                },
+                {
+                    GeographicLevel.RscRegion,
+                    new LocationLevelMappings
+                    {
+                        Mappings =
                         {
-                            Key = "LA location 1 key",
-                            Label = "LA location 1 label"
+                            {
+                                "RSC location 1 key",
+                                new LocationOptionMapping
+                                {
+                                    Source = new LocationOption { Label = "RSC location 1 label" },
+                                    Type = MappingType.AutoNone,
+                                    CandidateKey = null
+                                }
+                            }
                         },
-                        new LocationOption
-                        {
-                            Key = "LA location 3 key",
-                            Label = "LA location 3 label"
-                        }
-                    ]
+                        Candidates = []
+                    }
                 },
-                new LocationLevelMappings
                 {
-                    Level = GeographicLevel.RscRegion,
-                    Mappings =
-                    [
-                        new LocationOptionMapping
-                        {
-                            Source = new LocationOption
+                    GeographicLevel.Country, new LocationLevelMappings
+                    {
+                        Mappings = [],
+                        Candidates =
                             {
-                                Key = "RSC location 1 key",
-                                Label = "RSC location 1 label"
-                            },
-                            Type = MappingType.AutoNone,
-                            CandidateKey = null
-                        }
-                    ],
-                    Candidates = []
-                },
-                new LocationLevelMappings
-                {
-                    Level = GeographicLevel.Country,
-                    Mappings = [],
-                    Candidates =
-                    [
-                        new LocationOption
-                        {
-                            Key = "Country location 1 key",
-                            Label = "Country location 1 label"
-                        }
-                    ]
+                                { "Country location 1 key", new LocationOption { Label = "Country location 1 label" } }
+                            }
+                    }
                 }
-            ];
-
-            mappings.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLevelMappings);
+            };    
+                
+            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+                expectedLevelMappings,
+                ignoreCollectionOrders: true);
         }
-
+    
         [Fact]
         public async Task Complete_ExactMatch()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+        
             // Create a mapping plan based on 2 data set versions with perfectly overlapping
             // locations and levels.
-            var mapping = new DataSetVersionMapping
+            var mappings = new DataSetVersionMapping
             {
                 SourceDataSetVersionId = originalVersion.Id,
                 TargetDataSetVersionId = nextVersion.Id,
@@ -677,88 +684,91 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 LocationMappingPlan = new LocationMappingPlan
                 {
                     Levels =
-                    [
-                        new LocationLevelMappings
-                        {
-                            Level = GeographicLevel.LocalAuthority,
-                            Mappings =
-                            [
-                                new LocationOptionMapping
+                    {
+                        { 
+                            GeographicLevel.LocalAuthority, 
+                            new LocationLevelMappings
+                            {
+                                Mappings = 
                                 {
-                                    Source = new LocationOption
                                     {
-                                        Key = "LA location 1 key",
-                                        Label = "LA location 1 label"
+                                        "LA location 1 key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new LocationOption
+                                            {
+                                                Label = "LA location 1 label"
+                                            }
+                                        }
+                                    }
+                                },
+                                Candidates =
+                                {
+                                    {
+                                        "LA location 1 key",
+                                        new LocationOption
+                                        {
+                                            Label = "LA location 1 label"
+                                        }
                                     }
                                 }
-                            ],
-                            Candidates =
-                            [
-                                new LocationOption
-                                {
-                                    Key = "LA location 1 key",
-                                    Label = "LA location 1 label"
-                                }
-                            ]
+                            }
                         }
-                    ]
+                    }
                 }
             };
-
+            
             await AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersionMappings.Add(mapping));
-
+                context.DataSetVersionMappings.Add(mappings));
+        
             await ApplyAutoMappings(instanceId);
+        
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+        
+            Assert.True(updatedMappings.LocationMappingsComplete);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
-
-            Assert.True(mappings.LocationMappingsComplete);
-
-            List<LocationLevelMappings> expectedLevelMappings =
-            [
-                new LocationLevelMappings
+            Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
+            {
                 {
-                    Level = GeographicLevel.LocalAuthority,
-                    Mappings =
-                    [
-                        new LocationOptionMapping
+                    GeographicLevel.LocalAuthority,
+                    new LocationLevelMappings
+                    {
+                        Mappings =
                         {
-                            Source = new LocationOption
                             {
-                                Key = "LA location 1 key",
-                                Label = "LA location 1 label"
-                            },
-                            Type = MappingType.AutoMapped,
-                            CandidateKey = "LA location 1 key"
-                        }
-                    ],
-                    Candidates =
-                    [
-                        new LocationOption
+                                "LA location 1 key",
+                                new LocationOptionMapping
+                                {
+                                    Source = new LocationOption { Label = "LA location 1 label" },
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "LA location 1 key"
+                                }
+                            }
+                        },
+                        Candidates =
                         {
-                            Key = "LA location 1 key",
-                            Label = "LA location 1 label"
+                            { "LA location 1 key", new LocationOption { Label = "LA location 1 label" } }
                         }
-                    ]
+                    }
                 }
-            ];
-
-            mappings.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLevelMappings);
+            };
+        
+            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLevelMappings);
         }
-
+        
         [Fact]
         public async Task Complete_AllSourcesMapped_OtherUnmappedCandidatesExist()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+        
             // Create a mapping plan based on 2 data set versions with the same levels
             // and location options, but additional options exist in the new version.
             // Each source location option can be auto-mapped exactly to one in
             // the target version, leaving some candidates and new levels unused but
             // essentially the mapping is complete unless the user manually intervenes
             // at this point.
-            var mapping = new DataSetVersionMapping
+            var mappings = new DataSetVersionMapping
             {
                 SourceDataSetVersionId = originalVersion.Id,
                 TargetDataSetVersionId = nextVersion.Id,
@@ -766,112 +776,138 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 LocationMappingPlan = new LocationMappingPlan
                 {
                     Levels =
-                    [
-                        new LocationLevelMappings
+                    {
+                        { 
+                            GeographicLevel.LocalAuthority, 
+                            new LocationLevelMappings
+                            {
+                                Mappings = 
+                                {
+                                    {
+                                        "LA location 1 key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new LocationOption
+                                            {
+                                                Label = "LA location 1 label"
+                                            }
+                                        }
+                                    }
+                                },
+                                Candidates =
+                                {
+                                    {
+                                        "LA location 1 key",
+                                        new LocationOption
+                                        {
+                                            Label = "LA location 1 label"
+                                        }
+                                    },
+                                    {
+                                        "LA location 2 key",
+                                        new LocationOption
+                                        {
+                                            Label = "LA location 2 label"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        { 
+                            GeographicLevel.RscRegion, 
+                            new LocationLevelMappings
+                            {
+                                Mappings = [],
+                                Candidates =
+                                {
+                                    {
+                                        "RSC location 1 key",
+                                        new LocationOption
+                                        {
+                                            Label = "RSC location 1 label"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        
+            await AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersionMappings.Add(mappings));
+        
+            await ApplyAutoMappings(instanceId);
+        
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+        
+            Assert.True(updatedMappings.LocationMappingsComplete);
+        
+            Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
+            {
+                {
+                    GeographicLevel.LocalAuthority, 
+                    new LocationLevelMappings
+                    {
+                        Mappings = 
                         {
-                            Level = GeographicLevel.LocalAuthority,
-                            Mappings =
-                            [
+                            {
+                                "LA location 1 key",
                                 new LocationOptionMapping
                                 {
                                     Source = new LocationOption
                                     {
-                                        Key = "LA location 1 key",
                                         Label = "LA location 1 label"
-                                    }
+                                    },
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "LA location 1 key"
                                 }
-                            ],
-                            Candidates =
-                            [
+                            }
+                        },
+                        Candidates =
+                        {
+                            {
+                                "LA location 1 key",
                                 new LocationOption
                                 {
-                                    Key = "LA location 1 key",
                                     Label = "LA location 1 label"
-                                },
+                                }
+                            },
+                            {
+                                "LA location 2 key",
                                 new LocationOption
                                 {
-                                    Key = "LA location 2 key",
                                     Label = "LA location 2 label"
                                 }
-                            ]
-                        },
-                        new LocationLevelMappings
+                            }
+                        }
+                    }
+                },
+                { 
+                    GeographicLevel.RscRegion, 
+                    new LocationLevelMappings
+                    {
+                        Mappings = [],
+                        Candidates =
                         {
-                            Level = GeographicLevel.RscRegion,
-                            Mappings = [],
-                            Candidates =
-                            [
+                            {
+                                "RSC location 1 key",
                                 new LocationOption
                                 {
-                                    Key = "RSC location 1 key",
-                                    Label = "LA location 1 label"
+                                    Label = "RSC location 1 label"
                                 }
-                            ]
+                            }
                         }
-                    ]
+                    }
                 }
             };
-
-            await AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersionMappings.Add(mapping));
-
-            await ApplyAutoMappings(instanceId);
-
-            var mappings = GetDataSetVersionMapping(nextVersion);
-
-            Assert.True(mappings.LocationMappingsComplete);
-
-            List<LocationLevelMappings> expectedLevelMappings =
-            [
-                new LocationLevelMappings
-                {
-                    Level = GeographicLevel.LocalAuthority,
-                    Mappings =
-                    [
-                        new LocationOptionMapping
-                        {
-                            Source = new LocationOption
-                            {
-                                Key = "LA location 1 key",
-                                Label = "LA location 1 label"
-                            },
-                            Type = MappingType.AutoMapped,
-                            CandidateKey = "LA location 1 key"
-                        }
-                    ],
-                    Candidates =
-                    [
-                        new LocationOption
-                        {
-                            Key = "LA location 1 key",
-                            Label = "LA location 1 label"
-                        },
-                        new LocationOption
-                        {
-                            Key = "LA location 2 key",
-                            Label = "LA location 2 label"
-                        }
-                    ]
-                },
-                new LocationLevelMappings
-                {
-                    Level = GeographicLevel.RscRegion,
-                    Mappings = [],
-                    Candidates =
-                    [
-                        new LocationOption
-                        {
-                            Key = "RSC location 1 key",
-                            Label = "LA location 1 label"
-                        }
-                    ]
-                }
-            ];
-
-            mappings.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLevelMappings);
+        
+            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+                expectedLevelMappings,
+                ignoreCollectionOrders: true);
         }
     }
-
+    
     public class ApplyAutoMappingsFiltersTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ApplyAutoMappingsTests(fixture)
@@ -881,173 +917,171 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+    
             // Create a mapping plan based on 2 data set versions with partially overlapping filters.
             // Both have "Filter 1" and both have "Filter 1 option 1", but then each also contains Filter 1
             // options that the other do not, and each also contains filters that the other does not. 
-            var mapping = new DataSetVersionMapping
+            var mappings = new DataSetVersionMapping
             {
                 SourceDataSetVersionId = originalVersion.Id,
                 TargetDataSetVersionId = nextVersion.Id,
                 FilterMappingPlan = new FilterMappingPlan
                 {
                     Mappings =
-                    [
-                        new()
+                    {
                         {
-                            Source = new Filter
+                            "Filter 1 key",
+                            new FilterMapping
                             {
-                                Key = "Filter 1 key",
-                                Label = "Filter 1 label"
-                            },
-                            OptionMappings =
-                            [
-                                new()
+                                Source = new Filter
                                 {
-                                    Source = new()
-                                    {
-                                        Key = "Filter 1 option 1 key",
-                                        Label = "Filter 1 option 1 label"
-                                    }
+                                    Label = "Filter 1 label"
                                 },
-                                new()
+                                OptionMappings =
                                 {
-                                    Source = new()
                                     {
-                                        Key = "Filter 1 option 2 key",
-                                        Label = "Filter 1 option 2 label"
+                                        "Filter 1 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new FilterOption
+                                            {
+                                                Label = "Filter 1 option 1 label"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "Filter 1 option 2 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new FilterOption
+                                            {
+                                                Label = "Filter 1 option 2 label"
+                                            }
+                                        }
                                     }
                                 }
-                            ]
+                            }
                         },
-                        new()
                         {
-                            Source = new Filter
+                            "Filter 2 key",
+                            new FilterMapping
                             {
-                                Key = "Filter 2 key",
-                                Label = "Filter 2 label"
-                            },
-                            OptionMappings =
-                            [
-                                new()
+                                Source = new Filter
                                 {
-                                    Source = new()
+                                    Label = "Filter 2 label"
+                                },
+                                OptionMappings =
+                                {
                                     {
-                                        Key = "Filter 2 option 1 key",
-                                        Label = "Filter 2 option 1 label"
+                                        "Filter 2 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new FilterOption
+                                            {
+                                                Label = "Filter 2 option 1 label"
+                                            }
+                                        }
                                     }
                                 }
-                            ]
+                            }
                         }
-                    ],
+                    },
                     Candidates =
-                    [
-                        new()
+                    {
                         {
-                            Key = "Filter 1 key",
-                            Label = "Filter 1 label",
-                            Options =
-                            [
-                                new()
+                            "Filter 1 key",
+                            new FilterMappingCandidate
+                            {
+                                Label = "Filter 1 label",
+                                Options =
                                 {
-                                    Key = "Filter 1 option 1 key",
-                                    Label = "Filter 1 option 1 label"
-                                },
-                                new()
-                                {
-                                    Key = "Filter 1 option 3 key",
-                                    Label = "Filter 1 option 3 label"
+                                    {
+                                        "Filter 1 option 1 key",
+                                        new FilterOption
+                                        {
+                                            Label = "Filter 1 option 1 label"
+                                        }
+                                    },
+                                    {
+                                        "Filter 1 option 3 key",
+                                        new FilterOption
+                                        {
+                                            Label = "Filter 1 option 3 label"
+                                        }
+                                    }
                                 }
-                            ]
-                        },
-                        new()
-                        {
-                            Key = "Filter 3 key",
-                            Label = "Filter 3 label",
-                            Options =
-                            [
-                                new()
-                                {
-                                    Key = "Filter 3 option 1 key",
-                                    Label = "Filter 3 option 1 label"
-                                }
-                            ]
+                            }
                         }
-                    ]
+                    }
                 },
                 LocationMappingPlan = new LocationMappingPlan()
             };
-
+    
             await AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersionMappings.Add(mapping));
-
+                context.DataSetVersionMappings.Add(mappings));
+    
             await ApplyAutoMappings(instanceId);
+    
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+    
+            Assert.False(updatedMappings.FilterMappingsComplete);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
-
-            Assert.False(mappings.FilterMappingsComplete);
-
-            List<FilterMapping> expectedFilterMappings =
-            [
-                new()
+            Dictionary<string, FilterMapping> expectedFilterMappings = new()
+            {
                 {
-                    Source = new Filter
+                    "Filter 1 key", new FilterMapping
                     {
-                        Key = "Filter 1 key",
-                        Label = "Filter 1 label"
-                    },
-                    Type = MappingType.AutoMapped,
-                    CandidateKey = "Filter 1 key",
-                    OptionMappings =
-                    [
-                        new()
+                        Source = new Filter { Label = "Filter 1 label" },
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "Filter 1 key",
+                        OptionMappings =
                         {
-                            Source = new()
                             {
-                                Key = "Filter 1 option 1 key",
-                                Label = "Filter 1 option 1 label"
+                                "Filter 1 option 1 key",
+                                new FilterOptionMapping
+                                {
+                                    Source = new FilterOption { Label = "Filter 1 option 1 label" },
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "Filter 1 option 1 key"
+                                }
                             },
-                            Type = MappingType.AutoMapped,
-                            CandidateKey = "Filter 1 option 1 key"
-                        },
-                        new()
-                        {
-                            Source = new()
                             {
-                                Key = "Filter 1 option 2 key",
-                                Label = "Filter 1 option 2 label"
-                            },
-                            Type = MappingType.AutoNone,
-                            CandidateKey = null
+                                "Filter 1 option 2 key",
+                                new FilterOptionMapping
+                                {
+                                    Source = new FilterOption { Label = "Filter 1 option 2 label" },
+                                    Type = MappingType.AutoNone,
+                                    CandidateKey = null
+                                }
+                            }
                         }
-                    ]
+                    }
                 },
-                new()
                 {
-                    Source = new Filter
+                    "Filter 2 key", new FilterMapping
                     {
-                        Key = "Filter 2 key",
-                        Label = "Filter 2 label"
-                    },
-                    Type = MappingType.AutoNone,
-                    CandidateKey = null,
-                    OptionMappings =
-                    [
-                        new()
+                        Source = new Filter { Label = "Filter 2 label" },
+                        Type = MappingType.AutoNone,
+                        CandidateKey = null,
+                        OptionMappings =
                         {
-                            Source = new()
                             {
-                                Key = "Filter 2 option 1 key",
-                                Label = "Filter 2 option 1 label"
-                            },
-                            Type = MappingType.AutoNone,
-                            CandidateKey = null,
+                                "Filter 2 option 1 key",
+                                new FilterOptionMapping
+                                {
+                                    Source = new FilterOption { Label = "Filter 2 option 1 label" },
+                                    Type = MappingType.AutoNone,
+                                    CandidateKey = null
+                                }
+                            }
                         }
-                    ]
+                    }
                 }
-            ];
-
-            mappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
+            };
+        
+            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                expectedFilterMappings,
+                ignoreCollectionOrders: true);
         }
 
         [Fact]
@@ -1058,261 +1092,307 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
             // Create a mapping plan based on 2 data set versions with exactly the same filters
             // and filter options.
-            var mapping = new DataSetVersionMapping
+            var mappings = new DataSetVersionMapping
             {
                 SourceDataSetVersionId = originalVersion.Id,
                 TargetDataSetVersionId = nextVersion.Id,
                 FilterMappingPlan = new FilterMappingPlan
                 {
                     Mappings =
-                    [
-                        new()
+                    {
                         {
-                            Source = new Filter
+                            "Filter 1 key", 
+                            new FilterMapping
                             {
-                                Key = "Filter 1 key",
-                                Label = "Filter 1 label"
-                            },
-                            OptionMappings =
-                            [
-                                new()
+                                Source = new Filter { Label = "Filter 1 label" },
+                                OptionMappings =
                                 {
-                                    Source = new()
                                     {
-                                        Key = "Filter 1 option 1 key",
-                                        Label = "Filter 1 option 1 label"
-                                    }
-                                },
-                                new()
-                                {
-                                    Source = new()
+                                        "Filter 1 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new FilterOption { Label = "Filter 1 option 1 label" }
+                                        }
+                                    },
                                     {
-                                        Key = "Filter 1 option 2 key",
-                                        Label = "Filter 1 option 2 label"
+                                        "Filter 1 option 2 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new FilterOption { Label = "Filter 1 option 2 label" }
+                                        }
                                     }
                                 }
-                            ]
-                        }
-                    ],
-                    Candidates =
-                    [
-                        new()
+                            }
+                        },
                         {
-                            Key = "Filter 1 key",
-                            Label = "Filter 1 label",
-                            Options =
-                            [
-                                new()
+                            "Filter 2 key", new FilterMapping
+                            {
+                                Source = new Filter { Label = "Filter 2 label" },
+                                OptionMappings =
                                 {
-                                    Key = "Filter 1 option 1 key",
-                                    Label = "Filter 1 option 1 label"
-                                },
-                                new()
-                                {
-                                    Key = "Filter 1 option 2 key",
-                                    Label = "Filter 1 option 2 label"
+                                    {
+                                        "Filter 2 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new FilterOption { Label = "Filter 2 option 1 label" }
+                                        }
+                                    }
                                 }
-                            ]
+                            }
                         }
-                    ]
+                    },
+                    Candidates =
+                    {
+                        {
+                            "Filter 1 key", new FilterMappingCandidate
+                            {
+                                Label = "Filter 1 label",
+                                Options =
+                                {
+                                    { "Filter 1 option 1 key", new FilterOption { Label = "Filter 1 option 1 label" } },
+                                    { "Filter 1 option 2 key", new FilterOption { Label = "Filter 1 option 2 label" } }
+                                }
+                            }
+                        },
+                        {
+                            "Filter 2 key", new FilterMappingCandidate
+                            {
+                                Label = "Filter 2 label",
+                                Options =
+                                {
+                                    { "Filter 2 option 1 key", new FilterOption { Label = "Filter 2 option 1 label" } }
+                                }
+                            }
+                        }
+                    }
                 },
                 LocationMappingPlan = new LocationMappingPlan()
             };
 
             await AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersionMappings.Add(mapping));
+                context.DataSetVersionMappings.Add(mappings));
 
             await ApplyAutoMappings(instanceId);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
 
-            Assert.True(mappings.FilterMappingsComplete);
+            Assert.True(updatedMappings.FilterMappingsComplete);
 
-            List<FilterMapping> expectedFilterMappings =
-            [
-                new()
+            Dictionary<string, FilterMapping> expectedFilterMappings = new()
+            {
                 {
-                    Source = new Filter
+                    "Filter 1 key", 
+                    new FilterMapping
                     {
-                        Key = "Filter 1 key",
-                        Label = "Filter 1 label"
-                    },
-                    Type = MappingType.AutoMapped,
-                    CandidateKey = "Filter 1 key",
-                    OptionMappings =
-                    [
-                        new()
+                        Source = new Filter { Label = "Filter 1 label" },
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "Filter 1 key",
+                        OptionMappings =
                         {
-                            Source = new()
                             {
-                                Key = "Filter 1 option 1 key",
-                                Label = "Filter 1 option 1 label"
+                                "Filter 1 option 1 key",
+                                new FilterOptionMapping
+                                {
+                                    Source = new FilterOption { Label = "Filter 1 option 1 label" },
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "Filter 1 option 1 key"
+                                }
                             },
-                            Type = MappingType.AutoMapped,
-                            CandidateKey = "Filter 1 option 1 key"
-                        },
-                        new()
-                        {
-                            Source = new()
                             {
-                                Key = "Filter 1 option 2 key",
-                                Label = "Filter 1 option 2 label"
-                            },
-                            Type = MappingType.AutoMapped,
-                            CandidateKey = "Filter 1 option 2 key"
+                                "Filter 1 option 2 key",
+                                new FilterOptionMapping
+                                {
+                                    Source = new FilterOption { Label = "Filter 1 option 2 label" },
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "Filter 1 option 2 key"
+                                }
+                            }
                         }
-                    ]
+                    }
+                },
+                {
+                    "Filter 2 key", new FilterMapping
+                    {
+                        Source = new Filter { Label = "Filter 2 label" },
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "Filter 2 key",
+                        OptionMappings =
+                        {
+                            {
+                                "Filter 2 option 1 key",
+                                new FilterOptionMapping
+                                {
+                                    Source = new FilterOption { Label = "Filter 2 option 1 label" },
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "Filter 2 option 1 key"
+                                }
+                            }
+                        }
+                    }
                 }
-            ];
+            };
 
-            mappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
+            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
         }
-
+        
         [Fact]
         public async Task Complete_AllSourcesMapped_OtherUnmappedCandidatesExist()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+        
             // Create a mapping plan based on 2 data set versions with the same filters
             // and filter options, but additional options exist in the new version.
             // Each source filter and filter option can be auto-mapped exactly to one in
             // the target version, leaving some candidates unused but essentially the mapping
             // is complete unless the user manually intervenes at this point.
-            var mapping = new DataSetVersionMapping
+            var mappings = new DataSetVersionMapping
             {
                 SourceDataSetVersionId = originalVersion.Id,
                 TargetDataSetVersionId = nextVersion.Id,
                 FilterMappingPlan = new FilterMappingPlan
                 {
                     Mappings =
-                    [
-                        new()
+                    {
                         {
-                            Source = new Filter
+                            "Filter 1 key",
+                            new FilterMapping
                             {
-                                Key = "Filter 1 key",
-                                Label = "Filter 1 label"
-                            },
-                            OptionMappings =
-                            [
-                                new()
+                                Source = new Filter
                                 {
-                                    Source = new()
+                                    Label = "Filter 1 label"
+                                },
+                                OptionMappings =
+                                {
                                     {
-                                        Key = "Filter 1 option 1 key",
-                                        Label = "Filter 1 option 1 label"
+                                        "Filter 1 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new FilterOption
+                                            {
+                                                Label = "Filter 1 option 1 label"
+                                            }
+                                        }
                                     }
                                 }
-                            ]
+                            }
                         }
-                    ],
+                    },
                     Candidates =
-                    [
-                        new()
+                    {
                         {
-                            Key = "Filter 1 key",
-                            Label = "Filter 1 label",
-                            Options =
-                            [
-                                new()
+                            "Filter 1 key",
+                            new FilterMappingCandidate
+                            {
+                                Label = "Filter 1 label",
+                                Options =
                                 {
-                                    Key = "Filter 1 option 1 key",
-                                    Label = "Filter 1 option 1 label"
-                                },
-                                new()
-                                {
-                                    Key = "Filter 1 option 2 key",
-                                    Label = "Filter 1 option 2 label"
-                                }
-                            ]
+                                    {
+                                        "Filter 1 option 1 key",
+                                        new FilterOption
+                                        {
+                                            Label = "Filter 1 option 1 label"
+                                        }
+                                    },
+                                    {
+                                        "Filter 1 option 2 key",
+                                        new FilterOption
+                                        {
+                                            Label = "Filter 1 option 2 label"
+                                        }
+                                    }
+                                }   
+                            }
                         },
-                        new()
                         {
-                            Key = "Filter 2 key",
-                            Label = "Filter 2 label",
-                            Options =
-                            [
-                                new()
+                            "Filter 2 key",
+                            new FilterMappingCandidate
+                            {
+                                Label = "Filter 2 label",
+                                Options =
                                 {
-                                    Key = "Filter 2 option 1 key",
-                                    Label = "Filter 2 option 1 label"
-                                }
-                            ]
+                                    {
+                                        "Filter 2 option 1 key",
+                                        new FilterOption
+                                        {
+                                            Label = "Filter 2 option 1 label"
+                                        }
+                                    }
+                                }   
+                            }
                         }
-                    ]
+                    }
                 },
                 LocationMappingPlan = new LocationMappingPlan()
             };
-
+        
             await AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersionMappings.Add(mapping));
-
+                context.DataSetVersionMappings.Add(mappings));
+        
             await ApplyAutoMappings(instanceId);
+        
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+        
+            Assert.True(updatedMappings.FilterMappingsComplete);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
-
-            Assert.True(mappings.FilterMappingsComplete);
-
-            List<FilterMapping> expectedFilterMappings =
-            [
-                new()
+            Dictionary<string, FilterMapping> expectedFilterMappings = new()
+            {
                 {
-                    Source = new Filter
+                    "Filter 1 key", new FilterMapping
                     {
-                        Key = "Filter 1 key",
-                        Label = "Filter 1 label"
-                    },
-                    Type = MappingType.AutoMapped,
-                    CandidateKey = "Filter 1 key",
-                    OptionMappings =
-                    [
-                        new()
+                        Source = new Filter { Label = "Filter 1 label" },
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "Filter 1 key",
+                        OptionMappings =
                         {
-                            Source = new()
                             {
-                                Key = "Filter 1 option 1 key",
-                                Label = "Filter 1 option 1 label"
-                            },
-                            Type = MappingType.AutoMapped,
-                            CandidateKey = "Filter 1 option 1 key"
+                                "Filter 1 option 1 key",
+                                new FilterOptionMapping
+                                {
+                                    Source = new FilterOption { Label = "Filter 1 option 1 label" },
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "Filter 1 option 1 key"
+                                }
+                            }
                         }
-                    ]
+                    }
                 }
-            ];
-
-            mappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
+            };
+        
+            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                expectedFilterMappings,
+                ignoreCollectionOrders: true);
         }
     }
-
+    
     public class CompleteNextDataSetVersionMappingProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessNextDataSetVersionFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
-
+    
         [Fact]
         public async Task Success()
         {
             var (instanceId, _, nextVersion) = await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
-
+    
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(nextVersion));
-
+    
             await CompleteProcessing(instanceId);
-
+    
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
+    
             var savedImport = await publicDataDbContext.DataSetVersionImports
                 .Include(i => i.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
-
+    
             Assert.Equal(Stage, savedImport.Stage);
             savedImport.Completed.AssertUtcNow();
-
+    
             Assert.Equal(DataSetVersionStatus.Mapping, savedImport.DataSetVersion.Status);
         }
-
+    
         private async Task CompleteProcessing(Guid instanceId)
         {
             var function = GetRequiredService<ProcessNextDataSetVersionFunction>();

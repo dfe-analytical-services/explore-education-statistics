@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -83,18 +84,22 @@ internal class DataSetVersionMappingService(
             .LocationMappingPlan
             .Levels
             .Any(level => level
+                .Value
                 .Mappings
-                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Type)));
+                .Any(optionMapping =>
+                    IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
 
         mappings.FilterMappingsComplete = !mappings
             .FilterMappingPlan
             .Mappings
             .Any(filterMapping =>
-                filterMapping.Type == MappingType.None
+                IncompleteMappingTypes.Contains(filterMapping.Value.Type)
                 || filterMapping
+                    .Value
                     .OptionMappings
-                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Type)));
+                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
 
+        publicDataDbContext.Update(mappings);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -102,11 +107,13 @@ internal class DataSetVersionMappingService(
     {
         locationPlan
             .Levels
-            .ForEach(level => level
-                .Mappings
+            .ForEach(level => level.Value.Mappings
                 .ForEach(locationMapping => AutoMapElement(
-                    mapping: locationMapping,
-                    candidates: level.Candidates)));
+                    sourceKey: locationMapping.Key,
+                    mapping: locationMapping.Value,
+                    candidates: level
+                        .Value
+                        .Candidates)));
     }
 
     private static void AutoMapFilters(FilterMappingPlan filtersPlan)
@@ -114,14 +121,16 @@ internal class DataSetVersionMappingService(
         filtersPlan
             .Mappings
             .ForEach(filterMapping => AutoMapParentAndOptions(
-                parentMapping: filterMapping,
+                sourceParentKey: filterMapping.Key,
+                parentMapping: filterMapping.Value,
                 parentCandidates: filtersPlan.Candidates,
                 candidateOptionsSupplier: autoMappedCandidate => autoMappedCandidate.Options));
     }
 
     private static TCandidate? AutoMapElement<TMappableElement, TCandidate>(
+        string sourceKey,
         Mapping<TMappableElement> mapping,
-        List<TCandidate> candidates)
+        Dictionary<string, TCandidate> candidates)
         where TMappableElement : MappableElement
         where TCandidate : MappableElement
     {
@@ -131,13 +140,11 @@ internal class DataSetVersionMappingService(
             return null;
         }
 
-        var matchingCandidate = candidates
-            .SingleOrDefault(candidate =>
-                candidate.Key == mapping.Source.Key);
+        var matchingCandidate = candidates.GetValueOrDefault(sourceKey);    
 
         if (matchingCandidate is not null)
         {
-            mapping.CandidateKey = matchingCandidate.Key;
+            mapping.CandidateKey = sourceKey;
             mapping.Type = MappingType.AutoMapped;
         }
         else
@@ -150,15 +157,19 @@ internal class DataSetVersionMappingService(
     }
 
     private static void AutoMapParentAndOptions<TMappableParent, TParentCandidate, TMappableOption, TOptionMapping>(
+        string sourceParentKey,
         ParentMapping<TMappableParent, TMappableOption, TOptionMapping> parentMapping,
-        List<TParentCandidate> parentCandidates,
-        Func<TParentCandidate, List<TMappableOption>> candidateOptionsSupplier)
+        Dictionary<string, TParentCandidate> parentCandidates,
+        Func<TParentCandidate, Dictionary<string, TMappableOption>> candidateOptionsSupplier)
         where TMappableParent : MappableElement
         where TParentCandidate : MappableElement
         where TMappableOption : MappableElement
         where TOptionMapping : Mapping<TMappableOption>
     {
-        var autoMapCandidate = AutoMapElement(parentMapping, parentCandidates);
+        var autoMapCandidate = AutoMapElement(
+            sourceKey: sourceParentKey,
+            mapping: parentMapping,
+            candidates: parentCandidates);
 
         if (autoMapCandidate is not null)
         {
@@ -167,13 +178,15 @@ internal class DataSetVersionMappingService(
             parentMapping
                 .OptionMappings
                 .ForEach(optionMapping => AutoMapElement(
-                    mapping: optionMapping,
+                    sourceKey: optionMapping.Key,
+                    mapping: optionMapping.Value,
                     candidates: candidateOptions));
         }
         else
         {
             parentMapping
                 .OptionMappings
+                .Select(optionMapping => optionMapping.Value)
                 .ForEach(optionMapping =>
                 {
                     optionMapping.CandidateKey = null;
@@ -188,46 +201,43 @@ internal class DataSetVersionMappingService(
     {
         // Create mappings by level for each Geographic Level that appeared in the source data set version.
         var sourceMappingsByLevel = sourceLocationMeta
-            .OrderBy(level => level.Level)
-            .Select(level =>
-            {
-                var candidatesForLevel = targetLocationMeta
-                    .Any(entry => entry.Key.Level == level.Level)
-                    ? targetLocationMeta
-                        .Single(entry => entry.Key.Level == level.Level)
-                        .Value
-                    : [];
-
-                return new LocationLevelMappings
+            .ToDictionary(
+                keySelector: level => level.Level,
+                elementSelector: level =>
                 {
-                    Level = level.Level,
-                    Mappings = level
-                        .Options
-                        .OrderBy(option => option.Label)
-                        .Select(option => new LocationOptionMapping
-                        {
-                            Source = new LocationOption
-                            {
-                                Key = $"{option.Label} :: {option.ToRow().GetRowKey()}",
-                                Label = option.Label,
-                            },
-                            Type = MappingType.AutoNone
-                        })
-                        .ToList(),
-                    Candidates = candidatesForLevel
-                        .OrderBy(option => option.Label)
-                        .Select(option => new LocationOption
-                        {
-                            Key = $"{option.Label} :: {option.GetRowKey()}",
-                            Label = option.Label
-                        })
-                        .ToList()
-                };
-            })
-            .ToList();
+                    var candidatesForLevel = targetLocationMeta
+                        .Any(entry => entry.Key.Level == level.Level)
+                        ? targetLocationMeta
+                            .Single(entry => entry.Key.Level == level.Level)
+                            .Value
+                        : [];
+
+                    return new LocationLevelMappings
+                    {
+                        Mappings = level
+                            .Options
+                            .ToDictionary(
+                                keySelector: option => $"{option.Label} :: {option.ToRow().GetRowKey()}",
+                                elementSelector: option => new LocationOptionMapping
+                                {
+                                    Source = new LocationOption
+                                    {
+                                        Label = option.Label,
+                                    },
+                                    Type = MappingType.AutoNone
+                                }),
+                        Candidates = candidatesForLevel
+                            .ToDictionary(
+                                keySelector: option => $"{option.Label} :: {option.GetRowKey()}",
+                                elementSelector: option => new LocationOption
+                                {
+                                    Label = option.Label
+                                })
+                    };
+                });
 
         var sourceLevels = sourceMappingsByLevel
-            .Select(level => level.Level)
+            .Select(level => level.Key)
             .Distinct();
 
         // Additionally find any Geographic Levels that appear in the target data set version but not in the source,
@@ -237,30 +247,29 @@ internal class DataSetVersionMappingService(
             .Select(meta => (
                 levelMeta: meta.Key,
                 optionsMeta: meta.Value))
-            .OrderBy(meta => meta.levelMeta.Level)
-            .Select(meta => new LocationLevelMappings
-            {
-                Level = meta.levelMeta.Level,
-                Mappings = [],
-                Candidates = meta
-                    .optionsMeta
-                    .OrderBy(option => option.Label)
-                    .Select(option => new LocationOption
-                    {
-                        Key = $"{option.Label} :: {option.GetRowKey()}",
-                        Label = option.Label
-                    })
-                    .ToList()
-            })
-            .ToList();
+            .ToDictionary(
+                keySelector: meta => meta.levelMeta.Level,
+                elementSelector: meta => new LocationLevelMappings
+                {
+                    Mappings = [],
+                    Candidates = meta
+                        .optionsMeta
+                        .ToDictionary(
+                            keySelector: option => $"{option.Label} :: {option.GetRowKey()}",
+                            elementSelector: option => 
+                                new LocationOption
+                                {
+                                    Label = option.Label
+                                })
+                });
 
         return new LocationMappingPlan
         {
-            Levels =
-            [
-                ..sourceMappingsByLevel,
-                ..onlyTargetMappingsByLevel
-            ]
+            Levels = sourceMappingsByLevel
+                .Concat(onlyTargetMappingsByLevel)
+                .ToDictionary(
+                    e => e.Key,
+                    e => e.Value)
         };
     }
 
@@ -269,44 +278,48 @@ internal class DataSetVersionMappingService(
         IDictionary<FilterMeta, List<FilterOptionMeta>> targetFilterMeta)
     {
         var filterMappings = sourceFilterMeta
-            .Select(filter => new FilterMapping
-            {
-                Source = new Filter
-                {
-                    Key = filter.Label,
-                    Label = filter.Label
-                },
-                OptionMappings = filter
-                    .Options
-                    .Select(option => new FilterOptionMapping
+            .ToDictionary(
+                keySelector: filter => filter.Label,
+                elementSelector: filter => 
+                    new FilterMapping
                     {
-                        Source = new FilterOption
+                        Source = new Filter
                         {
-                            Key = option.Label,
-                            Label = option.Label
-                        }
-                    })
-                    .ToList()
-            })
-            .ToList();
+                            Label = filter.Label
+                        },
+                        OptionMappings = filter
+                            .Options
+                            .ToDictionary(
+                                keySelector: option => option.Label,
+                                elementSelector: option => 
+                                    new FilterOptionMapping
+                                    {
+                                        Source = new FilterOption
+                                        {
+                                            Label = option.Label
+                                        }
+                                    })
+                    });
 
         var filterTargets = targetFilterMeta
             .Select(meta => (
                 filterMeta: meta.Key,
                 optionsMeta: meta.Value))
-            .Select(meta => new FilterMappingCandidate
-            {
-                Key = meta.filterMeta.Label,
-                Label = meta.filterMeta.Label,
-                Options = meta.optionsMeta
-                    .Select(option => new FilterOption
+            .ToDictionary(
+                keySelector: meta => meta.filterMeta.Label,
+                elementSelector: meta => 
+                    new FilterMappingCandidate
                     {
-                        Key = option.Label,
-                        Label = option.Label
-                    })
-                    .ToList()
-            })
-            .ToList();
+                        Label = meta.filterMeta.Label,
+                        Options = meta.optionsMeta
+                            .ToDictionary(
+                                keySelector: option => option.Label,
+                                elementSelector: option => 
+                                    new FilterOption
+                                    {
+                                        Label = option.Label
+                                    })
+                    });
 
         var filters = new FilterMappingPlan
         {
