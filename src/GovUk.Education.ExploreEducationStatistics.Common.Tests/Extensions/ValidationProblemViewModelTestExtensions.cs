@@ -341,36 +341,50 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasNotEmptyBodyError(
         this ValidationProblemViewModel validationProblem)
     {
-        var error = validationProblem.AssertHasError(
+        return validationProblem.AssertHasError(
             expectedPath: null,
             expectedCode: ValidationMessages.NotEmptyBody.Code
         );
-
-        return error;
     }
 
     public static ErrorViewModel AssertHasInvalidInputError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath)
     {
-        var error = validationProblem.AssertHasError(
+        return validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.InvalidInput.Code
+            expectedCode: ValidationMessages.InvalidValue.Code
         );
-
-        return error;
     }
 
-    public static ErrorViewModel AssertHasRequiredFieldError(
+    public static ErrorViewModel AssertHasRequiredValueError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath)
     {
-        var error = validationProblem.AssertHasError(
+        return validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.RequiredField.Code
+            expectedCode: ValidationMessages.RequiredValue.Code
         );
+    }
 
-        return error;
+    public static ErrorViewModel AssertHasInvalidValueError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath)
+    {
+        return validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.InvalidValue.Code
+        );
+    }
+
+    public static ErrorViewModel AssertHasUnknownFieldError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath)
+    {
+        return validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.UnknownField.Code
+        );
     }
 
     public static ErrorViewModel AssertHasError(

@@ -5,6 +5,7 @@ using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
@@ -72,6 +73,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
 
+                // Stop empty query string parameters being converted to null
+                options.ModelMetadataDetailsProviders.Add(new EmptyStringMetadataDetailsProvider());
                 // Adds correct camelCased paths for model errors
                 options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
             })
@@ -83,6 +86,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
 
                 // This must be false to allow `JsonExceptionResultFilter` to work correctly,
                 // otherwise, JsonExceptions can't be identified. Also, this prevents
