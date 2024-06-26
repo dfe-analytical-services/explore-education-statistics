@@ -49,16 +49,18 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
             builder.Property(p => p.LocationMappingPlan)
                 .HasColumnType("jsonb")
                 .HasConversion(
-                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions(JsonSerializerDefaults.General)),
-                    v => JsonSerializer.Deserialize<LocationMappingPlan>(v,
-                        new JsonSerializerOptions(JsonSerializerDefaults.General))!);
+                    v =>
+                        JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
+                    v =>
+                        JsonSerializer.Deserialize<LocationMappingPlan>(v, (JsonSerializerOptions)null!)!);
 
             builder.Property(p => p.FilterMappingPlan)
                 .HasColumnType("jsonb")
                 .HasConversion(
-                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions(JsonSerializerDefaults.General)),
-                    v => JsonSerializer.Deserialize<FilterMappingPlan>(v,
-                        new JsonSerializerOptions(JsonSerializerDefaults.General))!);
+                    v =>
+                        JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
+                    v =>
+                        JsonSerializer.Deserialize<FilterMappingPlan>(v, (JsonSerializerOptions)null!)!);
         }
     }
 }

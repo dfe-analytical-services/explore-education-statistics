@@ -237,9 +237,7 @@ internal class DataSetVersionMappingService(
                     };
                 });
 
-        var sourceLevels = sourceMappingsByLevel
-            .Select(level => level.Key)
-            .Distinct();
+        var sourceLevels = sourceMappingsByLevel.Select(level => level.Key);
 
         // Additionally find any Geographic Levels that appear in the target data set version but not in the source,
         // and create mappings by level for them.
