@@ -144,7 +144,7 @@ public abstract record ParentMapping<TMappableElement, TOption, TOptionMapping>
 /// This represents a location option that is potentially mappable to another location option
 /// from the same geographic level. 
 /// </summary>
-public record LocationOption(string Label) : MappableElement(Label)
+public record MappableLocationOption(string Label) : MappableElement(Label)
 {
     public string? Code { get; set; }
 
@@ -161,7 +161,7 @@ public record LocationOption(string Label) : MappableElement(Label)
 /// This represents the mapping, or failure to map, of a source location option to a target
 /// location option from the same geographic level.
 /// </summary>
-public record LocationOptionMapping : Mapping<LocationOption>;
+public record LocationOptionMapping : Mapping<MappableLocationOption>;
 
 /// <summary>
 /// This represents a single geographic level's worth of location mappings from the source
@@ -171,7 +171,7 @@ public record LocationLevelMappings
 {
     public Dictionary<string, LocationOptionMapping> Mappings { get; set; } = [];
 
-    public Dictionary<string, LocationOption> Candidates { get; set; } = [];
+    public Dictionary<string, MappableLocationOption> Candidates { get; set; } = [];
 }
 
 /// <summary>
@@ -186,12 +186,12 @@ public class LocationMappingPlan
 /// <summary>
 /// This represents a filter option that is potentially mappable to another filter option. 
 /// </summary>
-public record FilterOption(string Label) : MappableElement(Label);
+public record MappableFilterOption(string Label) : MappableElement(Label);
 
 /// <summary>
 /// This represents a filter that is potentially mappable to another filter.
 /// </summary>
-public record Filter(string Label) : MappableElement(Label);
+public record MappableFilter(string Label) : MappableElement(Label);
 
 /// <summary>
 /// This represents a candidate filter and all of its candidate filter options from
@@ -199,20 +199,20 @@ public record Filter(string Label) : MappableElement(Label);
 /// from the source version.
 /// </summary>
 public record FilterMappingCandidate(string Label)
-    : MappableElementWithOptions<FilterOption>(Label);
+    : MappableElementWithOptions<MappableFilterOption>(Label);
 
 /// <summary>
 /// This represents a potential mapping of a filter option from the source data set version
 /// to a filter option in the target version.  In order to be mappable, both filter options'
 /// parent filters must firstly be mapped to each other.  
 /// </summary>
-public record FilterOptionMapping : Mapping<FilterOption>;
+public record FilterOptionMapping : Mapping<MappableFilterOption>;
 
 /// <summary>
 /// This represents a potential mapping of a filter from the source data set version
 /// to a filter in the target version.  
 /// </summary>
-public record FilterMapping : ParentMapping<Filter, FilterOption, FilterOptionMapping>;
+public record FilterMapping : ParentMapping<MappableFilter, MappableFilterOption, FilterOptionMapping>;
 
 /// <summary>
 /// This represents the overall mapping plan for filters and filter options from the source

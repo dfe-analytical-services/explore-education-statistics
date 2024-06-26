@@ -242,7 +242,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         .Select(meta => meta as LocationOptionMeta)
                         .ToList()))
                 .GenerateList();
-            
+
             await AddTestData<PublicDataDbContext>(context =>
                 context.LocationMetas.AddRange(initialLocationMeta));
 
@@ -267,7 +267,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 {
                                     CandidateKey = null,
                                     Type = MappingType.None,
-                                    Source = new LocationOption(option.Label)
+                                    Source = new MappableLocationOption(option.Label)
                                     {
                                         Code = option.ToRow().Code,
                                         OldCode = option.ToRow().OldCode,
@@ -332,7 +332,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 .options
                                 .ToDictionary(
                                     keySelector: option => $"{option.Label} :: {option.ToRow().GetRowKey()}",
-                                    elementSelector: option => new LocationOption(option.Label)
+                                    elementSelector: option => new MappableLocationOption(option.Label)
                                     {
                                         Code = option.ToRow().Code,
                                         OldCode = option.ToRow().OldCode,
@@ -385,7 +385,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         {
                             CandidateKey = null,
                             Type = MappingType.None,
-                            Source = new Filter(filter.Label),
+                            Source = new MappableFilter(filter.Label),
                             OptionMappings = filter
                                 .Options
                                 .ToDictionary(
@@ -395,7 +395,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                         {
                                             CandidateKey = null,
                                             Type = MappingType.None,
-                                            Source = new FilterOption(option.Label)
+                                            Source = new MappableFilterOption(option.Label)
                                         })
                         });
 
@@ -430,7 +430,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 .ToDictionary(
                                     keySelector: optionMeta => optionMeta.Label,
                                     elementSelector: optionMeta =>
-                                        new FilterOption(optionMeta.Label))
+                                        new MappableFilterOption(optionMeta.Label))
                         });
 
             mappings.FilterMappingPlan.Candidates.AssertDeepEqualTo(
@@ -516,17 +516,23 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 {
                                     {
                                         "LA location 1 key",
-                                        new LocationOptionMapping { Source = new LocationOption("LA location 1 label") }
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("LA location 1 label")
+                                        }
                                     },
                                     {
                                         "LA location 2 key",
-                                        new LocationOptionMapping { Source = new LocationOption("LA location 2 label") }
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("LA location 2 label")
+                                        }
                                     }
                                 },
                                 Candidates =
                                 {
-                                    { "LA location 1 key", new LocationOption("LA location 1 label") },
-                                    { "LA location 3 key", new LocationOption("LA location 3 label") },
+                                    { "LA location 1 key", new MappableLocationOption("LA location 1 label") },
+                                    { "LA location 3 key", new MappableLocationOption("LA location 3 label") },
                                 }
                             }
                         },
@@ -540,7 +546,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                         "RSC location 1 key",
                                         new LocationOptionMapping
                                         {
-                                            Source = new LocationOption("RSC location 1 label")
+                                            Source = new MappableLocationOption("RSC location 1 label")
                                         }
                                     }
                                 },
@@ -552,9 +558,9 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                             {
                                 Mappings = [],
                                 Candidates =
-                                    {
-                                        { "Country location 1 key", new LocationOption("Country location 1 label") }
-                                    }
+                                {
+                                    { "Country location 1 key", new MappableLocationOption("Country location 1 label") }
+                                }
                             }
                         }
                     }
@@ -581,7 +587,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "LA location 1 key",
                                 new LocationOptionMapping
                                 {
-                                    Source = new LocationOption("LA location 1 label"),
+                                    Source = new MappableLocationOption("LA location 1 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "LA location 1 key"
                                 }
@@ -590,7 +596,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "LA location 2 key",
                                 new LocationOptionMapping
                                 {
-                                    Source = new LocationOption("LA location 2 label"),
+                                    Source = new MappableLocationOption("LA location 2 label"),
                                     Type = MappingType.AutoNone,
                                     CandidateKey = null
                                 }
@@ -598,8 +604,8 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         },
                         Candidates =
                         {
-                            { "LA location 1 key", new LocationOption("LA location 1 label") },
-                            { "LA location 3 key", new LocationOption("LA location 3 label") },
+                            { "LA location 1 key", new MappableLocationOption("LA location 1 label") },
+                            { "LA location 3 key", new MappableLocationOption("LA location 3 label") },
                         }
                     }
                 },
@@ -613,7 +619,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "RSC location 1 key",
                                 new LocationOptionMapping
                                 {
-                                    Source = new LocationOption("RSC location 1 label"),
+                                    Source = new MappableLocationOption("RSC location 1 label"),
                                     Type = MappingType.AutoNone,
                                     CandidateKey = null
                                 }
@@ -626,7 +632,10 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                     GeographicLevel.Country, new LocationLevelMappings
                     {
                         Mappings = [],
-                        Candidates = { { "Country location 1 key", new LocationOption("Country location 1 label") } }
+                        Candidates =
+                            {
+                                { "Country location 1 key", new MappableLocationOption("Country location 1 label") }
+                            }
                     }
                 }
             };
@@ -663,11 +672,14 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                         "LA location 1 key",
                                         new LocationOptionMapping
                                         {
-                                            Source = new LocationOption("LA location 1 label")
+                                            Source = new MappableLocationOption("LA location 1 label")
                                         }
                                     }
                                 },
-                                Candidates = { { "LA location 1 key", new LocationOption("LA location 1 label") } }
+                                Candidates =
+                                {
+                                    { "LA location 1 key", new MappableLocationOption("LA location 1 label") }
+                                }
                             }
                         }
                     }
@@ -695,13 +707,13 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "LA location 1 key",
                                 new LocationOptionMapping
                                 {
-                                    Source = new LocationOption("LA location 1 label"),
+                                    Source = new MappableLocationOption("LA location 1 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "LA location 1 key"
                                 }
                             }
                         },
-                        Candidates = { { "LA location 1 key", new LocationOption("LA location 1 label") } }
+                        Candidates = { { "LA location 1 key", new MappableLocationOption("LA location 1 label") } }
                     }
                 }
             };
@@ -740,14 +752,14 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                         "LA location 1 key",
                                         new LocationOptionMapping
                                         {
-                                            Source = new LocationOption("LA location 1 label")
+                                            Source = new MappableLocationOption("LA location 1 label")
                                         }
                                     }
                                 },
                                 Candidates =
                                 {
-                                    { "LA location 1 key", new LocationOption("LA location 1 label") },
-                                    { "LA location 2 key", new LocationOption("LA location 2 label") }
+                                    { "LA location 1 key", new MappableLocationOption("LA location 1 label") },
+                                    { "LA location 2 key", new MappableLocationOption("LA location 2 label") }
                                 }
                             }
                         },
@@ -755,7 +767,10 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                             GeographicLevel.RscRegion, new LocationLevelMappings
                             {
                                 Mappings = [],
-                                Candidates = { { "RSC location 1 key", new LocationOption("RSC location 1 label") } }
+                                Candidates =
+                                    {
+                                        { "RSC location 1 key", new MappableLocationOption("RSC location 1 label") }
+                                    }
                             }
                         }
                     }
@@ -783,7 +798,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "LA location 1 key",
                                 new LocationOptionMapping
                                 {
-                                    Source = new LocationOption("LA location 1 label"),
+                                    Source = new MappableLocationOption("LA location 1 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "LA location 1 key"
                                 }
@@ -791,8 +806,8 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         },
                         Candidates =
                         {
-                            { "LA location 1 key", new LocationOption("LA location 1 label") },
-                            { "LA location 2 key", new LocationOption("LA location 2 label") }
+                            { "LA location 1 key", new MappableLocationOption("LA location 1 label") },
+                            { "LA location 2 key", new MappableLocationOption("LA location 2 label") }
                         }
                     }
                 },
@@ -800,7 +815,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                     GeographicLevel.RscRegion, new LocationLevelMappings
                     {
                         Mappings = [],
-                        Candidates = { { "RSC location 1 key", new LocationOption("RSC location 1 label") } }
+                        Candidates = { { "RSC location 1 key", new MappableLocationOption("RSC location 1 label") } }
                     }
                 }
             };
@@ -835,16 +850,22 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         {
                             "Filter 1 key", new FilterMapping
                             {
-                                Source = new Filter("Filter 1 label"),
+                                Source = new MappableFilter("Filter 1 label"),
                                 OptionMappings =
                                 {
                                     {
                                         "Filter 1 option 1 key",
-                                        new FilterOptionMapping { Source = new FilterOption("Filter 1 option 1 label") }
+                                        new FilterOptionMapping
+                                            {
+                                                Source = new MappableFilterOption("Filter 1 option 1 label")
+                                            }
                                     },
                                     {
                                         "Filter 1 option 2 key",
-                                        new FilterOptionMapping { Source = new FilterOption("Filter 1 option 2 label") }
+                                        new FilterOptionMapping
+                                            {
+                                                Source = new MappableFilterOption("Filter 1 option 2 label")
+                                            }
                                     }
                                 }
                             }
@@ -852,12 +873,15 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         {
                             "Filter 2 key", new FilterMapping
                             {
-                                Source = new Filter("Filter 2 label"),
+                                Source = new MappableFilter("Filter 2 label"),
                                 OptionMappings =
                                 {
                                     {
                                         "Filter 2 option 1 key",
-                                        new FilterOptionMapping { Source = new FilterOption("Filter 2 option 1 label") }
+                                        new FilterOptionMapping
+                                            {
+                                                Source = new MappableFilterOption("Filter 2 option 1 label")
+                                            }
                                     }
                                 }
                             }
@@ -871,8 +895,10 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                             {
                                 Options =
                                 {
-                                    { "Filter 1 option 1 key", new FilterOption("Filter 1 option 1 label") },
-                                    { "Filter 1 option 3 key", new FilterOption("Filter 1 option 3 label") }
+                                    {
+                                        "Filter 1 option 1 key", new MappableFilterOption("Filter 1 option 1 label")
+                                    },
+                                    { "Filter 1 option 3 key", new MappableFilterOption("Filter 1 option 3 label") }
                                 }
                             }
                         }
@@ -895,7 +921,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 {
                     "Filter 1 key", new FilterMapping
                     {
-                        Source = new Filter("Filter 1 label"),
+                        Source = new MappableFilter("Filter 1 label"),
                         Type = MappingType.AutoMapped,
                         CandidateKey = "Filter 1 key",
                         OptionMappings =
@@ -904,7 +930,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "Filter 1 option 1 key",
                                 new FilterOptionMapping
                                 {
-                                    Source = new FilterOption("Filter 1 option 1 label"),
+                                    Source = new MappableFilterOption("Filter 1 option 1 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "Filter 1 option 1 key"
                                 }
@@ -913,7 +939,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "Filter 1 option 2 key",
                                 new FilterOptionMapping
                                 {
-                                    Source = new FilterOption("Filter 1 option 2 label"),
+                                    Source = new MappableFilterOption("Filter 1 option 2 label"),
                                     Type = MappingType.AutoNone,
                                     CandidateKey = null
                                 }
@@ -924,7 +950,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 {
                     "Filter 2 key", new FilterMapping
                     {
-                        Source = new Filter("Filter 2 label"),
+                        Source = new MappableFilter("Filter 2 label"),
                         Type = MappingType.AutoNone,
                         CandidateKey = null,
                         OptionMappings =
@@ -933,7 +959,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "Filter 2 option 1 key",
                                 new FilterOptionMapping
                                 {
-                                    Source = new FilterOption("Filter 2 option 1 label"),
+                                    Source = new MappableFilterOption("Filter 2 option 1 label"),
                                     Type = MappingType.AutoNone,
                                     CandidateKey = null
                                 }
@@ -968,16 +994,22 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         {
                             "Filter 1 key", new FilterMapping
                             {
-                                Source = new Filter("Filter 1 label"),
+                                Source = new MappableFilter("Filter 1 label"),
                                 OptionMappings =
                                 {
                                     {
                                         "Filter 1 option 1 key",
-                                        new FilterOptionMapping { Source = new FilterOption("Filter 1 option 1 label") }
+                                        new FilterOptionMapping
+                                            {
+                                                Source = new MappableFilterOption("Filter 1 option 1 label")
+                                            }
                                     },
                                     {
                                         "Filter 1 option 2 key",
-                                        new FilterOptionMapping { Source = new FilterOption("Filter 1 option 2 label") }
+                                        new FilterOptionMapping
+                                            {
+                                                Source = new MappableFilterOption("Filter 1 option 2 label")
+                                            }
                                     }
                                 }
                             }
@@ -985,12 +1017,15 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         {
                             "Filter 2 key", new FilterMapping
                             {
-                                Source = new Filter("Filter 2 label"),
+                                Source = new MappableFilter("Filter 2 label"),
                                 OptionMappings =
                                 {
                                     {
                                         "Filter 2 option 1 key",
-                                        new FilterOptionMapping { Source = new FilterOption("Filter 2 option 1 label") }
+                                        new FilterOptionMapping
+                                            {
+                                                Source = new MappableFilterOption("Filter 2 option 1 label")
+                                            }
                                     }
                                 }
                             }
@@ -1004,8 +1039,10 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                             {
                                 Options =
                                 {
-                                    { "Filter 1 option 1 key", new FilterOption("Filter 1 option 1 label") },
-                                    { "Filter 1 option 2 key", new FilterOption("Filter 1 option 2 label") }
+                                    {
+                                        "Filter 1 option 1 key", new MappableFilterOption("Filter 1 option 1 label")
+                                    },
+                                    { "Filter 1 option 2 key", new MappableFilterOption("Filter 1 option 2 label") }
                                 }
                             }
                         },
@@ -1015,7 +1052,9 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                             {
                                 Options =
                                 {
-                                    { "Filter 2 option 1 key", new FilterOption("Filter 2 option 1 label") }
+                                    {
+                                        "Filter 2 option 1 key", new MappableFilterOption("Filter 2 option 1 label")
+                                    }
                                 }
                             }
                         }
@@ -1037,7 +1076,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 {
                     "Filter 1 key", new FilterMapping
                     {
-                        Source = new Filter("Filter 1 label"),
+                        Source = new MappableFilter("Filter 1 label"),
                         Type = MappingType.AutoMapped,
                         CandidateKey = "Filter 1 key",
                         OptionMappings =
@@ -1046,7 +1085,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "Filter 1 option 1 key",
                                 new FilterOptionMapping
                                 {
-                                    Source = new FilterOption("Filter 1 option 1 label"),
+                                    Source = new MappableFilterOption("Filter 1 option 1 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "Filter 1 option 1 key"
                                 }
@@ -1055,7 +1094,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "Filter 1 option 2 key",
                                 new FilterOptionMapping
                                 {
-                                    Source = new FilterOption("Filter 1 option 2 label"),
+                                    Source = new MappableFilterOption("Filter 1 option 2 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "Filter 1 option 2 key"
                                 }
@@ -1066,7 +1105,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 {
                     "Filter 2 key", new FilterMapping
                     {
-                        Source = new Filter("Filter 2 label"),
+                        Source = new MappableFilter("Filter 2 label"),
                         Type = MappingType.AutoMapped,
                         CandidateKey = "Filter 2 key",
                         OptionMappings =
@@ -1075,7 +1114,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "Filter 2 option 1 key",
                                 new FilterOptionMapping
                                 {
-                                    Source = new FilterOption("Filter 2 option 1 label"),
+                                    Source = new MappableFilterOption("Filter 2 option 1 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "Filter 2 option 1 key"
                                 }
@@ -1110,12 +1149,15 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         {
                             "Filter 1 key", new FilterMapping
                             {
-                                Source = new Filter("Filter 1 label"),
+                                Source = new MappableFilter("Filter 1 label"),
                                 OptionMappings =
                                 {
                                     {
                                         "Filter 1 option 1 key",
-                                        new FilterOptionMapping { Source = new FilterOption("Filter 1 option 1 label") }
+                                        new FilterOptionMapping
+                                            {
+                                                Source = new MappableFilterOption("Filter 1 option 1 label")
+                                            }
                                     }
                                 }
                             }
@@ -1129,8 +1171,10 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                             {
                                 Options =
                                 {
-                                    { "Filter 1 option 1 key", new FilterOption("Filter 1 option 1 label") },
-                                    { "Filter 1 option 2 key", new FilterOption("Filter 1 option 2 label") }
+                                    {
+                                        "Filter 1 option 1 key", new MappableFilterOption("Filter 1 option 1 label")
+                                    },
+                                    { "Filter 1 option 2 key", new MappableFilterOption("Filter 1 option 2 label") }
                                 }
                             }
                         },
@@ -1140,7 +1184,9 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                             {
                                 Options =
                                 {
-                                    { "Filter 2 option 1 key", new FilterOption("Filter 2 option 1 label") }
+                                    {
+                                        "Filter 2 option 1 key", new MappableFilterOption("Filter 2 option 1 label")
+                                    }
                                 }
                             }
                         }
@@ -1163,7 +1209,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 {
                     "Filter 1 key", new FilterMapping
                     {
-                        Source = new Filter("Filter 1 label"),
+                        Source = new MappableFilter("Filter 1 label"),
                         Type = MappingType.AutoMapped,
                         CandidateKey = "Filter 1 key",
                         OptionMappings =
@@ -1172,7 +1218,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 "Filter 1 option 1 key",
                                 new FilterOptionMapping
                                 {
-                                    Source = new FilterOption("Filter 1 option 1 label"),
+                                    Source = new MappableFilterOption("Filter 1 option 1 label"),
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "Filter 1 option 1 key"
                                 }
