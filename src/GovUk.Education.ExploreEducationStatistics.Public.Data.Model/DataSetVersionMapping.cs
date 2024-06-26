@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -120,6 +121,7 @@ public abstract record MappableElementWithOptions<TMappableOption>(string Label)
 public abstract record Mapping<TMappableElement>
     where TMappableElement : MappableElement
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public MappingType Type { get; set; } = MappingType.None;
 
     public TMappableElement Source { get; set; } = null!;
