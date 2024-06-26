@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
@@ -23,7 +24,7 @@ public static class DbContextTestExtensions
             {
                 await context.Database.ExecuteSqlRawAsync($"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""");
             }
-            
+
             var sequences = context.Model.GetSequences();
 
             foreach (var sequence in sequences)
@@ -37,5 +38,28 @@ public static class DbContextTestExtensions
             throw new NotImplementedException(
                 $"Clearing test data is not supported for type {context.Database.ProviderName}");
         }
+    }
+
+    /// <summary>
+    /// Enabling this on a DbContext during integration testing allows SQL to
+    /// be output to the console for analysis.
+    /// </summary>
+    public static DbContextOptionsBuilder UseConsoleLogging(
+        this DbContextOptionsBuilder options,
+        bool enabled)
+    {
+        if (!enabled)
+        {
+            return options;
+        }
+
+        return options.UseLoggerFactory(LoggerFactory.Create(builder =>
+        {
+            builder
+                .AddFilter((category, level) =>
+                    category == DbLoggerCategory.Database.Command.Name
+                    && level == LogLevel.Information)
+                .AddConsole();
+        }));
     }
 }

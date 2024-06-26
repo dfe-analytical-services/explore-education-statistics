@@ -454,6 +454,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
             services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
+            services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
+            services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
 
             services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
             {

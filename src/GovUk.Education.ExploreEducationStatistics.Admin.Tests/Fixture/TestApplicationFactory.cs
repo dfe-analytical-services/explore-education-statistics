@@ -1,5 +1,4 @@
 #nullable enable
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -13,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
 public class TestApplicationFactory : TestApplicationFactory<TestStartup>
 {
+    private const bool SqlLoggingEnabled = false;
+
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
         .Build();
@@ -43,7 +44,8 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
                     options => options
                         .UseNpgsql(
                             _postgreSqlContainer.GetConnectionString(),
-                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
+                            psqlOptions => psqlOptions.EnableRetryOnFailure())
+                        .UseConsoleLogging(SqlLoggingEnabled));
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
