@@ -12,7 +12,7 @@ internal class DataSetVersionMappingService(
     PublicDataDbContext publicDataDbContext)
     : IDataSetVersionMappingService
 {
-    public static readonly MappingType[] IncompleteMappingTypes =
+    private static readonly MappingType[] IncompleteMappingTypes =
     [
         MappingType.None,
         MappingType.AutoNone
@@ -22,15 +22,13 @@ internal class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        var liveVersion = (await publicDataDbContext
-            .DataSetVersions
-            .Where(dsv => dsv.Id == nextDataSetVersionId)
-            .Select(dsv => dsv.DataSet.LatestLiveVersion)
-            .SingleAsync(cancellationToken))!;
-
         var nextVersion = await publicDataDbContext
             .DataSetVersions
+            .Include(dsv => dsv.DataSet)
+            .ThenInclude(ds => ds.LatestLiveVersion)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
+
+        var liveVersion = nextVersion.DataSet.LatestLiveVersion!;
 
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMetaForMappings(
             dataSetVersionId: nextDataSetVersionId,
@@ -210,8 +208,7 @@ internal class DataSetVersionMappingService(
                             {
                                 Key = $"{option.Label} :: {option.ToRow().GetRowKey()}",
                                 Label = option.Label,
-                            },
-                            Type = MappingType.AutoNone
+                            }
                         })
                         .ToList(),
                     Candidates = candidatesForLevel
@@ -226,9 +223,7 @@ internal class DataSetVersionMappingService(
             })
             .ToList();
 
-        var sourceLevels = sourceMappingsByLevel
-            .Select(level => level.Level)
-            .Distinct();
+        var sourceLevels = sourceMappingsByLevel.Select(level => level.Level);
 
         // Additionally find any Geographic Levels that appear in the target data set version but not in the source,
         // and create mappings by level for them.

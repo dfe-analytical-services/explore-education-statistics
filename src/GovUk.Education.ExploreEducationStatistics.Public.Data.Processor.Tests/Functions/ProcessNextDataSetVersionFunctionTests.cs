@@ -125,7 +125,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
         }
     }
 
-    public abstract class CreateMappingMiscTests(
+    public class CreateMappingMiscTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateMappingsTests(fixture)
     {
@@ -257,7 +257,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         .Select(option => new LocationOptionMapping
                         {
                             CandidateKey = null,
-                            Type = MappingType.AutoNone,
+                            Type = MappingType.None,
                             Source = new LocationOption
                             {
                                 Key = $"{option.Label} :: {option.ToRow().GetRowKey()}",

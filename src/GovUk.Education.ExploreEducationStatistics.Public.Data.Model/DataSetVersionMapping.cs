@@ -57,12 +57,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
                         locationMapping.Property(lm => lm.Type)
                             .HasConversion(new EnumToEnumValueConverter<MappingType>());
                     });
-                });
-
-                locations.OwnsMany(location => location.Levels, level =>
-                {
-                    level.OwnsMany(mapping => mapping.Mappings);
-                    level.OwnsMany(mapping => mapping.Candidates);
+                    locationMappings.OwnsMany(mapping => mapping.Candidates);
                 });
             });
 
@@ -153,7 +148,7 @@ public abstract record MappableElementWithOptions<TMappableOption>
 /// the target DataSetVersion) and the candidate key (if a candidate has been chosen).
 /// </summary>
 public abstract record Mapping<TMappableElement>
-    where TMappableElement : class
+    where TMappableElement : MappableElement
 {
     public MappingType Type { get; set; } = MappingType.None;
 
