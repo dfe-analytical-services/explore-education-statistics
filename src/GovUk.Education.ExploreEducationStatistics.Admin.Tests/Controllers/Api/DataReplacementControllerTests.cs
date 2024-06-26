@@ -60,7 +60,7 @@ public abstract class DataReplacementControllerTests
                         })
                 ],
                 Footnotes = [],
-                LinkedApiDataSetVersion = new DeleteApiDataSetVersionPlanViewModel
+                DeleteApiDataSetVersionPlan = new DeleteApiDataSetVersionPlanViewModel
                 {
                     DataSetId = Guid.NewGuid(),
                     DataSetTitle = "my data set",

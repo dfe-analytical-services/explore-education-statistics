@@ -1785,13 +1785,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var replacementPlan = result.AssertRight();
 
-                Assert.NotNull(replacementPlan.LinkedApiDataSetVersion);
-                Assert.Equal(dataSet.Id, replacementPlan.LinkedApiDataSetVersion.DataSetId);
-                Assert.Equal(dataSet.Title, replacementPlan.LinkedApiDataSetVersion.DataSetTitle);
-                Assert.Equal(dataSetVersion.Id, replacementPlan.LinkedApiDataSetVersion.Id);
-                Assert.Equal(dataSetVersion.Version, replacementPlan.LinkedApiDataSetVersion.Version);
-                Assert.Equal(dataSetVersion.Status, replacementPlan.LinkedApiDataSetVersion.Status);
-                Assert.False(replacementPlan.LinkedApiDataSetVersion.Valid);
+                Assert.NotNull(replacementPlan.DeleteApiDataSetVersionPlan);
+                Assert.Equal(dataSet.Id, replacementPlan.DeleteApiDataSetVersionPlan.DataSetId);
+                Assert.Equal(dataSet.Title, replacementPlan.DeleteApiDataSetVersionPlan.DataSetTitle);
+                Assert.Equal(dataSetVersion.Id, replacementPlan.DeleteApiDataSetVersionPlan.Id);
+                Assert.Equal(dataSetVersion.Version, replacementPlan.DeleteApiDataSetVersionPlan.Version);
+                Assert.Equal(dataSetVersion.Status, replacementPlan.DeleteApiDataSetVersionPlan.Status);
+                Assert.False(replacementPlan.DeleteApiDataSetVersionPlan.Valid);
 
                 Assert.False(replacementPlan.Valid);
             }
@@ -2369,7 +2369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(footnoteForSubjectPlan.Valid);
 
-                Assert.Null(replacementPlan.LinkedApiDataSetVersion);
+                Assert.Null(replacementPlan.DeleteApiDataSetVersionPlan);
 
                 Assert.True(replacementPlan.Valid);
             }

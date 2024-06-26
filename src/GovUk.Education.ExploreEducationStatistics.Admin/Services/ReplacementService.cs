@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectId: originalSubjectId,
                         replacementSubjectMeta);
 
-                    var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
+                    var apiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
                     ? null
                     : new DeleteApiDataSetVersionPlanViewModel
                     {
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         DataBlocks = dataBlocks,
                         Footnotes = footnotes,
-                        LinkedApiDataSetVersion = linkedApiDataSetVersionDeletionPlan,
+                        DeleteApiDataSetVersionPlan = apiDataSetVersionDeletionPlan,
                         OriginalSubjectId = originalSubjectId,
                         ReplacementSubjectId = replacementSubjectId,
                     };
@@ -221,7 +221,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseFile.PublicApiDataSetId.Value,
                 releaseFile.PublicApiDataSetVersion!,
                 cancellationToken)
-                .OnSuccess(dsv => (DataSetVersion?)dsv);
+                .OnSuccess(dsv => (DataSetVersion?)dsv)
+                .OnFailureDo(_ => throw new ApplicationException(
+                    $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
         }
 
         private async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
