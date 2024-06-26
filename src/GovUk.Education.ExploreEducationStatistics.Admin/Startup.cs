@@ -777,11 +777,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
         
-        public Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(Guid releaseVersionId, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(new Either<ActionResult, IReadOnlyList<DataSetVersion>>([]));
-        }
-        
         public Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
             Guid dataSetId, 
             SemVersion version, 
