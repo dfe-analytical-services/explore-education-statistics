@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Testcontainers.Azurite;
 using Testcontainers.PostgreSql;
 
@@ -88,7 +89,17 @@ public abstract class ProcessorFunctionsIntegrationTest(
             .WithStatus(status ?? DataSetVersionStatus.Processing)
             .WithImports(() => [dataSetVersionImport])
             .WithVersionNumber(major: versionMajor, minor: versionMinor)
-            .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+            .FinishWith(dsv =>
+            {
+                if (status == DataSetVersionStatus.Published)
+                {
+                    dsv.DataSet.LatestLiveVersion = dsv;
+                }
+                else
+                {
+                    dsv.DataSet.LatestDraftVersion = dsv;
+                }
+            });
 
         await AddTestData<PublicDataDbContext>(context =>
         {
@@ -159,9 +170,12 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                 services.UseInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
 
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(
-                        _postgreSqlContainer.GetConnectionString(),
-                        psqlOptions => psqlOptions.EnableRetryOnFailure()));
+                    options =>
+                    {
+                        options.UseNpgsql(
+                                _postgreSqlContainer.GetConnectionString(),
+                                psqlOptions => psqlOptions.EnableRetryOnFailure());
+                    });
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()

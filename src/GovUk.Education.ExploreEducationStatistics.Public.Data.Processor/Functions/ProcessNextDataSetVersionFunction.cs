@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class ProcessNextDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
-    IDataSetMetaService dataSetMetaService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionMappingService mappingService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(nameof(ProcessNextDataSetVersion))]
     public async Task ProcessNextDataSetVersion(
@@ -29,6 +29,7 @@ public class ProcessNextDataSetVersionFunction(
         {
             await context.CallActivity(ActivityNames.CopyCsvFiles, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CreateMappings, logger, context.InstanceId);
+            await context.CallActivity(ActivityNames.ApplyAutoMappings, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CompleteNextDataSetVersionMappingProcessing, logger,
                 context.InstanceId);
         }
@@ -49,17 +50,18 @@ public class ProcessNextDataSetVersionFunction(
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingMetadata, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.CreatingMappings, cancellationToken);
+        await mappingService.CreateMappings(dataSetVersionImport.DataSetVersionId, cancellationToken);
+    }
 
-        var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMetaForMappings(
-                dataSetVersionId: dataSetVersionImport.DataSetVersionId,
-                cancellationToken);
-
-        var dataSetVersion = dataSetVersionImport.DataSetVersion;
-        dataSetVersion.MetaSummary = nextVersionMeta.MetaSummary;
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-
-        // TODO EES-4945 - implement the creation of mappings here.
+    [Function(ActivityNames.ApplyAutoMappings)]
+    public async Task ApplyAutoMappings(
+        [ActivityTrigger] Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.AutoMapping, cancellationToken);
+        await mappingService.ApplyAutoMappings(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(ActivityNames.CompleteNextDataSetVersionMappingProcessing)]
