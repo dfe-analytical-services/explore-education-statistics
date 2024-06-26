@@ -116,7 +116,7 @@ public abstract record MappableElementWithOptions<TMappableOption>(string Label)
 /// the target DataSetVersion) and the candidate key (if a candidate has been chosen).
 /// </summary>
 public abstract record Mapping<TMappableElement>
-    where TMappableElement : class
+    where TMappableElement : MappableElement
 {
     public MappingType Type { get; set; } = MappingType.None;
 
@@ -142,8 +142,7 @@ public abstract record ParentMapping<TMappableElement, TOption, TOptionMapping>
 /// This represents a location option that is potentially mappable to another location option
 /// from the same geographic level. 
 /// </summary>
-public record LocationOption(
-    string Label) : MappableElement(Label);
+public record LocationOption(string Label) : MappableElement(Label);
 
 /// <summary>
 /// This represents the mapping, or failure to map, of a source location option to a target

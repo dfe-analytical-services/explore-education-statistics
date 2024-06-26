@@ -32,15 +32,13 @@ internal class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        var liveVersion = (await publicDataDbContext
-            .DataSetVersions
-            .Where(dsv => dsv.Id == nextDataSetVersionId)
-            .Select(dsv => dsv.DataSet.LatestLiveVersion)
-            .SingleAsync(cancellationToken))!;
-
         var nextVersion = await publicDataDbContext
             .DataSetVersions
+            .Include(dsv => dsv.DataSet)
+            .ThenInclude(ds => ds.LatestLiveVersion)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
+
+        var liveVersion = nextVersion.DataSet.LatestLiveVersion!;
 
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMetaForMappings(
             dataSetVersionId: nextDataSetVersionId,
@@ -230,8 +228,7 @@ internal class DataSetVersionMappingService(
                                 keySelector: LocationOptionKeyGenerator,
                                 elementSelector: option => new LocationOptionMapping
                                 {
-                                    Source = new LocationOption(option.Label),
-                                    Type = MappingType.AutoNone
+                                    Source = new LocationOption(option.Label)
                                 }),
                         Candidates = candidatesForLevel
                             .ToDictionary(
