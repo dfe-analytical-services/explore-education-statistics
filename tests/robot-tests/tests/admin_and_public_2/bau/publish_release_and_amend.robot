@@ -111,6 +111,7 @@ Create chart for data block
     user clicks button    Choose an infographic as alternative
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
     user checks radio is checked    Use table title
+    user waits until element is enabled    id:chartConfigurationForm-alt
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
     user saves infographic configuration
 
@@ -149,10 +150,12 @@ Add data block to first accordion section
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
+    user reloads page
 
 Verify data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user scrolls down    100
+    user waits for caches to expire
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
@@ -415,6 +418,7 @@ Verify Dates data block accordion section
 
 Verify Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    id:content
+    user scrolls down    100
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
@@ -661,6 +665,8 @@ Update free text key stat
 
 Verify amended Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user scrolls down    100
+    user waits for caches to expire
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}

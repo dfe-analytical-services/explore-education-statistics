@@ -100,6 +100,7 @@ user creates data block for dates csv
     user chooses select option    id:timePeriodForm-start    2020 Week 13
     user chooses select option    id:timePeriodForm-end    2020 Week 16
     user clicks element    id:timePeriodForm-submit
+    User Waits For Caches To Expire
 
     user waits until table tool wizard step is available    4    Choose your filters
     user clicks subheaded indicator checkbox    Open settings    Number of open settings
@@ -248,6 +249,8 @@ user adds text block to editable accordion section
     ...    ${parent}=css:[data-testid="accordion"]
 
     ${section}=    user gets accordion section content element    ${section_name}    ${parent}
+    user waits until page finishes loading
+    user scrolls down    100
     user clicks button    Add text block    ${section}
     user waits until element contains    ${section}    This section is empty    %{WAIT_SMALL}
 
