@@ -215,6 +215,8 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
             var (instanceId, initialVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
+            // Select a set of LocationOptions that rely on all the available Location
+            // Code fields.
             var initialLocationMeta = DataFixture
                 .DefaultLocationMeta()
                 .WithDataSetVersionId(initialVersion.Id)
@@ -226,14 +228,21 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                         .Select(meta => meta as LocationOptionMeta)
                         .ToList()))
                 .ForIndex(1, s => s
-                    .SetLevel(GeographicLevel.RscRegion)
+                    .SetLevel(GeographicLevel.School)
                     .SetOptions(DataFixture
-                        .DefaultLocationRscRegionOptionMeta()
+                        .DefaultLocationSchoolOptionMeta()
+                        .GenerateList(2)
+                        .Select(meta => meta as LocationOptionMeta)
+                        .ToList()))
+                .ForIndex(2, s => s
+                    .SetLevel(GeographicLevel.Provider)
+                    .SetOptions(DataFixture
+                        .DefaultLocationProviderOptionMeta()
                         .GenerateList(2)
                         .Select(meta => meta as LocationOptionMeta)
                         .ToList()))
                 .GenerateList();
-
+            
             await AddTestData<PublicDataDbContext>(context =>
                 context.LocationMetas.AddRange(initialLocationMeta));
 
@@ -259,6 +268,13 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                     CandidateKey = null,
                                     Type = MappingType.None,
                                     Source = new LocationOption(option.Label)
+                                    {
+                                        Code = option.ToRow().Code,
+                                        OldCode = option.ToRow().OldCode,
+                                        Urn = option.ToRow().Urn,
+                                        LaEstab = option.ToRow().LaEstab,
+                                        Ukprn = option.ToRow().Ukprn
+                                    }
                                 })
                     });
 
@@ -266,7 +282,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
             Assert.Equal(ProcessorTestData
                     .AbsenceSchool
                     .ExpectedGeographicLevels
-                    .Concat([GeographicLevel.RscRegion])
+                    .Concat([GeographicLevel.Provider])
                     .Order(),
                 mappings.LocationMappingPlan
                     .Levels
@@ -316,7 +332,14 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                                 .options
                                 .ToDictionary(
                                     keySelector: option => $"{option.Label} :: {option.ToRow().GetRowKey()}",
-                                    elementSelector: option => new LocationOption(option.Label))
+                                    elementSelector: option => new LocationOption(option.Label)
+                                    {
+                                        Code = option.ToRow().Code,
+                                        OldCode = option.ToRow().OldCode,
+                                        Urn = option.ToRow().Urn,
+                                        LaEstab = option.ToRow().LaEstab,
+                                        Ukprn = option.ToRow().Ukprn
+                                    })
                         });
 
             mappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
@@ -356,7 +379,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
             var expectedFilterMappings = initialFilterMeta
                 .ToDictionary(
-                    keySelector: filter => filter.Label,
+                    keySelector: filter => filter.PublicId,
                     elementSelector: filter =>
                         new FilterMapping
                         {
@@ -398,7 +421,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
                 .AbsenceSchool
                 .ExpectedFilters
                 .ToDictionary(
-                    keySelector: filterAndOptions => filterAndOptions.Label,
+                    keySelector: filterAndOptions => filterAndOptions.PublicId,
                     elementSelector: filterAndOptions =>
                         new FilterMappingCandidate(filterAndOptions.Label)
                         {

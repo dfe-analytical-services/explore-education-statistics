@@ -13,7 +13,7 @@ internal class DataSetVersionMappingService(
     PublicDataDbContext publicDataDbContext)
     : IDataSetVersionMappingService
 {
-    public static readonly MappingType[] IncompleteMappingTypes =
+    private static readonly MappingType[] IncompleteMappingTypes =
     [
         MappingType.None,
         MappingType.AutoNone
@@ -23,7 +23,7 @@ internal class DataSetVersionMappingService(
         option => $"{option.Label} :: {option.GetRowKey()}";
 
     private static Func<FilterMeta, string> FilterKeyGenerator =>
-        filter => filter.Label;
+        filter => filter.PublicId;
 
     private static Func<FilterOptionMeta, string> FilterOptionKeyGenerator =>
         option => option.Label;
@@ -228,12 +228,12 @@ internal class DataSetVersionMappingService(
                                 keySelector: LocationOptionKeyGenerator,
                                 elementSelector: option => new LocationOptionMapping
                                 {
-                                    Source = new LocationOption(option.Label)
+                                    Source = CreateLocationOptionFromMetaRow(option)
                                 }),
                         Candidates = candidatesForLevel
                             .ToDictionary(
                                 keySelector: LocationOptionKeyGenerator,
-                                elementSelector: option => new LocationOption(option.Label))
+                                elementSelector: CreateLocationOptionFromMetaRow)
                     };
                 });
 
@@ -257,8 +257,7 @@ internal class DataSetVersionMappingService(
                         .optionsMeta
                         .ToDictionary(
                             keySelector: LocationOptionKeyGenerator,
-                            elementSelector: option =>
-                                new LocationOption(option.Label))
+                            elementSelector: CreateLocationOptionFromMetaRow)
                 });
 
         return new LocationMappingPlan
@@ -287,7 +286,7 @@ internal class DataSetVersionMappingService(
                             .ToDictionary(
                                 keySelector: FilterOptionKeyGenerator,
                                 elementSelector: option =>
-                                    new FilterOptionMapping { Source = new FilterOption(option.Label) })
+                                    new FilterOptionMapping { Source = CreateFilterOptionFromMetaRow(option) })
                     });
 
         var filterTargets = targetFilterMeta
@@ -302,8 +301,7 @@ internal class DataSetVersionMappingService(
                         Options = meta.optionsMeta
                             .ToDictionary(
                                 keySelector: FilterOptionKeyGenerator,
-                                elementSelector: option =>
-                                    new FilterOption(option.Label))
+                                elementSelector: CreateFilterOptionFromMetaRow)
                     });
 
         var filters = new FilterMappingPlan
@@ -315,6 +313,22 @@ internal class DataSetVersionMappingService(
         return filters;
     }
 
+    private static LocationOption CreateLocationOptionFromMetaRow(LocationOptionMetaRow option)
+    {
+        return new LocationOption(option.Label)
+        {
+            Code = option.Code,
+            OldCode = option.OldCode,
+            Ukprn = option.Ukprn,
+            Urn = option.Urn,
+            LaEstab = option.LaEstab
+        };
+    }
+
+    private static FilterOption CreateFilterOptionFromMetaRow(FilterOptionMeta option)
+    {
+        return new FilterOption(option.Label);
+    }
 
     private async Task<List<LocationMeta>> GetLocationMeta(
         Guid dataSetVersionId,

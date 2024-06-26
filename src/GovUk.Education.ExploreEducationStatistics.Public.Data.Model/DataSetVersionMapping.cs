@@ -142,7 +142,18 @@ public abstract record ParentMapping<TMappableElement, TOption, TOptionMapping>
 /// This represents a location option that is potentially mappable to another location option
 /// from the same geographic level. 
 /// </summary>
-public record LocationOption(string Label) : MappableElement(Label);
+public record LocationOption(string Label) : MappableElement(Label)
+{
+    public string? Code { get; set; }
+
+    public string? OldCode { get; set; }
+
+    public string? Urn { get; set; }
+
+    public string? LaEstab { get; set; }
+
+    public string? Ukprn { get; set; }
+};
 
 /// <summary>
 /// This represents the mapping, or failure to map, of a source location option to a target
@@ -173,21 +184,20 @@ public class LocationMappingPlan
 /// <summary>
 /// This represents a filter option that is potentially mappable to another filter option. 
 /// </summary>
-public record FilterOption(
-    string Label) : MappableElement(Label);
+public record FilterOption(string Label) : MappableElement(Label);
 
 /// <summary>
 /// This represents a filter that is potentially mappable to another filter.
 /// </summary>
-public record Filter(
-    string Label) : MappableElement(Label);
+public record Filter(string Label) : MappableElement(Label);
 
 /// <summary>
 /// This represents a candidate filter and all of its candidate filter options from
 /// the target data set version that could be mapped to from filters and filter options
 /// from the source version.
 /// </summary>
-public record FilterMappingCandidate(string Label) : MappableElementWithOptions<FilterOption>(Label);
+public record FilterMappingCandidate(string Label)
+    : MappableElementWithOptions<FilterOption>(Label);
 
 /// <summary>
 /// This represents a potential mapping of a filter option from the source data set version
