@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -38,52 +38,29 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
             builder.Property(mapping => mapping.Id)
                 .HasValueGenerator<UuidV7ValueGenerator>();
 
-            builder.HasIndex(mapping => new {mapping.SourceDataSetVersionId})
+            builder.HasIndex(mapping => new { mapping.SourceDataSetVersionId })
                 .HasDatabaseName("IX_DataSetVersionMappings_SourceDataSetVersionId")
                 .IsUnique();
 
-            builder.HasIndex(mapping => new {mapping.TargetDataSetVersionId})
+            builder.HasIndex(mapping => new { mapping.TargetDataSetVersionId })
                 .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId")
                 .IsUnique();
 
-            builder.OwnsOne(v => v.LocationMappingPlan, locations =>
-            {
-                locations.ToJson();
-                locations.OwnsMany(l => l.Levels, locationMappings =>
-                {
-                    locationMappings.OwnsMany(mapping => mapping.Mappings, locationMapping =>
-                    {
-                        locationMapping.OwnsOne(lm => lm.Source);
-                        locationMapping.Property(lm => lm.Type)
-                            .HasConversion(new EnumToEnumValueConverter<MappingType>());
-                    });
-                    locationMappings.OwnsMany(mapping => mapping.Candidates);
-                });
-            });
+            builder.Property(p => p.LocationMappingPlan)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v =>
+                        JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
+                    v =>
+                        JsonSerializer.Deserialize<LocationMappingPlan>(v, (JsonSerializerOptions)null!)!);
 
-            builder.OwnsOne(mapping => mapping.FilterMappingPlan, filters =>
-            {
-                filters.ToJson();
-
-                filters.OwnsMany(f => f.Mappings, filterMapping =>
-                {
-                    filterMapping.OwnsOne(mapping => mapping.Source);
-                    filterMapping.Property(mapping => mapping.Type)
-                        .HasConversion(new EnumToEnumValueConverter<MappingType>());
-
-                    filterMapping.OwnsMany(mapping => mapping.OptionMappings, filterOptionMapping =>
-                    {
-                        filterOptionMapping.OwnsOne(mapping => mapping.Source);
-                        filterOptionMapping.Property(mapping => mapping.Type)
-                            .HasConversion(new EnumToEnumValueConverter<MappingType>());
-                    });
-                });
-
-                filters.OwnsMany(f => f.Candidates, filterTarget =>
-                {
-                    filterTarget.OwnsMany(mapping => mapping.Options);
-                });
-            });
+            builder.Property(p => p.FilterMappingPlan)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v =>
+                        JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
+                    v =>
+                        JsonSerializer.Deserialize<FilterMappingPlan>(v, (JsonSerializerOptions)null!)!);
         }
     }
 }
@@ -125,20 +102,13 @@ public enum MappingType
 /// <summary>
 /// This base class represents an element from the DataSetVersions that can be mapped.
 /// </summary>
-public abstract record MappableElement
-{
-    /// <summary>
-    /// This is a synthetic identifier which is used to identify source and target
-    /// elements in lieu of using actual database ids.
-    /// </summary>
-    public string Key { get; set; } = string.Empty;
-}
+public abstract record MappableElement(string Label);
 
-public abstract record MappableElementWithOptions<TMappableOption>
-    : MappableElement
+public abstract record MappableElementWithOptions<TMappableOption>(string Label)
+    : MappableElement(Label)
     where TMappableOption : MappableElement
 {
-    public List<TMappableOption> Options { get; set; } = [];
+    public Dictionary<string, TMappableOption> Options { get; set; } = [];
 }
 
 /// <summary>
@@ -167,17 +137,25 @@ public abstract record ParentMapping<TMappableElement, TOption, TOptionMapping>
     where TOption : MappableElement
     where TOptionMapping : Mapping<TOption>
 {
-    public List<TOptionMapping> OptionMappings { get; set; } = [];
+    public Dictionary<string, TOptionMapping> OptionMappings { get; set; } = [];
 }
 
 /// <summary>
 /// This represents a location option that is potentially mappable to another location option
 /// from the same geographic level. 
 /// </summary>
-public record LocationOption : MappableElement
+public record LocationOption(string Label) : MappableElement(Label)
 {
-    public string Label { get; set; } = string.Empty;
-}
+    public string? Code { get; set; }
+
+    public string? OldCode { get; set; }
+
+    public string? Urn { get; set; }
+
+    public string? LaEstab { get; set; }
+
+    public string? Ukprn { get; set; }
+};
 
 /// <summary>
 /// This represents the mapping, or failure to map, of a source location option to a target
@@ -191,11 +169,9 @@ public record LocationOptionMapping : Mapping<LocationOption>;
 /// </summary>
 public record LocationLevelMappings
 {
-    public GeographicLevel Level { get; set; }
+    public Dictionary<string, LocationOptionMapping> Mappings { get; set; } = [];
 
-    public List<LocationOptionMapping> Mappings { get; set; } = [];
-
-    public List<LocationOption> Candidates { get; set; } = [];
+    public Dictionary<string, LocationOption> Candidates { get; set; } = [];
 }
 
 /// <summary>
@@ -204,34 +180,26 @@ public record LocationLevelMappings
 /// </summary>
 public class LocationMappingPlan
 {
-    public List<LocationLevelMappings> Levels { get; set; } = [];
+    public Dictionary<GeographicLevel, LocationLevelMappings> Levels { get; set; } = [];
 }
 
 /// <summary>
 /// This represents a filter option that is potentially mappable to another filter option. 
 /// </summary>
-public record FilterOption : MappableElement
-{
-    public string Label { get; set; } = string.Empty;
-}
+public record FilterOption(string Label) : MappableElement(Label);
 
 /// <summary>
 /// This represents a filter that is potentially mappable to another filter.
 /// </summary>
-public record Filter : MappableElement
-{
-    public string Label { get; set; } = string.Empty;
-}
+public record Filter(string Label) : MappableElement(Label);
 
 /// <summary>
 /// This represents a candidate filter and all of its candidate filter options from
 /// the target data set version that could be mapped to from filters and filter options
 /// from the source version.
 /// </summary>
-public record FilterMappingCandidate : MappableElementWithOptions<FilterOption>
-{
-    public string Label { get; set; } = string.Empty;
-}
+public record FilterMappingCandidate(string Label)
+    : MappableElementWithOptions<FilterOption>(Label);
 
 /// <summary>
 /// This represents a potential mapping of a filter option from the source data set version
@@ -252,7 +220,7 @@ public record FilterMapping : ParentMapping<Filter, FilterOption, FilterOptionMa
 /// </summary>
 public record FilterMappingPlan
 {
-    public List<FilterMapping> Mappings { get; set; } = [];
+    public Dictionary<string, FilterMapping> Mappings { get; set; } = [];
 
-    public List<FilterMappingCandidate> Candidates { get; set; } = [];
+    public Dictionary<string, FilterMappingCandidate> Candidates { get; set; } = [];
 }
