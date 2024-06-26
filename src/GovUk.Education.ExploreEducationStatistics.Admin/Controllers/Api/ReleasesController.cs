@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleaseVersionPlan(
+        public async Task<ActionResult<DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId,
             CancellationToken cancellationToken)
         {
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(
+        public async Task<ActionResult<DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
             Guid releaseVersionId, 
             Guid fileId,
             CancellationToken cancellationToken = default)

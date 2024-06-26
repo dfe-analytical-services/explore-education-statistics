@@ -26,12 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, DataBlockViewModel>> Update(Guid dataBlockVersionId,
             DataBlockUpdateViewModel dataBlockUpdate);
 
-        Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
+        Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlanViewModel deletePlan);
 
-        Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseVersionId,
+        Task<Either<ActionResult, DeleteDataBlockPlanViewModel>> GetDeletePlan(Guid releaseVersionId,
             Guid dataBlockVersionId);
 
-        Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseVersionId,
+        Task<DeleteDataBlockPlanViewModel> GetDeletePlan(Guid releaseVersionId,
             Subject? subject);
 
         Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseVersionId,

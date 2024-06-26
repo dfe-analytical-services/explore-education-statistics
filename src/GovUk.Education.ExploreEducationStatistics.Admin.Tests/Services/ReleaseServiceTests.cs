@@ -47,6 +47,7 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Adm
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -331,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlockService = new Mock<IDataBlockService>(Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
 
-            var deleteDataBlockPlan = new DeleteDataBlockPlan();
+            var deleteDataBlockPlan = new DeleteDataBlockPlanViewModel();
             dataBlockService.Setup(service => service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
                 .ReturnsAsync(deleteDataBlockPlan);
 
@@ -417,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataSetVersion);
 
-            var deleteDataBlockPlan = new DeleteDataBlockPlan();
+            var deleteDataBlockPlan = new DeleteDataBlockPlanViewModel();
             dataBlockService.Setup(service => service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
                 .ReturnsAsync(deleteDataBlockPlan);
 
@@ -505,9 +506,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             dataBlockService.Setup(service => service.GetDeletePlan(releaseVersion.Id,
                     It.Is<Subject>(s => s.Id == subject.Id)))
-                .ReturnsAsync(new DeleteDataBlockPlan());
+                .ReturnsAsync(new DeleteDataBlockPlanViewModel());
 
-            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
+            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
                 .ReturnsAsync(Unit.Instance);
 
             dataImportService.Setup(service => service.GetImport(file.Id))
@@ -666,9 +667,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataBlockService.Setup(service =>
                     service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s =>
                         new[] { subject.Id, replacementSubject.Id }.Contains(s.Id))))
-                .ReturnsAsync(new DeleteDataBlockPlan());
+                .ReturnsAsync(new DeleteDataBlockPlanViewModel());
 
-            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
+            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
                 .ReturnsAsync(Unit.Instance);
 
             dataImportService.Setup(service => service.GetImport(It.IsIn(file.Id, replacementFile.Id)))
@@ -715,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseSubjectRepository);
 
                 dataBlockService.Verify(
-                    mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
+                    mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()),
                     Times.Exactly(2));
 
                 releaseDataFileService.Verify(

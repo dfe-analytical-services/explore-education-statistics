@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var fileId = Guid.NewGuid();
 
-            var deleteDataFilePlan = new DeleteDataFilePlan();
+            var deleteDataFilePlan = new DeleteDataFilePlanViewModel();
 
             releaseService
                 .Setup(s => s.GetDeleteDataFilePlan(_releaseVersionId, fileId, It.IsAny<CancellationToken>()))
@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
-            var deleteReleasePlan = new DeleteReleasePlan();
+            var deleteReleasePlan = new DeleteReleasePlanViewModel();
 
             releaseService
                 .Setup(s => s.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>()))
