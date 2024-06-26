@@ -169,20 +169,13 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             {
                 services.UseInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
 
-                var loggerFactory = LoggerFactory.Create(builder =>
-                {
-                    builder
-                        .AddFilter((category, level) =>
-                            category == DbLoggerCategory.Database.Command.Name
-                            && level == LogLevel.Information)
-                        .AddConsole();
-                });
-                
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(
-                        _postgreSqlContainer.GetConnectionString(),
-                        psqlOptions => psqlOptions.EnableRetryOnFailure())
-                        .UseLoggerFactory(loggerFactory));
+                    options =>
+                    {
+                        options.UseNpgsql(
+                                _postgreSqlContainer.GetConnectionString(),
+                                psqlOptions => psqlOptions.EnableRetryOnFailure());
+                    });
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
