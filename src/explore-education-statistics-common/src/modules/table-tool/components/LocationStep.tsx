@@ -75,9 +75,9 @@ export default function LocationStep(stepProps: LocationFiltersFormProps) {
   return (
     <LocationFiltersForm
       {...stepProps}
-      onSubmit={values => {
+      onSubmit={async values => {
         setSelectedLocationIds(values.locationIds);
-        onSubmit(values);
+        await onSubmit(values);
       }}
     />
   );
