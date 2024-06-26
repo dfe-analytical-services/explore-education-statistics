@@ -119,6 +119,7 @@ using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using Microsoft.AspNetCore.Mvc;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -775,14 +776,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
+        
+        public Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
+            Guid dataSetId, 
+            SemVersion version, 
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult, DataSetVersion>(new NotFoundResult()));
+        }
 
         public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
             Guid releaseFileId,
             Guid dataSetId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
-            CancellationToken cancellationToken = default)
+        public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }

@@ -1,8 +1,15 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -21,17 +28,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -42,6 +46,7 @@ using static Moq.MockBehavior;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -292,31 +297,194 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetDeleteDataFilePlan()
+        {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
+
+            Subject subject = _dataFixture
+                .DefaultSubject();
+
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.Subject.Add(subject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+
+            var deleteDataBlockPlan = new DeleteDataBlockPlan();
+            dataBlockService.Setup(service => service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
+                .ReturnsAsync(deleteDataBlockPlan);
+
+            var footnote = new Footnote { Id = Guid.NewGuid() };
+            footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
+                .ReturnsAsync([footnote]);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    footnoteRepository: footnoteRepository.Object);
+
+                var result = await releaseService.GetDeleteDataFilePlan(
+                    releaseVersionId: releaseVersion.Id,
+                    fileId: file.Id);
+
+                VerifyAllMocks(dataBlockService,
+                    footnoteRepository);
+
+                var deleteDataFilePlan = result.AssertRight();
+
+                Assert.Equal(releaseVersion.Id, deleteDataFilePlan.ReleaseId);
+                Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
+                Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
+                Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
+                Assert.Null(deleteDataFilePlan.DeleteApiDataSetVersionPlan);
+                Assert.True(deleteDataFilePlan.Valid);
+            }
+        }
+
+        [Fact]
+        public async Task GetDeleteDataFilePlan_FileIsLinkedToPublicApiDataSet_InvalidPlan()
+        {
+            DataSet dataSet = _dataFixture
+                .DefaultDataSet();
+
+            DataSetVersion dataSetVersion = _dataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet);
+
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
+
+            Subject subject = _dataFixture
+                .DefaultSubject();
+
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file)
+                .WithPublicApiDataSetId(dataSet.Id)
+                .WithPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion());
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.Subject.Add(subject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+
+            dataSetVersionService.Setup(service => service.GetDataSetVersion(
+                    releaseFile.PublicApiDataSetId!.Value,
+                    releaseFile.PublicApiDataSetVersion!, 
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(dataSetVersion);
+
+            var deleteDataBlockPlan = new DeleteDataBlockPlan();
+            dataBlockService.Setup(service => service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
+                .ReturnsAsync(deleteDataBlockPlan);
+
+            var footnote = new Footnote { Id = Guid.NewGuid() };
+            footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
+                .ReturnsAsync([footnote]);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    dataSetVersionService: dataSetVersionService.Object,
+                    dataBlockService: dataBlockService.Object,
+                    footnoteRepository: footnoteRepository.Object);
+
+                var result = await releaseService.GetDeleteDataFilePlan(
+                    releaseVersionId: releaseVersion.Id,
+                    fileId: file.Id);
+
+                VerifyAllMocks(dataSetVersionService,
+                    dataBlockService,
+                    footnoteRepository);
+
+                var deleteDataFilePlan = result.AssertRight();
+
+                Assert.Equal(releaseVersion.Id, deleteDataFilePlan.ReleaseId);
+                Assert.Equal(subject.Id, deleteDataFilePlan.SubjectId);
+                Assert.Equal(deleteDataBlockPlan, deleteDataFilePlan.DeleteDataBlockPlan);
+                Assert.Equal([footnote.Id], deleteDataFilePlan.FootnoteIds);
+                Assert.NotNull(deleteDataFilePlan.DeleteApiDataSetVersionPlan);
+                Assert.Equal(dataSet.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetId);
+                Assert.Equal(dataSet.Title, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetTitle);
+                Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Id);
+                Assert.Equal(dataSetVersion.Version, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Version);
+                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Status);
+                Assert.False(deleteDataFilePlan.DeleteApiDataSetVersionPlan.Valid);
+                Assert.False(deleteDataFilePlan.Valid);
+            }
+        }
+
+        [Fact]
         public async Task RemoveDataFiles()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.Add(file);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.Add(subject);
@@ -387,29 +555,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles_FileImporting()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.Add(file);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -438,44 +605,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles_ReplacementExists()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var replacementSubject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject replacementSubject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
 
-            var replacementFile = new File
-            {
-                Filename = "replacement.csv",
-                Type = FileType.Data,
-                SubjectId = replacementSubject.Id,
-                Replacing = file
-            };
+            File replacementFile = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(replacementSubject.Id)
+                .WithType(FileType.Data)
+                .WithReplacing(file);
 
             file.ReplacedBy = replacementFile;
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
+
+            ReleaseFile replacementReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(replacementFile);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.AddRange(file, replacementFile);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.AddRange(subject, replacementSubject);
@@ -525,7 +692,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
+                var releaseService = BuildReleaseService(
+                    context,
                     statisticsDbContext,
                     cacheService: cacheService.Object,
                     dataBlockService: dataBlockService.Object,
@@ -534,10 +702,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
 
-                var result = await releaseService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
+                var result = await releaseService.RemoveDataFiles(
+                    releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                VerifyAllMocks(cacheService,
+                VerifyAllMocks(
+                    cacheService,
                     dataBlockService,
                     dataImportService,
                     footnoteRepository,
@@ -569,43 +739,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles_ReplacementFileImporting()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
 
-            var replacementSubject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Subject replacementSubject = _dataFixture
+                .DefaultSubject();
 
-            var file = new File
-            {
-                Filename = "data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
+            File file = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(subject.Id)
+                .WithType(FileType.Data);
 
-            var replacementFile = new File
-            {
-                Filename = "replacement.csv",
-                Type = FileType.Data,
-                SubjectId = replacementSubject.Id,
-                Replacing = file
-            };
+            File replacementFile = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(replacementSubject.Id)
+                .WithType(FileType.Data)
+                .WithReplacing(file);
 
             file.ReplacedBy = replacementFile;
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
+
+            ReleaseFile replacementReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(replacementFile);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Files.AddRange(file, replacementFile);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -633,6 +803,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(dataImportService);
 
                 result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveDataFiles_FileIsLinkedToPublicApiDataSet_ValidationProblem()
+        {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion();
+
+            File file = _dataFixture
+                .DefaultFile()
+                .WithType(FileType.Data);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file)
+                .WithPublicApiDataSetId(Guid.NewGuid())
+                .WithPublicApiDataSetVersion(1, 0);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataImportService = new Mock<IDataImportService>(Strict);
+
+            dataImportService.Setup(service => service.GetImport(file.Id))
+                .ReturnsAsync(new DataImport
+                {
+                    Status = DataImportStatus.COMPLETE
+                });
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseService = BuildReleaseService(context,
+                    dataImportService: dataImportService.Object);
+
+                var result = await releaseService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
+                    fileId: file.Id);
+
+                VerifyAllMocks(dataImportService);
+
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+                var errorDetail = validationProblem.AssertHasError(
+                    expectedPath: null,
+                    expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
+
+                var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(errorDetail.Detail);
+
+                Assert.Equal(releaseFile.PublicApiDataSetId, apiDataSetErrorDetail.DataSetId);
             }
         }
 
@@ -1988,6 +2214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IDataSetVersionService? dataSetVersionService = null,
             IProcessorClient? processorClient = null,
             IBlobCacheService? cacheService = null)
         {
@@ -2012,6 +2239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
+                dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
                 processorClient ?? Mock.Of<IProcessorClient>(Strict),
                 new SequentialGuidGenerator(),
                 cacheService ?? Mock.Of<IBlobCacheService>(Strict)
