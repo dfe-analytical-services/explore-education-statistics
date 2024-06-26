@@ -150,30 +150,40 @@ public static class DataSetVersionGeneratorExtensions
         Func<IEnumerable<TimePeriodMeta>> metas)
         => generator.ForInstance(s => s.SetTimePeriodMetas(metas));
 
-    public static Generator<DataSetVersion> WithFilterChanges(
+    public static Generator<DataSetVersion> WithFilterMetaChanges(
         this Generator<DataSetVersion> generator,
-        IEnumerable<ChangeSetFilters> filterChanges)
-        => generator.ForInstance(s => s.SetFilterChanges(filterChanges));
+        IEnumerable<FilterMetaChange> metaChanges)
+        => generator.ForInstance(s => s.SetFilterMetaChanges(metaChanges));
 
-    public static Generator<DataSetVersion> WithFilterOptionChanges(
+    public static Generator<DataSetVersion> WithFilterOptionMetaChanges(
         this Generator<DataSetVersion> generator,
-        IEnumerable<ChangeSetFilterOptions> filterOptionChanges)
-        => generator.ForInstance(s => s.SetFilterOptionChanges(filterOptionChanges));
+        IEnumerable<FilterOptionMetaChange> metaChanges)
+        => generator.ForInstance(s => s.SetFilterOptionMetaChanges(metaChanges));
 
-    public static Generator<DataSetVersion> WithIndicatorChanges(
+    public static Generator<DataSetVersion> WithGeographicLevelMetaChanges(
         this Generator<DataSetVersion> generator,
-        IEnumerable<ChangeSetIndicators> indicatorChanges)
-        => generator.ForInstance(s => s.SetIndicatorChanges(indicatorChanges));
+        GeographicLevelMetaChange metaChange)
+        => generator.ForInstance(s => s.SetGeographicLevelMetaChange(metaChange));
 
-    public static Generator<DataSetVersion> WithLocationChanges(
+    public static Generator<DataSetVersion> WithIndicatorMetaChanges(
         this Generator<DataSetVersion> generator,
-        IEnumerable<ChangeSetLocations> locationChanges)
-        => generator.ForInstance(s => s.SetLocationChanges(locationChanges));
+        IEnumerable<IndicatorMetaChange> metaChanges)
+        => generator.ForInstance(s => s.SetIndicatorMetaChanges(metaChanges));
 
-    public static Generator<DataSetVersion> WithTimePeriodChanges(
+    public static Generator<DataSetVersion> WithLocationMetaChanges(
         this Generator<DataSetVersion> generator,
-        IEnumerable<ChangeSetTimePeriods> timePeriodChanges)
-        => generator.ForInstance(s => s.SetTimePeriodChanges(timePeriodChanges));
+        IEnumerable<LocationMetaChange> metaChanges)
+        => generator.ForInstance(s => s.SetLocationMetaChanges(metaChanges));
+
+    public static Generator<DataSetVersion> WithLocationOptionMetaChanges(
+        this Generator<DataSetVersion> generator,
+        IEnumerable<LocationOptionMetaChange> metaChanges)
+        => generator.ForInstance(s => s.SetLocationOptionMetaChanges(metaChanges));
+    
+    public static Generator<DataSetVersion> WithTimePeriodMetaChanges(
+        this Generator<DataSetVersion> generator,
+        IEnumerable<TimePeriodMetaChange> metaChanges)
+        => generator.ForInstance(s => s.SetTimePeriodMetaChanges(metaChanges));
 
     public static Generator<DataSetVersion> WithPreviewTokens(
         this Generator<DataSetVersion> generator,
@@ -408,81 +418,110 @@ public static class DataSetVersionGeneratorExtensions
             }
         );
 
-    public static InstanceSetters<DataSetVersion> SetFilterChanges(
+    public static InstanceSetters<DataSetVersion> SetFilterMetaChanges(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        IEnumerable<ChangeSetFilters> filterChanges)
+        IEnumerable<FilterMetaChange> filterChanges)
         => instanceSetter.Set(
-            dsv => dsv.FilterChanges,
+            dsv => dsv.FilterMetaChanges,
             (_, dsv) => filterChanges.Select(
-                    changeSet =>
+                    change =>
                     {
-                        changeSet.DataSetVersionId = dsv.Id;
-                        changeSet.DataSetVersion = dsv;
-                        return changeSet;
+                        change.DataSetVersion = dsv;
+                        change.DataSetVersionId = dsv.Id;
+                        return change;
                     }
                 )
                 .ToList()
         );
 
-    public static InstanceSetters<DataSetVersion> SetFilterOptionChanges(
+    public static InstanceSetters<DataSetVersion> SetFilterOptionMetaChanges(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        IEnumerable<ChangeSetFilterOptions> filterOptionChanges)
+        IEnumerable<FilterOptionMetaChange> filterOptionChanges)
         => instanceSetter.Set(
-            dsv => dsv.FilterOptionChanges,
+            dsv => dsv.FilterOptionMetaChanges,
             (_, dsv) => filterOptionChanges.Select(
-                    changeSet =>
+                    change =>
                     {
-                        changeSet.DataSetVersionId = dsv.Id;
-                        changeSet.DataSetVersion = dsv;
-                        return changeSet;
+                        change.DataSetVersion = dsv;
+                        change.DataSetVersionId = dsv.Id;
+                        return change;
                     }
                 )
                 .ToList()
         );
-
-    public static InstanceSetters<DataSetVersion> SetIndicatorChanges(
+    
+    public static InstanceSetters<DataSetVersion> SetGeographicLevelMetaChange(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        IEnumerable<ChangeSetIndicators> indicatorChanges)
+        GeographicLevelMetaChange change)
         => instanceSetter.Set(
-            dsv => dsv.IndicatorChanges,
+            dsv => dsv.GeographicLevelMetaChange,
+            (_, dsv) =>
+            {
+                change.DataSetVersion = dsv;
+                change.DataSetVersionId = dsv.Id;
+                return change;
+            }
+        );
+
+    public static InstanceSetters<DataSetVersion> SetIndicatorMetaChanges(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        IEnumerable<IndicatorMetaChange> indicatorChanges)
+        => instanceSetter.Set(
+            dsv => dsv.IndicatorMetaChanges,
             (_, dsv) => indicatorChanges.Select(
-                    changeSet =>
+                    change =>
                     {
-                        changeSet.DataSetVersionId = dsv.Id;
-                        changeSet.DataSetVersion = dsv;
-                        return changeSet;
+                        change.DataSetVersion = dsv;
+                        change.DataSetVersionId = dsv.Id;
+                        return change;
                     }
                 )
                 .ToList()
         );
 
-    public static InstanceSetters<DataSetVersion> SetLocationChanges(
+    public static InstanceSetters<DataSetVersion> SetLocationMetaChanges(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        IEnumerable<ChangeSetLocations> locationChanges)
+        IEnumerable<LocationMetaChange> locationChanges)
         => instanceSetter.Set(
-            dsv => dsv.LocationChanges,
+            dsv => dsv.LocationMetaChanges,
             (_, dsv) => locationChanges.Select(
-                    changeSet =>
+                    change =>
                     {
-                        changeSet.DataSetVersionId = dsv.Id;
-                        changeSet.DataSetVersion = dsv;
-                        return changeSet;
+                        change.DataSetVersion = dsv;
+                        change.DataSetVersionId = dsv.Id;
+                        return change;
                     }
                 )
                 .ToList()
         );
 
-    public static InstanceSetters<DataSetVersion> SetTimePeriodChanges(
+    public static InstanceSetters<DataSetVersion> SetLocationOptionMetaChanges(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        IEnumerable<ChangeSetTimePeriods> timePeriodChanges)
+        IEnumerable<LocationOptionMetaChange> locationOptionChanges)
         => instanceSetter.Set(
-            dsv => dsv.TimePeriodChanges,
-            (_, dsv) => timePeriodChanges.Select(
-                    changeSet =>
+            dsv => dsv.LocationOptionMetaChanges,
+            (_, dsv) => locationOptionChanges.Select(
+                    change =>
                     {
-                        changeSet.DataSetVersionId = dsv.Id;
-                        changeSet.DataSetVersion = dsv;
-                        return changeSet;
+                        change.DataSetVersion = dsv;
+                        change.DataSetVersionId = dsv.Id;
+                        return change;
+                    }
+                )
+                .ToList()
+        );
+
+    public static InstanceSetters<DataSetVersion> SetTimePeriodMetaChanges(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        IEnumerable<TimePeriodMetaChange> timePeriodChanges)
+        => instanceSetter.Set(
+            dsv => dsv.TimePeriodMetaChanges,
+            (_, dsv) => timePeriodChanges.Select(
+                    change =>
+                    {
+                        change.DataSetVersion = dsv;
+                        change.DataSetVersionId = dsv.Id;
+                        return change;
                     }
                 )
                 .ToList()
