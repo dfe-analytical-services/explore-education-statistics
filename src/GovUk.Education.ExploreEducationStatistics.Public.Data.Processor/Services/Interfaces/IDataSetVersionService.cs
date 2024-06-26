@@ -17,6 +17,10 @@ public interface IDataSetVersionService
         Guid instanceId,
         CancellationToken cancellationToken = default);
 
+    Task<Either<ActionResult, Unit>> BulkDeleteVersions(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default);
+
     Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);

@@ -185,6 +185,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             typeof(ImportMetadataFunction),
             typeof(HandleProcessingFailureFunction),
             typeof(HealthCheckFunctions),
+            typeof(BulkDeleteDataSetVersionsFunction),
         ];
     }
 }

@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             HtmlImageUtil.GetReleaseImages(contentBlock.Body))
                         .Distinct();
 
-                    var imageFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, FileType.Image);
+                    var imageFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Image);
 
                     var unusedImages = imageFiles
                         .Where(file => !contentImageIds.Contains(file.File.Id))
