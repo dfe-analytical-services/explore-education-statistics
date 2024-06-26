@@ -1,10 +1,11 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
+public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>, IFilterDetails
 {
     public int Id { get; set; }
 

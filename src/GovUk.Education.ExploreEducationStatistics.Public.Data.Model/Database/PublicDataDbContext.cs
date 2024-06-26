@@ -59,7 +59,9 @@ public class PublicDataDbContext : DbContext
     public DbSet<TimePeriodMeta> TimePeriodMetas { get; init; } = null!;
     public DbSet<ChangeSetFilters> ChangeSetFilters { get; init; } = null!;
     public DbSet<ChangeSetFilterOptions> ChangeSetFilterOptions { get; init; } = null!;
+    public DbSet<ChangeSetGeographicLevels> ChangeSetGeographicLevels { get; init; } = null!;
     public DbSet<ChangeSetIndicators> ChangeSetIndicators { get; init; } = null!;
     public DbSet<ChangeSetLocations> ChangeSetLocations { get; init; } = null!;
+    public DbSet<ChangeSetLocationOptions> ChangeSetLocationOptions { get; init; } = null!;
     public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
 }

@@ -1,9 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public class LocationChangeState : ILocationDetails
+public class GeographicLevelChangeState
 {
     public required string Id { get; set; }
 

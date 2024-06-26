@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -33,8 +34,12 @@ public class ChangeSetFilters : ChangeSet<FilterChangeState>
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
-                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
-                cs.Property(c => c.Type).HasConversion<string>();
+
+                cs.Property(c => c.Identifier)
+                    .HasJsonPropertyName("Id");
+                cs.Property(c => c.Type)
+                    .HasConversion<string>();
+
                 cs.OwnsOne(c => c.CurrentState);
                 cs.OwnsOne(c => c.PreviousState);
             });
@@ -54,8 +59,12 @@ public class ChangeSetFilterOptions : ChangeSet<FilterOptionChangeState>
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
-                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
-                cs.Property(c => c.Type).HasConversion<string>();
+
+                cs.Property(c => c.Identifier)
+                    .HasJsonPropertyName("Id");
+                cs.Property(c => c.Type)
+                    .HasConversion<string>();
+
                 cs.OwnsOne(c => c.CurrentState);
                 cs.OwnsOne(c => c.PreviousState);
             });
@@ -75,8 +84,12 @@ public class ChangeSetIndicators : ChangeSet<IndicatorChangeState>
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
-                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
-                cs.Property(c => c.Type).HasConversion<string>();
+
+                cs.Property(c => c.Identifier)
+                    .HasJsonPropertyName("Id");
+                cs.Property(c => c.Type)
+                    .HasConversion<string>();
+
                 cs.OwnsOne(c => c.CurrentState, s =>
                 {
                     s.Property(sb => sb.Unit)
@@ -86,6 +99,39 @@ public class ChangeSetIndicators : ChangeSet<IndicatorChangeState>
                 {
                     s.Property(sb => sb.Unit)
                         .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
+                });
+            });
+        }
+    }
+}
+
+public class ChangeSetGeographicLevels : ChangeSet<GeographicLevelChangeState>
+{
+    internal class Config : IEntityTypeConfiguration<ChangeSetGeographicLevels>
+    {
+        public void Configure(EntityTypeBuilder<ChangeSetGeographicLevels> builder)
+        {
+            builder.Property(cs => cs.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
+            builder.OwnsMany(cs => cs.Changes, cs =>
+            {
+                cs.ToJson();
+
+                cs.Property(c => c.Identifier)
+                    .HasJsonPropertyName("Id");
+                cs.Property(c => c.Type)
+                    .HasConversion<string>();
+
+                cs.OwnsOne(c => c.CurrentState, s =>
+                {
+                    s.Property(msb => msb.Level)
+                        .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
+                });
+                cs.OwnsOne(c => c.PreviousState, s =>
+                {
+                    s.Property(msb => msb.Level)
+                        .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
                 });
             });
         }
@@ -104,13 +150,55 @@ public class ChangeSetLocations : ChangeSet<LocationChangeState>
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
-                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
-                cs.Property(c => c.Type).HasConversion<string>();
+
+                cs.Property(c => c.Identifier)
+                    .HasJsonPropertyName("Id");
+                cs.Property(c => c.Type)
+                    .HasConversion<string>();
+
                 cs.OwnsOne(c => c.CurrentState, s =>
                 {
-                    s.Property(sb => sb.Level).HasConversion<string>();
+                    s.Property(sb => sb.Level)
+                        .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
                 });
-                cs.OwnsOne(c => c.PreviousState);
+                cs.OwnsOne(c => c.PreviousState, s =>
+                {
+                    s.Property(sb => sb.Level)
+                        .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
+                });
+            });
+        }
+    }
+}
+
+public class ChangeSetLocationOptions : ChangeSet<LocationOptionChangeState>
+{
+    internal class Config : IEntityTypeConfiguration<ChangeSetLocationOptions>
+    {
+        public void Configure(EntityTypeBuilder<ChangeSetLocationOptions> builder)
+        {
+            builder.Property(cs => cs.Id)
+                .HasValueGenerator<UuidV7ValueGenerator>();
+
+            builder.OwnsMany(cs => cs.Changes, cs =>
+            {
+                cs.ToJson();
+
+                cs.Property(c => c.Identifier)
+                    .HasJsonPropertyName("Id");
+                cs.Property(c => c.Type)
+                    .HasConversion<string>();
+
+                cs.OwnsOne(c => c.CurrentState, s =>
+                {
+                    s.Property(sb => sb.Level)
+                        .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
+                });
+                cs.OwnsOne(c => c.PreviousState, s =>
+                {
+                    s.Property(sb => sb.Level)
+                        .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
+                });
             });
         }
     }
@@ -128,8 +216,12 @@ public class ChangeSetTimePeriods : ChangeSet<TimePeriodChangeState>
             builder.OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
-                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
-                cs.Property(c => c.Type).HasConversion<string>();
+
+                cs.Property(c => c.Identifier)
+                    .HasJsonPropertyName("Id");
+                cs.Property(c => c.Type)
+                    .HasConversion<string>();
+
                 cs.OwnsOne(c => c.CurrentState, s =>
                 {
                     s.Property(sb => sb.Code)

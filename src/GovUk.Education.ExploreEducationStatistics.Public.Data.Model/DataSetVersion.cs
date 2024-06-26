@@ -51,9 +51,13 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public List<ChangeSetFilterOptions> FilterOptionChanges { get; set; } = [];
 
+    public List<ChangeSetGeographicLevels> GeographicLevelChanges { get; set; } = [];
+
     public List<ChangeSetIndicators> IndicatorChanges { get; set; } = [];
 
     public List<ChangeSetLocations> LocationChanges { get; set; } = [];
+
+    public List<ChangeSetLocationOptions> LocationOptionChanges { get; set; } = [];
 
     public List<ChangeSetTimePeriods> TimePeriodChanges { get; set; } = [];
 

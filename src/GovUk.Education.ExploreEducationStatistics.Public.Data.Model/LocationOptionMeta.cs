@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -102,7 +103,7 @@ public abstract class LocationOptionMeta
     }
 }
 
-public class LocationCodedOptionMeta : LocationOptionMeta
+public class LocationCodedOptionMeta : LocationOptionMeta, ILocationCodedOptionDetails
 {
      public const string TypeValue = "CODE";
 
@@ -115,7 +116,7 @@ public class LocationCodedOptionMeta : LocationOptionMeta
      }
 }
 
-public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
+public class LocationLocalAuthorityOptionMeta : LocationOptionMeta, ILocationLocalAuthorityOptionDetails
 {
      public const string TypeValue = "LA";
 
@@ -134,7 +135,7 @@ public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
      }
 }
 
-public class LocationProviderOptionMeta : LocationOptionMeta
+public class LocationProviderOptionMeta : LocationOptionMeta, ILocationProviderOptionDetails
 {
      public const string TypeValue = "PROV";
 
@@ -147,14 +148,14 @@ public class LocationProviderOptionMeta : LocationOptionMeta
      }
 }
 
-public class LocationRscRegionOptionMeta : LocationOptionMeta
+public class LocationRscRegionOptionMeta : LocationOptionMeta, ILocationOptionDetails
 {
     public const string TypeValue = "RSC";
 
     protected override string Type { get; set; } = TypeValue;
 }
 
-public class LocationSchoolOptionMeta : LocationOptionMeta
+public class LocationSchoolOptionMeta : LocationOptionMeta, ILocationSchoolOptionDetails
 {
      public const string TypeValue = "SCH";
 

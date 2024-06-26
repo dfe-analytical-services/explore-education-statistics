@@ -160,6 +160,11 @@ public static class DataSetVersionGeneratorExtensions
         IEnumerable<ChangeSetFilterOptions> filterOptionChanges)
         => generator.ForInstance(s => s.SetFilterOptionChanges(filterOptionChanges));
 
+    public static Generator<DataSetVersion> WithGeographicLevelChanges(
+        this Generator<DataSetVersion> generator,
+        IEnumerable<ChangeSetGeographicLevels> geographicLevelChanges)
+        => generator.ForInstance(s => s.SetGeographicLevelChanges(geographicLevelChanges));
+
     public static Generator<DataSetVersion> WithIndicatorChanges(
         this Generator<DataSetVersion> generator,
         IEnumerable<ChangeSetIndicators> indicatorChanges)
@@ -170,6 +175,11 @@ public static class DataSetVersionGeneratorExtensions
         IEnumerable<ChangeSetLocations> locationChanges)
         => generator.ForInstance(s => s.SetLocationChanges(locationChanges));
 
+    public static Generator<DataSetVersion> WithLocationOptionChanges(
+        this Generator<DataSetVersion> generator,
+        IEnumerable<ChangeSetLocationOptions> locationOptionChanges)
+        => generator.ForInstance(s => s.SetLocationOptionChanges(locationOptionChanges));
+    
     public static Generator<DataSetVersion> WithTimePeriodChanges(
         this Generator<DataSetVersion> generator,
         IEnumerable<ChangeSetTimePeriods> timePeriodChanges)
@@ -434,6 +444,22 @@ public static class DataSetVersionGeneratorExtensions
                 )
                 .ToList()
         );
+    
+    public static InstanceSetters<DataSetVersion> SetGeographicLevelChanges(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        IEnumerable<ChangeSetGeographicLevels> geographicLevelChanges)
+        => instanceSetter.Set(
+            dsv => dsv.GeographicLevelChanges,
+            (_, dsv) => geographicLevelChanges.Select(
+                    changeSet =>
+                    {
+                        changeSet.DataSetVersionId = dsv.Id;
+                        changeSet.DataSetVersion = dsv;
+                        return changeSet;
+                    }
+                )
+                .ToList()
+        );
 
     public static InstanceSetters<DataSetVersion> SetIndicatorChanges(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -457,6 +483,22 @@ public static class DataSetVersionGeneratorExtensions
         => instanceSetter.Set(
             dsv => dsv.LocationChanges,
             (_, dsv) => locationChanges.Select(
+                    changeSet =>
+                    {
+                        changeSet.DataSetVersionId = dsv.Id;
+                        changeSet.DataSetVersion = dsv;
+                        return changeSet;
+                    }
+                )
+                .ToList()
+        );
+
+    public static InstanceSetters<DataSetVersion> SetLocationOptionChanges(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        IEnumerable<ChangeSetLocationOptions> locationOptionChanges)
+        => instanceSetter.Set(
+            dsv => dsv.LocationOptionChanges,
+            (_, dsv) => locationOptionChanges.Select(
                     changeSet =>
                     {
                         changeSet.DataSetVersionId = dsv.Id;
