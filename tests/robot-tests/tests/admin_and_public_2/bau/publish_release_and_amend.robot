@@ -167,6 +167,8 @@ Verify data block table has footnotes
     ...    ${data_block_table}
 
 Add test text to second accordion section
+    user scrolls to accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user opens accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test text    1    Some test text!
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
