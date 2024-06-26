@@ -53,12 +53,7 @@ public abstract class LocationOptionMeta
                 .HasValue<LocationRscRegionOptionMeta>(LocationRscRegionOptionMeta.TypeValue)
                 .HasValue<LocationSchoolOptionMeta>(LocationSchoolOptionMeta.TypeValue);
 
-            builder
-                .HasIndex(o => o.PublicId)
-                .IsUnique();
-
-            builder
-                .Property(o => o.Type)
+            builder.Property(o => o.Type)
                 .HasMaxLength(10);
 
             builder.Property(o => o.Code)
@@ -75,6 +70,10 @@ public abstract class LocationOptionMeta
 
             builder.Property(o => o.Ukprn)
                 .IsRequired(false);
+
+            builder
+                .HasIndex(o => o.PublicId)
+                .IsUnique();
 
             builder.HasIndex(o => o.Type);
             builder.HasIndex(o => o.Code);
