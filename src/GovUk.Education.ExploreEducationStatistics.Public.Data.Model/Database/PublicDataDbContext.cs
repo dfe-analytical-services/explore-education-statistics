@@ -29,6 +29,9 @@ public class PublicDataDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PublicDataDbContext).Assembly);
 
         modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence);
+
+        // This JsonFragment is a DTO and not an entity.
+        modelBuilder.Entity<JsonFragment>().HasNoKey().ToView(null);
     }
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
@@ -63,4 +66,11 @@ public class PublicDataDbContext : DbContext
     public DbSet<ChangeSetIndicators> ChangeSetIndicators { get; init; } = null!;
     public DbSet<ChangeSetLocations> ChangeSetLocations { get; init; } = null!;
     public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
+    
+    public DbSet<JsonFragment> JsonFragments { get; init; } = null!;
+}
+
+public class JsonFragment
+{
+    public string JsonString { get; set; }
 }
