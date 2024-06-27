@@ -1,12 +1,15 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Namotion.Reflection;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
@@ -124,6 +127,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
             var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
             return validationProblem;
+        }
+
+        public static void AssertBadRequestWithValidationErrors(this IActionResult result, List<ErrorViewModel> expectedErrors)
+        {
+            var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
+
+            Assert.NotNull(validationProblem);
+
+            var errors = validationProblem.Errors.ToList();
+
+            ResponseErrorAssertUtils.AssertHasErrors(errors, expectedErrors);
         }
 
         public static ValidationProblemViewModel AssertNotFoundWithValidationProblem<TEntity, TId>(

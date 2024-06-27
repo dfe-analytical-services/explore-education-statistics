@@ -29,13 +29,15 @@ public class ResponseErrorAssertUtils
                 expectedErrors.Remove(foundError);
             }
 
+            var assertFailMessage = string.Empty;
+
             if (notFoundErrors.Count != 0)
             {
                 var notFoundErrorMessages = notFoundErrors
                     .Select(e => e.Message)
                     .ToList()
                     .JoinToString('\n');
-                Assert.Fail($"Error message(s) not found in expectedErrors:\n{notFoundErrorMessages}");
+                assertFailMessage += $"Error message(s) not found in expectedErrors:\n{notFoundErrorMessages}\n";
             }
 
             if (expectedErrors.Count != 0)
@@ -44,7 +46,12 @@ public class ResponseErrorAssertUtils
                     .Select(e => e.Message)
                     .ToList()
                     .JoinToString('\n');
-                Assert.Fail($"expectedErrors message(s) were not in the response:\n{expectedErrorMessages}");
+                assertFailMessage += $"expectedErrors message(s) were not in the response:\n{expectedErrorMessages}\n";
+            }
+
+            if (assertFailMessage != string.Empty)
+            {
+                Assert.Fail(assertFailMessage);
             }
         }
 

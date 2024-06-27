@@ -41,8 +41,7 @@ const subjectErrorMappings = [
   }),
 ];
 
-// @MarkFix - check these error codes, some difference from the list give
-// and what the server returns, eg. DataFileNotFound is returned not DataFileNotFoundInZip
+// @MarkFix - check these error codes
 
 // Error messages are returned by the server so don't need to
 // define them here, but can't leave them blank in the mapping.
@@ -77,8 +76,8 @@ function baseErrorMappings(
             'BulkDataZipMustContainDatasetNamesCsv',
           DatasetNamesCsvReaderException: 'DatasetNamesCsvReaderException',
           DatasetNamesCsvIncorrectHeaders: 'DatasetNamesCsvIncorrectHeaders',
-          DataFileNotFound: 'DataFileNotFound',
-          MetaFileNotFound: 'MetaFileNotFound',
+          DataFileNotFoundInZip: 'DataFileNotFoundInZip',
+          MetaFileNotFoundInZip: 'MetaFileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
           BulkZipShouldContainDataSets: 'BulkZipShouldContainDataSets',
         },

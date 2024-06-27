@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
                 { Ancillary, AllowedAncillaryFileTypes },
                 { Chart, AllowedChartFileTypes },
                 { DataZip, AllowedArchiveMimeTypes },
+                { BulkDataZip, AllowedArchiveMimeTypes },
                 { Image, AllowedImageMimeTypes }
             };
     }

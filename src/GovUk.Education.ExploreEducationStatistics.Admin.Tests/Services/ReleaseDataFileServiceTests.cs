@@ -2790,9 +2790,342 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        // @MarkFix UploadAsBulkZip_Valid
-        // @MarkFix UploadAsBulkZip_Order
-        // @MarkFix UploadAsBulkZip_Replacing
+        [Fact]
+        public async Task UploadAsBulkZip()
+        {
+            const string zipFileName = "test-data-archive.zip";
+
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                Publication = new Publication
+                {
+                    Title = "Test publication",
+                    Topic = new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test topic",
+                        Theme = new Theme
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = "Test theme"
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
+
+            var archiveFile1 = CreateArchiveDataSet("One", "one.csv", "one.meta.csv");
+            var archiveFile2 = CreateArchiveDataSet("Two", "two.csv", "two.meta.csv");
+
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                dataArchiveValidationService
+                    .Setup(s => s.ValidateBulkDataArchiveFile(
+                        releaseVersion.Id,
+                        zipFormFile))
+                    .ReturnsAsync(new List<ArchiveDataSetFile>
+                    {
+                        archiveFile1, archiveFile2,
+                    });
+
+                dataImportService
+                    .Setup(s => s.Import(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == "one.csv"),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == "one.meta.csv"),
+                        It.Is<File>(file => file.Type == BulkDataZip && file.Filename == zipFileName)))
+                    .ReturnsAsync(new DataImport
+                    {
+                        Status = QUEUED
+                    });
+                dataImportService
+                    .Setup(s => s.Import(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == "two.csv"),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == "two.meta.csv"),
+                        It.Is<File>(file => file.Type == BulkDataZip && file.Filename == zipFileName)))
+                    .ReturnsAsync(new DataImport
+                    {
+                        Status = QUEUED
+                    });
+
+                privateBlobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(releaseVersion.Id, BulkDataZip))),
+                        zipFormFile
+                    )).Returns(Task.CompletedTask);
+
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    privateBlobStorageService: privateBlobStorageService.Object,
+                    dataImportService: dataImportService.Object,
+                    dataArchiveValidationService: dataArchiveValidationService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                );
+
+                var result = (await service.UploadAsBulkZip(
+                    releaseVersionId: releaseVersion.Id,
+                    bulkZipFormFile: zipFormFile))
+                    .AssertRight();
+
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
+                    dataArchiveValidationService,
+                    fileUploadsValidatorService,
+                    dataImportService);
+
+                Assert.Equal(2, result.Count);
+
+                Assert.Equal("One", result[0].Name);
+                Assert.Equal("one.csv", result[0].FileName);
+                Assert.Equal("one.meta.csv", result[0].MetaFileName);
+
+                Assert.Equal("Two", result[1].Name);
+                Assert.Equal("two.csv", result[1].FileName);
+                Assert.Equal("two.meta.csv", result[1].MetaFileName);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var files = contentDbContext.Files.ToList();
+
+                Assert.Equal(5, files.Count);
+
+                var zipFile = files
+                    .Single(f => f.Filename == zipFileName);
+                Assert.Equal(10240, zipFile.ContentLength);
+                Assert.Equal("application/zip", zipFile.ContentType);
+                Assert.Equal(BulkDataZip, zipFile.Type);
+
+                var dataFile1 = files
+                    .Single(f => f.Filename == archiveFile1.DataFileName);
+                Assert.Equal(1048576, dataFile1.ContentLength);
+                Assert.Equal("text/csv", dataFile1.ContentType);
+                Assert.Equal(FileType.Data, dataFile1.Type);
+                Assert.Equal(zipFile.Id, dataFile1.SourceId);
+
+                var metaFile1 = files
+                    .Single(f => f.Filename == archiveFile1.MetaFileName);
+                Assert.Equal(1024, metaFile1.ContentLength);
+                Assert.Equal("text/csv", metaFile1.ContentType);
+                Assert.Equal(Metadata, metaFile1.Type);
+
+                var dataFile2 = files
+                    .Single(f => f.Filename == archiveFile2.DataFileName);
+                Assert.Equal(1048576, dataFile2.ContentLength);
+                Assert.Equal("text/csv", dataFile2.ContentType);
+                Assert.Equal(FileType.Data, dataFile2.Type);
+                Assert.Equal(zipFile.Id, dataFile2.SourceId);
+
+                var metaFile2 = files
+                    .Single(f => f.Filename == archiveFile2.MetaFileName);
+                Assert.Equal(1024, metaFile2.ContentLength);
+                Assert.Equal("text/csv", metaFile2.ContentType);
+                Assert.Equal(Metadata, metaFile2.Type);
+
+                var releaseFiles = contentDbContext.ReleaseFiles.ToList();
+
+                Assert.Equal(4, releaseFiles.Count);
+
+                Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
+                    rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == dataFile1.Id));
+                Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
+                    rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == metaFile1.Id));
+                Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
+                    rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == dataFile2.Id));
+                Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
+                    rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == metaFile2.Id));
+            }
+        }
+
+        [Fact]
+        public async Task UploadAsBulkZip_Order()
+        {
+            const string zipFileName = "test-data-archive.zip";
+
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                Publication = new Publication
+                {
+                    Title = "Test publication",
+                    Topic = new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test topic",
+                        Theme = new Theme
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = "Test theme"
+                        }
+                    }
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new()
+                {
+                    Name = "Original one",
+                    ReleaseVersion = releaseVersion,
+                    File = new File { Type = FileType.Data },
+                    Order = 0,
+                },
+                new()
+                {
+                    Name = "Original two",
+                    ReleaseVersion = releaseVersion,
+                    File = new File { Type = FileType.Data },
+                    Order = 1,
+                },
+                new()
+                {
+                    Name = "Original three",
+                    ReleaseVersion = releaseVersion,
+                    File = new File { Type = FileType.Data },
+                    Order = 3,
+                },
+                new() // Ancillary files should be ignored
+                {
+                    ReleaseVersion = releaseVersion,
+                    File = new File { Type = FileType.Ancillary },
+                    Order = 5,
+                },
+            };
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
+
+            var archiveFile1 = CreateArchiveDataSet("One", "one.csv", "one.meta.csv");
+            var archiveFile2 = CreateArchiveDataSet("Two", "two.csv", "two.meta.csv");
+
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                dataArchiveValidationService
+                    .Setup(s => s.ValidateBulkDataArchiveFile(
+                        releaseVersion.Id,
+                        zipFormFile))
+                    .ReturnsAsync(new List<ArchiveDataSetFile>
+                    {
+                        archiveFile1, archiveFile2,
+                    });
+
+                dataImportService
+                    .Setup(s => s.Import(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == "one.csv"),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == "one.meta.csv"),
+                        It.Is<File>(file => file.Type == BulkDataZip && file.Filename == zipFileName)))
+                    .ReturnsAsync(new DataImport
+                    {
+                        Status = QUEUED
+                    });
+                dataImportService
+                    .Setup(s => s.Import(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == "two.csv"),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == "two.meta.csv"),
+                        It.Is<File>(file => file.Type == BulkDataZip && file.Filename == zipFileName)))
+                    .ReturnsAsync(new DataImport
+                    {
+                        Status = QUEUED
+                    });
+
+                privateBlobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(releaseVersion.Id, BulkDataZip))),
+                        zipFormFile
+                    )).Returns(Task.CompletedTask);
+
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    privateBlobStorageService: privateBlobStorageService.Object,
+                    dataImportService: dataImportService.Object,
+                    dataArchiveValidationService: dataArchiveValidationService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                );
+
+                var result = (await service.UploadAsBulkZip(
+                    releaseVersionId: releaseVersion.Id,
+                    bulkZipFormFile: zipFormFile))
+                    .AssertRight();
+
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
+                    dataArchiveValidationService,
+                    fileUploadsValidatorService,
+                    dataImportService);
+
+                Assert.Equal(2, result.Count);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var files = contentDbContext.Files.ToList();
+                Assert.Equal(9, files.Count);
+
+                var dbReleaseFiles = contentDbContext.ReleaseFiles
+                    .Where(rf => rf.File.Type == FileType.Data)
+                    .OrderBy(rf => rf.Order)
+                    .ToList();
+
+                Assert.Equal(5, dbReleaseFiles.Count);
+
+                Assert.Equal(0, dbReleaseFiles[0].Order);
+                Assert.Equal("Original one", dbReleaseFiles[0].Name);
+
+                Assert.Equal(1, dbReleaseFiles[1].Order);
+                Assert.Equal("Original two", dbReleaseFiles[1].Name);
+
+                // NOTE: The Orders of the original ReleaseFiles were 0,1,3 - 2 was skipped.
+
+                Assert.Equal(3, dbReleaseFiles[2].Order);
+                Assert.Equal("Original three", dbReleaseFiles[2].Name);
+
+                Assert.Equal(4, dbReleaseFiles[3].Order);
+                Assert.Equal("One", dbReleaseFiles[3].Name);
+
+                Assert.Equal(5, dbReleaseFiles[4].Order);
+                Assert.Equal("Two", dbReleaseFiles[4].Name);
+            }
+        }
 
         private ReleaseDataFileService SetupReleaseDataFileService(
             ContentDbContext contentDbContext,
