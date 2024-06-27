@@ -706,11 +706,11 @@ user checks url equals
     ${current_url}=    get location
     should be equal    ${current_url}    ${expected}
 
-user checks url and normalize
+user checks removed auth from url contains
     [Arguments]    ${expected}
     ${current_url}=    get location
-    ${remove_auth_current_url}=    normalize url    ${current_url}
-    set suite variable    ${remove_auth_current_url}
+    ${remove_auth_current_url}=    remove auth from url      ${current_url}
+    set variable    ${remove_auth_current_url}
     should contain    ${remove_auth_current_url}   ${expected}
 
 user checks page contains link
