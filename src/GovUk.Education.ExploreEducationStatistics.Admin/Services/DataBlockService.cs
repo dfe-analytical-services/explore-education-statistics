@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(DeleteDataBlocks);
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
+        public Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlanViewModel deletePlan)
         {
             return InvalidateDataBlockCaches(deletePlan)
                 .OnSuccessVoid(async () =>
@@ -239,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => Get(dataBlockVersionId));
         }
 
-        public async Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseVersionId,
+        public async Task<Either<ActionResult, DeleteDataBlockPlanViewModel>> GetDeletePlan(Guid releaseVersionId,
             Guid dataBlockVersionId)
         {
             return await _persistenceHelper
@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 )
                 .OnSuccessDo(dataBlockVersion => _userService.CheckCanUpdateReleaseVersion(dataBlockVersion.ReleaseVersion))
                 .OnSuccess(async dataBlockVersion =>
-                    new DeleteDataBlockPlan
+                    new DeleteDataBlockPlanViewModel
                     {
                         ReleaseId = releaseVersionId,
                         DependentDataBlocks = new List<DependentDataBlock>
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OrNotFound();
         }
 
-        public async Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseVersionId, Subject? subject)
+        public async Task<DeleteDataBlockPlanViewModel> GetDeletePlan(Guid releaseVersionId, Subject? subject)
         {
             var dataBlockVersions = subject == null
                 ? new List<DataBlockVersion>()
@@ -287,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dependentBlocks.Add(await CreateDependentDataBlock(block));
             }
 
-            return new DeleteDataBlockPlan()
+            return new DeleteDataBlockPlanViewModel()
             {
                 ReleaseId = releaseVersionId,
                 DependentDataBlocks = dependentBlocks
@@ -374,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
+        private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlanViewModel deletePlan)
         {
             var chartFileIds = deletePlan.DependentDataBlocks.SelectMany(
                 block => block.InfographicFilesInfo.Select(f => f.Id));
@@ -382,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _releaseFileService.Delete(deletePlan.ReleaseId, chartFileIds);
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteDependentDataBlocks(DeleteDataBlockPlan deletePlan)
+        private async Task<Either<ActionResult, Unit>> DeleteDependentDataBlocks(DeleteDataBlockPlanViewModel deletePlan)
         {
             var blockIdsToDelete = deletePlan
                 .DependentDataBlocks
@@ -442,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private Task<Either<ActionResult, Unit>> InvalidateDataBlockCaches(DeleteDataBlockPlan deletePlan)
+        private Task<Either<ActionResult, Unit>> InvalidateDataBlockCaches(DeleteDataBlockPlanViewModel deletePlan)
         {
             return deletePlan
                 .DependentDataBlocks
@@ -502,27 +502,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OfType<DataBlock>()
                 .ToListAsync();
         }
-    }
-
-    public class DependentDataBlock
-    {
-        [JsonIgnore] public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string? ContentSectionHeading { get; set; }
-        public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new();
-        public bool IsKeyStatistic { get; set; }
-        public FeaturedTableBasicViewModel? FeaturedTable { get; set; }
-    }
-
-    public class InfographicFileInfo
-    {
-        public Guid Id { get; set; }
-        public string Filename { get; set; } = "";
-    }
-
-    public class DeleteDataBlockPlan
-    {
-        [JsonIgnore] public Guid ReleaseId { get; set; }
-        public List<DependentDataBlock> DependentDataBlocks { get; set; } = new();
     }
 }

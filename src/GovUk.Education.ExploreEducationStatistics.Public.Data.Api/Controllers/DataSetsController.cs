@@ -40,55 +40,6 @@ public class DataSetsController(
     }
 
     /// <summary>
-    /// Get a data set version
-    /// </summary>
-    /// <remarks>
-    /// Get a data set version's summary details.
-    /// </remarks>
-    [HttpGet("{dataSetId:guid}/versions/{dataSetVersion}")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
-    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
-    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
-    public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
-        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion,
-        CancellationToken cancellationToken)
-    {
-        return await dataSetService
-            .GetVersion(
-                dataSetId: dataSetId, 
-                dataSetVersion: dataSetVersion,
-                cancellationToken: cancellationToken)
-            .HandleFailuresOrOk();
-    }
-
-    /// <summary>
-    /// List a data set’s versions
-    /// </summary>
-    /// <remarks>
-    /// List a data set’s versions. Only provides summary information of each version.
-    /// </remarks>
-    [HttpGet("{dataSetId:guid}/versions")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
-    [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
-    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
-    public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
-        [FromQuery] DataSetVersionListRequest request,
-        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        CancellationToken cancellationToken)
-    {
-        return await dataSetService
-            .ListVersions(
-                dataSetId: dataSetId,
-                page: request.Page,
-                pageSize: request.PageSize,
-                cancellationToken: cancellationToken)
-            .HandleFailuresOrOk();
-    }
-
-    /// <summary>
     /// Get a data set’s metadata
     /// </summary>
     /// <remarks>

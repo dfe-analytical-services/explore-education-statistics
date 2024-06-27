@@ -9,6 +9,8 @@ public enum DataSetVersionImportStage
     Pending,
     CopyingCsvFiles,
     ImportingMetadata,
+    CreatingMappings,
+    AutoMapping,
     ImportingData,
     WritingDataFiles,
     Completing

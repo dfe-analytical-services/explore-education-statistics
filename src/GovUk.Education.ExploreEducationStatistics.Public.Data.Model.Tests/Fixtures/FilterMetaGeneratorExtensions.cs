@@ -93,6 +93,7 @@ public static class FilterMetaGeneratorExtensions
                         .Select(o => context.Fixture
                             .DefaultFilterOptionMetaLink()
                             .WithOption(o)
+                            .WithMeta(m)
                             .Generate())
                         .ToList();
                 }

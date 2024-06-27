@@ -1,0 +1,67 @@
+using Asp.Versioning;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
+
+[ApiVersion(1.0)]
+[ApiController]
+[Route("api/v{version:apiVersion}/data-sets/{dataSetId:guid}/versions")]
+public class DataSetVersionsController(
+    IDataSetService dataSetService)
+    : ControllerBase
+{
+    /// <summary>
+    /// List a data set’s versions
+    /// </summary>
+    /// <remarks>
+    /// List a data set’s versions. Only provides summary information of each version.
+    /// </remarks>
+    [HttpGet]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
+    [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
+        [FromQuery] DataSetVersionListRequest request,
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetService
+            .ListVersions(
+                dataSetId: dataSetId,
+                page: request.Page,
+                pageSize: request.PageSize,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// Get a data set version
+    /// </summary>
+    /// <remarks>
+    /// Get a data set version's summary details.
+    /// </remarks>
+    [HttpGet("{dataSetVersion}")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
+    public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetService
+            .GetVersion(
+                dataSetId: dataSetId,
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+}

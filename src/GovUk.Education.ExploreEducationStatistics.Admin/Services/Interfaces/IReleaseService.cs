@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
-        Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleaseVersionPlan(
+        Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId, 
             CancellationToken cancellationToken = default);
 
@@ -41,7 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases();
 
-        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseVersionId, Guid fileId);
+        Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
+            Guid releaseVersionId, 
+            Guid fileId,
+            CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId);
 

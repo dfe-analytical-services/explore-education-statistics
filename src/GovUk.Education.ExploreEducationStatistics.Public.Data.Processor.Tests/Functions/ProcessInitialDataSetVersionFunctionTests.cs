@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -337,7 +336,9 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                  """
             );
 
-            var actualTimePeriods = (await timePeriodsCommand.QueryAsync<ParquetTimePeriod>()).AsList();
+            var actualTimePeriods = (
+                await timePeriodsCommand.QueryAsync<ParquetTimePeriod>()
+            ).AsList();
 
             Assert.Equal(testData.ExpectedTimePeriods.Count, actualTimePeriods.Count);
             Assert.All(testData.ExpectedTimePeriods,

@@ -70,7 +70,7 @@ public class AssertExtensionsTests
 
             // Assert that all fields in Person are expected to be equal apart from the "Name" field, which is
             // expected to be unequal.
-            person1.AssertDeepEqualTo(person2, Except<Person>(person => person.Name));
+            person1.AssertDeepEqualTo(person2, notEqualProperties: Except<Person>(person => person.Name));
         }
 
         [Fact]
@@ -82,7 +82,7 @@ public class AssertExtensionsTests
             // Assert that all fields in Person are expected to be equal apart from the "Name" field, which is
             // expected to be unequal. It is, however, equal.
             var exception = Assert.Throws<XunitException>(() =>
-                person1.AssertDeepEqualTo(person2, Except<Person>(person => person.Name)));
+                person1.AssertDeepEqualTo(person2, notEqualProperties: Except<Person>(person => person.Name)));
 
             Assert.Equal(
                 "Expected values for expression person => person.Name to not be equal," +
