@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (subjectNameExists)
                 {
-                    errors.Add(ValidationMessages.GenerateErrorDataSetFileNamesShouldBeUnique(name));
+                    errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvTitlesShouldBeUnique(name));
                 }
             }
 

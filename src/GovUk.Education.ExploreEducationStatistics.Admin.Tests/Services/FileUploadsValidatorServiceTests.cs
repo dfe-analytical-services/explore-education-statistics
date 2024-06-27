@@ -237,13 +237,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(fileTypeService);
 
                 AssertHasErrors(errors, [
-                    ValidationMessages.GenerateErrorDataSetFileNamesShouldBeUnique("Used data set file name"),
+                    ValidationMessages.GenerateErrorDataSetNamesCsvTitlesShouldBeUnique("Used data set file name"),
                 ]);
             }
         }
 
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesCannotHaveSameName (I think this is necessary)
-        // @MarkFix ValidateDataSetFilesForUpload_DataAndMetaFilesCannotContainSpecialCharacters
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataAndMetaFilesCannotHaveSameName()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var context = InMemoryContentDbContext(contentDbContextId);
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("samefilename.meta.csv").Object;
+            var metaFile = CreateFormFileMock("samefilename.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data file title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Code,
+                    Message = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Message,
+                },
+            ]);
+        }
+
+        [Theory]
+        [InlineData("test ")]
+        [InlineData("test/")]
+        [InlineData("test&")]
+        [InlineData($"test\0")]
+        public async Task ValidateDataFilesForUpload_DataFileNamesCannotContainSpacesOrSpecialCharacters(string dataFileName)
+        {
+            await using var context = InMemoryContentDbContext();
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock($"{dataFileName}.csv").Object;
+            var metaFile = CreateFormFileMock($"{dataFileName}.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters($"{dataFileName}.csv"),
+                ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters($"{dataFileName}.meta.csv"),
+            ]);
+        }
 
         [Fact]
         public async Task ValidateDataFilesForUpload_DataFilesHaveCorrectSuffix()

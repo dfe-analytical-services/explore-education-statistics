@@ -8,16 +8,18 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ResponseErrorAssertUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static Moq.MockBehavior;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -115,15 +117,285 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result.AssertBadRequest(DataZipFileDoesNotContainCsvFiles);
         }
 
-        // @MarkFix ValidateBulkDataArchiveFile_Success
-        // @MarkFix ValidateBulkDataArchiveFile_InvalidZipFile
-        // @MarkFix ValidateBulkDataArchiveFile_NoDataSetNamesCsv
-        // @MarkFix ValidateBulkDataArchiveFile_DataSetNamesCsvHasHeadersOnly - i.e. no data rows just columns in csv (duplicate of NoDataSetsInZip?)
-        // @MarkFix ValidateBulkDataArchiveFile_DataSetNamesCsvIncorrectHeaders
-        // @MarkFix ValidateBulkDataArchiveFile_FilesNotFoundInZip
-        // @MarkFix ValidateBulkDataArchiveFile_DataSetNamesCsvContainsDuplicateDataSetNames
-        // @MarkFix ValidateBulkDataArchiveFile_UnusedFilesInZip
-        // @MarkFix ValidateBulkDataArchiveFile_NoDataSetsInZip
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Success()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var archive = CreateFormFileFromResource("bulk-data-zip-valid.zip");
+
+            fileUploadsValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
+                    releaseVersionId,
+                    It.IsAny<ArchiveDataSetFile>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<Stream>(),
+                    null))
+                .ReturnsAsync([]);
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(true);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            Assert.True(result.IsRight);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_IsValidZipFile()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var longFilename =
+                "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongfilename.csv";
+            var archive = CreateFormFileFromResource("test-data.csv", longFilename);
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .ReturnsAsync(false);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    ValidationMessages.GenerateErrorFileNameTooLong(longFilename,
+                        FileUploadsValidatorService.MaxFilenameSize),
+                    ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(longFilename),
+                    ValidationMessages.GenerateErrorMustBeZipFile(longFilename),
+                ]);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_NoDatasetNamesCsv()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-no-datasetnames-csv.zip");
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(true);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    new ErrorViewModel
+                    {
+                        Code = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Code,
+                        Message = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Message,
+                    }
+                ]);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_DatasetNamesCsvIncorrectHeaders()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-datasetnames-headers.zip");
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(true);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    new ErrorViewModel
+                    {
+                        Code = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Code,
+                        Message = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Message,
+                    },
+                ]);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_FilesNotFoundInZip()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-files-not-found.zip");
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(true);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    ValidationMessages.GenerateErrorMetaFileNotFoundInZip("one.meta.csv"),
+                    ValidationMessages.GenerateErrorDataFileNotFoundInZip("two.csv"),
+                ]);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_DuplicateDataSetTitlesAndFilenames()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-duplicate-names.zip");
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(true);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    ValidationMessages.GenerateErrorDataSetNamesCsvTitlesShouldBeUnique("Duplicate title"),
+                    ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique("one"),
+                ]);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_DataSetNamesCsvFilesnamesEndsDotCsv()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-filename-contains-extension.zip");
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(true);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv("one.csv")
+                ]);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_UnusedFilesInZip()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+
+            var service = SetupDataArchiveValidationService(
+                fileTypeService: fileTypeService.Object,
+                fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var archive = CreateFormFileFromResource("bulk-data-zip-invalid-unused-files.zip");
+
+            fileUploadsValidatorService.Setup(mock => mock.ValidateDataSetFilesForUpload(
+                    releaseVersionId,
+                    It.IsAny<ArchiveDataSetFile>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<Stream>(),
+                    null))
+                .ReturnsAsync([]);
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(true);
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    ValidationMessages.GenerateErrorZipContainsUnusedFiles(["two.csv", "two.meta.csv"]),
+                ]);
+
+            VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
 
         private static IFormFile CreateFormFileFromResource(string fileName, string? newFileName = null)
         {

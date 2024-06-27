@@ -79,7 +79,7 @@ public static class ValidationMessages
     );
 
     public static readonly LocalizableMessage DataFileNotFoundInZip = new(
-        Code: "DataFileNotFound",
+        Code: "DataFileNotFoundInZip",
         Message: "Failed to find data file '{0}' in ZIP file."
     );
 
@@ -93,7 +93,7 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage MetaFileNotFoundInZip = new(
-        Code: "MetaFileNotFound",
+        Code: "MetaFileNotFoundInZip",
         Message: "Failed to find meta file '{0}' in ZIP file."
     );
 
@@ -106,22 +106,45 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage BulkDataZipShouldContainDataSets = new(
-        Code: "BulkDataZipShouldContainDataSets",
-        Message: "No data sets were included in the ZIP file."
-    );
-
-    public static readonly LocalizableMessage DataSetFileNamesShouldBeUnique = new(
+    public static readonly LocalizableMessage DataSetNamesCsvTitlesShouldBeUnique = new(
         Code: "DataSetFileNamesShouldBeUnique",
-        Message: "All new data sets should have unique names. Duplicate name: '{0}'."
+        Message: "All dataset_names.csv titles should be unique. Duplicate title: '{0}'."
     );
 
-    public static ErrorViewModel GenerateErrorDataSetFileNamesShouldBeUnique(string duplicate)
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvTitlesShouldBeUnique(string duplicate)
     {
         return new ErrorViewModel
         {
-            Code = DataSetFileNamesShouldBeUnique.Code,
-            Message = string.Format(DataSetFileNamesShouldBeUnique.Message, duplicate),
+            Code = DataSetNamesCsvTitlesShouldBeUnique.Code,
+            Message = string.Format(DataSetNamesCsvTitlesShouldBeUnique.Message, duplicate),
+        };
+    }
+
+    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldBeUnique = new(
+        Code: "DataSetFilenamesShouldBeUnique",
+        Message: "All dataset_names.csv filenames should be unique. Duplicate filename: '{0}'."
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(string duplicate)
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetNamesCsvFilenamesShouldBeUnique.Code,
+            Message = string.Format(DataSetNamesCsvFilenamesShouldBeUnique.Message, duplicate),
+        };
+    }
+
+    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldNotEndDotCsv = new(
+        Code: "DataSetFilenamesShouldBeUnique",
+        Message: "Inside dataset_names.csv, file_name cell entries should not end in '.csv' i.e. should be 'filename' not 'filename.csv'. Filename with extension: '{0}'."
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetNamesCsvFilenamesShouldNotEndDotCsv.Code,
+            Message = string.Format(DataSetNamesCsvFilenamesShouldNotEndDotCsv.Message, filename),
         };
     }
 
