@@ -14,6 +14,15 @@ public interface IProcessorClient
         Guid releaseFileId,
         CancellationToken cancellationToken = default);
 
+    Task<Either<ActionResult, CreateDataSetResponseViewModel>> CreateNextDataSetVersion(
+        Guid dataSetId,
+        Guid releaseFileId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default);
+
     Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);

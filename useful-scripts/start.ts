@@ -14,11 +14,8 @@ import exitProcess from './utils/exitProcess';
 import { logColours, logError, logInfo } from './utils/logging';
 import { getDirname, getFilename } from './utils/nodeGlobals';
 import onExitSignal from './utils/onExitSignal';
-import patchSigInt from './utils/patchSigInt';
 import createFileLock from './utils/createFileLock';
 import { ExecaChildProcessWithoutNullStreams } from './utils/types';
-
-patchSigInt();
 
 const __dirname = getDirname(import.meta.url);
 const __filename = getFilename(import.meta.url);

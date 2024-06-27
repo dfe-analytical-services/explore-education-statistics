@@ -113,9 +113,7 @@ describe('ReleaseTableToolPage', () => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
       expect(stepHeadings).toHaveLength(1);
-      expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current) Select a data set',
-      );
+      expect(stepHeadings[0]).toHaveTextContent('Step 1 Select a data set');
     });
 
     const step = within(screen.getByTestId('wizardStep-1'));

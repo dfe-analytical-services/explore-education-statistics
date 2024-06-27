@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -219,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var subject = _fixture.DefaultSubject()
                 .Generate();
 
-            var file = _fixture.DefaultFile()
+            var file = _fixture.DefaultFile(FileType.Data)
                 .WithDataSetFileMeta(null)
                 .WithSubjectId(subject.Id)
                 .Generate();

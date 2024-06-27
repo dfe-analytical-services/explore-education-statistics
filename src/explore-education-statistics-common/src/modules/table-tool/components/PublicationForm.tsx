@@ -1,8 +1,4 @@
-import {
-  FormFieldset,
-  FormGroup,
-  FormTextSearchInput,
-} from '@common/components/form';
+import { FormGroup, FormTextSearchInput } from '@common/components/form';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -37,6 +33,7 @@ const formId = 'publicationForm';
 interface Props extends InjectedWizardProps {
   initialValues?: FormValues;
   showSupersededPublications?: boolean;
+  stepTitle: string;
   themes: Theme[];
   onSubmit: PublicationFormSubmitHandler;
   renderSummaryAfter?: ReactNode;
@@ -48,6 +45,7 @@ const PublicationForm = ({
     themeId: '',
   },
   showSupersededPublications = false,
+  stepTitle,
   themes,
   onSubmit,
   renderSummaryAfter,
@@ -102,9 +100,7 @@ const PublicationForm = ({
       .find(publication => publication.id === publicationId);
 
   const stepHeading = (
-    <WizardStepHeading {...stepProps} fieldsetHeading>
-      Choose a publication
-    </WizardStepHeading>
+    <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
@@ -143,110 +139,107 @@ const PublicationForm = ({
         if (isActive) {
           return (
             <Form id={formId} onSubmit={handleSubmit}>
-              <FormFieldset id="publicationForm" legend={stepHeading}>
-                <p>Search or select a theme to find publications</p>
-                <FormGroup className="govuk-!-margin-bottom-3">
-                  <FormTextSearchInput
-                    id={`${formId}-publicationIdSearch`}
-                    label="Search publications"
-                    name="publicationSearch"
-                    onChange={event => {
-                      setSearchTerm(event.target.value);
-                      setSelectedThemeId('');
-                      resetField('themeId');
-                      resetField('publicationId');
-                    }}
-                    onKeyPress={event => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault();
-                      }
-                    }}
-                    value={searchTerm}
-                    width={20}
-                  />
-                  {searchTerm && publications.length > 0 && (
-                    <p>
-                      <a
-                        href={`#${formId}-publications`}
-                        className="govuk-!-margin-top-3 govuk-!-font-size-14"
-                      >
-                        Skip to search results
-                      </a>
-                    </p>
-                  )}
-                </FormGroup>
+              {stepHeading}
+              <p>Search or select a theme to find publications</p>
+              <FormGroup className="govuk-!-margin-bottom-3">
+                <FormTextSearchInput
+                  id={`${formId}-publicationIdSearch`}
+                  label="Search publications"
+                  name="publicationSearch"
+                  onChange={event => {
+                    setSearchTerm(event.target.value);
+                    setSelectedThemeId('');
+                    resetField('themeId');
+                    resetField('publicationId');
+                  }}
+                  onKeyPress={event => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                    }
+                  }}
+                  value={searchTerm}
+                  width={20}
+                />
+                {searchTerm && publications.length > 0 && (
+                  <p>
+                    <a
+                      href={`#${formId}-publications`}
+                      className="govuk-!-margin-top-3 govuk-!-font-size-14"
+                    >
+                      Skip to search results
+                    </a>
+                  </p>
+                )}
+              </FormGroup>
+              <p>or</p>
+              <div className={styles.optionsContainer}>
+                <FormFieldRadioGroup<FormValues>
+                  legend="Select a theme"
+                  legendSize="s"
+                  name="themeId"
+                  small
+                  options={themes.map(theme => ({
+                    label: theme.title,
+                    value: theme.id,
+                  }))}
+                  onChange={e => {
+                    setSelectedThemeId(e.target.value);
+                    resetField('publicationId');
+                    setSearchTerm('');
+                  }}
+                />
 
-                <p>or</p>
-
-                <div className={styles.optionsContainer}>
+                <div className={styles.publicationsList}>
                   <FormFieldRadioGroup<FormValues>
-                    legend="Select a theme"
+                    id="publications"
+                    legend={
+                      <>
+                        Select a publication
+                        <span
+                          className="govuk-visually-hidden"
+                          aria-live="polite"
+                          aria-atomic="true"
+                        >
+                          {` ${publications.length} ${
+                            publications.length === 1
+                              ? `publication`
+                              : `publications`
+                          } found`}
+                        </span>
+                      </>
+                    }
                     legendSize="s"
-                    name="themeId"
+                    name="publicationId"
                     small
-                    options={themes.map(theme => ({
-                      label: theme.title,
-                      value: theme.id,
-                    }))}
-                    onChange={e => {
-                      setSelectedThemeId(e.target.value);
-                      resetField('publicationId');
-                      setSearchTerm('');
-                    }}
+                    options={orderBy(publications, 'title').map(
+                      publication => ({
+                        hint: searchTerm
+                          ? getThemeForPublication(publication.id)
+                          : '',
+                        hintSmall: true,
+                        label: publication.title,
+                        value: publication.id,
+                      }),
+                    )}
                   />
 
-                  <div className={styles.publicationsList}>
-                    <FormFieldRadioGroup<FormValues>
-                      id="publications"
-                      legend={
-                        <>
-                          Select a publication
-                          <span
-                            className="govuk-visually-hidden"
-                            aria-live="polite"
-                            aria-atomic="true"
-                          >
-                            {` ${publications.length} ${
-                              publications.length === 1
-                                ? `publication`
-                                : `publications`
-                            } found`}
-                          </span>
-                        </>
-                      }
-                      legendSize="s"
-                      name="publicationId"
-                      small
-                      options={orderBy(publications, 'title').map(
-                        publication => ({
-                          hint: searchTerm
-                            ? getThemeForPublication(publication.id)
-                            : '',
-                          hintSmall: true,
-                          label: publication.title,
-                          value: publication.id,
-                        }),
+                  {!publications.length && (
+                    <>
+                      <p>Search or select a theme to view publications</p>
+                      {(searchTerm || selectedThemeId) && (
+                        <InsetText>No publications found</InsetText>
                       )}
+                    </>
+                  )}
+
+                  <div className="govuk-!-margin-top-6">
+                    <WizardStepFormActions
+                      {...stepProps}
+                      isSubmitting={formState.isSubmitting}
                     />
-
-                    {!publications.length && (
-                      <>
-                        <p>Search or select a theme to view publications</p>
-                        {(searchTerm || selectedThemeId) && (
-                          <InsetText>No publications found</InsetText>
-                        )}
-                      </>
-                    )}
-
-                    <div className="govuk-!-margin-top-6">
-                      <WizardStepFormActions
-                        {...stepProps}
-                        isSubmitting={formState.isSubmitting}
-                      />
-                    </div>
                   </div>
                 </div>
-              </FormFieldset>
+              </div>
             </Form>
           );
         }

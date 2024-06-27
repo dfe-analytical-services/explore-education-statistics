@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
@@ -31,11 +32,13 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerTests(
+    TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-sets";
 
-    public class ListDataSetsTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class ListDataSetsTests(
+        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task PublicationHasSingleDataSet_Success_CorrectViewModel()
@@ -450,15 +453,9 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             var queryParams = new Dictionary<string, string?>
             {
-                {
-                    "page", page?.ToString()
-                },
-                {
-                    "pageSize", pageSize?.ToString()
-                },
-                {
-                    "publicationId", publicationId.ToString()
-                },
+                { "page", page?.ToString() },
+                { "pageSize", pageSize?.ToString() },
+                { "publicationId", publicationId.ToString() },
             };
 
             var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
@@ -467,7 +464,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         }
     }
 
-    public class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class GetDataSetTests(
+        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -486,12 +484,12 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile liveReleaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(liveReleaseVersion);
 
             ReleaseFile draftReleaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(draftReleaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -599,7 +597,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                         .Generate(1)
                 );
 
-            File file = DataFixture.DefaultFile();
+            File file = DataFixture.DefaultFile(FileType.Data);
 
             var liveReleaseVersion = publication.ReleaseVersions.Single(rv => rv.Published is not null);
 
@@ -675,7 +673,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -738,7 +736,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -851,7 +849,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -876,8 +874,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                         .Generate(1)
                 );
 
-            File file = DataFixture
-                .DefaultFile();
+            File file = DataFixture.DefaultFile(FileType.Data);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -912,7 +909,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         }
     }
 
-    public class CreateDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class CreateDataSetTests(
+        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -929,7 +927,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture.DefaultFile())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(draftReleaseVersion);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -971,15 +969,15 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
 
                     return new CreateDataSetResponseViewModel
                     {
-                        DataSetId = dataSet!.Id,
-                        DataSetVersionId = dataSetVersion!.Id,
+                        DataSetId = dataSet.Id,
+                        DataSetVersionId = dataSetVersion.Id,
                         InstanceId = Guid.NewGuid()
                     };
                 });
 
             var client = BuildApp(processorClient.Object).CreateClient();
 
-            var response = await CreateDataSetVersion(releaseFile.Id, client);
+            var response = await CreateDataSet(releaseFile.Id, client);
 
             MockUtils.VerifyAllMocks(processorClient);
 
@@ -1010,7 +1008,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         {
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
-            var response = await CreateDataSetVersion(Guid.NewGuid(), client);
+            var response = await CreateDataSet(Guid.NewGuid(), client);
 
             response.AssertForbidden();
         }
@@ -1042,7 +1040,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 .ReturnsAsync(ValidationUtils.ValidationResult(processorErrors));
 
             var client = BuildApp(processorClient.Object).CreateClient();
-            var response = await CreateDataSetVersion(releaseFileId, client);
+            var response = await CreateDataSet(releaseFileId, client);
 
             MockUtils.VerifyAllMocks(processorClient);
 
@@ -1061,16 +1059,13 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 .SetUser(user ?? BauUser());
         }
 
-        private async Task<HttpResponseMessage> CreateDataSetVersion(
+        private async Task<HttpResponseMessage> CreateDataSet(
             Guid releaseFileId,
             HttpClient? client = null)
         {
             client ??= BuildApp().CreateClient();
 
-            var request = new DataSetVersionCreateRequest
-            {
-                ReleaseFileId = releaseFileId
-            };
+            var request = new DataSetCreateRequest { ReleaseFileId = releaseFileId };
 
             return await client.PostAsJsonAsync(BaseUrl, request);
         }

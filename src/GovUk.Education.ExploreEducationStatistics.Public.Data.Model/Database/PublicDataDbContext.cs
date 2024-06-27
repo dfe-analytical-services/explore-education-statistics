@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,7 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 
 public class PublicDataDbContext : DbContext
 {
-    public PublicDataDbContext(DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true) : base(options)
+    public const string FilterOptionMetaLinkSequence = "FilterOptionMetaLink_seq";
+    public const string LocationOptionMetasIdSequence = "LocationOptionMetas_Id_seq";
+
+    public PublicDataDbContext(
+        DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true) : base(options)
     {
         Configure(updateTimestamps: updateTimestamps);
     }
@@ -22,11 +27,28 @@ public class PublicDataDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PublicDataDbContext).Assembly);
+
+        modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence);
     }
+
+    [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
+    public Task<int> NextSequenceValue(string sequenceName, CancellationToken cancellationToken = default) =>
+        Database.SqlQueryRaw<int>($"""
+                                   SELECT nextval('public."{sequenceName}"') AS "Value"
+                                   """)
+            .FirstAsync(cancellationToken);
+
+    [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
+    public Task<int> SetSequenceValue(string sequenceName, long value, CancellationToken cancellationToken = default) =>
+        Database.SqlQueryRaw<int>($"""
+                                   SELECT setval('public."{sequenceName}"', {value}) AS "Value"
+                                   """)
+            .FirstAsync(cancellationToken);
 
     public DbSet<DataSet> DataSets { get; init; } = null!;
     public DbSet<DataSetVersion> DataSetVersions { get; init; } = null!;
     public DbSet<DataSetVersionImport> DataSetVersionImports { get; init; } = null!;
+    public DbSet<DataSetVersionMapping> DataSetVersionMappings { get; init; } = null!;
     public DbSet<GeographicLevelMeta> GeographicLevelMetas { get; init; } = null!;
     public DbSet<LocationMeta> LocationMetas { get; init; } = null!;
     public DbSet<LocationOptionMeta> LocationOptionMetas { get; init; } = null!;

@@ -2,21 +2,26 @@ import CollapsibleList from '@common/components/CollapsibleList';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import LocationFiltersForm, {
   LocationFiltersFormProps,
-  LocationStepHeading,
-} from '@common/modules/table-tool/components//LocationFiltersForm';
-
-import {
-  LocationOption,
-  SubjectMeta,
-} from '@common/services/tableBuilderService';
+} from '@common/modules/table-tool/components/LocationFiltersForm';
+import { LocationOption } from '@common/services/tableBuilderService';
 import sortBy from 'lodash/sortBy';
 import React, { useMemo, useState } from 'react';
 
-export default function LocationStep(stepProps: LocationFiltersFormProps) {
-  const { initialValues = [], isActive, options, onSubmit } = stepProps;
+interface Props extends LocationFiltersFormProps {
+  stepTitle: string;
+}
+
+export default function LocationStep(stepProps: Props) {
+  const {
+    initialValues = [],
+    isActive,
+    options,
+    stepTitle,
+    onSubmit,
+  } = stepProps;
 
   const [selectedLocationIds, setSelectedLocationIds] =
     useState<string[]>(initialValues);
@@ -46,11 +51,16 @@ export default function LocationStep(stepProps: LocationFiltersFormProps) {
       : [];
   }, [options, selectedLocationIds]);
 
+  const stepHeading = (
+    <WizardStepHeading {...stepProps} fieldsetHeading>
+      {stepTitle}
+    </WizardStepHeading>
+  );
+
   if (!isActive) {
     return (
       <WizardStepSummary {...stepProps} goToButtonText="Edit locations">
-        <LocationStepHeading {...stepProps} />
-
+        {stepHeading}
         <SummaryList noBorder>
           {selectedLocations.map(level => {
             return (
@@ -75,14 +85,11 @@ export default function LocationStep(stepProps: LocationFiltersFormProps) {
   return (
     <LocationFiltersForm
       {...stepProps}
+      stepHeading={stepHeading}
       onSubmit={async values => {
         setSelectedLocationIds(values.locationIds);
         await onSubmit(values);
       }}
     />
   );
-}
-
-export interface LocationStepHeadingProps extends InjectedWizardProps {
-  options: SubjectMeta['locations'];
 }

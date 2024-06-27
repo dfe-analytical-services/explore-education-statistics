@@ -217,22 +217,18 @@ Check subject order in data tables
 Check subject order in data catalogue
     user navigates to data catalogue page on public frontend
 
-    user clicks radio    %{TEST_THEME_NAME}
-    user clicks radio    ${PUBLICATION_NAME}
-    user clicks button    Next step
+    user chooses select option    id:filters-form-theme    %{TEST_THEME_NAME}
+    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME}
+    user chooses select option    id:filters-form-release    ${RELEASE_NAME}
 
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME}
+    user waits until page contains    Download all 4 data sets (ZIP)
 
-    user clicks radio    ${RELEASE_NAME}
-    user clicks button    Next step
-
-    user waits until page contains    Choose files to download
-
-    user checks checkbox in position has label    1    One
-    user checks checkbox in position has label    2    Two
-    user checks checkbox in position has label    3    Three
-    user checks checkbox in position has label    4    Four
+    user checks items matching locator contain exact items in order
+    ...    One
+    ...    Two
+    ...    Three
+    ...    Four
+    ...    locator=xpath://*[@data-testid="data-set-file-list"]/li/h4
 
 Check subject order in data guidance
     user navigates to public find statistics page

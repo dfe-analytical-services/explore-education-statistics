@@ -29,9 +29,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             ReleaseFile releaseDataFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture
-                    .DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             DataSet dataSet = DataFixture
@@ -87,9 +85,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             ReleaseFile releaseDataFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture
-                    .DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             DataSet dataSet = DataFixture
@@ -158,9 +154,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             ReleaseFile releaseDataFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture
-                    .DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             DataSet dataSet = DataFixture
@@ -222,8 +216,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .WithPreviousVersionId(originalReleaseVersion.Id);
             
             File dataFile = DataFixture
-                .DefaultFile()
-                .WithType(FileType.Data);
+                .DefaultFile(FileType.Data);
 
             var (originalReleaseDataFile, amendmentReleaseDataFile) = DataFixture
                 .DefaultReleaseFile()
@@ -294,8 +287,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .WithPreviousVersionId(originalReleaseVersion.Id);
             
             var (dataFile, newDataFile) = DataFixture
-                .DefaultFile()
-                .WithType(FileType.Data)
+                .DefaultFile(FileType.Data)
                 .Generate(2)
                 .ToTuple2();
 

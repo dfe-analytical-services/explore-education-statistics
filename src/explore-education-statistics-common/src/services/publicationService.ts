@@ -28,6 +28,7 @@ export interface Publication {
   releaseSeries: ReleaseSeriesItem[];
   topic: {
     theme: {
+      id: string;
       title: string;
     };
   };
@@ -131,20 +132,7 @@ export interface ContentSection<BlockType> {
   content: BlockType[];
 }
 
-export const publicationSortOptions = [
-  'newest',
-  'oldest',
-  'relevance',
-  'title',
-] as const;
-
-export type PublicationSortOption = (typeof publicationSortOptions)[number];
-
 export type PublicationSortParam = 'published' | 'title' | 'relevance';
-
-export const publicationFilters = ['releaseType', 'search', 'themeId'] as const;
-
-export type PublicationFilter = (typeof publicationFilters)[number];
 
 export interface PublicationListRequest {
   page?: number;

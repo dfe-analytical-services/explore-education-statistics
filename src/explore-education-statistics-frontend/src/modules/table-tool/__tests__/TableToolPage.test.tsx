@@ -363,10 +363,10 @@ describe('TableToolPage', () => {
   test('renders the page correctly with themes and publications', async () => {
     render(<TableToolPage themeMeta={testThemeMeta} />);
 
-    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).toHaveAttribute('aria-current', 'step');
+
     const themeRadios = within(
       screen.getByRole('group', { name: 'Select a theme' }),
     ).getAllByRole('radio');
@@ -409,14 +409,13 @@ describe('TableToolPage', () => {
     );
 
     // Check we are on step 2, not 1
-    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Select a data set' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     expect(screen.getByTestId('Publication')).toHaveTextContent(
       'Test publication',
@@ -439,25 +438,23 @@ describe('TableToolPage', () => {
     );
 
     // Check we are on step 3
-    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
-      'aria-current',
-      'step',
-    );
-    expect(screen.getByTestId('wizardStep-3')).toHaveAttribute(
-      'aria-current',
-      'step',
-    );
+    expect(await screen.findByText('Choose Countries')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Choose a publication' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 2 Select a data set' }),
+    ).not.toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { name: 'Step 3 Choose Countries' }),
+    ).toHaveAttribute('aria-current', 'step');
 
     expect(screen.getByTestId('Publication')).toHaveTextContent(
       'Test publication',
     );
 
     expect(screen.getByTestId('Data set')).toHaveTextContent('Test subject');
-    expect(screen.getByText('Choose Countries')).toBeInTheDocument();
     expect(screen.getByLabelText('Great Britain')).toBeInTheDocument();
   });
 

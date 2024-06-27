@@ -157,6 +157,20 @@ describe('DataSetFileSummary', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders the `not the latest data` tag when the publication is superseded', () => {
+    render(
+      <DataSetFileSummary
+        dataSetFile={{ ...testDataSetFileSummaries[0], isSuperseded: true }}
+        expanded
+      />,
+    );
+
+    expect(screen.getByText('This is not the latest data')).toBeInTheDocument();
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders the `Available by API` tag when it is available by API', () => {
     render(
       <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} expanded />,

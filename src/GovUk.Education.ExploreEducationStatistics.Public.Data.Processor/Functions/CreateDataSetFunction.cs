@@ -61,15 +61,9 @@ public class CreateDataSetFunction(
     {
         const string orchestratorName = nameof(ProcessInitialDataSetVersionFunction.ProcessInitialDataSetVersion);
 
-        var input = new ProcessInitialDataSetVersionContext
-        {
-            DataSetVersionId = dataSetVersionId
-        };
+        var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
-        var options = new StartOrchestrationOptions
-        {
-            InstanceId = instanceId.ToString()
-        };
+        var options = new StartOrchestrationOptions { InstanceId = instanceId.ToString() };
 
         logger.LogInformation(
             "Scheduling '{OrchestratorName}' (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",

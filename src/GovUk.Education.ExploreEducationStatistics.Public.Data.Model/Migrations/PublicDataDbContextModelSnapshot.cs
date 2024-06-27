@@ -18,10 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.HasSequence<int>("FilterOptionMetaLink_seq");
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilterOptions", b =>
                 {
@@ -276,6 +278,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsUnique();
 
                     b.ToTable("DataSetVersionImports");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FilterMappingPlan")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("FilterMappingsComplete")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LocationMappingPlan")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("LocationMappingsComplete")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("SourceDataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TargetDataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceDataSetVersionId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_DataSetVersionMappings_SourceDataSetVersionId");
+
+                    b.HasIndex("TargetDataSetVersionId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId");
+
+                    b.ToTable("DataSetVersionMappings");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
@@ -1249,6 +1296,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsRequired();
 
                     b.Navigation("DataSetVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionMapping", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "SourceDataSetVersion")
+                        .WithMany()
+                        .HasForeignKey("SourceDataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "TargetDataSetVersion")
+                        .WithMany()
+                        .HasForeignKey("TargetDataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SourceDataSetVersion");
+
+                    b.Navigation("TargetDataSetVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>

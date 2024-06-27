@@ -6,7 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
@@ -69,8 +72,10 @@ public static class ProcessorHostBuilder
                     .AddFluentValidation()
                     .AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>()
                     .AddScoped<IDataSetService, DataSetService>()
+                    .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                     .AddScoped<IDataSetVersionService, DataSetVersionService>()
                     .AddScoped<IDataSetMetaService, DataSetMetaService>()
+                    .AddScoped<IDataSetVersionMappingService, DataSetVersionMappingService>()
                     .AddScoped<IDataDuckDbRepository, DataDuckDbRepository>()
                     .AddScoped<IFilterOptionsDuckDbRepository, FilterOptionsDuckDbRepository>()
                     .AddScoped<IIndicatorsDuckDbRepository, IndicatorsDuckDbRepository>()
@@ -83,10 +88,12 @@ public static class ProcessorHostBuilder
                     .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
                     .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
-                    .AddScoped<IValidator<DataSetCreateRequest>,
-                        DataSetCreateRequest.Validator>()
+                    .Configure<AppSettingsOptions>(
+                        hostBuilderContext.Configuration.GetSection(AppSettingsOptions.Section))
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
+                
+                services.AddValidatorsFromAssemblyContaining<DataSetCreateRequest.Validator>();
             });
     }
 }

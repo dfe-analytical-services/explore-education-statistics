@@ -8,35 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixture
 
 public static class FileGeneratorExtensions
 {
-    public static Generator<File> DefaultFile(this DataFixture fixture)
-        => fixture.Generator<File>().WithDefaults();
+    public static Generator<File> DefaultFile(this DataFixture fixture, FileType? fileType = null)
+        => fixture.Generator<File>().WithDefaults(fileType);
 
-    public static Generator<File> WithDefaults(this Generator<File> generator)
-        => generator.ForInstance(d => d.SetDefaults());
-
-    public static InstanceSetters<File> SetDefaults(this InstanceSetters<File> setters)
-        => setters
-            .SetDefault(f => f.Id)
-            .SetDefault(f => f.RootPath)
-            .SetDefault(f => f.DataSetFileId)
-            .SetDefault(f => f.SubjectId)
-            .SetContentLength(1024 * 1024)
-            .SetContentType("text/csv")
-            .SetType(FileType.Data)
-            .SetDefault(f => f.Filename)
-            .SetDefault(f => f.DataSetFileId)
-            .SetDataSetFileMeta(new DataSetFileMeta
-            {
-                GeographicLevels = [GeographicLevel.Country],
-                TimePeriodRange = new TimePeriodRangeMeta
-                {
-                    Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
-                    End = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2001", }
-                },
-                Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", }],
-                Indicators = [new() { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", }],
-            })
-            .Set(f => f.Filename, (_, f) => $"{f.Filename}.csv");
+    public static Generator<File> WithDefaults(this Generator<File> generator, FileType? fileType = null)
+        => generator.ForInstance(d => d.SetDefaults(fileType));
 
     public static Generator<File> WithContentLength(
         this Generator<File> generator,
@@ -73,23 +49,6 @@ public static class FileGeneratorExtensions
         Guid replacedById)
         => generator.ForInstance(s => s.SetReplacedById(replacedById));
 
-    public static Generator<File> WithPublicApiDataSetId(
-        this Generator<File> generator,
-        Guid publicDataSetId)
-        => generator.ForInstance(s => s.SetPublicApiDataSetId(publicDataSetId));
-
-    public static Generator<File> WithPublicApiDataSetVersion(
-        this Generator<File> generator,
-        int major,
-        int minor,
-        int patch = 0)
-        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(major, minor, patch));
-
-    public static Generator<File> WithPublicApiDataSetVersion(
-        this Generator<File> generator,
-        SemVersion version)
-        => generator.ForInstance(s => s.SetPublicApiDataSetVersion(version));
-
     public static Generator<File> WithRootPath(
         this Generator<File> generator,
         Guid rootPath)
@@ -122,8 +81,52 @@ public static class FileGeneratorExtensions
 
     public static Generator<File> WithDataSetFileMeta(
         this Generator<File> generator,
-        DataSetFileMeta dataSetFileMeta)
+        DataSetFileMeta? dataSetFileMeta)
         => generator.ForInstance(s => s.SetDataSetFileMeta(dataSetFileMeta));
+
+    public static InstanceSetters<File> SetDefaults(this InstanceSetters<File> setters, FileType? fileType)
+        => fileType switch
+        {
+            FileType.Data => setters.SetDataFileDefaults(),
+            FileType.Metadata => setters.SetMetaFileDefaults(),
+            FileType.Ancillary => setters.SetAncillaryFileDefaults(),
+            null => setters.SetDefaults(),
+            // TODO: Implement other file types
+            _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null)
+        };
+
+    public static InstanceSetters<File> SetDefaults(this InstanceSetters<File> setters)
+        => setters
+            .SetDefault(f => f.Id)
+            .SetDefault(f => f.RootPath)
+            .SetDefault(f => f.Filename)
+            .Set(f => f.ContentLength, f => f.Random.Int(1, 1024) * 1024);
+
+    public static InstanceSetters<File> SetDataFileDefaults(this InstanceSetters<File> setters)
+        => setters
+            .SetDefaults()
+            .SetType(FileType.Data)
+            .Set(f => f.Filename, (_, f) => $"{f.Filename}.csv")
+            .SetDefault(f => f.SubjectId)
+            .SetContentType("text/csv")
+            .SetDefault(f => f.DataSetFileId)
+            .Set(f => f.DataSetFileMeta, (_, _, context) => context.Fixture.DefaultDataSetFileMeta());
+
+    public static InstanceSetters<File> SetMetaFileDefaults(this InstanceSetters<File> setters)
+        => setters
+            .SetDefaults()
+            .SetType(FileType.Metadata)
+            .SetDefault(f => f.SubjectId)
+            .SetContentType("text/csv")
+            .Set(f => f.Filename, (_, f) => $"{f.Filename}.meta.csv");
+
+    public static InstanceSetters<File> SetAncillaryFileDefaults(this InstanceSetters<File> setters)
+        => setters
+            .SetDefaults()
+            .SetType(FileType.Ancillary)
+            .SetContentType("application/pdf")
+            .SetDefault(f => f.Filename)
+            .Set(f => f.Filename, (_, f) => $"{f.Filename}.pdf");
 
     public static InstanceSetters<File> SetContentLength(
         this InstanceSetters<File> setters,
@@ -150,25 +153,6 @@ public static class FileGeneratorExtensions
         this InstanceSetters<File> setters,
         Guid replacedById)
         => setters.Set(f => f.ReplacedById, replacedById);
-
-    public static InstanceSetters<File> SetPublicApiDataSetId(
-        this InstanceSetters<File> setters,
-        Guid publicDataSetId)
-        => setters.Set(f => f.PublicApiDataSetId, publicDataSetId);
-
-    public static InstanceSetters<File> SetPublicApiDataSetVersion(
-        this InstanceSetters<File> setters,
-        int major,
-        int minor,
-        int patch = 0)
-        => setters.Set(
-            f => f.PublicApiDataSetVersion,
-            new SemVersion(major: major, minor: minor, patch: patch));
-
-    public static InstanceSetters<File> SetPublicApiDataSetVersion(
-        this InstanceSetters<File> setters,
-        SemVersion version)
-        => setters.Set(f => f.PublicApiDataSetVersion, version);
 
     public static InstanceSetters<File> SetReplacing(
         this InstanceSetters<File> setters,
@@ -214,6 +198,6 @@ public static class FileGeneratorExtensions
 
     public static InstanceSetters<File> SetDataSetFileMeta(
         this InstanceSetters<File> setters,
-        DataSetFileMeta dataSetFileMeta)
+        DataSetFileMeta? dataSetFileMeta)
         => setters.Set(f => f.DataSetFileMeta, dataSetFileMeta);
 }

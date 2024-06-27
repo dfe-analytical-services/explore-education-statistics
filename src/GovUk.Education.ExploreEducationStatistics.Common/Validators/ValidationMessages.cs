@@ -11,9 +11,9 @@ public static class ValidationMessages
         Message: "Must be one of the allowed values."
     );
 
-    public static readonly LocalizableMessage InvalidInput = new(
-        Code: "InvalidInput",
-        Message: "The input is not valid. Check that it is in the expected format."
+    public static readonly LocalizableMessage InvalidValue = new(
+        Code: "InvalidValue",
+        Message: "Must be a valid value. Check that the type and format are correct."
     );
 
     public static readonly LocalizableMessage NotEmptyBody = new(
@@ -21,8 +21,13 @@ public static class ValidationMessages
         Message: "The request body must not be empty."
     );
 
-    public static readonly LocalizableMessage RequiredField = new(
-        Code: "RequiredField",
-        Message: "The field is required."
+    public static readonly LocalizableMessage RequiredValue = new(
+        Code: "RequiredValue",
+        Message: "A value is required for this field."
+    );
+
+    public static readonly LocalizableMessage UnknownField = new(
+        Code: "UnknownField",
+        Message: "The field was not expected in the request and should be removed."
     );
 }

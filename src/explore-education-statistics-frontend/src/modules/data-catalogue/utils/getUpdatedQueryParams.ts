@@ -1,8 +1,6 @@
-import {
-  DataSetFileFilter,
-  DataSetFileSortOption,
-} from '@frontend/services/dataSetFileService';
-import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
+import { DataSetFileFilter } from '@frontend/modules/data-catalogue/utils/dataSetFileFilters';
+import { DataSetFileSortOption } from '@frontend/modules/data-catalogue/utils/dataSetFileSortOptions';
+import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePage';
 import omit from 'lodash/omit';
 import { ParsedUrlQuery } from 'querystring';
 import { ReleaseSummary } from '@common/services/publicationService';
@@ -28,13 +26,14 @@ export default async function getUpdatedQueryParams({
     return {
       ...omit(query, [
         'page',
-        ...(filterByReleaseId ? ['latest', 'latestOnly'] : ['releaseId']),
+        ...(filterByReleaseId
+          ? ['latest', 'latestOnly', 'sortBy']
+          : ['releaseId']),
       ]),
       ...(!filterByReleaseId && {
         latestOnly: nextValue === 'latest' ? 'true' : 'false',
       }),
       ...(filterByReleaseId && { [filterType]: nextValue }),
-      sortBy,
     };
   }
 
@@ -59,7 +58,7 @@ export default async function getUpdatedQueryParams({
       releaseId: releaseData?.find(release =>
         releaseId ? release.id === releaseId : release.latestRelease,
       )?.id,
-      sortBy,
+      ...(sortBy !== 'newest' && { sortBy }),
     };
   }
 

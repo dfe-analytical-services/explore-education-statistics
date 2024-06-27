@@ -2,14 +2,16 @@ import React from 'react';
 import Head from 'next/head';
 
 export interface PageMetaProps {
+  includeDefaultMetaTitle?: boolean;
   title?: string;
   description?: string;
   imgUrl?: string;
 }
 
-const defaultPageTitle = 'Explore education statistics – GOV.UK';
+const defaultPageTitle = 'Explore education statistics - GOV.UK';
 
 const PageMeta = ({
+  includeDefaultMetaTitle = true,
   title = defaultPageTitle,
   description = 'Find, download and explore official Department for Education (DfE) statistics and data in England.',
   imgUrl,
@@ -18,8 +20,8 @@ const PageMeta = ({
     <Head>
       {/* <!-- Primary Meta Tags --> */}
       <title>
-        {title && title !== defaultPageTitle
-          ? `${title} – ${defaultPageTitle}`
+        {title && title !== defaultPageTitle && includeDefaultMetaTitle
+          ? `${title} - ${defaultPageTitle}`
           : title}
       </title>
       <meta name="title" content={title} />

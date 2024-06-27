@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -134,10 +135,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
         }
 
-        public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems()
+        public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems(
+            CancellationToken cancellationToken = default)
         {
             return await _contentDbContext.Methodologies
                 .Include(m => m.LatestPublishedVersion)
+                .ThenInclude(mv => mv!.Methodology)
                 .Where(m => m.LatestPublishedVersion != null)
                 .Select(m => m.LatestPublishedVersion)
                 .OfType<MethodologyVersion>()
@@ -147,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         Slug = mv.Slug,
                         LastModified = mv.Published
                     })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
     }
 }

@@ -1,9 +1,12 @@
 import Button from '@common/components/Button';
 import styles from '@common/components/Modal.module.scss';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import * as Dialog from '@radix-ui/react-dialog';
 import classNames from 'classnames';
 import React, { ReactNode, useEffect, useRef } from 'react';
+
+const defaultCloseText = 'Close';
 
 export interface ModalProps {
   children: ReactNode;
@@ -29,7 +32,7 @@ const Modal = ({
   className,
   closeOnEsc = true,
   closeOnOutsideClick = true,
-  closeText = 'Close',
+  closeText = defaultCloseText,
   description,
   fullScreen = false,
   hideTitle = false,
@@ -66,7 +69,13 @@ const Modal = ({
       )}
       <Dialog.Portal>
         <Dialog.Overlay
-          className={classNames(styles.underlay, underlayClass)}
+          className={classNames(
+            styles.underlay,
+            {
+              [styles.noUnderlayClick]: !closeOnOutsideClick,
+            },
+            underlayClass,
+          )}
           data-testid="modal-underlay"
         >
           <Dialog.Content
@@ -100,7 +109,12 @@ const Modal = ({
             {children}
             {showClose && (
               <Dialog.Close asChild>
-                <Button>{closeText}</Button>
+                <Button>
+                  {closeText}
+                  {closeText === defaultCloseText && (
+                    <VisuallyHidden> modal</VisuallyHidden>
+                  )}
+                </Button>
               </Dialog.Close>
             )}
           </Dialog.Content>

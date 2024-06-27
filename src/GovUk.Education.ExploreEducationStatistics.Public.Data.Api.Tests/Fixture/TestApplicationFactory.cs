@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -25,18 +26,8 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
 
     public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
-        await using var context = GetDbContext<TDbContext>();
-
-        var tables = context.Model.GetEntityTypes()
-            .Select(type => type.GetTableName())
-            .Distinct()
-            .Cast<string>()
-            .ToList();
-
-        foreach (var table in tables)
-        {
-            await context.Database.ExecuteSqlRawAsync(@$"TRUNCATE TABLE ""{table}"" RESTART IDENTITY CASCADE;");
-        }
+        var context = this.GetDbContext<TDbContext, Startup>();
+        await context.ClearTestData();
     }
 
     public async Task ClearAllTestData()
@@ -51,7 +42,10 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
             .ConfigureServices(services =>
             {
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
+                    options => options
+                        .UseNpgsql(
+                            _postgreSqlContainer.GetConnectionString(),
+                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
             });
     }
 }

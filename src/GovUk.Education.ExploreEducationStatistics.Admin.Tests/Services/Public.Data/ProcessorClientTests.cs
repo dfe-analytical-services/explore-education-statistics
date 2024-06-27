@@ -87,19 +87,6 @@ public class ProcessorClientTests
             left.AssertValidationProblem(Errors.Error1);
         }
 
-        [Fact]
-        public async Task HttpClientNotFound_ReturnsNotFound()
-        {
-            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
-                .Respond(HttpStatusCode.NotFound);
-
-            var response = await _processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
-
-            _mockHttp.VerifyNoOutstandingExpectation();
-
-            var left = response.AssertLeft();
-            left.AssertNotFoundResult();
-        }
 
         [Theory]
         [InlineData(HttpStatusCode.RequestTimeout)]
@@ -109,6 +96,7 @@ public class ProcessorClientTests
         [InlineData(HttpStatusCode.Conflict)]
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
+        [InlineData(HttpStatusCode.NotFound)]
         [InlineData(HttpStatusCode.NotAcceptable)]
         public async Task HttpClientFailureStatusCode_ThrowsException(
             HttpStatusCode responseStatusCode)
@@ -122,11 +110,6 @@ public class ProcessorClientTests
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        private enum Errors
-        {
-            Error1,
         }
     }
 
@@ -174,7 +157,7 @@ public class ProcessorClientTests
             var left = response.AssertLeft();
             left.AssertValidationProblem(Errors.Error1);
         }
-
+        
         [Fact]
         public async Task HttpClientNotFound_ReturnsNotFound()
         {
@@ -215,10 +198,82 @@ public class ProcessorClientTests
 
             _mockHttp.VerifyNoOutstandingExpectation();
         }
+    }
 
-        private enum Errors
+    public class BulkDeleteDataSetVersionsTests : ProcessorClientTests
+    {
+        private static readonly Uri Uri = new(BaseUri, "api/BulkDeleteDataSetVersions");
+
+        [Fact]
+        public async Task HttpClientSuccess()
         {
-            Error1,
+            var releaseVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
+                .Respond(HttpStatusCode.NoContent);
+
+            var response = await _processorClient.BulkDeleteDataSetVersions(releaseVersionId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            response.AssertRight();
         }
+
+        [Fact]
+        public async Task HttpClientBadRequest_ReturnsBadRequest()
+        {
+            var releaseVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
+                .Respond(
+                    HttpStatusCode.BadRequest,
+                    JsonContent.Create(new ValidationProblemViewModel
+                    {
+                        Errors = new ErrorViewModel[]
+                        {
+                            new() {
+                               Code = Errors.Error1.ToString()
+                            }
+                        }
+                    }));
+
+            var response = await _processorClient.BulkDeleteDataSetVersions(releaseVersionId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            left.AssertValidationProblem(Errors.Error1);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.RequestTimeout)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.BadGateway)]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.Conflict)]
+        [InlineData(HttpStatusCode.Forbidden)]
+        [InlineData(HttpStatusCode.Gone)]
+        [InlineData(HttpStatusCode.NotAcceptable)]
+        [InlineData(HttpStatusCode.NotFound)]
+        public async Task HttpClientFailureStatusCode_ThrowsException(
+            HttpStatusCode responseStatusCode)
+        {
+            var releaseVersionId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
+                .Respond(responseStatusCode);
+
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
+            {
+                await _processorClient.BulkDeleteDataSetVersions(releaseVersionId);
+            });
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+        }
+    }
+
+    private enum Errors
+    {
+        Error1,
     }
 }

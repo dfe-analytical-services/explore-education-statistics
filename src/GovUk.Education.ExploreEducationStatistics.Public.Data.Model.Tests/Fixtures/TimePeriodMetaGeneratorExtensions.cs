@@ -23,6 +23,10 @@ public static class TimePeriodMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
 
+    public static Generator<TimePeriodMeta> WithDataSetVersionId(this Generator<TimePeriodMeta> generator,
+        Guid dataSetVersionId)
+        => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
+
     public static Generator<TimePeriodMeta> WithCode(this Generator<TimePeriodMeta> generator, TimeIdentifier code)
         => generator.ForInstance(s => s.SetCode(code));
 
@@ -43,7 +47,12 @@ public static class TimePeriodMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => setters
             .Set(m => m.DataSetVersion, dataSetVersion)
-            .Set(m => m.DataSetVersionId, dataSetVersion.Id);
+            .SetDataSetVersionId(dataSetVersion.Id);
+
+    public static InstanceSetters<TimePeriodMeta> SetDataSetVersionId(
+        this InstanceSetters<TimePeriodMeta> setters,
+        Guid dataSetVersionId)
+        => setters.Set(m => m.DataSetVersionId, dataSetVersionId);
 
     public static InstanceSetters<TimePeriodMeta> SetCode(
         this InstanceSetters<TimePeriodMeta> setters,

@@ -106,12 +106,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -171,10 +169,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -312,13 +307,15 @@ public class ProcessorStage3Tests
                 .Select(f => (f.Label, f.Hint, f.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Filter one", "Hint 1", "filter_one"),
-                    ("Filter two", null, "filter_two")]);
+                    ("Filter two", null, "filter_two")
+                ]);
 
             file.DataSetFileMeta.Indicators
                 .Select(i => (i.Label, i.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Indicator one", "indicator_one"),
-                    ("Indicator two", "indicator_two")]);
+                    ("Indicator two", "indicator_two")
+                ]);
         }
     }
 
@@ -328,12 +325,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         var unexpectedImportedObservation = _fixture
@@ -399,10 +394,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -462,14 +454,12 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16,
-                importedRows: 4,
-                lastProcessedRowIndex: 3
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
+            .WithImportedRows(4)
+            .WithLastProcessedRowIndex(3)
             .Generate();
 
         var alreadyImportedObservations = _fixture
@@ -536,10 +526,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -617,14 +604,12 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16,
-                importedRows: 10,
-                lastProcessedRowIndex: 9
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
+            .WithImportedRows(10)
+            .WithLastProcessedRowIndex(9)
             .Generate();
 
         var alreadyImportedObservations = _fixture
@@ -691,10 +676,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -767,12 +749,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 8
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(8)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -832,10 +812,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -917,14 +894,12 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 8,
-                importedRows: 4,
-                lastProcessedRowIndex: 6
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(8)
+            .WithImportedRows(4)
+            .WithLastProcessedRowIndex(6)
             .Generate();
 
         // Generate already-imported Observations with alternating CsvRow numbers
@@ -999,10 +974,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1080,12 +1052,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1143,16 +1113,10 @@ public class ProcessorStage3Tests
             guidGenerator,
             databaseHelper);
 
-        var observationBatchImporterMock = new Mock<TestObservationBatchImporter>
-        {
-            CallBase = true
-        };
+        var observationBatchImporterMock = new Mock<TestObservationBatchImporter> { CallBase = true };
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1226,12 +1190,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithDefaultFiles("small-csv")
             .WithStatus(CANCELLED)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1276,10 +1238,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 3
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1365,12 +1324,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("additional-filters-and-indicators")
+            .WithDefaultFiles("additional-filters-and-indicators")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 16,
-                expectedImportedRows: 16
-            )
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1431,10 +1388,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1539,12 +1493,10 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(subject.Id)
-            .WithFiles("small-csv-with-special-data")
+            .WithDefaultFiles("small-csv-with-special-data")
             .WithStatus(STAGE_3)
-            .WithRowCounts(
-                totalRows: 5,
-                expectedImportedRows: 5
-            )
+            .WithTotalRows(5)
+            .WithExpectedImportedRows(5)
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1604,10 +1556,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingOptions
-            {
-                RowsPerBatch = 5000
-            }),
+            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1691,7 +1640,8 @@ public class ProcessorStage3Tests
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class TestObservationBatchImporter : IObservationBatchImporter
     {
-        public virtual async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)
+        public virtual async Task ImportObservationBatch(
+            StatisticsDbContext context, IEnumerable<Observation> observations)
         {
             await context.Observation.AddRangeAsync(observations);
             await context.SaveChangesAsync();

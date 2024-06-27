@@ -22,7 +22,10 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
         class="govuk-list"
         id="indicatorsList"
       >
-        <li>
+        <li
+          class="focusableItem"
+          tabindex="-1"
+        >
           Number of excluded sessions
         </li>
       </ul>
@@ -46,7 +49,10 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
         class="govuk-list"
         id="filtersList-SchoolType"
       >
-        <li>
+        <li
+          class="focusableItem"
+          tabindex="-1"
+        >
           State-funded secondary
         </li>
       </ul>
@@ -70,7 +76,10 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
         class="govuk-list"
         id="filtersList-Characteristic"
       >
-        <li>
+        <li
+          class="focusableItem"
+          tabindex="-1"
+        >
           Ethnicity Major Black Total
         </li>
       </ul>

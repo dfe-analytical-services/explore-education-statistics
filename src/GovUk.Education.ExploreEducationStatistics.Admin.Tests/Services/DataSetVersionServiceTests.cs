@@ -44,9 +44,7 @@ public class DataSetVersionServiceTests(TestApplicationFactory testApp) : Integr
 
             ReleaseFile dataFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture
-                    .DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             DataSetVersion dataSetVersion = DataFixture
@@ -78,9 +76,7 @@ public class DataSetVersionServiceTests(TestApplicationFactory testApp) : Integr
 
             ReleaseFile dataFile = DataFixture
                 .DefaultReleaseFile()
-                .WithFile(DataFixture
-                    .DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
             DataSetVersion dataSetVersion = DataFixture

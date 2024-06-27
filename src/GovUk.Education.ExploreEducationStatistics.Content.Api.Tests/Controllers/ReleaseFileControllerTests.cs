@@ -42,8 +42,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                     .GenerateList(1));
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .WithFile(() => DataFixture.DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(() => DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .GenerateList(4);
 
@@ -91,8 +90,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
             var unpublishedReleaseVersion = publication.ReleaseVersions[1];
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .WithFile(() => DataFixture.DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(() => DataFixture.DefaultFile(FileType.Data))
                 .ForRange(..2, rf => rf
                     .SetReleaseVersion(unpublishedReleaseVersion))
                 .ForRange(2..4, rf => rf
@@ -144,8 +142,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
             var latestPublishedReleaseVersion = publication.ReleaseVersions[2];
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .WithFile(() => DataFixture.DefaultFile()
-                    .WithType(FileType.Data))
+                .WithFile(() => DataFixture.DefaultFile(FileType.Data))
                 .ForRange(..2, rf => rf
                     .SetReleaseVersion(publication.ReleaseVersions[0]))
                 .ForRange(2..4, rf => rf

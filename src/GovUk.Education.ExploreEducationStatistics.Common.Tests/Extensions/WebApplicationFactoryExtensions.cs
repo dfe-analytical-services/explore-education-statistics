@@ -21,7 +21,16 @@ public static class WebApplicationFactoryExtensions
         where TDbContext : DbContext
         where TEntrypoint : class
     {
-        return app.WithWebHostBuilder(builder => builder.ResetDbContext<TDbContext>());
+        return app.WithWebHostBuilder(builder => builder
+            .ResetDbContext<TDbContext>());
+    }
+    
+    public static TDbContext GetDbContext<TDbContext, TEntrypoint>(this WebApplicationFactory<TEntrypoint> app) 
+        where TDbContext : DbContext
+        where TEntrypoint : class
+    {
+        var scope = app.Services.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
 
     /// <summary>

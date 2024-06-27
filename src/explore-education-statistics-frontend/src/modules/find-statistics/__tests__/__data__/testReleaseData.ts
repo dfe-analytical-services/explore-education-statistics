@@ -53,6 +53,7 @@ export const testPublication: Publication = {
   ],
   topic: {
     theme: {
+      id: 'test-theme',
       title: 'Pupils and schools',
     },
   },

@@ -268,6 +268,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
@@ -339,6 +340,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMetaSingleFilters}
         onSubmit={noop}
@@ -380,6 +382,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMetaSingleFilters}
         onSubmit={noop}
@@ -426,6 +429,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
@@ -464,6 +468,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
@@ -501,6 +506,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         initialValues={{
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
           indicators: ['unauthorised-absence-rate'],
@@ -520,6 +526,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         initialValues={{
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
           indicators: ['unauthorised-absence-rate'],
@@ -543,6 +550,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMetaOneIndicator}
         onSubmit={noop}
@@ -564,6 +572,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={{
           ...testSubjectMeta,
@@ -603,6 +612,7 @@ describe('FiltersForm', () => {
     const { container, rerender } = render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
@@ -616,6 +626,7 @@ describe('FiltersForm', () => {
     await rerender(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         isActive={false}
         subject={testSubject}
         subjectMeta={testSubjectMeta}
@@ -637,6 +648,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={{
           ...testSubjectMeta,
@@ -684,6 +696,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={{
           ...testSubjectMeta,
@@ -733,6 +746,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={orderedTestSubjectMeta}
         onSubmit={noop}
@@ -773,6 +787,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={orderedTestSubjectMeta}
         onSubmit={noop}
@@ -794,6 +809,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
@@ -833,6 +849,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
@@ -848,6 +865,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={{
           ...testSubjectMeta,
@@ -892,6 +910,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
@@ -1003,6 +1022,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={{
           ...testSubjectMeta,
@@ -1037,6 +1057,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        stepTitle="Choose your filters"
         subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}

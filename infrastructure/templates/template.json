@@ -11,6 +11,9 @@
     "dataApiUrl": {
       "type": "string"
     },
+    "publicApiUrl": {
+      "type": "string"
+    },
     "subscription": {
       "type": "string",
       "defaultValue": "",
@@ -2061,6 +2064,7 @@
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
+        "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'),'/api/v1.0')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "20.14.0",
         "WEBSITES_PORT": 3000
       }

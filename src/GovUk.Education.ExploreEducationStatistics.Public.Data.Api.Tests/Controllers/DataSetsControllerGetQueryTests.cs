@@ -106,13 +106,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var client = BuildApp().CreateClient();
 
-            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query?indicators[]=");
+            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query?indicators[0]=");
 
             var validationProblem = response.AssertValidationProblem();
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasNotEmptyError("indicators");
+            validationProblem.AssertHasNotEmptyError("indicators[0]");
         }
 
         [Fact]
@@ -165,7 +165,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasNotEmptyError("indicators");
+            validationProblem.AssertHasRequiredValueError("indicators");
         }
 
         [Fact]
@@ -191,8 +191,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
     public class FiltersValidationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
-        [InlineData("filters.in")]
-        [InlineData("filters.notIn")]
+        [InlineData("filters.in[0]")]
+        [InlineData("filters.notIn[0]")]
         public async Task Empty_Returns400(string path)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -203,7 +203,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     {
-                        $"{path}[]", ""
+                        path, ""
                     }
                 }
             );
@@ -274,7 +274,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                         "filters.notEq", new string('a', 12)
                     },
                     {
-                        "filters.in[]", ""
+                        "filters.in[0]", ""
                     },
                     {
                         "filters.notIn", invalidFilters
@@ -288,7 +288,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             validationProblem.AssertHasMaximumLengthError("filters.eq", maxLength: 10);
             validationProblem.AssertHasMaximumLengthError("filters.notEq", maxLength: 10);
-            validationProblem.AssertHasNotEmptyError("filters.in");
+            validationProblem.AssertHasNotEmptyError("filters.in[0]");
             validationProblem.AssertHasMaximumLengthError("filters.notIn[0]", maxLength: 10);
             validationProblem.AssertHasNotEmptyError("filters.notIn[1]");
         }
@@ -328,8 +328,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
     public class GeographicLevelsValidationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
-        [InlineData("geographicLevels.in")]
-        [InlineData("geographicLevels.notIn")]
+        [InlineData("geographicLevels.in[0]")]
+        [InlineData("geographicLevels.notIn[0]")]
         public async Task Empty_Returns400(string path)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -340,7 +340,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     {
-                        $"{path}[]", ""
+                        path, ""
                     }
                 }
             );
@@ -349,7 +349,11 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasNotEmptyError(path);
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: path,
+                value: null,
+                allowed: GeographicLevelUtils.OrderedCodes
+            );
         }
 
         [Theory]
@@ -459,7 +463,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                         "geographicLevels.in", invalidLevels
                     },
                     {
-                        "geographicLevels.notIn[]", ""
+                        "geographicLevels.notIn[0]", ""
                     },
                 }
             );
@@ -490,7 +494,11 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 value: invalidLevels[1],
                 allowed: allowed
             );
-            validationProblem.AssertHasNotEmptyError("geographicLevels.notIn");
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: "geographicLevels.notIn[0]",
+                value: null,
+                allowed: allowed
+            );
         }
     }
 
@@ -498,8 +506,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
-        [InlineData("locations.in")]
-        [InlineData("locations.notIn")]
+        [InlineData("locations.in[0]")]
+        [InlineData("locations.notIn[0]")]
         public async Task Empty_Returns400(string path)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -510,7 +518,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     {
-                        $"{path}[]", ""
+                        path, ""
                     }
                 }
             );
@@ -654,7 +662,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                         "locations.in", invalidLocations
                     },
                     {
-                        "locations.notIn[]", ""
+                        "locations.notIn[0]", ""
                     },
                 }
             );
@@ -680,7 +688,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 property: "id",
                 maxLength: 10
             );
-            validationProblem.AssertHasNotEmptyError("locations.notIn");
+            validationProblem.AssertHasNotEmptyError("locations.notIn[0]");
         }
 
         [Theory]
@@ -736,7 +744,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     {
-                        "timePeriods.in[]", ""
+                        "timePeriods.in[0]", ""
                     }
                 }
             );
@@ -745,7 +753,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasNotEmptyError("timePeriods.in");
+            validationProblem.AssertHasNotEmptyError("timePeriods.in[0]");
         }
 
         [Theory]
@@ -826,7 +834,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                         "timePeriods.in", invalidTimePeriods
                     },
                     {
-                        "timePeriods.notIn[]", ""
+                        "timePeriods.notIn[0]", ""
                     }
                 }
             );
@@ -840,7 +848,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.in[0]");
             validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[1]", value: "invalid");
             validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.in[2]", code: "");
-            validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.notIn");
+            validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.notIn[0]");
         }
 
         [Theory]
@@ -892,7 +900,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     {
-                        "sorts[]", ""
+                        "sorts[0]", ""
                     }
                 }
             );
@@ -901,7 +909,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasNotEmptyError("sorts");
+            validationProblem.AssertHasNotEmptyError("sorts[0]");
         }
 
         [Fact]

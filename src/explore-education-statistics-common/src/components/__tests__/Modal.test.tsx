@@ -1,11 +1,11 @@
+import render from '@common-test/render';
 import Modal from '@common/components/Modal';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('Modal', () => {
   test('clicking the trigger button opens the modal', async () => {
-    render(
+    const { user } = render(
       <Modal
         triggerButton={<button type="button">Open</button>}
         title="Test modal"
@@ -19,7 +19,7 @@ describe('Modal', () => {
       screen.queryByRole('heading', { name: 'Test modal' }),
     ).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await user.click(screen.getByRole('button', { name: 'Open' }));
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(
@@ -28,7 +28,7 @@ describe('Modal', () => {
   });
 
   test('clicking the close button closes the modal', async () => {
-    render(
+    const { user } = render(
       <Modal
         showClose
         triggerButton={<button type="button">Open</button>}
@@ -44,7 +44,7 @@ describe('Modal', () => {
       screen.getByRole('heading', { name: 'Test modal' }),
     ).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await user.click(screen.getByRole('button', { name: 'Close modal' }));
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(
@@ -119,7 +119,7 @@ describe('Modal', () => {
   test('when opened the `onOpen` handler is called', async () => {
     const onOpen = jest.fn();
 
-    render(
+    const { user } = render(
       <Modal
         triggerButton={<button type="button">Open</button>}
         title="Test modal"
@@ -132,7 +132,7 @@ describe('Modal', () => {
 
     expect(onOpen).not.toHaveBeenCalled();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await user.click(screen.getByRole('button', { name: 'Open' }));
 
     await waitFor(() => {
       expect(onOpen).toHaveBeenCalled();
@@ -142,7 +142,7 @@ describe('Modal', () => {
   test('closing the modal calls the `onExit` handler', async () => {
     const onExit = jest.fn();
 
-    render(
+    const { user } = render(
       <Modal
         triggerButton={<button type="button">Open</button>}
         title="Test modal"
@@ -156,7 +156,7 @@ describe('Modal', () => {
 
     expect(onExit).not.toHaveBeenCalled();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await user.click(screen.getByRole('button', { name: 'Close modal' }));
 
     await waitFor(() => {
       expect(onExit).toHaveBeenCalled();

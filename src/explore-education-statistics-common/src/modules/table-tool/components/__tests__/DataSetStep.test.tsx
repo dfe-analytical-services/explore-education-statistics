@@ -109,18 +109,23 @@ describe('DataSetStep', () => {
 
   test('renders radios with details if no `renderFeaturedTableLink `', () => {
     render(
-      <DataSetStep {...wizardProps} subjects={testSubjects} onSubmit={noop} />,
+      <DataSetStep
+        {...wizardProps}
+        stepTitle="Select a data set"
+        subjects={testSubjects}
+        onSubmit={noop}
+      />,
     );
 
     expect(
       screen.getByRole('heading', {
-        name: 'Step 1 (current) Select a data set',
+        name: 'Step 1 Select a data set',
       }),
     ).toBeInTheDocument();
 
     const radios = within(
       screen.getByRole('group', {
-        name: 'Step 1 (current) Select a data set',
+        name: 'Step 1 Select a data set',
       }),
     ).getAllByRole('radio');
     expect(radios).toHaveLength(2);
@@ -192,6 +197,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         subjects={testSubjects}
         onSubmit={handleSubmit}
       />,
@@ -216,6 +222,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
@@ -256,6 +263,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set or featured table"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
@@ -265,7 +273,7 @@ describe('DataSetStep', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Step 1 (current) Select a data set or featured table',
+        name: 'Step 1 Select a data set or featured table',
       }),
     ).toBeInTheDocument();
 
@@ -286,6 +294,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
         onSubmit={noop}
@@ -294,7 +303,7 @@ describe('DataSetStep', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Step 1 (current) Select a data set',
+        name: 'Step 1 Select a data set',
       }),
     ).toBeInTheDocument();
 
@@ -316,6 +325,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
@@ -371,6 +381,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
@@ -414,6 +425,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
@@ -456,6 +468,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         release={testRelease}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
@@ -538,6 +551,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         release={testRelease}
@@ -556,7 +570,14 @@ describe('DataSetStep', () => {
   });
 
   test('renders empty message when there are no subjects', () => {
-    render(<DataSetStep {...wizardProps} subjects={[]} onSubmit={noop} />);
+    render(
+      <DataSetStep
+        {...wizardProps}
+        stepTitle="Select a data set"
+        subjects={[]}
+        onSubmit={noop}
+      />,
+    );
 
     expect(screen.getByText('No data sets available.')).toBeInTheDocument();
   });
@@ -565,6 +586,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         isActive={false}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
@@ -583,6 +605,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         isActive={false}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
@@ -603,6 +626,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
+        stepTitle="Select a data set"
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         release={testRelease}

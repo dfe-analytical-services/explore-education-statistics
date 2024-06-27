@@ -15,8 +15,13 @@ public static class FilterMetaGeneratorExtensions
     public static Generator<FilterMeta> WithDefaults(this Generator<FilterMeta> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<FilterMeta> WithDataSetVersion(this Generator<FilterMeta> generator, DataSetVersion dataSetVersion)
+    public static Generator<FilterMeta> WithDataSetVersion(this Generator<FilterMeta> generator,
+        DataSetVersion dataSetVersion)
         => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
+
+    public static Generator<FilterMeta> WithDataSetVersionId(this Generator<FilterMeta> generator,
+        Guid dataSetVersionId)
+        => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
 
     public static Generator<FilterMeta> WithPublicId(this Generator<FilterMeta> generator, string identifier)
         => generator.ForInstance(s => s.SetPublicId(identifier));
@@ -53,7 +58,12 @@ public static class FilterMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => setters
             .Set(m => m.DataSetVersion, dataSetVersion)
-            .Set(m => m.DataSetVersionId, dataSetVersion.Id);
+            .SetDataSetVersionId(dataSetVersion.Id);
+
+    public static InstanceSetters<FilterMeta> SetDataSetVersionId(
+        this InstanceSetters<FilterMeta> setters,
+        Guid dataSetVersionId)
+        => setters.Set(m => m.DataSetVersionId, dataSetVersionId);
 
     public static InstanceSetters<FilterMeta> SetPublicId(this InstanceSetters<FilterMeta> setters, string publicId)
         => setters.Set(m => m.PublicId, publicId);
@@ -67,7 +77,7 @@ public static class FilterMetaGeneratorExtensions
     public static InstanceSetters<FilterMeta> SetOptions(
         this InstanceSetters<FilterMeta> setters,
         IEnumerable<FilterOptionMeta> options)
-        => setters.Set(m => m.Options, () => options);
+        => setters.SetOptions(() => options);
 
     public static InstanceSetters<FilterMeta> SetOptions(
         this InstanceSetters<FilterMeta> setters,
@@ -83,6 +93,7 @@ public static class FilterMetaGeneratorExtensions
                         .Select(o => context.Fixture
                             .DefaultFilterOptionMetaLink()
                             .WithOption(o)
+                            .WithMeta(m)
                             .Generate())
                         .ToList();
                 }

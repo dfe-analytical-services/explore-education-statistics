@@ -1,4 +1,12 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -18,14 +26,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -130,9 +130,11 @@ public class DataSetFileService : IDataSetFileService
                 },
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
+                IsSuperseded = result.Value.ReleaseVersion.Publication.SupersededBy != null
+                    && result.Value.ReleaseVersion.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
                 Published = result.Value.ReleaseVersion.Published!.Value,
                 LastUpdated = result.Value.Published!.Value,
-                Api = BuildDataSetFileApiViewModel(result.Value.File),
+                Api = BuildDataSetFileApiViewModel(result.Value),
                 Meta = BuildDataSetFileMetaViewModel(
                     result.Value.File.DataSetFileMeta,
                     result.Value.FilterSequence,
@@ -140,7 +142,8 @@ public class DataSetFileService : IDataSetFileService
             };
     }
 
-    public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems()
+    public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems(
+        CancellationToken cancellationToken = default)
     {
         var latestReleaseVersions = _contentDbContext.ReleaseVersions
             .LatestReleaseVersions(publishedOnly: true);
@@ -157,7 +160,7 @@ public class DataSetFileService : IDataSetFileService
                 Id = rf.File.DataSetFileId!.Value.ToString(),
                 LastModified = rf.Published
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
@@ -177,6 +180,7 @@ public class DataSetFileService : IDataSetFileService
     {
         var releaseFile = await _contentDbContext.ReleaseFiles
             .Include(rf => rf.ReleaseVersion.Publication.Topic.Theme)
+            .Include(rf => rf.ReleaseVersion.Publication.SupersededBy)
             .Include(rf => rf.File)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetId
@@ -214,6 +218,8 @@ public class DataSetFileService : IDataSetFileService
                 IsLatestPublishedRelease =
                     releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
                     releaseFile.ReleaseVersionId,
+                IsSuperseded = releaseFile.ReleaseVersion.Publication.SupersededBy != null
+                    && releaseFile.ReleaseVersion.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
                 Published = releaseFile.ReleaseVersion.Published!.Value,
                 LastUpdated = releaseFile.Published!.Value,
                 Publication = new DataSetFilePublicationViewModel
@@ -238,7 +244,7 @@ public class DataSetFileService : IDataSetFileService
                 SubjectId = releaseFile.File.SubjectId!.Value,
             },
             Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes),
-            Api = BuildDataSetFileApiViewModel(releaseFile.File)
+            Api = BuildDataSetFileApiViewModel(releaseFile)
         };
     }
 
@@ -351,17 +357,17 @@ public class DataSetFileService : IDataSetFileService
         return indicators.Select(i => i.Label).ToList();
     }
 
-    private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(File file)
+    private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(ReleaseFile releaseFile)
     {
-        if (file.PublicApiDataSetId is null || file.PublicApiVersionString is null)
+        if (releaseFile.PublicApiDataSetId is null || releaseFile.PublicApiVersionString is null)
         {
             return null;
         }
 
         return new DataSetFileApiViewModel
         {
-            Id = file.PublicApiDataSetId.Value,
-            Version = file.PublicApiVersionString,
+            Id = releaseFile.PublicApiDataSetId.Value,
+            Version = releaseFile.PublicApiVersionString,
         };
     }
 }
@@ -462,7 +468,7 @@ internal static class ReleaseFileQueryableExtensions
         return dataSetType switch
         {
             DataSetType.All => query,
-            DataSetType.Api => query.Where(rf => rf.File.PublicApiDataSetId.HasValue),
+            DataSetType.Api => query.Where(rf => rf.PublicApiDataSetId.HasValue),
             _ => throw new ArgumentOutOfRangeException(nameof(dataSetType)),
         };
     }

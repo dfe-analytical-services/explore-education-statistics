@@ -27,6 +27,7 @@ interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   loadingFastTrack?: boolean;
   release?: SelectedRelease;
+  stepTitle: string;
   subjects: Subject[];
   subjectId?: string;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
@@ -37,6 +38,7 @@ export default function DataSetStep({
   featuredTables = [],
   loadingFastTrack = false,
   release,
+  stepTitle,
   subjects,
   subjectId = '',
   renderFeaturedTableLink,
@@ -50,9 +52,7 @@ export default function DataSetStep({
       {...stepProps}
       fieldsetHeading={!renderFeaturedTableLink}
     >
-      {featuredTables.length > 0
-        ? 'Select a data set or featured table'
-        : 'Select a data set'}
+      {stepTitle}
     </WizardStepHeading>
   );
 

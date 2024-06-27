@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -15,9 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
-        Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseVersionId);
+        Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
+            Guid releaseVersionId, 
+            CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseVersionId);
+        Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
 
@@ -38,7 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases();
 
-        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseVersionId, Guid fileId);
+        Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
+            Guid releaseVersionId, 
+            Guid fileId,
+            CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId);
 

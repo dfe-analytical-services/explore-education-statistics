@@ -47,6 +47,8 @@ public record DataSetFileReleaseViewModel
 
     public required bool IsLatestPublishedRelease { get; init; }
 
+    public required bool IsSuperseded { get; init; }
+
     public required DateTime Published { get; init; }
 
     public DateTime LastUpdated { get; init; }

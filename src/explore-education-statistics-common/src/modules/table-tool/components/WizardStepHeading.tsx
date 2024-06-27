@@ -17,6 +17,7 @@ const WizardStepHeading = ({
 }: Props) => {
   return (
     <h2
+      aria-current={isActive ? 'step' : undefined}
       className={classNames({
         'govuk-heading-l dfe-flex dfe-align-items--center': isActive,
         'govuk-fieldset__heading': fieldsetHeading && isActive,
@@ -30,7 +31,6 @@ const WizardStepHeading = ({
         })}
       >
         {`Step ${stepNumber} `}
-        {isActive && <span className="govuk-visually-hidden">(current) </span>}
       </span>
       <span className={classNames({ 'govuk-visually-hidden': !isActive })}>
         {children}

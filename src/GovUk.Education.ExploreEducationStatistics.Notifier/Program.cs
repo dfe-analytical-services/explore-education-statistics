@@ -28,7 +28,7 @@ var host = new HostBuilder()
             .AddTransient<ITokenService, TokenService>()
             .AddScoped<IValidator<NewPendingSubscriptionRequest>,
                 NewPendingSubscriptionRequest.Validator>()
-            .Configure<AppSettingOptions>(hostContext.Configuration.GetSection(AppSettingOptions.AppSettings))
+            .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.AppSettings))
             .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.GovUkNotify));
     })
     .Build();

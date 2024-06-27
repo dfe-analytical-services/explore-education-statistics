@@ -16,7 +16,6 @@ import React, { ReactNode, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
-import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {
   locations: Dictionary<string[]>;
@@ -29,12 +28,14 @@ export type LocationFiltersFormSubmitHandler = (values: {
 export interface LocationFiltersFormProps extends InjectedWizardProps {
   options: SubjectMeta['locations'];
   initialValues?: string[];
+  stepHeading?: ReactNode;
   onSubmit: LocationFiltersFormSubmitHandler;
 }
 
 const LocationFiltersForm = ({
   initialValues = [],
   options,
+  stepHeading,
   onSubmit,
   ...stepProps
 }: LocationFiltersFormProps) => {
@@ -164,7 +165,7 @@ const LocationFiltersForm = ({
           >
             <FormFieldset
               id="levels"
-              legend={<LocationStepHeading {...stepProps} options={options} />}
+              legend={stepHeading}
               hint="Select at least one"
               error={
                 showError ? getErrorMessage(formState.errors, 'locations') : ''
@@ -242,21 +243,3 @@ const LocationFiltersForm = ({
 };
 
 export default LocationFiltersForm;
-
-export interface LocationStepHeadingProps extends InjectedWizardProps {
-  options: SubjectMeta['locations'];
-}
-
-export function LocationStepHeading(
-  stepProps: LocationStepHeadingProps,
-): ReactNode {
-  const { options } = stepProps;
-  const levelKeys = Object.keys(options);
-  return (
-    <WizardStepHeading {...stepProps} fieldsetHeading>
-      {levelKeys.length === 1 && locationLevelsMap[levelKeys[0]]
-        ? `Choose ${locationLevelsMap[levelKeys[0]].plural}`
-        : 'Choose locations'}
-    </WizardStepHeading>
-  );
-}

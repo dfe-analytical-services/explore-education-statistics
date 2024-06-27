@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -441,13 +441,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("PublicApiDataSetId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PublicApiDataSetVersion")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uniqueidentifier");
 
@@ -483,10 +476,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("SourceId");
 
                     b.HasIndex("Type");
-
-                    b.HasIndex("PublicApiDataSetId", "PublicApiDataSetVersion")
-                        .IsUnique()
-                        .HasFilter("[PublicApiDataSetId] IS NOT NULL AND [PublicApiDataSetVersion] IS NOT NULL");
 
                     b.ToTable("Files");
                 });
@@ -936,6 +925,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("PublicApiDataSetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PublicApiDataSetVersion")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime?>("Published")
                         .HasColumnType("datetime2");
 
@@ -949,7 +945,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("FileId");
 
-                    b.HasIndex("ReleaseVersionId");
+                    b.HasIndex("ReleaseVersionId", "FileId")
+                        .IsUnique();
+
+                    b.HasIndex("ReleaseVersionId", "PublicApiDataSetId", "PublicApiDataSetVersion")
+                        .IsUnique()
+                        .HasFilter("[PublicApiDataSetId] IS NOT NULL AND [PublicApiDataSetVersion] IS NOT NULL");
 
                     b.ToTable("ReleaseFiles");
                 });

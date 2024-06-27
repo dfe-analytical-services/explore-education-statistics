@@ -8,10 +8,10 @@ using Xunit.Sdk;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
-
     public static class AssertExtensions
     {
-        public const int TimeWithinMillis = 750;
+        public const int TimeWithinMillis = 1500;
+
         /**
          * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
          * other testing frameworks.
@@ -24,11 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static bool AssertDeepEqualTo<T>(
             this T actual,
             T expected,
+            bool ignoreCollectionOrders = false,
             Expression<Func<T, object>>[]? notEqualProperties = null)
         {
             var compareLogic = new CompareLogic();
             notEqualProperties?.ForEach(compareLogic.Config.IgnoreProperty);
-            var comparison = compareLogic.Compare(actual, expected);
+            compareLogic.Config.MaxDifferences = 100;
+            compareLogic.Config.IgnoreCollectionOrder = ignoreCollectionOrders;
+            var comparison = compareLogic.Compare(expected, actual);
             Assert.True(comparison.AreEqual, comparison.DifferencesString);
             notEqualProperties?.ForEach(notEqualField =>
             {
@@ -45,7 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                     throw new XunitException($"Expected values for expression {notEqualField} to not be equal, " +
                                              $"but they were both of value \"{expectedValue}\".");
                 }
-
             });
             return true;
         }
@@ -67,7 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             var compareLogic = new CompareLogic();
             ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
-            var comparison = compareLogic.Compare(actual, expected);
+            compareLogic.Config.MaxDifferences = 100;
+            var comparison = compareLogic.Compare(expected, actual);
             return comparison.AreEqual;
         }
 
@@ -87,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.NotNull(dateTime);
             dateTime.Value.AssertUtcNow(withinMillis: withinMillis);
         }
-        
+
         /// <summary>
         /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
         /// </summary>

@@ -402,6 +402,7 @@ const PrototypeTableToolWizard = ({
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
                   renderFeaturedTableLink={renderFeaturedTableLink}
+                  stepTitle="Select a data set"
                   onSubmit={handleSubjectFormSubmit}
                   loadingFastTrack={loadingFastTrack}
                 />
@@ -423,6 +424,7 @@ const PrototypeTableToolWizard = ({
                   {...stepProps}
                   initialValues={state.query.timePeriod}
                   options={state.subjectMeta.timePeriod.options}
+                  stepTitle="Choose a time period"
                   onSubmit={handleTimePeriodFormSubmit}
                 />
               )}
@@ -436,6 +438,7 @@ const PrototypeTableToolWizard = ({
                     filters: state.query.filters,
                   }}
                   selectedPublication={state.selectedPublication}
+                  stepTitle="Choose filters"
                   subject={
                     state.subjects.filter(
                       subject => subject.id === state.query.subjectId,

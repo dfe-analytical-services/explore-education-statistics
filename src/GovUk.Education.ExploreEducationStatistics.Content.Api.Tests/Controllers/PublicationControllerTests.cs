@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var publicationService = new Mock<IPublicationService>(Strict);
 
-            publicationService.Setup(mock => mock.ListSitemapItems())
+            publicationService.Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<PublicationSitemapItemViewModel>()
                 {
                     new()

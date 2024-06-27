@@ -14,12 +14,33 @@ public class TimePeriodMetaRepository(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : ITimePeriodMetaRepository
 {
+    public Task<List<TimePeriodMeta>> ReadTimePeriodMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken = default) 
+    {
+        return GetTimePeriodMetas(duckDbConnection, dataSetVersion, cancellationToken);
+    }
+    
     public async Task<List<TimePeriodMeta>> CreateTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        var metas = (await duckDbConnection.SqlBuilder(
+        var metas = await GetTimePeriodMetas(duckDbConnection, dataSetVersion, cancellationToken);
+
+        publicDataDbContext.TimePeriodMetas.AddRange(metas);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        return metas;
+    }
+
+    private async Task<List<TimePeriodMeta>> GetTimePeriodMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        return (await duckDbConnection.SqlBuilder(
                 $"""
                  SELECT DISTINCT time_period, time_identifier
                  FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
@@ -36,10 +57,5 @@ public class TimePeriodMetaRepository(
             .OrderBy(meta => meta.Period)
             .ThenBy(meta => meta.Code)
             .ToList();
-
-        publicDataDbContext.TimePeriodMetas.AddRange(metas);
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
-
-        return metas;
     }
 }

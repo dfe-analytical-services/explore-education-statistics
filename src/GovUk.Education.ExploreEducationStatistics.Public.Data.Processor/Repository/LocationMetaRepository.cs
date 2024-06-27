@@ -2,10 +2,10 @@ using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
@@ -14,56 +14,57 @@ using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.GeographicLevelUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
 public class LocationMetaRepository(
     PublicDataDbContext publicDataDbContext,
+    IOptions<AppSettingsOptions> appSettingsOptions,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationMetaRepository
 {
+    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+
+    public async Task<IDictionary<LocationMeta, List<LocationOptionMetaRow>>> ReadLocationMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns,
+        CancellationToken cancellationToken)
+    {
+        var metas = GetLocationMetas(dataSetVersion, allowedColumns);
+
+        return await metas
+            .ToAsyncEnumerable()
+            .ToDictionaryAwaitAsync(
+                keySelector: ValueTask.FromResult,
+                elementSelector: async meta =>
+                    await GetLocationOptionMetas(
+                        duckDbConnection,
+                        dataSetVersion,
+                        meta,
+                        cancellationToken),
+                cancellationToken);
+    }
+
     public async Task CreateLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
-        var levels = ListLocationLevels(allowedColumns);
-
-        var metas = levels
-            .Select(level => new LocationMeta
-            {
-                DataSetVersionId = dataSetVersion.Id,
-                Level = level,
-            })
-            .ToList();
+        var metas = GetLocationMetas(dataSetVersion, allowedColumns);
 
         publicDataDbContext.LocationMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         foreach (var meta in metas)
         {
-            var nameCol = meta.Level.CsvNameColumn();
-            var codeCols = meta.Level.CsvCodeColumns();
-            string[] cols = [..codeCols, nameCol];
-
-            var options = (await duckDbConnection.SqlBuilder(
-                        $"""
-                         SELECT {cols.JoinToString(", "):raw}
-                         FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
-                         WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
-                         GROUP BY {cols.JoinToString(", "):raw}
-                         ORDER BY {cols.JoinToString(", "):raw}
-                         """
-                    ).QueryAsync(cancellationToken: cancellationToken)
-                )
-                .Cast<IDictionary<string, object?>>()
-                .Select(row => row.ToDictionary(
-                    kv => kv.Key,
-                    kv => (string)kv.Value!
-                ))
-                .Select(row => MapLocationOptionMeta(row, meta.Level).ToRow())
-                .ToList();
+            var options = await GetLocationOptionMetas(
+                duckDbConnection,
+                dataSetVersion,
+                meta,
+                cancellationToken);
 
             var optionTable = publicDataDbContext
                 .GetTable<LocationOptionMetaRow>()
@@ -71,13 +72,11 @@ public class LocationMetaRepository(
 
             var current = 0;
 
-            const int batchSize = 1000;
-
             while (current < options.Count)
             {
                 var batch = options
                     .Skip(current)
-                    .Take(batchSize)
+                    .Take(_appSettingsOptions.MetaInsertBatchSize)
                     .ToList();
 
                 // We create a 'row key' for each option that allows us to quickly
@@ -113,7 +112,9 @@ public class LocationMetaRepository(
                         .Where(o => !existingRowKeys.Contains(o.GetRowKey()))
                         .ToList();
 
-                    var startIndex = await publicDataDbContext.LocationOptionMetas.CountAsync(token: cancellationToken);
+                    var startIndex = await publicDataDbContext.NextSequenceValue(
+                        PublicDataDbContext.LocationOptionMetasIdSequence,
+                        cancellationToken);
 
                     foreach (var option in newOptions)
                     {
@@ -121,7 +122,15 @@ public class LocationMetaRepository(
                         option.PublicId = SqidEncoder.Encode(option.Id);
                     }
 
-                    await optionTable.BulkCopyAsync(newOptions, cancellationToken);
+                    await optionTable.BulkCopyAsync(
+                        new BulkCopyOptions { KeepIdentity = true },
+                        newOptions,
+                        cancellationToken);
+
+                    await publicDataDbContext.SetSequenceValue(
+                        PublicDataDbContext.LocationOptionMetasIdSequence,
+                        startIndex - 1,
+                        cancellationToken);
                 }
 
                 var links = await optionTable
@@ -136,7 +145,7 @@ public class LocationMetaRepository(
                 publicDataDbContext.LocationOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-                current += batchSize;
+                current += _appSettingsOptions.MetaInsertBatchSize;
             }
 
             var insertedLinks = await publicDataDbContext.LocationOptionMetaLinks
@@ -152,16 +161,58 @@ public class LocationMetaRepository(
         }
     }
 
+    private async Task<List<LocationOptionMetaRow>> GetLocationOptionMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        LocationMeta meta,
+        CancellationToken cancellationToken)
+    {
+        var nameCol = meta.Level.CsvNameColumn();
+        var codeCols = meta.Level.CsvCodeColumns();
+        string[] cols = [..codeCols, nameCol];
+
+        return (await duckDbConnection.SqlBuilder(
+                    $"""
+                     SELECT {cols.JoinToString(", "):raw}
+                     FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                     WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
+                     GROUP BY {cols.JoinToString(", "):raw}
+                     ORDER BY {cols.JoinToString(", "):raw}
+                     """
+                ).QueryAsync(cancellationToken: cancellationToken)
+            )
+            .Cast<IDictionary<string, object?>>()
+            .Select(row => row.ToDictionary(
+                kv => kv.Key,
+                kv => (string)kv.Value!
+            ))
+            .Select(row => MapLocationOptionMeta(row, meta.Level).ToRow())
+            .ToList();
+    }
+
+    private static List<LocationMeta> GetLocationMetas(
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns)
+    {
+        var levels = ListLocationLevels(allowedColumns);
+
+        return levels
+            .Select(level => new LocationMeta
+            {
+                DataSetVersionId = dataSetVersion.Id,
+                Level = level
+            })
+            .ToList();
+    }
+
     private static List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
     {
-        return
-        [
-            .. allowedColumns
-                .Where(CsvColumnsToGeographicLevel.ContainsKey)
-                .Select(col => CsvColumnsToGeographicLevel[col])
-                .Distinct()
-                .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
-        ];
+        return allowedColumns
+            .Where(CsvColumnsToGeographicLevel.ContainsKey)
+            .Select(col => CsvColumnsToGeographicLevel[col])
+            .Distinct()
+            .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
+            .ToList();
     }
 
     private static LocationOptionMeta MapLocationOptionMeta(

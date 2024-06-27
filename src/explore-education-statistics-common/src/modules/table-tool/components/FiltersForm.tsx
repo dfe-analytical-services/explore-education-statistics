@@ -52,6 +52,7 @@ interface Props extends InjectedWizardProps {
   };
   selectedPublication?: SelectedPublication;
   showTableQueryErrorDownload?: boolean;
+  stepTitle: string;
   subject: Subject;
   subjectMeta: SubjectMeta;
   onSubmit: FilterFormSubmitHandler;
@@ -65,6 +66,7 @@ interface Props extends InjectedWizardProps {
 export default function FiltersForm({
   initialValues,
   selectedPublication,
+  stepTitle,
   subject,
   subjectMeta,
   showTableQueryErrorDownload = true,
@@ -114,7 +116,7 @@ export default function FiltersForm({
   }, [initialValues, subjectMeta]);
 
   const stepHeading = (
-    <WizardStepHeading {...stepProps}>Choose your filters</WizardStepHeading>
+    <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
   );
 
   const handleSubmit = async (values: FiltersFormValues) => {

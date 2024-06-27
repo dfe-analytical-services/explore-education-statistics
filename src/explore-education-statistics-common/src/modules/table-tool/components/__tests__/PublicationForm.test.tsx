@@ -218,7 +218,12 @@ describe('PublicationForm', () => {
 
   test('renders the form with the search form, themes list and empty publications list', () => {
     render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     expect(screen.getByLabelText('Search publications')).toBeInTheDocument();
@@ -259,7 +264,12 @@ describe('PublicationForm', () => {
 
   test('renders publication options filtered by title when using search field', async () => {
     render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     await userEvent.type(
@@ -297,6 +307,7 @@ describe('PublicationForm', () => {
     render(
       <PublicationForm
         {...wizardProps}
+        stepTitle="Choose a publication"
         themes={[...testThemes, testThemeWithSupercededPublication]}
         onSubmit={noop}
       />,
@@ -319,7 +330,12 @@ describe('PublicationForm', () => {
 
   test('renders the theme as a hint on the publication options when using search field', async () => {
     render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     await userEvent.type(
@@ -355,7 +371,12 @@ describe('PublicationForm', () => {
 
   test('renders publication options filtered by case-insensitive title', async () => {
     render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     await userEvent.type(
@@ -390,7 +411,12 @@ describe('PublicationForm', () => {
 
   test('renders the `no publications found` message when there are no search results', async () => {
     render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     await userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
@@ -412,7 +438,12 @@ describe('PublicationForm', () => {
     const user = userEvent.setup({ delay: null });
 
     render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     await user.type(screen.getByLabelText('Search publications'), '[[');
@@ -425,7 +456,14 @@ describe('PublicationForm', () => {
   });
 
   test('renders empty message when there are no themes', () => {
-    render(<PublicationForm {...wizardProps} onSubmit={noop} themes={[]} />);
+    render(
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        onSubmit={noop}
+        themes={[]}
+      />,
+    );
 
     expect(
       screen.queryByRole('group', { name: 'Select a theme' }),
@@ -439,7 +477,12 @@ describe('PublicationForm', () => {
 
   test('renders the publication options when a theme is selected', async () => {
     render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     await userEvent.click(
@@ -481,6 +524,7 @@ describe('PublicationForm', () => {
     render(
       <PublicationForm
         {...wizardProps}
+        stepTitle="Choose a publication"
         themes={[...testThemes, testThemeWithSupercededPublication]}
         onSubmit={noop}
       />,
@@ -517,6 +561,7 @@ describe('PublicationForm', () => {
     render(
       <PublicationForm
         {...wizardProps}
+        stepTitle="Choose a publication"
         initialValues={{
           publicationId: 'publication-3',
         }}
@@ -540,7 +585,12 @@ describe('PublicationForm', () => {
 
   test('renders read-only view with selected publication when step is not active', async () => {
     const { rerender } = render(
-      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+      <PublicationForm
+        {...wizardProps}
+        stepTitle="Choose a publication"
+        themes={testThemes}
+        onSubmit={noop}
+      />,
     );
 
     await userEvent.click(
@@ -564,6 +614,7 @@ describe('PublicationForm', () => {
     rerender(
       <PublicationForm
         {...wizardProps}
+        stepTitle="Choose a publication"
         isActive={false}
         themes={testThemes}
         onSubmit={noop}
@@ -582,6 +633,7 @@ describe('PublicationForm', () => {
     render(
       <PublicationForm
         {...wizardProps}
+        stepTitle="Choose a publication"
         themes={testThemes}
         onSubmit={handleSubmit}
       />,

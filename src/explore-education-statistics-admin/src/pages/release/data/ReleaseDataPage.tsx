@@ -1,8 +1,11 @@
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
-import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
-import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
+import ReleaseApiDataSetsSection from '@admin/pages/release/data/components/ReleaseApiDataSetsSection';
 import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
 import ReleaseDataReorderSection from '@admin/pages/release/data/components/ReleaseDataReorderSection';
+import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
+import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
+import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
 import permissionService from '@admin/services/permissionService';
 import { DataFile } from '@admin/services/releaseDataFileService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -11,15 +14,10 @@ import TabsSection from '@common/components/TabsSection';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
 
-export const releaseDataPageTabIds = {
-  dataUploads: 'data-uploads',
-  fileUploads: 'file-uploads',
-  dataGuidance: 'data-guidance',
-  reordering: 'reordering',
-};
-
 const ReleaseDataPage = () => {
   const { release, releaseId } = useReleaseContext();
+  const { user } = useAuthContext();
+
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
 
   const { value: canUpdateRelease = false, isLoading } = useAsyncHandledRetry(
@@ -29,7 +27,7 @@ const ReleaseDataPage = () => {
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <Tabs id="dataUploadTab">
+      <Tabs id="data-and-files-tabs">
         <TabsSection
           id={releaseDataPageTabIds.dataUploads}
           title="Data uploads"
@@ -75,6 +73,15 @@ const ReleaseDataPage = () => {
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
+        {user?.permissions.isBauUser && (
+          <TabsSection
+            id={releaseDataPageTabIds.apiDataSets}
+            title="API data sets"
+            lazy
+          >
+            <ReleaseApiDataSetsSection />
+          </TabsSection>
+        )}
       </Tabs>
     </LoadingSpinner>
   );

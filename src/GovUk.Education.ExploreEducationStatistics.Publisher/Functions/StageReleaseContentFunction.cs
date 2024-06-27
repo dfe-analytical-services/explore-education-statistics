@@ -16,11 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     public class StageReleaseContentFunction(
         ILogger<StageReleaseContentFunction> logger,
-        IOptions<AppSettingOptions> appSettingOptions,
+        IOptions<AppSettingsOptions> appSettingsOptions,
         IContentService contentService,
         IReleasePublishingStatusService releasePublishingStatusService)
     {
-        private readonly AppSettingOptions _appSettingOptions = appSettingOptions.Value;
+        private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
 
         /// <summary>
         /// Azure function which generates the content for a Release into a staging directory.
@@ -30,8 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [Function("StageReleaseContent")]
         public async Task StageReleaseContent(
-            [QueueTrigger(StageReleaseContentQueue)]
-            StageReleaseContentMessage message,
+            [QueueTrigger(StageReleaseContentQueue)] StageReleaseContentMessage message,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered: {Message}",
@@ -40,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateContentStage(message, Started);
             try
             {
-                var publishStagedReleasesCronExpression = _appSettingOptions.PublishReleaseContentCronSchedule;
+                var publishStagedReleasesCronExpression = _appSettingsOptions.PublishReleaseContentCronSchedule;
                 var nextScheduledPublishingTime = CrontabSchedule.Parse(publishStagedReleasesCronExpression,
                     new CrontabSchedule.ParseOptions
                     {
@@ -54,7 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}", context.FunctionDefinition.Name);
 
-                await UpdateContentStage(message, Failed,
+                await UpdateContentStage(message,
+                    Failed,
                     new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
 

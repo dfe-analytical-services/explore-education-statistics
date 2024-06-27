@@ -2,7 +2,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +16,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 [Route("api/public-data/data-set-versions")]
 public class DataSetVersionsController(IDataSetVersionService dataSetVersionService) : ControllerBase
 {
+    [HttpPost]
+    [Produces("application/json")]
+    public async Task<ActionResult<DataSetVersionSummaryViewModel>> CreateNextVersion(
+        [FromBody] NextDataSetVersionCreateRequest nextDataSetVersionCreateRequest,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetVersionService
+            .CreateNextVersion(
+                releaseFileId: nextDataSetVersionCreateRequest.ReleaseFileId,
+                dataSetId: nextDataSetVersionCreateRequest.DataSetId,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
     [HttpDelete("{dataSetVersionId:guid}")]
     [Produces("application/json")]
     public async Task<ActionResult> DeleteVersion(

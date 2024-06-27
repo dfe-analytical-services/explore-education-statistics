@@ -46,7 +46,6 @@ const allNavRoutes = [
   releaseContentRoute,
   releaseStatusRoute,
   releasePreReleaseAccessRoute,
-  releaseApiDataSetsRoute,
 ];
 
 const routes = [
@@ -56,13 +55,14 @@ const routes = [
   releaseDataFileRoute,
   releaseDataFileReplaceRoute,
   releaseDataFileReplacementCompleteRoute,
+  releaseApiDataSetsRoute,
+  releaseApiDataSetDetailsRoute,
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
   releaseTableToolRoute,
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
-  releaseApiDataSetDetailsRoute,
 ];
 
 interface MatchProps {

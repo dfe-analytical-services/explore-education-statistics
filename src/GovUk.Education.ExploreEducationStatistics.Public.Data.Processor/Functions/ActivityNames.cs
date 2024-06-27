@@ -8,5 +8,11 @@ internal static class ActivityNames
 
     public const string ImportData = nameof(ProcessInitialDataSetVersionFunction.ImportData);
     public const string WriteDataFiles = nameof(ProcessInitialDataSetVersionFunction.WriteDataFiles);
-    public const string CompleteProcessing = nameof(ProcessInitialDataSetVersionFunction.CompleteProcessing);
+    public const string CompleteInitialDataSetVersionProcessing = 
+        nameof(ProcessInitialDataSetVersionFunction.CompleteInitialDataSetVersionProcessing);
+
+    public const string CreateMappings = nameof(ProcessNextDataSetVersionFunction.CreateMappings);
+    public const string ApplyAutoMappings = nameof(ProcessNextDataSetVersionFunction.ApplyAutoMappings);
+    public const string CompleteNextDataSetVersionMappingProcessing = 
+        nameof(ProcessNextDataSetVersionFunction.CompleteNextDataSetVersionMappingProcessing);
 }

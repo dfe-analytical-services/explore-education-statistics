@@ -5,6 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public interface ILocationMetaRepository
 {
+    Task<IDictionary<LocationMeta, List<LocationOptionMetaRow>>> ReadLocationMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns,
+        CancellationToken cancellationToken = default);
+
     Task CreateLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
