@@ -706,7 +706,7 @@ user checks url equals
     ${current_url}=    get location
     should be equal    ${current_url}    ${expected}
 
-user checks removed auth from url contains
+user checks url without auth equals
     [Arguments]    ${expected}
     ${current_url}=    get location
     ${remove_auth_current_url}=    remove auth from url      ${current_url}
