@@ -579,8 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 principalTable: "DataSetVersions",
                 principalColumn: "Id");
 
-            // Grant permissions on database tables created by this resource's database user to the
-            // Admin App Service user.
+            // Grant privileges on objects created by this resource's database user to the Admin App Service user.
             var adminAppServiceIdentityName = Environment.GetEnvironmentVariable("AdminAppServiceIdentityName");
             if (adminAppServiceIdentityName != null)
             {
@@ -590,8 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{adminAppServiceIdentityName}\"");
             }
 
-            // Grant permissions on database tables created by this resource's database user to the
-            // Public API Data Processor Function App user.
+            // Grant privileges on objects created by this resource's database user to the Public API Data Processor Function App user.
             var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
             if (dataProcessorFunctionAppIdentityName != null)
             {
@@ -599,10 +597,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
                 migrationBuilder.Sql(
                     $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{dataProcessorFunctionAppIdentityName}\"");
+
+                migrationBuilder.Sql(
+                    $"GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+                migrationBuilder.Sql(
+                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, UPDATE ON SEQUENCES TO \"{dataProcessorFunctionAppIdentityName}\"");
             }
 
-            // Grant permissions on database tables created by this resource's database user to the
-            // Publisher Function App user.
+            // Grant privileges on objects created by this resource's database user to the Publisher Function App user.
             var publisherFunctionAppIdentityName = Environment.GetEnvironmentVariable("PublisherFunctionAppIdentityName");
             if (publisherFunctionAppIdentityName != null)
             {
