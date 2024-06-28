@@ -49,14 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
-            await using var stream = file.OpenReadStream();
-            var mimeType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_TYPE);
-
-            if (IsMimeTypeNullOrZip(mimeType))
-            {
-                var fileType = await GetMimeTypeUsingMimeDetective(file.OpenReadStream());
-                mimeType = fileType?.Mime ?? mimeType;
-            }
+            var mimeType = await GetMimeType(file);
 
             return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }
@@ -103,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             // I have no idea why wrapping the Stream as a StreamReader is necessary, but it is.
             using var streamReader = new StreamReader(fileStream);
-            return magic.Read(streamReader.BaseStream, 1024); // Read handles if buffer size is < 1024
+            return magic.Read(streamReader.BaseStream, 1024); // magic.Read handles if buffer size is < 1024
         }
 
         private bool IsMimeTypeNullOrZip(string mimeType)

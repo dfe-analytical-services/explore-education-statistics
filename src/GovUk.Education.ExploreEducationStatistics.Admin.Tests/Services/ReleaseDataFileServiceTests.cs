@@ -535,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithFile(metaFile)
                 .Generate();
 
-            // otherSubject will not be deleted
+            // otherSubject, from the same bulk zip file, will not be deleted
             var otherSubject = _fixture.DefaultSubject()
                 .Generate();
 
@@ -1850,7 +1850,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
-                    subjectName: subjectName);
+                    dataSetTitle: subjectName);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2236,7 +2236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
-                    subjectName: subjectName);
+                    dataSetTitle: subjectName);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2367,7 +2367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = (await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
-                    subjectName: subjectName)).AssertRight();
+                    dataSetTitle: subjectName)).AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataArchiveValidationService,
@@ -2534,7 +2534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
-                    subjectName: subjectName);
+                    dataSetTitle: subjectName);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2906,27 +2906,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(BulkDataZip, zipFile.Type);
 
                 var dataFile1 = files
-                    .Single(f => f.Filename == archiveFile1.DataFileName);
+                    .Single(f => f.Filename == archiveFile1.DataFilename);
                 Assert.Equal(1048576, dataFile1.ContentLength);
                 Assert.Equal("text/csv", dataFile1.ContentType);
                 Assert.Equal(FileType.Data, dataFile1.Type);
                 Assert.Equal(zipFile.Id, dataFile1.SourceId);
 
                 var metaFile1 = files
-                    .Single(f => f.Filename == archiveFile1.MetaFileName);
+                    .Single(f => f.Filename == archiveFile1.MetaFilename);
                 Assert.Equal(1024, metaFile1.ContentLength);
                 Assert.Equal("text/csv", metaFile1.ContentType);
                 Assert.Equal(Metadata, metaFile1.Type);
 
                 var dataFile2 = files
-                    .Single(f => f.Filename == archiveFile2.DataFileName);
+                    .Single(f => f.Filename == archiveFile2.DataFilename);
                 Assert.Equal(1048576, dataFile2.ContentLength);
                 Assert.Equal("text/csv", dataFile2.ContentType);
                 Assert.Equal(FileType.Data, dataFile2.Type);
                 Assert.Equal(zipFile.Id, dataFile2.SourceId);
 
                 var metaFile2 = files
-                    .Single(f => f.Filename == archiveFile2.MetaFileName);
+                    .Single(f => f.Filename == archiveFile2.MetaFilename);
                 Assert.Equal(1024, metaFile2.ContentLength);
                 Assert.Equal("text/csv", metaFile2.ContentType);
                 Assert.Equal(Metadata, metaFile2.Type);
@@ -3102,7 +3102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(1, dbReleaseFiles[1].Order);
                 Assert.Equal("Original two", dbReleaseFiles[1].Name);
 
-                // NOTE: The Orders of the original ReleaseFiles were 0,1,3 - 2 was skipped.
+                // NOTE: The Orders of the original ReleaseFiles were 0,1,3 - no releaseFile had an order of 2
 
                 Assert.Equal(3, dbReleaseFiles[2].Order);
                 Assert.Equal("Original three", dbReleaseFiles[2].Name);
