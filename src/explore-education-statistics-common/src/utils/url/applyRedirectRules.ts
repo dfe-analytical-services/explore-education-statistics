@@ -21,7 +21,8 @@ type RedirectRule =
   | ((url: string) => Promise<string>);
 
 const noTrailingSlashUnlessOnlyHost: RedirectRule = (url: string) => {
-  if (url === '/' || url.endsWith('.gov.uk/')) {
+  const parsedUrl: URL = new URL(url, prodPublicUrl);
+  if (parsedUrl.pathname === '/') {
     return url;
   }
 

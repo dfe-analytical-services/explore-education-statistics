@@ -1,7 +1,6 @@
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import styles from '@common/components/ContentHtml.module.scss';
 import formatContentLink from '@common/utils/url/formatContentLink';
-import applyRedirectRules from '@common/utils/url/applyRedirectRules';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -16,6 +15,7 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
+import AnchorHtml from './AnchorHtml';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -50,7 +50,7 @@ export default function ContentHtml({
   }, [html, sanitizeOptions]);
 
   const parsedContent = parseHtmlString(cleanHtml, {
-    replace: async (node: DOMNode) => {
+    replace: (node: DOMNode) => {
       if (!(node instanceof Element)) {
         return undefined;
       }
@@ -82,19 +82,17 @@ export default function ContentHtml({
       }
 
       if (formatLinks && node.name === 'a') {
-        const url = await applyRedirectRules(
-          formatContentLink(node.attribs.href),
-        );
+        const url = formatContentLink(node.attribs.href);
         const text = domToReact(node.children);
 
         return !node.attribs.href.includes(
           'explore-education-statistics.service.gov.uk',
         ) && typeof node.attribs['data-featured-table'] === 'undefined' ? (
-          <a href={url} target="_blank" rel="noopener noreferrer">
+          <AnchorHtml href={url} target="_blank" rel="noopener noreferrer">
             {text} (opens in a new tab)
-          </a>
+          </AnchorHtml>
         ) : (
-          <a href={url}>{text}</a>
+          <AnchorHtml href={url}>{text}</AnchorHtml>
         );
       }
 

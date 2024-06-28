@@ -48,6 +48,11 @@ describe('applyRedirectRules', () => {
     ],
     ['/', '/'],
     ['/data-catalogue/', '/data-catalogue'],
+    ['https://gov.uk/', 'https://gov.uk/'],
+    [
+      'https://site-with-search-param-and-trailing-slash/?foo=123',
+      'https://site-with-search-param-and-trailing-slash/?foo=123',
+    ],
   ])(
     `noTrailingSlash: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
