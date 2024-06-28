@@ -1,10 +1,8 @@
-import _redirectService, {
-  Redirects,
-} from '@frontend/services/redirectService';
+import _redirectService, { Redirects } from '@common/services/redirectService';
 import redirectPages from '@frontend/middleware/pages/redirectPages';
 import { NextResponse, NextRequest } from 'next/server';
 
-jest.mock('@frontend/services/redirectService');
+jest.mock('@common/services/redirectService');
 const redirectService = _redirectService as jest.Mocked<
   typeof _redirectService
 >;

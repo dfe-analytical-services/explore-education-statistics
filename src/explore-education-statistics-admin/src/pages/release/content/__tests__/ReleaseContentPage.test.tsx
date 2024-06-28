@@ -23,6 +23,7 @@ import _tableBuilderService, {
   FeaturedTable as TableToolFeaturedTable,
   Subject,
 } from '@common/services/tableBuilderService';
+import _redirectService from '@common/services/redirectService';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -40,6 +41,7 @@ jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/hubs/utils/createConnection');
 jest.mock('@common/services/tableBuilderService');
+jest.mock('@common/services/redirectService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
@@ -62,8 +64,20 @@ const publicationService = _publicationService as jest.Mocked<
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
+const redirectService = _redirectService as jest.Mocked<
+  typeof _redirectService
+>;
 
 describe('ReleaseContentPage', () => {
+  beforeEach(() => {
+    redirectService.list.mockImplementation(async () => {
+      return Promise.resolve({
+        methodologies: [],
+        publications: [],
+      });
+    });
+  });
+
   const testEditableRelease: EditableRelease = {
     approvalStatus: 'Draft',
     content: [
@@ -792,6 +806,7 @@ describe('ReleaseContentPage', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
+        expect(screen.getByText('featured table link')).toBeInTheDocument();
       });
 
       expect(
