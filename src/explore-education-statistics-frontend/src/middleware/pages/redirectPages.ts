@@ -1,4 +1,5 @@
 import redirectService, {
+  redirectPathStarts,
   Redirects,
   RedirectType,
 } from '@frontend/services/redirectService';
@@ -14,18 +15,13 @@ const cacheTime = getCacheTime();
 
 let cachedRedirects: CachedRedirects | undefined;
 
-const redirectPaths = {
-  methodologies: '/methodology',
-  publications: '/find-statistics',
-};
-
 export default async function redirectPages(request: NextRequest) {
   const { nextUrl } = request;
   const decodedPathname = decodeURIComponent(request.nextUrl.pathname);
 
   // Check for redirects for release and methodology pages
   if (
-    Object.values(redirectPaths).find(path =>
+    Object.values(redirectPathStarts).find(path =>
       decodedPathname.toLowerCase().startsWith(path),
     ) &&
     decodedPathname.split('/').length > 2
@@ -40,10 +36,12 @@ export default async function redirectPages(request: NextRequest) {
       };
     }
 
-    const redirectPath = Object.keys(redirectPaths).reduce((acc, key) => {
+    const redirectPath = Object.keys(redirectPathStarts).reduce((acc, key) => {
       const redirectType = key as RedirectType;
       if (
-        decodedPathname.toLowerCase().startsWith(redirectPaths[redirectType])
+        decodedPathname
+          .toLowerCase()
+          .startsWith(redirectPathStarts[redirectType])
       ) {
         const pathSegments = decodedPathname.split('/');
 

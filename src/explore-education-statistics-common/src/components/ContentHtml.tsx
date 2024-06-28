@@ -1,6 +1,7 @@
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import styles from '@common/components/ContentHtml.module.scss';
 import formatContentLink from '@common/utils/url/formatContentLink';
+import applyRedirectRules from '@common/utils/url/applyRedirectRules';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -49,7 +50,7 @@ export default function ContentHtml({
   }, [html, sanitizeOptions]);
 
   const parsedContent = parseHtmlString(cleanHtml, {
-    replace: (node: DOMNode) => {
+    replace: async (node: DOMNode) => {
       if (!(node instanceof Element)) {
         return undefined;
       }
@@ -81,7 +82,9 @@ export default function ContentHtml({
       }
 
       if (formatLinks && node.name === 'a') {
-        const url = formatContentLink(node.attribs.href);
+        const url = await applyRedirectRules(
+          formatContentLink(node.attribs.href),
+        );
         const text = domToReact(node.children);
 
         return !node.attribs.href.includes(

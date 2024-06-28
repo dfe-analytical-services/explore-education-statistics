@@ -1,3 +1,5 @@
+import { contentApi } from './api';
+
 export interface Redirects {
   methodologies: Redirect[];
   publications: Redirect[];
@@ -10,11 +12,14 @@ interface Redirect {
   toSlug: string;
 }
 
-const contentApiUrl = process.env.CONTENT_API_BASE_URL;
+export const redirectPathStarts = {
+  methodologies: '/methodology',
+  publications: '/find-statistics',
+};
 
 const redirectService = {
   async list(): Promise<Redirects> {
-    return (await fetch(`${contentApiUrl}/redirects`)).json();
+    return contentApi.get(`/redirects`);
   },
 };
 
