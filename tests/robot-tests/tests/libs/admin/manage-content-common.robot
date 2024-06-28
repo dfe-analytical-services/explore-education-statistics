@@ -248,6 +248,8 @@ user adds text block to editable accordion section
     ...    ${parent}=css:[data-testid="accordion"]
 
     ${section}=    user gets accordion section content element    ${section_name}    ${parent}
+    user waits until page finishes loading
+    user scrolls down    100
     user clicks button    Add text block    ${section}
     user waits until element contains    ${section}    This section is empty    %{WAIT_SMALL}
 
