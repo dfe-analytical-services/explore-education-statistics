@@ -15,6 +15,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from SeleniumLibrary.utils import is_noney
 from tests.libs.logger import get_logger
 from tests.libs.selenium_elements import element_finder, sl, waiting
+from urllib.parse import urlparse, urlunparse
 
 logger = get_logger(__name__)
 
@@ -366,3 +367,15 @@ def get_www_url(publicUrl: str):
     protocol, hostnameAndPort = publicUrl.split("://")
 
     return protocol + "://www." + hostnameAndPort
+
+
+def remove_auth_from_url(publicUrl: str):
+    parsed_url = urlparse(publicUrl)
+    netloc = parsed_url.hostname
+
+    if parsed_url.port:
+        netloc += f":{parsed_url.port}"
+
+    modified_url_without_auth = urlunparse((parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment))
+    return modified_url_without_auth
+

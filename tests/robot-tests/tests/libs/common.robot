@@ -6,6 +6,7 @@ Library     file_operations.py
 Library     utilities.py
 Library     fail_fast.py
 Library     visual.py
+Library     urlparsing.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
@@ -704,6 +705,13 @@ user checks url equals
     [Arguments]    ${expected}
     ${current_url}=    get location
     should be equal    ${current_url}    ${expected}
+
+user checks url without auth equals
+    [Arguments]    ${expected}
+    ${current_url}=    get location
+    ${remove_auth_current_url}=    remove auth from url      ${current_url}
+    set variable    ${remove_auth_current_url}
+    should contain    ${remove_auth_current_url}   ${expected}
 
 user checks page contains link
     [Arguments]
