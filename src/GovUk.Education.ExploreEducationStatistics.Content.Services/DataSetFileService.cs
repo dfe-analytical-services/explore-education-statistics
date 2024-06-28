@@ -283,8 +283,8 @@ public class DataSetFileService : IDataSetFileService
             path: releaseFile.PublicPath());
 
         await using var stream = await datafileStreamProvider.Invoke();
-        using var dataFileReader = new StreamReader(stream);
-        using var csvReader = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
+        using var streamReader = new StreamReader(stream);
+        using var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture);
         await csvReader.ReadAsync();
         csvReader.ReadHeader();
         var headers = csvReader.HeaderRecord?.ToList() ?? new List<string>();

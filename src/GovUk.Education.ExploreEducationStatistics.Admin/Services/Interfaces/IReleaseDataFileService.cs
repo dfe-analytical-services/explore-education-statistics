@@ -31,18 +31,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             List<Guid> fileIds);
 
-        Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
+        Task<Either<ActionResult, DataFileInfo>> Upload(
+            Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string subjectName,
+            string? dataSetTitle = null,
             Guid? replacingFileId = null);
 
-        Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
+        Task<Either<ActionResult, DataFileInfo>> UploadAsZip(
+            Guid releaseVersionId,
             IFormFile zipFormFile,
-            string? subjectName = null,
+            string? dataSetTitle = null,
             Guid? replacingFileId = null);
 
-        Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(Guid releaseVersionId,
+        Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(
+            Guid releaseVersionId,
             IFormFile bulkZipFormFile);
     }
 }

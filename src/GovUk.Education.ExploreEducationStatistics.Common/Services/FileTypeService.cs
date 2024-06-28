@@ -49,14 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
-            await using var stream = file.OpenReadStream();
-            var mimeType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_TYPE);
-
-            if (IsMimeTypeNullOrZip(mimeType))
-            {
-                var fileType = await GetMimeTypeUsingMimeDetective(file.OpenReadStream());
-                mimeType = fileType?.Mime ?? mimeType;
-            }
+            var mimeType = await GetMimeType(file);
 
             return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }

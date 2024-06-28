@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
-                "DataSetFile name",
+                "Data set title",
                 dataFile.FileName,
                 dataFile.Length,
                 dataFile.OpenReadStream(),
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var toBeReplacedReleaseFile = new ReleaseFile
             {
                 ReleaseVersionId = releaseVersionId,
-                Name = "Data set name",
+                Name = "Data set title",
                 File = new File
                 {
                     Type = FileType.Data,
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ValidateDataFilesForUpload_DataSetFileNameCannotBeEmpty()
+        public async Task ValidateDataFilesForUpload_DataSetTitleCannotBeEmpty()
         {
             await using var context = InMemoryContentDbContext();
             var (service, fileTypeService) = BuildService(context);
@@ -153,8 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AssertHasErrors(errors, [
                 new ErrorViewModel
                 {
-                    Code = ValidationMessages.DataSetFileNameCannotBeEmpty.Code,
-                    Message = ValidationMessages.DataSetFileNameCannotBeEmpty.Message,
+                    Code = ValidationMessages.DataSetTitleCannotBeEmpty.Code,
+                    Message = ValidationMessages.DataSetTitleCannotBeEmpty.Message,
                 },
             ]);
         }
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [InlineData("test/")]
         [InlineData("test&")]
         [InlineData($"test\0")]
-        public async Task ValidateDataFilesForUpload_DataSetFileNameCannotContainSpecialCharacters(string dataSetFileName)
+        public async Task ValidateDataFilesForUpload_DataSetTitleCannotContainSpecialCharacters(string dataSetTitle)
         {
             await using var context = InMemoryContentDbContext();
             var (service, fileTypeService) = BuildService(context);
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
-                dataSetFileName,
+                dataSetTitle,
                 dataFile.FileName,
                 dataFile.Length,
                 dataFile.OpenReadStream(),
@@ -190,16 +190,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             VerifyAllMocks(fileTypeService);
 
             AssertHasErrors(errors, [
-                ValidationMessages.GenerateErrorDataSetFileNameShouldNotContainSpecialCharacters(dataSetFileName),
+                ValidationMessages.GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(dataSetTitle),
             ]);
         }
 
         [Fact]
-        public async Task ValidateDataFilesForUpload_DataSetFileNameShouldBeUnique()
+        public async Task ValidateDataFilesForUpload_DataSetTitleShouldBeUnique()
         {
             var releaseFile = new ReleaseFile
             {
-                Name = "Used data set file name",
+                Name = "Used data set title",
                 ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
                 File = new File { Type = FileType.Data, },
             };
@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var errors = await service.ValidateDataSetFilesForUpload(
                     releaseFile.ReleaseVersionId,
-                    "Used data set file name",
+                    "Used data set title",
                     dataFile.FileName,
                     dataFile.Length,
                     dataFile.OpenReadStream(),
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(fileTypeService);
 
                 AssertHasErrors(errors, [
-                    ValidationMessages.GenerateErrorDataSetNamesCsvTitlesShouldBeUnique("Used data set file name"),
+                    ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique("Used data set title"),
                 ]);
             }
         }
@@ -335,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
-                "Data set file name",
+                "Data set title",
                 dataFile.FileName,
                 dataFile.Length,
                 dataFile.OpenReadStream(),
@@ -371,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
-                "Data set file name",
+                "Data set title",
                 dataFile.FileName,
                 dataFile.Length,
                 dataFile.OpenReadStream(),
@@ -381,9 +381,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             VerifyAllMocks(fileTypeService);
 
             AssertHasErrors(errors, [
-                ValidationMessages.GenerateErrorFileNameTooLong($"{filename}.csv",
+                ValidationMessages.GenerateErrorFilenameTooLong($"{filename}.csv",
                     FileUploadsValidatorService.MaxFilenameSize),
-                ValidationMessages.GenerateErrorFileNameTooLong($"{filename}.meta.csv",
+                ValidationMessages.GenerateErrorFilenameTooLong($"{filename}.meta.csv",
                     FileUploadsValidatorService.MaxFilenameSize),
             ]);
         }
@@ -431,7 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var errors = await service.ValidateDataSetFilesForUpload(
                     releaseVersion.Id,
-                    "Data set file name",
+                    "Data set title",
                     dataFile.FileName,
                     dataFile.Length,
                     dataFile.OpenReadStream(),
@@ -468,7 +468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
-                "Data set file name",
+                "Data set title",
                 dataFile.FileName,
                 dataFile.Length,
                 dataFile.OpenReadStream(),
@@ -502,7 +502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var errors = await service.ValidateDataSetFilesForUpload(
                 Guid.NewGuid(),
-                "Data set file name",
+                "Data set title",
                 dataFile.FileName,
                 dataFile.Length,
                 dataFile.OpenReadStream(),
@@ -545,7 +545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var toBeReplacedReleaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .WithName("Data set name")
+                .WithName("Data set title")
                 .WithFile(_fixture.DefaultFile()
                     .WithType(FileType.Data)
                     .WithFilename("test.csv")

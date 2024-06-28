@@ -1,5 +1,4 @@
 #nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -54,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.ValidateDataArchiveFile(
                 releaseVersionId,
-                "Data set name",
+                "Data set title",
                 archive);
 
             Assert.True(result.IsRight);
@@ -81,13 +80,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.ValidateDataArchiveFile(
                 Guid.NewGuid(),
-                "Data set name",
+                "Data set title",
                 archive);
             VerifyAllMocks(fileTypeService);
 
             Assert.True(result.IsLeft);
-            AssertBadRequestHasErrors(result.Left, [
-                ValidationMessages.GenerateErrorFileNameTooLong(
+            result.Left.AssertBadRequestWithValidationErrors([
+                ValidationMessages.GenerateErrorFilenameTooLong(
                     fileName, DataArchiveValidationService.MaxFilenameSize),
                 ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(fileName),
             ]);
@@ -110,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.ValidateDataArchiveFile(
                 Guid.NewGuid(),
-                "Data set name",
+                "Data set title",
                 archive);
             VerifyAllMocks(fileTypeService);
 
@@ -178,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result
                 .AssertLeft()
                 .AssertBadRequestWithValidationErrors([
-                    ValidationMessages.GenerateErrorFileNameTooLong(longFilename,
+                    ValidationMessages.GenerateErrorFilenameTooLong(longFilename,
                         FileUploadsValidatorService.MaxFilenameSize),
                     ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(longFilename),
                     ValidationMessages.GenerateErrorMustBeZipFile(longFilename),
@@ -285,8 +284,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result
                 .AssertLeft()
                 .AssertBadRequestWithValidationErrors([
-                    ValidationMessages.GenerateErrorMetaFileNotFoundInZip("one.meta.csv"),
-                    ValidationMessages.GenerateErrorDataFileNotFoundInZip("two.csv"),
+                    ValidationMessages.GenerateErrorFileNotFoundInZip("one.meta.csv", FileType.Metadata),
+                    ValidationMessages.GenerateErrorFileNotFoundInZip("two.csv", FileType.Data),
                 ]);
 
             VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
@@ -318,15 +317,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result
                 .AssertLeft()
                 .AssertBadRequestWithValidationErrors([
-                    ValidationMessages.GenerateErrorDataSetNamesCsvTitlesShouldBeUnique("Duplicate title"),
-                    ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique("one"),
+                    ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique("Duplicate title"),
+                    ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldBeUnique("one"),
                 ]);
 
             VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
         }
 
         [Fact]
-        public async Task ValidateBulkDataArchiveFile_Fail_DataSetNamesCsvFilesnamesEndsDotCsv()
+        public async Task ValidateBulkDataArchiveFile_Fail_DataSetNamesCsvFilesnamesShouldNotEndDotCsv()
         {
             var releaseVersionId = Guid.NewGuid();
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
@@ -351,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result
                 .AssertLeft()
                 .AssertBadRequestWithValidationErrors([
-                    ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv("one.csv")
+                    ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv("one.csv")
                 ]);
 
             VerifyAllMocks(fileUploadsValidatorService, fileTypeService);

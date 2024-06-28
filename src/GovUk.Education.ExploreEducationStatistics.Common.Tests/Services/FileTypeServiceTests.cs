@@ -245,13 +245,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var allowedEncodingTypes = AllowedCsvEncodingTypes;
 
+            var service = BuildService();
+
             foreach (var type in AllTypes)
             {
                 var expectedToSucceed = CsvTypes.Contains(type);
 
                 var fileInfo = type;
-
-                var service = BuildService();
 
                 var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
                     "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
@@ -290,13 +290,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         [Fact]
         public async Task IsValidCsvFile_AllTypes()
         {
+            var service = BuildService();
+
             foreach (var type in AllTypes)
             {
                 var expectedToSucceed = CsvTypes.Contains(type);
 
                 var fileInfo = type;
-
-                var service = BuildService();
 
                 var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
                     "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);

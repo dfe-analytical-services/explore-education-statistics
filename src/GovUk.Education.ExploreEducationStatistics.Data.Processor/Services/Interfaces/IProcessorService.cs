@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IProcessorService
     {
-        Task ProcessUnpackingArchive(Guid importId);
+        Task ProcessUnpackingArchiveDataSet(Guid importId);
 
         Task ProcessStage1(Guid importId);
 

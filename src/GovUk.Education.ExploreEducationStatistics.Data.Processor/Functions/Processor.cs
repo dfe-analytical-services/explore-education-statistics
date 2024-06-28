@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     case DataImportStatus.QUEUED:
                     case DataImportStatus.PROCESSING_ARCHIVE_FILE:
                     {
-                        // This handles both dataZips and bulkDataZips
+                        // This handles data sets from both dataZips and bulkDataZips
                         if (import.ZipFile != null)
                         {
                             _logger.LogInformation(
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                                 import.File.Filename,
                                 import.ZipFile.Filename);
                             
-                            await _processorService.ProcessUnpackingArchive(import.Id);
+                            await _processorService.ProcessUnpackingArchiveDataSet(import.Id);
                         }
 
                         await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);

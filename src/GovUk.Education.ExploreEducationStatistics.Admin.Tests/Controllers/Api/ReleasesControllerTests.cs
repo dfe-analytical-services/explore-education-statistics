@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -52,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task Upload_UploadsTheFiles_Returns_Ok()
+        public async Task Upload_Success()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -78,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var result = await controller.Upload(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
-                subjectName: "Subject name",
+                dataSetTitle: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
 
@@ -89,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task Upload_UploadsTheFiles_Returns_ValidationProblem()
+        public async Task Upload_Fail_ValidationProblem()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -108,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Call the method under test
             var result = await controller.Upload(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
-                subjectName: "Subject name",
+                dataSetTitle: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
 
@@ -154,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task DeleteDataFiles_Returns_OK()
+        public async Task DeleteDataFiles_Success()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -174,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task DeleteDataFiles_Returns_ValidationProblem()
+        public async Task DeleteDataFiles_Fail_UnableToFindMetaFileToDelete()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -257,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task CancelFileImport_Forbidden()
+        public async Task CancelFileImport_Fail_Forbidden()
         {
             var importService = new Mock<IDataImportService>(Strict);
 
