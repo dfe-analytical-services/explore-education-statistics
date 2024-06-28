@@ -11,6 +11,16 @@ describe('formatContentLink', () => {
     );
   });
 
+  test('converts Admin EES links to lowercase', () => {
+    expect(
+      formatContentLink(
+        'https://adMIN.exploRe-eduCation-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools',
+      ),
+    ).toEqual(
+      'https://admin.explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools',
+    );
+  });
+
   test('does not convert query params on EES links to lowercase', () => {
     expect(
       formatContentLink(
@@ -55,6 +65,12 @@ describe('formatContentLink', () => {
     expect(formatContentLink('https://gov.uk/Something')).toEqual(
       'https://gov.uk/Something',
     );
+  });
+
+  test('converts host to lowercase but does not convert paths', () => {
+    expect(
+      formatContentLink('https://STACKoverFLOW.com/SOMETHING_UPPER_CASE'),
+    ).toEqual('https://stackoverflow.com/SOMETHING_UPPER_CASE');
   });
 
   test('trims external links', () => {

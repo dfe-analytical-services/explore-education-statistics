@@ -1,6 +1,5 @@
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import styles from '@common/components/ContentHtml.module.scss';
-import formatContentLink from '@common/utils/url/formatContentLink';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -15,6 +14,7 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
+import getPropsForExternality from '@common/utils/url/getPropsForExternality';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -69,30 +69,36 @@ export default function ContentHtml({
         ) : undefined;
       }
 
-      if (
-        transformFeaturedTableLinks &&
-        node.name === 'a' &&
-        typeof node.attribs['data-featured-table'] !== 'undefined'
-      ) {
-        const text = domToReact(node.children);
-        return isMounted && typeof text === 'string'
-          ? transformFeaturedTableLinks(node.attribs.href, text)
-          : undefined;
-      }
+      if (node.name === 'a') {
+        const targetUrl = node.attribs.href;
 
-      if (formatLinks && node.name === 'a') {
-        const url = formatContentLink(node.attribs.href);
-        const text = domToReact(node.children);
+        if (
+          transformFeaturedTableLinks &&
+          typeof node.attribs['data-featured-table'] !== 'undefined'
+        ) {
+          const text = domToReact(node.children);
+          return isMounted && typeof text === 'string'
+            ? transformFeaturedTableLinks(targetUrl, text)
+            : undefined;
+        }
 
-        return !node.attribs.href.includes(
-          'explore-education-statistics.service.gov.uk',
-        ) && typeof node.attribs['data-featured-table'] === 'undefined' ? (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {text} (opens in a new tab)
-          </a>
-        ) : (
-          <a href={url}>{text}</a>
-        );
+        if (formatLinks) {
+          const text = domToReact(node.children);
+          const { url, target, rel, externality } =
+            getPropsForExternality(targetUrl);
+
+          return externality !== 'internal' &&
+            typeof node.attribs['data-featured-table'] === 'undefined' ? (
+            // eslint-disable-next-line react/jsx-no-target-blank
+            <a href={url} target={target} rel={rel}>
+              {text} (opens in a new tab)
+            </a>
+          ) : (
+            <a href={url} rel={rel}>
+              {text}
+            </a>
+          );
+        }
       }
 
       if (node.name === 'figure' && node.attribs.class === 'table') {

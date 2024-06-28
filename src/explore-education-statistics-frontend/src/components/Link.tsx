@@ -1,4 +1,5 @@
 import { OmitStrict } from '@common/types';
+import getPropsForExternality from '@common/utils/url/getPropsForExternality';
 import classNames from 'classnames';
 import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
@@ -23,15 +24,24 @@ const Link = ({
   to,
   unvisited = false,
   testId,
+  rel: originalRel,
   ...props
 }: LinkProps) => {
+  const { target, rel } = getPropsForExternality(
+    to.toString(),
+    undefined,
+    originalRel,
+  );
+
   return (
     <RouterLink
       {...props}
       href={to}
+      target={target}
       prefetch={prefetch}
       scroll={scroll}
       shallow={shallow}
+      rel={rel}
       className={classNames(
         'govuk-link',
         {

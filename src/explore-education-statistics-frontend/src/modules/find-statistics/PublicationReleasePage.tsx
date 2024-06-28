@@ -30,6 +30,7 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import getPropsForExternality from '@common/utils/url/getPropsForExternality';
 
 interface Props {
   release: Release;
@@ -339,19 +340,37 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                             description,
                             legacyLinkUrl,
                             releaseSlug,
-                          }) => (
-                            <li key={id} data-testid="other-release-item">
-                              {isLegacyLink ? (
-                                <a href={legacyLinkUrl}>{description}</a>
-                              ) : (
+                          }) => {
+                            if (isLegacyLink) {
+                              if (legacyLinkUrl === undefined) {
+                                return null;
+                              }
+
+                              const { url, target, rel, text } =
+                                getPropsForExternality(
+                                  legacyLinkUrl,
+                                  description,
+                                );
+
+                              return (
+                                <li key={id} data-testid="other-release-item">
+                                  <a href={url} target={target} rel={rel}>
+                                    {text}
+                                  </a>
+                                </li>
+                              );
+                            }
+
+                            return (
+                              <li key={id} data-testid="other-release-item">
                                 <Link
                                   to={`/find-statistics/${release.publication.slug}/${releaseSlug}`}
                                 >
                                   {description}
                                 </Link>
-                              )}
-                            </li>
-                          ),
+                              </li>
+                            );
+                          },
                         ),
                       ]}
                     </ul>
@@ -399,11 +418,18 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <nav role="navigation" aria-labelledby="related-pages">
                   <ul className="govuk-list">
                     {release.relatedInformation &&
-                      release.relatedInformation.map(link => (
-                        <li key={link.id}>
-                          <a href={link.url}>{link.description}</a>
-                        </li>
-                      ))}
+                      release.relatedInformation.map(link => {
+                        const { url, target, rel, text } =
+                          getPropsForExternality(link.url, link.description);
+
+                        return (
+                          <li key={link.id}>
+                            <a href={url} rel={rel} target={target}>
+                              {text}
+                            </a>
+                          </li>
+                        );
+                      })}
                   </ul>
                 </nav>
               </>
