@@ -49,7 +49,7 @@ describe('applyRedirectRules', () => {
     ['/', '/'],
     ['/data-catalogue/', '/data-catalogue'],
   ])(
-    `${generateTestName('%s', '%s')}`,
+    `noTrailingSlash: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
       expect(await applyRedirectRules(url)).toEqual(result);
     },
@@ -66,7 +66,7 @@ describe('applyRedirectRules', () => {
       'https://explore-education-statistics.service.gov.uk/data-catalogue',
     ],
   ])(
-    `${generateTestName('%s', '%s')}`,
+    `no /1000: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
       expect(await applyRedirectRules(url)).toEqual(result);
     },
@@ -82,7 +82,7 @@ describe('applyRedirectRules', () => {
       'https://admin.explore-education-statistics.service.gov.uk/',
     ],
   ])(
-    `${generateTestName('%s', '%s')}`,
+    `no www: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
       expect(await applyRedirectRules(url)).toEqual(result);
     },
@@ -106,7 +106,7 @@ describe('applyRedirectRules', () => {
       'https://explore-education-statistics.service.gov.uk/find-statistics/this-publication-slug-should-not-change',
     ],
   ])(
-    `${generateTestName('%s', '%s')}`,
+    `no ContentAPI redirect: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
       expect(await applyRedirectRules(url)).toEqual(result);
     },

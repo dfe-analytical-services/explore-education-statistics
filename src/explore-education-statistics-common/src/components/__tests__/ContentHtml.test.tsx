@@ -3,9 +3,24 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ContentHtml from '@common/components/ContentHtml';
 import { GlossaryEntry } from '@common/services/types/glossary';
+import _redirectService from '@common/services/redirectService';
 import { within } from '@testing-library/dom';
 
+jest.mock('@common/services/redirectService');
+const redirectService = _redirectService as jest.Mocked<
+  typeof _redirectService
+>;
+
 describe('ContentHtml', () => {
+  beforeEach(() => {
+    redirectService.list.mockImplementation(async () => {
+      return Promise.resolve({
+        methodologies: [],
+        publications: [],
+      });
+    });
+  });
+
   test('renders correctly with required props', () => {
     render(<ContentHtml html="<p>Test text</p>" />);
 

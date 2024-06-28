@@ -2,7 +2,7 @@ import redirectService, {
   redirectPathStarts,
   Redirects,
   RedirectType,
-} from '@frontend/services/redirectService';
+} from '@common/services/redirectService';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
