@@ -10,7 +10,7 @@ export default async function applyRedirectRules(url: string): Promise<string> {
 
   newUrl = await noTrailingSlashUnlessOnlyHost(newUrl);
   newUrl = await pathMustNotEndInSlash1000(newUrl);
-  newUrl = await hostMustNotStartWithWww(newUrl);
+  newUrl = await publicSiteHostMustNotStartWithWww(newUrl);
   newUrl = await mustNotTriggerAContentApiRedirect(newUrl);
 
   return newUrl;
@@ -34,9 +34,18 @@ const pathMustNotEndInSlash1000: RedirectRule = (url: string) => {
   return newUrl === '' ? '/' : newUrl;
 };
 
-const hostMustNotStartWithWww: RedirectRule = (url: string) => {
-  const newUrl = url.replace(/www\./, '');
-  return newUrl === '' ? '/' : newUrl;
+const publicSiteHostMustNotStartWithWww: RedirectRule = (url: string) => {
+  const parsedUrl: URL = new URL(url, prodPublicUrl);
+  if (
+    parsedUrl.hostname.includes(
+      'www.explore-education-statistics.service.gov.uk',
+    )
+  ) {
+    parsedUrl.hostname = parsedUrl.hostname.replace('www.', '');
+    return parsedUrl.href;
+  }
+
+  return url;
 };
 
 const mustNotTriggerAContentApiRedirect: RedirectRule = async (url: string) => {

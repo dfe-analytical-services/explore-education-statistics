@@ -84,7 +84,11 @@ describe('applyRedirectRules', () => {
     ],
     [
       'https://www.admin.explore-education-statistics.service.gov.uk/',
-      'https://admin.explore-education-statistics.service.gov.uk/',
+      'https://www.admin.explore-education-statistics.service.gov.uk/',
+    ],
+    [
+      'https://www.some-external-site.com/',
+      'https://www.some-external-site.com/',
     ],
   ])(
     `no www: ${generateTestName('%s', '%s')}`,
