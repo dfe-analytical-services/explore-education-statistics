@@ -86,9 +86,9 @@ export default function LocationStep(stepProps: Props) {
     <LocationFiltersForm
       {...stepProps}
       stepHeading={stepHeading}
-      onSubmit={values => {
+      onSubmit={async values => {
         setSelectedLocationIds(values.locationIds);
-        onSubmit(values);
+        await onSubmit(values);
       }}
     />
   );

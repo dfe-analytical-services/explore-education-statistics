@@ -56,7 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GetFilterItems
         }
 
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseVersionId,
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
+            Guid releaseVersionId,
             Guid subjectId)
         {
             return await releaseSubjectService.Find(subjectId: subjectId,
@@ -85,7 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseVersionId,
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(
+            Guid? releaseVersionId,
             ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
@@ -181,7 +183,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var observations = statisticsDbContext
                         .Observation
                         .AsNoTracking()
-                        .Where(o => o.SubjectId == query.SubjectId && query.LocationIds.Contains(o.LocationId));
+                        .Where(o =>
+                            o.SubjectId == query.SubjectId &&
+                            EF.Constant(query.LocationIds).Contains(o.LocationId));
 
                     var timePeriods = await GetTimePeriods(observations);
 
@@ -369,11 +373,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return AssertCollectionsAreSameIgnoringOrder(firstIdList, secondIdList, error);
         }
 
-        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<T>(IEnumerable<T> first,
+        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<T>(
+            IEnumerable<T> first,
             IEnumerable<T> second,
             ValidationErrorMessages error) where T : IComparable
         {
-            if(ComparerUtils.SequencesAreEqualIgnoringOrder(first, second))
+            if (ComparerUtils.SequencesAreEqualIgnoringOrder(first, second))
             {
                 return Unit.Instance;
             }
