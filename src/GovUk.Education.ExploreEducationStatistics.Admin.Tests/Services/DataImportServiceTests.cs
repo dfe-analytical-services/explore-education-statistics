@@ -286,7 +286,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-
             var sourceFile = new File
             {
                 Filename = "data.zip",

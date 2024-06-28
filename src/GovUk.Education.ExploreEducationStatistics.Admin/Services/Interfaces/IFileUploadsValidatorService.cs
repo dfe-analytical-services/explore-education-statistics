@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload( // Used by unit tests
             Guid releaseVersionId,
-            string dataSetName,
+            string dataSetTitle,
             string dataFileName,
             long dataFileLength,
             Stream dataFileStream,
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
-            string dataSetFileName,
+            string dataSetTitle,
             IFormFile dataFile,
             IFormFile metaFile,
             File? replacingFile = null);

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.IO.Compression;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Moq;

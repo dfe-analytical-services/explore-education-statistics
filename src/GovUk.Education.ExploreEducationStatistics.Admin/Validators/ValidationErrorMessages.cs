@@ -60,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileTypeMustBeData,
         FileIdsShouldBeDistinct,
         IncorrectNumberOfFileIds,
-        DataFilenameTooLong,
 
         // Data zip file
         DataZipFileCanOnlyContainTwoFiles,

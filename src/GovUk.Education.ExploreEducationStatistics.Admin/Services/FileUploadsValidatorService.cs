@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
-            string dataSetName,
+            string dataSetTitle,
             string dataFileName,
             long dataFileLength,
             Stream dataFileStream,
@@ -50,9 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             List<ErrorViewModel> errors = [];
 
-            errors.AddRange(ValidateDataSetFileName(
+            errors.AddRange(ValidateDataSetTitle(
                 releaseVersionId,
-                dataSetName,
+                dataSetTitle,
                 isReplacement: replacingFile != null));
 
             errors.AddRange(ValidateDataFileNames(
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
-            string dataSetFileName,
+            string dataSetTitle,
             IFormFile dataFile,
             IFormFile metaFile,
             File? replacingFile = null)
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await ValidateDataSetFilesForUpload(
                 releaseVersionId: releaseVersionId,
-                dataSetName: dataSetFileName,
+                dataSetTitle: dataSetTitle,
                 dataFileName:dataFile.FileName,
                 dataFileLength:dataFile.Length,
                 dataFileStream: dataFileStream,
@@ -107,11 +107,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await ValidateDataSetFilesForUpload(
                 releaseVersionId: releaseVersionId,
-                dataSetName: archiveDataSet.DataSetFileName,
-                dataFileName: archiveDataSet.DataFileName,
+                dataSetTitle: archiveDataSet.Title,
+                dataFileName: archiveDataSet.DataFilename,
                 dataFileLength: archiveDataSet.DataFileSize,
                 dataFileStream: dataFileStream,
-                metaFileName: archiveDataSet.MetaFileName,
+                metaFileName: archiveDataSet.MetaFilename,
                 metaFileLength: archiveDataSet.MetaFileSize,
                 metaFileStream: metaFileStream,
                 replacingFile: replacingFile);
@@ -143,52 +143,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private List<ErrorViewModel> ValidateDataSetFileName(
+        private List<ErrorViewModel> ValidateDataSetTitle(
             Guid releaseVersionId,
-            string name,
+            string title,
             bool isReplacement)
         {
             List<ErrorViewModel> errors = [];
 
-            if (!name.Any())
+            if (!title.Any())
             {
                 errors.Add(new ErrorViewModel
                 {
-                    Code = ValidationMessages.DataSetFileNameCannotBeEmpty.Code,
-                    Message = ValidationMessages.DataSetFileNameCannotBeEmpty.Message,
+                    Code = ValidationMessages.DataSetTitleCannotBeEmpty.Code,
+                    Message = ValidationMessages.DataSetTitleCannotBeEmpty.Message,
                 });
             }
 
-            if (FileContainsSpecialChars(name))
+            if (ContainsSpecialChars(title))
             {
-                errors.Add(ValidationMessages.GenerateErrorDataSetFileNameShouldNotContainSpecialCharacters(name));
+                errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(title));
             }
 
-            if (!isReplacement)
+            if (!isReplacement) // if a replacement, we get the title from the replacement which is already validated as unique
             {
-                var subjectNameExists = _context.ReleaseFiles
+                var dataSetNameExists = _context.ReleaseFiles
                     .Include(rf => rf.File)
                     .Any(rf =>
                         rf.ReleaseVersionId == releaseVersionId
                         && rf.File.Type == FileType.Data
-                        && rf.Name == name);
+                        && rf.Name == title);
 
-                if (subjectNameExists)
+                if (dataSetNameExists)
                 {
-                    errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvTitlesShouldBeUnique(name));
+                    errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(title));
                 }
             }
 
             return errors;
         }
 
-        private static bool FileContainsSpacesOrSpecialChars(string filename)
+        private static bool ContainsSpacesOrSpecialChars(string filename)
         {
             return filename.IndexOf(" ", Ordinal) > -1 ||
-                   FileContainsSpecialChars(filename);
+                   ContainsSpecialChars(filename);
         }
 
-        private static bool FileContainsSpecialChars(string filename)
+        private static bool ContainsSpecialChars(string filename)
         {
             return filename.IndexOf("&", Ordinal) > -1 ||
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private bool IsFileExisting(Guid releaseVersionId,
             FileType type,
-            string? filename)
+            string filename)
         {
             return _context
                 .ReleaseFiles
@@ -224,13 +224,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
             }
 
-            if (FileContainsSpacesOrSpecialChars(dataFileName))
+            if (ContainsSpacesOrSpecialChars(dataFileName))
             {
                 errors.Add(ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters(
                     dataFileName));
             }
 
-            if (FileContainsSpacesOrSpecialChars(metaFileName))
+            if (ContainsSpacesOrSpecialChars(metaFileName))
             {
                 errors.Add(ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters(
                     metaFileName));
@@ -248,19 +248,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (dataFileName.Length > MaxFilenameSize)
             {
-                errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
+                errors.Add(ValidationMessages.GenerateErrorFilenameTooLong(
                     dataFileName, MaxFilenameSize));
             }
 
             if (metaFileName.Length > MaxFilenameSize)
             {
-                errors.Add(ValidationMessages.GenerateErrorFileNameTooLong(
+                errors.Add(ValidationMessages.GenerateErrorFilenameTooLong(
                     metaFileName, MaxFilenameSize));
             }
 
-            // Original uploads are not unique if the ReleaseFile exists.
-            // Replacement uploads are not unique if the ReleaseFile exists AND the new data filename is not the same
-            // as the file being replaced.
+            // - Original uploads' data filename is not unique if a ReleaseFile exists with the same filename.
+            // - With replacement uploads, we can ignore a preexisting ReleaseFile if it is the file being replaced -
+            // we only care if the preexisting duplicate ReleaseFile name isn't the file being replaced.
             if (IsFileExisting(releaseVersionId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
@@ -268,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
-            // zips, so meta files won't be included in the same directory by name and thereby cannot clash.
+            // zips, so meta files won't be included in the same directory by filename and thereby cannot clash
 
             return errors;
         }

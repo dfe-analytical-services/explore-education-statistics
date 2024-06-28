@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, ArchiveDataSetFile>> ValidateDataArchiveFile(
             Guid releaseVersionId,
-            string dataSetFileName,
+            string dataSetTitle,
             IFormFile zipFile,
             File? replacingFile = null);
 

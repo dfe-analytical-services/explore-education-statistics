@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             processorService
-                .Setup(s => s.ProcessUnpackingArchive(import.Id))
+                .Setup(s => s.ProcessUnpackingArchiveDataSet(import.Id))
                 .Returns(Task.CompletedTask);
 
             dataImportService

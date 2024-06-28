@@ -41,15 +41,13 @@ const subjectErrorMappings = [
   }),
 ];
 
-// @MarkFix - check these error codes
-
-// Error messages are returned by the server so don't need to
+// Error messages are returned by the backend so don't need to
 // define them here, but can't leave them blank in the mapping.
 const fileErrorMappings = {
-  DataSetFileNameCannotBeEmpty: 'DataSetFileNameCannotBeEmpty',
-  DataSetFileNameShouldNotContainSpecialCharacters:
-    'DataSetFileNameShouldNotContainSpecialCharacters',
-  DataSetFileNamesShouldBeUnique: 'DataSetFileNamesShouldBeUnique',
+  DataSetTitleCannotBeEmpty: 'DataSetTitleCannotBeEmpty',
+  DataSetTitleShouldNotContainSpecialCharacters:
+    'DataSetTitleShouldNotContainSpecialCharacters',
+  DataSetTitleShouldBeUnique: 'DataTitleShouldBeUnique',
   DataAndMetaFilesCannotHaveSameName: 'DataAndMetaFilesCannotHaveSameName',
   FilenameCannotContainSpacesOrSpecialCharacters:
     'FilenameCannotContainSpacesOrSpecialCharacters',
@@ -76,10 +74,12 @@ function baseErrorMappings(
             'BulkDataZipMustContainDatasetNamesCsv',
           DatasetNamesCsvReaderException: 'DatasetNamesCsvReaderException',
           DatasetNamesCsvIncorrectHeaders: 'DatasetNamesCsvIncorrectHeaders',
-          DataFileNotFoundInZip: 'DataFileNotFoundInZip',
-          MetaFileNotFoundInZip: 'MetaFileNotFoundInZip',
+          DatasetNamesCsvFilenamesShouldNotEndDotCsv:
+            'DatasetNamesCsvFilenamesShouldNotEndDotCsv',
+          DatasetNamesCsvFilenamesShouldBeUnique:
+            'DatasetNamesCsvFilenamesShouldBeUnique',
+          FileNotFoundInZip: 'FileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
-          BulkZipShouldContainDataSets: 'BulkZipShouldContainDataSets',
         },
       }),
     ];
@@ -93,10 +93,7 @@ function baseErrorMappings(
           ...fileErrorMappings,
           ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
-          DataZipFileCanOnlyContainTwoFiles:
-            'DataZipFileCanOnlyContainTwoFiles',
-          DataZipFileDoesNotContainCsvFiles:
-            'DataZipFileDoesNotContainCsvFiles',
+          DataZipFileShouldContainTwoFiles: 'DataZipFileShouldContainTwoFiles',
         },
       }),
     ];

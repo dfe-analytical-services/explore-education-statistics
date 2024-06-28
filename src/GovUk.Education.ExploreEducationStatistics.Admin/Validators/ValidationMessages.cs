@@ -45,7 +45,7 @@ public static class ValidationMessages
     );
 
     public static readonly LocalizableMessage ZipFilenameMustEndDotZip = new(
-        Code: "ZipFilenameMustEndDotZip",
+        Code: nameof(ZipFilenameMustEndDotZip),
         Message: "The file provided '{0}' should have a filename ending in '.zip'."
     );
 
@@ -59,7 +59,7 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage MustBeZipFile = new(
-        Code: "MustBeZipFile",
+        Code: nameof(MustBeZipFile),
         Message: "The file provided '{0}' must be a ZIP file."
     );
 
@@ -72,8 +72,13 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage DataZipShouldContainTwoFiles = new(
+        Code: nameof(DataZipShouldContainTwoFiles),
+        Message: "The ZIP file provided should contain two files."
+    );
+
     public static readonly LocalizableMessage MustBeCsvFile = new(
-        Code: "MustBeCsvFile",
+        Code: nameof(MustBeCsvFile),
         Message: "The file provided '{0}' must be a CSV file."
     );
 
@@ -87,12 +92,12 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage BulkDataZipMustContainDatasetNamesCsv = new(
-        Code: "BulkDataZipMustContainDatasetNamesCsv",
-        Message: "For bulk imports, the ZIP must include a dataset_names.csv"
+        Code: nameof(BulkDataZipMustContainDatasetNamesCsv),
+        Message: "For bulk imports, the ZIP must include dataset_names.csv"
     );
 
     public static readonly LocalizableMessage DatasetNamesCsvReaderException = new(
-        Code: "DatasetNamesCsvReaderException",
+        Code: nameof(DatasetNamesCsvReaderException),
         Message: "Failed to read dataset_names.csv. Exception: {0}"
     );
 
@@ -105,86 +110,72 @@ public static class ValidationMessages
         };
     }
     public static readonly LocalizableMessage DatasetNamesCsvIncorrectHeaders = new(
-        Code: "DatasetNamesCsvIncorrectHeaders",
+        Code: nameof(DatasetNamesCsvIncorrectHeaders),
         Message: "dataset_names.csv has incorrect headers. It should have 'file_name' and 'dataset_name' only."
     );
 
-    public static readonly LocalizableMessage DataFileNotFoundInZip = new(
-        Code: "DataFileNotFoundInZip",
-        Message: "Failed to find data file '{0}' in ZIP file."
+    public static readonly LocalizableMessage FileNotFoundInZip = new(
+        Code: nameof(FileNotFoundInZip),
+        Message: "Failed to find file '{0}' of type {1} in ZIP file."
     );
 
-    public static ErrorViewModel GenerateErrorDataFileNotFoundInZip(string fullFilename)
+    public static ErrorViewModel GenerateErrorFileNotFoundInZip(string fullFilename, FileType type)
     {
         return new ErrorViewModel
         {
-            Code = DataFileNotFoundInZip.Code,
-            Message = string.Format(DataFileNotFoundInZip.Message, fullFilename),
+            Code = FileNotFoundInZip.Code,
+            Message = string.Format(FileNotFoundInZip.Message, fullFilename, type.ToString()),
         };
     }
 
-    public static readonly LocalizableMessage MetaFileNotFoundInZip = new(
-        Code: "MetaFileNotFoundInZip",
-        Message: "Failed to find meta file '{0}' in ZIP file."
+    public static readonly LocalizableMessage DataSetTitleShouldBeUnique = new(
+        Code: nameof(DataSetTitleShouldBeUnique),
+        Message: "Data set title should be unique. Duplicate title: '{0}'."
     );
 
-    public static ErrorViewModel GenerateErrorMetaFileNotFoundInZip(string fullFilename)
+    public static ErrorViewModel GenerateErrorDataSetTitleShouldBeUnique(string duplicate)
     {
         return new ErrorViewModel
         {
-            Code = MetaFileNotFoundInZip.Code,
-            Message = string.Format(MetaFileNotFoundInZip.Message, fullFilename),
+            Code = DataSetTitleShouldBeUnique.Code,
+            Message = string.Format(DataSetTitleShouldBeUnique.Message, duplicate),
         };
     }
 
-    public static readonly LocalizableMessage DataSetNamesCsvTitlesShouldBeUnique = new(
-        Code: "DataSetFileNamesShouldBeUnique",
-        Message: "All dataset_names.csv titles should be unique. Duplicate title: '{0}'."
+    public static readonly LocalizableMessage DatasetNamesCsvFilenamesShouldBeUnique = new(
+        Code: nameof(DatasetNamesCsvFilenamesShouldBeUnique),
+        Message: "In dataset_names.csv, all filenames should be unique. Duplicate filename: '{0}'."
     );
 
-    public static ErrorViewModel GenerateErrorDataSetNamesCsvTitlesShouldBeUnique(string duplicate)
+    public static ErrorViewModel GenerateErrorDatasetNamesCsvFilenamesShouldBeUnique(string duplicate)
     {
         return new ErrorViewModel
         {
-            Code = DataSetNamesCsvTitlesShouldBeUnique.Code,
-            Message = string.Format(DataSetNamesCsvTitlesShouldBeUnique.Message, duplicate),
+            Code = DatasetNamesCsvFilenamesShouldBeUnique.Code,
+            Message = string.Format(DatasetNamesCsvFilenamesShouldBeUnique.Message, duplicate),
         };
     }
 
-    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldBeUnique = new(
-        Code: "DataSetFilenamesShouldBeUnique",
-        Message: "All dataset_names.csv filenames should be unique. Duplicate filename: '{0}'."
+    public static readonly LocalizableMessage DatasetNamesCsvFilenamesShouldNotEndDotCsv = new(
+        Code: nameof(DatasetNamesCsvFilenamesShouldNotEndDotCsv),
+        Message: "Inside dataset_names.csv, file_name cell entries should not end in '.csv' i.e. should be 'filename' not 'filename.csv'. Filename found with extension: '{0}'."
     );
 
-    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(string duplicate)
+    public static ErrorViewModel GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
     {
         return new ErrorViewModel
         {
-            Code = DataSetNamesCsvFilenamesShouldBeUnique.Code,
-            Message = string.Format(DataSetNamesCsvFilenamesShouldBeUnique.Message, duplicate),
-        };
-    }
-
-    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldNotEndDotCsv = new(
-        Code: "DataSetFilenamesShouldBeUnique",
-        Message: "Inside dataset_names.csv, file_name cell entries should not end in '.csv' i.e. should be 'filename' not 'filename.csv'. Filename with extension: '{0}'."
-    );
-
-    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
-    {
-        return new ErrorViewModel
-        {
-            Code = DataSetNamesCsvFilenamesShouldNotEndDotCsv.Code,
-            Message = string.Format(DataSetNamesCsvFilenamesShouldNotEndDotCsv.Message, filename),
+            Code = DatasetNamesCsvFilenamesShouldNotEndDotCsv.Code,
+            Message = string.Format(DatasetNamesCsvFilenamesShouldNotEndDotCsv.Message, filename),
         };
     }
 
     public static readonly LocalizableMessage FilenameTooLong = new(
-        Code: "FilenameTooLong",
+        Code: nameof(FilenameTooLong),
         Message: "Filename '{0}' is too long. Should be at most {1} characters."
     );
 
-    public static ErrorViewModel GenerateErrorFileNameTooLong(string fullFileName, int maxLength)
+    public static ErrorViewModel GenerateErrorFilenameTooLong(string fullFileName, int maxLength)
     {
         return new ErrorViewModel
         {
@@ -194,7 +185,7 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage ZipContainsUnusedFiles = new(
-        Code: "ZipContainsUnusedFiles",
+        Code: nameof(ZipContainsUnusedFiles),
         Message: "ZIP file contains unused files: {0}"
     );
 
@@ -208,12 +199,12 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage DataAndMetaFilesCannotHaveSameName = new(
-        Code: "DataAndMetaFilesCannotHaveSameName",
+        Code: nameof(DataAndMetaFilesCannotHaveSameName),
         Message: "Data file and meta file must use a different filename"
     );
 
     public static readonly LocalizableMessage FilenameCannotContainSpacesOrSpecialCharacters = new(
-        Code: "FilenameCannotContainSpacesOrSpecialCharacters",
+        Code: nameof(FilenameCannotContainSpacesOrSpecialCharacters),
         Message: "Filename '{0}' must not use spaces or special characters."
     );
 
@@ -227,7 +218,7 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage FilenameMustEndDotCsv = new(
-        Code: "FilenameMustEndDotCsv",
+        Code: nameof(FilenameMustEndDotCsv),
         Message: "Filename '{0}' must end in '.csv'."
     );
 
@@ -241,7 +232,7 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage MetaFilenameMustEndDotMetaDotCsv = new(
-        Code: "MetaFilenameMustEndDotMetaDotCsv",
+        Code: nameof(MetaFilenameMustEndDotMetaDotCsv),
         Message: "Meta file '{0}' must end in '.meta.csv'."
     );
 
@@ -255,8 +246,8 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage FilenameNotUnique = new(
-        Code: "FilenameNotUnique",
-        Message: "Filename '{0}' of FileType {1} isn't unique to this release."
+        Code: nameof(FilenameNotUnique),
+        Message: "Filename '{0}' of type {1} isn't unique to this release."
     );
 
     public static ErrorViewModel GenerateErrorFilenameNotUnique(string filename, FileType type)
@@ -269,7 +260,7 @@ public static class ValidationMessages
     }
 
     public static readonly LocalizableMessage FileSizeMustNotBeZero = new(
-        Code: "FileSizeMustNotBeZero",
+        Code: nameof(FileSizeMustNotBeZero),
         Message: "File '{0}' must not be of 0 size."
     );
 
@@ -282,22 +273,22 @@ public static class ValidationMessages
         };
     }
     
-    public static readonly LocalizableMessage DataSetFileNameCannotBeEmpty = new(
-        Code: "DataSetFileNameCannotBeEmpty",
-        Message: "Data set name cannot be empty"
+    public static readonly LocalizableMessage DataSetTitleCannotBeEmpty = new(
+        Code: nameof(DataSetTitleCannotBeEmpty),
+        Message: "Data set title cannot be empty"
     );
 
-    public static readonly LocalizableMessage DataSetFileNameShouldNotContainSpecialCharacters = new(
-        Code: "DataSetFileNameShouldNotContainSpecialCharacters",
-        Message: "Data set name '{0}' should not contain special characters"
+    public static readonly LocalizableMessage DataSetTitleShouldNotContainSpecialCharacters = new(
+        Code: nameof(DataSetTitleShouldNotContainSpecialCharacters),
+        Message: "Data set title '{0}' should not contain special characters"
     );
 
-    public static ErrorViewModel GenerateErrorDataSetFileNameShouldNotContainSpecialCharacters(string filename)
+    public static ErrorViewModel GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(string filename)
     {
         return new ErrorViewModel
         {
-            Code = DataSetFileNameShouldNotContainSpecialCharacters.Code,
-            Message = string.Format(DataSetFileNameShouldNotContainSpecialCharacters.Message, filename),
+            Code = DataSetTitleShouldNotContainSpecialCharacters.Code,
+            Message = string.Format(DataSetTitleShouldNotContainSpecialCharacters.Message, filename),
         };
     }
     
