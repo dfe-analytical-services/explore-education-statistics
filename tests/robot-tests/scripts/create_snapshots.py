@@ -38,8 +38,8 @@ class SnapshotService:
         self.timeout = 10
         self.page_size = 10
         self.snapshots = [
-            "data_catalogue_snapshot.json",
-            "find_statistics_snapshot.json",
+            #"data_catalogue_snapshot.json", # EES-5270
+            #"find_statistics_snapshot.json", # EES-5270
             "methodologies_snapshot.json",
             "table_tool_snapshot.json",
         ]
