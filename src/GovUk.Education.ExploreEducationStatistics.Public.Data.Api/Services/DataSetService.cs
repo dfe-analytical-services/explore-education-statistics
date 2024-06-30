@@ -348,25 +348,25 @@ internal class DataSetService(
     private static DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)
     {
         var filters = dataSetVersion.FilterMetas
-            .Select(MapFilterMeta)
+            .Select(MapFilterOptions)
             .OrderBy(fm => fm.Label)
             .ToList();
 
         var indicators = dataSetVersion.IndicatorMetas
-            .Select(MapIndicatorMeta)
+            .Select(MapIndicator)
             .OrderBy(im => im.Label)
             .ToList();
 
         var geographicLevels = dataSetVersion.GeographicLevelMeta?.Levels
-            .Select(MapGeographicLevelMeta)
+            .Select(MapGeographicLevelOption)
             .ToList() ?? [];
 
         var locations = dataSetVersion.LocationMetas
-            .Select(MapLocationMeta)
+            .Select(MapLocationGroupOptions)
             .ToList();
 
         var timePeriods = dataSetVersion.TimePeriodMetas
-            .Select(MapTimePeriod)
+            .Select(MapTimePeriodOption)
             .OrderBy(tm => tm.Code.GetEnumValue())
             .ThenBy(tm => tm.Period)
             .ToList();
@@ -381,23 +381,23 @@ internal class DataSetService(
         };
     }
 
-    private static GeographicLevelMetaViewModel MapGeographicLevelMeta(GeographicLevel level)
+    private static GeographicLevelOptionViewModel MapGeographicLevelOption(GeographicLevel level)
     {
-        return new GeographicLevelMetaViewModel
+        return new GeographicLevelOptionViewModel
         {
             Level = level,
             Label = level.GetEnumLabel(),
         };
     }
 
-    private static FilterMetaViewModel MapFilterMeta(FilterMeta filterMeta)
+    private static FilterOptionsViewModel MapFilterOptions(FilterMeta filterMeta)
     {
         var options = filterMeta.OptionLinks
-            .Select(MapFilterOptionMeta)
+            .Select(MapFilterOption)
             .OrderBy(fom => fom.Label)
             .ToList();
 
-        return new FilterMetaViewModel
+        return new FilterOptionsViewModel
         {
             Id = filterMeta.PublicId,
             Hint = filterMeta.Hint,
@@ -406,9 +406,9 @@ internal class DataSetService(
         };
     }
 
-    private static FilterOptionMetaViewModel MapFilterOptionMeta(FilterOptionMetaLink filterOptionMetaLink)
+    private static FilterOptionViewModel MapFilterOption(FilterOptionMetaLink filterOptionMetaLink)
     {
-        return new FilterOptionMetaViewModel
+        return new FilterOptionViewModel
         {
             Id = filterOptionMetaLink.PublicId,
             Label = filterOptionMetaLink.Option.Label,
@@ -416,9 +416,9 @@ internal class DataSetService(
         };
     }
 
-    private static IndicatorMetaViewModel MapIndicatorMeta(IndicatorMeta indicatorMeta)
+    private static IndicatorViewModel MapIndicator(IndicatorMeta indicatorMeta)
     {
-        return new IndicatorMetaViewModel
+        return new IndicatorViewModel
         {
             Id = indicatorMeta.PublicId,
             Label = indicatorMeta.Label,
@@ -427,14 +427,14 @@ internal class DataSetService(
         };
     }
 
-    private static LocationLevelMetaViewModel MapLocationMeta(LocationMeta locationMeta)
+    private static LocationGroupOptionsViewModel MapLocationGroupOptions(LocationMeta locationMeta)
     {
         var options = locationMeta.OptionLinks
             .Select(MapLocationOptionMeta)
             .OrderBy(lom => lom.Label)
             .ToList();
 
-        return new LocationLevelMetaViewModel
+        return new LocationGroupOptionsViewModel
         {
             Level = locationMeta.Level,
             Label = locationMeta.Level.GetEnumLabel(),
@@ -442,37 +442,37 @@ internal class DataSetService(
         };
     }
 
-    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationOptionMetaLink locationOptionMetaLink)
+    private static LocationOptionViewModel MapLocationOptionMeta(LocationOptionMetaLink locationOptionMetaLink)
     {
         var locationOptionMeta = locationOptionMetaLink.Option;
         
         return locationOptionMeta switch
         {
-            LocationCodedOptionMeta codedOption => new LocationCodedOptionMetaViewModel
+            LocationCodedOptionMeta codedOption => new LocationCodedOptionViewModel
             {
                 Id = locationOptionMetaLink.PublicId,
                 Label = codedOption.Label,
                 Code = codedOption.Code,
             },
-            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionMetaViewModel
+            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionViewModel
             {
                 Id = locationOptionMetaLink.PublicId,
                 Label = localAuthorityOption.Label,
                 Code = localAuthorityOption.Code,
                 OldCode = localAuthorityOption.OldCode,
             },
-            LocationProviderOptionMeta providerOption => new LocationProviderOptionMetaViewModel
+            LocationProviderOptionMeta providerOption => new LocationProviderOptionViewModel
             {
                 Id = locationOptionMetaLink.PublicId,
                 Label = providerOption.Label,
                 Ukprn = providerOption.Ukprn,
             },
-            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionMetaViewModel
+            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionViewModel
             {
                 Id = locationOptionMetaLink.PublicId,
                 Label = rscRegionOption.Label,
             },
-            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionMetaViewModel
+            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionViewModel
             {
                 Id = locationOptionMetaLink.PublicId,
                 Label = schoolOption.Label,
@@ -483,9 +483,9 @@ internal class DataSetService(
         };
     }
 
-    private static TimePeriodMetaViewModel MapTimePeriod(TimePeriodMeta timePeriodMeta)
+    private static TimePeriodOptionViewModel MapTimePeriodOption(TimePeriodMeta timePeriodMeta)
     {
-        return new TimePeriodMetaViewModel
+        return new TimePeriodOptionViewModel
         {
             Code = timePeriodMeta.Code,
             Period = timePeriodMeta.Period,
