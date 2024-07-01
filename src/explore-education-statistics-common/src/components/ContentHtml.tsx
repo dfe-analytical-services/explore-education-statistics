@@ -84,9 +84,8 @@ export default function ContentHtml({
         const url = formatContentLink(node.attribs.href);
         const text = domToReact(node.children);
 
-        return !node.attribs.href.includes(
-          'explore-education-statistics.service.gov.uk',
-        ) && typeof node.attribs['data-featured-table'] === 'undefined' ? (
+        return !url?.includes('explore-education-statistics.service.gov.uk') &&
+          typeof node.attribs['data-featured-table'] === 'undefined' ? (
           <a href={url} target="_blank" rel="noopener noreferrer">
             {text} (opens in a new tab)
           </a>
