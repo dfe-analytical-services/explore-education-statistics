@@ -57,11 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             Level = GeographicLevel.Region
         };
 
-        private readonly BoundaryData _boundaryData = new()
-        {
-            GeoJson = "[]"
-        };
-
         [Fact]
         public async Task GetSubjectMeta_SubjectNotFound()
         {

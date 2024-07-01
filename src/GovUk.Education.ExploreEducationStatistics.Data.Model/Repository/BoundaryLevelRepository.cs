@@ -56,7 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             {
                 Level = level,
                 Label = label,
-                Created = DateTime.UtcNow,
                 Published = published,
             });
 

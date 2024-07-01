@@ -1,4 +1,5 @@
 #nullable enable
+using GeoJSON.Net.Feature;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -111,7 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<FilterItem> FilterItem { get; set; } = null!;
         public DbSet<FilterItemFootnote> FilterItemFootnote { get; set; } = null!;
         public DbSet<Footnote> Footnote { get; set; } = null!;
-        public DbSet<GeoJson> GeoJson { get; set; } = null!;
         public DbSet<Indicator> Indicator { get; set; } = null!;
         public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; } = null!;
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; } = null!;
@@ -133,7 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureBoundaryData(modelBuilder);
             ConfigureBoundaryLevel(modelBuilder);
             ConfigureIndicator(modelBuilder);
-            ConfigureGeoJson(modelBuilder);
             ConfigureFilter(modelBuilder);
             ConfigureFilterFootnote(modelBuilder);
             ConfigureFilterGroupFootnote(modelBuilder);
@@ -167,6 +166,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<BoundaryData>()
                 .HasOne(boundaryData => boundaryData.BoundaryLevel)
                 .WithMany();
+
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.GeoJson)
+                .HasConversion(
+                    feature => JsonConvert.SerializeObject(feature),
+                    feature => JsonConvert.DeserializeObject<Feature>(feature));
+
+            modelBuilder.Entity<BoundaryData>()
+                .HasIndex(boundaryData => boundaryData.Code);
         }
 
         private void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
@@ -480,11 +488,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Subject>()
                 .HasQueryFilter(s => !s.SoftDeleted);
-        }
-
-        private static void ConfigureGeoJson(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");
         }
     }
 }

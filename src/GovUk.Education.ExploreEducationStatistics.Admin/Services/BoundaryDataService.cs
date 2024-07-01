@@ -5,48 +5,36 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class BoundaryDataService : IBoundaryDataService
+public class BoundaryDataService(
+    IBoundaryLevelRepository boundaryLevelRepository,
+    IBoundaryDataRepository boundaryDataRepository) : IBoundaryDataService
 {
-    private readonly IBoundaryLevelRepository _boundaryLevelRepository;
-    private readonly IBoundaryDataRepository _boundaryDataRepository;
-
-    public BoundaryDataService(
-        IBoundaryLevelRepository boundaryLevelRepository,
-        IBoundaryDataRepository boundaryDataRepository)
-    {
-        _boundaryLevelRepository = boundaryLevelRepository;
-        _boundaryDataRepository = boundaryDataRepository;
-    }
-
     public async Task ProcessGeoJson(
         GeographicLevel level,
         string label,
         DateTime published,
         FeatureCollection featureCollection)
     {
-        var boundaryLevel = await _boundaryLevelRepository.CreateBoundaryLevel(level, label, published);
-        var boundaryData = new List<BoundaryData>();
-
-        foreach (var feature in featureCollection.Features)
-        {
-            var (name, code) = BoundaryDataUtils.GetFeatureDetails(feature.Properties);
-
-            boundaryData.Add(new()
+        var boundaryLevel = await boundaryLevelRepository.CreateBoundaryLevel(level, label, published);
+        var boundaryData = featureCollection.Features
+            .Select(feature =>
             {
-                BoundaryLevel = boundaryLevel,
-                Name = name,
-                Code = code,
-                GeoJson = JsonConvert.SerializeObject(feature)
-            });
-        }
+                var (name, code) = BoundaryDataUtils.GetFeatureDetails(feature.Properties);
+                return new BoundaryData
+                {
+                    BoundaryLevel = boundaryLevel,
+                    Name = name,
+                    Code = code,
+                    GeoJson = feature
+                };
+            }).ToList();
 
-        await _boundaryDataRepository.AddRange(boundaryData);
+        await boundaryDataRepository.AddRange(boundaryData);
     }
 }

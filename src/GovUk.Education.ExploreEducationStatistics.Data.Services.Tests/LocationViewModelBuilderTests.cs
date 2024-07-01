@@ -1,10 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.ViewModels.LocationViewModelBuilder;
@@ -818,24 +816,24 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_derby.Code, la2.Value);
     }
 
-    private static Dictionary<GeographicLevel, Dictionary<string, BoundaryData>> BuildGeoJson(
-        params LocationAttribute[] locationAttributes)
-    {
-        return locationAttributes
-            .GroupBy(locationAttribute => locationAttribute.GeographicLevel)
-            .ToDictionary(grouping => grouping.Key,
-                grouping => grouping.ToDictionary(locationAttribute => locationAttribute.Code,
-                    locationAttribute => new BoundaryData
-                    {
-                        // Set a minimal JSON string as the value which contains the location code.
-                        // This should be enough to assert the correct GeoJson object has been selected
-                        // when the the location view model was built.
-                        GeoJson = new JObject
-                        {
-                            {
-                                "code", locationAttribute.Code
-                            }
-                        }.ToString()
-                    }));
-    }
+    //private static Dictionary<GeographicLevel, Dictionary<string, BoundaryData>> BuildGeoJson(
+    //    params LocationAttribute[] locationAttributes)
+    //{
+    //    return locationAttributes
+    //        .GroupBy(locationAttribute => locationAttribute.GeographicLevel)
+    //        .ToDictionary(grouping => grouping.Key,
+    //            grouping => grouping.ToDictionary(locationAttribute => locationAttribute.Code,
+    //                locationAttribute => new BoundaryData
+    //                {
+    //                    // Set a minimal JSON string as the value which contains the location code.
+    //                    // This should be enough to assert the correct GeoJson object has been selected
+    //                    // when the the location view model was built.
+    //                    GeoJson = new JObject
+    //                    {
+    //                        {
+    //                            "code", locationAttribute.Code
+    //                        }
+    //                    }.ToString()
+    //                }));
+    //}
 }

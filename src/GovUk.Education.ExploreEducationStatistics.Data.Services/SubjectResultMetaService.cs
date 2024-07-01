@@ -212,15 +212,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             long? boundaryLevelId,
             Dictionary<GeographicLevel, List<string>>? hierarchies)
         {
-            var geoJson = await GetGeoJson(locations, boundaryLevelId);
+            var boundaryData = await GetBoundaryData(locations, boundaryLevelId);
 
-            return BuildLocationAttributeViewModels(locations, hierarchies, geoJson)
+            return BuildLocationAttributeViewModels(locations, hierarchies, boundaryData)
                 .ToDictionary(
                     pair => pair.Key.ToString().CamelCase(),
                     pair => pair.Value);
         }
 
-        private async Task<Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>> GetGeoJson(
+        private async Task<Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>> GetBoundaryData(
             List<Location> locations,
             long? boundaryLevelId)
         {
@@ -243,13 +243,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var codes = locationsMatchingLevel
                 .Select(location => location.ToLocationAttribute().GetCodeOrFallback())
                 .ToList();
-            var geoJson = _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, codes);
+            var boundaryData = _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, codes);
 
             return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>
             {
                 {
                     boundaryLevel.Level,
-                    geoJson
+                    boundaryData
                 }
             };
         }

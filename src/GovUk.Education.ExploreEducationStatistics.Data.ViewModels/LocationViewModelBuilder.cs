@@ -11,69 +11,71 @@ public static class LocationViewModelBuilder
     public static Dictionary<GeographicLevel, List<LocationAttributeViewModel>> BuildLocationAttributeViewModels(
         IList<Location> locations,
         Dictionary<GeographicLevel, List<string>>? hierarchies,
-        Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>? geoJson = null)
+        Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>? boundaryData = null)
     {
         var locationAttributes = locations.GetLocationAttributesHierarchical(hierarchies);
         return locationAttributes.ToDictionary(
             levelAndLocationAttributes => levelAndLocationAttributes.Key,
             levelAndLocationAttributes =>
             {
-                var geoJsonByCode = geoJson?.GetValueOrDefault(levelAndLocationAttributes.Key);
-                return BuildLocationAttributeViewModels(levelAndLocationAttributes.Value, geoJsonByCode);
+                var boundaryDataByCode = boundaryData?.GetValueOrDefault(levelAndLocationAttributes.Key);
+                return BuildLocationAttributeViewModels(levelAndLocationAttributes.Value, boundaryDataByCode);
             });
     }
 
     private static List<LocationAttributeViewModel> BuildLocationAttributeViewModels(
         IEnumerable<LocationAttributeNode> locationAttributes,
-        IReadOnlyDictionary<string, BoundaryData>? geoJsonByCode)
+        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
     {
         return DeduplicateLocationViewModels(
             locationAttributes
                 .OrderBy(OrderingKey)
-                .Select(locationAttribute => BuildLocationAttributeViewModel(locationAttribute, geoJsonByCode))
+                .Select(locationAttribute => BuildLocationAttributeViewModel(locationAttribute, boundaryDataByCode))
                 .ToList()
         );
     }
 
     private static LocationAttributeViewModel BuildLocationAttributeViewModel(
         LocationAttributeNode locationAttributeNode,
-        IReadOnlyDictionary<string, BoundaryData>? geoJsonByCode)
+        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
     {
         var locationAttribute = locationAttributeNode.Attribute;
         return locationAttributeNode.IsLeaf
-            ? BuildLocationAttributeLeafViewModel(locationAttributeNode, geoJsonByCode)
+            ? BuildLocationAttributeLeafViewModel(locationAttributeNode, boundaryDataByCode)
             : new LocationAttributeViewModel
             {
                 Label = locationAttribute.Name ?? string.Empty,
                 Level = locationAttribute.GeographicLevel,
                 Value = locationAttribute.GetCodeOrFallback(),
-                Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, geoJsonByCode)
+                Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, boundaryDataByCode)
             };
     }
 
     private static LocationAttributeViewModel BuildLocationAttributeLeafViewModel(
         LocationAttributeNode locationAttributeNode,
-        IReadOnlyDictionary<string, BoundaryData>? geoJsonByCode)
+        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
     {
         var locationAttribute = locationAttributeNode.Attribute;
         var code = locationAttribute.GetCodeOrFallback();
 
-        var geoJson = code.IsNullOrEmpty()
+        var feature = code.IsNullOrEmpty()
             ? null
-            : geoJsonByCode?.GetValueOrDefault(code)?.Feature;
+            : boundaryDataByCode?.GetValueOrDefault(code)?.GeoJson;
 
-        if (geoJson != null)
+        if (feature != null)
         {
-            var (featureName, featureCode) = BoundaryDataUtils.GetFeatureDetails(geoJson.Properties);
+            var (featureName, featureCode) = BoundaryDataUtils.GetFeatureDetails(feature.Properties);
 
-            geoJson.Properties.Add("Code", featureCode);
-            geoJson.Properties.Add("Name", featureName);
+            // A recent change (from either of the two latest commits) is causing these to be added multiple times, throwing exceptions due to duplicates.
+            // TryAdd prevents the exception, but doesn't resolve the duplicate calls
+            feature.Properties.TryAdd("Code", featureCode);
+            feature.Properties.TryAdd("Name", featureName);
         }
 
         return new LocationAttributeViewModel
         {
             Id = locationAttributeNode.LocationId,
-            GeoJson = geoJson,
+            GeoJson = feature,
             Label = locationAttribute.Name ?? string.Empty,
             Value = code
         };
