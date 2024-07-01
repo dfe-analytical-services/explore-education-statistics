@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.Converters;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
@@ -18,6 +19,50 @@ public abstract record LocationOptionViewModel
     /// The human-readable label of the location.
     /// </summary>
     public required string Label { get; init; }
+
+    public static LocationOptionViewModel Create(LocationOptionMetaLink link)
+    {
+        return Create(link.Option, link.PublicId);
+    }
+
+    public static LocationOptionViewModel Create(LocationOptionMeta optionMeta, string publicId)
+    {
+        return optionMeta switch
+        {
+            LocationCodedOptionMeta codedOption => new LocationCodedOptionViewModel
+            {
+                Id = publicId,
+                Label = codedOption.Label,
+                Code = codedOption.Code,
+            },
+            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionViewModel
+            {
+                Id = publicId,
+                Label = localAuthorityOption.Label,
+                Code = localAuthorityOption.Code,
+                OldCode = localAuthorityOption.OldCode,
+            },
+            LocationProviderOptionMeta providerOption => new LocationProviderOptionViewModel
+            {
+                Id = publicId,
+                Label = providerOption.Label,
+                Ukprn = providerOption.Ukprn,
+            },
+            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionViewModel
+            {
+                Id = publicId,
+                Label = rscRegionOption.Label,
+            },
+            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionViewModel
+            {
+                Id = publicId,
+                Label = schoolOption.Label,
+                Urn = schoolOption.Urn,
+                LaEstab = schoolOption.LaEstab,
+            },
+            _ => throw new NotImplementedException()
+        };
+    }
 }
 
 /// <summary>

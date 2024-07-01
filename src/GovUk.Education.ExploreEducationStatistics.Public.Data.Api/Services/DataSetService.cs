@@ -417,7 +417,7 @@ internal class DataSetService(
     private static LocationGroupOptionsViewModel MapLocationGroupOptions(LocationMeta locationMeta)
     {
         var options = locationMeta.OptionLinks
-            .Select(MapLocationOptionMeta)
+            .Select(LocationOptionViewModel.Create)
             .OrderBy(lom => lom.Label)
             .ToList();
 
@@ -426,47 +426,6 @@ internal class DataSetService(
             Level = locationMeta.Level,
             Label = locationMeta.Level.GetEnumLabel(),
             Options = options,
-        };
-    }
-
-    private static LocationOptionViewModel MapLocationOptionMeta(LocationOptionMetaLink locationOptionMetaLink)
-    {
-        var locationOptionMeta = locationOptionMetaLink.Option;
-        
-        return locationOptionMeta switch
-        {
-            LocationCodedOptionMeta codedOption => new LocationCodedOptionViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = codedOption.Label,
-                Code = codedOption.Code,
-            },
-            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = localAuthorityOption.Label,
-                Code = localAuthorityOption.Code,
-                OldCode = localAuthorityOption.OldCode,
-            },
-            LocationProviderOptionMeta providerOption => new LocationProviderOptionViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = providerOption.Label,
-                Ukprn = providerOption.Ukprn,
-            },
-            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = rscRegionOption.Label,
-            },
-            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = schoolOption.Label,
-                Urn = schoolOption.Urn,
-                LaEstab = schoolOption.LaEstab,
-            },
-            _ => throw new NotImplementedException()
         };
     }
 
