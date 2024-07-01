@@ -41,15 +41,18 @@ public class DataSetVersionMappingService(
                         update.SourceKey
                     ];
 
-                    await postgreSqlRepository.UpdateJsonbByPath(
-                        context: publicDataDbContext,
-                        tableName: nameof(PublicDataDbContext.DataSetVersionMappings),
-                        idColumnName: "TargetDataSetVersionId",
-                        jsonColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
-                        rowId: nextDataSetVersionId,
-                        [..baseJsonPathSegments, nameof(Mapping<MappableLocationOption>.Type)],
-                        update.Type.ToString(),
-                        cancellationToken);
+                    var mapping = await postgreSqlRepository
+                        .GetJsonbFromPath<PublicDataDbContext, Guid, LocationOptionMapping>(
+                            context: publicDataDbContext,
+                            tableName: nameof(PublicDataDbContext.DataSetVersionMappings),
+                            idColumnName: "TargetDataSetVersionId",
+                            jsonColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
+                            rowId: nextDataSetVersionId,
+                            baseJsonPathSegments,
+                            cancellationToken);
+
+                    mapping.Type = update.Type;
+                    mapping.CandidateKey = update.CandidateKey;
 
                     await postgreSqlRepository.UpdateJsonbByPath(
                         context: publicDataDbContext,
@@ -57,17 +60,8 @@ public class DataSetVersionMappingService(
                         idColumnName: "TargetDataSetVersionId",
                         jsonColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
                         rowId: nextDataSetVersionId,
-                        [..baseJsonPathSegments, nameof(Mapping<MappableLocationOption>.CandidateKey)],
-                        update.CandidateKey,
-                        cancellationToken);
-                    
-                    var a = await postgreSqlRepository.GetJsonbFromPath<PublicDataDbContext, Guid, LocationOptionMapping>(
-                        context: publicDataDbContext,
-                        tableName: nameof(PublicDataDbContext.DataSetVersionMappings),
-                        idColumnName: "TargetDataSetVersionId",
-                        jsonColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
-                        rowId: nextDataSetVersionId,
                         baseJsonPathSegments,
+                        mapping,
                         cancellationToken);
 
                     // Should this actually return the JSON fragment at the given JSON path?
