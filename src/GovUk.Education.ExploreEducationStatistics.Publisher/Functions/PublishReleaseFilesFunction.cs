@@ -25,31 +25,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [Function("PublishReleaseFiles")]
         public async Task PublishReleaseFiles(
-            [QueueTrigger(PublishReleaseFilesQueue)]
-            PublishReleaseFilesMessage message,
+            [QueueTrigger(PublishReleaseFilesQueue)] PublishReleaseFilesMessage message,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered: {Message}",
                 context.FunctionDefinition.Name,
                 message);
 
-            await UpdateFilesStage(message.Releases, Started);
+            await UpdateFilesStage(message.ReleasePublishingKeys, Started);
 
             var successfulReleases = await message
-                .Releases
+                .ReleasePublishingKeys
                 .ToAsyncEnumerable()
-                .WhereAwait(async releaseStatus =>
+                .WhereAwait(async key =>
                 {
                     try
                     {
                         await publishingService.PublishMethodologyFilesIfApplicableForRelease(
-                            releaseStatus.ReleaseVersionId);
-                        await publishingService.PublishReleaseFiles(releaseStatus.ReleaseVersionId);
+                            key.ReleaseVersionId);
+                        await publishingService.PublishReleaseFiles(key.ReleaseVersionId);
                         return true;
                     }
                     catch (Exception e)
                     {
-                        logger.LogError(e, "Exception occured while executing {FunctionName}",
+                        logger.LogError(e,
+                            "Exception occured while executing {FunctionName}",
                             context.FunctionDefinition.Name);
 
                         return false;
@@ -58,8 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 .ToListAsync();
 
             var unsuccessfulReleases = message
-                .Releases
-                .Except(successfulReleases);
+                .ReleasePublishingKeys
+                .Except(successfulReleases)
+                .ToList();
 
             await UpdateFilesStage(successfulReleases, Complete);
             await UpdateFilesStage(unsuccessfulReleases, Failed);
@@ -70,7 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception occured while completing publishing in {FunctionName}",
+                logger.LogError(e,
+                    "Exception occured while completing publishing in {FunctionName}",
                     context.FunctionDefinition.Name);
 
                 await UpdatePublishingStage(
@@ -84,33 +86,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateFilesStage(
-            IEnumerable<(Guid releaseVersionId, Guid releaseStatusId)> releaseStatuses,
+            IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await releaseStatuses
+            await releasePublishingKeys
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(status =>
-                    releasePublishingStatusService.UpdateFilesStageAsync(
-                        releaseVersionId: status.releaseVersionId,
-                        releaseStatusId: status.releaseStatusId,
-                        stage,
-                        logMessage));
+                .ForEachAwaitAsync(key => releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage));
         }
 
         private async Task UpdatePublishingStage(
-            IEnumerable<(Guid releaseVersionId, Guid releaseStatusId)> releaseStatuses,
+            IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await releaseStatuses
+            await releasePublishingKeys
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(status =>
-                    releasePublishingStatusService.UpdatePublishingStageAsync(
-                        releaseVersionId: status.releaseVersionId,
-                        releaseStatusId: status.releaseStatusId,
-                        stage,
-                        logMessage));
+                .ForEachAwaitAsync(key => releasePublishingStatusService.UpdatePublishingStage(key, stage, logMessage));
         }
     }
 }

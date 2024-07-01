@@ -4,9 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusContentStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -28,30 +26,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [Function("PublishImmediateReleaseContent")]
         public async Task PublishImmediateReleaseContent(
-            [QueueTrigger(PublishReleaseContentQueue)]
-            PublishReleaseContentMessage message,
+            [QueueTrigger(PublishReleaseContentQueue)] PublishReleaseContentMessage message,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             try
             {
-                await UpdateContentStage(releaseVersionId: message.ReleaseVersionId,
-                    releaseStatusId: message.ReleaseStatusId,
-                    Started);
-                await contentService.UpdateContent(message.ReleaseVersionId);
-                await UpdateContentStage(releaseVersionId: message.ReleaseVersionId,
-                    releaseStatusId: message.ReleaseStatusId,
-                    Complete);
-
-                await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                    ListOf((message.ReleaseVersionId, message.ReleaseStatusId)));
+                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Started);
+                await contentService.UpdateContent(message.ReleasePublishingKey.ReleaseVersionId);
+                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Complete);
+                await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(new[]
+                {
+                    message.ReleasePublishingKey
+                });
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}", context.FunctionDefinition.Name);
 
-                await UpdateContentStage(message.ReleaseVersionId, message.ReleaseStatusId, Failed,
+                await UpdateContentStage(
+                    message.ReleasePublishingKey,
+                    ReleasePublishingStatusContentStage.Failed,
                     new ReleasePublishingStatusLogMessage(
                         $"Exception publishing Release Content immediately: {e.Message}"));
             }
@@ -60,13 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateContentStage(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await releasePublishingStatusService.UpdateContentStageAsync(releaseVersionId: releaseVersionId,
-                releaseStatusId: releaseStatusId,
+            await releasePublishingStatusService.UpdateContentStage(
+                releasePublishingKey,
                 state,
                 logMessage);
         }

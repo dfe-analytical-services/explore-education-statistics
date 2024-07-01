@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,21 +25,13 @@ public class PublishingCompletionService(
     : IPublishingCompletionService
 {
     public async Task CompletePublishingIfAllPriorStagesComplete(
-        IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releaseVersionAndReleaseStatusIds)
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
     {
-        var releaseStatuses = await releaseVersionAndReleaseStatusIds
+        var releaseStatuses = await releasePublishingKeys
             .ToAsyncEnumerable()
-            .SelectAwait(async status =>
-                await releasePublishingStatusService.GetAsync(releaseVersionId: status.ReleaseVersionId,
-                    releaseStatusId: status.ReleaseStatusId))
-            .ToArrayAsync();
+            .SelectAwait(async key => await releasePublishingStatusService.Get(key))
+            .ToListAsync();
 
-        await CompletePublishingIfAllPriorStagesComplete(releaseStatuses);
-    }
-
-    public async Task CompletePublishingIfAllPriorStagesComplete(
-        ReleasePublishingStatus[] releaseStatuses)
-    {
         var prePublishingStagesComplete = releaseStatuses
             .Where(status => status.AllStagesPriorToPublishingComplete())
             .ToList();
@@ -52,10 +43,8 @@ public class PublishingCompletionService(
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(status => releasePublishingStatusService
-                .UpdatePublishingStageAsync(
-                    releaseVersionId: status.ReleaseVersionId,
-                    releaseStatusId: status.Id,
+            .ForEachAwaitAsync(status =>
+                releasePublishingStatusService.UpdatePublishingStage(status.AsTableRowKey(),
                     ReleasePublishingStatusPublishingStage.Started));
 
         var releaseVersionIdsToUpdate = prePublishingStagesComplete
@@ -68,9 +57,9 @@ public class PublishingCompletionService(
 
         await releaseVersionIdsToUpdate
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async releaseId =>
+            .ForEachAwaitAsync(async releaseVersionId =>
             {
-                var releaseVersion = await releaseService.Get(releaseId);
+                var releaseVersion = await releaseService.Get(releaseVersionId);
                 var methodologyVersions =
                     await methodologyService.GetLatestVersionByRelease(releaseVersion);
 
@@ -128,11 +117,8 @@ public class PublishingCompletionService(
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(status => releasePublishingStatusService
-                .UpdatePublishingStageAsync(
-                    releaseVersionId: status.ReleaseVersionId,
-                    releaseStatusId: status.Id,
-                    ReleasePublishingStatusPublishingStage.Complete));
+            .ForEachAwaitAsync(async status => await releasePublishingStatusService
+                .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete));
     }
 
     private async Task UpdateLatestPublishedRelease(Guid publicationId)
@@ -140,7 +126,8 @@ public class PublishingCompletionService(
         var publication = await contentDbContext.Publications
             .SingleAsync(p => p.Id == publicationId);
 
-        var latestPublishedReleaseVersion = await releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId);
+        var latestPublishedReleaseVersion =
+            await releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId);
         publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion!.Id;
 
         contentDbContext.Update(publication);

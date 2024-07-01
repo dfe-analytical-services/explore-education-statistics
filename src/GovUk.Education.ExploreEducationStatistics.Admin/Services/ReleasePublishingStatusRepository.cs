@@ -20,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseVersionId,
+        public Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
+            Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
             var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
@@ -49,10 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
-            return _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
+            return _publisherTableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
         }
 
-        public async Task RemovePublisherReleaseStatuses(List<Guid> releaseVersionIds)
+        public async Task RemovePublisherReleaseStatuses(IReadOnlyList<Guid> releaseVersionIds)
         {
             if (releaseVersionIds.IsNullOrEmpty())
             {

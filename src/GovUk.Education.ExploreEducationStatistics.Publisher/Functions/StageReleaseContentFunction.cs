@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         IncludingSeconds = CronExpressionHasSecondPrecision(publishStagedReleasesCronExpression)
                     }).GetNextOccurrence(DateTime.UtcNow);
                 await contentService.UpdateContentStaged(nextScheduledPublishingTime,
-                    message.Releases.Select(tuple => tuple.ReleaseVersionId).ToArray());
+                    message.ReleasePublishingKeys.Select(key => key.ReleaseVersionId).ToArray());
                 await UpdateContentStage(message, Scheduled);
             }
             catch (Exception e)
@@ -66,13 +66,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            foreach (var (releaseVersionId, releaseStatusId) in message.Releases)
-            {
-                await releasePublishingStatusService.UpdateContentStageAsync(releaseVersionId: releaseVersionId,
-                    releaseStatusId: releaseStatusId,
-                    stage,
-                    logMessage);
-            }
+            await message.ReleasePublishingKeys
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async key =>
+                    await releasePublishingStatusService.UpdateContentStage(key, stage, logMessage));
         }
     }
 }

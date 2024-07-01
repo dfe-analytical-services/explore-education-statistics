@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -135,12 +136,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         CreatedById = _userService.GetUserId()
                     };
 
+                    var releasePublishingKey = new ReleasePublishingKey(releaseVersionId, releaseStatus.Id);
+                    var immediate = request.PublishMethod == PublishMethod.Immediate;
+
                     return await
                         ValidateReleaseWithChecklist(releaseVersion)
                         .OnSuccess(() => RemoveUnusedImages(releaseVersion.Id))
                         .OnSuccess(() =>
                             SendEmailNotificationsAndInvites(request, releaseVersion)
-                            .OnSuccess(() => NotifyPublisher(releaseVersionId, request, oldStatus, releaseStatus))
+                            .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus, immediate))
                             .OnSuccessDo(async () =>
                             {
                                 _context.ReleaseVersions.Update(releaseVersion);
@@ -151,19 +155,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> NotifyPublisher(
-            Guid releaseVersionId,
+            ReleasePublishingKey releasePublishingKey,
             ReleaseStatusCreateRequest request,
             ReleaseApprovalStatus oldStatus,
-            ReleaseStatus releaseStatus)
+            bool immediate)
         {
             // Only need to inform Publisher if changing release approval status to or from Approved
             if (oldStatus == ReleaseApprovalStatus.Approved ||
                 request.ApprovalStatus == ReleaseApprovalStatus.Approved)
             {
-                return await _publishingService.ReleaseChanged(
-                    releaseVersionId,
-                    releaseStatus.Id,
-                    request.PublishMethod == PublishMethod.Immediate);
+                return await _publishingService.ReleaseChanged(releasePublishingKey, immediate);
             }
 
             return Unit.Instance;

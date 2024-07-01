@@ -19,11 +19,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -809,8 +809,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.ReleaseVersions.Add(releaseVersion);
                 context.Users.AddRange(existingUser1, existingUser2, existingUser3);
                 context.UserReleaseInvites.AddRange(
-                    existingUser1Invite, existingUser2SentInvite, existingUser3NonPreReleaseInvite,
-                    nonExistingUserPreReleaseInvite, nonExistingUserNonPreReleaseInvite);
+                    existingUser1Invite,
+                    existingUser2SentInvite,
+                    existingUser3NonPreReleaseInvite,
+                    nonExistingUserPreReleaseInvite,
+                    nonExistingUserNonPreReleaseInvite);
                 await context.SaveChangesAsync();
             }
 
@@ -828,9 +831,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == releaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    false
                 ))
                 .ReturnsAsync(Unit.Instance);
 
@@ -951,9 +953,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == releaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    true
                 ))
                 .ReturnsAsync(Unit.Instance);
 
@@ -1062,9 +1063,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == amendedReleaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == amendedReleaseVersion.Id),
+                    false
                 ))
                 .ReturnsAsync(Unit.Instance);
 
@@ -1306,11 +1306,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<HtmlBlock>());
 
             releaseFileService.Setup(mock =>
-                    mock.Delete(releaseVersion.Id, new List<Guid>
-                    {
-                        imageFile1.File.Id,
-                        imageFile2.File.Id
-                    }, false))
+                    mock.Delete(releaseVersion.Id,
+                        new List<Guid>
+                        {
+                            imageFile1.File.Id,
+                            imageFile2.File.Id
+                        },
+                        false))
                 .ReturnsAsync(Unit.Instance);
 
             userReleaseRoleService.Setup(mock =>
@@ -1524,9 +1526,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == releaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    false
                 ))
                 .ReturnsAsync(new BadRequestResult());
 
@@ -1955,36 +1956,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var (release, otherRelease) = _fixture
                     .DefaultRelease()
-                    .ForIndex(0, r => r.SetVersions(_fixture
-                        .DefaultReleaseVersion()
-                        .ForIndex(0, rv => rv
-                            .SetVersion(0)
-                            .SetReleaseStatuses(_fixture
+                    .ForIndex(0,
+                        r => r.SetVersions(_fixture
+                            .DefaultReleaseVersion()
+                            .ForIndex(0,
+                                rv => rv
+                                    .SetVersion(0)
+                                    .SetReleaseStatuses(_fixture
+                                        .DefaultReleaseStatus()
+                                        .WithCreatedBy(User)
+                                        .ForIndex(0,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-4)))
+                                        .ForIndex(1,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-3)))
+                                        .Generate(2)))
+                            .ForIndex(1,
+                                rv => rv
+                                    .SetVersion(1)
+                                    .SetReleaseStatuses(_fixture
+                                        .DefaultReleaseStatus()
+                                        .WithCreatedBy(User)
+                                        .ForIndex(0,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-2)))
+                                        .ForIndex(1,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-1)))
+                                        .Generate(2)))
+                            .Generate(2)))
+                    .ForIndex(1,
+                        r => r.SetVersions(_fixture
+                            .DefaultReleaseVersion()
+                            .WithReleaseStatuses(_fixture
                                 .DefaultReleaseStatus()
                                 .WithCreatedBy(User)
-                                .ForIndex(0, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-4)))
-                                .ForIndex(1, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-3)))
-                                .Generate(2)))
-                        .ForIndex(1, rv => rv
-                            .SetVersion(1)
-                            .SetReleaseStatuses(_fixture
-                                .DefaultReleaseStatus()
-                                .WithCreatedBy(User)
-                                .ForIndex(0, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-2)))
-                                .ForIndex(1, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-1)))
-                                .Generate(2)))
-                        .Generate(2)))
-                    .ForIndex(1, r => r.SetVersions(_fixture
-                        .DefaultReleaseVersion()
-                        .WithReleaseStatuses(_fixture
-                            .DefaultReleaseStatus()
-                            .WithCreatedBy(User)
-                            .Generate(1))
-                        .Generate(1)))
+                                .Generate(1))
+                            .Generate(1)))
                     .Generate(2)
                     .ToTuple2();
 

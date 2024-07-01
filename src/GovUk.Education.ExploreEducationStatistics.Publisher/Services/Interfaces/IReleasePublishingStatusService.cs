@@ -7,53 +7,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleasePublishingStatusService
     {
-        Task<ReleasePublishingStatus> CreateAsync(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+        Task<ReleasePublishingKey> Create(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null);
 
-        Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayWithStages(
+        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayOrInFutureWithStages(
+        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
+            IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(
+        Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages);
 
-        Task<ReleasePublishingStatus> GetAsync(Guid releaseVersionId,
-            Guid releaseStatusId);
+        Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey);
 
-        Task<ReleasePublishingStatus?> GetLatestAsync(Guid releaseVersionId);
+        Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId);
 
-        Task UpdateStateAsync(Guid releaseVersionId,
-            Guid releaseStatusId,
+        Task UpdateState(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state);
 
-        Task UpdateContentStageAsync(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+        Task UpdateContentStage(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
 
-        Task UpdateFilesStageAsync(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+        Task UpdateFilesStage(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
 
-        Task UpdatePublishingStageAsync(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+        Task UpdatePublishingStage(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
     }

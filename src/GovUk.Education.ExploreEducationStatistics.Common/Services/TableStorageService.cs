@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));
         }
 
-        public async Task<IEnumerable<TElement>> ExecuteQueryAsync<TElement>(string tableName,
+        public async Task<IReadOnlyList<TElement>> ExecuteQuery<TElement>(string tableName,
             TableQuery<TElement> query) where TElement : ITableEntity, new()
         {
             var results = new List<TElement>();

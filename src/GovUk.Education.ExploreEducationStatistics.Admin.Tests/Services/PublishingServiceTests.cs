@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -10,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
@@ -23,10 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RetryReleasePublishing()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = Approved
-            };
+            var releaseVersion = new ReleaseVersion { ApprovalStatus = Approved };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -54,7 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 storageQueueService.Verify(
                     mock => mock.AddMessageAsync(RetryReleasePublishingQueue,
                         It.Is<RetryReleasePublishingMessage>(message =>
-                            message.ReleaseVersionId == releaseVersion.Id)), Times.Once());
+                            message.ReleaseVersionId == releaseVersion.Id)),
+                    Times.Once());
 
                 result.AssertRight();
             }
@@ -84,10 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ReleaseChanged()
         {
             var releaseVersion = new ReleaseVersion();
-            var releaseStatus = new ReleaseStatus
-            {
-                ReleaseVersion = releaseVersion
-            };
+            var releaseStatus = new ReleaseStatus { ReleaseVersion = releaseVersion };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -100,12 +95,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
 
-            storageQueueService.Setup(
-                    mock => mock.AddMessageAsync(NotifyChangeQueue,
-                        It.Is<NotifyChangeMessage>(message =>
-                            message.ReleaseVersionId == releaseVersion.Id
-                            && message.ReleaseStatusId == releaseStatus.Id
-                            && message.Immediate)))
+            var releasePublishingKey = new ReleasePublishingKey(releaseVersion.Id, releaseStatus.Id);
+
+            var expectedMessage = new NotifyChangeMessage(true, releasePublishingKey);
+
+            storageQueueService.Setup(mock => mock.AddMessageAsync(NotifyChangeQueue, expectedMessage))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -113,15 +107,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publishingService = BuildPublishingService(contentDbContext: context,
                     storageQueueService: storageQueueService.Object);
 
-                var result = await publishingService
-                    .ReleaseChanged(releaseVersion.Id, releaseStatus.Id, true);
+                var result = await publishingService.ReleaseChanged(releasePublishingKey, immediate: true);
 
                 storageQueueService.Verify(
-                    mock => mock.AddMessageAsync(NotifyChangeQueue,
-                        It.Is<NotifyChangeMessage>(message =>
-                            message.ReleaseVersionId == releaseVersion.Id
-                            && message.ReleaseStatusId == releaseStatus.Id
-                            && message.Immediate)), Times.Once());
+                    mock => mock.AddMessageAsync(NotifyChangeQueue, expectedMessage),
+                    Times.Once());
 
                 result.AssertRight();
             }
@@ -139,8 +129,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publishingService = BuildPublishingService(contentDbContext: context,
                     storageQueueService: storageQueueService.Object);
 
-                var result = await publishingService
-                    .ReleaseChanged(Guid.NewGuid(), Guid.NewGuid(), true);
+                var result =
+                    await publishingService.ReleaseChanged(new ReleasePublishingKey(Guid.NewGuid(), Guid.NewGuid()),
+                        immediate: true);
 
                 result.AssertNotFound();
             }
@@ -180,7 +171,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 storageQueueService.Verify(
                     mock => mock.AddMessageAsync(PublishMethodologyFilesQueue,
                         It.Is<PublishMethodologyFilesMessage>(message =>
-                            message.MethodologyId == methodologyVersion.Id)), Times.Once());
+                            message.MethodologyId == methodologyVersion.Id)),
+                    Times.Once());
 
                 result.AssertRight();
             }
@@ -207,16 +199,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             VerifyAllMocks(storageQueueService);
         }
 
-        private static PublishingService BuildPublishingService(ContentDbContext contentDbContext,
-            IStorageQueueService storageQueueService = null,
-            IUserService userService = null,
-            ILogger<PublishingService> logger = null)
+        private static PublishingService BuildPublishingService(
+            ContentDbContext contentDbContext,
+            IStorageQueueService? storageQueueService = null,
+            IUserService? userService = null)
         {
             return new PublishingService(
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 storageQueueService ?? new Mock<IStorageQueueService>().Object,
                 userService ?? AlwaysTrueUserService().Object,
-                logger ?? new Mock<ILogger<PublishingService>>().Object);
+                new Mock<ILogger<PublishingService>>().Object);
         }
     }
 }
