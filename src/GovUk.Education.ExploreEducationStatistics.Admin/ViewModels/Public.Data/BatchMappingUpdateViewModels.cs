@@ -8,29 +8,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Dat
 // fluent validation
 public record BatchLocationMappingUpdatesRequest
 {
-    public List<LocationMappingUpdate> Updates { get; init; } = [];
+    public List<LocationMappingUpdateRequest> Updates { get; init; } = [];
 }
 
-public record LocationMappingUpdate
+public record LocationMappingUpdateRequest
 {
     public GeographicLevel Level { get; init; }
 
     public string SourceKey { get; init; } = string.Empty;
 
     // hierarchy of types to allow only valid combos to exist?
-    public string CandidateKey { get; init; } = string.Empty;
+    public string? CandidateKey { get; init; }
 
     public MappingType Type { get; init; } = MappingType.None;
 }
 
-public record BatchMappingUpdatesResponseViewModel
+public record LocationMappingUpdateResponse
 {
-    public Dictionary<string, LocationOptionMapping> Results { get; init; } = [];
+    public GeographicLevel Level { get; init; }
+
+    public string SourceKey { get; init; } = string.Empty;
+
+    public LocationOptionMapping Mapping { get; init; } = null!;
 }
 
-public record LocationMappingUpdateResult
+public record BatchLocationMappingUpdatesResponseViewModel
 {
-    public string CandidateKey { get; init; } = string.Empty;
-
-    public MappingType Type { get; init; } = MappingType.None;
+    public List<LocationMappingUpdateResponse> Updates { get; init; } = [];
 }
