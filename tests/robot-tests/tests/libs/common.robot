@@ -1014,3 +1014,18 @@ user takes html snapshot of element
 
 user waits for caches to expire
     sleep    %{WAIT_CACHE_EXPIRY}
+
+wait for dynamic options to be available in dropdown
+    [Arguments]  ${dropdown_locator}  ${option_text}  ${timeout}=30s
+    wait until keyword succeeds  ${timeout}  1s  option should be present in dropdown  ${dropdown_locator}  ${option_text}
+
+option should be present in dropdown
+    [Arguments]  ${dropdown_locator}  ${option_text}
+    ${options}=  get webelements  ${dropdown_locator} > option
+    ${matched}=  set variable  False
+
+    FOR  ${option}  IN  @{options}
+    ${text}=  get text  ${option}
+    run keyword if  '${text}' == '${option_text}'  Set Variable  ${matched}  True
+    should be true  ${matched}  Option ${option_text} not found in the dropdown
+    END

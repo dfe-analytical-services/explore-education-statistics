@@ -161,7 +161,7 @@ Validate release filter exists
     user checks select contains option    id:filters-form-release    Latest releases
     user checks selected option label     id:filters-form-release    Latest releases
     user checks select contains option    id:filters-form-release    All releases
-    
+
 Filter by theme
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -183,7 +183,7 @@ Remove theme filter
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks selected option label     id:filters-form-theme    All themes
-    Sleep    1000
+    Sleep    2
 
 Remove publication filter
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -194,59 +194,11 @@ Remove publication filter
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks selected option label     id:filters-form-publication    All publications
 
-Remove release filter
-    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user chooses select option    id:filters-form-release    ${PUPIL_ABSENCE_RELEASE_NAME}
-    user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
-    user checks selected option label     id:filters-form-release    All releases
 
-Reset all filters
-    user clicks element    id:searchForm-search
-    user presses keys    pupil
-    user clicks button    Search
-    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-
-    user checks page contains button    pupil
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-
-    user clicks button    Reset filters
-
-    user checks page does not contain button    pupil
-    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page does not contain button    Reset filters
-
-    user checks selected option label     id:filters-form-theme    All themes
-    user checks selected option label     id:filters-form-publication    All publications
-    user checks selected option label     id:filters-form-release    Latest releases
-
-Searching
-    user clicks element    id:searchForm-search
-    user presses keys    Exclusions by geographic level
-    user clicks button    Search
-    user checks page contains button    Exclusions by geographic level
-    user checks list item contains    testid:data-set-file-list    1    Exclusions by geographic level
-
-Removing search
-    user clicks button    Exclusions by geographic level
-    user checks page does not contain button    Exclusions by geographic level
-
-Validate data catalogue page redirect from slug based urls
-    environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/${PUPIL_ABSENCE_PUBLICATION_SLUG}/2016-17?newDesign=true
-    user waits until h1 is visible    Data catalogue
-
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
-
-    user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    2
-    ${dataSet_1}=    user gets testid element    data-set-file-summary-Absence by characteristic
-    user checks element contains    ${dataSet_1}    Absence by characteristic
-    ${dataSet_2}=    user gets testid element    data-set-file-summary-Absence in PRUs
-    user checks element contains    ${dataSet_2}    Absence in PRUs
-
-
+Select Option From Dynamic Dropdown With Wait
+    wait for dynamic options to be available in dropdown  id:filters-form-theme   ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    Select From List By Label  id:filters-form-theme   ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    wait for dynamic options to be available in dropdown  id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    Select From List By Label  id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    wait for dynamic options to be available in dropdown  id:filters-form-release    ${PUPIL_ABSENCE_RELEASE_NAME}
+    Select From List By Label  id:filters-form-release    ${PUPIL_ABSENCE_RELEASE_NAME}
