@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -82,9 +83,10 @@ public abstract class DataSetVersionMappingControllerTests(
                                         }
                                     },
                                     {
-                                        "source-location-2-key", new LocationOptionMapping
+                                        "source-location-2-key",
+                                        new LocationOptionMapping
                                         {
-                                            Source = new MappableLocationOption("Source location 2") 
+                                            Source = new MappableLocationOption("Source location 2")
                                             {
                                                 Code = "Source location 2 code"
                                             },
@@ -105,7 +107,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                         "source-location-1-key",
                                         new LocationOptionMapping
                                         {
-                                            Source = new MappableLocationOption("Source location 1") 
+                                            Source = new MappableLocationOption("Source location 1")
                                             {
                                                 Code = "Source location 1 code"
                                             },
@@ -117,7 +119,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                         "source-location-3-key",
                                         new LocationOptionMapping
                                         {
-                                            Source = new MappableLocationOption("Source location 3") 
+                                            Source = new MappableLocationOption("Source location 3")
                                             {
                                                 Code = "Source location 3 code"
                                             },
@@ -174,10 +176,8 @@ public abstract class DataSetVersionMappingControllerTests(
                         SourceKey = "source-location-1-key",
                         Mapping = new LocationOptionMapping
                         {
-                            Source = new MappableLocationOption("Source location 1") 
-                            {
-                                Code = "Source location 1 code"
-                            },
+                            Source =
+                                new MappableLocationOption("Source location 1") { Code = "Source location 1 code" },
                             Type = MappingType.ManualMapped,
                             CandidateKey = "target-location-1-key"
                         }
@@ -188,10 +188,8 @@ public abstract class DataSetVersionMappingControllerTests(
                         SourceKey = "source-location-3-key",
                         Mapping = new LocationOptionMapping
                         {
-                            Source = new MappableLocationOption("Source location 3") 
-                            {
-                                Code = "Source location 3 code"
-                            },
+                            Source =
+                                new MappableLocationOption("Source location 3") { Code = "Source location 3 code" },
                             Type = MappingType.ManualNone,
                             CandidateKey = null
                         }
@@ -217,9 +215,10 @@ public abstract class DataSetVersionMappingControllerTests(
                             // We expect this mapping's type ot be set to ManualMapped and
                             // its CandidateKey set.
                             {
-                                "source-location-1-key", new LocationOptionMapping
+                                "source-location-1-key",
+                                new LocationOptionMapping
                                 {
-                                    Source = new MappableLocationOption("Source location 1") 
+                                    Source = new MappableLocationOption("Source location 1")
                                     {
                                         Code = "Source location 1 code"
                                     },
@@ -228,9 +227,10 @@ public abstract class DataSetVersionMappingControllerTests(
                                 }
                             },
                             {
-                                "source-location-2-key", new LocationOptionMapping
+                                "source-location-2-key",
+                                new LocationOptionMapping
                                 {
-                                    Source = new MappableLocationOption("Source location 2") 
+                                    Source = new MappableLocationOption("Source location 2")
                                     {
                                         Code = "Source location 2 code"
                                     },
@@ -247,9 +247,10 @@ public abstract class DataSetVersionMappingControllerTests(
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
                             {
-                                "source-location-1-key", new LocationOptionMapping
+                                "source-location-1-key",
+                                new LocationOptionMapping
                                 {
-                                    Source = new MappableLocationOption("Source location 1") 
+                                    Source = new MappableLocationOption("Source location 1")
                                     {
                                         Code = "Source location 1 code"
                                     },
@@ -260,9 +261,10 @@ public abstract class DataSetVersionMappingControllerTests(
                             {
                                 // We expect this mapping's type to be set to ManualNone and
                                 // its CandidateKey unset.
-                                "source-location-3-key", new LocationOptionMapping
+                                "source-location-3-key",
+                                new LocationOptionMapping
                                 {
-                                    Source = new MappableLocationOption("Source location 3") 
+                                    Source = new MappableLocationOption("Source location 3")
                                     {
                                         Code = "Source location 3 code"
                                     },
@@ -280,6 +282,157 @@ public abstract class DataSetVersionMappingControllerTests(
             updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedFullMappings,
                 ignoreCollectionOrders: true);
+        }
+
+        [Fact]
+        public async Task MappingToUpdateDoesDoesNotExist_Return400_AndRollBackTransaction()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var mappings = new DataSetVersionMapping
+            {
+                SourceDataSetVersionId = currentDataSetVersion.Id,
+                TargetDataSetVersionId = nextDataSetVersion.Id,
+                LocationMappingPlan = new LocationMappingPlan
+                {
+                    Levels = new Dictionary<GeographicLevel, LocationLevelMappings>
+                    {
+                        {
+                            GeographicLevel.LocalAuthority,
+                            new LocationLevelMappings
+                            {
+                                Mappings = new Dictionary<string, LocationOptionMapping>
+                                {
+                                    {
+                                        "source-location-1-key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("Source location 1")
+                                            {
+                                                Code = "Source location 1 code"
+                                            },
+                                            Type = MappingType.None,
+                                            CandidateKey = null
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                FilterMappingPlan = new FilterMappingPlan()
+            };
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            List<LocationMappingUpdateRequest> updates =
+            [
+                // This mapping does not exist.
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "target-location-1-key"
+                },
+                // This mapping does not exist.
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-2-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "target-location-2-key"
+                },
+                // This mapping does not exist.
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-3-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "target-location-3-key"
+                }
+            ];
+
+            var response = await ApplyBatchMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                client);
+
+            var validationProblem = response.AssertValidationProblem();
+            
+            Assert.Equal(2, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasError(
+                expectedPath: "updates[1].sourceKey",
+                expectedCode: nameof(ValidationMessages.DataSetVersionMappingPathDoesNotExist));
+
+            validationProblem.AssertHasError(
+                expectedPath: "updates[2].sourceKey",
+                expectedCode: nameof(ValidationMessages.DataSetVersionMappingPathDoesNotExist));
+
+            var retrievedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Test that the mappings are not updated due to the failures of some of the update requests.
+            retrievedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+                mappings.LocationMappingPlan.Levels,
+                ignoreCollectionOrders: true);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await ApplyBatchMappingUpdates(
+                Guid.NewGuid(),
+                new List<LocationMappingUpdateRequest>(),
+                client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionMappingDoesNotExist_Returns404()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ApplyBatchMappingUpdates(
+                Guid.NewGuid(),
+                new List<LocationMappingUpdateRequest>(),
+                client);
+
+            response.AssertNotFound();
         }
 
         private async Task<HttpResponseMessage> ApplyBatchMappingUpdates(

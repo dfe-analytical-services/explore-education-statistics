@@ -9,4 +9,9 @@ public static class ValidationMessages
         Code: nameof(CannotDeleteApiDataSetReleaseFile),
         Message: "The file cannot be deleted as it is linked to an API data set."
     );
+
+    public static readonly LocalizableMessage DataSetVersionMappingPathDoesNotExist = new(
+        Code: nameof(DataSetVersionMappingPathDoesNotExist),
+        Message: "The data set mapping does not exist."
+    );
 }
