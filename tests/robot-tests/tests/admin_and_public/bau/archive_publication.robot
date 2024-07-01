@@ -68,7 +68,7 @@ Set archive-publication to be superseded by superseding-publication
 
     user waits until page contains element    id:publicationDetailsForm-supersede
 
-    user chooses select option    id:publicationDetailsForm-supersededById    ${PUBLICATION_NAME_SUPERSEDE}
+    user wait for option to be available and select it    id:publicationDetailsForm-supersededById    ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks button    Update publication details
     ${modal}=    user waits until modal is visible    Confirm publication changes
@@ -127,8 +127,8 @@ Generate permalink for archive-publication
 
     user waits until table tool wizard step is available    4    Choose time period
     user checks previous table tool step contains    3    Regional    North East
-    user chooses select option    id:timePeriodForm-start    2005
-    user chooses select option    id:timePeriodForm-end    2016
+    user wait for option to be available and select it     id:timePeriodForm-start    2005
+    user wait for option to be available and select it     id:timePeriodForm-end    2016
     user clicks element    id:timePeriodForm-submit
 
     user waits until table tool wizard step is available    5    Choose your filters
@@ -157,14 +157,13 @@ Generate permalink for archive-publication
 Check that archive-publication subject appears correctly on Data catalogue page
     user navigates to data catalogue page on public frontend
 
-    user chooses select option    id:filters-form-theme    %{TEST_THEME_NAME}
+    user wait for option to be available and select it     id:filters-form-theme    %{TEST_THEME_NAME}
     
     user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
     user checks select does not contain option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
-    sleep    1    #prevent intermittent failures ,where robot test suite trying to interact with 'release-filters' option before it fully got loaded
-    user chooses select option    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
+    user wait for option to be available and select it     id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user wait for option to be available and select it     id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}
     user checks element contains    testid:release-info    ${RELEASE_NAME_ARCHIVE}
@@ -250,13 +249,13 @@ Check public data tables page contains superseding-publication's subject
 Check data catalogue page contains archive and superseding publication subjects
     user navigates to data catalogue page on public frontend
 
-    user chooses select option    id:filters-form-theme    %{TEST_THEME_NAME}
+    user wait for option to be available and select it    id:filters-form-theme    %{TEST_THEME_NAME}
 
     user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
     user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
-    user chooses select option    id:filters-form-release    ${RELEASE_NAME_SUPERSEDE}
+    user wait for option to be available and select it    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
+    user wait for option to be available and select it    id:filters-form-release    ${RELEASE_NAME_SUPERSEDE}
 
     user checks page contains button    ${RELEASE_NAME_SUPERSEDE}
     user checks element contains    testid:release-info    ${RELEASE_NAME_SUPERSEDE}
@@ -264,8 +263,8 @@ Check data catalogue page contains archive and superseding publication subjects
     user checks element contains    testid:release-info    This is the latest data
     user waits until page contains    ${SUBJECT_NAME_SUPERSEDE}
 
-    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
-    user chooses select option    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
+    user wait for option to be available and select it   id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user wait for option to be available and select it    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}
     user checks element contains    testid:release-info    ${RELEASE_NAME_ARCHIVE}
@@ -302,7 +301,7 @@ Set archive-publication to be no longer be superseded
 
     user clicks button    Edit publication details
     user waits until page contains element    id:publicationDetailsForm-supersede
-    user chooses select option    id:publicationDetailsForm-supersededById    None selected
+    user wait for option to be available and select it   id:publicationDetailsForm-supersededById    None selected
     user clicks button    Update publication details
 
     ${modal}=    user waits until modal is visible    Confirm publication changes
@@ -366,13 +365,13 @@ Check data catalogue page is correct after archive-publication has been unarchiv
 
     user navigates to data catalogue page on public frontend
 
-    user chooses select option    id:filters-form-theme    %{TEST_THEME_NAME}
+    user wait for option to be available and select it    id:filters-form-theme    %{TEST_THEME_NAME}
 
     user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
     user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
-    user chooses select option    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
+    user wait for option to be available and select it   id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    user wait for option to be available and select it    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}
     user checks element contains    testid:release-info    ${RELEASE_NAME_ARCHIVE}
@@ -380,8 +379,8 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks element contains    testid:release-info    This is the latest data
     user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
 
-    user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
-    user chooses select option    id:filters-form-release    ${RELEASE_NAME_SUPERSEDE}
+    user wait for option to be available and select it    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
+    user wait for option to be available and select it    id:filters-form-release    ${RELEASE_NAME_SUPERSEDE}
 
     user checks page contains button    ${RELEASE_NAME_SUPERSEDE}
     user checks element contains    testid:release-info    ${RELEASE_NAME_SUPERSEDE}
