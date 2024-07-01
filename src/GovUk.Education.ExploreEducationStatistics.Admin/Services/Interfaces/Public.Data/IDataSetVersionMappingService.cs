@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 
 public interface IDataSetVersionMappingService
 {
-    Task<Either<ActionResult, BatchMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken = default);
