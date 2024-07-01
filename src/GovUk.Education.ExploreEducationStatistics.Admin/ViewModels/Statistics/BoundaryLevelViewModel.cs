@@ -1,14 +1,15 @@
+#nullable enable
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 
-public class BoundaryLevelViewModel
+public record BoundaryLevelViewModel
 {
-    public long Id { get; set; }
+    public required long Id { get; init; }
 
-    public string Level { get; set; }
+    public required string Level { get; init; }
 
-    public string Label { get; set; }
+    public required string Label { get; init; }
 
-    public DateTime Published { get; set; }
+    public required DateTime Published { get; init; }
 }

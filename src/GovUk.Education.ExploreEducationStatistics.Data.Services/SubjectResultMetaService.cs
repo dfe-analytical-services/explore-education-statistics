@@ -231,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             // TODO EES-3328 This could soon be irrelevant if boundary level is about to be removed from the query
             // but if not we should consider returning an error if this isn't found
-            var boundaryLevel = await _boundaryLevelRepository.Get(boundaryLevelId.Value);
+            var boundaryLevel = await _boundaryLevelRepository.GetBoundaryLevel(boundaryLevelId.Value);
             if (boundaryLevel == null)
             {
                 return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>();

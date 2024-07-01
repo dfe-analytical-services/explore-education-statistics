@@ -1,3 +1,4 @@
+#nullable enable
 using GeoJSON.Net.Feature;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using System;

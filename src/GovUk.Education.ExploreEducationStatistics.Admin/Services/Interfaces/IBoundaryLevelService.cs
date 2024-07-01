@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IBoundaryLevelService
 {
-    Task<List<BoundaryLevelViewModel>> Get();
+    Task<List<BoundaryLevelViewModel>> ListBoundaryLevels();
 
-    Task<BoundaryLevelViewModel> Get(long id);
+    Task<BoundaryLevelViewModel?> GetBoundaryLevel(long id);
 
-    Task UpdateLabel(
+    Task UpdateBoundaryLevel(
         long id,
         string label);
 }

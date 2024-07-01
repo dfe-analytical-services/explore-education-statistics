@@ -19,27 +19,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<BoundaryLevel>> Get()
+        public async Task<IEnumerable<BoundaryLevel>> ListBoundaryLevels()
         {
             return await _context.BoundaryLevel.ToListAsync();
         }
 
-        public Task<BoundaryLevel?> Get(long id)
+        public Task<BoundaryLevel?> GetBoundaryLevel(long id)
         {
-            return id == 0
-                ? throw new ArgumentNullException(nameof(id))
-                : _context.BoundaryLevel.SingleOrDefaultAsync(level => level.Id == id);
+            return _context.BoundaryLevel.SingleOrDefaultAsync(level => level.Id == id);
         }
 
-        public async Task Update(
+        public async Task UpdateBoundaryLevel(
             long id,
             string label)
         {
-            if (id == 0)
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
-
             var level = await _context.BoundaryLevel.FindAsync(id)
                 ?? throw new KeyNotFoundException();
 
@@ -54,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .OrderByDescending(level => level.Published);
         }
 
-        public async Task<BoundaryLevel> Create(
+        public async Task<BoundaryLevel> CreateBoundaryLevel(
             GeographicLevel level,
             string label,
             DateTime published)

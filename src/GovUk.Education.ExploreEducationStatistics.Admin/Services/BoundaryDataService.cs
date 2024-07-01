@@ -1,3 +1,4 @@
+#nullable enable
 using GeoJSON.Net.Feature;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -30,7 +31,7 @@ public class BoundaryDataService : IBoundaryDataService
         DateTime published,
         FeatureCollection featureCollection)
     {
-        var boundaryLevel = await _boundaryLevelRepository.Create(level, label, published);
+        var boundaryLevel = await _boundaryLevelRepository.CreateBoundaryLevel(level, label, published);
         var boundaryData = new List<BoundaryData>();
 
         foreach (var feature in featureCollection.Features)

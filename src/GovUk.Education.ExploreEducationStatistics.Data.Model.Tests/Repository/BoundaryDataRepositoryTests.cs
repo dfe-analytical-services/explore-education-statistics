@@ -1,10 +1,10 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -25,7 +25,7 @@ public sealed class BoundaryDataRepositoryTests : IDisposable
 
         _connection.Open();
         _context = new StatisticsDbContext(_contextOptions);
-        _context.Database.EnsureCreatedAsync();
+        _context.Database.EnsureCreated();
 
         _sut = new BoundaryDataRepository(_context);
     }

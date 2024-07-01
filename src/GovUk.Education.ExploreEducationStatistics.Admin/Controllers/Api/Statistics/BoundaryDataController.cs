@@ -1,4 +1,6 @@
+#nullable enable
 using GeoJSON.Net.Feature;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -17,50 +19,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 [Route("api")]
 [ApiController]
 [Authorize]
-public class BoundaryDataController : ControllerBase
+public class BoundaryDataController(
+    IBoundaryDataService boundaryDataService,
+    IBoundaryLevelService boundaryLevelService) : ControllerBase
 {
-    private readonly IBoundaryDataService _boundaryDataService;
-    private readonly IBoundaryLevelService _boundaryLevelService;
-
-    public BoundaryDataController(
-        IBoundaryDataService boundaryDataService,
-        IBoundaryLevelService boundaryLevelService)
-    {
-        _boundaryDataService = boundaryDataService;
-        _boundaryLevelService = boundaryLevelService;
-    }
-
     [HttpGet("boundary-data/levels")]
     public async Task<ActionResult<List<BoundaryLevelViewModel>>> GetBoundaryLevels()
     {
-        var levels = await _boundaryLevelService.Get();
+        var levels = await boundaryLevelService.ListBoundaryLevels();
 
         return Ok(levels);
     }
 
-    [HttpGet("boundary-data/levels/{id}")]
-    public async Task<ActionResult<List<BoundaryLevelViewModel>>> GetBoundaryLevel(long id)
+    [HttpGet("boundary-data/levels/{id:long}")]
+    public async Task<ActionResult<BoundaryLevelViewModel>> GetBoundaryLevel(long id)
     {
         if (id == 0)
         {
             return BadRequest("Id is required");
         }
 
-        var level = await _boundaryLevelService.Get(id);
+        var level = await boundaryLevelService.GetBoundaryLevel(id);
 
-        return Ok(level);
+        return level is null
+            ? NotFound()
+            : Ok(level);
     }
 
     [HttpPatch("boundary-data/levels")]
     public async Task<ActionResult> UpdateBoundaryLevel(BoundaryLevelUpdateRequest updateRequest)
     {
-        await _boundaryLevelService.UpdateLabel(updateRequest.Id, updateRequest.Label);
+        await boundaryLevelService.UpdateBoundaryLevel(updateRequest.Id, updateRequest.Label);
 
         return NoContent();
     }
 
     [HttpPost("boundary-data")]
-    public async Task<ActionResult> UploadBoundaryFile(
+    public async Task<ActionResult> CreateBoundaryLevel(
         [FromForm] GeographicLevel level,
         [FromForm] string label,
         IFormFile file,
@@ -71,7 +66,7 @@ public class BoundaryDataController : ControllerBase
             return BadRequest("Invalid file format. This function only accepts GeoJSON files");
         }
 
-        var existingLevels = await _boundaryLevelService.Get();
+        var existingLevels = await boundaryLevelService.ListBoundaryLevels();
         var existingLabels = existingLevels.Select(el => el.Label).ToList();
 
         if (existingLabels.Contains(label))
@@ -88,7 +83,12 @@ public class BoundaryDataController : ControllerBase
 
         var parsedGeoJson = JsonConvert.DeserializeObject<FeatureCollection>(fileContents, new JsonSerializerSettings { CheckAdditionalContent = false });
 
-        await _boundaryDataService.ProcessGeoJson(level, label, published, parsedGeoJson);
+        if (parsedGeoJson is null)
+        {
+            return BadRequest("Unable to deserialise GeoJSON file");
+        }
+
+        await boundaryDataService.ProcessGeoJson(level, label, published, parsedGeoJson);
 
         return NoContent();
     }

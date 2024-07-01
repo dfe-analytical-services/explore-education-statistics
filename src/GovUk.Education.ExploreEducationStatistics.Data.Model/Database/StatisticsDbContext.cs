@@ -157,27 +157,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureBoundaryData(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BoundaryData>()
-                .Property(boundaryData => boundaryData.Id)
-                .UseIdentityColumn();
-
-            modelBuilder.Entity<BoundaryData>()
                 .Property(boundaryData => boundaryData.Code)
-                .HasMaxLength(9)
-                .IsRequired();
+                .HasMaxLength(9);
 
             modelBuilder.Entity<BoundaryData>()
                 .Property(boundaryData => boundaryData.Name)
-                .HasMaxLength(100)
-                .IsRequired();
+                .HasMaxLength(100);
 
             modelBuilder.Entity<BoundaryData>()
                 .HasOne(boundaryData => boundaryData.BoundaryLevel)
-                .WithMany()
-                .IsRequired();
-
-            modelBuilder.Entity<BoundaryData>()
-                .Property(boundaryData => boundaryData.GeoJson)
-                .IsRequired();
+                .WithMany();
         }
 
         private void ConfigureBoundaryLevel(ModelBuilder modelBuilder)

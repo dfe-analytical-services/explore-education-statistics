@@ -1,5 +1,4 @@
 #nullable enable
-using Azure.Core;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -68,6 +67,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
@@ -86,7 +86,6 @@ using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
-using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using IContentMethodologyService =
     GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;

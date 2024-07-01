@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
@@ -34,7 +35,7 @@ public class BoundaryDataControllerTests
         };
 
         _boundaryLevelService
-            .Setup(bls => bls.Get())
+            .Setup(bls => bls.ListBoundaryLevels())
             .ReturnsAsync(boundaryLevels);
 
         // Act
@@ -61,7 +62,7 @@ public class BoundaryDataControllerTests
         var boundaryLevel = new BoundaryLevelViewModel { Id = 1, Level = "School", Label = "Test", Published = DateTime.UtcNow };
 
         _boundaryLevelService
-            .Setup(bls => bls.Get(1))
+            .Setup(bls => bls.GetBoundaryLevel(1))
             .ReturnsAsync(boundaryLevel);
 
         // Act
@@ -76,7 +77,7 @@ public class BoundaryDataControllerTests
     {
         // Arrange
         _boundaryLevelService
-            .Setup(bls => bls.UpdateLabel(1, "Test (updated)"))
+            .Setup(bls => bls.UpdateBoundaryLevel(1, "Test (updated)"))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -87,13 +88,13 @@ public class BoundaryDataControllerTests
     }
 
     [Fact]
-    public async Task UploadBoundaryFile_InvalidFileExtension_ReturnsBadRequest()
+    public async Task CreateBoundaryLevel_InvalidFileExtension_ReturnsBadRequest()
     {
         // Arrange
         var geoJsonFile = MockFormTestUtils.CreateFormFileMock("boundaries.json", "application/octet-stream").Object;
 
         // Act
-        var response = await _sut.UploadBoundaryFile(
+        var response = await _sut.CreateBoundaryLevel(
             GeographicLevel.School,
             "Boundary Data 1",
             geoJsonFile,

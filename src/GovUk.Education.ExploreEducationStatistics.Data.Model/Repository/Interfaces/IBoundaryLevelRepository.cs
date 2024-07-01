@@ -8,16 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface IBoundaryLevelRepository
     {
-        Task<IEnumerable<BoundaryLevel>> Get();
+        Task<IEnumerable<BoundaryLevel>> ListBoundaryLevels();
 
-        Task<BoundaryLevel?> Get(long id);
+        Task<BoundaryLevel?> GetBoundaryLevel(long id);
 
-        Task<BoundaryLevel> Create(
+        Task<BoundaryLevel> CreateBoundaryLevel(
             GeographicLevel level,
             string label,
             DateTime published);
 
-        Task Update(
+        Task UpdateBoundaryLevel(
             long id,
             string label);
 

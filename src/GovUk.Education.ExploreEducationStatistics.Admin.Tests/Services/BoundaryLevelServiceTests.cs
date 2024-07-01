@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -27,15 +28,15 @@ public class BoundaryLevelServiceTests
     }
 
     [Fact]
-    public async Task Get_ReturnsListOfViewModels()
+    public async Task ListBoundaryLevels_ReturnsListOfViewModels()
     {
         // Arrange
         _boundaryLevelRepository
-            .Setup(blr => blr.Get())
+            .Setup(blr => blr.ListBoundaryLevels())
             .ReturnsAsync(BoundaryLevels);
 
         // Act
-        var results = await _sut.Get();
+        var results = await _sut.ListBoundaryLevels();
 
         // Assert
         Assert.IsType<List<BoundaryLevelViewModel>>(results);
@@ -48,15 +49,15 @@ public class BoundaryLevelServiceTests
     }
 
     [Fact]
-    public async Task Get_Single_ReturnsViewModel()
+    public async Task GetBoundaryLevel_ReturnsViewModel()
     {
         // Arrange
         _boundaryLevelRepository
-            .Setup(blr => blr.Get(1))
+            .Setup(blr => blr.GetBoundaryLevel(1))
             .ReturnsAsync(BoundaryLevels[0]);
 
         // Act
-        var result = await _sut.Get(1);
+        var result = await _sut.GetBoundaryLevel(1);
 
         // Assert
         Assert.Equal(1, result.Id);
@@ -66,21 +67,14 @@ public class BoundaryLevelServiceTests
     }
 
     [Fact]
-    public async Task UpdateLabel_NoId_ThrowsArgumentNullException()
+    public async Task UpdateBoundaryLevel_NoLabel_ThrowsArgumentNullException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await _sut.UpdateLabel(default, ""));
-    }
-
-    [Fact]
-    public async Task UpdateLabel_NoLabel_ThrowsArgumentNullException()
-    {
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await _sut.UpdateLabel(1, ""));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await _sut.UpdateBoundaryLevel(1, ""));
     }
 
     //[Fact]
-    //public async Task UpdateLabel_ReturnsUpdatedItem()
+    //public async Task UpdateBoundaryLevel_ReturnsUpdatedItem()
     //{
     //    // Arrange
     //    _boundaryLevelRepository
@@ -90,6 +84,6 @@ public class BoundaryLevelServiceTests
     //        .Returns(Task.CompletedTask);
 
     //    // Act & Assert
-    //    await Assert.IsAssignableFrom<Task>(async () => await _sut.UpdateLabel(1, "Boundary Level 1 (UPDATED)")).;
+    //    await Assert.IsAssignableFrom<Task>(async () => await _sut.UpdateBoundaryLevel(1, "Boundary Level 1 (UPDATED)")).;
     //}
 }
