@@ -134,8 +134,11 @@ Generate permalink for archive-publication
     user waits until table tool wizard step is available    5    Choose your filters
     user checks previous table tool step contains    4    Time period    2005 to 2016
     user clicks element    id:filtersForm-submit
+    
+    user waits until page finishes loading    
+    
 
-    user waits until results table appears    %{WAIT_SMALL}
+    user waits until results table appears    %{WAIT_LONG}
     user waits until page contains button    Generate shareable link
 
     user clicks button    Generate shareable link
@@ -160,6 +163,7 @@ Check that archive-publication subject appears correctly on Data catalogue page
     user checks select does not contain option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
 
     user chooses select option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
+    sleep    1    #prevent intermittent failures ,where robot test suite trying to interact with 'release-filters' option before it fully got loaded
     user chooses select option    id:filters-form-release    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}

@@ -6,7 +6,6 @@ Library     file_operations.py
 Library     utilities.py
 Library     fail_fast.py
 Library     visual.py
-Library     urlparsing.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
