@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +31,7 @@ public class PublicDataDbContext : DbContext
 
         modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence);
 
-        // This JsonFragment is a DTO and not an entity.
+        // This JsonFragment is a DTO for extracting JSON fragments from JSONB columns and not an entity.
         modelBuilder.Entity<JsonFragment>().HasNoKey().ToView(null);
     }
 
@@ -68,9 +69,4 @@ public class PublicDataDbContext : DbContext
     public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
     
     public DbSet<JsonFragment> JsonFragments { get; init; } = null!;
-}
-
-public class JsonFragment
-{
-    public string JsonString { get; set; }
 }

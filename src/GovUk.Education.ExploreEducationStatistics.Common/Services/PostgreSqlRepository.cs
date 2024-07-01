@@ -1,13 +1,13 @@
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using NpgsqlTypes;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public class PostgreSqlRepository : IPostgreSqlRepository
 {

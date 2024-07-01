@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 public interface IPostgreSqlRepository
 {

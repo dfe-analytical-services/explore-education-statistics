@@ -49,6 +49,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -74,6 +75,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using Semver;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -116,10 +118,6 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admi
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
-using Microsoft.AspNetCore.Mvc;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
