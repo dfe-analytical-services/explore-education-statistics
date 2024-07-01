@@ -1,11 +1,11 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Npgsql;
+using NpgsqlTypes;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -36,10 +36,10 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             .SingleOrDefaultAsync(cancellationToken);
 
         return response is not null
-            ? JsonConvert.DeserializeObject<TResponse>(response.JsonString)
+            ? JsonSerializer.Deserialize<TResponse>(response.JsonString)
             : null;
     }
-    
+
 #pragma warning disable EF1002
     public async Task UpdateJsonbByPath<TDbContext, TValue, TRowId>(
         TDbContext context,
@@ -53,9 +53,12 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         where TDbContext : DbContext
     {
         var jsonPathParam = new NpgsqlParameter("jsonPath", jsonPathSegments);
-        var valueParam = new NpgsqlParameter("value", value);
         var rowIdParam = new NpgsqlParameter("rowId", rowId);
-
+        var valueParam = new NpgsqlParameter("value", NpgsqlDbType.Json)
+        {
+            Value = JsonSerializer.Serialize(value)
+        };
+        
         await context
             .Database
             .ExecuteSqlRawAsync(
