@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -32,44 +33,30 @@ public class DataSetVersionMappingService(
                 keySelector: update => ValueTask.FromResult(update.SourceKey),
                 elementSelector: async update =>
                 {
-                    // collapse into single command
-                    string[] baseJsonPathSegments =
-                    [
-                        "Levels",
-                        update.Level.ToString(),
-                        "Mappings",
-                        update.SourceKey
-                    ];
-
-                    var mapping = await postgreSqlRepository
-                        .GetJsonbFromPath<PublicDataDbContext, Guid, LocationOptionMapping>(
-                            context: publicDataDbContext,
-                            tableName: nameof(PublicDataDbContext.DataSetVersionMappings),
-                            idColumnName: "TargetDataSetVersionId",
-                            jsonColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
-                            rowId: nextDataSetVersionId,
-                            baseJsonPathSegments,
-                            cancellationToken);
-
-                    mapping.Type = update.Type;
-                    mapping.CandidateKey = update.CandidateKey;
-
-                    await postgreSqlRepository.UpdateJsonbByPath(
-                        context: publicDataDbContext,
-                        tableName: nameof(PublicDataDbContext.DataSetVersionMappings),
-                        idColumnName: "TargetDataSetVersionId",
-                        jsonColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
-                        rowId: nextDataSetVersionId,
-                        baseJsonPathSegments,
-                        mapping,
-                        cancellationToken);
-
-                    // Should this actually return the JSON fragment at the given JSON path?
-                    return new LocationMappingUpdateResult
+                    var updateJsonRequest = new JsonbPathRequest<Guid>
                     {
-                        CandidateKey = update.CandidateKey,
-                        Type = update.Type
+                        TableName = nameof(PublicDataDbContext.DataSetVersionMappings),
+                        IdColumnName = "TargetDataSetVersionId",
+                        JsonbColumnName = nameof(DataSetVersionMapping.LocationMappingPlan),
+                        RowId = nextDataSetVersionId,
+                        PathSegments =
+                        [
+                            "Levels",
+                            update.Level.ToString(),
+                            "Mappings",
+                            update.SourceKey
+                        ]
                     };
+                    
+                    return await postgreSqlRepository.UpdateJsonbByPath(
+                        publicDataDbContext,
+                        updateJsonRequest,
+                        (LocationOptionMapping mapping) =>
+                        {
+                            mapping.Type = update.Type;
+                            mapping.CandidateKey = update.CandidateKey;
+                        },
+                        cancellationToken);
                 },
                 cancellationToken);
 

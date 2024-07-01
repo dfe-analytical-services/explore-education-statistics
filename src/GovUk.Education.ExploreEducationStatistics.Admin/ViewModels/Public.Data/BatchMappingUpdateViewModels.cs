@@ -25,7 +25,7 @@ public record LocationMappingUpdate
 
 public record BatchMappingUpdatesResponseViewModel
 {
-    public Dictionary<string, LocationMappingUpdateResult> Results { get; init; } = [];
+    public Dictionary<string, LocationOptionMapping> Results { get; init; } = [];
 }
 
 public record LocationMappingUpdateResult
