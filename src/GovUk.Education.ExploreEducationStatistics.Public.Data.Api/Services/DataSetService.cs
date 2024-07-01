@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -71,9 +72,11 @@ internal class DataSetService(
         string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return await CheckVersionExists(
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .FindByVersion(
                 dataSetId: dataSetId,
-                dataSetVersion: dataSetVersion,
+                version: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(async dsv =>
@@ -196,24 +199,6 @@ internal class DataSetService(
         };
     }
 
-    private async Task<Either<ActionResult, DataSetVersion>> CheckVersionExists(
-        Guid dataSetId,
-        string dataSetVersion,
-        CancellationToken cancellationToken = default)
-    {
-        if (!VersionUtils.TryParse(dataSetVersion, out var version))
-        {
-            return new NotFoundResult();
-        }
-
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == version.Major)
-            .Where(dsv => dsv.VersionMinor == version.Minor)
-            .SingleOrNotFoundAsync(cancellationToken);
-    }
-
     private static DataSetLatestVersionViewModel MapLatestVersion(DataSetVersion latestVersion)
     {
         return new DataSetLatestVersionViewModel
@@ -291,10 +276,12 @@ internal class DataSetService(
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 
-        return await CheckVersionExists(
-            dataSetId: dataSetId,
-            dataSetVersion: dataSetVersion,
-            cancellationToken: cancellationToken);
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .FindByVersion(
+                dataSetId: dataSetId,
+                version: dataSetVersion,
+                cancellationToken: cancellationToken);
     }
 
     private async Task LoadMeta(
