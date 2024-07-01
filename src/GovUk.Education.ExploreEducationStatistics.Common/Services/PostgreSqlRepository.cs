@@ -1,6 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -13,24 +15,20 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 {
     public async Task<TResponse> GetJsonbFromPath<TDbContext, TRowId, TResponse>(
         TDbContext context,
-        string tableName,
-        string idColumnName,
-        string jsonColumnName,
-        TRowId rowId,
-        string[] jsonPathSegments,
+        JsonbPathRequest<TRowId> request,
         CancellationToken cancellationToken = default)
         where TDbContext : DbContext
         where TResponse : class
     {
-        var jsonPathParam = new NpgsqlParameter("jsonPath", jsonPathSegments);
-        var rowIdParam = new NpgsqlParameter("rowId", rowId);
+        var jsonPathParam = new NpgsqlParameter("jsonPath", request.PathSegments);
+        var rowIdParam = new NpgsqlParameter("rowId", request.RowId);
 
         var response = await context
             .Set<JsonFragment>()
             .FromSqlRaw(
                 sql: $"""
-                      SELECT "{jsonColumnName}"#>@jsonPath "JsonString" FROM "{tableName}"
-                      WHERE "{idColumnName}" = @rowId
+                      SELECT "{request.JsonbColumnName}"#>@jsonPath "JsonString" FROM "{request.TableName}"
+                      WHERE "{request.IdColumnName}" = @rowId
                       """,
                 parameters: [jsonPathParam, rowIdParam])
             .SingleOrDefaultAsync(cancellationToken);
@@ -43,17 +41,14 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 #pragma warning disable EF1002
     public async Task UpdateJsonbByPath<TDbContext, TValue, TRowId>(
         TDbContext context,
-        string tableName,
-        string idColumnName,
-        string jsonColumnName,
-        TRowId rowId,
-        string[] jsonPathSegments,
+        JsonbPathRequest<TRowId> request,
         TValue value,
         CancellationToken cancellationToken = default)
         where TDbContext : DbContext
+        where TValue : class
     {
-        var jsonPathParam = new NpgsqlParameter("jsonPath", jsonPathSegments);
-        var rowIdParam = new NpgsqlParameter("rowId", rowId);
+        var jsonPathParam = new NpgsqlParameter("jsonPath", request.PathSegments);
+        var rowIdParam = new NpgsqlParameter("rowId", request.RowId);
         var valueParam = new NpgsqlParameter("value", NpgsqlDbType.Json)
         {
             Value = JsonSerializer.Serialize(value)
@@ -63,12 +58,34 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             .Database
             .ExecuteSqlRawAsync(
                 sql: $"""
-                      UPDATE "{tableName}" SET "{jsonColumnName}" =
-                      jsonb_set("{jsonColumnName}", @jsonPath, to_jsonb(@value))
-                      WHERE "{idColumnName}" = @rowId
+                      UPDATE "{request.TableName}" SET "{request.JsonbColumnName}" =
+                      jsonb_set("{request.JsonbColumnName}", @jsonPath, to_jsonb(@value))
+                      WHERE "{request.IdColumnName}" = @rowId
                       """,
                 parameters: [jsonPathParam, valueParam, rowIdParam],
                 cancellationToken: cancellationToken);
+    }
+#pragma warning restore EF1002
+    
+#pragma warning disable EF1002
+    public async Task<TValue> UpdateJsonbByPath<TDbContext, TValue, TRowId>(
+        TDbContext context,
+        JsonbPathRequest<TRowId> request,
+        Action<TValue> updateValueAction,
+        CancellationToken cancellationToken = default)
+        where TDbContext : DbContext
+        where TValue : class
+    {
+        var json = await GetJsonbFromPath<TDbContext, TRowId, TValue>(
+            context,
+            request, 
+            cancellationToken);
+        
+        updateValueAction.Invoke(json);
+
+        await UpdateJsonbByPath(context, request, json, cancellationToken);
+
+        return json;
     }
 #pragma warning restore EF1002
 }
