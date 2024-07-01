@@ -18,7 +18,7 @@ public class DataSetVersionMappingService(
     PublicDataDbContext publicDataDbContext)
     : IDataSetVersionMappingService
 {
-    public async Task<Either<ActionResult, BatchMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    public async Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken = default)
@@ -29,37 +29,42 @@ public class DataSetVersionMappingService(
         var updateResults = await request
             .Updates
             .ToAsyncEnumerable()
-            .ToDictionaryAwaitAsync(
-                keySelector: update => ValueTask.FromResult(update.SourceKey),
-                elementSelector: async update =>
+            .SelectAwait(async updateRequest =>
+            {
+                var updateJsonRequest = new JsonbPathRequest<Guid>
                 {
-                    var updateJsonRequest = new JsonbPathRequest<Guid>
-                    {
-                        TableName = nameof(PublicDataDbContext.DataSetVersionMappings),
-                        IdColumnName = "TargetDataSetVersionId",
-                        JsonbColumnName = nameof(DataSetVersionMapping.LocationMappingPlan),
-                        RowId = nextDataSetVersionId,
-                        PathSegments =
-                        [
-                            "Levels",
-                            update.Level.ToString(),
-                            "Mappings",
-                            update.SourceKey
-                        ]
-                    };
-                    
-                    return await postgreSqlRepository.UpdateJsonbByPath(
-                        publicDataDbContext,
-                        updateJsonRequest,
-                        (LocationOptionMapping mapping) =>
-                        {
-                            mapping.Type = update.Type;
-                            mapping.CandidateKey = update.CandidateKey;
-                        },
-                        cancellationToken);
-                },
-                cancellationToken);
+                    TableName = nameof(PublicDataDbContext.DataSetVersionMappings),
+                    IdColumnName = "TargetDataSetVersionId",
+                    JsonbColumnName = nameof(DataSetVersionMapping.LocationMappingPlan),
+                    RowId = nextDataSetVersionId,
+                    PathSegments =
+                    [
+                        "Levels",
+                        updateRequest.Level.ToString(),
+                        "Mappings",
+                        updateRequest.SourceKey
+                    ]
+                };
 
-        return new BatchMappingUpdatesResponseViewModel { Results = updateResults };
+                var updatedMapping = await postgreSqlRepository.UpdateJsonbByPath(
+                    publicDataDbContext,
+                    updateJsonRequest,
+                    (LocationOptionMapping mapping) =>
+                    {
+                        mapping.Type = updateRequest.Type;
+                        mapping.CandidateKey = updateRequest.CandidateKey;
+                    },
+                    cancellationToken);
+
+                return new LocationMappingUpdateResponse
+                {
+                    Level = updateRequest.Level,
+                    SourceKey = updateRequest.SourceKey,
+                    Mapping = updatedMapping
+                };
+            })
+            .ToListAsync(cancellationToken);
+
+        return new BatchLocationMappingUpdatesResponseViewModel { Updates = updateResults };
     }
 }

@@ -73,6 +73,10 @@ public abstract class DataSetVersionMappingControllerTests(
                                         "source-location-1-key",
                                         new LocationOptionMapping
                                         {
+                                            Source = new MappableLocationOption("Source location 1")
+                                            {
+                                                Code = "Source location 1 code"
+                                            },
                                             Type = MappingType.None,
                                             CandidateKey = null
                                         }
@@ -80,6 +84,10 @@ public abstract class DataSetVersionMappingControllerTests(
                                     {
                                         "source-location-2-key", new LocationOptionMapping
                                         {
+                                            Source = new MappableLocationOption("Source location 2") 
+                                            {
+                                                Code = "Source location 2 code"
+                                            },
                                             Type = MappingType.None,
                                             CandidateKey = null
                                         }
@@ -97,8 +105,24 @@ public abstract class DataSetVersionMappingControllerTests(
                                         "source-location-1-key",
                                         new LocationOptionMapping
                                         {
+                                            Source = new MappableLocationOption("Source location 1") 
+                                            {
+                                                Code = "Source location 1 code"
+                                            },
                                             Type = MappingType.None,
                                             CandidateKey = null
+                                        }
+                                    },
+                                    {
+                                        "source-location-3-key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("Source location 3") 
+                                            {
+                                                Code = "Source location 3 code"
+                                            },
+                                            Type = MappingType.AutoMapped,
+                                            CandidateKey = "target-location-3-key"
                                         }
                                     }
                                 }
@@ -116,7 +140,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var client = BuildApp().CreateClient();
 
-            List<LocationMappingUpdate> updates =
+            List<LocationMappingUpdateRequest> updates =
             [
                 new()
                 {
@@ -124,6 +148,12 @@ public abstract class DataSetVersionMappingControllerTests(
                     SourceKey = "source-location-1-key",
                     Type = MappingType.ManualMapped,
                     CandidateKey = "target-location-1-key"
+                },
+                new()
+                {
+                    Level = GeographicLevel.Country,
+                    SourceKey = "source-location-3-key",
+                    Type = MappingType.ManualNone
                 }
             ];
 
@@ -132,25 +162,67 @@ public abstract class DataSetVersionMappingControllerTests(
                 updates: updates,
                 client);
 
-            // do something with thi  when returning JSON fragments
-            var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
+            var viewModel = response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
+
+            var expectedUpdateResponse = new BatchLocationMappingUpdatesResponseViewModel
+            {
+                Updates =
+                [
+                    new LocationMappingUpdateResponse
+                    {
+                        Level = GeographicLevel.LocalAuthority,
+                        SourceKey = "source-location-1-key",
+                        Mapping = new LocationOptionMapping
+                        {
+                            Source = new MappableLocationOption("Source location 1") 
+                            {
+                                Code = "Source location 1 code"
+                            },
+                            Type = MappingType.ManualMapped,
+                            CandidateKey = "target-location-1-key"
+                        }
+                    },
+                    new LocationMappingUpdateResponse
+                    {
+                        Level = GeographicLevel.Country,
+                        SourceKey = "source-location-3-key",
+                        Mapping = new LocationOptionMapping
+                        {
+                            Source = new MappableLocationOption("Source location 3") 
+                            {
+                                Code = "Source location 3 code"
+                            },
+                            Type = MappingType.ManualNone,
+                            CandidateKey = null
+                        }
+                    }
+                ]
+            };
+
+            // Test that the response from the Controller contains details of all the mappings
+            // that were updated.
+            viewModel.AssertDeepEqualTo(expectedUpdateResponse, ignoreCollectionOrders: true);
 
             var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            var expectedMappings = new Dictionary<GeographicLevel, LocationLevelMappings>
+            var expectedFullMappings = new Dictionary<GeographicLevel, LocationLevelMappings>
             {
                 {
-                    GeographicLevel.LocalAuthority,
-                    new LocationLevelMappings
+                    GeographicLevel.LocalAuthority, new LocationLevelMappings
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
+                            // We expect this mapping's type ot be set to ManualMapped and
+                            // its CandidateKey set.
                             {
-                                "source-location-1-key",
-                                new LocationOptionMapping
+                                "source-location-1-key", new LocationOptionMapping
                                 {
+                                    Source = new MappableLocationOption("Source location 1") 
+                                    {
+                                        Code = "Source location 1 code"
+                                    },
                                     Type = MappingType.ManualMapped,
                                     CandidateKey = "target-location-1-key"
                                 }
@@ -158,6 +230,10 @@ public abstract class DataSetVersionMappingControllerTests(
                             {
                                 "source-location-2-key", new LocationOptionMapping
                                 {
+                                    Source = new MappableLocationOption("Source location 2") 
+                                    {
+                                        Code = "Source location 2 code"
+                                    },
                                     Type = MappingType.None,
                                     CandidateKey = null
                                 }
@@ -166,15 +242,31 @@ public abstract class DataSetVersionMappingControllerTests(
                     }
                 },
                 {
-                    GeographicLevel.Country,
-                    new LocationLevelMappings
+                    GeographicLevel.Country, new LocationLevelMappings
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
                             {
                                 "source-location-1-key", new LocationOptionMapping
                                 {
+                                    Source = new MappableLocationOption("Source location 1") 
+                                    {
+                                        Code = "Source location 1 code"
+                                    },
                                     Type = MappingType.None,
+                                    CandidateKey = null
+                                }
+                            },
+                            {
+                                // We expect this mapping's type to be set to ManualNone and
+                                // its CandidateKey unset.
+                                "source-location-3-key", new LocationOptionMapping
+                                {
+                                    Source = new MappableLocationOption("Source location 3") 
+                                    {
+                                        Code = "Source location 3 code"
+                                    },
+                                    Type = MappingType.ManualNone,
                                     CandidateKey = null
                                 }
                             }
@@ -183,14 +275,16 @@ public abstract class DataSetVersionMappingControllerTests(
                 }
             };
 
+            // Test that the updated mappings retrieved from the database reflect the updates
+            // that were requested. 
             updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
-                expectedMappings,
+                expectedFullMappings,
                 ignoreCollectionOrders: true);
         }
 
         private async Task<HttpResponseMessage> ApplyBatchMappingUpdates(
             Guid nextDataSetVersionId,
-            List<LocationMappingUpdate> updates,
+            List<LocationMappingUpdateRequest> updates,
             HttpClient? client = null)
         {
             client ??= BuildApp().CreateClient();
