@@ -36,13 +36,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var publishedReleaseVersionIds =
-                await PublishScheduledReleases((await QueryScheduledReleasesForToday()).ToArray());
+            var scheduled = await QueryScheduledReleasesForToday();
+
+            await PublishScheduledReleases(scheduled);
 
             logger.LogInformation(
                 "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
                 context.FunctionDefinition.Name,
-                publishedReleaseVersionIds.JoinToString(','));
+                scheduled.Select(key => key.ReleaseVersionId).JoinToString(','));
         }
 
         /// <summary>
@@ -61,8 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [Function("PublishStagedReleaseVersionContentImmediately")]
         public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
-            HttpRequest request,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
@@ -70,11 +70,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
             var scheduled = releaseVersionIds?.Length > 0
-                ? (await QueryScheduledReleasesForTodayOrFuture())
-                .Where(releaseStatus => releaseVersionIds.Contains(releaseStatus.ReleaseVersionId))
+                ? await QueryScheduledReleasesForTodayOrFuture(releaseVersionIds)
                 : await QueryScheduledReleasesForToday();
 
-            var publishedReleaseVersionIds = await PublishScheduledReleases(scheduled.ToArray());
+            await PublishScheduledReleases(scheduled);
+
+            var publishedReleaseVersionIds = scheduled.Select(key => key.ReleaseVersionId).ToArray();
 
             logger.LogInformation("{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
                 context.FunctionDefinition.Name,
@@ -83,30 +84,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new ManualTriggerResponse(publishedReleaseVersionIds);
         }
 
-        private async Task<Guid[]> PublishScheduledReleases(ReleasePublishingStatus[] scheduled)
+        private async Task PublishScheduledReleases(IReadOnlyList<ReleasePublishingKey> scheduled)
         {
             if (!scheduled.Any())
             {
-                return Array.Empty<Guid>();
+                return;
             }
 
             await publishingService.PublishStagedReleaseContent();
 
             await scheduled
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async message =>
-                    await UpdateContentStage(message, ReleasePublishingStatusContentStage.Complete));
+                .ForEachAwaitAsync(async key =>
+                    await releasePublishingStatusService.UpdateContentStage(key,
+                        ReleasePublishingStatusContentStage.Complete));
 
             // Finalise publishing of these releases
-            await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                scheduled.Select(status => (status.ReleaseVersionId, ReleaseStatusId: status.Id)));
-
-            return scheduled
-                .Select(releaseStatus => releaseStatus.ReleaseVersionId)
-                .ToArray();
+            await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(scheduled);
         }
 
-        private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleasesForToday()
+        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForToday()
         {
             return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 content: ReleasePublishingStatusContentStage.Scheduled,
@@ -114,24 +111,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
         }
 
-        private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleasesForTodayOrFuture()
+        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForTodayOrFuture(
+            IReadOnlyList<Guid> releaseVersionIds)
         {
             return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
+                releaseVersionIds,
                 content: ReleasePublishingStatusContentStage.Scheduled,
                 files: ReleasePublishingStatusFilesStage.Complete,
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
-        }
-
-        private async Task UpdateContentStage(
-            ReleasePublishingStatus status,
-            ReleasePublishingStatusContentStage stage,
-            ReleasePublishingStatusLogMessage? logMessage = null)
-        {
-            await releasePublishingStatusService.UpdateContentStageAsync(
-                releaseVersionId: status.ReleaseVersionId,
-                releaseStatusId: status.Id,
-                stage,
-                logMessage);
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

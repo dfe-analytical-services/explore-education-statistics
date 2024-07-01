@@ -9,11 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
@@ -23,7 +21,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using ReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -68,14 +67,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
+                                Publication = new Publication { Id = Guid.NewGuid() },
                                 ApprovalStatus = status
                             };
 
-                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
@@ -137,10 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
+                                Publication = new Publication { Id = Guid.NewGuid() },
                                 ApprovalStatus = status
                             };
 
@@ -169,7 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     releaseVersion,
-                                    Owner, Approver
+                                    Owner,
+                                    Approver
                                 );
                             }
                             else
@@ -259,14 +253,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
+                                Publication = new Publication { Id = Guid.NewGuid() },
                                 ApprovalStatus = status
                             };
 
-                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
@@ -328,14 +319,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
+                                Publication = new Publication { Id = Guid.NewGuid() },
                                 ApprovalStatus = status
                             };
 
-                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
@@ -450,14 +438,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
+                                Publication = new Publication { Id = Guid.NewGuid() },
                                 ApprovalStatus = status
                             };
 
-                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
@@ -496,14 +481,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
+                                Publication = new Publication { Id = Guid.NewGuid() },
                                 ApprovalStatus = status
                             };
 
-                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
@@ -574,14 +556,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
-                            Publication = new Publication
-                            {
-                                Id = Guid.NewGuid()
-                            },
+                            Publication = new Publication { Id = Guid.NewGuid() },
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+
+                        releaseStatusRepository.Setup(
+                                s => s.GetAllByOverallStage(
+                                    releaseVersion.Id,
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
+                                )
+                            )
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that users with the specified claims can update the
                         // Release status if it has not started publishing
@@ -614,14 +602,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
-                            Publication = new Publication
-                            {
-                                Id = Guid.NewGuid()
-                            },
+                            Publication = new Publication { Id = Guid.NewGuid() },
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
@@ -631,10 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 )
                             )
                             .ReturnsAsync(
-                                new List<ReleasePublishingStatus>
-                                {
-                                    new ReleasePublishingStatus()
-                                }
+                                new List<ReleasePublishingStatus> { new() }
                             );
 
                         // Assert that no users can update a Release status once it has started publishing
@@ -666,15 +648,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
-                            Publication = new Publication
-                            {
-                                Id = Guid.NewGuid()
-                            },
+                            Publication = new Publication { Id = Guid.NewGuid() },
                             ApprovalStatus = status,
                             Published = DateTime.Now
                         };
 
-                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
@@ -714,14 +693,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
-                            Publication = new Publication
-                            {
-                                Id = Guid.NewGuid()
-                            },
+                            Publication = new Publication { Id = Guid.NewGuid() },
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
@@ -731,10 +707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 )
                             )
                             .ReturnsAsync(
-                                new List<ReleasePublishingStatus>
-                                {
-                                    new ReleasePublishingStatus()
-                                }
+                                new List<ReleasePublishingStatus> { new() }
                             );
 
                         // Assert that no user release roles allow updating a Release status once it has started publishing
@@ -779,15 +752,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
-                            Publication = new Publication
-                            {
-                                Id = Guid.NewGuid()
-                            },
+                            Publication = new Publication { Id = Guid.NewGuid() },
                             ApprovalStatus = status,
                             Published = DateTime.Now,
                         };
 
-                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
