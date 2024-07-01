@@ -415,7 +415,7 @@ internal class DataSetService(
     private static LocationGroupOptionsViewModel MapLocationGroupOptions(LocationMeta locationMeta)
     {
         var options = locationMeta.Options
-            .Select(MapLocationOption)
+            .Select(LocationOptionViewModel.Create)
             .OrderBy(lom => lom.Label)
             .ToList();
 
@@ -424,45 +424,6 @@ internal class DataSetService(
             Level = locationMeta.Level,
             Label = locationMeta.Level.GetEnumLabel(),
             Options = options,
-        };
-    }
-
-    private static LocationOptionViewModel MapLocationOption(LocationOptionMeta locationOptionMeta)
-    {
-        return locationOptionMeta switch
-        {
-            LocationCodedOptionMeta codedOption => new LocationCodedOptionViewModel
-            {
-                Id = codedOption.PublicId,
-                Label = codedOption.Label,
-                Code = codedOption.Code,
-            },
-            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionViewModel
-            {
-                Id = localAuthorityOption.PublicId,
-                Label = localAuthorityOption.Label,
-                Code = localAuthorityOption.Code,
-                OldCode = localAuthorityOption.OldCode,
-            },
-            LocationProviderOptionMeta providerOption => new LocationProviderOptionViewModel
-            {
-                Id = providerOption.PublicId,
-                Label = providerOption.Label,
-                Ukprn = providerOption.Ukprn,
-            },
-            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionViewModel
-            {
-                Id = rscRegionOption.PublicId,
-                Label = rscRegionOption.Label,
-            },
-            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionViewModel
-            {
-                Id = schoolOption.PublicId,
-                Label = schoolOption.Label,
-                Urn = schoolOption.Urn,
-                LaEstab = schoolOption.LaEstab,
-            },
-            _ => throw new NotImplementedException()
         };
     }
 

@@ -18,6 +18,45 @@ public abstract record LocationOptionViewModel
     /// The human-readable label of the location.
     /// </summary>
     public required string Label { get; init; }
+
+    public static LocationOptionViewModel Create(LocationOptionMeta optionMeta)
+    {
+        return optionMeta switch
+        {
+            LocationCodedOptionMeta codedOption => new LocationCodedOptionViewModel
+            {
+                Id = codedOption.PublicId,
+                Label = codedOption.Label,
+                Code = codedOption.Code,
+            },
+            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionViewModel
+            {
+                Id = localAuthorityOption.PublicId,
+                Label = localAuthorityOption.Label,
+                Code = localAuthorityOption.Code,
+                OldCode = localAuthorityOption.OldCode,
+            },
+            LocationProviderOptionMeta providerOption => new LocationProviderOptionViewModel
+            {
+                Id = providerOption.PublicId,
+                Label = providerOption.Label,
+                Ukprn = providerOption.Ukprn,
+            },
+            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionViewModel
+            {
+                Id = rscRegionOption.PublicId,
+                Label = rscRegionOption.Label,
+            },
+            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionViewModel
+            {
+                Id = schoolOption.PublicId,
+                Label = schoolOption.Label,
+                Urn = schoolOption.Urn,
+                LaEstab = schoolOption.LaEstab,
+            },
+            _ => throw new NotImplementedException()
+        };
+    }
 }
 
 /// <summary>
