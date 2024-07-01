@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public class PostgreSqlRepository : IPostgreSqlRepository
 {
-    public async Task<TResponse> GetJsonbFromPath<TDbContext, TRowId, TResponse>(
+    public async Task<TResponse?> GetJsonbFromPath<TDbContext, TRowId, TResponse>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         CancellationToken cancellationToken = default)
@@ -34,15 +35,16 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             .SingleOrDefaultAsync(cancellationToken);
 
         return response is not null
+               && response.JsonString is not null
             ? JsonSerializer.Deserialize<TResponse>(response.JsonString)
             : null;
     }
 
 #pragma warning disable EF1002
-    public async Task UpdateJsonbByPath<TDbContext, TValue, TRowId>(
+    public async Task<TValue?> UpdateJsonbByPath<TDbContext, TValue, TRowId>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
-        TValue value,
+        TValue? value,
         CancellationToken cancellationToken = default)
         where TDbContext : DbContext
         where TValue : class
@@ -51,9 +53,11 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         var rowIdParam = new NpgsqlParameter("rowId", request.RowId);
         var valueParam = new NpgsqlParameter("value", NpgsqlDbType.Json)
         {
-            Value = JsonSerializer.Serialize(value)
+            Value = value is not null
+                ? JsonSerializer.Serialize(value)
+                : null
         };
-        
+
         await context
             .Database
             .ExecuteSqlRawAsync(
@@ -64,28 +68,32 @@ public class PostgreSqlRepository : IPostgreSqlRepository
                       """,
                 parameters: [jsonPathParam, valueParam, rowIdParam],
                 cancellationToken: cancellationToken);
+
+        return value;
     }
+
 #pragma warning restore EF1002
-    
-#pragma warning disable EF1002
-    public async Task<TValue> UpdateJsonbByPath<TDbContext, TValue, TRowId>(
+
+    public async Task<Either<TFailure, TValue?>> UpdateJsonbByPath<TDbContext, TValue, TRowId, TFailure>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
-        Action<TValue> updateValueAction,
+        Func<TValue?, Either<TFailure, TValue?>> updateValueFn,
         CancellationToken cancellationToken = default)
         where TDbContext : DbContext
         where TValue : class
     {
         var json = await GetJsonbFromPath<TDbContext, TRowId, TValue>(
             context,
-            request, 
+            request,
             cancellationToken);
-        
-        updateValueAction.Invoke(json);
 
-        await UpdateJsonbByPath(context, request, json, cancellationToken);
+        var jsonUpdateResult = updateValueFn.Invoke(json);
 
-        return json;
+        if (jsonUpdateResult.IsLeft)
+        {
+            return jsonUpdateResult;
+        }
+
+        return await UpdateJsonbByPath(context, request, jsonUpdateResult.Right, cancellationToken);
     }
-#pragma warning restore EF1002
 }

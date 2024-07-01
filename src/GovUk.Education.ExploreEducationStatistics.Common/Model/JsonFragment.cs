@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,4 +11,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 /// modelBuilder.Entity&lt;JsonFragment&gt;().HasNoKey().ToView(null);
 /// </code>
 /// </summary>
-public record JsonFragment(string JsonString);
+public record JsonFragment(string? JsonString);
