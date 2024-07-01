@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -22,7 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publishingService = new Mock<IPublishingService>(Strict);
 
-            publishingService.Setup(s => s.TaxonomyChanged())
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -160,10 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Old title",
                 Slug = "old-title",
-                Theme = new Theme
-                {
-                    Title = "Old theme"
-                }
+                Theme = new Theme { Title = "Old theme" }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -178,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publishingService = new Mock<IPublishingService>(Strict);
 
-            publishingService.Setup(s => s.TaxonomyChanged())
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -219,10 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Old title",
                 Slug = "old-title",
-                Theme = new Theme
-                {
-                    Title = "Old theme"
-                }
+                Theme = new Theme { Title = "Old theme" }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -305,10 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test topic",
                 Slug = "test-topic",
-                Theme = new Theme
-                {
-                    Title = "Test theme"
-                }
+                Theme = new Theme { Title = "Test theme" }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -443,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.DeleteMethodology(methodology.Id, true))
                     .ReturnsAsync(Unit.Instance);
 
-                publishingService.Setup(s => s.TaxonomyChanged())
+                publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
                 cacheService
@@ -505,14 +496,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Id = releaseVersion2Id,
                         PreviousVersionId = releaseVersion1Id
                     },
+                    new ReleaseVersion { Id = releaseVersion1Id },
                     new ReleaseVersion
-                    {
-                        Id = releaseVersion1Id
-                    }, new ReleaseVersion
                     {
                         Id = releaseVersion4Id,
                         PreviousVersionId = releaseVersion3Id
-                    }, new ReleaseVersion
+                    },
+                    new ReleaseVersion
                     {
                         Id = releaseVersion3Id,
                         PreviousVersionId = releaseVersion2Id
@@ -612,7 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                         .Returns(Task.CompletedTask));
 
-                publishingService.Setup(s => s.TaxonomyChanged())
+                publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
                 releasePublishingStatusRepository.Setup(mock =>
@@ -654,10 +644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = publicationId,
                 Topic = topic,
-                ReleaseVersions = AsList(new ReleaseVersion
-                {
-                    Id = releaseVersionId
-                })
+                ReleaseVersions = AsList(new ReleaseVersion { Id = releaseVersionId })
             };
 
             var statsReleaseVersion = new Data.Model.ReleaseVersion
@@ -716,10 +703,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = publicationId,
                 Topic = topic,
-                ReleaseVersions = AsList(new ReleaseVersion
-                {
-                    Id = releaseVersionId
-                })
+                ReleaseVersions = AsList(new ReleaseVersion { Id = releaseVersionId })
             };
 
             var statsReleaseVersion = new Data.Model.ReleaseVersion
@@ -916,7 +900,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.DeleteMethodology(methodology.Id, true))
                     .ReturnsAsync(Unit.Instance);
 
-                publishingService.Setup(s => s.TaxonomyChanged())
+                publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
                 cacheService

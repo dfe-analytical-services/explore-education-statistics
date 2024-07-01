@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -16,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -28,15 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseVersion = new ReleaseVersion();
 
-            var file = new File
-            {
-                Type = FileType.Data
-            };
+            var file = new File { Type = FileType.Data };
 
-            var import = new DataImport
-            {
-                File = file
-            };
+            var import = new DataImport { File = file };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -51,9 +45,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var dataProcessorQueueServiceClient = new Mock<IDataProcessorQueueServiceClient>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var userService = new Mock<IUserService>(Strict);
-            var queueService = new Mock<IStorageQueueService>(Strict);
+
+            dataProcessorQueueServiceClient
+                .Setup(s => s.SendMessageAsJson(ProcessorQueues.ImportsCancellingQueue,
+                    new CancelImportMessage(import.Id),
+                    CancellationToken.None))
+                .Returns(Task.CompletedTask);
 
             releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id,
                     file.Id,
@@ -65,22 +65,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     SecurityPolicies.CanCancelOngoingImports))
                 .ReturnsAsync(true);
 
-            queueService
-                .Setup(s => s.AddMessageAsync(ImportsCancellingQueue,
-                    It.Is<CancelImportMessage>(m => m.Id == import.Id)))
-                .Returns(Task.CompletedTask);
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
                     releaseFileService: releaseFileService.Object,
-                    queueService: queueService.Object,
+                    dataProcessorQueueServiceClient: dataProcessorQueueServiceClient.Object,
                     userService: userService.Object);
 
                 var result = await service.CancelImport(releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                MockUtils.VerifyAllMocks(releaseFileService, userService, queueService);
+                MockUtils.VerifyAllMocks(releaseFileService, userService, dataProcessorQueueServiceClient);
 
                 result.AssertRight();
             }
@@ -91,15 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseVersion = new ReleaseVersion();
 
-            var file = new File
-            {
-                Type = FileType.Data
-            };
+            var file = new File { Type = FileType.Data };
 
-            var import = new DataImport
-            {
-                File = file
-            };
+            var import = new DataImport { File = file };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -116,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var userService = new Mock<IUserService>(Strict);
-            var queueService = new Mock<IStorageQueueService>(Strict);
 
             releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id,
                     file.Id,
@@ -132,13 +120,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
                     releaseFileService: releaseFileService.Object,
-                    queueService: queueService.Object,
                     userService: userService.Object);
 
                 var result = await service.CancelImport(releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                MockUtils.VerifyAllMocks(releaseFileService, userService, queueService);
+                MockUtils.VerifyAllMocks(releaseFileService, userService);
 
                 result.AssertForbidden();
             }
@@ -150,10 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion1 = new ReleaseVersion();
             var releaseVersion2 = new ReleaseVersion();
 
-            var release2File1 = new File
-            {
-                Type = FileType.Data
-            };
+            var release2File1 = new File { Type = FileType.Data };
 
             // Incomplete imports for other Releases should be ignored
 
@@ -192,20 +176,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release1 = new ReleaseVersion();
             var release2 = new ReleaseVersion();
 
-            var release1File1 = new File
-            {
-                Type = FileType.Data
-            };
+            var release1File1 = new File { Type = FileType.Data };
 
-            var release1File2 = new File
-            {
-                Type = FileType.Data
-            };
+            var release1File2 = new File { Type = FileType.Data };
 
-            var release2File1 = new File
-            {
-                Type = FileType.Data
-            };
+            var release2File1 = new File { Type = FileType.Data };
 
             var release1Import1 = new DataImport
             {
@@ -265,15 +240,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseVersion = new ReleaseVersion();
 
-            var file1 = new File
-            {
-                Type = FileType.Data
-            };
+            var file1 = new File { Type = FileType.Data };
 
-            var file2 = new File
-            {
-                Type = FileType.Data
-            };
+            var file2 = new File { Type = FileType.Data };
 
             var import1 = new DataImport
             {
@@ -341,19 +310,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.Files.AddRangeAsync(dataFile, metaFile);
             }
 
-            var queueService = new Mock<IStorageQueueService>(Strict);
+            var dataProcessorQueueServiceClient = new Mock<IDataProcessorQueueServiceClient>(Strict);
 
-            queueService.Setup(mock => mock.AddMessageAsync(ImportsPendingQueue, It.IsAny<ImportMessage>()))
+            dataProcessorQueueServiceClient.Setup(mock => mock.SendMessageAsJson(ProcessorQueues.ImportsPendingQueue,
+                    It.IsAny<ImportMessage>(),
+                    CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
-                    queueService: queueService.Object);
+                    dataProcessorQueueServiceClient: dataProcessorQueueServiceClient.Object);
 
                 var result = await service.Import(subjectId, dataFile, metaFile);
 
-                MockUtils.VerifyAllMocks(queueService);
+                MockUtils.VerifyAllMocks(dataProcessorQueueServiceClient);
 
                 Assert.Equal(dataFile.Id, result.FileId);
                 Assert.Equal(metaFile.Id, result.MetaFileId);
@@ -366,15 +337,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static DataImportService BuildDataImportService(
             ContentDbContext contentDbContext,
             IDataImportRepository? dataImportRepository = null,
+            IDataProcessorQueueServiceClient? dataProcessorQueueServiceClient = null,
             IReleaseFileService? releaseFileService = null,
-            IStorageQueueService? queueService = null,
             IUserService? userService = null)
         {
             return new DataImportService(
                 contentDbContext,
                 dataImportRepository ?? new DataImportRepository(contentDbContext),
-                releaseFileService ?? new Mock<IReleaseFileService>(Strict).Object,
-                queueService ?? new Mock<IStorageQueueService>(Strict).Object,
+                dataProcessorQueueServiceClient ?? Mock.Of<IDataProcessorQueueServiceClient>(Strict),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService().Object);
         }
     }

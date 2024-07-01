@@ -1,29 +1,32 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublishingServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task RetryReleasePublishing()
         {
-            var releaseVersion = new ReleaseVersion { ApprovalStatus = Approved };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -33,110 +36,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            var publisherQueueServiceClient = new Mock<IPublisherQueueServiceClient>(MockBehavior.Strict);
 
-            storageQueueService.Setup(
-                    mock => mock.AddMessageAsync(RetryReleasePublishingQueue,
-                        It.Is<RetryReleasePublishingMessage>(message =>
-                            message.ReleaseVersionId == releaseVersion.Id)))
+            publisherQueueServiceClient.Setup(
+                    mock => mock.SendMessageAsJson(
+                        PublisherQueues.RetryReleasePublishingQueue,
+                        new RetryReleasePublishingMessage(releaseVersion.Id),
+                        CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
+                    publisherQueueServiceClient: publisherQueueServiceClient.Object);
 
                 var result = await publishingService.RetryReleasePublishing(releaseVersion.Id);
 
-                storageQueueService.Verify(
-                    mock => mock.AddMessageAsync(RetryReleasePublishingQueue,
-                        It.Is<RetryReleasePublishingMessage>(message =>
-                            message.ReleaseVersionId == releaseVersion.Id)),
+                publisherQueueServiceClient.Verify(
+                    mock => mock.SendMessageAsJson(
+                        PublisherQueues.RetryReleasePublishingQueue,
+                        new RetryReleasePublishingMessage(releaseVersion.Id),
+                        CancellationToken.None),
                     Times.Once());
 
                 result.AssertRight();
             }
 
-            VerifyAllMocks(storageQueueService);
+            VerifyAllMocks(publisherQueueServiceClient);
         }
 
         [Fact]
         public async Task RetryReleasePublishing_ReleaseNotFound()
         {
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            await using var context = InMemoryApplicationDbContext();
 
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
+            var publishingService = BuildPublishingService(contentDbContext: context);
 
-                var result = await publishingService.RetryReleasePublishing(Guid.NewGuid());
+            var result = await publishingService.RetryReleasePublishing(Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
-
-            VerifyAllMocks(storageQueueService);
+            result.AssertNotFound();
         }
 
         [Fact]
         public async Task ReleaseChanged()
         {
-            var releaseVersion = new ReleaseVersion();
-            var releaseStatus = new ReleaseStatus { ReleaseVersion = releaseVersion };
+            ReleaseStatus releaseStatus = _fixture.DefaultReleaseStatus();
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithReleaseStatuses(new[] { releaseStatus });
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.ReleaseVersions.Add(releaseVersion);
-                context.ReleaseStatus.Add(releaseStatus);
                 await context.SaveChangesAsync();
             }
 
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            var publisherQueueServiceClient = new Mock<IPublisherQueueServiceClient>(MockBehavior.Strict);
 
             var releasePublishingKey = new ReleasePublishingKey(releaseVersion.Id, releaseStatus.Id);
 
             var expectedMessage = new NotifyChangeMessage(true, releasePublishingKey);
 
-            storageQueueService.Setup(mock => mock.AddMessageAsync(NotifyChangeQueue, expectedMessage))
+            publisherQueueServiceClient.Setup(mock =>
+                    mock.SendMessageAsJson(PublisherQueues.NotifyChangeQueue, expectedMessage, CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
+                    publisherQueueServiceClient: publisherQueueServiceClient.Object);
 
                 var result = await publishingService.ReleaseChanged(releasePublishingKey, immediate: true);
 
-                storageQueueService.Verify(
-                    mock => mock.AddMessageAsync(NotifyChangeQueue, expectedMessage),
+                publisherQueueServiceClient.Verify(
+                    mock => mock.SendMessageAsJson(PublisherQueues.NotifyChangeQueue,
+                        expectedMessage,
+                        CancellationToken.None),
                     Times.Once());
 
                 result.AssertRight();
             }
 
-            VerifyAllMocks(storageQueueService);
+            VerifyAllMocks(publisherQueueServiceClient);
         }
 
         [Fact]
         public async Task ReleaseChanged_ReleaseNotFound()
         {
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            await using var context = InMemoryApplicationDbContext();
 
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
+            var publishingService = BuildPublishingService(contentDbContext: context);
 
-                var result =
-                    await publishingService.ReleaseChanged(new ReleasePublishingKey(Guid.NewGuid(), Guid.NewGuid()),
-                        immediate: true);
+            var result =
+                await publishingService.ReleaseChanged(new ReleasePublishingKey(Guid.NewGuid(), Guid.NewGuid()),
+                    immediate: true);
 
-                result.AssertNotFound();
-            }
-
-            VerifyAllMocks(storageQueueService);
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -152,61 +149,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            var publisherQueueServiceClient = new Mock<IPublisherQueueServiceClient>(MockBehavior.Strict);
 
-            storageQueueService.Setup(
-                    mock => mock.AddMessageAsync(PublishMethodologyFilesQueue,
-                        It.Is<PublishMethodologyFilesMessage>(message =>
-                            message.MethodologyId == methodologyVersion.Id)))
+            publisherQueueServiceClient.Setup(
+                    mock => mock.SendMessageAsJson(PublisherQueues.PublishMethodologyFilesQueue,
+                        new PublishMethodologyFilesMessage(methodologyVersion.Id),
+                        CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
+                    publisherQueueServiceClient: publisherQueueServiceClient.Object);
 
                 var result = await publishingService
                     .PublishMethodologyFiles(methodologyVersion.Id);
 
-                storageQueueService.Verify(
-                    mock => mock.AddMessageAsync(PublishMethodologyFilesQueue,
-                        It.Is<PublishMethodologyFilesMessage>(message =>
-                            message.MethodologyId == methodologyVersion.Id)),
+                publisherQueueServiceClient.Verify(
+                    mock => mock.SendMessageAsJson(PublisherQueues.PublishMethodologyFilesQueue,
+                        new PublishMethodologyFilesMessage(methodologyVersion.Id),
+                        CancellationToken.None),
                     Times.Once());
 
                 result.AssertRight();
             }
 
-            VerifyAllMocks(storageQueueService);
+            VerifyAllMocks(publisherQueueServiceClient);
         }
 
         [Fact]
         public async Task PublishMethodologyFiles_MethodologyNotFound()
         {
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            await using var context = InMemoryApplicationDbContext();
 
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
+            var publishingService = BuildPublishingService(contentDbContext: context);
 
-                var result = await publishingService
-                    .PublishMethodologyFiles(Guid.NewGuid());
+            var result = await publishingService
+                .PublishMethodologyFiles(Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
-
-            VerifyAllMocks(storageQueueService);
+            result.AssertNotFound();
         }
 
         private static PublishingService BuildPublishingService(
             ContentDbContext contentDbContext,
-            IStorageQueueService? storageQueueService = null,
+            IPublisherQueueServiceClient? publisherQueueServiceClient = null,
             IUserService? userService = null)
         {
             return new PublishingService(
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
-                storageQueueService ?? new Mock<IStorageQueueService>().Object,
+                contentDbContext,
+                publisherQueueServiceClient ?? Mock.Of<IPublisherQueueServiceClient>(MockBehavior.Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 new Mock<ILogger<PublishingService>>().Object);
         }

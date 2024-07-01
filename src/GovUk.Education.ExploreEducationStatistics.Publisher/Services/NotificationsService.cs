@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,25 +8,17 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
-    public class NotificationsService : INotificationsService
+    public class NotificationsService(
+        ContentDbContext context,
+        INotifierQueueServiceClient notifierQueueServiceClient)
+        : INotificationsService
     {
-        private readonly ContentDbContext _context;
-        private readonly IStorageQueueService _storageQueueService;
-
-        public NotificationsService(ContentDbContext context,
-            IStorageQueueService storageQueueService)
-        {
-            _context = context;
-            _storageQueueService = storageQueueService;
-        }
-
         public async Task NotifySubscribersIfApplicable(params Guid[] releaseVersionIds)
         {
-            var releaseVersionsToNotify = await _context.ReleaseVersions
+            var releaseVersionsToNotify = await context.ReleaseVersions
                 .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.NotifySubscribers)
                 .ToListAsync();
 
@@ -38,21 +29,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (messages.Count > 0)
             {
-                await _storageQueueService.AddMessages(ReleaseNotificationQueue, messages);
+                await notifierQueueServiceClient.SendMessagesAsJson(NotifierQueues.ReleaseNotificationQueue, messages);
                 releaseVersionsToNotify
                     .ForEach(releaseVersion =>
                     {
-                        _context.ReleaseVersions.Update(releaseVersion);
+                        context.ReleaseVersions.Update(releaseVersion);
                         releaseVersion.NotifiedOn = DateTime.UtcNow;
                     });
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
         }
 
         private async Task<ReleaseNotificationMessage> BuildPublicationNotificationMessage(
             ReleaseVersion releaseVersion)
         {
-            await _context.Entry(releaseVersion)
+            await context.Entry(releaseVersion)
                 .Reference(rv => rv.Publication)
                 .LoadAsync();
 
@@ -60,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // NOTE: Only amendment email template displays an update note.
             if (releaseVersion.Version > 0)
             {
-                await _context.Entry(releaseVersion)
+                await context.Entry(releaseVersion)
                     .Collection(rv => rv.Updates)
                     .LoadAsync();
                 var latestUpdateNote = releaseVersion.Updates
@@ -69,9 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 latestUpdateNoteReason = latestUpdateNote.Reason;
             }
 
-            var supersededPublications = await _context.Publications
+            var supersededPublications = await context.Publications
                 .Where(p => p.SupersededById == releaseVersion.PublicationId)
-                .Select(p => new { p.Id, p.Title })
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Title
+                })
                 .ToListAsync();
 
             return new ReleaseNotificationMessage

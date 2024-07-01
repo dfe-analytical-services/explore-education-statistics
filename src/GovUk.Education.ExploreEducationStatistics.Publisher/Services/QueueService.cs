@@ -6,12 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
 public class QueueService(
-    IStorageQueueService storageQueueService,
+    IPublisherQueueServiceClient publisherQueueServiceClient,
     IReleasePublishingStatusService releasePublishingStatusService,
     ILogger<QueueService> logger)
     : IQueueService
@@ -22,8 +21,8 @@ public class QueueService(
             "Queuing generate content message for release versions: [{ReleaseVersionIds}]",
             releasePublishingKeys.Select(key => key.ReleaseVersionId).JoinToString(','));
 
-        await storageQueueService.AddMessageAsync(
-            StageReleaseContentQueue,
+        await publisherQueueServiceClient.SendMessageAsJson(
+            PublisherQueues.StageReleaseContentQueue,
             new StageReleaseContentMessage(releasePublishingKeys));
 
         await releasePublishingKeys
@@ -37,7 +36,7 @@ public class QueueService(
     {
         logger.LogInformation("Queuing publish content message for release version: {ReleaseVersionId}",
             releasePublishingKey.ReleaseVersionId);
-        await storageQueueService.AddMessageAsync(PublishReleaseContentQueue,
+        await publisherQueueServiceClient.SendMessageAsJson(PublisherQueues.PublishReleaseContentQueue,
             new PublishReleaseContentMessage(releasePublishingKey));
         await releasePublishingStatusService.UpdateContentStage(releasePublishingKey,
             ReleasePublishingStatusContentStage.Queued);
@@ -49,7 +48,7 @@ public class QueueService(
             "Queuing files message for release versions: [{ReleaseVersionIds}]",
             releasePublishingKeys.Select(key => key.ReleaseVersionId).JoinToString(','));
 
-        await storageQueueService.AddMessageAsync(PublishReleaseFilesQueue,
+        await publisherQueueServiceClient.SendMessageAsJson(PublisherQueues.PublishReleaseFilesQueue,
             new PublishReleaseFilesMessage(releasePublishingKeys));
 
         await releasePublishingKeys
