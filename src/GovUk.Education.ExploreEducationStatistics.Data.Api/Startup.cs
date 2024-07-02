@@ -1,20 +1,16 @@
 #nullable enable
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
-using System.Text;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -46,6 +42,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
+using System.Text;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
@@ -79,7 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     options.ReturnHttpNotAcceptable = true;
                     options.EnableEndpointRouting = false;
                 })
-                .AddNewtonsoftJson(options => {
+                .AddNewtonsoftJson(options =>
+                {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
 
@@ -104,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        providerOptions => 
+                        providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
@@ -121,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Data API", Version = "v1" });
             });
 
             //
@@ -164,12 +165,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IPermalinkCsvMetaService, PermalinkCsvMetaService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
-            services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
+            services.AddSingleton<DataServiceMemoryCache<BoundaryData>, DataServiceMemoryCache<BoundaryData>>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 
             services
-                .AddAuthentication(options => {
+                .AddAuthentication(options =>
+                {
                     options.DefaultAuthenticateScheme = "defaultScheme";
                     options.DefaultForbidScheme = "defaultScheme";
                     options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
@@ -237,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             var rewriteOptions = new RewriteOptions()
                 .Add(new LowercasePathRule());
 
-            if(Configuration.GetValue<bool>("enableSwagger"))
+            if (Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

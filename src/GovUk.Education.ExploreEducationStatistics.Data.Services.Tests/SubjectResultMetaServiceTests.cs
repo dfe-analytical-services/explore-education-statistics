@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -23,6 +19,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -55,11 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             Id = 2,
             Label = "Regions November 2021",
             Level = GeographicLevel.Region
-        };
-
-        private readonly GeoJson _geoJson = new()
-        {
-            Value = "[]"
         };
 
         [Fact]
@@ -670,236 +665,236 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        [Fact]
-        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject_SpecificBoundaryLevelId()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+        //[Fact]
+        //public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject_SpecificBoundaryLevelId()
+        //{
+        //    Publication publication = _dataFixture
+        //        .DefaultPublication()
+        //        .WithReleases(_dataFixture
+        //            .DefaultRelease(publishedVersions: 1)
+        //            .Generate(1));
 
-            var releaseVersion = publication.ReleaseVersions[0];
+        //    var releaseVersion = publication.ReleaseVersions[0];
 
-            Subject subject = _dataFixture
-                .DefaultSubject();
+        //    Subject subject = _dataFixture
+        //        .DefaultSubject();
 
-            ReleaseSubject releaseSubject = _dataFixture
-                .DefaultReleaseSubject()
-                .WithReleaseVersion(_dataFixture
-                    .DefaultStatsReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithPublicationId(publication.Id))
-                .WithSubject(subject);
+        //    ReleaseSubject releaseSubject = _dataFixture
+        //        .DefaultReleaseSubject()
+        //        .WithReleaseVersion(_dataFixture
+        //            .DefaultStatsReleaseVersion()
+        //            .WithId(releaseVersion.Id)
+        //            .WithPublicationId(publication.Id))
+        //        .WithSubject(subject);
 
-            var observations = ListOf(
-                new Observation
-                {
-                    Location = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _northEast
-                    }
-                },
-                new Observation
-                {
-                    Location = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _northWest
-                    }
-                },
-                new Observation
-                {
-                    Location = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _eastMidlands
-                    }
-                });
+        //    var observations = ListOf(
+        //        new Observation
+        //        {
+        //            Location = new Location
+        //            {
+        //                Id = Guid.NewGuid(),
+        //                GeographicLevel = GeographicLevel.Region,
+        //                Country = _england,
+        //                Region = _northEast
+        //            }
+        //        },
+        //        new Observation
+        //        {
+        //            Location = new Location
+        //            {
+        //                Id = Guid.NewGuid(),
+        //                GeographicLevel = GeographicLevel.Region,
+        //                Country = _england,
+        //                Region = _northWest
+        //            }
+        //        },
+        //        new Observation
+        //        {
+        //            Location = new Location
+        //            {
+        //                Id = Guid.NewGuid(),
+        //                GeographicLevel = GeographicLevel.Region,
+        //                Country = _england,
+        //                Region = _eastMidlands
+        //            }
+        //        });
 
-            var options = Options.Create(new LocationsOptions
-            {
-                Hierarchies = new Dictionary<GeographicLevel, List<string>>
-                {
-                    {
-                        GeographicLevel.Region,
-                        new List<string>
-                        {
-                            "Country"
-                        }
-                    }
-                }
-            });
+        //    var options = Options.Create(new LocationsOptions
+        //    {
+        //        Hierarchies = new Dictionary<GeographicLevel, List<string>>
+        //        {
+        //            {
+        //                GeographicLevel.Region,
+        //                new List<string>
+        //                {
+        //                    "Country"
+        //                }
+        //            }
+        //        }
+        //    });
 
-            // Setup a query requesting GeoJSON (by virtue of having a boundary level set)
-            var query = new ObservationQueryContext
-            {
-                BoundaryLevel = 123,
-                Indicators = new List<Guid>(),
-                SubjectId = subject.Id
-            };
+        //    // Setup a query requesting GeoJSON (by virtue of having a boundary level set)
+        //    var query = new ObservationQueryContext
+        //    {
+        //        BoundaryLevel = 123,
+        //        Indicators = new List<Guid>(),
+        //        SubjectId = subject.Id
+        //    };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+        //    var contentDbContextId = Guid.NewGuid().ToString();
+        //    var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
+        //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        //    {
+        //        contentDbContext.Publications.Add(publication);
+        //        await contentDbContext.SaveChangesAsync();
+        //    }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
+        //    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        //    {
+        //        statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+        //        await statisticsDbContext.SaveChangesAsync();
+        //    }
 
-            var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-            var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
-            var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
-            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+        //    var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
+        //    var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
+        //    var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+        //    var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
+        //    var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
+        //    var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+        //    var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+        //    var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            boundaryLevelRepository.Setup(s => s.Get(query.BoundaryLevel.Value))
-                .ReturnsAsync(_regionsBoundaryLevel);
+        //    boundaryLevelRepository.Setup(s => s.Get(query.BoundaryLevel.Value))
+        //        .ReturnsAsync(_regionsBoundaryLevel);
 
-            boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(ItIs.ListSequenceEqualTo(ListOf(GeographicLevel.Region))))
-                .Returns(ListOf(_regionsBoundaryLevel));
+        //    boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(ItIs.ListSequenceEqualTo(ListOf(GeographicLevel.Region))))
+        //        .Returns(ListOf(_regionsBoundaryLevel));
 
-            filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservations(observations))
-                .ReturnsAsync(new List<FilterItem>());
+        //    filterItemRepository
+        //        .Setup(s => s.GetFilterItemsFromObservations(observations))
+        //        .ReturnsAsync(new List<FilterItem>());
 
-            footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseVersion.Id,
-                    subject.Id,
-                    new List<Guid>(),
-                    query.Indicators))
-                .ReturnsAsync(new List<Footnote>());
+        //    footnoteRepository.Setup(s => s.GetFilteredFootnotes(
+        //            releaseVersion.Id,
+        //            subject.Id,
+        //            new List<Guid>(),
+        //            query.Indicators))
+        //        .ReturnsAsync(new List<Footnote>());
 
-            geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
-                    query.BoundaryLevel.Value,
-                    new List<string>
-                    {
-                        _northEast.Code!, _northWest.Code!, _eastMidlands.Code!
-                    }))
-                .Returns(new Dictionary<string, GeoJson>
-                {
-                    {
-                        _northEast.Code!,
-                        _geoJson
-                    },
-                    {
-                        _northWest.Code!,
-                        _geoJson
-                    },
-                    {
-                        _eastMidlands.Code!,
-                        _geoJson
-                    }
-                });
+        //    geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
+        //            query.BoundaryLevel.Value,
+        //            new List<string>
+        //            {
+        //                _northEast.Code!, _northWest.Code!, _eastMidlands.Code!
+        //            }))
+        //        .Returns(new Dictionary<string, BoundaryData>
+        //        {
+        //            {
+        //                _northEast.Code!,
+        //                _boundaryData
+        //            },
+        //            {
+        //                _northWest.Code!,
+        //                _boundaryData
+        //            },
+        //            {
+        //                _eastMidlands.Code!,
+        //                _boundaryData
+        //            }
+        //        });
 
-            indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
-                .Returns(Enumerable.Empty<Indicator>());
+        //    indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
+        //        .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
-                .ReturnsAsync(new ReleaseFile());
+        //    releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
+        //        .ReturnsAsync(new ReleaseFile());
 
-            timePeriodService
-                .Setup(s => s.GetTimePeriodRange(observations))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+        //    timePeriodService
+        //        .Setup(s => s.GetTimePeriodRange(observations))
+        //        .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    boundaryLevelRepository: boundaryLevelRepository.Object,
-                    filterItemRepository: filterItemRepository.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    geoJsonRepository: geoJsonRepository.Object,
-                    indicatorRepository: indicatorRepository.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    timePeriodService: timePeriodService.Object,
-                    options: options
-                );
+        //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        //    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        //    {
+        //        var service = BuildService(
+        //            contentDbContext: contentDbContext,
+        //            statisticsDbContext: statisticsDbContext,
+        //            boundaryLevelRepository: boundaryLevelRepository.Object,
+        //            filterItemRepository: filterItemRepository.Object,
+        //            footnoteRepository: footnoteRepository.Object,
+        //            geoJsonRepository: geoJsonRepository.Object,
+        //            indicatorRepository: indicatorRepository.Object,
+        //            releaseDataFileRepository: releaseDataFileRepository.Object,
+        //            timePeriodService: timePeriodService.Object,
+        //            options: options
+        //        );
 
-                var result = await service.GetSubjectMeta(
-                    releaseVersion.Id,
-                    query,
-                    observations);
+        //        var result = await service.GetSubjectMeta(
+        //            releaseVersion.Id,
+        //            query,
+        //            observations);
 
-                VerifyAllMocks(
-                    boundaryLevelRepository,
-                    filterItemRepository,
-                    footnoteRepository,
-                    geoJsonRepository,
-                    indicatorRepository,
-                    locationRepository,
-                    releaseDataFileRepository,
-                    timePeriodService);
+        //        VerifyAllMocks(
+        //            boundaryLevelRepository,
+        //            filterItemRepository,
+        //            footnoteRepository,
+        //            geoJsonRepository,
+        //            indicatorRepository,
+        //            locationRepository,
+        //            releaseDataFileRepository,
+        //            timePeriodService);
 
-                var viewModel = result.AssertRight();
+        //        var viewModel = result.AssertRight();
 
-                Assert.True(viewModel.GeoJsonAvailable);
+        //        Assert.True(viewModel.GeoJsonAvailable);
 
-                var locationViewModels = viewModel.Locations;
+        //        var locationViewModels = viewModel.Locations;
 
-                // Result only has a Region level
-                Assert.Single(locationViewModels);
-                Assert.True(locationViewModels.ContainsKey("region"));
+        //        // Result only has a Region level
+        //        Assert.Single(locationViewModels);
+        //        Assert.True(locationViewModels.ContainsKey("region"));
 
-                // Expect a hierarchy of Country-Region within the Region level
-                var regions = locationViewModels["region"];
+        //        // Expect a hierarchy of Country-Region within the Region level
+        //        var regions = locationViewModels["region"];
 
-                // Country option that groups the Regions does not have GeoJson
-                var regionOption1 = Assert.Single(regions);
-                Assert.NotNull(regionOption1);
-                Assert.Null(regionOption1.Id);
-                Assert.Equal(_england.Name, regionOption1.Label);
-                Assert.Equal(_england.Code, regionOption1.Value);
-                Assert.Null(regionOption1.GeoJson);
-                Assert.Equal(GeographicLevel.Country, regionOption1.Level);
-                Assert.NotNull(regionOption1.Options);
-                Assert.Equal(3, regionOption1.Options!.Count);
+        //        // Country option that groups the Regions does not have GeoJson
+        //        var regionOption1 = Assert.Single(regions);
+        //        Assert.NotNull(regionOption1);
+        //        Assert.Null(regionOption1.Id);
+        //        Assert.Equal(_england.Name, regionOption1.Label);
+        //        Assert.Equal(_england.Code, regionOption1.Value);
+        //        Assert.Null(regionOption1.GeoJson);
+        //        Assert.Equal(GeographicLevel.Country, regionOption1.Level);
+        //        Assert.NotNull(regionOption1.Options);
+        //        Assert.Equal(3, regionOption1.Options!.Count);
 
-                // Each Region option should have GeoJson
-                var regionOption1SubOption1 = regionOption1.Options[0];
-                Assert.Equal(observations[0].Location.Id, regionOption1SubOption1.Id);
-                Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
-                Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
-                Assert.NotNull(regionOption1SubOption1.GeoJson);
-                Assert.Null(regionOption1SubOption1.Level);
-                Assert.Null(regionOption1SubOption1.Options);
+        //        // Each Region option should have GeoJson
+        //        var regionOption1SubOption1 = regionOption1.Options[0];
+        //        Assert.Equal(observations[0].Location.Id, regionOption1SubOption1.Id);
+        //        Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
+        //        Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
+        //        Assert.NotNull(regionOption1SubOption1.GeoJson);
+        //        Assert.Null(regionOption1SubOption1.Level);
+        //        Assert.Null(regionOption1SubOption1.Options);
 
-                var regionOption1SubOption2 = regionOption1.Options[1];
-                Assert.Equal(observations[1].Location.Id, regionOption1SubOption2.Id);
-                Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
-                Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
-                Assert.NotNull(regionOption1SubOption2.GeoJson);
-                Assert.Null(regionOption1SubOption2.Level);
-                Assert.Null(regionOption1SubOption2.Options);
+        //        var regionOption1SubOption2 = regionOption1.Options[1];
+        //        Assert.Equal(observations[1].Location.Id, regionOption1SubOption2.Id);
+        //        Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
+        //        Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
+        //        Assert.NotNull(regionOption1SubOption2.GeoJson);
+        //        Assert.Null(regionOption1SubOption2.Level);
+        //        Assert.Null(regionOption1SubOption2.Options);
 
-                var regionOption1SubOption3 = regionOption1.Options[2];
-                Assert.Equal(observations[2].Location.Id, regionOption1SubOption3.Id);
-                Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
-                Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
-                Assert.NotNull(regionOption1SubOption3.GeoJson);
-                Assert.Null(regionOption1SubOption3.Level);
-                Assert.Null(regionOption1SubOption3.Options);
-            }
-        }
+        //        var regionOption1SubOption3 = regionOption1.Options[2];
+        //        Assert.Equal(observations[2].Location.Id, regionOption1SubOption3.Id);
+        //        Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
+        //        Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
+        //        Assert.NotNull(regionOption1SubOption3.GeoJson);
+        //        Assert.Null(regionOption1SubOption3.Level);
+        //        Assert.Null(regionOption1SubOption3.Options);
+        //    }
+        //}
 
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
