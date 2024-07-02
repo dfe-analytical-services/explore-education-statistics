@@ -6,7 +6,6 @@ Library     file_operations.py
 Library     utilities.py
 Library     fail_fast.py
 Library     visual.py
-Library     urlparsing.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
@@ -1014,3 +1013,20 @@ user takes html snapshot of element
 
 user waits for caches to expire
     sleep    %{WAIT_CACHE_EXPIRY}
+
+user wait for option to be available and select it
+    [Arguments]  ${dropdown_locator}  ${option_text}  ${timeout}=%{TIMEOUT}
+    wait until keyword succeeds  ${timeout}  1s  check option exist in dropdown  ${dropdown_locator}  ${option_text}
+    select from list by label  ${dropdown_locator}  ${option_text}
+
+check option exist in dropdown
+    [Arguments]  ${dropdown_locator}  ${option_text}
+    ${options}=  get webelements  ${dropdown_locator} > option
+    ${matched}=  set variable  False
+
+    FOR  ${option}  IN  @{options}
+    ${text}=  get text  ${option}
+    run keyword if  '${text}' == '${option_text}'  Set Variable  ${matched}  True
+    should be true  ${matched}  Option ${option_text} not found in the dropdown
+    END
+

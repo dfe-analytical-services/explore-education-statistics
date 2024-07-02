@@ -163,18 +163,18 @@ Validate release filter exists
     user checks select contains option    id:filters-form-release    All releases
     
 Filter by theme
-    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Filter by publication
-    user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user wait for option to be available and select it    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Filter by all releases
-    user chooses select option    id:filters-form-release    All releases
+    user wait for option to be available and select it    id:filters-form-release    All releases
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
@@ -185,8 +185,8 @@ Remove theme filter
     user checks selected option label     id:filters-form-theme    All themes
 
 Remove publication filter
-    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
@@ -194,9 +194,9 @@ Remove publication filter
     user checks selected option label     id:filters-form-publication    All publications
 
 Remove release filter
-    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user chooses select option    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user chooses select option    id:filters-form-release    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user wait for option to be available and select it    id:filters-form-release    ${PUPIL_ABSENCE_RELEASE_NAME}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
@@ -207,7 +207,7 @@ Reset all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
     user checks page contains button    pupil
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -249,4 +249,3 @@ Validate data catalogue page redirect from slug based urls
     user checks element contains    ${dataSet_2}    Absence in PRUs
 
 
-    
