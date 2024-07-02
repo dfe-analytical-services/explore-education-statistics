@@ -1,7 +1,7 @@
 #nullable enable
-using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Xunit;
@@ -162,7 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsLeft_SecondEitherIsLeft_ReturnsFirstLeft()
+        public async Task
+            OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsLeft_SecondEitherIsLeft_ReturnsFirstLeft()
         {
             var result =
                 await new Either<int, string>(1)
@@ -184,7 +185,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsRight_SecondEitherIsRight_ReturnsSecondRight()
+        public async Task
+            OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsRight_SecondEitherIsRight_ReturnsSecondRight()
         {
             var result =
                 await new Either<int, string>("either1")
@@ -275,6 +277,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             Assert.Empty(results);
         }
+
+        [Fact]
+        public void OnFailure_Success()
+        {
+            var either = new Either<int, string>("success");
+            var result = either.OnFailure(failure => new Either<char, string>('a'));
+            Assert.True(result.IsRight);
+            Assert.Equal("success", result.Right);
+        }
+
+        [Fact]
+        public void OnFailure_Failure()
+        {
+            var either = new Either<int, string>(1);
+            var result = either.OnFailure(failure => new Either<char, string>('a'));
+            Assert.True(result.IsLeft);
+            Assert.Equal('a', result.Left);
+        }
+
+        [Fact]
+        public void AggregateSuccessesAndFailures_AllSuccesses()
+        {
+            Either<int, string>[] eithers =
+            [
+                new("success 1"),
+                new("success 2")
+            ];
+
+            var aggregate = eithers.AggregateSuccessesAndFailures();
+            Assert.True(aggregate.IsRight);
+            Assert.Equal(["success 1", "success 2"], aggregate.Right);
+        }
+
+        [Fact]
+        public void AggregateSuccessesAndFailures_AllFailures()
+        {
+            Either<string, int>[] eithers =
+            [
+                new("failure 1"),
+                new("failure 2")
+            ];
+
+            var aggregate = eithers.AggregateSuccessesAndFailures();
+            Assert.True(aggregate.IsLeft);
+            Assert.Equal(["failure 1", "failure 2"], aggregate.Left);
+        }
+        
+        [Fact]
+        public void AggregateSuccessesAndFailures_MixedFailuresAndSuccess()
+        {
+            Either<string, int>[] eithers =
+            [
+                new("failure 1"),
+                new(1)
+            ];
+
+            var aggregate = eithers.AggregateSuccessesAndFailures();
+            Assert.True(aggregate.IsLeft);
+            Assert.Equal(["failure 1"], aggregate.Left);
+        }
     }
 
     public class EitherTaskTest
@@ -345,22 +407,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>("task1");
-                })
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(5);
-                    results.Add(previousResult + " task2");
-                    throw new Exception("exception thrown");
-                }))
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(15);
-                    results.Add(previousResult + " task3");
-                })));
+                    {
+                        await Task.Delay(20);
+                        results.Add("task1");
+                        return new Either<int, string>("task1");
+                    })
+                    .OnSuccess(previousResult => Task.Run(async () =>
+                    {
+                        await Task.Delay(5);
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
+                    }))
+                    .OnSuccess(previousResult => Task.Run(async () =>
+                    {
+                        await Task.Delay(15);
+                        results.Add(previousResult + " task3");
+                    })));
 
             Assert.Equal("exception thrown", exception.Message);
 
@@ -399,26 +461,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>("task1");
-                })
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(10);
-                    results.Add(previousResult + " task2");
-                    throw new Exception("exception thrown");
+                    {
+                        await Task.Delay(20);
+                        results.Add("task1");
+                        return new Either<int, string>("task1");
+                    })
+                    .OnSuccess(previousResult => Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
 #pragma warning disable 162
-                    return previousResult + " task2";
+                        return previousResult + " task2";
 #pragma warning restore 162
-                }))
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(0);
-                    results.Add(previousResult + " task3");
-                    return previousResult + " task3";
-                })));
+                    }))
+                    .OnSuccess(previousResult => Task.Run(async () =>
+                    {
+                        await Task.Delay(0);
+                        results.Add(previousResult + " task3");
+                        return previousResult + " task3";
+                    })));
 
             Assert.Equal("exception thrown", exception.Message);
 
@@ -466,26 +528,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>("task1");
-                })
-                .OnSuccess(() => Task.Run(async () =>
-                {
-                    await Task.Delay(10);
-                    results.Add("task2");
-                    throw new Exception("exception thrown");
+                    {
+                        await Task.Delay(20);
+                        results.Add("task1");
+                        return new Either<int, string>("task1");
+                    })
+                    .OnSuccess(() => Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add("task2");
+                        throw new Exception("exception thrown");
 #pragma warning disable 162
-                    return "task2";
+                        return "task2";
 #pragma warning restore 162
-                }))
-                .OnSuccess(() => Task.Run(async () =>
-                {
-                    await Task.Delay(0);
-                    results.Add("task3");
-                    return "task3";
-                })));
+                    }))
+                    .OnSuccess(() => Task.Run(async () =>
+                    {
+                        await Task.Delay(0);
+                        results.Add("task3");
+                        return "task3";
+                    })));
 
             Assert.Equal("exception thrown", exception.Message);
 
@@ -754,22 +816,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>("task1");
-                })
-                .OnSuccessVoid(() => Task.Run(async () =>
-                {
-                    await Task.Delay(10);
-                    results.Add("task2");
-                    throw new Exception("exception thrown");
-                }))
-                .OnSuccessVoid(() => Task.Run(async () =>
-                {
-                    await Task.Delay(0);
-                    results.Add("task3");
-                })));
+                    {
+                        await Task.Delay(20);
+                        results.Add("task1");
+                        return new Either<int, string>("task1");
+                    })
+                    .OnSuccessVoid(() => Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add("task2");
+                        throw new Exception("exception thrown");
+                    }))
+                    .OnSuccessVoid(() => Task.Run(async () =>
+                    {
+                        await Task.Delay(0);
+                        results.Add("task3");
+                    })));
 
             Assert.Equal("exception thrown", exception.Message);
 
@@ -785,16 +847,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             var result = await
                 Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>(500);
-                })
-                .OnSuccessVoid(() => Task.Run(async () =>
-                {
-                    await Task.Delay(10);
-                    results.Add("task2");
-                }));
+                    {
+                        await Task.Delay(20);
+                        results.Add("task1");
+                        return new Either<int, string>(500);
+                    })
+                    .OnSuccessVoid(() => Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add("task2");
+                    }));
 
             result.AssertLeft(500);
 
@@ -831,20 +893,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>("task1");
-                })
-                .OnSuccessVoid(() =>
-                {
-                    results.Add("task2");
-                    throw new Exception("exception thrown");
-                })
-                .OnSuccessVoid(() =>
-                {
-                    results.Add("task3");
-                }));
+                    {
+                        await Task.Delay(20);
+                        results.Add("task1");
+                        return new Either<int, string>("task1");
+                    })
+                    .OnSuccessVoid(() =>
+                    {
+                        results.Add("task2");
+                        throw new Exception("exception thrown");
+                    })
+                    .OnSuccessVoid(() =>
+                    {
+                        results.Add("task3");
+                    }));
 
             Assert.Equal("exception thrown", exception.Message);
 
@@ -1049,7 +1111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 {
                     await Task.Delay(10);
                     results.Add("task2");
-                    await Task.Run(() => {});
+                    await Task.Run(() => { });
                 });
 
             result.AssertRight("task1");
@@ -1248,22 +1310,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>("task1");
-                })
-                .OnSuccessDo(async previousResult => await Task.Run(() =>
-                {
-                    Task.Delay(10);
-                    results.Add(previousResult + " task2");
-                    throw new Exception("exception thrown");
-                }))
-                .OnSuccessDo(async previousResult => await Task.Run(() =>
-                {
-                    Task.Delay(20);
-                    results.Add(previousResult + " task3");
-                })));
+                    {
+                        await Task.Delay(20);
+                        results.Add("task1");
+                        return new Either<int, string>("task1");
+                    })
+                    .OnSuccessDo(async previousResult => await Task.Run(() =>
+                    {
+                        Task.Delay(10);
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
+                    }))
+                    .OnSuccessDo(async previousResult => await Task.Run(() =>
+                    {
+                        Task.Delay(20);
+                        results.Add(previousResult + " task3");
+                    })));
 
             Assert.Equal("exception thrown", exception.Message);
 
@@ -1385,12 +1447,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var result = await
                 Task.FromResult(new Either<int, string>("Success number one!"))
-                // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccessCombineWith(firstSuccess =>
-                {
-                    Assert.Equal("Success number one!", firstSuccess);
-                    return Task.FromResult(new Either<int, char>('2'));
-                });
+                    // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
+                    .OnSuccessCombineWith(firstSuccess =>
+                    {
+                        Assert.Equal("Success number one!", firstSuccess);
+                        return Task.FromResult(new Either<int, char>('2'));
+                    });
 
             result.AssertRight(TupleOf("Success number one!", '2'));
         }
@@ -1592,13 +1654,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var exception = await Assert.ThrowsAsync<Exception>(() =>
                 Task.FromResult(new Either<int, string>(500))
-                .OrElse(() =>
-                {
-                    throw new Exception("exception thrown");
+                    .OrElse(() =>
+                    {
+                        throw new Exception("exception thrown");
 #pragma warning disable 162
-                    return "failure";
+                        return "failure";
 #pragma warning restore 162
-                }));
+                    }));
 
             Assert.Equal("exception thrown", exception.Message);
         }
@@ -1608,7 +1670,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var result = await
                 Task.FromResult(new Either<int, string>("Success1"))
-                .OrElse(() => "Success2");
+                    .OrElse(() => "Success2");
 
             Assert.Equal("Success1", result);
         }
