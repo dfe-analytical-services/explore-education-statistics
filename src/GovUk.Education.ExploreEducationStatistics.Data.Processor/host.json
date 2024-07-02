@@ -10,11 +10,8 @@
       "enableLiveMetricsFilters": true
     },
     "logLevel": {
-      "default": "Warning",
-      "Microsoft": "Warning",
-      "Function": "Information",
-      "GovUk.Education.ExploreEducationStatistics": "Information",
-      "Azure": "Error"
+      "default": "Error",
+      "Function": "Information"
     }
   },
   "extensions": {
