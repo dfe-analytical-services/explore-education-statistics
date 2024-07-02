@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -17,4 +18,13 @@ public record GeographicLevelOptionViewModel
     /// The human-readable label for the geographic level.
     /// </summary>
     public required string Label { get; init; }
+
+    public static GeographicLevelOptionViewModel Create(GeographicLevel level)
+    {
+        return new GeographicLevelOptionViewModel
+        {
+            Level = level,
+            Label = level.GetEnumLabel()
+        };
+    }
 }

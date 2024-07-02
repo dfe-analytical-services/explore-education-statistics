@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
@@ -19,4 +21,14 @@ public record FilterViewModel
     /// The human-readable label describing the filter.
     /// </summary>
     public required string Label { get; init; }
+
+    public static FilterViewModel Create(FilterMeta meta)
+    {
+        return new FilterViewModel
+        {
+            Id = meta.PublicId,
+            Label = meta.Label,
+            Hint = meta.Hint
+        };
+    }
 }
