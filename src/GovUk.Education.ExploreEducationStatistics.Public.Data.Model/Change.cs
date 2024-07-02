@@ -1,10 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public abstract class Change<TEntity, TIdentifier>
+public abstract class Change<TEntity>
 {
     public long Id { get; set; }
 
@@ -14,14 +13,10 @@ public abstract class Change<TEntity, TIdentifier>
 
     public TEntity? CurrentState { get; set; }
 
-    public TIdentifier? CurrentStateId { get; set; }
-
     public TEntity? PreviousState { get; set; }
 
-    public TIdentifier? PreviousStateId { get; set; }
-
     internal abstract class BaseConfig<TChange, TChangeEntity> : IEntityTypeConfiguration<TChange>
-        where TChange : Change<TChangeEntity, TIdentifier>
+        where TChange : Change<TChangeEntity>
         where TChangeEntity : class
     {
         public virtual void Configure(EntityTypeBuilder<TChange> builder)
@@ -42,56 +37,134 @@ public abstract class Change<TEntity, TIdentifier>
     }
 }
 
-public class FilterMetaChange : Change<FilterMeta, int?>
+public class FilterMetaChange : Change<FilterMeta>
 {
+    public int? CurrentStateId { get; set; }
+
+    public int? PreviousStateId { get; set; }
+
     internal class Config : BaseConfig<FilterMetaChange, FilterMeta>;
 }
 
-public class FilterOptionMetaChange : Change<FilterOptionMeta, int?>
+public class FilterOptionMetaChange : Change<FilterOptionMetaChange.State>
 {
-    public required string PublicId { get; set; }
-
-    public FilterMeta Meta { get; set; } = null!;
-
-    public required int MetaId { get; set; }
-
-    internal class Config : BaseConfig<FilterOptionMetaChange, FilterOptionMeta>
+    internal class Config : IEntityTypeConfiguration<FilterOptionMetaChange>
     {
-        public override void Configure(EntityTypeBuilder<FilterOptionMetaChange> builder)
+        public void Configure(EntityTypeBuilder<FilterOptionMetaChange> builder)
         {
-            base.Configure(builder);
+            builder.OwnsOne(c => c.PreviousState, b =>
+            {
+                b.HasOne(s => s.Meta)
+                    .WithMany();
 
-            builder.HasIndex(c => new { c.MetaId, c.PublicId })
-                .IsUnique();
+                b.HasOne(s => s.Option)
+                    .WithMany();
+
+                b.Navigation(s => s.Option).AutoInclude();
+            });
+
+            builder.OwnsOne(c => c.CurrentState, b =>
+            {
+                b.HasOne(s => s.Meta)
+                    .WithMany();
+
+                b.HasOne(s => s.Option)
+                    .WithMany();
+
+                b.Navigation(s => s.Option).AutoInclude();
+            });
         }
+    }
+
+    public class State
+    {
+        public FilterMeta Meta { get; set; } = null!;
+
+        public required int MetaId { get; set; }
+
+        public FilterOptionMeta Option { get; set; } = null!;
+
+        public required int OptionId { get; set; }
+
+        public required string PublicId { get; set; }
     }
 }
 
-public class GeographicLevelMetaChange : Change<GeographicLevelMeta, int?>
+public class GeographicLevelMetaChange : Change<GeographicLevelMeta>
 {
+    public int? CurrentStateId { get; set; }
+
+    public int? PreviousStateId { get; set; }
+
     internal class Config : BaseConfig<GeographicLevelMetaChange, GeographicLevelMeta>;
 }
 
-public class IndicatorMetaChange : Change<IndicatorMeta, int?>
+public class IndicatorMetaChange : Change<IndicatorMeta>
 {
+    public int? CurrentStateId { get; set; }
+
+    public int? PreviousStateId { get; set; }
+
     internal class Config : BaseConfig<IndicatorMetaChange, IndicatorMeta>;
 }
 
-public class LocationMetaChange : Change<LocationMeta, int?>
+public class LocationMetaChange : Change<LocationMeta>
+
 {
+    public int? CurrentStateId { get; set; }
+
+    public int? PreviousStateId { get; set; }
+
     internal class Config : BaseConfig<LocationMetaChange, LocationMeta>;
 }
 
-public class LocationOptionMetaChange : Change<LocationOptionMeta, int?>
+public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
 {
-    public LocationMeta Meta { get; set; } = null!;
+    internal class Config : IEntityTypeConfiguration<LocationOptionMetaChange>
+    {
+        public void Configure(EntityTypeBuilder<LocationOptionMetaChange> builder)
+        {
+            builder.OwnsOne(c => c.PreviousState, b =>
+            {
+                b.HasOne(s => s.Meta)
+                    .WithMany();
 
-    public int MetaId { get; set; }
+                b.HasOne(s => s.Option)
+                    .WithMany();
 
-    internal class Config : BaseConfig<LocationOptionMetaChange, LocationOptionMeta>;
+                b.Navigation(s => s.Option).AutoInclude();
+            });
+
+            builder.OwnsOne(c => c.CurrentState, b =>
+            {
+                b.HasOne(s => s.Meta)
+                    .WithMany();
+
+                b.HasOne(s => s.Option)
+                    .WithMany();
+
+                b.Navigation(s => s.Option).AutoInclude();
+            });
+        }
+    }
+
+    public class State
+    {
+        public LocationMeta Meta { get; set; } = null!;
+
+        public required int MetaId { get; set; }
+
+        public LocationOptionMeta Option { get; set; } = null!;
+
+        public required int OptionId { get; set; }
+    }
 }
 
-public class TimePeriodMetaChange : Change<TimePeriodMeta, int?>
+public class TimePeriodMetaChange : Change<TimePeriodMeta>
 {
+    public int? CurrentStateId { get; set; }
+
+    public int? PreviousStateId { get; set; }
+
     internal class Config : BaseConfig<TimePeriodMetaChange, TimePeriodMeta>;
 }

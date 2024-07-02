@@ -33,9 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CurrentStateId = table.Column<int>(type: "integer", nullable: true),
-                    PreviousStateId = table.Column<int>(type: "integer", nullable: true)
+                    PreviousStateId = table.Column<int>(type: "integer", nullable: true),
+                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,11 +64,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PublicId = table.Column<string>(type: "text", nullable: false),
-                    MetaId = table.Column<int>(type: "integer", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CurrentStateId = table.Column<int>(type: "integer", nullable: true),
-                    PreviousStateId = table.Column<int>(type: "integer", nullable: true)
+                    CurrentState_MetaId = table.Column<int>(type: "integer", nullable: true),
+                    CurrentState_OptionId = table.Column<int>(type: "integer", nullable: true),
+                    CurrentState_PublicId = table.Column<string>(type: "text", nullable: true),
+                    PreviousState_MetaId = table.Column<int>(type: "integer", nullable: true),
+                    PreviousState_OptionId = table.Column<int>(type: "integer", nullable: true),
+                    PreviousState_PublicId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -80,21 +82,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FilterOptionMetaChanges_FilterMetas_MetaId",
-                        column: x => x.MetaId,
+                        name: "FK_FilterOptionMetaChanges_FilterMetas_CurrentState_MetaId",
+                        column: x => x.CurrentState_MetaId,
                         principalTable: "FilterMetas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FilterOptionMetaChanges_FilterOptionMetas_CurrentStateId",
-                        column: x => x.CurrentStateId,
-                        principalTable: "FilterOptionMetas",
-                        principalColumn: "Id");
+                        name: "FK_FilterOptionMetaChanges_FilterMetas_PreviousState_MetaId",
+                        column: x => x.PreviousState_MetaId,
+                        principalTable: "FilterMetas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FilterOptionMetaChanges_FilterOptionMetas_PreviousStateId",
-                        column: x => x.PreviousStateId,
+                        name: "FK_FilterOptionMetaChanges_FilterOptionMetas_CurrentState_Opti~",
+                        column: x => x.CurrentState_OptionId,
                         principalTable: "FilterOptionMetas",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FilterOptionMetaChanges_FilterOptionMetas_PreviousState_Opt~",
+                        column: x => x.PreviousState_OptionId,
+                        principalTable: "FilterOptionMetas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,9 +113,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CurrentStateId = table.Column<int>(type: "integer", nullable: true),
-                    PreviousStateId = table.Column<int>(type: "integer", nullable: true)
+                    PreviousStateId = table.Column<int>(type: "integer", nullable: true),
+                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,9 +144,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CurrentStateId = table.Column<int>(type: "integer", nullable: true),
-                    PreviousStateId = table.Column<int>(type: "integer", nullable: true)
+                    PreviousStateId = table.Column<int>(type: "integer", nullable: true),
+                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -165,9 +175,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CurrentStateId = table.Column<int>(type: "integer", nullable: true),
-                    PreviousStateId = table.Column<int>(type: "integer", nullable: true)
+                    PreviousStateId = table.Column<int>(type: "integer", nullable: true),
+                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -196,10 +206,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    MetaId = table.Column<int>(type: "integer", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CurrentStateId = table.Column<int>(type: "integer", nullable: true),
-                    PreviousStateId = table.Column<int>(type: "integer", nullable: true)
+                    CurrentState_MetaId = table.Column<int>(type: "integer", nullable: true),
+                    CurrentState_OptionId = table.Column<int>(type: "integer", nullable: true),
+                    PreviousState_MetaId = table.Column<int>(type: "integer", nullable: true),
+                    PreviousState_OptionId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -211,21 +222,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_LocationOptionMetaChanges_LocationMetas_MetaId",
-                        column: x => x.MetaId,
+                        name: "FK_LocationOptionMetaChanges_LocationMetas_CurrentState_MetaId",
+                        column: x => x.CurrentState_MetaId,
                         principalTable: "LocationMetas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_LocationOptionMetaChanges_LocationOptionMetas_CurrentStateId",
-                        column: x => x.CurrentStateId,
+                        name: "FK_LocationOptionMetaChanges_LocationMetas_PreviousState_MetaId",
+                        column: x => x.PreviousState_MetaId,
+                        principalTable: "LocationMetas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LocationOptionMetaChanges_LocationOptionMetas_CurrentState_~",
+                        column: x => x.CurrentState_OptionId,
                         principalTable: "LocationOptionMetas",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LocationOptionMetaChanges_LocationOptionMetas_PreviousState~",
-                        column: x => x.PreviousStateId,
+                        column: x => x.PreviousState_OptionId,
                         principalTable: "LocationOptionMetas",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -234,9 +253,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CurrentStateId = table.Column<int>(type: "integer", nullable: true),
-                    PreviousStateId = table.Column<int>(type: "integer", nullable: true)
+                    PreviousStateId = table.Column<int>(type: "integer", nullable: true),
+                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -275,9 +294,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "PreviousStateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilterOptionMetaChanges_CurrentStateId",
+                name: "IX_FilterOptionMetaChanges_CurrentState_MetaId",
                 table: "FilterOptionMetaChanges",
-                column: "CurrentStateId");
+                column: "CurrentState_MetaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FilterOptionMetaChanges_CurrentState_OptionId",
+                table: "FilterOptionMetaChanges",
+                column: "CurrentState_OptionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FilterOptionMetaChanges_DataSetVersionId",
@@ -285,15 +309,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilterOptionMetaChanges_MetaId_PublicId",
+                name: "IX_FilterOptionMetaChanges_PreviousState_MetaId",
                 table: "FilterOptionMetaChanges",
-                columns: new[] { "MetaId", "PublicId" },
-                unique: true);
+                column: "PreviousState_MetaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilterOptionMetaChanges_PreviousStateId",
+                name: "IX_FilterOptionMetaChanges_PreviousState_OptionId",
                 table: "FilterOptionMetaChanges",
-                column: "PreviousStateId");
+                column: "PreviousState_OptionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GeographicLevelMetaChanges_CurrentStateId",
@@ -342,9 +365,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "PreviousStateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationOptionMetaChanges_CurrentStateId",
+                name: "IX_LocationOptionMetaChanges_CurrentState_MetaId",
                 table: "LocationOptionMetaChanges",
-                column: "CurrentStateId");
+                column: "CurrentState_MetaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetaChanges_CurrentState_OptionId",
+                table: "LocationOptionMetaChanges",
+                column: "CurrentState_OptionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LocationOptionMetaChanges_DataSetVersionId",
@@ -352,14 +380,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationOptionMetaChanges_MetaId",
+                name: "IX_LocationOptionMetaChanges_PreviousState_MetaId",
                 table: "LocationOptionMetaChanges",
-                column: "MetaId");
+                column: "PreviousState_MetaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationOptionMetaChanges_PreviousStateId",
+                name: "IX_LocationOptionMetaChanges_PreviousState_OptionId",
                 table: "LocationOptionMetaChanges",
-                column: "PreviousStateId");
+                column: "PreviousState_OptionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TimePeriodMetaChanges_CurrentStateId",

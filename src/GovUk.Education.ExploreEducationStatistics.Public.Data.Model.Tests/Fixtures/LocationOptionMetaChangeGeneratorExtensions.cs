@@ -21,57 +21,51 @@ public static class LocationOptionMetaChangeGeneratorExtensions
         this Generator<LocationOptionMetaChange> generator,
         Guid dataSetVersionId)
         => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
-    
-    public static Generator<LocationOptionMetaChange> WithMeta(
-        this Generator<LocationOptionMetaChange> generator,
-        LocationMeta meta)
-        => generator.ForInstance(s => s.SetMeta(meta));
-    
-    public static Generator<LocationOptionMetaChange> WithMeta(
-        this Generator<LocationOptionMetaChange> generator,
-        Func<LocationMeta> meta)
-        => generator.ForInstance(s => s.SetMeta(meta));
-    
-    public static Generator<LocationOptionMetaChange> WithMetaId(
-        this Generator<LocationOptionMetaChange> generator,
-        int metaId)
-        => generator.ForInstance(s => s.SetMetaId(metaId));
 
     public static Generator<LocationOptionMetaChange> WithCurrentState(
         this Generator<LocationOptionMetaChange> generator,
-        LocationOptionMeta? currentState)
+        LocationOptionMetaLink? currentState)
         => generator.ForInstance(s => s.SetCurrentState(currentState));
 
     public static Generator<LocationOptionMetaChange> WithCurrentState(
         this Generator<LocationOptionMetaChange> generator,
-        Func<LocationOptionMeta?> currentState)
+        Func<LocationOptionMetaLink?> currentState)
         => generator.ForInstance(s => s.SetCurrentState(currentState));
 
-    public static Generator<LocationOptionMetaChange> WithCurrentStateId(
+    public static Generator<LocationOptionMetaChange> WithCurrentState(
         this Generator<LocationOptionMetaChange> generator,
-        int? currentStateId)
-        => generator.ForInstance(s => s.SetCurrentStateId(currentStateId));
+        LocationOptionMetaChange.State? currentState)
+        => generator.ForInstance(s => s.SetCurrentState(currentState));
+
+    public static Generator<LocationOptionMetaChange> WithCurrentState(
+        this Generator<LocationOptionMetaChange> generator,
+        Func<LocationOptionMetaChange.State?> currentState)
+        => generator.ForInstance(s => s.SetCurrentState(currentState));
 
     public static Generator<LocationOptionMetaChange> WithPreviousState(
         this Generator<LocationOptionMetaChange> generator,
-        LocationOptionMeta? previousState)
+        LocationOptionMetaLink? previousState)
         => generator.ForInstance(s => s.SetPreviousState(previousState));
 
     public static Generator<LocationOptionMetaChange> WithPreviousState(
         this Generator<LocationOptionMetaChange> generator,
-        Func<LocationOptionMeta?> previousState)
+        Func<LocationOptionMetaLink?> previousState)
         => generator.ForInstance(s => s.SetPreviousState(previousState));
 
-    public static Generator<LocationOptionMetaChange> WithPreviousStateId(
+    public static Generator<LocationOptionMetaChange> WithPreviousState(
         this Generator<LocationOptionMetaChange> generator,
-        int? previousStateId)
-        => generator.ForInstance(s => s.SetPreviousStateId(previousStateId));
+        LocationOptionMetaChange.State? previousState)
+        => generator.ForInstance(s => s.SetPreviousState(previousState));
+
+    public static Generator<LocationOptionMetaChange> WithPreviousState(
+        this Generator<LocationOptionMetaChange> generator,
+        Func<LocationOptionMetaChange.State?> previousState)
+        => generator.ForInstance(s => s.SetPreviousState(previousState));
 
     public static InstanceSetters<LocationOptionMetaChange> SetDefaults(
         this InstanceSetters<LocationOptionMetaChange> setters)
         => setters
-            .SetDefault(c => c.DataSetVersionId)
-            .SetDefault(c => c.MetaId);
+            .SetDefault(c => c.DataSetVersionId);
 
     public static InstanceSetters<LocationOptionMetaChange> SetDataSetVersion(
         this InstanceSetters<LocationOptionMetaChange> setters,
@@ -85,53 +79,70 @@ public static class LocationOptionMetaChangeGeneratorExtensions
         Guid dataSetVersionId)
         => setters.Set(c => c.DataSetVersionId, dataSetVersionId);
 
-    public static InstanceSetters<LocationOptionMetaChange> SetMeta(
+    public static InstanceSetters<LocationOptionMetaChange> SetCurrentState(
         this InstanceSetters<LocationOptionMetaChange> setters,
-        LocationMeta meta)
-        => setters.SetMeta(() => meta);
-
-    public static InstanceSetters<LocationOptionMetaChange> SetMeta(
-        this InstanceSetters<LocationOptionMetaChange> setters,
-        Func<LocationMeta> meta)
-        => setters
-            .Set(c => c.Meta, meta)
-            .Set(c => c.MetaId, (_, c) => c.Meta.Id);
-
-    public static InstanceSetters<LocationOptionMetaChange> SetMetaId(
-        this InstanceSetters<LocationOptionMetaChange> setters,
-        int metaId)
-        => setters.Set(c => c.MetaId, metaId);
+        LocationOptionMetaLink? currentState)
+        => setters.SetCurrentState(() => currentState);
 
     public static InstanceSetters<LocationOptionMetaChange> SetCurrentState(
         this InstanceSetters<LocationOptionMetaChange> setters,
-        LocationOptionMeta? currentState)
-        => setters.SetPreviousState(() => currentState);
+        Func<LocationOptionMetaLink?> currentState)
+    {
+        var current = currentState();
+
+        return current is not null
+            ? setters
+                .SetCurrentState(
+                    new LocationOptionMetaChange.State
+                    {
+                        MetaId = current.MetaId,
+                        OptionId = current.OptionId
+
+                    }
+                )
+            : setters;
+    }
 
     public static InstanceSetters<LocationOptionMetaChange> SetCurrentState(
         this InstanceSetters<LocationOptionMetaChange> setters,
-        Func<LocationOptionMeta?> currentState)
-        => setters
-            .Set(c => c.CurrentState, currentState)
-            .Set(c => c.CurrentStateId, (_, f) => f.CurrentState?.Id);
+        LocationOptionMetaChange.State? currentState)
+        => setters.Set(c => c.CurrentState, currentState);
 
-    public static InstanceSetters<LocationOptionMetaChange> SetCurrentStateId(
+    public static InstanceSetters<LocationOptionMetaChange> SetCurrentState(
         this InstanceSetters<LocationOptionMetaChange> setters,
-        int? currentStateId)
-        => setters.Set(c => c.CurrentStateId, currentStateId);
+        Func<LocationOptionMetaChange.State?> currentState)
+        => setters.Set(c => c.CurrentState, currentState);
 
     public static InstanceSetters<LocationOptionMetaChange> SetPreviousState(
         this InstanceSetters<LocationOptionMetaChange> setters,
-        LocationOptionMeta? previousState)
+        LocationOptionMetaLink? previousState)
         => setters.SetPreviousState(() => previousState);
+
     public static InstanceSetters<LocationOptionMetaChange> SetPreviousState(
         this InstanceSetters<LocationOptionMetaChange> setters,
-        Func<LocationOptionMeta?> previousState)
-        => setters
-            .Set(c => c.PreviousState, previousState)
-            .Set(c => c.PreviousStateId, (_, f) => f.PreviousState?.Id);
+        Func<LocationOptionMetaLink?> previousState)
+    {
+        var previous = previousState();
 
-    public static InstanceSetters<LocationOptionMetaChange> SetPreviousStateId(
+        return previous is not null
+            ? setters
+                .SetPreviousState(
+                    new LocationOptionMetaChange.State
+                    {
+                        MetaId = previous.MetaId,
+                        OptionId = previous.OptionId
+                    }
+                )
+            : setters;
+    }
+
+    public static InstanceSetters<LocationOptionMetaChange> SetPreviousState(
         this InstanceSetters<LocationOptionMetaChange> setters,
-        int? previousStateId)
-        => setters.Set(c => c.PreviousStateId, previousStateId);
+        LocationOptionMetaChange.State? previousState)
+        => setters.Set(c => c.PreviousState, previousState);
+
+    public static InstanceSetters<LocationOptionMetaChange> SetPreviousState(
+        this InstanceSetters<LocationOptionMetaChange> setters,
+        Func<LocationOptionMetaChange.State?> previousState)
+        => setters.Set(c => c.PreviousState, previousState);
 }
