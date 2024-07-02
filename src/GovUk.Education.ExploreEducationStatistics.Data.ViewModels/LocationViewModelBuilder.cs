@@ -64,12 +64,10 @@ public static class LocationViewModelBuilder
 
         if (feature != null)
         {
-            var (featureName, featureCode) = BoundaryDataUtils.GetFeatureDetails(feature.Properties);
-
             // A recent change (from either of the two latest commits) is causing these to be added multiple times, throwing exceptions due to duplicates.
             // TryAdd prevents the exception, but doesn't resolve the duplicate calls
-            feature.Properties.TryAdd("Code", featureCode);
-            feature.Properties.TryAdd("Name", featureName);
+            feature.Properties.TryAdd("Code", BoundaryDataUtils.GetCode(feature.Properties));
+            feature.Properties.TryAdd("Name", BoundaryDataUtils.GetName(feature.Properties));
         }
 
         return new LocationAttributeViewModel

@@ -25,12 +25,11 @@ public class BoundaryDataService(
         var boundaryData = featureCollection.Features
             .Select(feature =>
             {
-                var (name, code) = BoundaryDataUtils.GetFeatureDetails(feature.Properties);
                 return new BoundaryData
                 {
                     BoundaryLevel = boundaryLevel,
-                    Name = name,
-                    Code = code,
+                    Code = BoundaryDataUtils.GetCode(feature.Properties),
+                    Name = BoundaryDataUtils.GetName(feature.Properties),
                     GeoJson = feature
                 };
             }).ToList();
