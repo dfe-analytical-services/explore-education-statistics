@@ -1,9 +1,12 @@
 import Link from '@admin/components/Link';
+import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
+import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
 import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import {
   releaseDataFileReplaceRoute,
   ReleaseDataFileReplaceRouteParams,
@@ -21,13 +24,11 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
-import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
-import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
+import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   publicationId: string;
@@ -48,19 +49,28 @@ const ReleaseDataUploadsSection = ({
   onDataFilesChange,
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
-  const [activeFileId, setActiveFileId] = useState<string>();
-  const {
-    value: dataFiles = [],
-    setState: setDataFilesState,
-    isLoading,
-  } = useAsyncHandledRetry(
-    () => releaseDataFileService.getDataFiles(releaseId),
-    [releaseId],
+  const [activeFileIds, setActiveFileIds] = useState<string[]>();
+  const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
+
+  const { data: initialDataFiles = [], isLoading } = useQuery(
+    releaseDataFileQueries.list(releaseId),
   );
 
+  // Store the data files on state so we can reliably update them
+  // when the permissions/status change.
+  useEffect(() => {
+    if (!isLoading) {
+      setDataFiles(initialDataFiles);
+    }
+  }, [initialDataFiles, isLoading, setDataFiles]);
+
+  useEffect(() => {
+    onDataFilesChange?.(dataFiles);
+  }, [dataFiles, onDataFilesChange]);
+
   const setFileDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
-    setDataFiles(
-      dataFiles.map(file =>
+    setDataFiles(currentDataFiles =>
+      currentDataFiles.map(file =>
         file.fileName !== dataFile.file.fileName
           ? file
           : {
@@ -71,17 +81,6 @@ const ReleaseDataUploadsSection = ({
     );
   };
 
-  const setDataFiles = useCallback(
-    (nextDataFiles: DataFile[]) => {
-      setDataFilesState({ value: nextDataFiles });
-
-      if (onDataFilesChange) {
-        onDataFilesChange(nextDataFiles);
-      }
-    },
-    [onDataFilesChange, setDataFilesState],
-  );
-
   const handleStatusChange = async (
     dataFile: DataFile,
     { totalRows, status }: DataFileImportStatus,
@@ -91,9 +90,10 @@ const ReleaseDataUploadsSection = ({
       dataFile.id,
     );
 
-    setActiveFileId('');
-    setDataFiles(
-      dataFiles.map(file =>
+    setActiveFileIds([]);
+
+    setDataFiles(currentDataFiles =>
+      currentDataFiles.map(file =>
         file.fileName !== dataFile.fileName
           ? file
           : {
@@ -108,27 +108,49 @@ const ReleaseDataUploadsSection = ({
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
-      let file: DataFile;
-      if (!values.subjectTitle) {
-        return;
-      }
+      const newFiles: DataFile[] = [];
 
-      if (values.uploadType === 'csv') {
-        file = await releaseDataFileService.uploadDataFiles(releaseId, {
-          title: values.subjectTitle,
-          dataFile: values.dataFile as File,
-          metadataFile: values.metadataFile as File,
-        });
-      } else {
-        file = await releaseDataFileService.uploadZipDataFile(releaseId, {
-          title: values.subjectTitle,
-          zipFile: values.zipFile as File,
-        });
+      switch (values.uploadType) {
+        case 'csv': {
+          if (!values.subjectTitle) {
+            return;
+          }
+          newFiles.push(
+            await releaseDataFileService.uploadDataFiles(releaseId, {
+              title: values.subjectTitle,
+              dataFile: values.dataFile as File,
+              metadataFile: values.metadataFile as File,
+            }),
+          );
+          break;
+        }
+        case 'zip': {
+          if (!values.subjectTitle) {
+            return;
+          }
+          newFiles.push(
+            await releaseDataFileService.uploadZipDataFile(releaseId, {
+              title: values.subjectTitle,
+              zipFile: values.zipFile as File,
+            }),
+          );
+          break;
+        }
+        case 'bulkZip':
+          newFiles.push(
+            ...(await releaseDataFileService.uploadBulkZipDataFile(
+              releaseId,
+              values.bulkZipFile as File,
+            )),
+          );
+          break;
+        default:
+          break;
       }
-      setActiveFileId(file.id);
-      setDataFiles([...dataFiles, file]);
+      setActiveFileIds(newFiles.map(file => file.id));
+      setDataFiles(currentDataFiles => [...currentDataFiles, ...newFiles]);
     },
-    [dataFiles, releaseId, setDataFiles],
+    [releaseId],
   );
 
   return (
@@ -149,7 +171,7 @@ const ReleaseDataUploadsSection = ({
             </a>
           </li>
           <li>
-            your data files meets these standards - if not you won’t be able to
+            your data files meets these standards - if not you won't be able to
             upload it to your release
           </li>
           <li>
@@ -193,7 +215,7 @@ const ReleaseDataUploadsSection = ({
                 key={dataFile.title}
                 heading={dataFile.title}
                 headingTag="h3"
-                open={dataFile.id === activeFileId}
+                open={activeFileIds?.includes(dataFile.id)}
               >
                 <div style={{ position: 'relative' }}>
                   {dataFile.isDeleting && (
@@ -284,7 +306,9 @@ const ReleaseDataUploadsSection = ({
             try {
               await releaseDataFileService.deleteDataFiles(releaseId, file.id);
 
-              setDataFiles(dataFiles.filter(dataFile => dataFile !== file));
+              setDataFiles(currentDataFiles =>
+                currentDataFiles.filter(dataFile => dataFile.id !== file.id),
+              );
             } catch (err) {
               logger.error(err);
               setFileDeleting(deleteDataFile, false);

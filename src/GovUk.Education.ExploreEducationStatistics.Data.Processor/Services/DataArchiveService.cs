@@ -23,15 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var path = import.ZipFile!.Path();
 
-            await using var zipBlobFileStream = await _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, path);
+            await using var zipBlobFileStream = await _privateBlobStorageService
+                .StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
-            var file1 = archive.Entries[0];
-            var file2 = archive.Entries[1];
-            var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
-            var metadataFile = file1.Name.Contains(".meta.") ? file1 : file2;
+            var dataFile = archive.GetEntry(import.File.Filename);
+            var metaFile = archive.GetEntry(import.MetaFile.Filename);
 
-            await using (var stream = dataFile.Open())
+            await using (var stream = dataFile!.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
@@ -40,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     contentType: ContentTypes.Csv);
             }
 
-            await using (var stream = metadataFile.Open())
+            await using (var stream = metaFile!.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,

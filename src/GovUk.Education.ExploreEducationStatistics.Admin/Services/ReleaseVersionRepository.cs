@@ -71,14 +71,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseVersionId)
         {
-            var releaseVersion = await _contentDbContext.ReleaseVersions
-                .FirstAsync(rv => rv.Id == releaseVersionId);
-
             var existingStatsReleaseVersion = await _statisticsDbContext.ReleaseVersion
                 .FirstOrDefaultAsync(rv => rv.Id == releaseVersionId);
 
             if (existingStatsReleaseVersion == null)
             {
+                var releaseVersion = await _contentDbContext.ReleaseVersions
+                    .FirstAsync(rv => rv.Id == releaseVersionId);
+
                 _statisticsDbContext.ReleaseVersion.Add(new Data.Model.ReleaseVersion
                 {
                     Id = releaseVersionId,
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersionId = releaseVersion.Id,
+                ReleaseVersionId = releaseVersionId,
                 Subject = new Subject()
             };
 

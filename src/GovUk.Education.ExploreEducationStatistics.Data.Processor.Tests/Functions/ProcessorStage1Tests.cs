@@ -134,7 +134,7 @@ public class ProcessorStage1Tests
         var validatorService = new ValidatorService(
             Mock.Of<ILogger<ValidatorService>>(),
             privateBlobStorageService.Object,
-            new FileTypeService(Mock.Of<ILogger<FileTypeService>>(), new ConfigurationBuilder().Build()),
+            new FileTypeService(new ConfigurationBuilder().Build()),
             dataImportService);
 
         var processorService = BuildProcessorService(

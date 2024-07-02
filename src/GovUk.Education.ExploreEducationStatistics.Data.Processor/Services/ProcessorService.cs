@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _dbContextSupplier = dbContextSupplier;
         }
 
-        public async Task ProcessUnpackingArchive(Guid importId)
+        public async Task ProcessUnpackingArchiveDataSet(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
             await _dataArchiveService.ExtractDataFiles(import);

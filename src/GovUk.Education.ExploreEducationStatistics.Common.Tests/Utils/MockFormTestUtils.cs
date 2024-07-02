@@ -36,31 +36,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             return formFile;
         }
 
-        public static Mock<IDataArchiveFile> CreateDataArchiveFileMock(
+        public static ArchiveDataSetFile CreateArchiveDataSet(
+            string dataSetName,
             string dataFileName,
             string metaFileName,
             long dataFileSize = 1048576,
             long metaFileSize = 1024)
         {
-            var dataArchiveFile = new Mock<IDataArchiveFile>();
-
-            dataArchiveFile
-                .SetupGet(f => f.DataFileName)
-                .Returns(dataFileName);
-
-            dataArchiveFile
-                .SetupGet(f => f.DataFileSize)
-                .Returns(dataFileSize);
-
-            dataArchiveFile
-                .SetupGet(f => f.MetaFileName)
-                .Returns(metaFileName);
-
-            dataArchiveFile
-                .SetupGet(f => f.MetaFileSize)
-                .Returns(metaFileSize);
-
-            return dataArchiveFile;
+            return new ArchiveDataSetFile(dataSetName, dataFileName, dataFileSize, metaFileName, metaFileSize);
         }
     }
 }

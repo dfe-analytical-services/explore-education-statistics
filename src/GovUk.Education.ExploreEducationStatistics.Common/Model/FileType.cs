@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         Data,
         [EnumLabelValue("data-zip")]
         DataZip,
+        [EnumLabelValue("bulk-data-zip")]
+        BulkDataZip,
         [EnumLabelValue("image")]
         Image,
         [EnumLabelValue("metadata")]

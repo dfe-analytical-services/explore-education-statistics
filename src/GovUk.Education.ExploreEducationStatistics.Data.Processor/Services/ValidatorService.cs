@@ -90,13 +90,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, 
                 import.File.Path());
-                    
+
             var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles,
                 import.MetaFile.Path());
 
             return await
-                ValidateCsvFileType(import.MetaFile, metaFileStreamProvider, true)
-                    .OnSuccess(() => ValidateCsvFileType(import.File, dataFileStreamProvider, false))
+                ValidateCsvFileType(metaFileStreamProvider, true)
+                    .OnSuccess(() => ValidateCsvFileType(dataFileStreamProvider, false))
                     .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
                     .OnSuccess(async _ =>
                     {
@@ -111,17 +111,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                 dataFileTotalRows,
                                 dataFileStreamProvider
                             )
-                            .OnSuccessDo(async () =>
+                            .OnSuccessDo(() =>
                                 _logger.LogInformation("Validating: {FileName} complete", import.File.Filename)));
                     });
         }
 
         private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFileType(
-            File file,
             Func<Task<Stream>> fileStreamProvider,
             bool isMetaFile)
         {
-            if (!await _fileTypeService.IsValidCsvFile(fileStreamProvider, file.Filename))
+            await using var stream = await fileStreamProvider.Invoke();
+
+            if (!await _fileTypeService.IsValidCsvFile(stream))
             {
                 return ListOf(isMetaFile
                     ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())
@@ -130,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return Unit.Instance;
         }
-        
+
         private async Task<Either<List<DataImportError>, (List<string> columnHeaders, int totalRows)>>
             ValidateMetadataFile(
                 File file,

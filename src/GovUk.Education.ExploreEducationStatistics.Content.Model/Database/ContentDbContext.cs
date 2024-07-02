@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.ZipFile)
-                .WithOne()
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<DataImport>()

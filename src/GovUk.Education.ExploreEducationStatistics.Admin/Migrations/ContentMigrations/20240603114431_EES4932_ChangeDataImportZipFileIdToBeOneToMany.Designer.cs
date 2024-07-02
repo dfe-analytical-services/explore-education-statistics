@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240603114431_EES4932_ChangeDataImportZipFileIdToBeOneToMany")]
+    partial class EES4932_ChangeDataImportZipFileIdToBeOneToMany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -439,6 +442,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("PublicApiDataSetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PublicApiDataSetVersion")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uniqueidentifier");
 
@@ -474,6 +484,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("SourceId");
 
                     b.HasIndex("Type");
+
+                    b.HasIndex("PublicApiDataSetId", "PublicApiDataSetVersion")
+                        .IsUnique()
+                        .HasFilter("[PublicApiDataSetId] IS NOT NULL AND [PublicApiDataSetVersion] IS NOT NULL");
 
                     b.ToTable("Files");
                 });
@@ -923,13 +937,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("PublicApiDataSetId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PublicApiDataSetVersion")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTime?>("Published")
                         .HasColumnType("datetime2");
 
@@ -943,12 +950,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("FileId");
 
-                    b.HasIndex("ReleaseVersionId", "FileId")
-                        .IsUnique();
-
-                    b.HasIndex("ReleaseVersionId", "PublicApiDataSetId", "PublicApiDataSetVersion")
-                        .IsUnique()
-                        .HasFilter("[PublicApiDataSetId] IS NOT NULL AND [PublicApiDataSetVersion] IS NOT NULL");
+                    b.HasIndex("ReleaseVersionId");
 
                     b.ToTable("ReleaseFiles");
                 });

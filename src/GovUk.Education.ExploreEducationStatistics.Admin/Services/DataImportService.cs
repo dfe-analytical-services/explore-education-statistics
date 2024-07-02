@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile)
+        public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null)
         {
             var import = await _dataImportRepository.Add(new DataImport
             {
@@ -110,23 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileId = dataFile.Id,
                 MetaFileId = metaFile.Id,
                 SubjectId = subjectId,
-                Status = DataImportStatus.QUEUED
-            });
-
-            await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
-            return import;
-        }
-
-        public async Task<DataImport> ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile)
-        {
-            var import = await _dataImportRepository.Add(new DataImport
-            {
-                Created = DateTime.UtcNow,
-                FileId = dataFile.Id,
-                MetaFileId = metaFile.Id,
-                ZipFileId = zipFile.Id,
-                SubjectId = subjectId,
-                Status = DataImportStatus.QUEUED
+                Status = DataImportStatus.QUEUED,
+                ZipFileId = sourceZipFile?.Id,
             });
 
             await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
