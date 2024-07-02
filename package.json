@@ -65,6 +65,7 @@
     "lint:style": "stylelint src/**/*.{scss,css}",
     "start": "tsx useful-scripts/start.ts",
     "test": "pnpm -r --no-bail test",
+    "test:playwright": "cd tests/playwright-tests && pnpm playwright test",
     "test:snapshot": "pnpm -r --no-bail test:snapshot",
     "test:ci": "pnpm -r --no-bail --aggregate-output --reporter=append-only test:ci",
     "test:coverage": "pnpm -r --no-bail test:coverage",
