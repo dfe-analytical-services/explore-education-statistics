@@ -25,6 +25,172 @@ public abstract class DataSetVersionMappingControllerTests(
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
+    public class GetLocationMappingsTests(
+        TestApplicationFactory testApp) : DataSetVersionMappingControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var mappings = new DataSetVersionMapping
+            {
+                SourceDataSetVersionId = currentDataSetVersion.Id,
+                TargetDataSetVersionId = nextDataSetVersion.Id,
+                LocationMappingPlan = new LocationMappingPlan
+                {
+                    Levels = new Dictionary<GeographicLevel, LocationLevelMappings>
+                    {
+                        {
+                            GeographicLevel.LocalAuthority,
+                            new LocationLevelMappings
+                            {
+                                Mappings = new Dictionary<string, LocationOptionMapping>
+                                {
+                                    {
+                                        "source-location-1-key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("Source location 1")
+                                            {
+                                                Code = "Source location 1 code"
+                                            },
+                                            Type = MappingType.None,
+                                            CandidateKey = null
+                                        }
+                                    },
+                                    {
+                                        "source-location-2-key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("Source location 2")
+                                            {
+                                                Code = "Source location 2 code"
+                                            },
+                                            Type = MappingType.None,
+                                            CandidateKey = null
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            GeographicLevel.Country,
+                            new LocationLevelMappings
+                            {
+                                Mappings = new Dictionary<string, LocationOptionMapping>
+                                {
+                                    {
+                                        "source-location-1-key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("Source location 1")
+                                            {
+                                                Code = "Source location 1 code"
+                                            },
+                                            Type = MappingType.None,
+                                            CandidateKey = null
+                                        }
+                                    },
+                                    {
+                                        "source-location-3-key",
+                                        new LocationOptionMapping
+                                        {
+                                            Source = new MappableLocationOption("Source location 3")
+                                            {
+                                                Code = "Source location 3 code"
+                                            },
+                                            Type = MappingType.AutoMapped,
+                                            CandidateKey = "target-location-3-key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                FilterMappingPlan = new FilterMappingPlan()
+            };
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var response = await GetLocationMappings(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                client);
+
+            var retrievedMappings = response.AssertOk<LocationMappingPlan>();
+
+            // Test that the mappings from the Controller are identical to the mappings saved in the database
+            retrievedMappings.AssertDeepEqualTo(
+                mappings.LocationMappingPlan,
+                ignoreCollectionOrders: true);
+        }
+        
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await GetLocationMappings(
+                Guid.NewGuid(),
+                client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionMappingDoesNotExist_Returns404()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await GetLocationMappings(
+                Guid.NewGuid(),
+                client);
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetLocationMappings(
+            Guid nextDataSetVersionId,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/locations", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
     public class ApplyBatchMappingUpdatesTests(
         TestApplicationFactory testApp) : DataSetVersionMappingControllerTests(testApp)
     {

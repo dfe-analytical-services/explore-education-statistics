@@ -28,6 +28,16 @@ public class DataSetVersionMappingService(
     PublicDataDbContext publicDataDbContext)
     : IDataSetVersionMappingService
 {
+    public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return userService
+            .CheckIsBauUser()
+            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+            .OnSuccess(mapping => mapping.LocationMappingPlan);
+    }
+
     public async Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
