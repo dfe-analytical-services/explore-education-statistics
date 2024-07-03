@@ -60,7 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public Either<TL, T> OnSuccess<T>(Func<TR, Either<TL, T>> func) => IsLeft ? Left : func.Invoke(Right);
 
-        public Either<TL2, TR> OnFailure<TL2>(Func<TL, Either<TL2, TR>> func) => IsLeft ? func.Invoke(Left) : Right;
+        /// <summary>
+        /// If the current Either is failing, the function provided here can take the failure and transform it to
+        /// another type of failure.
+        /// </summary>
+        public Either<T, TR> OnFailure<T>(Func<TL, Either<T, TR>> func) => IsLeft ? func.Invoke(Left) : Right;
 
         public Either<TL, TR> OrElse(Func<TR> func) => IsLeft ? func() : Right;
 

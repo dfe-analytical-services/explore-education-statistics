@@ -52,6 +52,11 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
                     builder
                         .AddFilter<ConsoleLoggerProvider>("Default", LogLevel.Warning)
                         .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Warning);
+
+                    // Uncomment to add SQL logging to the debug console.
+                    // .AddFilter<ConsoleLoggerProvider>((category, level) =>
+                    //     category == DbLoggerCategory.Database.Command.Name
+                    //     && level == LogLevel.Information);
                 }
             )
             .ConfigureWebHostDefaults(builder =>

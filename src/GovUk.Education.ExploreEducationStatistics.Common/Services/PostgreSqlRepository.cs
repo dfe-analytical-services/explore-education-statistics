@@ -41,7 +41,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
     }
 
 #pragma warning disable EF1002
-    public async Task<TValue?> UpdateJsonbByPath<TDbContext, TValue, TRowId>(
+    public async Task<TValue?> SetJsonbAtPath<TDbContext, TValue, TRowId>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         TValue? value,
@@ -74,7 +74,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 
 #pragma warning restore EF1002
 
-    public async Task<Either<TFailure, TValue?>> UpdateJsonbByPath<TDbContext, TValue, TRowId, TFailure>(
+    public async Task<Either<TFailure, TValue?>> UpdateJsonbAtPath<TDbContext, TValue, TRowId, TFailure>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         Func<TValue?, Either<TFailure, TValue?>> updateValueFn,
@@ -94,6 +94,6 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             return jsonUpdateResult;
         }
 
-        return await UpdateJsonbByPath(context, request, jsonUpdateResult.Right, cancellationToken);
+        return await SetJsonbAtPath(context, request, jsonUpdateResult.Right, cancellationToken);
     }
 }

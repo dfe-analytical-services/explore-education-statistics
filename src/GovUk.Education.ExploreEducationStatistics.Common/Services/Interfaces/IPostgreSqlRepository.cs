@@ -10,6 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 public interface IPostgreSqlRepository
 {
+    /// <summary>
+    /// Retrieve a JSON fragment from a JSONB column in a particular table and row,
+    /// given a JSON path to the fragment.
+    /// </summary>
     Task<TResponse?> GetJsonbFromPath<TDbContext, TRowId, TResponse>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
@@ -17,7 +21,11 @@ public interface IPostgreSqlRepository
         where TDbContext : DbContext
         where TResponse : class;
 
-    Task<TValue?> UpdateJsonbByPath<TDbContext, TValue, TRowId>(
+    /// <summary>
+    /// Set the JSON to the given value within a JSONB column in a particular table and row,
+    /// given a JSON path to the fragment that needs setting.
+    /// </summary>
+    Task<TValue?> SetJsonbAtPath<TDbContext, TValue, TRowId>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         TValue? value,
@@ -25,7 +33,15 @@ public interface IPostgreSqlRepository
         where TDbContext : DbContext
         where TValue : class;
 
-    Task<Either<TFailure, TValue?>> UpdateJsonbByPath<TDbContext, TValue, TRowId, TFailure>(
+    /// <summary>
+    /// Update the JSON within a JSONB column in a particular table and row,
+    /// given a JSON path to the fragment that needs updating.
+    ///
+    /// The "updateValueFn" function is given the existing JSON at the specified path if it
+    /// exists, and can then transform it and return a succeeding Either.  Optionally it can
+    /// fail and return a failing Either.
+    /// </summary>
+    Task<Either<TFailure, TValue?>> UpdateJsonbAtPath<TDbContext, TValue, TRowId, TFailure>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         Func<TValue?, Either<TFailure, TValue?>> updateValueFn,

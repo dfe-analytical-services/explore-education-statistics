@@ -39,14 +39,22 @@ public class DataSetVersionMappingService(
                 .OnSuccess(_ => UpdateLocationOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken))
                 .OnSuccess(updateSuccessesAndFailures =>
                 {
+                    // Take all the update results from this batch of updates, and check to make sure they all
+                    // succeeded.  If any have failed, we fail the entire transaction and inform the front end of the
+                    // particular update requests that failed. 
                     var aggregatedResult = updateSuccessesAndFailures.AggregateSuccessesAndFailures();
 
                     return aggregatedResult
-                        .OnSuccess(updates => new BatchLocationMappingUpdatesResponseViewModel { Updates = updates })
+                        .OnSuccess(updates =>
+                            new BatchLocationMappingUpdatesResponseViewModel { Updates = updates })
                         .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors));
                 }));
     }
 
+    /// <summary>
+    /// Given a batch of Location mapping update requests, this method will return a list of either success or failure
+    /// responses for each update.
+    /// </summary>
     private async Task<List<Either<ErrorViewModel, LocationMappingUpdateResponse>>> UpdateLocationOptionMappingsBatch(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
@@ -63,6 +71,9 @@ public class DataSetVersionMappingService(
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Given a Location mapping update request, this method will return either a success or failure response.
+    /// </summary>
     private async Task<Either<ErrorViewModel, LocationMappingUpdateResponse>> UpdateLocationOptionMapping(
         Guid nextDataSetVersionId,
         LocationMappingUpdateRequest updateRequest,
@@ -85,13 +96,13 @@ public class DataSetVersionMappingService(
         };
 
         return await postgreSqlRepository
-            .UpdateJsonbByPath(
+            .UpdateJsonbAtPath(
                 publicDataDbContext,
                 updateJsonRequest,
                 (LocationOptionMapping mapping) => mapping is not null
                     ? mapping with
                     {
-                        Type = updateRequest.Type,
+                        Type = updateRequest.Type!.Value,
                         CandidateKey = updateRequest.CandidateKey
                     }
                     : new Either<ErrorViewModel, LocationOptionMapping>(new ErrorViewModel
@@ -105,8 +116,8 @@ public class DataSetVersionMappingService(
                 cancellationToken: cancellationToken)
             .OnSuccess(mappingUpdate => new LocationMappingUpdateResponse
             {
-                Level = updateRequest.Level,
-                SourceKey = updateRequest.SourceKey,
+                Level = updateRequest.Level!.Value,
+                SourceKey = updateRequest.SourceKey!,
                 Mapping = mappingUpdate
             });
     }
