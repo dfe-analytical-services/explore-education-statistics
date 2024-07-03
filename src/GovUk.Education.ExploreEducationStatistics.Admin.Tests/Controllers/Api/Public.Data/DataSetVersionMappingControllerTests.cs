@@ -79,8 +79,8 @@ public abstract class DataSetVersionMappingControllerTests(
                                             {
                                                 Code = "Source location 1 code"
                                             },
-                                            Type = MappingType.None,
-                                            CandidateKey = null
+                                            Type = MappingType.AutoMapped,
+                                            CandidateKey = "target-location-1-key"
                                         }
                                     },
                                     {
@@ -93,6 +93,16 @@ public abstract class DataSetVersionMappingControllerTests(
                                             },
                                             Type = MappingType.None,
                                             CandidateKey = null
+                                        }
+                                    }
+                                },
+                                Candidates = new Dictionary<string, MappableLocationOption>
+                                {
+                                    {
+                                        "target-location-1-key",
+                                        new MappableLocationOption("Target location 1")
+                                        {
+                                            Code = "Target location 1 code"
                                         }
                                     }
                                 }
@@ -112,7 +122,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                             {
                                                 Code = "Source location 1 code"
                                             },
-                                            Type = MappingType.None,
+                                            Type = MappingType.ManualNone,
                                             CandidateKey = null
                                         }
                                     },
@@ -124,8 +134,18 @@ public abstract class DataSetVersionMappingControllerTests(
                                             {
                                                 Code = "Source location 3 code"
                                             },
-                                            Type = MappingType.AutoMapped,
-                                            CandidateKey = "target-location-3-key"
+                                            Type = MappingType.ManualMapped,
+                                            CandidateKey = "target-location-1-key"
+                                        }
+                                    }
+                                },
+                                Candidates = new Dictionary<string, MappableLocationOption>
+                                {
+                                    {
+                                        "target-location-1-key",
+                                        new MappableLocationOption("Target location 1")
+                                        {
+                                            Code = "Target location 1 code"
                                         }
                                     }
                                 }
