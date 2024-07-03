@@ -7,6 +7,36 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
+public record LocationMappingUpdateRequest : MappingUpdateRequest
+{
+    public GeographicLevel? Level { get; init; }
+
+    public class Validator : MappingUpdateRequestValidator<LocationMappingUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Level)
+                .NotNull();
+        }
+    }
+}
+
+public record FilterOptionMappingUpdateRequest : MappingUpdateRequest
+{
+    public string? FilterKey { get; init; } = null;
+
+    public class Validator : MappingUpdateRequestValidator<FilterOptionMappingUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.FilterKey)
+                .Cascade(CascadeMode.Stop)
+                .NotNull()
+                .NotEmpty();
+        }
+    }
+}
+
 public record BatchLocationMappingUpdatesRequest
 {
     public List<LocationMappingUpdateRequest> Updates { get; init; } = [];
@@ -21,29 +51,56 @@ public record BatchLocationMappingUpdatesRequest
     }
 }
 
-public record LocationMappingUpdateRequest
+public record BatchFilterOptionMappingUpdatesRequest
 {
-    public GeographicLevel? Level { get; init; }
+    public List<FilterOptionMappingUpdateRequest> Updates { get; init; } = [];
 
-    public string? SourceKey { get; init; } = null;
+    public class Validator : AbstractValidator<BatchFilterOptionMappingUpdatesRequest>
+    {
+        public Validator()
+        {
+            RuleForEach(request => request.Updates)
+                .SetValidator(new FilterOptionMappingUpdateRequest.Validator());
+        }
+    }
+}
+
+public record LocationMappingUpdateResponse : MappingUpdateResponse<LocationOptionMapping, MappableLocationOption>
+{
+    public GeographicLevel Level { get; init; }
+}
+
+public record FilterOptionMappingUpdateResponse : MappingUpdateResponse<FilterOptionMapping, MappableFilterOption>
+{
+    public string FilterKey { get; init; } = string.Empty;
+}
+
+public record BatchLocationMappingUpdatesResponseViewModel : BatchMappingUpdatesResponseViewModel
+    <LocationMappingUpdateResponse, LocationOptionMapping, MappableLocationOption>;
+
+public record BatchFilterOptionMappingUpdatesResponseViewModel : BatchMappingUpdatesResponseViewModel
+    <FilterOptionMappingUpdateResponse, FilterOptionMapping, MappableFilterOption>;
+
+public abstract record MappingUpdateRequest
+{
+    private static readonly MappingType[] MappedTypes =
+    [
+        MappingType.AutoMapped,
+        MappingType.ManualMapped
+    ];
+
+    public string? SourceKey { get; init; }
 
     public string? CandidateKey { get; init; }
 
     public MappingType? Type { get; init; }
 
-    public class Validator : AbstractValidator<LocationMappingUpdateRequest>
+    public abstract class MappingUpdateRequestValidator<TMappingUpdateRequest>
+        : AbstractValidator<TMappingUpdateRequest>
+        where TMappingUpdateRequest : MappingUpdateRequest
     {
-        private static readonly MappingType[] MappedTypes =
-        [
-            MappingType.AutoMapped,
-            MappingType.ManualMapped
-        ];
-
-        public Validator()
+        public MappingUpdateRequestValidator()
         {
-            RuleFor(request => request.Level)
-                .NotNull();
-
             RuleFor(request => request.SourceKey)
                 .Cascade(CascadeMode.Stop)
                 .NotNull()
@@ -65,16 +122,19 @@ public record LocationMappingUpdateRequest
     }
 }
 
-public record LocationMappingUpdateResponse
+public abstract record MappingUpdateResponse<TMapping, TMappableElement>
+    where TMapping : Mapping<TMappableElement>
+    where TMappableElement : MappableElement
 {
-    public GeographicLevel Level { get; init; }
-
     public string SourceKey { get; init; } = string.Empty;
 
-    public LocationOptionMapping Mapping { get; init; } = null!;
+    public TMapping Mapping { get; init; } = null!;
 }
 
-public record BatchLocationMappingUpdatesResponseViewModel
+public abstract record BatchMappingUpdatesResponseViewModel<TMappingUpdateResponse, TMapping, TMappableElement>
+    where TMappingUpdateResponse : MappingUpdateResponse<TMapping, TMappableElement>
+    where TMapping : Mapping<TMappableElement>
+    where TMappableElement : MappableElement
 {
-    public List<LocationMappingUpdateResponse> Updates { get; init; } = [];
+    public List<TMappingUpdateResponse> Updates { get; init; } = [];
 }

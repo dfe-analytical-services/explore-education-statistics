@@ -30,7 +30,7 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpPatch("{nextDataSetVersionId:guid}/mapping/locations")]
     [Produces("application/json")]
-    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
         [FromBody] BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken)
@@ -42,7 +42,7 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
-    
+
     [HttpGet("{nextDataSetVersionId:guid}/mapping/filters")]
     [Produces("application/json")]
     public Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
@@ -54,4 +54,18 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
             .HandleFailuresOrOk();
     }
 
+    [HttpPatch("{nextDataSetVersionId:guid}/mapping/filters/options")]
+    [Produces("application/json")]
+    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+        [FromRoute] Guid nextDataSetVersionId,
+        [FromBody] BatchLocationMappingUpdatesRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await mappingService
+            .ApplyBatchMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersionId,
+                request: request,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
 }
