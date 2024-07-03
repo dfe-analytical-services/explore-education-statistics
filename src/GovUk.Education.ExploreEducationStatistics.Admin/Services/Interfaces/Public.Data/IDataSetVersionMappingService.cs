@@ -23,4 +23,9 @@ public interface IDataSetVersionMappingService
     Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default);
+    
+    Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchFilterOptionMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default);
 }

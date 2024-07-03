@@ -54,4 +54,19 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
             .GetFilterMappings(nextDataSetVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
+
+    [HttpPatch("filters/options")]
+    [Produces("application/json")]
+    public async Task<ActionResult<BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+        [FromRoute] Guid nextDataSetVersionId,
+        [FromBody] BatchFilterOptionMappingUpdatesRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await mappingService
+            .ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersionId,
+                request: request,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
 }

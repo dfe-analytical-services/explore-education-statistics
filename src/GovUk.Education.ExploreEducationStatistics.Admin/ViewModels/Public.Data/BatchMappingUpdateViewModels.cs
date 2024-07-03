@@ -5,12 +5,12 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
-public record LocationMappingUpdateResponseViewModel : MappingUpdateResponse<LocationOptionMapping, MappableLocationOption>
+public record LocationMappingUpdateResponseViewModel : MappingUpdateResponseViewModel<LocationOptionMapping, MappableLocationOption>
 {
     public GeographicLevel Level { get; init; }
 }
 
-public record FilterOptionMappingUpdateResponseViewModel : MappingUpdateResponse<FilterOptionMapping, MappableFilterOption>
+public record FilterOptionMappingUpdateResponseViewModel : MappingUpdateResponseViewModel<FilterOptionMapping, MappableFilterOption>
 {
     public string FilterKey { get; init; } = string.Empty;
 }
@@ -21,7 +21,7 @@ public record BatchLocationMappingUpdatesResponseViewModel : BatchMappingUpdates
 public record BatchFilterOptionMappingUpdatesResponseViewModel : BatchMappingUpdatesResponseViewModel
     <FilterOptionMappingUpdateResponseViewModel, FilterOptionMapping, MappableFilterOption>;
 
-public abstract record MappingUpdateResponse<TMapping, TMappableElement>
+public abstract record MappingUpdateResponseViewModel<TMapping, TMappableElement>
     where TMapping : Mapping<TMappableElement>
     where TMappableElement : MappableElement
 {
@@ -31,7 +31,7 @@ public abstract record MappingUpdateResponse<TMapping, TMappableElement>
 }
 
 public abstract record BatchMappingUpdatesResponseViewModel<TMappingUpdateResponse, TMapping, TMappableElement>
-    where TMappingUpdateResponse : MappingUpdateResponse<TMapping, TMappableElement>
+    where TMappingUpdateResponse : MappingUpdateResponseViewModel<TMapping, TMappableElement>
     where TMapping : Mapping<TMappableElement>
     where TMappableElement : MappableElement
 {
