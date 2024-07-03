@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -211,7 +211,7 @@ public abstract class DataSetVersionMappingControllerTests(
         }
     }
 
-    public class ApplyBatchMappingUpdatesTests(
+    public class ApplyBatchLocationMappingUpdatesTests(
         TestApplicationFactory testApp) : DataSetVersionMappingControllerTests(testApp)
     {
         [Fact]
@@ -346,7 +346,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 }
             ];
 
-            var response = await ApplyBatchMappingUpdates(
+            var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
                 client);
@@ -569,7 +569,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 }
             ];
 
-            var response = await ApplyBatchMappingUpdates(
+            var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
                 client);
@@ -603,7 +603,7 @@ public abstract class DataSetVersionMappingControllerTests(
         {
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
-            var response = await ApplyBatchMappingUpdates(
+            var response = await ApplyBatchLocationMappingUpdates(
                 Guid.NewGuid(),
                 new List<LocationMappingUpdateRequest>(),
                 client);
@@ -616,7 +616,7 @@ public abstract class DataSetVersionMappingControllerTests(
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ApplyBatchMappingUpdates(
+            var response = await ApplyBatchLocationMappingUpdates(
                 Guid.NewGuid(),
                 new List<LocationMappingUpdateRequest>(),
                 client);
@@ -629,7 +629,7 @@ public abstract class DataSetVersionMappingControllerTests(
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ApplyBatchMappingUpdates(
+            var response = await ApplyBatchLocationMappingUpdates(
                 Guid.NewGuid(),
                 [
                     new LocationMappingUpdateRequest()
@@ -650,7 +650,7 @@ public abstract class DataSetVersionMappingControllerTests(
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ApplyBatchMappingUpdates(
+            var response = await ApplyBatchLocationMappingUpdates(
                 Guid.NewGuid(),
                 [
                     new LocationMappingUpdateRequest
@@ -677,7 +677,7 @@ public abstract class DataSetVersionMappingControllerTests(
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ApplyBatchMappingUpdates(
+            var response = await ApplyBatchLocationMappingUpdates(
                 Guid.NewGuid(),
                 [
                     new LocationMappingUpdateRequest
@@ -697,7 +697,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 expectedCode: ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Code,
                 expectedMessage: ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Message);
         }
-        
+
         [Theory]
         [InlineData(MappingType.None)]
         [InlineData(MappingType.AutoMapped)]
@@ -727,7 +727,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 expectedMessage: "Type must be one of the following values: ManualMapped, ManualNone");
         }
 
-        private async Task<HttpResponseMessage> ApplyBatchMappingUpdates(
+        private async Task<HttpResponseMessage> ApplyBatchLocationMappingUpdates(
             Guid nextDataSetVersionId,
             List<LocationMappingUpdateRequest> updates,
             HttpClient? client = null)
@@ -738,6 +738,340 @@ public abstract class DataSetVersionMappingControllerTests(
 
             return await client.PatchAsync(uri,
                 new JsonNetContent(new BatchLocationMappingUpdatesRequest { Updates = updates }));
+        }
+    }
+    
+    public class GetFilterMappingsTests(
+        TestApplicationFactory testApp) : DataSetVersionMappingControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var mappings = new DataSetVersionMapping
+            {
+                SourceDataSetVersionId = currentDataSetVersion.Id,
+                TargetDataSetVersionId = nextDataSetVersion.Id,
+                LocationMappingPlan = new LocationMappingPlan(),
+                FilterMappingPlan = new FilterMappingPlan
+                {
+                    Mappings =
+                    {
+                        {
+                            "Filter 1 key", new FilterMapping
+                            {
+                                Source = new MappableFilter("Filter 1 label"),
+                                Type = MappingType.AutoMapped,
+                                CandidateKey = "Filter 1 key",
+                                OptionMappings =
+                                {
+                                    {
+                                        "Filter 1 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new MappableFilterOption("Filter 1 option 1 label"),
+                                            Type = MappingType.AutoMapped,
+                                            CandidateKey = "Filter 1 option 1 key"
+                                        }
+                                    },
+                                    {
+                                        "Filter 1 option 2 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new MappableFilterOption("Filter 1 option 2 label"),
+                                            Type = MappingType.ManualNone
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Filter 2 key", new FilterMapping
+                            {
+                                Source = new MappableFilter("Filter 2 label"),
+                                Type = MappingType.AutoNone,
+                                OptionMappings =
+                                {
+                                    {
+                                        "Filter 2 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new MappableFilterOption("Filter 2 option 1 label"),
+                                            Type = MappingType.AutoNone
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    Candidates =
+                    {
+                        {
+                            "Filter 1 key",
+                            new FilterMappingCandidate("Filter 1 label")
+                            {
+                                Options =
+                                {
+                                    {
+                                        "Filter 1 option 1 key", 
+                                        new MappableFilterOption("Filter 1 option 1 label")
+                                    },
+                                    {
+                                        "Filter 1 option 3 key", 
+                                        new MappableFilterOption("Filter 1 option 3 label")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var response = await GetFilterMappings(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                client);
+
+            var retrievedMappings = response.AssertOk<FilterMappingPlan>();
+            
+            // Test that the mappings from the Controller are identical to the mappings saved in the database
+            retrievedMappings.AssertDeepEqualTo(
+                mappings.FilterMappingPlan,
+                ignoreCollectionOrders: true);
+        }
+        
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await GetFilterMappings(
+                Guid.NewGuid(),
+                client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionMappingDoesNotExist_Returns404()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await GetFilterMappings(
+                Guid.NewGuid(),
+                client);
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetFilterMappings(
+            Guid nextDataSetVersionId,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/filters", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    public class GetFilterMappingsTests(
+        TestApplicationFactory testApp) : DataSetVersionMappingControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var mappings = new DataSetVersionMapping
+            {
+                SourceDataSetVersionId = currentDataSetVersion.Id,
+                TargetDataSetVersionId = nextDataSetVersion.Id,
+                LocationMappingPlan = new LocationMappingPlan(),
+                FilterMappingPlan = new FilterMappingPlan
+                {
+                    Mappings =
+                    {
+                        {
+                            "Filter 1 key", new FilterMapping
+                            {
+                                Source = new MappableFilter("Filter 1 label"),
+                                Type = MappingType.AutoMapped,
+                                CandidateKey = "Filter 1 key",
+                                OptionMappings =
+                                {
+                                    {
+                                        "Filter 1 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new MappableFilterOption("Filter 1 option 1 label"),
+                                            Type = MappingType.AutoMapped,
+                                            CandidateKey = "Filter 1 option 1 key"
+                                        }
+                                    },
+                                    {
+                                        "Filter 1 option 2 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new MappableFilterOption("Filter 1 option 2 label"),
+                                            Type = MappingType.ManualNone
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Filter 2 key", new FilterMapping
+                            {
+                                Source = new MappableFilter("Filter 2 label"),
+                                Type = MappingType.AutoNone,
+                                OptionMappings =
+                                {
+                                    {
+                                        "Filter 2 option 1 key",
+                                        new FilterOptionMapping
+                                        {
+                                            Source = new MappableFilterOption("Filter 2 option 1 label"),
+                                            Type = MappingType.AutoNone
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    Candidates =
+                    {
+                        {
+                            "Filter 1 key",
+                            new FilterMappingCandidate("Filter 1 label")
+                            {
+                                Options =
+                                {
+                                    {
+                                        "Filter 1 option 1 key", 
+                                        new MappableFilterOption("Filter 1 option 1 label")
+                                    },
+                                    {
+                                        "Filter 1 option 3 key", 
+                                        new MappableFilterOption("Filter 1 option 3 label")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var response = await GetFilterMappings(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                client);
+
+            var retrievedMappings = response.AssertOk<FilterMappingPlan>();
+
+            var s = JsonSerializer.Serialize(retrievedMappings);
+            
+            // Test that the mappings from the Controller are identical to the mappings saved in the database
+            retrievedMappings.AssertDeepEqualTo(
+                mappings.FilterMappingPlan,
+                ignoreCollectionOrders: true);
+        }
+        
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await GetFilterMappings(
+                Guid.NewGuid(),
+                client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionMappingDoesNotExist_Returns404()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await GetFilterMappings(
+                Guid.NewGuid(),
+                client);
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetFilterMappings(
+            Guid nextDataSetVersionId,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/filters", UriKind.Relative);
+
+            return await client.GetAsync(uri);
         }
     }
 

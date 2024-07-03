@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
@@ -44,4 +43,16 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
+    
+    [HttpGet("{nextDataSetVersionId:guid}/mapping/filters")]
+    [Produces("application/json")]
+    public Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
+        [FromRoute] Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        return mappingService
+            .GetFilterMappings(nextDataSetVersionId, cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
 }

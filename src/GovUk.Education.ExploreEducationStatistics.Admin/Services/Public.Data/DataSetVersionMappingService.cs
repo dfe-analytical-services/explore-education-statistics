@@ -61,6 +61,17 @@ public class DataSetVersionMappingService(
                         .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors));
                 }));
     }
+    
+    public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return userService
+            .CheckIsBauUser()
+            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+            .OnSuccess(mapping => mapping.FilterMappingPlan);
+    }
+
 
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will return a list of either success or failure
