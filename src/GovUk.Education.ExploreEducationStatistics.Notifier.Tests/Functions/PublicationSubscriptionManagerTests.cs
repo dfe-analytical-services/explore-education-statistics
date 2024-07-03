@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +18,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Utils.NotifierTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
@@ -39,7 +39,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task SendsSubscriptionVerificationEmail()
     {
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -64,7 +64,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -111,7 +111,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 DateTime.UtcNow));
 
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -136,7 +136,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -185,7 +185,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 DateTime.UtcNow.AddDays(-4)));
 
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -210,7 +210,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -251,7 +251,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -276,7 +276,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -304,7 +304,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -329,7 +329,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -357,7 +357,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -382,7 +382,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -410,7 +410,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -435,7 +435,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -473,7 +473,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
 
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -502,7 +502,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -542,7 +542,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
 
         // Arrange (mocks)
-        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -562,7 +562,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
         var notifierFunction = BuildFunction(
-            storageTableService: storageTableService,
+            publicationSubscriptionRepository: publicationSubscriptionRepository,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
