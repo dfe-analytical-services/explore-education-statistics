@@ -36,7 +36,7 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
         CancellationToken cancellationToken)
     {
         return await mappingService
-            .ApplyBatchMappingUpdates(
+            .ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
                 cancellationToken: cancellationToken)
@@ -56,13 +56,13 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpPatch("{nextDataSetVersionId:guid}/mapping/filters/options")]
     [Produces("application/json")]
-    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+    public async Task<ActionResult<BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
-        [FromBody] BatchLocationMappingUpdatesRequest request,
+        [FromBody] BatchFilterOptionMappingUpdatesRequest request,
         CancellationToken cancellationToken)
     {
         return await mappingService
-            .ApplyBatchMappingUpdates(
+            .ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
                 cancellationToken: cancellationToken)

@@ -37,10 +37,8 @@ public record FilterOptionMappingUpdateRequest : MappingUpdateRequest
     }
 }
 
-public record BatchLocationMappingUpdatesRequest
+public record BatchLocationMappingUpdatesRequest : BatchMappingUpdatesRequest<LocationMappingUpdateRequest>
 {
-    public List<LocationMappingUpdateRequest> Updates { get; init; } = [];
-
     public class Validator : AbstractValidator<BatchLocationMappingUpdatesRequest>
     {
         public Validator()
@@ -51,10 +49,8 @@ public record BatchLocationMappingUpdatesRequest
     }
 }
 
-public record BatchFilterOptionMappingUpdatesRequest
+public record BatchFilterOptionMappingUpdatesRequest : BatchMappingUpdatesRequest<FilterOptionMappingUpdateRequest>
 {
-    public List<FilterOptionMappingUpdateRequest> Updates { get; init; } = [];
-
     public class Validator : AbstractValidator<BatchFilterOptionMappingUpdatesRequest>
     {
         public Validator()
@@ -120,6 +116,12 @@ public abstract record MappingUpdateRequest
                 .When(request => request.Type is not null && !MappedTypes.Contains(request.Type.Value));
         }
     }
+}
+
+public abstract record BatchMappingUpdatesRequest<TMappingUpdateRequest>
+    where TMappingUpdateRequest : MappingUpdateRequest
+{
+    public List<TMappingUpdateRequest> Updates { get; init; } = [];
 }
 
 public abstract record MappingUpdateResponse<TMapping, TMappableElement>

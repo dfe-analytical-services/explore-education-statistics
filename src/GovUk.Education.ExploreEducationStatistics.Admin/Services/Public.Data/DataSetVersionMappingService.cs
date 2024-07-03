@@ -37,28 +37,16 @@ public class DataSetVersionMappingService(
             .OnSuccess(mapping => mapping.LocationMappingPlan);
     }
 
-    public async Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await publicDataDbContext.RequireTransaction(async () =>
-            await userService
-                .CheckIsBauUser()
-                .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
-                .OnSuccess(_ => UpdateLocationOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken))
-                .OnSuccess(updateSuccessesAndFailures =>
-                {
-                    // Take all the update results from this batch of updates, and check to make sure they all
-                    // succeeded.  If any have failed, we fail the entire transaction and inform the front end of the
-                    // particular update requests that failed. 
-                    var aggregatedResult = updateSuccessesAndFailures.AggregateSuccessesAndFailures();
-
-                    return aggregatedResult
-                        .OnSuccess(updates =>
-                            new BatchLocationMappingUpdatesResponseViewModel { Updates = updates })
-                        .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors));
-                }));
+        return ApplyBatchMappingUpdates(
+            nextDataSetVersionId: nextDataSetVersionId,
+            applyUpdatesFn: () => UpdateLocationOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
+            createViewModelFn: updates => new BatchLocationMappingUpdatesResponseViewModel { Updates = updates },
+            cancellationToken: cancellationToken);
     }
     
     public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
@@ -70,7 +58,43 @@ public class DataSetVersionMappingService(
             .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
+    
+    public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchFilterOptionMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return ApplyBatchMappingUpdates(
+            nextDataSetVersionId: nextDataSetVersionId,
+            applyUpdatesFn: () => UpdateFilterOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
+            createViewModelFn: updates => new BatchFilterOptionMappingUpdatesResponseViewModel { Updates = updates },
+            cancellationToken: cancellationToken);
+    }
 
+    private async Task<Either<ActionResult, TBatchMappingUpdatesResponseViewModel>> 
+        ApplyBatchMappingUpdates<TMappingUpdateResponse, TBatchMappingUpdatesResponseViewModel>(
+        Guid nextDataSetVersionId,
+        Func<Task<List<Either<ErrorViewModel, TMappingUpdateResponse>>>> applyUpdatesFn,
+        Func<List<TMappingUpdateResponse>, TBatchMappingUpdatesResponseViewModel> createViewModelFn,
+        CancellationToken cancellationToken = default)
+    {
+        return await publicDataDbContext.RequireTransaction(async () =>
+            await userService
+                .CheckIsBauUser()
+                .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+                .OnSuccess(_ => applyUpdatesFn())
+                .OnSuccess(updateSuccessesAndFailures =>
+                {
+                    // Take all the update results from this batch of updates, and check to make sure they all
+                    // succeeded.  If any have failed, we fail the entire transaction and inform the front end of the
+                    // particular update requests that failed. 
+                    var aggregatedResult = updateSuccessesAndFailures.AggregateSuccessesAndFailures();
+
+                    return aggregatedResult
+                        .OnSuccess(createViewModelFn)
+                        .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors));
+                }));
+    }
 
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will return a list of either success or failure
@@ -84,63 +108,108 @@ public class DataSetVersionMappingService(
         return await request
             .Updates
             .ToAsyncEnumerable()
-            .SelectAwait(async (updateRequest, index) => await UpdateLocationOptionMapping(
-                nextDataSetVersionId,
-                updateRequest,
-                index,
-                cancellationToken))
+            .SelectAwait(async (updateRequest, index) => await UpdateMapping
+                <LocationOptionMapping, MappableLocationOption, LocationMappingUpdateRequest, LocationMappingUpdateResponse>(
+                    nextDataSetVersionId: nextDataSetVersionId,
+                    updateRequest: updateRequest,
+                    index: index,
+                    jsonbColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
+                    jsonPathSegments: [
+                        "Levels",
+                        updateRequest.Level.ToString(),
+                        "Mappings",
+                        updateRequest.SourceKey
+                    ],
+                    createSuccessfulResponseFn: mappingUpdate => new LocationMappingUpdateResponse
+                    {
+                        Level = updateRequest.Level!.Value,
+                        SourceKey = updateRequest.SourceKey!,
+                        Mapping = mappingUpdate
+                    },
+                    cancellationToken))
+            .ToListAsync(cancellationToken);
+    }
+    
+    /// <summary>
+    /// Given a batch of Filter Option mapping update requests, this method will return a list of either success or
+    /// failure responses for each update.
+    /// </summary>
+    private async Task<List<Either<ErrorViewModel, FilterOptionMappingUpdateResponse>>> UpdateFilterOptionMappingsBatch(
+        Guid nextDataSetVersionId,
+        BatchFilterOptionMappingUpdatesRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await request
+            .Updates
+            .ToAsyncEnumerable()
+            .SelectAwait(async (updateRequest, index) => await UpdateMapping
+                <FilterOptionMapping, MappableFilterOption, FilterOptionMappingUpdateRequest, FilterOptionMappingUpdateResponse>(
+                    nextDataSetVersionId: nextDataSetVersionId,
+                    updateRequest: updateRequest,
+                    index: index,
+                    jsonbColumnName: nameof(DataSetVersionMapping.FilterMappingPlan),
+                    jsonPathSegments: [
+                        "Mappings",
+                        updateRequest.FilterKey,
+                        "OptionMappings",
+                        updateRequest.SourceKey
+                    ],
+                    createSuccessfulResponseFn: mappingUpdate => new FilterOptionMappingUpdateResponse
+                    {
+                        FilterKey = updateRequest.FilterKey!,
+                        SourceKey = updateRequest.SourceKey!,
+                        Mapping = mappingUpdate
+                    },
+                    cancellationToken))
             .ToListAsync(cancellationToken);
     }
 
     /// <summary>
-    /// Given a Location mapping update request, this method will return either a success or failure response.
+    /// Given a mapping update request, this method will return either a success or failure response.
     /// </summary>
-    private async Task<Either<ErrorViewModel, LocationMappingUpdateResponse>> UpdateLocationOptionMapping(
-        Guid nextDataSetVersionId,
-        LocationMappingUpdateRequest updateRequest,
-        int index,
-        CancellationToken cancellationToken = default)
+    private async Task<Either<ErrorViewModel, TMappingUpdateResponse>> 
+        UpdateMapping<TMapping, TMappableElement, TMappingUpdateRequest, TMappingUpdateResponse>(
+            Guid nextDataSetVersionId,
+            TMappingUpdateRequest updateRequest,
+            int index,
+            string jsonbColumnName,
+            string[] jsonPathSegments,
+            Func<TMapping, TMappingUpdateResponse> createSuccessfulResponseFn,
+            CancellationToken cancellationToken = default)
+        where TMapping : Mapping<TMappableElement>
+        where TMappableElement : MappableElement
+        where TMappingUpdateRequest: MappingUpdateRequest
+        where TMappingUpdateResponse: MappingUpdateResponse<TMapping, TMappableElement>
     {
         var updateJsonRequest = new JsonbPathRequest<Guid>
         {
             TableName = nameof(PublicDataDbContext.DataSetVersionMappings),
             IdColumnName = "TargetDataSetVersionId",
-            JsonbColumnName = nameof(DataSetVersionMapping.LocationMappingPlan),
+            JsonbColumnName = jsonbColumnName,
             RowId = nextDataSetVersionId,
-            PathSegments =
-            [
-                "Levels",
-                updateRequest.Level.ToString(),
-                "Mappings",
-                updateRequest.SourceKey
-            ]
+            PathSegments = jsonPathSegments
         };
 
         return await postgreSqlRepository
             .UpdateJsonbAtPath(
                 publicDataDbContext,
                 updateJsonRequest,
-                (LocationOptionMapping mapping) => mapping is not null
+                (TMapping mapping) => mapping is not null
                     ? mapping with
                     {
                         Type = updateRequest.Type!.Value,
                         CandidateKey = updateRequest.CandidateKey
                     }
-                    : new Either<ErrorViewModel, LocationOptionMapping>(new ErrorViewModel
+                    : new Either<ErrorViewModel, TMapping>(new ErrorViewModel
                     {
                         Code = ValidationMessages.DataSetVersionMappingPathDoesNotExist.Code,
                         Message = ValidationMessages.DataSetVersionMappingPathDoesNotExist.Message,
                         Path =
-                            $"{nameof(BatchLocationMappingUpdatesRequest.Updates).ToLowerFirst()}[{index}]." +
-                            $"{nameof(LocationMappingUpdateRequest.SourceKey).ToLowerFirst()}"
+                            $"{nameof(BatchMappingUpdatesRequest<TMappingUpdateRequest>.Updates).ToLowerFirst()}[{index}]." +
+                            $"{nameof(MappingUpdateRequest.SourceKey).ToLowerFirst()}"
                     }),
                 cancellationToken: cancellationToken)
-            .OnSuccess(mappingUpdate => new LocationMappingUpdateResponse
-            {
-                Level = updateRequest.Level!.Value,
-                SourceKey = updateRequest.SourceKey!,
-                Mapping = mappingUpdate
-            });
+            .OnSuccess(createSuccessfulResponseFn);
     }
 
     private async Task<Either<ActionResult, DataSetVersionMapping>> CheckMappingExists(
