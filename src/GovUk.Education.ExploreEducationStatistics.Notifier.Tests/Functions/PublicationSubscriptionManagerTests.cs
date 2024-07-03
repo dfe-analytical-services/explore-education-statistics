@@ -18,10 +18,11 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Utils.NotifierTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
-public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFixture fixture)
+public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTestFixture fixture)
     : NotifierFunctionsIntegrationTest(fixture)
 {
     private static readonly GovUkNotifyOptions.EmailTemplateOptions EmailTemplateOptions = new()
@@ -38,7 +39,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task SendsSubscriptionVerificationEmail()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -110,7 +111,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
                 DateTime.UtcNow));
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -184,7 +185,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
                 DateTime.UtcNow.AddDays(-4)));
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -250,7 +251,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -303,7 +304,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -356,7 +357,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -409,7 +410,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -472,7 +473,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -541,7 +542,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
 
 
         // Arrange (mocks)
-        var storageTableService = new StorageTableService(Options.Create(new AppSettingsOptions
+        var storageTableService = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
             TableStorageConnectionString = fixture.TableStorageConnectionString()
         }));
@@ -600,13 +601,13 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
         return true;
     }
 
-    private static SubscriptionManager BuildFunction(
+    private static PublicationSubscriptionManager BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IStorageTableService? storageTableService = null,
+        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null,
         INotificationClientProvider? notificationClientProvider = null) =>
         new(
-            Mock.Of<ILogger<SubscriptionManager>>(),
+            Mock.Of<ILogger<PublicationSubscriptionManager>>(),
             Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
             Options.Create(new GovUkNotifyOptions
             {
@@ -615,7 +616,7 @@ public class SubscriptionManagerFunctionTests(NotifierFunctionsIntegrationTestFi
             }),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            storageTableService ?? Mock.Of<IStorageTableService>(MockBehavior.Strict),
+            publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
             notificationClientProvider ?? Mock.Of<INotificationClientProvider>(MockBehavior.Strict),
             new NewPendingSubscriptionRequest.Validator());
 }

@@ -1,5 +1,8 @@
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
@@ -28,9 +31,10 @@ var host = new HostBuilder()
         services
             .AddApplicationInsightsTelemetryWorkerService()
             .ConfigureFunctionsApplicationInsights()
+            .AddFluentValidation()
             .AddTransient<IEmailService, EmailService>()
             .AddTransient<INotificationClientProvider, NotificationClientProvider>()
-            .AddTransient<IStorageTableService, StorageTableService>()
+            .AddTransient<IPublicationSubscriptionRepository, PublicationSubscriptionRepository>()
             .AddTransient<ITokenService, TokenService>()
             .AddScoped<IValidator<NewPendingSubscriptionRequest>,
                 NewPendingSubscriptionRequest.Validator>()

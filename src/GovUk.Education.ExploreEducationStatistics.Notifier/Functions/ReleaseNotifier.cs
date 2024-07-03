@@ -13,6 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQ
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
@@ -23,7 +24,7 @@ public class ReleaseNotifier
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions;
     private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
-    private readonly IStorageTableService _storageTableService;
+    private readonly IPublicationSubscriptionRepository _publicationSubscriptionRepository;
     private readonly INotificationClientProvider _notificationClientProvider;
 
     public ReleaseNotifier(
@@ -32,7 +33,7 @@ public class ReleaseNotifier
         IOptions<GovUkNotifyOptions> govUkNotifyOptions,
         ITokenService tokenService,
         IEmailService emailService,
-        IStorageTableService storageTableService,
+        IPublicationSubscriptionRepository publicationSubscriptionRepository,
         INotificationClientProvider notificationClientProvider)
     {
         _logger = logger;
@@ -40,7 +41,7 @@ public class ReleaseNotifier
         _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-        _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
+        _publicationSubscriptionRepository = publicationSubscriptionRepository ?? throw new ArgumentNullException(nameof(publicationSubscriptionRepository));
         _notificationClientProvider = notificationClientProvider
                                       ?? throw new ArgumentNullException(nameof(notificationClientProvider));
     }
@@ -54,7 +55,7 @@ public class ReleaseNotifier
 
         var notificationClient = _notificationClientProvider.Get();
 
-        var subscribersTable = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
+        var subscribersTable = await _publicationSubscriptionRepository.GetTable(NotifierSubscriptionsTableName);
 
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 

@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
@@ -77,8 +78,8 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
                 mock.GetTable(NotifierSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
@@ -99,7 +100,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -175,8 +176,8 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
                 mock.GetTable(NotifierSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
@@ -203,7 +204,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -288,8 +289,8 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
                 mock.GetTable(NotifierSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
@@ -316,7 +317,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -419,8 +420,8 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPub2Subs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
                 mock.GetTable(NotifierSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
@@ -441,7 +442,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -532,8 +533,8 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
                 mock.GetTable(NotifierSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
@@ -555,7 +556,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -638,7 +639,7 @@ public class ReleaseNotifierTests
     private static ReleaseNotifier BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IStorageTableService? storageTableService = null,
+        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null,
         INotificationClientProvider? notificationClientProvider = null)
     {
         return new ReleaseNotifier(
@@ -651,7 +652,7 @@ public class ReleaseNotifierTests
             }),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            storageTableService ?? Mock.Of<IStorageTableService>(MockBehavior.Strict),
+            publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
             notificationClientProvider ?? Mock.Of<INotificationClientProvider>(MockBehavior.Strict));
     }
 }
