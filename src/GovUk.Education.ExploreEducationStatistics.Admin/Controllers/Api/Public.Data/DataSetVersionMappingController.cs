@@ -31,20 +31,20 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpPatch("locations")]
     [Produces("application/json")]
-    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
         [FromBody] BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken)
     {
         return await mappingService
-            .ApplyBatchMappingUpdates(
+            .ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
-    
-    [HttpGet("{nextDataSetVersionId:guid}/mapping/filters")]
+
+    [HttpGet("filters")]
     [Produces("application/json")]
     public Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
         [FromRoute] Guid nextDataSetVersionId,
@@ -54,5 +54,4 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
             .GetFilterMappings(nextDataSetVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
-
 }

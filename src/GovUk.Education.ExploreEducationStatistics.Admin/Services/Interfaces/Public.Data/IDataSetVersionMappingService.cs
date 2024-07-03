@@ -15,7 +15,7 @@ public interface IDataSetVersionMappingService
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken = default);

@@ -8,6 +8,35 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 
+public record LocationMappingUpdateRequest : MappingUpdateRequest
+{
+    public GeographicLevel? Level { get; init; }
+
+    public class Validator : MappingUpdateRequestValidator<LocationMappingUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Level)
+                .NotNull()
+                .IsInEnum();
+        }
+    }
+}
+
+public record FilterOptionMappingUpdateRequest : MappingUpdateRequest
+{
+    public string? FilterKey { get; init; } = null;
+
+    public class Validator : MappingUpdateRequestValidator<FilterOptionMappingUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.FilterKey)
+                .NotEmpty();
+        }
+    }
+}
+
 public record BatchLocationMappingUpdatesRequest
 {
     public List<LocationMappingUpdateRequest> Updates { get; init; } = [];
@@ -22,30 +51,40 @@ public record BatchLocationMappingUpdatesRequest
     }
 }
 
-public record LocationMappingUpdateRequest
+public record BatchFilterOptionMappingUpdatesRequest
 {
-    public GeographicLevel? Level { get; init; }
+    public List<FilterOptionMappingUpdateRequest> Updates { get; init; } = [];
 
-    public string SourceKey { get; init; } = string.Empty;
+    public class Validator : AbstractValidator<BatchFilterOptionMappingUpdatesRequest>
+    {
+        public Validator()
+        {
+            RuleForEach(request => request.Updates)
+                .SetValidator(new FilterOptionMappingUpdateRequest.Validator());
+        }
+    }
+}
+
+public abstract record MappingUpdateRequest
+{
+    private static readonly MappingType[] ManualMappingTypes =
+    [
+        MappingType.ManualNone,
+        MappingType.ManualMapped
+    ];
+
+    public string? SourceKey { get; init; }
 
     public string? CandidateKey { get; init; }
 
     public MappingType? Type { get; init; }
 
-    public class Validator : AbstractValidator<LocationMappingUpdateRequest>
+    public abstract class MappingUpdateRequestValidator<TMappingUpdateRequest>
+        : AbstractValidator<TMappingUpdateRequest>
+        where TMappingUpdateRequest : MappingUpdateRequest
     {
-        private static readonly MappingType[] ManualMappingTypes =
-        [
-            MappingType.ManualNone,
-            MappingType.ManualMapped
-        ];
-
-        public Validator()
+        public MappingUpdateRequestValidator()
         {
-            RuleFor(request => request.Level)
-                .NotNull()
-                .IsInEnum();
-
             RuleFor(request => request.SourceKey)
                 .NotEmpty();
 

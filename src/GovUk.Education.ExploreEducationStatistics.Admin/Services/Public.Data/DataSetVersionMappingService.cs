@@ -38,7 +38,7 @@ public class DataSetVersionMappingService(
             .OnSuccess(mapping => mapping.LocationMappingPlan);
     }
 
-    public async Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    public async Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken = default)
