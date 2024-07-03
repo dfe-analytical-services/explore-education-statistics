@@ -19,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 public class DataSetVersionMappingController(IDataSetVersionMappingService mappingService)
     : ControllerBase
 {
-
     [HttpGet("locations")]
     [Produces("application/json")]
     public Task<ActionResult<LocationMappingPlan>> GetLocationMappings(
