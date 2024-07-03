@@ -12,8 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
 public class TestApplicationFactory : TestApplicationFactory<TestStartup>
 {
-    private const bool SqlLoggingEnabled = false;
-
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
         .Build();
@@ -41,11 +39,12 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
             .ConfigureServices(services =>
             {
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options
-                        .UseNpgsql(
+                    options =>
+                    {
+                        options.UseNpgsql(
                             _postgreSqlContainer.GetConnectionString(),
-                            psqlOptions => psqlOptions.EnableRetryOnFailure())
-                        .UseConsoleLogging(SqlLoggingEnabled));
+                            psqlOptions => psqlOptions.EnableRetryOnFailure());
+                    });
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()

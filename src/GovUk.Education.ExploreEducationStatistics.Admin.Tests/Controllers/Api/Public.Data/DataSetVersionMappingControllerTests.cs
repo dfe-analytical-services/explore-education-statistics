@@ -285,7 +285,7 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Fact]
-        public async Task MappingToUpdateDoesDoesNotExist_Return400_AndRollBackTransaction()
+        public async Task UpdateMappingDoesNotExist_Returns400_AndRollsBackTransaction()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -356,7 +356,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             List<LocationMappingUpdateRequest> updates =
             [
-                // This mapping does not exist.
+                // This mapping exists.
                 new()
                 {
                     Level = GeographicLevel.LocalAuthority,
@@ -388,7 +388,9 @@ public abstract class DataSetVersionMappingControllerTests(
                 client);
 
             var validationProblem = response.AssertValidationProblem();
-            
+
+            // The 2 non-existent mappings in the batch update request should have failure messages
+            // indicating that the mappings they were attempting to update do not exist.
             Assert.Equal(2, validationProblem.Errors.Count);
 
             validationProblem.AssertHasError(
@@ -433,6 +435,76 @@ public abstract class DataSetVersionMappingControllerTests(
                 client);
 
             response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task EmptyRequiredFields_Return400()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ApplyBatchMappingUpdates(
+                Guid.NewGuid(),
+                [
+                    new LocationMappingUpdateRequest()
+                ],
+                client);
+
+            var validationProblem = response.AssertValidationProblem();
+            Assert.Equal(3, validationProblem.Errors.Count);
+            validationProblem.AssertHasNotNullError("updates[0].level");
+            validationProblem.AssertHasNotNullError("updates[0].type");
+            validationProblem.AssertHasNotNullError("updates[0].sourceKey");
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped)]
+        [InlineData(MappingType.AutoMapped)]
+        public async Task MappingTypeExpectsCandidateKey_Returns400(MappingType type)
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ApplyBatchMappingUpdates(
+                Guid.NewGuid(),
+                [
+                    new LocationMappingUpdateRequest
+                    {
+                        Level = GeographicLevel.LocalAuthority,
+                        SourceKey = "location-1",
+                        Type = type,
+                        CandidateKey = null
+                    }
+                ],
+                client);
+
+            var validationProblem = response.AssertValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotNullError("updates[0].candidateKey");
+        }
+
+        [Theory]
+        [InlineData(MappingType.None)]
+        [InlineData(MappingType.ManualNone)]
+        [InlineData(MappingType.AutoNone)]
+        public async Task MappingTypeDoeNotExpectCandidateKey_Returns400(MappingType type)
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ApplyBatchMappingUpdates(
+                Guid.NewGuid(),
+                [
+                    new LocationMappingUpdateRequest
+                    {
+                        Level = GeographicLevel.LocalAuthority,
+                        SourceKey = "location-1",
+                        Type = type,
+                        CandidateKey = "target-location-1"
+                    }
+                ],
+                client);
+
+            var validationProblem = response.AssertValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNullError("updates[0].candidateKey");
         }
 
         private async Task<HttpResponseMessage> ApplyBatchMappingUpdates(
