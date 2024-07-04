@@ -378,6 +378,14 @@ Cancel the release amendment
     user clicks button    Confirm
     user waits until modal is not visible    Confirm you want to cancel this amended release
 
+    user waits until h3 is visible    Published releases (1 of 1)    %{WAIT_SMALL}
+    user checks page contains element    testid:publication-published-releases
+    user checks table body has x rows    1    testid:publication-published-releases
+    table cell should contain    testid:publication-published-releases    1    1    Release period
+    table cell should contain    testid:publication-published-releases    1    2    Status
+    table cell should contain    testid:publication-published-releases    2    1    Financial year 3000-01
+    table cell should contain    testid:publication-published-releases    2    2    Published
+
 Revisit the Release after the cancellation to double check it remains unaffected
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user clicks element    xpath://*[text()="View"]    ${ROW}
