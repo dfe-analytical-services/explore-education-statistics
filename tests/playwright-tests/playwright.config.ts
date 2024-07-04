@@ -51,16 +51,22 @@ export default defineConfig({
     {
       name: 'admin',
       testDir: './tests/admin',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
     },
     {
       name: 'adminandpublic',
       testDir: './tests/admin-and-public',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
     },
     {
       name: 'public',
       testDir: './tests/public',
-    },
-    {
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
