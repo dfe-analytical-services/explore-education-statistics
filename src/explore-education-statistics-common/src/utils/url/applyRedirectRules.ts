@@ -1,93 +1,79 @@
-import redirectService, {
+import {
+  Redirects,
   RedirectType,
   redirectPathStarts,
 } from '@common/services/redirectService';
 
 const prodPublicUrl = 'https://explore-education-statistics.service.gov.uk/';
 
-export default async function applyRedirectRules(url: string): Promise<string> {
-  let newUrl: string = url;
+export default function applyRedirectRules(
+  url: string,
+  redirects: Redirects,
+): string {
+  let parsedUrl: URL = new URL(url, prodPublicUrl);
 
-  newUrl = await noTrailingSlashUnlessOnlyHost(newUrl);
-  newUrl = await pathMustNotEndInSlash1000(newUrl);
-  newUrl = await publicSiteHostMustNotStartWithWww(newUrl);
-  newUrl = await mustNotTriggerAContentApiRedirect(newUrl);
-
-  return newUrl;
-}
-
-type RedirectRule =
-  | ((url: string) => string)
-  | ((url: string) => Promise<string>);
-
-const noTrailingSlashUnlessOnlyHost: RedirectRule = (url: string) => {
-  const parsedUrl: URL = new URL(url, prodPublicUrl);
+  // noTrailingSlashUnlessOnlyHost
   if (parsedUrl.pathname === '/') {
     return url;
   }
+  parsedUrl.pathname = parsedUrl.pathname.replace(/\/+$/, '');
 
-  return url.replace(/\/+$/, '');
-};
+  // pathMustNotEndInSlash1000
+  parsedUrl.pathname = parsedUrl.pathname.replace(/(\/1000)+$/, '');
 
-const pathMustNotEndInSlash1000: RedirectRule = (url: string) => {
-  const newUrl = url.replace(/(\/1000)+$/, '');
-  return newUrl === '' ? '/' : newUrl;
-};
-
-const publicSiteHostMustNotStartWithWww: RedirectRule = (url: string) => {
-  const parsedUrl: URL = new URL(url, prodPublicUrl);
+  // publicSiteHostMustNotStartWithWww
   if (
     parsedUrl.hostname.includes(
       'www.explore-education-statistics.service.gov.uk',
     )
   ) {
     parsedUrl.hostname = parsedUrl.hostname.replace('www.', '');
-    return parsedUrl.href;
   }
 
-  return url;
-};
+  // mustNotTriggerAContentApiRedirect
+  parsedUrl = applyContentApiRedirects(parsedUrl, redirects);
 
-const mustNotTriggerAContentApiRedirect: RedirectRule = async (url: string) => {
-  const parsedUrl: URL = new URL(url, prodPublicUrl);
-  // Remove leading slash to match the redirectPathStarts used by the redirectPages middleware
-  const parsedPath = parsedUrl.pathname;
+  // If original url was relative, return a relative url also
+  if (isAbsoluteUrl(url)) {
+    return parsedUrl.href;
+  }
+  return `${parsedUrl.pathname}${parsedUrl.search}`;
+}
 
-  const redirectsFromContentApi = await redirectService.list();
+const applyContentApiRedirects = (
+  parsedUrl: URL,
+  redirects: Redirects,
+): URL => {
+  const redirectPathStart = Object.entries(redirectPathStarts).find(
+    ([_, path]) => parsedUrl.pathname.startsWith(path),
+  );
+  const pathSegments = parsedUrl.pathname.split('/');
 
-  if (
-    Object.values(redirectPathStarts).find(path =>
-      parsedPath.startsWith(path),
-    ) &&
-    parsedPath.split('/').length > 1
-  ) {
-    const redirectPath = Object.keys(redirectPathStarts).reduce((acc, key) => {
-      const redirectType = key as RedirectType;
-      // If starts with "methodologies/" or "publications/"
-      if (parsedPath.startsWith(redirectPathStarts[redirectType])) {
-        const pathSegments = parsedPath.split('/');
+  if (redirectPathStart && pathSegments.length > 1) {
+    const [key] = redirectPathStart;
+    const redirectType = key as RedirectType;
 
-        const rewriteRule = redirectsFromContentApi[redirectType]?.find(
-          ({ fromSlug }) => pathSegments[2].toLowerCase() === fromSlug,
-        );
+    const rewriteRule = redirects[redirectType].find(
+      ({ fromSlug }) => pathSegments[2].toLowerCase() === fromSlug,
+    );
 
-        if (rewriteRule) {
-          return pathSegments
-            .map(segment =>
-              segment.toLowerCase() === rewriteRule?.fromSlug
-                ? rewriteRule?.toSlug
-                : segment.toLowerCase(),
-            )
-            .join('/');
-        }
-      }
-      return acc;
-    }, '');
+    if (rewriteRule) {
+      const path = pathSegments
+        .map(segment =>
+          segment.toLowerCase() === rewriteRule?.fromSlug
+            ? rewriteRule?.toSlug
+            : segment.toLowerCase(),
+        )
+        .join('/');
 
-    if (redirectPath) {
-      return new URL(`${redirectPath}${parsedUrl.search}`, prodPublicUrl).href;
+      return new URL(`${path}${parsedUrl.search}`, prodPublicUrl);
     }
   }
 
-  return url;
+  return parsedUrl;
 };
+
+const isAbsoluteUrl = (url: string) =>
+  url.startsWith('http') ||
+  url.startsWith('www') ||
+  url.includes('explore-education-statistics.service.gov.uk');

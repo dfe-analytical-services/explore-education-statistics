@@ -1,10 +1,5 @@
 import applyRedirectRules from '@common/utils/url/applyRedirectRules';
-import _redirectService, { Redirects } from '@common/services/redirectService';
-
-jest.mock('@common/services/redirectService');
-const redirectService = _redirectService as jest.Mocked<
-  typeof _redirectService
->;
+import testRedirects from '@common/utils/url/__tests__/__data__/testRedirects';
 
 function generateTestName(url: string, result: string) {
   return url === result
@@ -13,26 +8,6 @@ function generateTestName(url: string, result: string) {
 }
 
 describe('applyRedirectRules', () => {
-  beforeEach(() => {
-    redirectService.list.mockImplementation(async () => {
-      const mockRedirects: Redirects = {
-        methodologies: [
-          {
-            fromSlug: 'test-methodology',
-            toSlug: 'test-methodology-revised',
-          },
-        ],
-        publications: [
-          {
-            fromSlug: 'test-publication',
-            toSlug: 'test-publication-revised',
-          },
-        ],
-      };
-      return Promise.resolve(mockRedirects);
-    });
-  });
-
   test.each([
     [
       'https://explore-education-statistics.service.gov.uk/',
@@ -56,7 +31,7 @@ describe('applyRedirectRules', () => {
   ])(
     `noTrailingSlash: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
-      expect(await applyRedirectRules(url)).toEqual(result);
+      expect(await applyRedirectRules(url, testRedirects)).toEqual(result);
     },
   );
 
@@ -73,7 +48,7 @@ describe('applyRedirectRules', () => {
   ])(
     `no /1000: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
-      expect(await applyRedirectRules(url)).toEqual(result);
+      expect(await applyRedirectRules(url, testRedirects)).toEqual(result);
     },
   );
 
@@ -93,7 +68,7 @@ describe('applyRedirectRules', () => {
   ])(
     `no www: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
-      expect(await applyRedirectRules(url)).toEqual(result);
+      expect(await applyRedirectRules(url, testRedirects)).toEqual(result);
     },
   );
 
@@ -106,6 +81,11 @@ describe('applyRedirectRules', () => {
       'https://explore-education-statistics.service.gov.uk/methodology/this-methodology-slug-should-not-change',
       'https://explore-education-statistics.service.gov.uk/methodology/this-methodology-slug-should-not-change',
     ],
+    ['/methodology/test-methodology/', '/methodology/test-methodology-revised'],
+    [
+      '/methodology/this-methodology-slug-should-not-change/',
+      '/methodology/this-methodology-slug-should-not-change',
+    ],
     [
       'https://explore-education-statistics.service.gov.uk/find-statistics/test-publication',
       'https://explore-education-statistics.service.gov.uk/find-statistics/test-publication-revised',
@@ -117,7 +97,7 @@ describe('applyRedirectRules', () => {
   ])(
     `no ContentAPI redirect: ${generateTestName('%s', '%s')}`,
     async (url: string, result: string | undefined) => {
-      expect(await applyRedirectRules(url)).toEqual(result);
+      expect(await applyRedirectRules(url, testRedirects)).toEqual(result);
     },
   );
 });
