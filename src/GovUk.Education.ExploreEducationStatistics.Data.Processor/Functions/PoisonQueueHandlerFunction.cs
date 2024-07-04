@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -8,14 +9,13 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.Pro
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions;
 
-public class PoisonQueueHandler(
+public class PoisonQueueHandlerFunction(
     IDataImportService dataImportService,
-    ILogger<PoisonQueueHandler> logger)
+    ILogger<PoisonQueueHandlerFunction> logger)
 {
     [Function("ProcessUploadsPoisonHandler")]
     public async Task ProcessUploadsPoisonQueueHandler(
-        [QueueTrigger(ImportsPendingPoisonQueue)]
-        ImportMessage message,
+        [QueueTrigger(ImportsPendingPoisonQueue)] ImportMessage message,
         FunctionContext context)
     {
         try
@@ -25,7 +25,8 @@ public class PoisonQueueHandler(
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Exception occured while executing {FunctionName}",
+            logger.LogError(e,
+                "Exception occured while executing {FunctionName}",
                 context.FunctionDefinition.Name);
         }
     }
