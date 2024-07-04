@@ -148,33 +148,33 @@ Validate sort controls exist
     user checks page contains radio    A to Z
 
 Validate theme filter exists
-    user checks select contains option    id:filters-form-theme    All themes
-    user checks selected option label     id:filters-form-theme    All themes
-    user checks select contains option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks select contains option    id:filters-form-theme    ${ROLE_PERMISSIONS_THEME_TITLE}
+    user checks select contains option    css:select[id="filters-form-theme"]      All themes
+    user checks selected option label     css:select[id="filters-form-theme"]      All themes
+    user checks select contains option    css:select[id="filters-form-theme"]      ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks select contains option    css:select[id="filters-form-theme"]     ${ROLE_PERMISSIONS_THEME_TITLE}
 
 Validate publication filter exists
-    user checks select contains option    id:filters-form-publication    All publications
-    user checks selected option label     id:filters-form-publication    All publications
+    user checks select contains option    css:select[id="filters-form-publication"]      All publications
+    user checks selected option label     css:select[id="filters-form-publication"]    All publications
 
 Validate release filter exists
-    user checks select contains option    id:filters-form-release    Latest releases
-    user checks selected option label     id:filters-form-release    Latest releases
-    user checks select contains option    id:filters-form-release    All releases
+    user checks select contains option    css:select[id="filters-form-release"]    Latest releases
+    user checks selected option label     css:select[id="filters-form-release"]    Latest releases
+    user checks select contains option    css:select[id="filters-form-release"]    All releases
     
 Filter by theme
-    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    css:select[id="filters-form-theme"]     ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Filter by publication
-    user wait for option to be available and select it    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user wait for option to be available and select it    css:select[id="filters-form-publication"]     ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Filter by all releases
-    user wait for option to be available and select it    id:filters-form-release    All releases
+    user wait for option to be available and select it    css:select[id="filters-form-release"]     All releases
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
@@ -182,21 +182,21 @@ Remove theme filter
     user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user checks selected option label     id:filters-form-theme    All themes
+    user checks selected option label     css:select[id="filters-form-theme"]    All themes
 
 Remove publication filter
-    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user wait for option to be available and select it    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user wait for option to be available and select it    css:select[id="filters-form-theme"]     ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    css:select[id="filters-form-publication"]    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
-    user checks selected option label     id:filters-form-publication    All publications
+    user checks selected option label     css:select[id="filters-form-publication"]    All publications
 
 Remove release filter
-    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user wait for option to be available and select it    id:filters-form-publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user wait for option to be available and select it    id:filters-form-release    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user wait for option to be available and select it    css:select[id="filters-form-theme"]     ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    css:select[id="filters-form-publication"]    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user wait for option to be available and select it    css:select[id="filters-form-release"]    ${PUPIL_ABSENCE_RELEASE_NAME}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
@@ -207,7 +207,7 @@ Reset all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user wait for option to be available and select it    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user wait for option to be available and select it    css:select[id="filters-form-theme"]     ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
     user checks page contains button    pupil
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -218,9 +218,9 @@ Reset all filters
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    Reset filters
 
-    user checks selected option label     id:filters-form-theme    All themes
-    user checks selected option label     id:filters-form-publication    All publications
-    user checks selected option label     id:filters-form-release    Latest releases
+    user checks selected option label     css:select[id="filters-form-theme"]     All themes
+    user checks selected option label     css:select[id="filters-form-publication"]    All publications
+    user checks selected option label     css:select[id="filters-form-release"]    Latest releases
 
 Searching
     user clicks element    id:searchForm-search

@@ -217,9 +217,9 @@ Check subject order in data tables
 Check subject order in data catalogue
     user navigates to data catalogue page on public frontend
 
-    user wait for option to be available and select it    id:filters-form-theme    %{TEST_THEME_NAME}
-    user wait for option to be available and select it    id:filters-form-publication    ${PUBLICATION_NAME}
-    user wait for option to be available and select it    id:filters-form-release    ${RELEASE_NAME}
+    user wait for option to be available and select it    css:select[id="filters-form-theme"]    %{TEST_THEME_NAME}
+    user wait for option to be available and select it    css:select[id="filters-form-publication"]     ${PUBLICATION_NAME}
+    user wait for option to be available and select it    css:select[id="filters-form-release"]    ${RELEASE_NAME}
 
     user waits until page contains    Download all 4 data sets (ZIP)
 
