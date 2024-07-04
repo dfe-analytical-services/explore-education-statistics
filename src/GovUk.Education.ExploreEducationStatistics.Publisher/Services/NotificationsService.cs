@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -13,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class NotificationsService(
         ContentDbContext context,
-        INotifierQueueServiceClient notifierQueueServiceClient)
+        INotifierClient notifierClient)
         : INotificationsService
     {
         public async Task NotifySubscribersIfApplicable(params Guid[] releaseVersionIds)
@@ -29,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (messages.Count > 0)
             {
-                await notifierQueueServiceClient.SendMessagesAsJson(NotifierQueues.ReleaseNotificationQueue, messages);
+                await notifierClient.NotifyPublicationSubscribers(messages);
                 releaseVersionsToNotify
                     .ForEach(releaseVersion =>
                     {

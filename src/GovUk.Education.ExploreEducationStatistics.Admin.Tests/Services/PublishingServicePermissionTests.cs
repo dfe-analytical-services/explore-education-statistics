@@ -22,7 +22,7 @@ public abstract class PublishingServicePermissionTests
     public class RetryReleasePublishingTests : PublishingServicePermissionTests
     {
         [Fact]
-        public async Task RetryReleasePublishing()
+        public async Task SecurityPolicyChecked()
         {
             ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved);

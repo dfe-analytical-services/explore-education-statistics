@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
-public abstract class AbstractQueueServiceClient(string connectionString) : IQueueServiceClient
+public class QueueServiceClient(string connectionString) : IQueueServiceClient
 {
     private readonly Azure.Storage.Queues.QueueServiceClient _queueServiceClient = new(connectionString,
         new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });

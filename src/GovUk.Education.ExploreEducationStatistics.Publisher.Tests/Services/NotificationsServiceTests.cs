@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -91,9 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var notifierQueueServiceClient = new Mock<INotifierQueueServiceClient>(MockBehavior.Strict);
-            notifierQueueServiceClient.Setup(mock => mock.SendMessagesAsJson(
-                    NotifierQueues.ReleaseNotificationQueue,
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+            notifierClient.Setup(mock => mock.NotifyPublicationSubscribers(
                     It.IsAny<IReadOnlyList<ReleaseNotificationMessage>>(),
                     CancellationToken.None))
                 .Returns(Task.CompletedTask);
@@ -102,14 +100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var notificationsService = BuildNotificationsService(
                     contentDbContext,
-                    notifierQueueServiceClient: notifierQueueServiceClient.Object);
+                    notifierClient: notifierClient.Object);
 
                 await notificationsService.NotifySubscribersIfApplicable(release1Version.Id,
                     release2Version.Id,
                     amendedReleaseVersion.Id);
 
-                notifierQueueServiceClient.Verify(mock => mock.SendMessagesAsJson(
-                        NotifierQueues.ReleaseNotificationQueue,
+                notifierClient.Verify(mock => mock.NotifyPublicationSubscribers(
                         ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
                         {
                             new()
@@ -139,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Times.Once);
             }
 
-            MockUtils.VerifyAllMocks(notifierQueueServiceClient);
+            MockUtils.VerifyAllMocks(notifierClient);
         }
 
         [Fact]
@@ -177,9 +174,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var notifierQueueServiceClient = new Mock<INotifierQueueServiceClient>(MockBehavior.Strict);
-            notifierQueueServiceClient.Setup(mock => mock.SendMessageAsJson(
-                    NotifierQueues.ReleaseNotificationQueue,
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+            notifierClient.Setup(mock => mock.NotifyPublicationSubscribers(
                     It.IsAny<IReadOnlyList<ReleaseNotificationMessage>>(),
                     CancellationToken.None))
                 .Returns(Task.CompletedTask);
@@ -188,12 +184,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var notificationsService = BuildNotificationsService(
                     contentDbContext,
-                    notifierQueueServiceClient.Object);
+                    notifierClient.Object);
 
                 await notificationsService.NotifySubscribersIfApplicable(releaseVersion.Id);
 
-                notifierQueueServiceClient.Verify(mock => mock.SendMessagesAsJson(
-                        NotifierQueues.ReleaseNotificationQueue,
+                notifierClient.Verify(mock => mock.NotifyPublicationSubscribers(
                         ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
                         {
                             new()
@@ -219,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Times.Once);
             }
 
-            MockUtils.VerifyAllMocks(notifierQueueServiceClient);
+            MockUtils.VerifyAllMocks(notifierClient);
         }
 
         [Fact]
@@ -235,11 +230,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         private static NotificationsService BuildNotificationsService(
             ContentDbContext contentDbContext,
-            INotifierQueueServiceClient? notifierQueueServiceClient = null)
+            INotifierClient? notifierClient = null)
         {
             return new NotificationsService(
                 contentDbContext,
-                notifierQueueServiceClient ?? Mock.Of<INotifierQueueServiceClient>(MockBehavior.Strict));
+                notifierClient ?? Mock.Of<INotifierClient>(MockBehavior.Strict));
         }
     }
 }

@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -111,7 +112,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
-                    .AddScoped<INotifierQueueServiceClient, NotifierQueueServiceClient>(_ => new NotifierQueueServiceClient(configuration.GetValue<string>("NotificationStorage")))
+                    .AddScoped<INotifierClient, NotifierClient>(_ => new NotifierClient(configuration.GetValue<string>("NotificationStorage")))
                     .AddScoped<IPublisherQueueServiceClient, PublisherQueueServiceClient>(_ => new PublisherQueueServiceClient(configuration.GetValue<string>("PublisherStorage")))
                     .Configure<AppSettingsOptions>(configuration.GetSection(AppSettingsOptions.AppSettings));
 
