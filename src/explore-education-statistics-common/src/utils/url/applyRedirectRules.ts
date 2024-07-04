@@ -1,8 +1,19 @@
-import {
-  Redirects,
-  RedirectType,
-  redirectPathStarts,
-} from '@common/services/redirectService';
+export interface Redirects {
+  methodologies: Redirect[];
+  publications: Redirect[];
+}
+
+export type RedirectType = keyof Redirects;
+
+interface Redirect {
+  fromSlug: string;
+  toSlug: string;
+}
+
+export const redirectPathStarts = {
+  methodologies: '/methodology',
+  publications: '/find-statistics',
+};
 
 const prodPublicUrl = 'https://explore-education-statistics.service.gov.uk/';
 

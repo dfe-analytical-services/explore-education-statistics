@@ -15,7 +15,8 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
-import AnchorHtml from './AnchorHtml';
+import { useRedirectsContext } from '@common/contexts/RedirectsContext';
+import applyRedirectRules from '@common/utils/url/applyRedirectRules';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -39,6 +40,7 @@ export default function ContentHtml({
   transformFeaturedTableLinks,
 }: ContentHtmlProps) {
   const { isMounted } = useMounted();
+  const { redirects } = useRedirectsContext();
 
   const cleanHtml = useMemo(() => {
     const opts: SanitizeHtmlOptions = {
@@ -88,11 +90,11 @@ export default function ContentHtml({
         return !node.attribs.href.includes(
           'explore-education-statistics.service.gov.uk',
         ) && typeof node.attribs['data-featured-table'] === 'undefined' ? (
-          <AnchorHtml href={url} target="_blank" rel="noopener noreferrer">
+          <a href={url} target="_blank" rel="noopener noreferrer">
             {text} (opens in a new tab)
-          </AnchorHtml>
+          </a>
         ) : (
-          <AnchorHtml href={url}>{text}</AnchorHtml>
+          <a href={applyRedirectRules(url, redirects)}>{text}</a>
         );
       }
 
