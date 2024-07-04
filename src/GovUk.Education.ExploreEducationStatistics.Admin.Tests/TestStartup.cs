@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -53,7 +54,7 @@ public class TestStartup : Startup
             .UseInMemoryDbContext<ContentDbContext>()
             .UseInMemoryDbContext<StatisticsDbContext>()
             .UseInMemoryDbContext<UsersAndRolesDbContext>()
-            .MockService<IDataProcessorQueueServiceClient>()
+            .MockService<IDataProcessorClient>()
             .MockService<IPublisherQueueServiceClient>()
             .MockService<ICoreTableStorageService>()
             .MockService<IPublisherTableStorageService>()

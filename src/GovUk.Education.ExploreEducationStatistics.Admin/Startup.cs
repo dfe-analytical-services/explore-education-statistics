@@ -46,6 +46,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -556,8 +557,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     provider.GetRequiredService<ILogger<BlobCacheService>>()
                 ));
             services.AddTransient<ICacheKeyService, CacheKeyService>();
-            services.AddTransient<IDataProcessorQueueServiceClient, DataProcessorQueueServiceClient>(_ =>
-                new DataProcessorQueueServiceClient(coreStorageConnectionString));
+            services.AddTransient<IDataProcessorClient, DataProcessorClient>(_ =>
+                new DataProcessorClient(coreStorageConnectionString));
             services.AddTransient<IPublisherQueueServiceClient, PublisherQueueServiceClient>(_ =>
                 new PublisherQueueServiceClient(publisherStorageConnectionString));
 

@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -45,14 +44,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataProcessorQueueServiceClient = new Mock<IDataProcessorQueueServiceClient>(Strict);
+            var dataProcessorClient = new Mock<IDataProcessorClient>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var userService = new Mock<IUserService>(Strict);
 
-            dataProcessorQueueServiceClient
-                .Setup(s => s.SendMessageAsJson(ProcessorQueues.ImportsCancellingQueue,
-                    new CancelImportMessage(import.Id),
-                    CancellationToken.None))
+            dataProcessorClient
+                .Setup(s => s.CancelImport(import.Id, CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id,
@@ -69,13 +66,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
                     releaseFileService: releaseFileService.Object,
-                    dataProcessorQueueServiceClient: dataProcessorQueueServiceClient.Object,
+                    dataProcessorClient: dataProcessorClient.Object,
                     userService: userService.Object);
 
                 var result = await service.CancelImport(releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                MockUtils.VerifyAllMocks(releaseFileService, userService, dataProcessorQueueServiceClient);
+                MockUtils.VerifyAllMocks(releaseFileService, userService, dataProcessorClient);
 
                 result.AssertRight();
             }
@@ -310,21 +307,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.Files.AddRangeAsync(dataFile, metaFile);
             }
 
-            var dataProcessorQueueServiceClient = new Mock<IDataProcessorQueueServiceClient>(Strict);
+            var dataProcessorClient = new Mock<IDataProcessorClient>(Strict);
 
-            dataProcessorQueueServiceClient.Setup(mock => mock.SendMessageAsJson(ProcessorQueues.ImportsPendingQueue,
-                    It.IsAny<ImportMessage>(),
-                    CancellationToken.None))
+            dataProcessorClient.Setup(s => s.Import(It.IsAny<Guid>(), CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
-                    dataProcessorQueueServiceClient: dataProcessorQueueServiceClient.Object);
+                    dataProcessorClient: dataProcessorClient.Object);
 
                 var result = await service.Import(subjectId, dataFile, metaFile);
 
-                MockUtils.VerifyAllMocks(dataProcessorQueueServiceClient);
+                MockUtils.VerifyAllMocks(dataProcessorClient);
 
                 Assert.Equal(dataFile.Id, result.FileId);
                 Assert.Equal(metaFile.Id, result.MetaFileId);
@@ -337,14 +332,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static DataImportService BuildDataImportService(
             ContentDbContext contentDbContext,
             IDataImportRepository? dataImportRepository = null,
-            IDataProcessorQueueServiceClient? dataProcessorQueueServiceClient = null,
+            IDataProcessorClient? dataProcessorClient = null,
             IReleaseFileService? releaseFileService = null,
             IUserService? userService = null)
         {
             return new DataImportService(
                 contentDbContext,
                 dataImportRepository ?? new DataImportRepository(contentDbContext),
-                dataProcessorQueueServiceClient ?? Mock.Of<IDataProcessorQueueServiceClient>(Strict),
+                dataProcessorClient ?? Mock.Of<IDataProcessorClient>(Strict),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService().Object);
         }

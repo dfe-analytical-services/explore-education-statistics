@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -20,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DataImportService(
         ContentDbContext contentDbContext,
         IDataImportRepository dataImportRepository,
-        IDataProcessorQueueServiceClient dataProcessorQueueServiceClient,
+        IDataProcessorClient dataProcessorClient,
         IReleaseFileService releaseFileService,
         IUserService userService)
         : IDataImportService
@@ -43,9 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var import = await dataImportRepository.GetByFileId(file.Id);
                     if (import != null)
                     {
-                        await dataProcessorQueueServiceClient.SendMessageAsJson(
-                            ProcessorQueues.ImportsCancellingQueue,
-                            new CancelImportMessage(import.Id));
+                        await dataProcessorClient.CancelImport(import.Id);
                     }
                 });
         }
@@ -101,9 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = DataImportStatus.QUEUED
             });
 
-            await dataProcessorQueueServiceClient.SendMessageAsJson(
-                ProcessorQueues.ImportsPendingQueue,
-                new ImportMessage(import.Id));
+            await dataProcessorClient.Import(import.Id);
 
             return import;
         }
@@ -120,9 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = DataImportStatus.QUEUED
             });
 
-            await dataProcessorQueueServiceClient.SendMessageAsJson(
-                ProcessorQueues.ImportsPendingQueue,
-                new ImportMessage(import.Id));
+            await dataProcessorClient.Import(import.Id);
 
             return import;
         }
