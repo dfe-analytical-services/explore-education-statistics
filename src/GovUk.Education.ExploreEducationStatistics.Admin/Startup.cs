@@ -51,6 +51,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -559,8 +560,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddTransient<IDataProcessorClient, DataProcessorClient>(_ =>
                 new DataProcessorClient(coreStorageConnectionString));
-            services.AddTransient<IPublisherQueueServiceClient, PublisherQueueServiceClient>(_ =>
-                new PublisherQueueServiceClient(publisherStorageConnectionString));
+            services.AddTransient<IPublisherClient, PublisherClient>(_ =>
+                new PublisherClient(publisherStorageConnectionString));
 
             /*
              * Swagger

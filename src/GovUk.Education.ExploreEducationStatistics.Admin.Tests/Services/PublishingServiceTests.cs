@@ -3,7 +3,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -36,33 +35,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publisherQueueServiceClient = new Mock<IPublisherQueueServiceClient>(MockBehavior.Strict);
+            var publisherClient = new Mock<IPublisherClient>(MockBehavior.Strict);
 
-            publisherQueueServiceClient.Setup(
-                    mock => mock.SendMessageAsJson(
-                        PublisherQueues.RetryReleasePublishingQueue,
-                        new RetryReleasePublishingMessage(releaseVersion.Id),
-                        CancellationToken.None))
+            publisherClient.Setup(
+                    s => s.RetryReleasePublishing(releaseVersion.Id, CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var publishingService = BuildPublishingService(contentDbContext: context,
-                    publisherQueueServiceClient: publisherQueueServiceClient.Object);
+                    publisherClient: publisherClient.Object);
 
                 var result = await publishingService.RetryReleasePublishing(releaseVersion.Id);
 
-                publisherQueueServiceClient.Verify(
-                    mock => mock.SendMessageAsJson(
-                        PublisherQueues.RetryReleasePublishingQueue,
-                        new RetryReleasePublishingMessage(releaseVersion.Id),
-                        CancellationToken.None),
+                publisherClient.Verify(
+                    s => s.RetryReleasePublishing(releaseVersion.Id, CancellationToken.None),
                     Times.Once());
 
                 result.AssertRight();
             }
 
-            VerifyAllMocks(publisherQueueServiceClient);
+            VerifyAllMocks(publisherClient);
         }
 
         [Fact]
@@ -93,33 +86,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publisherQueueServiceClient = new Mock<IPublisherQueueServiceClient>(MockBehavior.Strict);
+            var publisherClient = new Mock<IPublisherClient>(MockBehavior.Strict);
 
             var releasePublishingKey = new ReleasePublishingKey(releaseVersion.Id, releaseStatus.Id);
 
-            var expectedMessage = new NotifyChangeMessage(true, releasePublishingKey);
-
-            publisherQueueServiceClient.Setup(mock =>
-                    mock.SendMessageAsJson(PublisherQueues.NotifyChangeQueue, expectedMessage, CancellationToken.None))
+            publisherClient.Setup(s => s.HandleReleaseChanged(releasePublishingKey, true, CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var publishingService = BuildPublishingService(contentDbContext: context,
-                    publisherQueueServiceClient: publisherQueueServiceClient.Object);
+                    publisherClient: publisherClient.Object);
 
                 var result = await publishingService.ReleaseChanged(releasePublishingKey, immediate: true);
 
-                publisherQueueServiceClient.Verify(
-                    mock => mock.SendMessageAsJson(PublisherQueues.NotifyChangeQueue,
-                        expectedMessage,
-                        CancellationToken.None),
+                publisherClient.Verify(s => s.HandleReleaseChanged(releasePublishingKey, true, CancellationToken.None),
                     Times.Once());
 
                 result.AssertRight();
             }
 
-            VerifyAllMocks(publisherQueueServiceClient);
+            VerifyAllMocks(publisherClient);
         }
 
         [Fact]
@@ -149,32 +136,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publisherQueueServiceClient = new Mock<IPublisherQueueServiceClient>(MockBehavior.Strict);
+            var publisherClient = new Mock<IPublisherClient>(MockBehavior.Strict);
 
-            publisherQueueServiceClient.Setup(
-                    mock => mock.SendMessageAsJson(PublisherQueues.PublishMethodologyFilesQueue,
-                        new PublishMethodologyFilesMessage(methodologyVersion.Id),
-                        CancellationToken.None))
+            publisherClient.Setup(
+                    s => s.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var publishingService = BuildPublishingService(contentDbContext: context,
-                    publisherQueueServiceClient: publisherQueueServiceClient.Object);
+                    publisherClient: publisherClient.Object);
 
                 var result = await publishingService
                     .PublishMethodologyFiles(methodologyVersion.Id);
 
-                publisherQueueServiceClient.Verify(
-                    mock => mock.SendMessageAsJson(PublisherQueues.PublishMethodologyFilesQueue,
-                        new PublishMethodologyFilesMessage(methodologyVersion.Id),
-                        CancellationToken.None),
+                publisherClient.Verify(s => s.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None),
                     Times.Once());
 
                 result.AssertRight();
             }
 
-            VerifyAllMocks(publisherQueueServiceClient);
+            VerifyAllMocks(publisherClient);
         }
 
         [Fact]
@@ -192,12 +174,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static PublishingService BuildPublishingService(
             ContentDbContext contentDbContext,
-            IPublisherQueueServiceClient? publisherQueueServiceClient = null,
+            IPublisherClient? publisherClient = null,
             IUserService? userService = null)
         {
             return new PublishingService(
                 contentDbContext,
-                publisherQueueServiceClient ?? Mock.Of<IPublisherQueueServiceClient>(MockBehavior.Strict),
+                publisherClient ?? Mock.Of<IPublisherClient>(MockBehavior.Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 new Mock<ILogger<PublishingService>>().Object);
         }

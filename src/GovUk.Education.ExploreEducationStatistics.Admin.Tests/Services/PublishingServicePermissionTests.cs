@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -43,12 +43,12 @@ public abstract class PublishingServicePermissionTests
 
     private static PublishingService BuildService(
         ContentDbContext context,
-        IPublisherQueueServiceClient? publisherQueueServiceClient = null,
+        IPublisherClient? publisherClient = null,
         IUserService? userService = null)
     {
         return new PublishingService(
             context,
-            publisherQueueServiceClient ?? Mock.Of<IPublisherQueueServiceClient>(MockBehavior.Strict),
+            publisherClient ?? Mock.Of<IPublisherClient>(MockBehavior.Strict),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
             Mock.Of<ILogger<PublishingService>>());
     }

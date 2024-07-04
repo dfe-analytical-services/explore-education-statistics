@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
@@ -113,7 +114,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
                     .AddScoped<INotifierClient, NotifierClient>(_ => new NotifierClient(configuration.GetValue<string>("NotificationStorage")))
-                    .AddScoped<IPublisherQueueServiceClient, PublisherQueueServiceClient>(_ => new PublisherQueueServiceClient(configuration.GetValue<string>("PublisherStorage")))
+                    .AddScoped<IPublisherClient, PublisherClient>(_ => new PublisherClient(configuration.GetValue<string>("PublisherStorage")))
                     .Configure<AppSettingsOptions>(configuration.GetSection(AppSettingsOptions.AppSettings));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.

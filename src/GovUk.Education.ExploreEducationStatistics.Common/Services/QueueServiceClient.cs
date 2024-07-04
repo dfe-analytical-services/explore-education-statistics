@@ -13,13 +13,6 @@ public class QueueServiceClient(string connectionString) : IQueueServiceClient
     private readonly Azure.Storage.Queues.QueueServiceClient _queueServiceClient = new(connectionString,
         new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
 
-    public async Task<QueueClient> GetQueueClient(string queueName, CancellationToken cancellationToken = default)
-    {
-        var queueClient = _queueServiceClient.GetQueueClient(queueName);
-        await queueClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-        return queueClient;
-    }
-
     public async Task SendMessagesAsJson<T>(
         string queueName, IReadOnlyList<T> messages, CancellationToken cancellationToken = default)
     {
@@ -44,5 +37,12 @@ public class QueueServiceClient(string connectionString) : IQueueServiceClient
     {
         var queueClient = await GetQueueClient(queueName, cancellationToken);
         await queueClient.SendMessageAsync(message, cancellationToken);
+    }
+
+    private async Task<QueueClient> GetQueueClient(string queueName, CancellationToken cancellationToken = default)
+    {
+        var queueClient = _queueServiceClient.GetQueueClient(queueName);
+        await queueClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        return queueClient;
     }
 }

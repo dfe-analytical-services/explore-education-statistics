@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -20,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class PublishingService(
         ContentDbContext context,
-        IPublisherQueueServiceClient publisherQueueServiceClient,
+        IPublisherClient publisherClient,
         IUserService userService,
         ILogger<PublishingService> logger)
         : IPublishingService
@@ -47,10 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReleaseNotApproved);
                     }
 
-                    await publisherQueueServiceClient.SendMessageAsJson(
-                        PublisherQueues.RetryReleasePublishingQueue,
-                        new RetryReleasePublishingMessage(releaseVersionId),
-                        cancellationToken);
+                    await publisherClient.RetryReleasePublishing(releaseVersionId, cancellationToken);
 
                     logger.LogTrace("Sent publishing retry message for ReleaseVersion: {ReleaseVersionId}",
                         releaseVersionId);
@@ -87,10 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrNotFoundAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId, cancellationToken)
                 .OnSuccessVoid(async _ =>
                 {
-                    await publisherQueueServiceClient.SendMessageAsJson(
-                        PublisherQueues.NotifyChangeQueue,
-                        new NotifyChangeMessage(immediate, releasePublishingKey),
-                        cancellationToken);
+                    await publisherClient.HandleReleaseChanged(releasePublishingKey, immediate, cancellationToken);
 
                     logger.LogTrace(
                         "Sent message for ReleaseVersion: {ReleaseVersionId}, ReleaseStatusId: {ReleaseStatusId}",
@@ -112,10 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrNotFoundAsync(mv => mv.Id == methodologyVersionId, cancellationToken)
                 .OnSuccessVoid(async _ =>
                 {
-                    await publisherQueueServiceClient.SendMessageAsJson(
-                        PublisherQueues.PublishMethodologyFilesQueue,
-                        new PublishMethodologyFilesMessage(methodologyVersionId),
-                        cancellationToken);
+                    await publisherClient.PublishMethodologyFiles(methodologyVersionId, cancellationToken);
 
                     logger.LogTrace("Sent message for MethodologyVersion: {MethodologyVersionId}",
                         methodologyVersionId);
@@ -130,9 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// <returns></returns>
         public async Task<Either<ActionResult, Unit>> TaxonomyChanged(CancellationToken cancellationToken = default)
         {
-            await publisherQueueServiceClient.SendMessageAsJson(PublisherQueues.PublishTaxonomyQueue,
-                new PublishTaxonomyMessage(),
-                cancellationToken);
+            await publisherClient.PublishTaxonomy(cancellationToken);
 
             logger.LogTrace("Sent PublishTaxonomy message");
 
