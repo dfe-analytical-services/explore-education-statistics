@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -170,7 +171,7 @@ public abstract class DataSetVersionMappingControllerTests(
             {
                 Updates =
                 [
-                    new LocationMappingUpdateResponse
+                    new LocationMappingUpdateResponseViewModel
                     {
                         Level = GeographicLevel.LocalAuthority,
                         SourceKey = "source-location-1-key",
@@ -182,7 +183,7 @@ public abstract class DataSetVersionMappingControllerTests(
                             CandidateKey = "target-location-1-key"
                         }
                     },
-                    new LocationMappingUpdateResponse
+                    new LocationMappingUpdateResponseViewModel
                     {
                         Level = GeographicLevel.Country,
                         SourceKey = "source-location-3-key",
@@ -453,13 +454,13 @@ public abstract class DataSetVersionMappingControllerTests(
             Assert.Equal(3, validationProblem.Errors.Count);
             validationProblem.AssertHasNotNullError("updates[0].level");
             validationProblem.AssertHasNotNullError("updates[0].type");
-            validationProblem.AssertHasNotNullError("updates[0].sourceKey");
+            validationProblem.AssertHasNotEmptyError("updates[0].sourceKey");
         }
 
         [Theory]
-        [InlineData(MappingType.ManualMapped)]
-        [InlineData(MappingType.AutoMapped)]
-        public async Task MappingTypeExpectsCandidateKey_Returns400(MappingType type)
+        [InlineData(MappingType.ManualMapped, null)]
+        [InlineData(MappingType.ManualMapped, "")]
+        public async Task MappingTypeExpectsCandidateKey_Returns400(MappingType type, string? candidateKeyValue)
         {
             var client = BuildApp().CreateClient();
 
@@ -471,20 +472,21 @@ public abstract class DataSetVersionMappingControllerTests(
                         Level = GeographicLevel.LocalAuthority,
                         SourceKey = "location-1",
                         Type = type,
-                        CandidateKey = null
+                        CandidateKey = candidateKeyValue
                     }
                 ],
                 client);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
-            validationProblem.AssertHasNotNullError("updates[0].candidateKey");
+            validationProblem.AssertHasError(
+                expectedPath: "updates[0].candidateKey",
+                expectedCode: ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Code,
+                expectedMessage: ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Message);
         }
 
         [Theory]
-        [InlineData(MappingType.None)]
         [InlineData(MappingType.ManualNone)]
-        [InlineData(MappingType.AutoNone)]
         public async Task MappingTypeDoeNotExpectCandidateKey_Returns400(MappingType type)
         {
             var client = BuildApp().CreateClient();
@@ -504,7 +506,39 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
-            validationProblem.AssertHasNullError("updates[0].candidateKey");
+            validationProblem.AssertHasError(
+                expectedPath: "updates[0].candidateKey",
+                expectedCode: ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Code,
+                expectedMessage: ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Message);
+        }
+        
+        [Theory]
+        [InlineData(MappingType.None)]
+        [InlineData(MappingType.AutoMapped)]
+        [InlineData(MappingType.AutoNone)]
+        public async Task InvalidMappingTypeForManualInteraction_Returns400(MappingType type)
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ApplyBatchMappingUpdates(
+                Guid.NewGuid(),
+                [
+                    new LocationMappingUpdateRequest
+                    {
+                        Level = GeographicLevel.LocalAuthority,
+                        SourceKey = "location-1",
+                        Type = type,
+                        CandidateKey = null
+                    }
+                ],
+                client);
+
+            var validationProblem = response.AssertValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: "updates[0].type", 
+                expectedCode: ValidationMessages.ManualMappingTypeInvalid.Code,
+                expectedMessage: "Type must be one of the following values: ManualMapped, ManualNone");
         }
 
         private async Task<HttpResponseMessage> ApplyBatchMappingUpdates(
@@ -520,8 +554,6 @@ public abstract class DataSetVersionMappingControllerTests(
                 new JsonNetContent(new BatchLocationMappingUpdatesRequest { Updates = updates }));
         }
     }
-
-    // permission tests (and do we have these for other controller integration tests too)?
 
     private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
     {

@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -12,11 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 
 [Authorize]
 [ApiController]
-[Route("api/public-data/data-set-versions")]
+[Route("api/public-data/data-set-versions/{nextDataSetVersionId:guid}/mapping")]
 public class DataSetVersionMappingController(IDataSetVersionMappingService mappingService)
     : ControllerBase
 {
-    [HttpPatch("{nextDataSetVersionId:guid}/mapping/locations")]
+    [HttpPatch("locations")]
     [Produces("application/json")]
     public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,

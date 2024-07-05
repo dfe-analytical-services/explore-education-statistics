@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
@@ -13,5 +14,20 @@ public static class ValidationMessages
     public static readonly LocalizableMessage DataSetVersionMappingPathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingPathDoesNotExist),
         Message: "The data set mapping does not exist."
+    );
+    
+    public static readonly LocalizableMessage ManualMappingTypeInvalid = new(
+        Code: nameof(ManualMappingTypeInvalid),
+        Message: $"Type must be one of the following values: {MappingType.ManualMapped}, {MappingType.ManualNone}"
+    );
+    
+    public static readonly LocalizableMessage CandidateKeyMustBeSpecifiedWithMappedMappingType = new(
+        Code: nameof(CandidateKeyMustBeSpecifiedWithMappedMappingType),
+        Message: $"Value must be specified if type is {nameof(MappingType.ManualMapped)}"
+    );
+    
+    public static readonly LocalizableMessage CandidateKeyMustBeEmptyWithNoneMappingType = new(
+        Code: nameof(CandidateKeyMustBeEmptyWithNoneMappingType),
+        Message: $"Value must be empty if type is {nameof(MappingType.ManualNone)}"
     );
 }

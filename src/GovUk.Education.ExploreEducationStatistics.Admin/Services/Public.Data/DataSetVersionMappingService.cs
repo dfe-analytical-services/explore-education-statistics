@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -55,10 +56,11 @@ public class DataSetVersionMappingService(
     /// Given a batch of Location mapping update requests, this method will return a list of either success or failure
     /// responses for each update.
     /// </summary>
-    private async Task<List<Either<ErrorViewModel, LocationMappingUpdateResponse>>> UpdateLocationOptionMappingsBatch(
-        Guid nextDataSetVersionId,
-        BatchLocationMappingUpdatesRequest request,
-        CancellationToken cancellationToken)
+    private async Task<List<Either<ErrorViewModel, LocationMappingUpdateResponseViewModel>>>
+        UpdateLocationOptionMappingsBatch(
+            Guid nextDataSetVersionId,
+            BatchLocationMappingUpdatesRequest request,
+            CancellationToken cancellationToken)
     {
         return await request
             .Updates
@@ -74,7 +76,7 @@ public class DataSetVersionMappingService(
     /// <summary>
     /// Given a Location mapping update request, this method will return either a success or failure response.
     /// </summary>
-    private async Task<Either<ErrorViewModel, LocationMappingUpdateResponse>> UpdateLocationOptionMapping(
+    private async Task<Either<ErrorViewModel, LocationMappingUpdateResponseViewModel>> UpdateLocationOptionMapping(
         Guid nextDataSetVersionId,
         LocationMappingUpdateRequest updateRequest,
         int index,
@@ -83,7 +85,7 @@ public class DataSetVersionMappingService(
         var updateJsonRequest = new JsonbPathRequest<Guid>
         {
             TableName = nameof(PublicDataDbContext.DataSetVersionMappings),
-            IdColumnName = "TargetDataSetVersionId",
+            IdColumnName = nameof(DataSetVersionMapping.TargetDataSetVersionId),
             JsonbColumnName = nameof(DataSetVersionMapping.LocationMappingPlan),
             RowId = nextDataSetVersionId,
             PathSegments =
@@ -98,23 +100,23 @@ public class DataSetVersionMappingService(
         return await postgreSqlRepository
             .UpdateJsonbAtPath(
                 publicDataDbContext,
-                updateJsonRequest,
-                (LocationOptionMapping mapping) => mapping is not null
-                    ? mapping with
-                    {
-                        Type = updateRequest.Type!.Value,
-                        CandidateKey = updateRequest.CandidateKey
-                    }
-                    : new Either<ErrorViewModel, LocationOptionMapping>(new ErrorViewModel
-                    {
-                        Code = ValidationMessages.DataSetVersionMappingPathDoesNotExist.Code,
-                        Message = ValidationMessages.DataSetVersionMappingPathDoesNotExist.Message,
-                        Path =
-                            $"{nameof(BatchLocationMappingUpdatesRequest.Updates).ToLowerFirst()}[{index}]." +
-                            $"{nameof(LocationMappingUpdateRequest.SourceKey).ToLowerFirst()}"
-                    }),
+                updateJsonRequest, (LocationOptionMapping mapping) => Task.FromResult(
+                    mapping is not null 
+                        ? mapping with
+                        {
+                            Type = updateRequest.Type!.Value,
+                            CandidateKey = updateRequest.CandidateKey
+                        }
+                        : new Either<ErrorViewModel, LocationOptionMapping>(new ErrorViewModel
+                        {
+                            Code = ValidationMessages.DataSetVersionMappingPathDoesNotExist.Code,
+                            Message = ValidationMessages.DataSetVersionMappingPathDoesNotExist.Message,
+                            Path =
+                                $"{nameof(BatchLocationMappingUpdatesRequest.Updates).ToLowerFirst()}[{index}]." +
+                                $"{nameof(LocationMappingUpdateRequest.SourceKey).ToLowerFirst()}"
+                        })),
                 cancellationToken: cancellationToken)
-            .OnSuccess(mappingUpdate => new LocationMappingUpdateResponse
+            .OnSuccess(mappingUpdate => new LocationMappingUpdateResponseViewModel
             {
                 Level = updateRequest.Level!.Value,
                 SourceKey = updateRequest.SourceKey!,
@@ -129,7 +131,7 @@ public class DataSetVersionMappingService(
         return await publicDataDbContext
             .DataSetVersionMappings
             .AsNoTracking()
-            .FirstOrNotFoundAsync(
+            .SingleOrNotFoundAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken);
     }

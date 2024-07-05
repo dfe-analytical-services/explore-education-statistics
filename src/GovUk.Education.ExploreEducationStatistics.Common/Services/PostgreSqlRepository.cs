@@ -28,14 +28,13 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             .Set<JsonFragment>()
             .FromSqlRaw(
                 sql: $"""
-                      SELECT "{request.JsonbColumnName}"#>@jsonPath "JsonString" FROM "{request.TableName}"
-                      WHERE "{request.IdColumnName}" = @rowId
-                      """,
+                    SELECT "{request.JsonbColumnName}"#>@jsonPath "{nameof(JsonFragment.JsonString)}" FROM "{request.TableName}"
+                    WHERE "{request.IdColumnName}" = @rowId
+                    """,
                 parameters: [jsonPathParam, rowIdParam])
             .SingleOrDefaultAsync(cancellationToken);
 
-        return response is not null
-               && response.JsonString is not null
+        return response?.JsonString is not null
             ? JsonSerializer.Deserialize<TResponse>(response.JsonString)
             : null;
     }
@@ -77,7 +76,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
     public async Task<Either<TFailure, TValue?>> UpdateJsonbAtPath<TDbContext, TValue, TRowId, TFailure>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
-        Func<TValue?, Either<TFailure, TValue?>> updateValueFn,
+        Func<TValue?, Task<Either<TFailure, TValue?>>> updateValueFn,
         CancellationToken cancellationToken = default)
         where TDbContext : DbContext
         where TValue : class
@@ -87,13 +86,8 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             request,
             cancellationToken);
 
-        var jsonUpdateResult = updateValueFn.Invoke(json);
-
-        if (jsonUpdateResult.IsLeft)
-        {
-            return jsonUpdateResult;
-        }
-
-        return await SetJsonbAtPath(context, request, jsonUpdateResult.Right, cancellationToken);
+        return await updateValueFn
+            .Invoke(json)
+            .OnSuccessDo(updateResult => SetJsonbAtPath(context, request, updateResult, cancellationToken));
     }
 }

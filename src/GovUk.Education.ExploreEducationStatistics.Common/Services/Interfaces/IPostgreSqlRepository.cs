@@ -44,7 +44,7 @@ public interface IPostgreSqlRepository
     Task<Either<TFailure, TValue?>> UpdateJsonbAtPath<TDbContext, TValue, TRowId, TFailure>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
-        Func<TValue?, Either<TFailure, TValue?>> updateValueFn,
+        Func<TValue?, Task<Either<TFailure, TValue?>>> updateValueFn,
         CancellationToken cancellationToken = default)
         where TDbContext : DbContext
         where TValue : class;
