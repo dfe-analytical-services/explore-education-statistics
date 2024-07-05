@@ -1028,13 +1028,15 @@ check option exist in dropdown
         ${text}=  get text  ${option}
         Append To List  ${all_texts}  ${text}
      END
-
+     # Adding logging to help catch intermittent test failures
      Log to console  \n\tAll Texts: ${all_texts}
      ${matched}=  Run Keyword And Return Status  Should Contain  ${all_texts}  ${option_text}
 
      IF  ${matched}
+        # Adding logging to help catch intermittent test failures
         Log to console  \n\tOption '${option_text}' found in the dropdown.
      ELSE
+         # Adding logging to help catch intermittent test failures
         Log to console  \n\tOption '${option_text}' not found in the dropdown.
      END
      Return From Keyword  ${matched}
