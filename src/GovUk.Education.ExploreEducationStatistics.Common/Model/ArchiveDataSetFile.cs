@@ -16,7 +16,12 @@ public class ArchiveDataSetFile
         MetaFileSize = metaFileSize;
     }
 
-    public string Title;
+    private string _title;
+    public string Title
+    {
+        get => _title;
+        set => _title = value.Trim();
+    }
 
     private string _dataFilename;
     public string DataFilename
