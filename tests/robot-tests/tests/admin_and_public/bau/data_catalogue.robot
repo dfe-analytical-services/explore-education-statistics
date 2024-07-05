@@ -196,6 +196,7 @@ Remove publication filter
 Remove release filter
     user wait for option to be available and select it    css:select[id="filters-form-theme"]     ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user wait for option to be available and select it    css:select[id="filters-form-publication"]    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    sleep    1  # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it    css:select[id="filters-form-release"]    ${PUPIL_ABSENCE_RELEASE_NAME}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}

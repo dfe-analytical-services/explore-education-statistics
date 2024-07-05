@@ -1021,19 +1021,23 @@ user wait for option to be available and select it
 
 check option exist in dropdown
     [Arguments]  ${dropdown_locator}  ${option_text}
-     ${options}=  Get WebElements    ${dropdown_locator} > option
+     ${options}=  get webelements    ${dropdown_locator} > option
      ${all_texts}=  Create List
 
      FOR    ${option}    IN    @{options}
-        ${text}=  Get Text  ${option}
+        ${text}=  get text  ${option}
         Append To List  ${all_texts}  ${text}
      END
 
-     Log To Console  All Texts: ${all_texts}
+     Log to console  \n\tAll Texts: ${all_texts}
      ${matched}=  Run Keyword And Return Status  Should Contain  ${all_texts}  ${option_text}
 
+     IF  ${matched}
+        Log to console  \n\tOption '${option_text}' found in the dropdown.
+     ELSE
+        Log to console  \n\tOption '${option_text}' not found in the dropdown.
+     END
      Return From Keyword  ${matched}
-     Log To Console    matced:${true}
 
 
     

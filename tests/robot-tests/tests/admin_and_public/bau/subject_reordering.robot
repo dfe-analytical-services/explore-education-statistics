@@ -219,6 +219,7 @@ Check subject order in data catalogue
 
     user wait for option to be available and select it    css:select[id="filters-form-theme"]    %{TEST_THEME_NAME}
     user wait for option to be available and select it    css:select[id="filters-form-publication"]     ${PUBLICATION_NAME}
+     sleep    1  # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it    css:select[id="filters-form-release"]    ${RELEASE_NAME}
 
     user waits until page contains    Download all 4 data sets (ZIP)

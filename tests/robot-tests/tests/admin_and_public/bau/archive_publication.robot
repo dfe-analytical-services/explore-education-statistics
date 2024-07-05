@@ -160,10 +160,11 @@ Check that archive-publication subject appears correctly on Data catalogue page
 
     user wait for option to be available and select it     css:select[id="filters-form-theme"]    %{TEST_THEME_NAME}
     
-    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
-    user checks select does not contain option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks select contains option    css:select[id="filters-form-publication"]     ${PUBLICATION_NAME_ARCHIVE}
+    user checks select does not contain option    css:select[id="filters-form-publication"]     ${PUBLICATION_NAME_SUPERSEDE}
 
     user wait for option to be available and select it     css:select[id="filters-form-publication"]    ${PUBLICATION_NAME_ARCHIVE}
+    sleep    1  # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it     css:select[id="filters-form-release"]     ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}
@@ -252,19 +253,23 @@ Check data catalogue page contains archive and superseding publication subjects
 
     user wait for option to be available and select it    css:select[id="filters-form-theme"]    %{TEST_THEME_NAME}
 
-    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_ARCHIVE}
-    user checks select contains option    id:filters-form-publication    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks select contains option    css:select[id="filters-form-publication"]     ${PUBLICATION_NAME_ARCHIVE}
+    user checks select contains option    css:select[id="filters-form-publication"]     ${PUBLICATION_NAME_SUPERSEDE}
 
     user wait for option to be available and select it    css:select[id="filters-form-publication"]    ${PUBLICATION_NAME_SUPERSEDE}
+    sleep    1  # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it    css:select[id="filters-form-release"]    ${RELEASE_NAME_SUPERSEDE}
+
 
     user checks page contains button    ${RELEASE_NAME_SUPERSEDE}
     user checks element contains    testid:release-info    ${RELEASE_NAME_SUPERSEDE}
+
     user checks element does not contain    testid:release-info    This is not the latest data
     user checks element contains    testid:release-info    This is the latest data
     user waits until page contains    ${SUBJECT_NAME_SUPERSEDE}
 
     user wait for option to be available and select it   css:select[id="filters-form-publication"]     ${PUBLICATION_NAME_ARCHIVE}
+    sleep    1  # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it   css:select[id="filters-form-release"]     ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains button    ${RELEASE_NAME_ARCHIVE}
