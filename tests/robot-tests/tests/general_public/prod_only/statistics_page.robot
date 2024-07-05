@@ -19,15 +19,15 @@ Validate Related information section and links exist
     user checks element contains child element    ${related_information}    xpath://h2[text()="Related information"]
 
     user checks page contains link with text and url
-    ...    Education statistics: data catalogue
+    ...    Data catalogue
     ...    /data-catalogue
     ...    ${related_information}
     user checks page contains link with text and url
-    ...    Education statistics: methodology
+    ...    Methodology
     ...    /methodology
     ...    ${related_information}
     user checks page contains link with text and url
-    ...    Education statistics: glossary
+    ...    Glossary
     ...    /glossary
     ...    ${related_information}
 
