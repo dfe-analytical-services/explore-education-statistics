@@ -26,9 +26,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
@@ -39,17 +39,20 @@ public class DataSetFileService : IDataSetFileService
     private readonly IReleaseVersionRepository _releaseVersionRepository;
     private readonly IPublicBlobStorageService _publicBlobStorageService;
     private readonly IFootnoteRepository _footnoteRepository;
+    private readonly ILogger<IDataSetFileService> _logger;
 
     public DataSetFileService(
         ContentDbContext contentDbContext,
         IReleaseVersionRepository releaseVersionRepository,
         IPublicBlobStorageService publicBlobStorageService,
-        IFootnoteRepository footnoteRepository)
+        IFootnoteRepository footnoteRepository,
+        ILogger<IDataSetFileService> logger)
     {
         _contentDbContext = contentDbContext;
         _releaseVersionRepository = releaseVersionRepository;
         _publicBlobStorageService = publicBlobStorageService;
         _footnoteRepository = footnoteRepository;
+        _logger = logger;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
@@ -198,7 +201,17 @@ public class DataSetFileService : IDataSetFileService
 
         var dataCsvPreview = await GetDataCsvPreview(releaseFile);
 
-        var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
+        // EES-5265 Restore once bad data sets are sorted
+        // var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
+        List<LabelValue> variables = [];
+        if (releaseFile.File.DataSetFileMeta != null)
+        {
+            variables = GetVariables(releaseFile.File.DataSetFileMeta!);
+        }
+        else
+        {
+            _logger.LogCritical("File should not have a null DataSetFileMeta. FileId: {fileId}", releaseFile.File.Id);
+        }
 
         var footnotes = await _footnoteRepository.GetFootnotes(
             releaseFile.ReleaseVersionId,
@@ -255,7 +268,24 @@ public class DataSetFileService : IDataSetFileService
     {
         if (meta == null)
         {
-            throw new InvalidDataException("DataSetMeta should not be null");
+            // EES-5265 Restore exception once bad data sets are sorted
+            //throw new InvalidDataException("DataSetMeta should not be null");
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            var logger = loggerFactory.CreateLogger(string.Empty);
+            logger.LogCritical("File.DataSetFileMeta should not be null if type FileType.Data");
+
+            // We do this to avoid 500 response on bad data sets, which allows Data catalogue pages to load
+            return new DataSetFileMetaViewModel
+            {
+                GeographicLevels = [],
+                TimePeriodRange = new()
+                {
+                    From = "",
+                    To = "",
+                },
+                Filters = [],
+                Indicators = [],
+            };
         }
 
         return new DataSetFileMetaViewModel
