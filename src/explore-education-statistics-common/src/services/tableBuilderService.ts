@@ -65,14 +65,14 @@ export interface LocationOption {
   value: string;
   level?: string;
   options?: LocationLeafOption[];
-  geoJson?: GeoJsonFeature[];
+  geoJson?: GeoJsonFeature;
 }
 
 export interface LocationLeafOption {
   id?: string;
   label: string;
   value: string;
-  geoJson?: GeoJsonFeature[];
+  geoJson?: GeoJsonFeature;
 }
 
 export interface Subject {
