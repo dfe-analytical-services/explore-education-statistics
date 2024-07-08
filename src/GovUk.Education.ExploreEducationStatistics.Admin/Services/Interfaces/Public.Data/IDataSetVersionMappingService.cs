@@ -15,8 +15,17 @@ public interface IDataSetVersionMappingService
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default);
+    
+    Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default);
+    
+    Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchFilterOptionMappingUpdatesRequest request,
         CancellationToken cancellationToken = default);
 }

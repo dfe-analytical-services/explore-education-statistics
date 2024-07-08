@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
@@ -19,7 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 public class DataSetVersionMappingController(IDataSetVersionMappingService mappingService)
     : ControllerBase
 {
-
     [HttpGet("locations")]
     [Produces("application/json")]
     public Task<ActionResult<LocationMappingPlan>> GetLocationMappings(
@@ -33,13 +31,39 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpPatch("locations")]
     [Produces("application/json")]
-    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchMappingUpdates(
+    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
         [FromBody] BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken)
     {
         return await mappingService
-            .ApplyBatchMappingUpdates(
+            .ApplyBatchLocationMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersionId,
+                request: request,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpGet("filters")]
+    [Produces("application/json")]
+    public Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
+        [FromRoute] Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        return mappingService
+            .GetFilterMappings(nextDataSetVersionId, cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpPatch("filters/options")]
+    [Produces("application/json")]
+    public async Task<ActionResult<BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+        [FromRoute] Guid nextDataSetVersionId,
+        [FromBody] BatchFilterOptionMappingUpdatesRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await mappingService
+            .ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
                 cancellationToken: cancellationToken)
