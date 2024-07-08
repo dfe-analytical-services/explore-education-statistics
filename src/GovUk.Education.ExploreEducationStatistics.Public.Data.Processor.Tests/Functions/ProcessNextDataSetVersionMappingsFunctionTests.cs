@@ -17,13 +17,13 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessNextDataSetVersionFunctionTests(
+public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    public class ProcessNextDataSetVersionTests(
+    public class ProcessNextDataSetVersionMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionFunctionTests(fixture)
+        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -84,8 +84,8 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
         private async Task ProcessNextDataSetVersion(TaskOrchestrationContext orchestrationContext)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
-            await function.ProcessNextDataSetVersion(
+            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
+            await function.ProcessNextDataSetVersionMappings(
                 orchestrationContext,
                 new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
         }
@@ -115,13 +115,13 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
     public abstract class CreateMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionFunctionTests(fixture)
+        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.CreatingMappings;
 
         protected async Task CreateMappings(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
+            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
             await function.CreateMappings(instanceId, CancellationToken.None);
         }
     }
@@ -441,13 +441,13 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
     public abstract class ApplyAutoMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionFunctionTests(fixture)
+        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.AutoMapping;
 
         protected async Task ApplyAutoMappings(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
+            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
             await function.ApplyAutoMappings(instanceId, CancellationToken.None);
         }
     }
@@ -1234,9 +1234,9 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
         }
     }
 
-    public class CompleteNextDataSetVersionMappingProcessingTests(
+    public class CompleteNextDataSetVersionMappingsMappingProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionFunctionTests(fixture)
+        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
 
@@ -1264,7 +1264,7 @@ public abstract class ProcessNextDataSetVersionFunctionTests(
 
         private async Task CompleteProcessing(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionFunction>();
+            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
             await function.CompleteNextDataSetVersionMappingProcessing(instanceId, CancellationToken.None);
         }
     }

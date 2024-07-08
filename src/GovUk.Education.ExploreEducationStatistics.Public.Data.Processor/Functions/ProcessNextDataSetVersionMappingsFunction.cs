@@ -9,16 +9,15 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class ProcessNextDataSetVersionFunction(
+public class ProcessNextDataSetVersionMappingsFunction(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionMappingService mappingService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
-    [Function(nameof(ProcessNextDataSetVersion))]
-    public async Task ProcessNextDataSetVersion(
-        [OrchestrationTrigger] TaskOrchestrationContext context,
+    [Function(nameof(ProcessNextDataSetVersionMappings))]
+    public async Task ProcessNextDataSetVersionMappings([OrchestrationTrigger] TaskOrchestrationContext context,
         ProcessDataSetVersionContext input)
     {
-        var logger = context.CreateReplaySafeLogger(nameof(ProcessNextDataSetVersion));
+        var logger = context.CreateReplaySafeLogger(nameof(ProcessNextDataSetVersionMappings));
 
         logger.LogInformation(
             "Processing next data set version (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
