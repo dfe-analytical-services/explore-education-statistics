@@ -11,16 +11,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReleasePublishingStatusRepository : IReleasePublishingStatusRepository
+    public class ReleasePublishingStatusRepository(IPublisherTableStorageService publisherTableStorageService)
+        : IReleasePublishingStatusRepository
     {
-        private readonly IPublisherTableStorageService _publisherTableStorageService;
-
-        public ReleasePublishingStatusRepository(IPublisherTableStorageService publisherTableStorageService)
-        {
-            _publisherTableStorageService = publisherTableStorageService;
-        }
-
-        public Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
+        public async Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
@@ -50,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
-            return _publisherTableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
+            return await publisherTableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
         }
 
         public async Task RemovePublisherReleaseStatuses(IReadOnlyList<Guid> releaseVersionIds)
@@ -73,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     : TableQuery.CombineFilters(filter, TableOperators.Or, newFilter);
             }
 
-            var cloudTable = _publisherTableStorageService.GetTable(PublisherReleaseStatusTableName);
+            var cloudTable = publisherTableStorageService.GetTable(PublisherReleaseStatusTableName);
             var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
             var releaseStatusesToRemove = cloudTable.ExecuteQuery(query);
 
