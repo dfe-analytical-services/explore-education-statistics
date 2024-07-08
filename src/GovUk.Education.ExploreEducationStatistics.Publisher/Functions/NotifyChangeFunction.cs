@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -6,8 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusStates;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -49,25 +48,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         {
                             if (message.Immediate)
                             {
-                                var releaseStatus =
-                                    await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                                await queueService.QueuePublishReleaseFilesMessage(
-                                    releaseVersionId: releaseStatus.ReleaseVersionId,
-                                    releaseStatusId: releaseStatus.Id);
-                                await queueService.QueuePublishReleaseContentMessage(
-                                    releaseVersionId: message.ReleaseVersionId,
-                                    releaseStatusId: message.ReleaseStatusId);
+                                var releasePublishingKey = await CreateReleaseStatus(message,
+                                    ReleasePublishingStatusStates.ImmediateReleaseStartedState);
+                                await queueService.QueuePublishReleaseFilesMessages(new[] { releasePublishingKey });
+                                await queueService.QueuePublishReleaseContentMessage(releasePublishingKey);
                             }
                             else
                             {
                                 // Create a Release Status entry here for the midnight job to pick up.
-                                await CreateReleaseStatusAsync(message, ScheduledState);
+                                await CreateReleaseStatus(message, ReleasePublishingStatusStates.ScheduledState);
                             }
                         })
-                        .OnFailureDo(async logMessages =>
-                        {
-                            await CreateReleaseStatusAsync(message, InvalidState, logMessages);
-                        });
+                        .OnFailureDo(async logMessages => await CreateReleaseStatus(message,
+                            ReleasePublishingStatusStates.InvalidState,
+                            logMessages));
                 }
             }
             finally
@@ -78,13 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
         }
 
-        private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
+        private async Task<ReleasePublishingKey> CreateReleaseStatus(
+            NotifyChangeMessage message,
             ReleasePublishingStatusState state,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
-            return await releasePublishingStatusService.CreateAsync(
-                releaseVersionId: message.ReleaseVersionId,
-                releaseStatusId: message.ReleaseStatusId,
+            return await releasePublishingStatusService.Create(
+                message.ReleasePublishingKey,
                 state,
                 message.Immediate,
                 logMessages);
@@ -96,13 +90,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             // If so, mark it as superseded
             var scheduled = await releasePublishingStatusService.GetAllByOverallStage(
                 message.ReleaseVersionId,
-                Scheduled);
-            foreach (var releaseStatus in scheduled)
-            {
-                await releasePublishingStatusService.UpdateStateAsync(releaseVersionId: message.ReleaseVersionId,
-                    releaseStatusId: releaseStatus.Id,
-                    SupersededState);
-            }
+                ReleasePublishingStatusOverallStage.Scheduled);
+
+            await scheduled
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async status =>
+                    await releasePublishingStatusService.UpdateState(status.AsTableRowKey(),
+                        ReleasePublishingStatusStates.SupersededState));
         }
     }
 }

@@ -8,8 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleasePublishingStatusRepository
 {
-    Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseVersionId,
+    Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseVersionId,
         params ReleasePublishingStatusOverallStage[] overallStages);
 
-    Task RemovePublisherReleaseStatuses(List<Guid> releaseVersionIds);
+    Task RemovePublisherReleaseStatuses(IReadOnlyList<Guid> releaseVersionIds);
 }

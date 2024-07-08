@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
     public interface ITableStorageService
     {
-        Task<IEnumerable<TElement>> ExecuteQueryAsync<TElement>(string tableName, TableQuery<TElement> query)
+        Task<IReadOnlyList<TElement>> ExecuteQuery<TElement>(string tableName, TableQuery<TElement> query)
             where TElement : ITableEntity, new();
 
         CloudTable GetTable(string tableName);

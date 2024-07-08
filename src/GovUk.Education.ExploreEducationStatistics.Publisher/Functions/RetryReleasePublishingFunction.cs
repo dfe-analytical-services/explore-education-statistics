@@ -27,13 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [Function("RetryReleasePublishing")]
         public async Task RetryReleasePublishing(
-            [QueueTrigger(RetryReleasePublishingQueue)]
-            RetryReleasePublishingMessage message,
+            [QueueTrigger(RetryReleasePublishingQueue)] RetryReleasePublishingMessage message,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var releaseStatus = await releasePublishingStatusService.GetLatestAsync(message.ReleaseVersionId);
+            var releaseStatus = await releasePublishingStatusService.GetLatest(message.ReleaseVersionId);
 
             if (releaseStatus == null)
             {
@@ -53,8 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 else
                 {
-                    await queueService.QueuePublishReleaseContentMessage(releaseVersionId: message.ReleaseVersionId,
-                        releaseStatusId: releaseStatus.Id);
+                    await queueService.QueuePublishReleaseContentMessage(releaseStatus.AsTableRowKey());
                 }
             }
 
