@@ -1,4 +1,6 @@
+#nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -11,25 +13,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     [Route("api")]
     [ApiController]
     [Authorize]
-    public class BauReleaseController : ControllerBase
+    public class BauReleaseController(IPublishingService publishingService) : ControllerBase
     {
-        private readonly IPublishingService _publishingService;
-
-        public BauReleaseController(IPublishingService publishingService)
-        {
-            _publishingService = publishingService;
-        }
-
         /// <summary>
         /// Retry a combination of the Content and Publishing stages of the publishing workflow.
         /// </summary>
         /// <param name="releaseVersionId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPut("bau/release/{releaseVersionId:guid}/publish/content")]
-        public async Task<ActionResult<Unit>> RetryReleasePublishing(Guid releaseVersionId)
+        public async Task<ActionResult<Unit>> RetryReleasePublishing(
+            Guid releaseVersionId, CancellationToken cancellationToken)
         {
-            return await _publishingService
-                .RetryReleasePublishing(releaseVersionId)
+            return await publishingService
+                .RetryReleasePublishing(releaseVersionId, cancellationToken)
                 .HandleFailuresOrOk();
         }
     }

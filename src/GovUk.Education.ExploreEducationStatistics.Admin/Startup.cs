@@ -33,7 +33,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -47,10 +46,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -395,15 +396,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleasePermissionService, ReleasePermissionService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
-
-            services.AddTransient<IPublishingService, PublishingService>(provider =>
-                new PublishingService(
-                    provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    new StorageQueueService(
-                        publisherStorageConnectionString,
-                        new StorageInstanceCreationUtil()),
-                    provider.GetService<IUserService>(),
-                    provider.GetRequiredService<ILogger<PublishingService>>()));
+            services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>();
             services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>();
             services.AddTransient<IThemeService, ThemeService>();
@@ -541,10 +534,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<ICoreTableStorageService, CoreTableStorageService>();
             services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>();
-            services.AddTransient<IStorageQueueService, StorageQueueService>(_ =>
-                new StorageQueueService(
-                    coreStorageConnectionString,
-                    new StorageInstanceCreationUtil()));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -569,6 +558,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     provider.GetRequiredService<ILogger<BlobCacheService>>()
                 ));
             services.AddTransient<ICacheKeyService, CacheKeyService>();
+            services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
+                new DataProcessorClient(coreStorageConnectionString));
+            services.AddSingleton<IPublisherClient, PublisherClient>(_ =>
+                new PublisherClient(publisherStorageConnectionString));
 
             /*
              * Swagger
@@ -584,14 +577,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             Version = "v1"
                         });
                     c.CustomSchemaIds((type) => type.FullName);
-                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        Description =
-                            "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
-                        Name = "Authorization",
-                        In = ParameterLocation.Header,
-                        Type = SecuritySchemeType.ApiKey
-                    });
+                    c.AddSecurityDefinition("Bearer",
+                        new OpenApiSecurityScheme
+                        {
+                            Description =
+                                "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
+                            Name = "Authorization",
+                            In = ParameterLocation.Header,
+                            Type = SecuritySchemeType.ApiKey
+                        });
                     c.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {
                         {
@@ -776,10 +770,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new List<DataSetVersionStatusSummary>());
         }
-        
+
         public Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
-            Guid dataSetId, 
-            SemVersion version, 
+            Guid dataSetId,
+            SemVersion version,
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, DataSetVersion>(new NotFoundResult()));
@@ -790,7 +784,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid dataSetId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken = default)
+        public Task<Either<ActionResult, Unit>> DeleteVersion(
+            Guid dataSetVersionId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }

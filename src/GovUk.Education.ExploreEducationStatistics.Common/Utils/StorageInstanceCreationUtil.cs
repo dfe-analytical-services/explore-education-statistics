@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ public class StorageInstanceCreationUtil : IStorageInstanceCreationUtil
         string instance,
         Func<Task> createIfNotExists)
     {
-        var identifyingString = $"{instance}{storageType.ToString()}{connectionString}";
+        var identifyingString = $"{instance}{storageType}{connectionString}";
         if (!CreatedInstances.ContainsKey(identifyingString))
         {
             await createIfNotExists.Invoke();
@@ -30,7 +31,7 @@ public class StorageInstanceCreationUtil : IStorageInstanceCreationUtil
         string instance,
         Action createIfNotExists)
     {
-        var identifyingString = $"{instance}{storageType.ToString()}{connectionString}";
+        var identifyingString = $"{instance}{storageType}{connectionString}";
         if (!CreatedInstances.ContainsKey(identifyingString))
         {
             createIfNotExists.Invoke();
@@ -42,6 +43,5 @@ public class StorageInstanceCreationUtil : IStorageInstanceCreationUtil
 public enum AzureStorageType
 {
     Blob,
-    Queue,
     Table,
 }

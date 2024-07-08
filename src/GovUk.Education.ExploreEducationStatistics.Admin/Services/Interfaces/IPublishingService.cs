@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -9,11 +10,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IPublishingService
 {
-    Task<Either<ActionResult, Unit>> RetryReleasePublishing(Guid releaseVersionId);
+    Task<Either<ActionResult, Unit>> RetryReleasePublishing(
+        Guid releaseVersionId, CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, Unit>> ReleaseChanged(ReleasePublishingKey releasePublishingKey, bool immediate = false);
+    Task<Either<ActionResult, Unit>> ReleaseChanged(
+        ReleasePublishingKey releasePublishingKey, bool immediate = false,
+        CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, Unit>> PublishMethodologyFiles(Guid methodologyVersionId);
+    Task<Either<ActionResult, Unit>> PublishMethodologyFiles(
+        Guid methodologyVersionId, CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, Unit>> TaxonomyChanged();
+    Task<Either<ActionResult, Unit>> TaxonomyChanged(CancellationToken cancellationToken = default);
 }

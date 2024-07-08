@@ -13,7 +13,9 @@ public class PublishTaxonomyFunction(
 {
     [Function("PublishTaxonomy")]
     public async Task PublishTaxonomy(
+#pragma warning disable IDE0060
         [QueueTrigger(PublishTaxonomyQueue)] PublishTaxonomyMessage message,
+#pragma warning restore IDE0060
         FunctionContext context)
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
