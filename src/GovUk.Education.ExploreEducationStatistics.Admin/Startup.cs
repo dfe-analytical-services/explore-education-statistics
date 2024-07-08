@@ -558,9 +558,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     provider.GetRequiredService<ILogger<BlobCacheService>>()
                 ));
             services.AddTransient<ICacheKeyService, CacheKeyService>();
-            services.AddTransient<IDataProcessorClient, DataProcessorClient>(_ =>
+            services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
                 new DataProcessorClient(coreStorageConnectionString));
-            services.AddTransient<IPublisherClient, PublisherClient>(_ =>
+            services.AddSingleton<IPublisherClient, PublisherClient>(_ =>
                 new PublisherClient(publisherStorageConnectionString));
 
             /*
