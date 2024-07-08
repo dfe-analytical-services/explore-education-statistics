@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -86,6 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             services.AddFluentValidation();
             services.AddValidatorsFromAssemblyContaining<DataSetFileListRequest.Validator>();
+            services.AddValidatorsFromAssemblyContaining<FullTableQueryRequest.Validator>();
+            services.AddValidatorsFromAssemblyContaining<LocationsOrTimePeriodsQueryRequest.Validator>();
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options

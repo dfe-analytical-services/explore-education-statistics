@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public UserDetailsViewModel? LockedBy { get; init; }
     }
 
-    public record DataBlockCreateViewModel
+    public record DataBlockCreateViewModel // @MarkFix this is used as a request
     {
         [Required] public string Heading { get; init; } = string.Empty;
 
@@ -60,14 +60,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Source { get; init; } = string.Empty;
 
-        public ObservationQueryContext Query { get; init; } = null!;
+        public FullTableQueryRequest QueryRequest { get; init; } = null!;
 
         public List<IChart> Charts { get; init; } = new();
 
         public TableBuilderConfiguration Table { get; init; } = null!;
     }
 
-    public record DataBlockUpdateViewModel
+    public record DataBlockUpdateViewModel // @MarkFix this is used as a request
     {
         [Required]
         public string Heading { get; init; } = string.Empty;
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Source { get; init; } = string.Empty;
 
-        public ObservationQueryContext Query { get; init; } = null!;
+        public FullTableQueryRequest QueryRequest { get; init; } = null!;
 
         public List<IChart> Charts { get; init; } = new();
 

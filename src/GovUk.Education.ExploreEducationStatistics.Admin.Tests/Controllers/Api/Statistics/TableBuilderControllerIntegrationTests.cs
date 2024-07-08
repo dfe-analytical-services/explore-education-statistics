@@ -29,12 +29,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static readonly Guid ReleaseVersionId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
 
-        private static readonly ObservationQueryContext ObservationQueryContext = new()
+        private static readonly FullTableQueryRequest FullTableQueryRequest = new()
         {
             SubjectId = SubjectId,
-            Filters = new List<Guid>(),
-            Indicators = new List<Guid>(),
-            LocationIds = new List<Guid>(),
+            Filters = new List<Guid>(), // data set might have no filters
+            Indicators = new List<Guid> { Guid.NewGuid() },
+            LocationIds = new List<Guid> { Guid.NewGuid() },
             TimePeriod = new TimePeriodQuery
             {
                 StartYear = 2021,
@@ -44,15 +44,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             }
         };
 
+        private static readonly ObservationQueryContext ObservationQueryContext =
+            FullTableQueryRequest.AsObservationQueryContext();
+
         private readonly TableBuilderResultViewModel _tableBuilderResults = new()
         {
             SubjectMeta = new SubjectResultMetaViewModel
             {
-                TimePeriodRange = new List<TimePeriodMetaViewModel>
-                {
-                    new(2020, AcademicYear),
-                    new(2021, AcademicYear),
-                }
+                TimePeriodRange =
+                [
+                    new TimePeriodMetaViewModel(2020, AcademicYear),
+                    new TimePeriodMetaViewModel(2021, AcademicYear)
+                ]
             },
             Results = new List<ObservationViewModel>
             {
@@ -85,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var response = await client.PostAsync(
                 $"/api/data/tablebuilder/release/{ReleaseVersionId}",
-                new JsonNetContent(ObservationQueryContext));
+                new JsonNetContent(FullTableQueryRequest));
 
             VerifyAllMocks(tableBuilderService);
 
@@ -112,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var response = await client.PostAsync(
                 $"/api/data/tablebuilder/release/{ReleaseVersionId}",
-                content: new JsonNetContent(ObservationQueryContext),
+                content: new JsonNetContent(FullTableQueryRequest),
                 headers: new Dictionary<string, string>
                 {
                     { HeaderNames.Accept, ContentTypes.Csv}

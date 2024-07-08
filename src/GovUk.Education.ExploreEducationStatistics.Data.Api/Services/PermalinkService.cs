@@ -11,6 +11,7 @@ using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -86,10 +87,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
             CancellationToken cancellationToken = default)
         {
-            return await (request.ReleaseId ?? await FindLatestPublishedReleaseVersionId(request.Query.SubjectId))
+            return await (request.ReleaseId ?? await FindLatestPublishedReleaseVersionId(request.QueryRequest.SubjectId))
                 .OnSuccess(releaseVersionId =>
                 {
-                    return _tableBuilderService.Query(releaseVersionId, request.Query, cancellationToken)
+                    return _tableBuilderService.Query(releaseVersionId,
+                            request.QueryRequest.AsObservationQueryContext(),
+                            cancellationToken)
                         .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                         {
                             var frontendTableTask = _frontendService.CreateTable(
@@ -99,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             );
 
                             var csvMetaTask = _permalinkCsvMetaService.GetCsvMeta(
-                                request.Query.SubjectId,
+                                request.QueryRequest.SubjectId,
                                 tableResult.SubjectMeta,
                                 cancellationToken
                             );
@@ -134,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             var permalink = new Permalink
                             {
                                 ReleaseVersionId = releaseVersionId,
-                                SubjectId = request.Query.SubjectId,
+                                SubjectId = request.QueryRequest.SubjectId,
                                 PublicationTitle = subjectMeta.PublicationName,
                                 DataSetTitle = subjectMeta.SubjectName,
                             };

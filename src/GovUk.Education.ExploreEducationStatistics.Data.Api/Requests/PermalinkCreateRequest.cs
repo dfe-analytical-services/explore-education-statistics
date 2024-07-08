@@ -11,5 +11,5 @@ public record PermalinkCreateRequest
 
     public TableBuilderConfiguration Configuration { get; init; } = new();
 
-    public ObservationQueryContext Query { get; init; } = new();
+    public FullTableQueryRequest QueryRequest { get; init; } = new();
 }

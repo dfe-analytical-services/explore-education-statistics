@@ -38,10 +38,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("data/release/{releaseVersionId:guid}/meta/subject")]
+        [HttpPost("data/release/{releaseVersionId:guid}/meta/subject")] // @MarkFix split into two endpoints for locations and timeperiods steps
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
             Guid releaseVersionId,
-            [FromBody] ObservationQueryContext query,
+            [FromBody] LocationsOrTimePeriodsQueryRequest query,
             CancellationToken cancellationToken)
         {
             return _subjectMetaService.FilterSubjectMeta(releaseVersionId, query, cancellationToken)

@@ -1,5 +1,4 @@
 #nullable enable
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -46,6 +45,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
+using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
@@ -89,6 +90,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
             });
+
+            services.AddFluentValidation();
+            services.AddValidatorsFromAssemblyContaining<FullTableQueryRequest.Validator>();
+            services.AddValidatorsFromAssemblyContaining<LocationsOrTimePeriodsQueryRequest.Validator>();
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options

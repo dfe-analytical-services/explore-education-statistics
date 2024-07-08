@@ -126,7 +126,7 @@ public class SubjectMetaServicePermissionTests
                         releaseSubjectService: releaseSubjectService.Object
                     );
 
-                    var query = new ObservationQueryContext
+                    var query = new LocationsOrTimePeriodsQueryRequest
                     {
                         SubjectId = SubjectId
                     };
@@ -166,7 +166,7 @@ public class SubjectMetaServicePermissionTests
                         contentDbContext: contextDbContext,
                         releaseSubjectService: releaseSubjectService.Object);
 
-                    var query = new ObservationQueryContext
+                    var query = new LocationsOrTimePeriodsQueryRequest
                     {
                         SubjectId = SubjectId
                     };

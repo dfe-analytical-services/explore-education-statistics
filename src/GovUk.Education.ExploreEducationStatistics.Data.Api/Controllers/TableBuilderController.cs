@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [Produces("application/json", "text/csv")]
         [CancellationTokenTimeout(TableBuilderQuery)]
         public async Task<ActionResult> Query(
-            [FromBody] ObservationQueryContext query,
+            [FromBody] FullTableQueryRequest request,
             CancellationToken cancellationToken = default)
         {
             if (Request.AcceptsCsv(exact: true))
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Response.ContentDispositionAttachment(ContentTypes.Csv);
 
                 return await _tableBuilderService.QueryToCsvStream(
-                    queryContext: query,
+                    queryContext: request.AsObservationQueryContext(),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationToken
                 )
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return await _tableBuilderService
-                .Query(query, cancellationToken)
+                .Query(request.AsObservationQueryContext(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [CancellationTokenTimeout(TableBuilderQuery)]
         public async Task<ActionResult> Query(
             Guid releaseVersionId,
-            [FromBody] ObservationQueryContext query,
+            [FromBody] FullTableQueryRequest request,
             CancellationToken cancellationToken = default)
         {
             if (Request.AcceptsCsv(exact: true))
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
                 return await _tableBuilderService.QueryToCsvStream(
                         releaseVersionId: releaseVersionId,
-                        queryContext: query,
+                        queryContext: request.AsObservationQueryContext(),
                         stream: Response.BodyWriter.AsStream(),
                         cancellationToken: cancellationToken
                     )
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, query, cancellationToken)
+                .Query(releaseVersionId, request.AsObservationQueryContext(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 

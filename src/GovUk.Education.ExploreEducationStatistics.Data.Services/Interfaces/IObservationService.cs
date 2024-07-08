@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         /// <param name="query">The query to run in order to find matching Observation rows.</param>
         /// <param name="cancellationToken">Cancellation token for cancelling this request.</param>
         /// <returns>A query for selecting the matched Observation Ids from the temporary table.</returns>
-        Task<IQueryable<MatchedObservation>> GetMatchedObservations(
+        Task<IQueryable<MatchedObservation>> GetMatchedObservations( // @MarkFix this is called with FullTableQueryContext and LocationsAndTimePeriodsQueryContext
             ObservationQueryContext query,
             CancellationToken cancellationToken);
     }

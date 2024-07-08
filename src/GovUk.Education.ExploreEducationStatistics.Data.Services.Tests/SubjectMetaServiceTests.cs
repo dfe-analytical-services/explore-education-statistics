@@ -393,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var query = new ObservationQueryContext
+                var query = new LocationsOrTimePeriodsQueryRequest
                 {
                     SubjectId = releaseSubject.SubjectId,
                     LocationIds = ListOf(Guid.NewGuid())
@@ -462,10 +462,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var query = new ObservationQueryContext
+                var query = new LocationsOrTimePeriodsQueryRequest
                 {
                     SubjectId = releaseSubject.SubjectId,
-                    LocationIds = ListOf(Guid.NewGuid())
+                    LocationIds = ListOf(Guid.NewGuid()),
                 };
 
                 var service = BuildSubjectMetaService(
@@ -532,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 LocalAuthority = _sunderland
             };
 
-            var query = new ObservationQueryContext
+            var query = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = subject.Id,
                 LocationIds = ListOf(location1.Id, location2.Id, location3.Id)
@@ -665,7 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
             };
 
-            var query = new ObservationQueryContext
+            var query = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = releaseSubject.SubjectId,
                 LocationIds = ListOf(Guid.NewGuid()),
@@ -909,7 +909,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Subject = subject
             };
 
-            var query = new ObservationQueryContext
+            var query = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = subject.Id,
                 LocationIds = new List<Guid>(),

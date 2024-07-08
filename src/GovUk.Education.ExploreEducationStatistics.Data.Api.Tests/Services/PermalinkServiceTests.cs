@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -71,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var request = new PermalinkCreateRequest
             {
-                Query =
+                QueryRequest =
                 {
                     SubjectId = Guid.NewGuid()
                 }
@@ -85,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync((ReleaseVersion?) null);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
+                .Setup(s => s.FindPublicationIdForSubject(request.QueryRequest.SubjectId, default))
                 .ReturnsAsync(_publicationId);
 
             var service = BuildService(releaseVersionRepository: releaseVersionRepository.Object,
@@ -271,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 {
                     TableHeaders = new TableHeaders()
                 },
-                Query =
+                QueryRequest =
                 {
                     SubjectId = subject.Id
                 }
@@ -363,7 +364,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             tableBuilderService
-                .Setup(s => s.Query(releaseVersion.Id, request.Query, CancellationToken.None))
+                .Setup(s => s.Query(releaseVersion.Id,
+                    It.Is<ObservationQueryContext>(ctx =>
+                        ctx.Equals(request.QueryRequest.AsObservationQueryContext())),
+                    CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -603,7 +607,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 {
                     TableHeaders = new TableHeaders()
                 },
-                Query =
+                QueryRequest =
                 {
                     SubjectId = subject.Id
                 }
@@ -683,7 +687,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             tableBuilderService
-                .Setup(s => s.Query(releaseVersion.Id, request.Query, CancellationToken.None))
+                .Setup(s => s.Query(releaseVersion.Id,
+                    It.Is<ObservationQueryContext>(ctx =>
+                        ctx.Equals(request.QueryRequest.AsObservationQueryContext())),
+                    CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
             var contentDbContextId = Guid.NewGuid().ToString();

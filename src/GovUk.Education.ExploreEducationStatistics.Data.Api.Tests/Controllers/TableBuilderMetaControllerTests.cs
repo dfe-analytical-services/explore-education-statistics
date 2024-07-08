@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         private static readonly Guid ReleaseVersionId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
 
-        private static readonly ObservationQueryContext QueryContext = new()
+        private static readonly LocationsOrTimePeriodsQueryRequest QueryRequest = new()
         {
             SubjectId = SubjectId
         };
@@ -172,10 +172,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, mocks) = BuildControllerAndMocks();
 
             mocks.subjectMetaService
-                .Setup(s => s.FilterSubjectMeta(null, QueryContext, cancellationToken))
+                .Setup(s => s.FilterSubjectMeta(null, QueryRequest, cancellationToken))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            var result = await controller.FilterSubjectMeta(QueryContext, cancellationToken);
+            var result = await controller.FilterSubjectMeta(QueryRequest, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);
@@ -190,10 +190,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, mocks) = BuildControllerAndMocks();
 
             mocks.subjectMetaService
-                .Setup(s => s.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken))
+                .Setup(s => s.FilterSubjectMeta(ReleaseVersionId, QueryRequest, cancellationToken))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            var result = await controller.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken);
+            var result = await controller.FilterSubjectMeta(ReleaseVersionId, QueryRequest, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);

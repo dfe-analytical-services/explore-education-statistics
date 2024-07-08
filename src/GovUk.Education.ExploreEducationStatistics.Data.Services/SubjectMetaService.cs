@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(
             Guid? releaseVersionId,
-            ObservationQueryContext query,
+            LocationsOrTimePeriodsQueryRequest query,
             CancellationToken cancellationToken)
         {
             return await releaseSubjectService.Find(subjectId: query.SubjectId,
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(
-            ObservationQueryContext query,
+            LocationsOrTimePeriodsQueryRequest query,
             ReleaseSubject releaseSubject,
             CancellationToken cancellationToken)
         {

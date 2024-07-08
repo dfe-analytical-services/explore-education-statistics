@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseSubject releaseSubject);
 
         Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseVersionId,
-            ObservationQueryContext query,
+            LocationsOrTimePeriodsQueryRequest query,
             CancellationToken cancellationToken);
 
         Task<Either<ActionResult, Unit>> UpdateSubjectFilters(Guid releaseVersionId,

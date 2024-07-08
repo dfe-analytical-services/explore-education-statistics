@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             },
         };
 
-        private static readonly ObservationQueryContext Query = new()
+        private static readonly FullTableQueryRequest FullTableQueryRequest = new()
         {
             SubjectId = SubjectId,
         };
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersionId(ReleaseVersionId)
-                    .WithQuery(Query))
+                    .WithQuery(FullTableQueryRequest.AsObservationQueryContext()))
                 .Generate();
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         s.Query(
                             ReleaseVersionId,
                             It.Is<ObservationQueryContext>(
-                                q => q.SubjectId == Query.SubjectId
+                                q => q.SubjectId == FullTableQueryRequest.SubjectId
                             ),
                             cancellationToken
                         )

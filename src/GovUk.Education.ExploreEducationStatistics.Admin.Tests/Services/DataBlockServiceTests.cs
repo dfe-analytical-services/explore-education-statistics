@@ -1226,7 +1226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "Test heading",
                 Name = "Test name",
                 Source = "Test source",
-                Query = new ObservationQueryContext
+                QueryRequest = new FullTableQueryRequest
                 {
                     SubjectId = subjectId,
                     Filters = new List<Guid>
@@ -1274,7 +1274,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.Name, viewModel.Name);
                 Assert.Equal(createRequest.Source, viewModel.Source);
 
-                createRequest.Query.AssertDeepEqualTo(viewModel.Query);
+                createRequest.QueryRequest.AsObservationQueryContext()
+                    .AssertDeepEqualTo(viewModel.Query);
                 Assert.Equal(createRequest.Table, viewModel.Table);
                 Assert.Equal(createRequest.Charts, viewModel.Charts);
 
@@ -1321,7 +1322,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.Name, dataBlock.Name);
                 Assert.Equal(createRequest.Source, dataBlock.Source);
 
-                createRequest.Query.AssertDeepEqualTo(dataBlock.Query);
+                createRequest.QueryRequest.AsObservationQueryContext()
+                    .AssertDeepEqualTo(dataBlock.Query);
                 createRequest.Table.AssertDeepEqualTo(dataBlock.Table);
                 createRequest.Charts.AssertDeepEqualTo(dataBlock.Charts);
 
@@ -1371,7 +1373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var createRequest = new DataBlockCreateViewModel
             {
                 Heading = "Test heading",
-                Query = new ObservationQueryContext
+                QueryRequest = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1492,7 +1494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "New heading",
                 Name = "New name",
                 Source = "New source",
-                Query = new ObservationQueryContext
+                QueryRequest = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1542,7 +1544,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectId, updateResult.DataSetId);
                 Assert.Equal("test file", updateResult.DataSetName);
 
-                Assert.Equal(updateRequest.Query, updateResult.Query);
+                updateRequest.QueryRequest.AsObservationQueryContext()
+                    .AssertDeepEqualTo(updateResult.Query);
                 Assert.Equal(updateRequest.Table, updateResult.Table);
                 Assert.Equal(updateRequest.Charts, updateResult.Charts);
             }
@@ -1556,7 +1559,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
-                updateRequest.Query.AssertDeepEqualTo(updatedDataBlock.Query);
+                updateRequest.QueryRequest.AsObservationQueryContext()
+                    .AssertDeepEqualTo(updatedDataBlock.Query);
                 updateRequest.Table.AssertDeepEqualTo(updatedDataBlock.Table);
                 updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
             }
@@ -1611,7 +1615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var updateRequest = new DataBlockUpdateViewModel
             {
                 Heading = "New heading",
-                Query = new ObservationQueryContext
+                QueryRequest = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1743,7 +1747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var updateRequest = new DataBlockUpdateViewModel
             {
-                Query = new ObservationQueryContext
+                QueryRequest = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },

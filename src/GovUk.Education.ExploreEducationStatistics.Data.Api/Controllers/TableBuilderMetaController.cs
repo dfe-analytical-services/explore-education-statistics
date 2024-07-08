@@ -72,19 +72,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return _subjectMetaService.GetSubjectMeta(cacheable.ReleaseSubject);
         }
 
-        [HttpPost("meta/subject")]
+        [HttpPost("meta/subject")] // @MarkFix split into two endpoints for locations and time period steps
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
-            [FromBody] ObservationQueryContext query,
+            [FromBody] LocationsOrTimePeriodsQueryRequest query,
             CancellationToken cancellationToken)
         {
             return _subjectMetaService.FilterSubjectMeta(releaseVersionId: null, query, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseVersionId:guid}/meta/subject")]
+        [HttpPost("release/{releaseVersionId:guid}/meta/subject")] // @MarkFix split into two endpoints for locations and time period steps
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
             Guid releaseVersionId,
-            [FromBody] ObservationQueryContext query,
+            [FromBody] LocationsOrTimePeriodsQueryRequest query,
             CancellationToken cancellationToken)
         {
             return _subjectMetaService.FilterSubjectMeta(releaseVersionId, query, cancellationToken)
