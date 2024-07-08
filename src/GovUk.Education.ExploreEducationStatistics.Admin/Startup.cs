@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -73,11 +69,16 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
 using Semver;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -119,7 +120,6 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
-using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -155,10 +155,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.AddControllers(options =>
-                {
-                    options.AddCommaSeparatedQueryModelBinderProvider();
-                    options.AddTrimStringBinderProvider();
-                })
+            {
+                options.AddCommaSeparatedQueryModelBinderProvider();
+                options.AddTrimStringBinderProvider();
+            })
                 .AddControllersAsServices();
 
             services.AddHttpContextAccessor();
@@ -166,13 +166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddFluentValidation();
 
             services.AddMvc(options =>
-                {
-                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
-                    options.Filters.Add(new OperationCancelledExceptionFilter());
-                    options.Filters.Add(new ProblemDetailsResultFilter());
-                    options.EnableEndpointRouting = false;
-                    options.AllowEmptyInputInBodyModelBinding = true;
-                })
+            {
+                options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
+                options.Filters.Add(new OperationCancelledExceptionFilter());
+                options.Filters.Add(new ProblemDetailsResultFilter());
+                options.EnableEndpointRouting = false;
+                options.AllowEmptyInputInBodyModelBinding = true;
+            })
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -494,6 +494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
             services.AddTransient<IEmailService, EmailService>();
 
+            services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
@@ -523,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
-            services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
+            services.AddSingleton<DataServiceMemoryCache<BoundaryData>, DataServiceMemoryCache<BoundaryData>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
             services.AddTransient<IUserRepository, UserRepository>();
@@ -694,9 +695,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
-                }
+            {
+                endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+            }
             );
 
             app.UseMvc();

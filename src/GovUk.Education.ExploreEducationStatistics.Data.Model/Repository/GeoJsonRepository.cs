@@ -1,51 +1,51 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
     public class GeoJsonRepository : IGeoJsonRepository
     {
-        private readonly DataServiceMemoryCache<GeoJson> _cache;
+        private readonly DataServiceMemoryCache<BoundaryData> _cache;
         private readonly StatisticsDbContext _context;
 
         public GeoJsonRepository(StatisticsDbContext context,
-            DataServiceMemoryCache<GeoJson> cache)
+            DataServiceMemoryCache<BoundaryData> cache)
         {
             _context = context;
             _cache = cache;
         }
 
-        public Dictionary<string, GeoJson> FindByBoundaryLevelAndCodes(long boundaryLevelId, IEnumerable<string> codes)
+        public Dictionary<string, BoundaryData> FindByBoundaryLevelAndCodes(long boundaryLevelId, IEnumerable<string> codes)
         {
             var codesList = codes.ToList();
             var cached = TryCacheLookup(boundaryLevelId, codesList);
-            var cachedCodes = cached.Select(geoJson => geoJson.Code);
+            var cachedCodes = cached.Select(boundaryData => boundaryData.Code);
             var codesNotCached = codesList.Except(cachedCodes);
 
             var dbResult = FindAndCache(boundaryLevelId, codesNotCached);
 
             return cached
                 .Union(dbResult)
-                .ToDictionary(geoJson => geoJson.Code);
+                .ToDictionary(boundaryData => boundaryData.Code);
         }
 
-        private IEnumerable<GeoJson> FindAndCache(long boundaryLevelId, IEnumerable<string> codes)
+        private IEnumerable<BoundaryData> FindAndCache(long boundaryLevelId, IEnumerable<string> codes)
         {
-            var geoJsonList = _context.GeoJson.Where(geoJson =>
-                geoJson.BoundaryLevelId == boundaryLevelId &&
-                codes.Contains(geoJson.Code)).ToList();
+            var boundaryDataList = _context.BoundaryData.Where(boundaryData =>
+                boundaryData.BoundaryLevel.Id == boundaryLevelId &&
+                codes.Contains(boundaryData.Code)).ToList();
 
-            AddAllToCache(boundaryLevelId, geoJsonList);
+            AddAllToCache(boundaryLevelId, boundaryDataList);
 
-            return geoJsonList;
+            return boundaryDataList;
         }
 
-        private List<GeoJson> TryCacheLookup(long boundaryLevelId, IEnumerable<string> codes)
+        private List<BoundaryData> TryCacheLookup(long boundaryLevelId, IEnumerable<string> codes)
         {
             return codes
                 .Select(code => TryCacheLookup(boundaryLevelId, code))
@@ -53,16 +53,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .ToList();
         }
 
-        private GeoJson? TryCacheLookup(long boundaryLevelId, string code)
+        private BoundaryData? TryCacheLookup(long boundaryLevelId, string code)
         {
             return _cache.GetOrDefault($"{boundaryLevelId}_{code}");
         }
 
-        private void AddAllToCache(long boundaryLevelId, List<GeoJson> geoJsonList)
+        private void AddAllToCache(long boundaryLevelId, List<BoundaryData> boundaryDataList)
         {
-            foreach (var geoJson in geoJsonList)
+            foreach (var boundaryData in boundaryDataList)
             {
-                _cache.Set($"{boundaryLevelId}_{geoJson.Code}", geoJson, TimeSpan.FromMinutes(30));
+                _cache.Set($"{boundaryLevelId}_{boundaryData.Code}", boundaryData, TimeSpan.FromMinutes(30));
             }
         }
     }
