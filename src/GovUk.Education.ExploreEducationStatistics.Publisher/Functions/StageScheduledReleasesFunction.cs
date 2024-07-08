@@ -84,8 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await releasePublishingStatusService.UpdateState(key,
                         ReleasePublishingStatusStates.ScheduledReleaseStartedState));
 
-            await queueService.QueuePublishReleaseFilesMessage(scheduled);
-            await queueService.QueueGenerateStagedReleaseContentMessage(scheduled);
+            await queueService.QueuePublishReleaseFilesMessages(scheduled);
+            await queueService.QueueStageReleaseContentMessages(scheduled);
         }
 
         private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForToday()

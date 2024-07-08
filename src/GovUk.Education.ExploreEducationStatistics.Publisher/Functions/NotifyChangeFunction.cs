@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                             {
                                 var releasePublishingKey = await CreateReleaseStatus(message,
                                     ReleasePublishingStatusStates.ImmediateReleaseStartedState);
-                                await queueService.QueuePublishReleaseFilesMessage(new[] { releasePublishingKey });
+                                await queueService.QueuePublishReleaseFilesMessages(new[] { releasePublishingKey });
                                 await queueService.QueuePublishReleaseContentMessage(releasePublishingKey);
                             }
                             else
