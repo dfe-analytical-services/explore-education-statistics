@@ -58,7 +58,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                 ActivityNames.ImportMetadata,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
-                ActivityNames.CompleteInitialDataSetVersionProcessing,
+                ActivityNames.CompleteInitialDataSetVersionMappingProcessing,
             ];
 
             foreach (var activityName in expectedActivitySequence)
