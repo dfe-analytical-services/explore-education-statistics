@@ -21,13 +21,13 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateNextDataSetVersionFunctionTests(
+public abstract class CreateNextDataSetVersionMappingsFunctionTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    public class CreateNextDataSetVersionTests(
+    public class CreateNextDataSetVersionMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : CreateNextDataSetVersionFunctionTests(fixture)
+        : CreateNextDataSetVersionMappingsFunctionTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -469,7 +469,7 @@ public abstract class CreateNextDataSetVersionFunctionTests(
             Guid releaseFileId,
             DurableTaskClient? durableTaskClient = null)
         {
-            var function = GetRequiredService<CreateNextDataSetVersionFunction>();
+            var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
             return await function.CreateNextDataSetVersion(new NextDataSetVersionCreateRequest
                 {
                     DataSetId = dataSetId,

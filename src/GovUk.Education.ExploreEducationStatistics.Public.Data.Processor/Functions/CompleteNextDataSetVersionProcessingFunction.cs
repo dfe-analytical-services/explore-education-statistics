@@ -14,8 +14,8 @@ using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribut
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class CreateNextDataSetVersionFunction(
-    ILogger<CreateNextDataSetVersionFunction> logger,
+public class CompleteNextDataSetVersionProcessingFunction(
+    ILogger<CompleteNextDataSetVersionProcessingFunction> logger,
     IDataSetVersionService dataSetVersionService,
     IValidator<NextDataSetVersionCreateRequest> requestValidator)
 {
