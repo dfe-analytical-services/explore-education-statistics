@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -59,6 +60,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public Either<TL, T> OnSuccess<T>(Func<TR, Either<TL, T>> func) => IsLeft ? Left : func.Invoke(Right);
 
+        /// <summary>
+        /// If the current Either is failing, the function provided here can take the failure and transform it to
+        /// another type of failure.
+        /// </summary>
+        public Either<T, TR> OnFailure<T>(Func<TL, Either<T, TR>> func) => IsLeft ? func.Invoke(Left) : Right;
+
         public Either<TL, TR> OrElse(Func<TR> func) => IsLeft ? func() : Right;
 
         public Either<TL, TR> OrElse(Func<TL, TR> func) => IsLeft ? func(Left) : Right;
@@ -78,22 +85,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
     {
         /// <summary>
         /// If all Eithers in the provided list are successful, return a list of the successful results. Otherwise,
-        /// return the first failure.
+        /// return a list of the failure results.
         /// </summary>
-        public static Either<TFailure, List<TSuccess>> OnSuccessAll<TFailure, TSuccess>(
+        public static Either<List<TFailure>, List<TSuccess>> AggregateSuccessesAndFailures<TFailure, TSuccess>(
             this IEnumerable<Either<TFailure, TSuccess>> items)
         {
-            var result = new List<TSuccess>();
+            var successes = new List<TSuccess>();
+            var failures = new List<TFailure>();
+
             foreach (var either in items)
             {
                 if (either.IsLeft)
                 {
-                    return either.Left;
+                    failures.Add(either.Left);
                 }
-
-                result.Add(either.Right);
+                else
+                {
+                    successes.Add(either.Right);
+                }
             }
-            return result;
+
+            return failures.Count > 0 ? failures : successes;
         }
 
         /// <summary>
@@ -103,9 +115,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public static Either<TFailure, Unit> OnSuccessAllReturnVoid<TFailure, TSuccess>(
             this IEnumerable<Either<TFailure, TSuccess>> items)
         {
-            return items
-                .OnSuccessAll()
+            var result = items
+                .AggregateSuccessesAndFailures()
                 .OnSuccessVoid();
+
+            if (result.IsLeft)
+            {
+                return result.Left.FirstOrDefault();
+            }
+
+            return result.Right;
         }
 
         public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(

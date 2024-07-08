@@ -23,7 +23,7 @@ public static class DbContextTestExtensions
             {
                 await context.Database.ExecuteSqlRawAsync($"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""");
             }
-            
+
             var sequences = context.Model.GetSequences();
 
             foreach (var sequence in sequences)

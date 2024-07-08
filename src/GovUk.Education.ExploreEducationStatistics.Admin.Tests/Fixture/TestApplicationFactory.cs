@@ -1,5 +1,4 @@
 #nullable enable
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -40,10 +39,12 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
             .ConfigureServices(services =>
             {
                 services.AddDbContext<PublicDataDbContext>(
-                    options => options
-                        .UseNpgsql(
+                    options =>
+                    {
+                        options.UseNpgsql(
                             _postgreSqlContainer.GetConnectionString(),
-                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
+                            psqlOptions => psqlOptions.EnableRetryOnFailure());
+                    });
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
