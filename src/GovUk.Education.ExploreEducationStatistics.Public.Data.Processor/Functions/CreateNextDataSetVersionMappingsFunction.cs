@@ -44,7 +44,7 @@ public class CreateNextDataSetVersionMappingsFunction(
                     instanceId: instanceId,
                     cancellationToken);
 
-                return new CreateDataSetResponseViewModel
+                return new ProcessDataSetVersionResponseViewModel
                 {
                     DataSetId = request.DataSetId,
                     DataSetVersionId = dataSetVersionId,

@@ -4,10 +4,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.DurableTask;
-using Microsoft.DurableTask.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -17,7 +15,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessInitialDataSetVersionFunctionTests(
+public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
@@ -34,31 +32,22 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
         LocationOptionsTable.ParquetFile,
         TimePeriodsTable.ParquetFile
     ];
-
-    public class ProcessInitialDataSetVersionTests(
+    
+    public class ProcessCompletionOfNextDataSetVersionImportTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessInitialDataSetVersionFunctionTests(fixture)
+        : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             var mockOrchestrationContext = DefaultMockOrchestrationContext();
-
-            // Expect an entity lock to be acquired for calling the ImportMetadata activity
-            var mockEntityFeature = new Mock<TaskOrchestrationEntityFeature>(MockBehavior.Strict);
-            mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
-            mockOrchestrationContext.SetupGet(context => context.Entities)
-                .Returns(mockEntityFeature.Object);
-
             var activitySequence = new MockSequence();
 
             string[] expectedActivitySequence =
             [
-                ActivityNames.CopyCsvFiles,
-                ActivityNames.ImportMetadata,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
-                ActivityNames.CompleteInitialDataSetVersionMappingProcessing,
+                ActivityNames.CompleteNextDataSetVersionImportProcessing
             ];
 
             foreach (var activityName in expectedActivitySequence)
@@ -71,9 +60,9 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                     .Returns(Task.CompletedTask);
             }
 
-            await ProcessInitialDataSetVersion(mockOrchestrationContext.Object);
+            await ProcessCompletionOfNextDataSetVersionImport(mockOrchestrationContext.Object);
 
-            VerifyAllMocks(mockOrchestrationContext, mockEntityFeature);
+            VerifyAllMocks(mockOrchestrationContext);
         }
 
         [Fact]
@@ -86,7 +75,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.CopyCsvFiles,
+                    context.CallActivityAsync(ActivityNames.ImportData,
                         mockOrchestrationContext.Object.InstanceId,
                         null))
                 .Throws<Exception>();
@@ -99,15 +88,15 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                         null))
                 .Returns(Task.CompletedTask);
 
-            await ProcessInitialDataSetVersion(mockOrchestrationContext.Object);
+            await ProcessCompletionOfNextDataSetVersionImport(mockOrchestrationContext.Object);
 
             VerifyAllMocks(mockOrchestrationContext);
         }
 
-        private async Task ProcessInitialDataSetVersion(TaskOrchestrationContext orchestrationContext)
+        private async Task ProcessCompletionOfNextDataSetVersionImport(TaskOrchestrationContext orchestrationContext)
         {
-            var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.ProcessInitialDataSetVersion(
+            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
+            await function.ProcessCompletionOfNextDataSetVersion(
                 orchestrationContext,
                 new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
         }
@@ -137,7 +126,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
 
     public class CompleteInitialDataSetVersionProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessInitialDataSetVersionFunctionTests(fixture)
+        : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
 
@@ -188,8 +177,8 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
 
         private async Task CompleteProcessing(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
-            await function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
+            var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
+            await function.CompleteInitialDataSetVersionProcessing(instanceId, CancellationToken.None);
         }
     }
 }

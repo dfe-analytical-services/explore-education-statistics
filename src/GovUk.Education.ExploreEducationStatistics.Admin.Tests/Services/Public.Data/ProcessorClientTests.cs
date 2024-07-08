@@ -43,7 +43,7 @@ public class ProcessorClientTests
         [Fact]
         public async Task HttpClientSuccess()
         {
-            var responseBody = new CreateDataSetResponseViewModel
+            var responseBody = new ProcessDataSetVersionResponseViewModel
             {
                 DataSetId = Guid.NewGuid(),
                 DataSetVersionId = Guid.NewGuid(),

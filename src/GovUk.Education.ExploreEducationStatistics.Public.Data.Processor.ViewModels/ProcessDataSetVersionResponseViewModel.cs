@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 
-public record CreateDataSetResponseViewModel
+public record ProcessDataSetVersionResponseViewModel
 {
     public required Guid DataSetId { get; init; }
     public required Guid DataSetVersionId { get; init; }

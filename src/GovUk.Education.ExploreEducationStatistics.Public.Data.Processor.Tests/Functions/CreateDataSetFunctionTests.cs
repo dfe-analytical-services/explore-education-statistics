@@ -74,7 +74,7 @@ public abstract class CreateDataSetFunctionTests(
 
             VerifyAllMocks(durableTaskClientMock);
 
-            var responseViewModel = result.AssertOkObjectResult<CreateDataSetResponseViewModel>();
+            var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 

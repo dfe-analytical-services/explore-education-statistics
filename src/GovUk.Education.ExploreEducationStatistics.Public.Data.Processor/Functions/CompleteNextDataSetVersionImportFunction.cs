@@ -1,6 +1,7 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
@@ -16,51 +18,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class CompleteNextDataSetVersionProcessingFunction(
     ILogger<CompleteNextDataSetVersionProcessingFunction> logger,
-    IDataSetVersionService dataSetVersionService,
-    IValidator<NextDataSetVersionCreateRequest> requestValidator)
+    PublicDataDbContext publicDataDbContext,
+    IValidator<NextDataSetVersionCompleteImportRequest> requestValidator)
 {
-    [Function(nameof(CreateNextDataSetVersion))]
-    public async Task<IActionResult> CreateNextDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateNextDataSetVersion))] [FromBody]
-        NextDataSetVersionCreateRequest request,
+    [Function(nameof(CompleteNextDataSetVersionImport))]
+    public async Task<IActionResult> CompleteNextDataSetVersionImport(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CompleteNextDataSetVersionImport))] [FromBody]
+        NextDataSetVersionCompleteImportRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
-        // Identifier of the scheduled processing orchestration instance
         var instanceId = Guid.NewGuid();
 
         return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetVersionService.CreateNextVersion(
-                dataSetId: request.DataSetId,
-                releaseFileId: request.ReleaseFileId,
-                instanceId,
-                cancellationToken: cancellationToken
-            ))
-            .OnSuccess(async dataSetVersionId =>
+            .OnSuccess(_ => publicDataDbContext
+                .DataSetVersions
+                .AsNoTracking()
+                .SingleOrNotFoundAsync(
+                    dataSetVersion => dataSetVersion.Id == request.DataSetVersionId, 
+                    cancellationToken))
+            .OnSuccess(async nextDataSetVersion =>
             {
-                await ProcessNextDataSetVersion(
+                await ProcessCompletionOfNextDataSetVersionImport(
                     client,
-                    dataSetVersionId: dataSetVersionId,
+                    dataSetVersionId: nextDataSetVersion.Id,
                     instanceId: instanceId,
                     cancellationToken);
 
-                return new CreateDataSetResponseViewModel
+                return new ProcessDataSetVersionResponseViewModel
                 {
-                    DataSetId = request.DataSetId,
-                    DataSetVersionId = dataSetVersionId,
+                    DataSetId = nextDataSetVersion.DataSetId,
+                    DataSetVersionId = nextDataSetVersion.Id,
                     InstanceId = instanceId
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
     }
 
-    private async Task ProcessNextDataSetVersion(
+    private async Task ProcessCompletionOfNextDataSetVersionImport(
         DurableTaskClient client,
         Guid dataSetVersionId,
         Guid instanceId,
         CancellationToken cancellationToken)
     {
-        const string orchestratorName = nameof(ProcessNextDataSetVersionMappingsFunction.ProcessNextDataSetVersion);
+        const string orchestratorName = 
+            nameof(ProcessCompletionOfNextDataSetVersionFunction.CompleteNextDataSetVersionImportProcessing);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 

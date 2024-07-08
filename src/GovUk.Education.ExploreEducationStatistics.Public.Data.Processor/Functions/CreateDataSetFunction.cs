@@ -43,7 +43,7 @@ public class CreateDataSetFunction(
                     instanceId: instanceId,
                     cancellationToken);
 
-                return new CreateDataSetResponseViewModel
+                return new ProcessDataSetVersionResponseViewModel
                 {
                     DataSetId = tuple.dataSetId,
                     DataSetVersionId = tuple.dataSetVersionId,
