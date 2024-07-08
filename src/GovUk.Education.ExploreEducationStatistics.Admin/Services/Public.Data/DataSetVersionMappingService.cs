@@ -46,12 +46,13 @@ public class DataSetVersionMappingService(
     {
         return ApplyBatchMappingUpdates(
             nextDataSetVersionId: nextDataSetVersionId,
-            validateCandidatesFn: () => ValidateLocationOptionCandidates(nextDataSetVersionId, request, cancellationToken),
+            validateCandidatesFn: () =>
+                ValidateLocationOptionCandidates(nextDataSetVersionId, request, cancellationToken),
             applyUpdatesFn: () => UpdateLocationOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
             createViewModelFn: updates => new BatchLocationMappingUpdatesResponseViewModel { Updates = updates },
             cancellationToken: cancellationToken);
     }
-    
+
     public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -61,27 +62,29 @@ public class DataSetVersionMappingService(
             .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
-    
-    public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
-        Guid nextDataSetVersionId,
-        BatchFilterOptionMappingUpdatesRequest request,
-        CancellationToken cancellationToken = default)
+
+    public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>>
+        ApplyBatchFilterOptionMappingUpdates(
+            Guid nextDataSetVersionId,
+            BatchFilterOptionMappingUpdatesRequest request,
+            CancellationToken cancellationToken = default)
     {
         return ApplyBatchMappingUpdates(
             nextDataSetVersionId: nextDataSetVersionId,
-            validateCandidatesFn: () => ValidateFilterOptionCandidates(nextDataSetVersionId, request, cancellationToken),
+            validateCandidatesFn: () =>
+                ValidateFilterOptionCandidates(nextDataSetVersionId, request, cancellationToken),
             applyUpdatesFn: () => UpdateFilterOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
             createViewModelFn: updates => new BatchFilterOptionMappingUpdatesResponseViewModel { Updates = updates },
             cancellationToken: cancellationToken);
     }
 
-    private async Task<Either<ActionResult, TBatchMappingUpdatesResponseViewModel>> 
+    private async Task<Either<ActionResult, TBatchMappingUpdatesResponseViewModel>>
         ApplyBatchMappingUpdates<TMappingUpdateResponse, TBatchMappingUpdatesResponseViewModel, TMappingCandidate>(
-        Guid nextDataSetVersionId,
-        Func<Task<List<Either<ErrorViewModel, TMappingCandidate>>>> validateCandidatesFn,
-        Func<Task<List<Either<ErrorViewModel, TMappingUpdateResponse>>>> applyUpdatesFn,
-        Func<List<TMappingUpdateResponse>, TBatchMappingUpdatesResponseViewModel> createViewModelFn,
-        CancellationToken cancellationToken = default)
+            Guid nextDataSetVersionId,
+            Func<Task<List<Either<ErrorViewModel, TMappingCandidate>>>> validateCandidatesFn,
+            Func<Task<List<Either<ErrorViewModel, TMappingUpdateResponse>>>> applyUpdatesFn,
+            Func<List<TMappingUpdateResponse>, TBatchMappingUpdatesResponseViewModel> createViewModelFn,
+            CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.RequireTransaction(async () =>
             await userService
@@ -111,41 +114,12 @@ public class DataSetVersionMappingService(
                         .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors));
                 }));
     }
-    
+
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will validate that the chosen mapping candidates
     /// exist and return a list of either success or failure responses for each candidate.
     /// </summary>
-    private async Task<List<Either<ErrorViewModel, MappableLocationOption?>>> ValidateLocationOptionCandidates(
-        Guid nextDataSetVersionId,
-        BatchLocationMappingUpdatesRequest request,
-        CancellationToken cancellationToken)
-    {
-        return (await request
-            .Updates
-            .ToAsyncEnumerable()
-            .SelectAwait(async (updateRequest, index) => updateRequest.CandidateKey is null
-                ? new Either<ErrorViewModel, MappableLocationOption>(((MappableLocationOption?) null)!)
-                : await ValidateMappingCandidate<MappableLocationOption>(
-                    nextDataSetVersionId: nextDataSetVersionId,
-                    index: index,
-                    jsonbColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
-                    jsonPathSegments:
-                    [
-                        nameof(DataSetVersionMapping.LocationMappingPlan.Levels),
-                        updateRequest.Level!.Value.ToString(),
-                        nameof(LocationLevelMappings.Candidates),
-                        updateRequest.CandidateKey
-                    ],
-                    cancellationToken))
-            .ToListAsync(cancellationToken))!;
-    }
-
-    /// <summary>
-    /// Given a batch of Location mapping update requests, this method will return a list of either success or failure
-    /// responses for each update.
-    /// </summary>
-    private async Task<List<Either<ErrorViewModel, LocationMappingUpdateResponseViewModel>>> UpdateLocationOptionMappingsBatch(
+    private async Task<List<Either<ErrorViewModel, Unit>>> ValidateLocationOptionCandidates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
         CancellationToken cancellationToken)
@@ -153,25 +127,57 @@ public class DataSetVersionMappingService(
         return await request
             .Updates
             .ToAsyncEnumerable()
-            .SelectAwait(async (updateRequest, index) => await UpdateMapping
-                <LocationOptionMapping, MappableLocationOption, LocationMappingUpdateRequest, LocationMappingUpdateResponseViewModel>(
+            .SelectAwait(async (updateRequest, index) => updateRequest.CandidateKey is null
+                ? Unit.Instance
+                : await ValidateMappingCandidate(
                     nextDataSetVersionId: nextDataSetVersionId,
-                    updateRequest: updateRequest,
                     index: index,
                     jsonbColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
-                    jsonPathSegments: [
+                    jsonPathSegments:
+                    [
                         nameof(DataSetVersionMapping.LocationMappingPlan.Levels),
                         updateRequest.Level!.Value.ToString(),
-                        nameof(LocationLevelMappings.Mappings),
-                        updateRequest.SourceKey
+                        nameof(LocationLevelMappings.Candidates)
                     ],
-                    createSuccessfulResponseFn: mappingUpdate => new LocationMappingUpdateResponseViewModel
-                    {
-                        Level = updateRequest.Level!.Value,
-                        SourceKey = updateRequest.SourceKey,
-                        Mapping = mappingUpdate
-                    },
+                    updateRequest.CandidateKey,
                     cancellationToken))
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Given a batch of Location mapping update requests, this method will return a list of either success or failure
+    /// responses for each update.
+    /// </summary>
+    private async Task<List<Either<ErrorViewModel, LocationMappingUpdateResponseViewModel>>>
+        UpdateLocationOptionMappingsBatch(
+            Guid nextDataSetVersionId,
+            BatchLocationMappingUpdatesRequest request,
+            CancellationToken cancellationToken)
+    {
+        return await request
+            .Updates
+            .ToAsyncEnumerable()
+            .SelectAwait(async (updateRequest, index) => await UpdateMapping
+            <LocationOptionMapping, MappableLocationOption, LocationMappingUpdateRequest,
+                LocationMappingUpdateResponseViewModel>(
+                nextDataSetVersionId: nextDataSetVersionId,
+                updateRequest: updateRequest,
+                index: index,
+                jsonbColumnName: nameof(DataSetVersionMapping.LocationMappingPlan),
+                jsonPathSegments:
+                [
+                    nameof(DataSetVersionMapping.LocationMappingPlan.Levels),
+                    updateRequest.Level!.Value.ToString(),
+                    nameof(LocationLevelMappings.Mappings),
+                    updateRequest.SourceKey
+                ],
+                createSuccessfulResponseFn: mappingUpdate => new LocationMappingUpdateResponseViewModel
+                {
+                    Level = updateRequest.Level!.Value,
+                    SourceKey = updateRequest.SourceKey,
+                    Mapping = mappingUpdate
+                },
+                cancellationToken))
             .ToListAsync(cancellationToken);
     }
 
@@ -179,7 +185,7 @@ public class DataSetVersionMappingService(
     /// Given a batch of filter option mapping update requests, this method will validate that the chosen mapping
     /// candidates exist and return a list of either success or failure responses for each candidate.
     /// </summary>
-    private async Task<List<Either<ErrorViewModel, MappableFilterOption?>>> ValidateFilterOptionCandidates(
+    private async Task<List<Either<ErrorViewModel, Unit>>> ValidateFilterOptionCandidates(
         Guid nextDataSetVersionId,
         BatchFilterOptionMappingUpdatesRequest request,
         CancellationToken cancellationToken)
@@ -188,8 +194,8 @@ public class DataSetVersionMappingService(
             nextDataSetVersionId: nextDataSetVersionId,
             request: request,
             cancellationToken: cancellationToken);
-        
-        return (await request
+
+        return await request
             .Updates
             .ToAsyncEnumerable()
             .SelectAwait(async (updateRequest, index) =>
@@ -198,19 +204,19 @@ public class DataSetVersionMappingService(
 
                 if (candidateFilterForOwningFilter is null)
                 {
-                    return new Either<ErrorViewModel, MappableFilterOption>(new ErrorViewModel
+                    return new ErrorViewModel
                     {
                         Code = ValidationMessages.OwningFilterNotMapped.Code,
                         Message = ValidationMessages.OwningFilterNotMapped.Message,
                         Path =
                             $"{nameof(BatchMappingUpdatesRequest<FilterOptionMappingUpdateRequest>.Updates).ToLowerFirst()}[{index}]." +
                             $"{nameof(FilterOptionMappingUpdateRequest.FilterKey).ToLowerFirst()}"
-                    });
+                    };
                 }
-                
+
                 return updateRequest.CandidateKey is null
-                    ? new Either<ErrorViewModel, MappableFilterOption>(((MappableFilterOption?)null)!)
-                    : await ValidateMappingCandidate<MappableFilterOption>(
+                    ? Unit.Instance
+                    : await ValidateMappingCandidate(
                         nextDataSetVersionId: nextDataSetVersionId,
                         index: index,
                         jsonbColumnName: nameof(DataSetVersionMapping.FilterMappingPlan),
@@ -218,14 +224,14 @@ public class DataSetVersionMappingService(
                         [
                             nameof(DataSetVersionMapping.FilterMappingPlan.Candidates),
                             candidateFilterForOwningFilter,
-                            nameof(FilterMappingCandidate.Options),
-                            updateRequest.CandidateKey
+                            nameof(FilterMappingCandidate.Options)
                         ],
+                        updateRequest.CandidateKey,
                         cancellationToken);
             })
-            .ToListAsync(cancellationToken))!;
+            .ToListAsync(cancellationToken);
     }
-    
+
     /// <summary>
     /// This method finds the mappings between top-level source filters and their candidate filters.
     /// If a filter has not been mapped, it will return a null "candidate" string for that filter.
@@ -273,47 +279,50 @@ public class DataSetVersionMappingService(
     /// Given a batch of Filter Option mapping update requests, this method will return a list of either success or
     /// failure responses for each update.
     /// </summary>
-    private async Task<List<Either<ErrorViewModel, FilterOptionMappingUpdateResponseViewModel>>> UpdateFilterOptionMappingsBatch(
-        Guid nextDataSetVersionId,
-        BatchFilterOptionMappingUpdatesRequest request,
-        CancellationToken cancellationToken)
+    private async Task<List<Either<ErrorViewModel, FilterOptionMappingUpdateResponseViewModel>>>
+        UpdateFilterOptionMappingsBatch(
+            Guid nextDataSetVersionId,
+            BatchFilterOptionMappingUpdatesRequest request,
+            CancellationToken cancellationToken)
     {
         return await request
             .Updates
             .ToAsyncEnumerable()
             .SelectAwait(async (updateRequest, index) => await UpdateMapping
-                <FilterOptionMapping, MappableFilterOption, FilterOptionMappingUpdateRequest, FilterOptionMappingUpdateResponseViewModel>(
-                    nextDataSetVersionId: nextDataSetVersionId,
-                    updateRequest: updateRequest,
-                    index: index,
-                    jsonbColumnName: nameof(DataSetVersionMapping.FilterMappingPlan),
-                    jsonPathSegments: [
-                        nameof(DataSetVersionMapping.FilterMappingPlan.Mappings),
-                        updateRequest.FilterKey,
-                        nameof(FilterMapping.OptionMappings),
-                        updateRequest.SourceKey
-                    ],
-                    createSuccessfulResponseFn: mappingUpdate => new FilterOptionMappingUpdateResponseViewModel
-                    {
-                        FilterKey = updateRequest.FilterKey,
-                        SourceKey = updateRequest.SourceKey,
-                        Mapping = mappingUpdate
-                    },
-                    cancellationToken))
+            <FilterOptionMapping, MappableFilterOption, FilterOptionMappingUpdateRequest,
+                FilterOptionMappingUpdateResponseViewModel>(
+                nextDataSetVersionId: nextDataSetVersionId,
+                updateRequest: updateRequest,
+                index: index,
+                jsonbColumnName: nameof(DataSetVersionMapping.FilterMappingPlan),
+                jsonPathSegments:
+                [
+                    nameof(DataSetVersionMapping.FilterMappingPlan.Mappings),
+                    updateRequest.FilterKey,
+                    nameof(FilterMapping.OptionMappings),
+                    updateRequest.SourceKey
+                ],
+                createSuccessfulResponseFn: mappingUpdate => new FilterOptionMappingUpdateResponseViewModel
+                {
+                    FilterKey = updateRequest.FilterKey,
+                    SourceKey = updateRequest.SourceKey,
+                    Mapping = mappingUpdate
+                },
+                cancellationToken))
             .ToListAsync(cancellationToken);
     }
-    
+
     /// <summary>
     /// Given a mapping update request, this method will return either a success or failure response.
     /// </summary>
-    private async Task<Either<ErrorViewModel, TMappableElement>> 
-        ValidateMappingCandidate<TMappableElement>(
+    private async Task<Either<ErrorViewModel, Unit>>
+        ValidateMappingCandidate(
             Guid nextDataSetVersionId,
             int index,
             string jsonbColumnName,
             string[] jsonPathSegments,
+            string candidateKey,
             CancellationToken cancellationToken = default)
-        where TMappableElement : MappableElement
     {
         var jsonRequest = new JsonbPathRequest<Guid>
         {
@@ -324,26 +333,29 @@ public class DataSetVersionMappingService(
             PathSegments = jsonPathSegments
         };
 
-        var candidate = await postgreSqlRepository
-            .GetJsonbFromPath<PublicDataDbContext, Guid, TMappableElement>(
+        var candidateExists = await postgreSqlRepository
+            .KeyExistsAtJsonbPath(
                 publicDataDbContext,
                 jsonRequest,
+                candidateKey,
                 cancellationToken: cancellationToken);
-            
-         return candidate ?? new Either<ErrorViewModel, TMappableElement>(new ErrorViewModel
+
+        return candidateExists
+            ? Unit.Instance
+            : new ErrorViewModel
             {
                 Code = ValidationMessages.DataSetVersionMappingCandidatePathDoesNotExist.Code,
                 Message = ValidationMessages.DataSetVersionMappingCandidatePathDoesNotExist.Message,
                 Path =
                     $"{nameof(BatchMappingUpdatesRequest<LocationMappingUpdateRequest>.Updates).ToLowerFirst()}[{index}]." +
                     $"{nameof(MappingUpdateRequest.CandidateKey).ToLowerFirst()}"
-            });
+            };
     }
 
     /// <summary>
     /// Given a mapping update request, this method will return either a success or failure response.
     /// </summary>
-    private async Task<Either<ErrorViewModel, TMappingUpdateResponse>> 
+    private async Task<Either<ErrorViewModel, TMappingUpdateResponse>>
         UpdateMapping<TMapping, TMappableElement, TMappingUpdateRequest, TMappingUpdateResponse>(
             Guid nextDataSetVersionId,
             TMappingUpdateRequest updateRequest,
@@ -354,8 +366,8 @@ public class DataSetVersionMappingService(
             CancellationToken cancellationToken = default)
         where TMapping : Mapping<TMappableElement>
         where TMappableElement : MappableElement
-        where TMappingUpdateRequest: MappingUpdateRequest
-        where TMappingUpdateResponse: MappingUpdateResponseViewModel<TMapping, TMappableElement>
+        where TMappingUpdateRequest : MappingUpdateRequest
+        where TMappingUpdateResponse : MappingUpdateResponseViewModel<TMapping, TMappableElement>
     {
         var updateJsonRequest = new JsonbPathRequest<Guid>
         {

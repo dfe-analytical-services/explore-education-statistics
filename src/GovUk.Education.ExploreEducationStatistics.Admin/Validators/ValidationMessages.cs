@@ -13,12 +13,12 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage DataSetVersionMappingSourcePathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingSourcePathDoesNotExist),
-        Message: "The data set mapping does not exist."
+        Message: "The source mapping does not exist."
     );
 
     public static readonly LocalizableMessage DataSetVersionMappingCandidatePathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingCandidatePathDoesNotExist),
-        Message: "The data set candidate does not exist."
+        Message: "The candidate does not exist."
     );
 
     public static readonly LocalizableMessage ManualMappingTypeInvalid = new(

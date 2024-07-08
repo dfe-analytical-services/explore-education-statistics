@@ -11,4 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 /// modelBuilder.Entity&lt;JsonFragment&gt;().HasNoKey().ToView(null);
 /// </code>
 /// </summary>
-public record JsonFragment(string? JsonString);
+public record JsonFragment(string? JsonValue);
+
+/// <summary>
+/// Used as a DTO by <see cref="PostgreSqlRepository" /> to extract boolean results from JSONB queries.
+/// In order to use this in a DbContext, to must be registered as a DTO by adding the following configuration to
+/// the OnModelBuilding() method of the DbContext:
+/// <code>
+/// modelBuilder.Entity&lt;JsonBool&gt;().HasNoKey().ToView(null);
+/// </code>
+/// </summary>
+public record JsonBool(bool BoolValue);

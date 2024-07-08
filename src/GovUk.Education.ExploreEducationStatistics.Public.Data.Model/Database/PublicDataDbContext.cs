@@ -31,8 +31,10 @@ public class PublicDataDbContext : DbContext
 
         modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence);
 
-        // This JsonFragment is a DTO for extracting JSON fragments from JSONB columns and not an entity.
+        // These Json classes are DTOs for extracting JSON fragments / query results  from JSONB columns.
+        // They are mapped here to inform EF that they are not entities.
         modelBuilder.Entity<JsonFragment>().HasNoKey().ToView(null);
+        modelBuilder.Entity<JsonBool>().HasNoKey().ToView(null);
     }
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
@@ -69,4 +71,6 @@ public class PublicDataDbContext : DbContext
     public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
     
     public DbSet<JsonFragment> JsonFragments { get; init; } = null!;
+    
+    public DbSet<JsonBool> JsonBool { get; init; } = null!;
 }

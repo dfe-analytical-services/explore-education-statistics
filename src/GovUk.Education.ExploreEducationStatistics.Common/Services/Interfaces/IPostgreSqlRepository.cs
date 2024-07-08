@@ -11,6 +11,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 public interface IPostgreSqlRepository
 {
     /// <summary>
+    /// Determines if a given key exists within the JSON at the specified JSONB path.
+    /// If the JSONB path does not exist, this method will return false.
+    /// </summary>
+    Task<bool> KeyExistsAtJsonbPath<TDbContext, TRowId>(
+        TDbContext context,
+        JsonbPathRequest<TRowId> request,
+        string keyValue,
+        CancellationToken cancellationToken = default)
+        where TDbContext : DbContext;
+
+    /// <summary>
     /// Retrieve a JSON fragment from a JSONB column in a particular table and row,
     /// given a JSON path to the fragment.
     /// </summary>
