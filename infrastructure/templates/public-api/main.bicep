@@ -393,6 +393,9 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       path: '/api/HealthCheck'
       unhealthyMetricName: '${subscription}PublicDataProcessorUnhealthy'
     }
+    appSettings: {
+      AppSettings__MetaInsertBatchSize: 1000
+    }
     azureFileShares: [{
       storageName: dataFilesFileShareModule.outputs.fileShareName
       storageAccountKey: publicApiStorageAccountAccessKey
