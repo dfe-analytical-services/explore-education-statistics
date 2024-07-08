@@ -51,6 +51,11 @@ public static class PublisherHostBuilderExtensions
                     .AddEnvironmentVariables()
                     .AddConfiguration(hostBuilderContext.Configuration);
             })
+            .ConfigureLogging(logging =>
+            {
+                // TODO EES-5013 Why can't this be controlled through application settings?
+                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+            })
             .ConfigureServices((hostContext, services) =>
             {
                 var configuration = hostContext.Configuration;
