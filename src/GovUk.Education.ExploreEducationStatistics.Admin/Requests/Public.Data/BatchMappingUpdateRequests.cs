@@ -8,10 +8,36 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 
-public record BatchLocationMappingUpdatesRequest
+public record LocationMappingUpdateRequest : MappingUpdateRequest
 {
-    public List<LocationMappingUpdateRequest> Updates { get; init; } = [];
+    public GeographicLevel? Level { get; init; }
 
+    public class Validator : MappingUpdateRequestValidator<LocationMappingUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Level)
+                .NotNull();
+        }
+    }
+}
+
+public record FilterOptionMappingUpdateRequest : MappingUpdateRequest
+{
+    public string FilterKey { get; init; } = string.Empty;
+
+    public class Validator : MappingUpdateRequestValidator<FilterOptionMappingUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.FilterKey)
+                .NotEmpty();
+        }
+    }
+}
+
+public record BatchLocationMappingUpdatesRequest : BatchMappingUpdatesRequest<LocationMappingUpdateRequest>
+{
     public class Validator : AbstractValidator<BatchLocationMappingUpdatesRequest>
     {
         public Validator()
@@ -22,9 +48,25 @@ public record BatchLocationMappingUpdatesRequest
     }
 }
 
-public record LocationMappingUpdateRequest
+public record BatchFilterOptionMappingUpdatesRequest : BatchMappingUpdatesRequest<FilterOptionMappingUpdateRequest>
 {
-    public GeographicLevel? Level { get; init; }
+    public class Validator : AbstractValidator<BatchFilterOptionMappingUpdatesRequest>
+    {
+        public Validator()
+        {
+            RuleForEach(request => request.Updates)
+                .SetValidator(new FilterOptionMappingUpdateRequest.Validator());
+        }
+    }
+}
+
+public abstract record MappingUpdateRequest
+{
+    private static readonly MappingType[] ManualMappingTypes =
+    [
+        MappingType.ManualNone,
+        MappingType.ManualMapped
+    ];
 
     public string SourceKey { get; init; } = string.Empty;
 
@@ -32,27 +74,19 @@ public record LocationMappingUpdateRequest
 
     public MappingType? Type { get; init; }
 
-    public class Validator : AbstractValidator<LocationMappingUpdateRequest>
+    public abstract class MappingUpdateRequestValidator<TMappingUpdateRequest>
+        : AbstractValidator<TMappingUpdateRequest>
+        where TMappingUpdateRequest : MappingUpdateRequest
     {
-        private static readonly MappingType[] ManualMappingTypes =
-        [
-            MappingType.ManualNone,
-            MappingType.ManualMapped
-        ];
-
-        public Validator()
+        public MappingUpdateRequestValidator()
         {
-            RuleFor(request => request.Level)
-                .NotNull()
-                .IsInEnum();
-
             RuleFor(request => request.SourceKey)
                 .NotEmpty();
 
             RuleFor(request => request.Type)
                 .Cascade(CascadeMode.Stop)
                 .NotNull()
-                .Must(type => ManualMappingTypes.Contains(type!.Value))
+                .Must(type => type is not null && ManualMappingTypes.Contains(type.Value))
                 .WithErrorCode(ValidationMessages.ManualMappingTypeInvalid.Code)
                 .WithMessage(ValidationMessages.ManualMappingTypeInvalid.Message);
 
@@ -63,10 +97,16 @@ public record LocationMappingUpdateRequest
                 .WithMessage(ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Message);
             
             RuleFor(request => request.CandidateKey)
-                .Null()
-                .When(request => request.Type is not null && request.Type.Value != MappingType.ManualMapped)
+                .Empty()
+                .When(request => request.Type is not null && request.Type.Value == MappingType.ManualNone)
                 .WithErrorCode(ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Code)
                 .WithMessage(ValidationMessages.CandidateKeyMustBeEmptyWithNoneMappingType.Message);
         }
     }
+}
+
+public abstract record BatchMappingUpdatesRequest<TMappingUpdateRequest>
+    where TMappingUpdateRequest : MappingUpdateRequest
+{
+    public List<TMappingUpdateRequest> Updates { get; init; } = [];
 }
