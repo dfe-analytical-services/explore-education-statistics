@@ -1,8 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using GeoJSON.Net.Geometry;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -23,6 +20,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private readonly LocalAuthority _derby = new("E06000015", "", "Derby");
         private readonly LocalAuthority _nottingham = new("E06000018", "", "Nottingham");
 
-        private readonly BoundaryLevel _countriesBoundaryLevel = new()
+        private static readonly BoundaryLevel _countriesBoundaryLevel = new()
         {
             Id = 1,
             Label = "Countries November 2021",
@@ -57,9 +58,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             Level = GeographicLevel.Region
         };
 
-        private readonly GeoJson _geoJson = new()
+        private static readonly Dictionary<string, object> _properties = new()
         {
-            Value = "[]"
+            { "OBJECTID", 1 },
+            { "ctry17cd", "E92000001" },
+            { "ctry17nm", "England" },
+            { "ctry17nmw", "Lloegr" },
+            { "bng_e", 394881 },
+            { "bng_n", 370341 },
+            { "long", -2 },
+            { "lat", 50 },
+            { "GlobalID", "1277674d-5d60-457d-9322-833b31f77014" },
+        };
+
+        private static readonly BoundaryData _boundaryData = new()
+        {
+            BoundaryLevel = _countriesBoundaryLevel,
+            Code = "E92000001",
+            Name = "England",
+            GeoJson = new(new MultiPolygon([[[
+                        [-71.17351189255714, 42.350224666504324],
+                        [-71.1677360907197, 42.34671571695422],
+                        [-71.16970919072628, 42.35326835618748],
+                        [-71.14341516047716, 42.36174674733808],
+                        [-71.17559093981981, 42.368232175909064],
+                        [-71.17351189255714, 42.350224666504324]]]]), _properties, "1"),
         };
 
         [Fact]
@@ -340,8 +363,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildService(
-                    contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
+                    contentDbContext: contentDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
@@ -758,20 +781,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                statisticsDbContext.BoundaryLevel.Add(new() { Id = 123, Label = "Boundary Level 1", Level = GeographicLevel.Region });
                 await statisticsDbContext.SaveChangesAsync();
             }
 
             var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
             var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-            var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
+            var boundaryDataRepository = new Mock<IBoundaryDataRepository>(MockBehavior.Strict);
             var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository.Setup(s => s.Get(query.BoundaryLevel.Value))
-                .ReturnsAsync(_regionsBoundaryLevel);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(ItIs.ListSequenceEqualTo(ListOf(GeographicLevel.Region))))
                 .Returns(ListOf(_regionsBoundaryLevel));
@@ -787,25 +808,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query.Indicators))
                 .ReturnsAsync(new List<Footnote>());
 
-            geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
+            boundaryDataRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
                     query.BoundaryLevel.Value,
                     new List<string>
                     {
                         _northEast.Code!, _northWest.Code!, _eastMidlands.Code!
                     }))
-                .Returns(new Dictionary<string, GeoJson>
+                .Returns(new Dictionary<string, BoundaryData>
                 {
                     {
                         _northEast.Code!,
-                        _geoJson
+                        _boundaryData
                     },
                     {
                         _northWest.Code!,
-                        _geoJson
+                        _boundaryData
                     },
                     {
                         _eastMidlands.Code!,
-                        _geoJson
+                        _boundaryData
                     }
                 });
 
@@ -828,7 +849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     boundaryLevelRepository: boundaryLevelRepository.Object,
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
-                    geoJsonRepository: geoJsonRepository.Object,
+                    boundaryDataRepository: boundaryDataRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -844,7 +865,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
-                    geoJsonRepository,
+                    boundaryDataRepository,
                     indicatorRepository,
                     locationRepository,
                     releaseDataFileRepository,
@@ -913,7 +934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IFilterItemRepository? filterItemRepository = null,
             IBoundaryLevelRepository? boundaryLevelRepository = null,
             IFootnoteRepository? footnoteRepository = null,
-            IGeoJsonRepository? geoJsonRepository = null,
+            IBoundaryDataRepository? boundaryDataRepository = null,
             IIndicatorRepository? indicatorRepository = null,
             ITimePeriodService? timePeriodService = null,
             IUserService? userService = null,
@@ -922,12 +943,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IOptions<LocationsOptions>? options = null)
         {
             return new(
+                statisticsDbContext ?? InMemoryStatisticsDbContext(),
                 contentDbContext ?? InMemoryContentDbContext(),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 boundaryLevelRepository ?? Mock.Of<IBoundaryLevelRepository>(MockBehavior.Strict),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-                geoJsonRepository ?? Mock.Of<IGeoJsonRepository>(MockBehavior.Strict),
+                boundaryDataRepository ?? Mock.Of<IBoundaryDataRepository>(MockBehavior.Strict),
                 indicatorRepository ?? Mock.Of<IIndicatorRepository>(MockBehavior.Strict),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
                 userService ?? AlwaysTrueUserService().Object,

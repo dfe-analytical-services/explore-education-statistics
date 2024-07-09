@@ -502,7 +502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
-            services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
+            services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
             services.AddTransient<IGlossaryService, GlossaryService>();
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
@@ -797,19 +797,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
     internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService
     {
         public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
-            Guid nextDataSetVersionId, 
-            CancellationToken cancellationToken = default) 
+            Guid nextDataSetVersionId,
+            CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
             Guid nextDataSetVersionId,
             BatchLocationMappingUpdatesRequest request,
-            CancellationToken cancellationToken = default) 
+            CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
-            Guid nextDataSetVersionId, 
-            CancellationToken cancellationToken = default) 
+            Guid nextDataSetVersionId,
+            CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,

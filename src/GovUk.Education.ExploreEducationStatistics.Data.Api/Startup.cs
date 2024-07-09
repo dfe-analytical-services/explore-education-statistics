@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IFrontendService, FrontendService>();
-            services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
+            services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<ILocationRepository, LocationRepository>();

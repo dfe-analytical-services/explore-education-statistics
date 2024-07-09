@@ -58,8 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .Select(feature => new BoundaryData
                 {
                     BoundaryLevel = boundaryLevel,
-                    Code = BoundaryDataUtils.GetCode(feature.Properties)!,
-                    Name = BoundaryDataUtils.GetName(feature.Properties)!,
+                    Code = BoundaryDataUtils.GetCode(feature.Properties),
+                    Name = BoundaryDataUtils.GetName(feature.Properties),
                     GeoJson = feature
                 }).ToList();
         }

@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IBoundaryLevelRepository _boundaryLevelRepository;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IFootnoteRepository _footnoteRepository;
-        private readonly IGeoJsonRepository _geoJsonRepository;
+        private readonly IBoundaryDataRepository _boundaryDataRepository;
         private readonly IIndicatorRepository _indicatorRepository;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IBoundaryLevelRepository boundaryLevelRepository,
             IFilterItemRepository filterItemRepository,
             IFootnoteRepository footnoteRepository,
-            IGeoJsonRepository geoJsonRepository,
+            IBoundaryDataRepository boundaryDataRepository,
             IIndicatorRepository indicatorRepository,
             ITimePeriodService timePeriodService,
             IUserService userService,
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _boundaryLevelRepository = boundaryLevelRepository;
             _filterItemRepository = filterItemRepository;
             _footnoteRepository = footnoteRepository;
-            _geoJsonRepository = geoJsonRepository;
+            _boundaryDataRepository = boundaryDataRepository;
             _indicatorRepository = indicatorRepository;
             _timePeriodService = timePeriodService;
             _userService = userService;
@@ -246,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var codes = locationsMatchingLevel
                 .Select(location => location.ToLocationAttribute().GetCodeOrFallback())
                 .ToList();
-            var boundaryData = _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, codes);
+            var boundaryData = _boundaryDataRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, codes);
 
             return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>
             {

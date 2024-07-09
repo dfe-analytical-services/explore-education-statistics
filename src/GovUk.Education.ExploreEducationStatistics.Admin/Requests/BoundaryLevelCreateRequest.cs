@@ -27,14 +27,10 @@ public record BoundaryLevelCreateRequest
 
             RuleFor(request => request.Label)
                 .NotEmpty()
-                .MustAsync(async (label, cancellation) =>
+                .MustAsync(async (label, cancellationToken) =>
                 {
-                    var existingLevels = await boundaryLevelService.ListBoundaryLevels();
-
-                    return !existingLevels.IsLeft && !existingLevels.Right
-                        .Select(el => el.Label)
-                        .ToList()
-                        .Contains(label);
+                    var existingLevels = await boundaryLevelService.ListBoundaryLevels(cancellationToken);
+                    return existingLevels.IsRight && !existingLevels.Right.Exists(bl => bl.Label == label);
                 })
                 .WithMessage("A boundary level matching {PropertyValue} already exists");
 

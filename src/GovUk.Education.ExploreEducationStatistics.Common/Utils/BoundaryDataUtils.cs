@@ -6,7 +6,7 @@ using System.Linq;
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 public static class BoundaryDataUtils
 {
-    public static string? GetCode(IDictionary<string, object> properties)
+    public static string GetCode(IDictionary<string, object> properties)
     {
         var key = GetKeyBySuffix(properties, "CD");
 
@@ -15,7 +15,7 @@ public static class BoundaryDataUtils
             : throw new ArgumentException("Required key not found (expects key ending 'CD')");
     }
 
-    public static string? GetName(IDictionary<string, object> properties)
+    public static string GetName(IDictionary<string, object> properties)
     {
         var key = GetKeyBySuffix(properties, "NM");
 

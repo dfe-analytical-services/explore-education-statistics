@@ -8,12 +8,12 @@ using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class GeoJsonRepository : IGeoJsonRepository
+    public class BoundaryDataRepository : IBoundaryDataRepository
     {
         private readonly DataServiceMemoryCache<BoundaryData> _cache;
         private readonly StatisticsDbContext _context;
 
-        public GeoJsonRepository(StatisticsDbContext context,
+        public BoundaryDataRepository(StatisticsDbContext context,
             DataServiceMemoryCache<BoundaryData> cache)
         {
             _context = context;
