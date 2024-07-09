@@ -1257,7 +1257,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
-            savedImport.Completed.AssertUtcNow();
+            Assert.Null(savedImport.Completed);
 
             Assert.Equal(DataSetVersionStatus.Mapping, savedImport.DataSetVersion.Status);
         }

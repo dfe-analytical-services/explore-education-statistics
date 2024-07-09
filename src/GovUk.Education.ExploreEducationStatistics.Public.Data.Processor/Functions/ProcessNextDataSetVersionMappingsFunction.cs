@@ -74,7 +74,6 @@ public class ProcessNextDataSetVersionMappingsFunction(
         var dataSetVersion = dataSetVersionImport.DataSetVersion;
         dataSetVersion.Status = DataSetVersionStatus.Mapping;
 
-        dataSetVersionImport.Completed = DateTimeOffset.UtcNow;
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 }

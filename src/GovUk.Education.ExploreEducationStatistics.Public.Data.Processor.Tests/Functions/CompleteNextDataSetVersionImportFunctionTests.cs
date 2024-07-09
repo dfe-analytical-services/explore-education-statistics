@@ -55,6 +55,13 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                         startOrchestrationOptions = options;
                     });
 
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+            var originalDataSetVersionImport = publicDataDbContext
+                .DataSetVersionImports
+                .AsNoTracking()
+                .Single(import => import.DataSetVersionId == nextVersion.Id);
+
             var result = await CompleteNextDataSetVersionImport(
                 dataSetVersionId: nextVersion.Id,
                 durableTaskClientMock.Object);
@@ -63,22 +70,26 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            // Assert that the InstanceId of the pre-existing import entry for the next data
-            // set version  is re-used.
-            var dataSetVersionImport = publicDataDbContext
+            // Assert that the pre-existing import entry for the next data set version is re-used.
+            var updatedDataSetVersionImport = publicDataDbContext
                 .DataSetVersionImports
                 .Single(import => import.DataSetVersionId == nextVersion.Id);
 
-            Assert.Equal(dataSetVersionImport.InstanceId, responseViewModel.InstanceId);
+            Assert.Equal(originalDataSetVersionImport.Id, updatedDataSetVersionImport.Id);
+
+            // Assert that the InstanceId has been set to a new unique value.
+            Assert.NotEqual(originalDataSetVersionImport.InstanceId, updatedDataSetVersionImport.InstanceId);
+
+            // Assert that the InstanceId returned in the view model is the new one rather than the original.
+            Assert.Equal(updatedDataSetVersionImport.InstanceId, responseViewModel.InstanceId);
 
             // Assert the processing orchestrator was scheduled with the correct arguments
             Assert.NotNull(processNextDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
             Assert.Equal(new ProcessDataSetVersionContext { DataSetVersionId = nextVersion.Id },
                 processNextDataSetVersionContext);
-            Assert.Equal(new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
+            Assert.Equal(
+                new StartOrchestrationOptions { InstanceId = updatedDataSetVersionImport.InstanceId.ToString() },
                 startOrchestrationOptions);
         }
 
@@ -156,7 +167,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetVersionMappingNotFound.Code);
         }
-        
+
         [Fact]
         public async Task DataSetVersionMappings_LocationsNotComplete_ReturnsValidationProblem()
         {
@@ -170,7 +181,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .SingleAsync();
 
             mapping.LocationMappingsComplete = false;
-            
+
             await publicDataDbContext.SaveChangesAsync();
 
             var result = await CompleteNextDataSetVersionImport(
@@ -182,7 +193,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetVersionMappingsNotComplete.Code);
         }
-        
+
         [Fact]
         public async Task DataSetVersionMappings_FilterOptionsNotComplete_ReturnsValidationProblem()
         {
@@ -196,7 +207,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .SingleAsync();
 
             mapping.FilterMappingsComplete = false;
-            
+
             await publicDataDbContext.SaveChangesAsync();
 
             var result = await CompleteNextDataSetVersionImport(

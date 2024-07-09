@@ -42,7 +42,7 @@ public static class ValidationMessages
     public static readonly LocalizableMessage DataSetVersionCanNotBeDeleted = new(
         Code: nameof(DataSetVersionCanNotBeDeleted),
         Message:
-        $"The data set version is not in a draft status, or is currently being processed, so cannot be deleted."
+        "The data set version is not in a draft status, or is currently being processed, so cannot be deleted."
     );
 
     public static readonly LocalizableMessage DataSetNotFound = new(
@@ -67,8 +67,8 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage MultipleDataSetVersionsCanNotBeDeleted = new(
         Code: nameof(MultipleDataSetVersionsCanNotBeDeleted),
-        Message:
-        $"One or more data set versions are not in a draft status, or are currently being processed, so cannot be deleted."
+        Message: "One or more data set versions are not in a draft status, " +
+                 "or are currently being processed, so cannot be deleted."
     );
 
     public static readonly LocalizableMessage DataSetVersionNotInMappingStatus = new(

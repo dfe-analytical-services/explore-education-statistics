@@ -43,19 +43,21 @@ public class CompleteNextDataSetVersionImportFunction(
             {
                 var (nextVersion, importToContinue) = versionAndImport;
 
-                var instanceId = importToContinue.InstanceId;
+                importToContinue.InstanceId = Guid.NewGuid();
+                publicDataDbContext.DataSetVersionImports.Update(importToContinue);
+                await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
                 await ProcessCompletionOfNextDataSetVersionImport(
                     client,
                     dataSetVersionId: nextVersion.Id,
-                    instanceId: instanceId,
+                    instanceId: importToContinue.InstanceId,
                     cancellationToken);
 
                 return new ProcessDataSetVersionResponseViewModel
                 {
                     DataSetId = nextVersion.DataSetId,
                     DataSetVersionId = nextVersion.Id,
-                    InstanceId = instanceId
+                    InstanceId = importToContinue.InstanceId
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
@@ -71,17 +73,14 @@ public class CompleteNextDataSetVersionImportFunction(
                                        && import.Stage == DataSetVersionImportStage.ManualMapping);
 
         return importToContinue is null
-            ? ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.ImportInManualMappingStateNotFound.Code,
-                Message = ValidationMessages.ImportInManualMappingStateNotFound.Message,
-                Path = nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
-                Detail = new InvalidErrorDetail<Guid>(request.DataSetVersionId)
-            })
+            ? CreateDataSetVersionIdError(
+                message: ValidationMessages.ImportInManualMappingStateNotFound,
+                dataSetVersionId: request.DataSetVersionId)
             : importToContinue;
     }
 
-    private async Task<Either<ActionResult, DataSetVersion>> GetNextDataSetVersionInMappingStatus(DataSetVersionProcessRequest request,
+    private async Task<Either<ActionResult, DataSetVersion>> GetNextDataSetVersionInMappingStatus(
+        DataSetVersionProcessRequest request,
         CancellationToken cancellationToken)
     {
         var nextVersion = await publicDataDbContext
@@ -94,26 +93,18 @@ public class CompleteNextDataSetVersionImportFunction(
 
         if (nextVersion is null)
         {
-            return ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.DataSetVersionNotFound.Code,
-                Message = ValidationMessages.DataSetVersionNotFound.Message,
-                Path = nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
-                Detail = new InvalidErrorDetail<Guid>(request.DataSetVersionId)
-            });
+            return CreateDataSetVersionIdError(
+                message: ValidationMessages.DataSetVersionNotFound,
+                dataSetVersionId: request.DataSetVersionId);
         }
 
         if (nextVersion.Status != DataSetVersionStatus.Mapping)
         {
-            return ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.DataSetVersionNotInMappingStatus.Code,
-                Message = ValidationMessages.DataSetVersionNotInMappingStatus.Message,
-                Path = nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
-                Detail = new InvalidErrorDetail<Guid>(request.DataSetVersionId)
-            });
+            return CreateDataSetVersionIdError(
+                message: ValidationMessages.DataSetVersionNotInMappingStatus,
+                dataSetVersionId: request.DataSetVersionId);
         }
-        
+
         return nextVersion;
     }
 
@@ -130,26 +121,18 @@ public class CompleteNextDataSetVersionImportFunction(
 
         if (mapping is null)
         {
-            return ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.DataSetVersionMappingNotFound.Code,
-                Message = ValidationMessages.DataSetVersionMappingNotFound.Message,
-                Path = nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
-                Detail = new InvalidErrorDetail<Guid>(request.DataSetVersionId)
-            });
+            return CreateDataSetVersionIdError(
+                message: ValidationMessages.DataSetVersionMappingNotFound,
+                dataSetVersionId: request.DataSetVersionId);
         }
 
         if (!mapping.FilterMappingsComplete || !mapping.LocationMappingsComplete)
         {
-            return ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.DataSetVersionMappingsNotComplete.Code,
-                Message = ValidationMessages.DataSetVersionMappingsNotComplete.Message,
-                Path = nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
-                Detail = new InvalidErrorDetail<Guid>(request.DataSetVersionId)
-            });
+            return CreateDataSetVersionIdError(
+                message: ValidationMessages.DataSetVersionMappingsNotComplete,
+                dataSetVersionId: request.DataSetVersionId);
         }
-        
+
         return mapping;
     }
 
@@ -177,5 +160,18 @@ public class CompleteNextDataSetVersionImportFunction(
             input,
             options,
             cancellationToken);
+    }
+
+    private static BadRequestObjectResult CreateDataSetVersionIdError(
+        LocalizableMessage message,
+        Guid dataSetVersionId)
+    {
+        return ValidationUtils.ValidationResult(new ErrorViewModel
+        {
+            Code = message.Code,
+            Message = message.Message,
+            Path = nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
+            Detail = new InvalidErrorDetail<Guid>(dataSetVersionId)
+        });
     }
 }
