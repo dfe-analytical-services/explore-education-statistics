@@ -66,8 +66,7 @@ public abstract class DataSetVersionMappingControllerTests(
                     Levels = new Dictionary<GeographicLevel, LocationLevelMappings>
                     {
                         {
-                            GeographicLevel.LocalAuthority,
-                            new LocationLevelMappings
+                            GeographicLevel.LocalAuthority, new LocationLevelMappings
                             {
                                 Mappings = new Dictionary<string, LocationOptionMapping>
                                 {
@@ -253,8 +252,7 @@ public abstract class DataSetVersionMappingControllerTests(
                     Levels = new Dictionary<GeographicLevel, LocationLevelMappings>
                     {
                         {
-                            GeographicLevel.LocalAuthority,
-                            new LocationLevelMappings
+                            GeographicLevel.LocalAuthority, new LocationLevelMappings
                             {
                                 Mappings = new Dictionary<string, LocationOptionMapping>
                                 {
@@ -546,8 +544,7 @@ public abstract class DataSetVersionMappingControllerTests(
                     Levels = new Dictionary<GeographicLevel, LocationLevelMappings>
                     {
                         {
-                            GeographicLevel.LocalAuthority,
-                            new LocationLevelMappings
+                            GeographicLevel.LocalAuthority, new LocationLevelMappings
                             {
                                 Mappings = new Dictionary<string, LocationOptionMapping>
                                 {
@@ -576,23 +573,24 @@ public abstract class DataSetVersionMappingControllerTests(
                                         }
                                     }
                                 },
-                                Candidates = new Dictionary<string, MappableLocationOption>
-                                {
+                                Candidates =
+                                    new Dictionary<string, MappableLocationOption>
                                     {
-                                        "target-la-location-1-key",
-                                        new MappableLocationOption("Target location 1")
                                         {
-                                            Code = "Target location 1 code"
-                                        }
-                                    },
-                                    {
-                                        "target-la-location-2-key",
-                                        new MappableLocationOption("Target location 2")
+                                            "target-la-location-1-key",
+                                            new MappableLocationOption("Target location 1")
+                                            {
+                                                Code = "Target location 1 code"
+                                            }
+                                        },
                                         {
-                                            Code = "Target location 2 code"
+                                            "target-la-location-2-key",
+                                            new MappableLocationOption("Target location 2")
+                                            {
+                                                Code = "Target location 2 code"
+                                            }
                                         }
                                     }
-                                }
                             }
                         },
                         {
@@ -605,9 +603,9 @@ public abstract class DataSetVersionMappingControllerTests(
                                     {
                                         "target-country-location-1-key",
                                         new MappableLocationOption("Target location 1")
-                                        {
-                                            Code = "Target location 1 code"
-                                        }
+                                            {
+                                                Code = "Target location 1 code"
+                                            }
                                     }
                                 }
                             }
@@ -682,7 +680,7 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Fact]
-        public async Task CandidateKeyDoesNotExist_Returns400_AndRollsBackTransaction()
+        public async Task CandidateKeyDoesNotExist_Returns400()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -795,7 +793,10 @@ public abstract class DataSetVersionMappingControllerTests(
                     Type = MappingType.ManualMapped,
                     CandidateKey = "target-la-location-1-key"
                 },
-                // This candidate does not exist.
+                // This candidate does not exist as there is no candidate with the key
+                // "target-la-location-2-key" under the "LocalAuthority" level. This tests
+                // the simple case where a candidate simply doesn't exist at all with the
+                // given key. 
                 new()
                 {
                     Level = GeographicLevel.LocalAuthority,
@@ -803,7 +804,12 @@ public abstract class DataSetVersionMappingControllerTests(
                     Type = MappingType.ManualMapped,
                     CandidateKey = "target-la-location-2-key"
                 },
-                // This candidate does not exist.
+                // This candidate does not exist as there is no candidate with the key
+                // "target-la-location-1-key" under the "Country" level, despite it existing
+                // under the "LocalAuthority" level.  This tests the more complex case
+                // whereby a candidate *does* exist with the given key, but it's under a
+                // different level than that of the source location and thus is not a valid
+                // candidate.
                 new()
                 {
                     Level = GeographicLevel.Country,
@@ -1465,12 +1471,17 @@ public abstract class DataSetVersionMappingControllerTests(
                                 Options =
                                 {
                                     {
-                                        "Target filter 1 option 1 key", new MappableFilterOption("Filter 1 option 1 label")
+                                        "Target filter 1 option 1 key",
+                                        new MappableFilterOption("Filter 1 option 1 label")
                                     },
                                     {
-                                        "Target filter 1 option 2 key", new MappableFilterOption("Filter 1 option 2 label")
+                                        "Target filter 1 option 2 key",
+                                        new MappableFilterOption("Filter 1 option 2 label")
                                     },
-                                    { "Target filter 1 option 3 key", new MappableFilterOption("Filter 1 option 3 label") }
+                                    {
+                                        "Target filter 1 option 3 key",
+                                        new MappableFilterOption("Filter 1 option 3 label")
+                                    }
                                 }
                             }
                         }
@@ -1531,7 +1542,7 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Fact]
-        public async Task CandidateKeyDoesNotExist_Returns400_AndRollsBackTransaction()
+        public async Task CandidateKeyDoesNotExist_Returns400()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -1670,7 +1681,9 @@ public abstract class DataSetVersionMappingControllerTests(
                     Type = MappingType.ManualMapped,
                     CandidateKey = "Target filter 1 option 1 key"
                 },
-                // This candidate does not exist.
+                // This candidate does not exist as there is no candidate with the key
+                // "Non existent candidate key".  This tests the simple case where a candidate
+                // doesn't exist at all with the given key. 
                 new()
                 {
                     FilterKey = "Filter 1 key",
@@ -1678,7 +1691,13 @@ public abstract class DataSetVersionMappingControllerTests(
                     Type = MappingType.ManualMapped,
                     CandidateKey = "Non existent candidate key"
                 },
-                // This candidate does not exist.
+                // This candidate does not exist as there is no candidate with the key
+                // "Non existent candidate key" under the filter that "Filter 2 key" is
+                // mapped to, despite there being a filter option candidate that exists
+                // under a different filter with the key "Target filter 1 option 1 key".
+                // This tests the more complex case whereby only filter option candidates
+                // that exist under the filter that the owning filter is mapped to are
+                // considered valid candidates.  
                 new()
                 {
                     FilterKey = "Filter 2 key",
@@ -1718,7 +1737,7 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Fact]
-        public async Task OwningFilterNotMapped_Returns400_AndRollsBackTransaction()
+        public async Task OwningFilterNotMapped_Returns400()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
