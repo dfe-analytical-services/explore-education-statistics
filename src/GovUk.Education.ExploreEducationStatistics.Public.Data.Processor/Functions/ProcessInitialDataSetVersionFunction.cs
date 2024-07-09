@@ -2,8 +2,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
@@ -13,9 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class ProcessInitialDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
-    IDataDuckDbRepository dataDuckDbRepository,
-    IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IParquetService parquetService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionPathResolver dataSetVersionPathResolver) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(nameof(ProcessInitialDataSetVersion))]
     public async Task ProcessInitialDataSetVersion(
@@ -47,26 +43,6 @@ public class ProcessInitialDataSetVersionFunction(
 
             await context.CallActivity(ActivityNames.HandleProcessingFailure, logger, context.InstanceId);
         }
-    }
-
-    [Function(ActivityNames.ImportData)]
-    public async Task ImportData(
-        [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
-    {
-        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingData, cancellationToken);
-        await dataDuckDbRepository.CreateDataTable(dataSetVersionImport.DataSetVersionId, cancellationToken);
-    }
-
-    [Function(ActivityNames.WriteDataFiles)]
-    public async Task WriteDataFiles(
-        [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
-    {
-        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.WritingDataFiles, cancellationToken);
-        await parquetService.WriteDataFiles(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(ActivityNames.CompleteInitialDataSetVersionProcessing)]
