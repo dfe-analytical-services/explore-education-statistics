@@ -1238,7 +1238,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
     {
-        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
+        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ManualMapping;
 
         [Fact]
         public async Task Success()
