@@ -11,8 +11,9 @@ import _apiDataSetService, {
 import { GlobalPermissions } from '@admin/services/authService';
 import { Release } from '@admin/services/releaseService';
 import render, { CustomRenderResult } from '@common-test/render';
-import { screen, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { createMemoryHistory, History } from 'history';
+import { screen, waitFor, within } from '@testing-library/react';
+import { Router } from 'react-router-dom';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetCandidateService');
@@ -225,18 +226,72 @@ describe('ReleaseApiDataSetsSection', () => {
     ).toBeInTheDocument();
   });
 
+  test('submitting the create version form calls the correct service and redirects to next page', async () => {
+    apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
+    apiDataSetService.listDataSets.mockResolvedValue([]);
+    apiDataSetService.createDataSet.mockResolvedValue({
+      id: 'data-set-id',
+      title: 'Test title',
+      summary: 'Test summary',
+      status: 'Draft',
+    });
+
+    const history = createMemoryHistory();
+
+    const { user } = renderPage({ history });
+
+    expect(await screen.findByText('Create API data set')).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Create API data set' }),
+    );
+
+    expect(
+      await screen.findByText('Create a new API data set'),
+    ).toBeInTheDocument();
+
+    await user.selectOptions(
+      await screen.findByLabelText('Data set'),
+      testCandidates[0].releaseFileId,
+    );
+
+    expect(apiDataSetService.createDataSet).not.toHaveBeenCalled();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Confirm new API data set' }),
+    );
+
+    await waitFor(() => {
+      expect(apiDataSetService.createDataSet).toHaveBeenCalledTimes(1);
+      expect(apiDataSetService.createDataSet).toHaveBeenCalledWith<
+        Parameters<typeof apiDataSetService.createDataSet>
+      >({
+        releaseFileId: testCandidates[0].releaseFileId,
+      });
+    });
+
+    expect(history.location.pathname).toBe(
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-id',
+    );
+  });
+
   function renderPage(options?: {
     release?: Release;
     user?: User;
+    history?: History;
   }): CustomRenderResult {
-    const { release = testRelease, user = testBauUser } = options ?? {};
+    const {
+      release = testRelease,
+      user = testBauUser,
+      history = createMemoryHistory(),
+    } = options ?? {};
 
     return render(
       <AuthContextTestProvider user={user}>
         <ReleaseContextProvider release={release}>
-          <MemoryRouter>
+          <Router history={history}>
             <ReleaseApiDataSetsSection />
-          </MemoryRouter>
+          </Router>
         </ReleaseContextProvider>
       </AuthContextTestProvider>,
     );

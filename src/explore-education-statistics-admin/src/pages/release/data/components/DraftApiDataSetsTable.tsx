@@ -20,17 +20,21 @@ import React from 'react';
 import { generatePath } from 'react-router-dom';
 import styles from './DraftApiDataSetsTable.module.scss';
 
+export const columnWidth = 90;
+
 export interface DraftApiDataSetSummary extends ApiDataSetSummary {
   draftVersion: ApiDataSetDraftVersionSummary;
 }
 
 interface Props {
+  canUpdateRelease: boolean;
   dataSets: DraftApiDataSetSummary[];
   publicationId: string;
   releaseId: string;
 }
 
 export default function DraftApiDataSetsTable({
+  canUpdateRelease,
   dataSets,
   publicationId,
   releaseId,
@@ -46,88 +50,107 @@ export default function DraftApiDataSetsTable({
     <table className={styles.table} data-testid="draft-api-data-sets">
       <thead>
         <tr>
-          <th scope="col" style={{ width: '5%' }}>
+          <th
+            scope="col"
+            style={{
+              width: hasLiveDataSets
+                ? `${columnWidth}px`
+                : `${columnWidth * 2}px`,
+            }}
+          >
             Draft version
           </th>
-          {hasLiveDataSets && <th style={{ width: '5%' }}>Live version</th>}
+          {hasLiveDataSets && (
+            <th style={{ width: `${columnWidth}px` }}>Live version</th>
+          )}
           <th scope="col">Name</th>
           <th scope="col">Status</th>
-          <th scope="col">Actions</th>
+          <th className="govuk-!-width-one-third" scope="col">
+            Actions
+          </th>
         </tr>
       </thead>
       <tbody>
         {orderedDataSets.map(
-          ({ draftVersion, latestLiveVersion, ...dataSet }) => (
-            <tr
-              key={dataSet.id}
-              className={classNames({
-                [styles.rowHighlight]:
-                  draftVersion.status === 'Failed' ||
-                  draftVersion.status === 'Cancelled' ||
-                  draftVersion.status === 'Mapping',
-              })}
-            >
-              <td className="govuk-!-padding-left-1">
-                <Tag
-                  className={styles.versionTag}
-                  colour={getDataSetVersionStatusTagColour(draftVersion.status)}
+          ({ draftVersion, latestLiveVersion, ...dataSet }) => {
+            const rowHighlight =
+              draftVersion.status === 'Failed' ||
+              draftVersion.status === 'Cancelled' ||
+              draftVersion.status === 'Mapping';
+            return (
+              <tr
+                key={dataSet.id}
+                className={classNames({
+                  [styles.rowHighlight]: rowHighlight,
+                })}
+              >
+                <td
+                  className={classNames({
+                    'govuk-!-padding-left-1': rowHighlight,
+                  })}
                 >
-                  {`v${draftVersion.version}`}
-                </Tag>
-              </td>
-              {hasLiveDataSets ? (
-                <td>
                   <Tag
-                    className={styles.versionTag}
-                    colour={latestLiveVersion ? 'blue' : 'grey'}
-                  >
-                    {latestLiveVersion?.version
-                      ? `v${latestLiveVersion?.version}`
-                      : 'N/A'}
-                  </Tag>
-                </td>
-              ) : null}
-              <td>{dataSet.title}</td>
-              <td>
-                <Tag
-                  colour={getDataSetVersionStatusTagColour(draftVersion.status)}
-                >
-                  {getDataSetVersionStatusText(draftVersion.status)}
-                </Tag>
-              </td>
-              <td>
-                <ButtonGroup
-                  className="govuk-!-margin-bottom-0"
-                  horizontalSpacing="m"
-                >
-                  <Link
-                    to={generatePath<ReleaseDataSetRouteParams>(
-                      releaseApiDataSetDetailsRoute.path,
-                      {
-                        publicationId,
-                        releaseId,
-                        dataSetId: dataSet.id,
-                      },
+                    colour={getDataSetVersionStatusTagColour(
+                      draftVersion.status,
                     )}
                   >
-                    {draftVersion.version === '1.0'
-                      ? 'View details'
-                      : 'View details / edit draft'}
-                    <VisuallyHidden>for {dataSet.title}</VisuallyHidden>
-                  </Link>
-                  {draftVersion.status !== 'Processing' && (
-                    <DeleteDraftVersionButton
-                      dataSet={dataSet}
-                      dataSetVersion={draftVersion}
+                    {`v${draftVersion.version}`}
+                  </Tag>
+                </td>
+                {hasLiveDataSets ? (
+                  <td>
+                    <Tag colour={latestLiveVersion ? 'blue' : 'grey'}>
+                      {latestLiveVersion?.version
+                        ? `v${latestLiveVersion?.version}`
+                        : 'N/A'}
+                    </Tag>
+                  </td>
+                ) : null}
+                <td>{dataSet.title}</td>
+                <td>
+                  <Tag
+                    colour={getDataSetVersionStatusTagColour(
+                      draftVersion.status,
+                    )}
+                  >
+                    {getDataSetVersionStatusText(draftVersion.status)}
+                  </Tag>
+                </td>
+                <td>
+                  <ButtonGroup
+                    className="govuk-!-margin-bottom-0"
+                    horizontalSpacing="m"
+                  >
+                    <Link
+                      to={generatePath<ReleaseDataSetRouteParams>(
+                        releaseApiDataSetDetailsRoute.path,
+                        {
+                          publicationId,
+                          releaseId,
+                          dataSetId: dataSet.id,
+                        },
+                      )}
                     >
-                      Delete draft
-                      <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
-                    </DeleteDraftVersionButton>
-                  )}
-                </ButtonGroup>
-              </td>
-            </tr>
-          ),
+                      {draftVersion.version === '1.0' || !canUpdateRelease
+                        ? 'View details'
+                        : 'View details / edit draft'}
+                      <VisuallyHidden>for {dataSet.title}</VisuallyHidden>
+                    </Link>
+                    {draftVersion.status !== 'Processing' &&
+                      canUpdateRelease && (
+                        <DeleteDraftVersionButton
+                          dataSet={dataSet}
+                          dataSetVersion={draftVersion}
+                        >
+                          Remove draft
+                          <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
+                        </DeleteDraftVersionButton>
+                      )}
+                  </ButtonGroup>
+                </td>
+              </tr>
+            );
+          },
         )}
       </tbody>
     </table>
