@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -446,7 +447,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRedirectsService, RedirectsService>();
             services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
             services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
-            services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
 
             services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
             {
@@ -459,6 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 services.AddTransient<IDataSetService, DataSetService>();
                 services.AddTransient<IDataSetVersionService, DataSetVersionService>();
+                services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
             }
             else
             {
@@ -471,6 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         provider.GetRequiredService<IUserService>()));
 
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
+                services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -789,5 +791,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
+    }
+
+    internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService
+    {
+        public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
+            Guid nextDataSetVersionId, 
+            CancellationToken cancellationToken = default) 
+            => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
+            Guid nextDataSetVersionId,
+            BatchLocationMappingUpdatesRequest request,
+            CancellationToken cancellationToken = default) 
+            => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
+            Guid nextDataSetVersionId, 
+            CancellationToken cancellationToken = default) 
+            => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
+            BatchFilterOptionMappingUpdatesRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }
