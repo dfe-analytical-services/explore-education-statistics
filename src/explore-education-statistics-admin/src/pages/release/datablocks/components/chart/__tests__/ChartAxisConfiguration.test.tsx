@@ -263,7 +263,9 @@ describe('ChartAxisConfiguration', () => {
     await user.click(screen.getByLabelText('Custom'));
     await user.clear(screen.getByLabelText('Every nth value'));
     await user.type(screen.getByLabelText('Every nth value'), 'x');
-    await user.tab();
+    await user.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -275,8 +277,9 @@ describe('ChartAxisConfiguration', () => {
 
     await user.clear(screen.getByLabelText('Every nth value'));
     await user.type(screen.getByLabelText('Every nth value'), '-1');
-    await user.tab();
-
+    await user.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
@@ -303,7 +306,9 @@ describe('ChartAxisConfiguration', () => {
     );
 
     await user.type(screen.getByLabelText('Width (pixels)'), '-1');
-    await user.tab();
+    await user.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -331,7 +336,9 @@ describe('ChartAxisConfiguration', () => {
     );
     await user.clear(screen.getByLabelText('Size of axis (pixels)'));
     await user.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
-    await user.tab();
+    await user.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 

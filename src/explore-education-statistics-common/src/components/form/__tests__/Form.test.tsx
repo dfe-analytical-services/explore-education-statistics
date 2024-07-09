@@ -4,13 +4,13 @@ import Form from '@common/components/form/Form';
 import SubmitError from '@common/components/form/util/SubmitError';
 import delay from '@common/utils/delay';
 import Yup from '@common/validation/yup';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('Form', () => {
   test('renders error summary from form errors when form is submitted', async () => {
-    const { container } = render(
+    const { container, user } = render(
       <FormProvider
         initialValues={{
           firstName: '',
@@ -28,7 +28,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('First name is required')).toHaveAttribute(
@@ -45,7 +45,7 @@ describe('Form', () => {
   });
 
   test('does not render errors for fields that do not have errors', async () => {
-    const { container } = render(
+    const { container, user } = render(
       <FormProvider
         initialValues={{
           firstName: '',
@@ -63,7 +63,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.queryByText('First name is required')).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('Form', () => {
   });
 
   test('renders nested error messages', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           address: {
@@ -96,7 +96,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Line 1 of address is required')).toHaveAttribute(
@@ -107,7 +107,7 @@ describe('Form', () => {
   });
 
   test('does not render nested error messages for fields that do not have errors', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           address: {
@@ -129,7 +129,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -144,7 +144,7 @@ describe('Form', () => {
   test('calls `onSubmit` handler when form is submitted successfully', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -160,7 +160,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -170,7 +170,7 @@ describe('Form', () => {
   test('prevents multiple `onSubmit` calls until submission completes', async () => {
     const handleSubmit = jest.fn(() => delay(200));
 
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -189,9 +189,9 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(handleSubmit).toHaveBeenCalledTimes(1);
 
@@ -201,7 +201,7 @@ describe('Form', () => {
   });
 
   test('renders submit error with default message when error thrown', async () => {
-    const { container } = render(
+    const { container, user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -222,7 +222,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -234,7 +234,7 @@ describe('Form', () => {
   });
 
   test('renders submit error with custom message when `SubmitError` thrown', async () => {
-    const { container } = render(
+    const { container, user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -255,7 +255,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Custom submit error message')).toHaveAttribute(
@@ -268,7 +268,7 @@ describe('Form', () => {
   });
 
   test('renders submit error with custom field when `SubmitError` thrown', async () => {
-    const { container } = render(
+    const { container, user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -291,7 +291,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Custom submit error message')).toHaveAttribute(
@@ -304,7 +304,7 @@ describe('Form', () => {
   });
 
   test('renders submit error with default href when `SubmitError` thrown with invalid field', async () => {
-    const { container } = render(
+    const { container, user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -327,7 +327,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Custom submit error message')).toHaveAttribute(
@@ -344,7 +344,7 @@ describe('Form', () => {
       throw new Error();
     });
 
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -360,7 +360,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -371,7 +371,7 @@ describe('Form', () => {
     // Stop the onSubmit from throwing error
     onSubmit.mockImplementation();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -381,7 +381,7 @@ describe('Form', () => {
   });
 
   test('removes submit error when form is reset', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -412,7 +412,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -420,7 +420,7 @@ describe('Form', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByText('Reset form'));
+    await user.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(
@@ -430,7 +430,7 @@ describe('Form', () => {
   });
 
   test('renders mapped server validation errors when form submitted', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -453,7 +453,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
@@ -467,7 +467,7 @@ describe('Form', () => {
       ]);
     });
 
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -483,7 +483,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
@@ -492,7 +492,7 @@ describe('Form', () => {
     // Stop the onSubmit from throwing error
     onSubmit.mockImplementation();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
@@ -500,7 +500,7 @@ describe('Form', () => {
   });
 
   test('removes mapped server validation errors when form is reset', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -533,13 +533,13 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByText('Reset form'));
+    await user.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
@@ -547,7 +547,7 @@ describe('Form', () => {
   });
 
   test('removes mapped server validation errors when field values are changed', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -579,16 +579,13 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
     });
 
-    await userEvent.type(
-      screen.getByLabelText('Firstname'),
-      'Another firstname',
-    );
+    await user.type(screen.getByLabelText('Firstname'), 'Another firstname');
 
     await waitFor(() => {
       expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
@@ -596,7 +593,7 @@ describe('Form', () => {
   });
 
   test('does not render unmapped server validation errors when form submitted', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: 'Firstname',
@@ -624,7 +621,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('The form is submitted')).toBeInTheDocument();
@@ -642,7 +639,7 @@ describe('Form', () => {
   });
 
   test('focuses error summary on submit', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: '',
@@ -664,7 +661,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -674,7 +671,7 @@ describe('Form', () => {
   });
 
   test('does not re-focus error summary when changing input', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: '',
@@ -697,7 +694,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -707,13 +704,15 @@ describe('Form', () => {
 
     const input = screen.getByLabelText('First name');
 
-    await userEvent.type(input, 'a first name');
+    await user.type(input, 'a first name');
+    await user.tab();
 
     await waitFor(() => {
       expect(screen.queryByText('There is a problem')).not.toBeInTheDocument();
     });
 
-    await userEvent.clear(input);
+    await user.clear(input);
+    await user.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -723,7 +722,7 @@ describe('Form', () => {
   });
 
   test('re-focuses error summary on re-submit', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           firstName: '',
@@ -746,7 +745,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -757,7 +756,7 @@ describe('Form', () => {
     screen.getByLabelText('First name').focus();
     expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();

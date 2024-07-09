@@ -20,6 +20,7 @@ interface Props<TFormValues extends FieldValues> {
   children: ReactNode;
   id: string;
   initialTouched?: Path<TFormValues>[];
+  noValidate?: boolean;
   submitId?: string;
   showErrorSummary?: boolean;
   visuallyHiddenErrorSummary?: boolean;
@@ -47,6 +48,7 @@ export default function Form<TFormValues extends FieldValues>({
   children,
   id,
   initialTouched,
+  noValidate = true,
   submitId = `${id}-submit`,
   showErrorSummary = true,
   visuallyHiddenErrorSummary = false,
@@ -125,7 +127,7 @@ export default function Form<TFormValues extends FieldValues>({
 
   return (
     <FormIdContextProvider id={id}>
-      <form id={id} onSubmit={handleSubmit}>
+      <form id={id} noValidate={noValidate} onSubmit={handleSubmit}>
         {showErrorSummary && (
           <ErrorSummary
             errors={allErrors}

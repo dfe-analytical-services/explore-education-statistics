@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Form does not render errors for fields that do not have errors 1`] = `
-<form id="test-form">
+<form id="test-form"
+      novalidate
+>
   <div class="govuk-error-summary"
        tabindex="-1"
        data-testid="errorSummary"
@@ -29,7 +31,9 @@ exports[`Form does not render errors for fields that do not have errors 1`] = `
 `;
 
 exports[`Form renders error summary from form errors when form is submitted 1`] = `
-<form id="test-form">
+<form id="test-form"
+      novalidate
+>
   <div class="govuk-error-summary"
        tabindex="-1"
        data-testid="errorSummary"
@@ -62,7 +66,9 @@ exports[`Form renders error summary from form errors when form is submitted 1`] 
 `;
 
 exports[`Form renders submit error with custom field when \`SubmitError\` thrown 1`] = `
-<form id="test-form">
+<form id="test-form"
+      novalidate
+>
   <div class="govuk-error-summary"
        tabindex="-1"
        data-testid="errorSummary"
@@ -90,7 +96,9 @@ exports[`Form renders submit error with custom field when \`SubmitError\` thrown
 `;
 
 exports[`Form renders submit error with custom message when \`SubmitError\` thrown 1`] = `
-<form id="test-form">
+<form id="test-form"
+      novalidate
+>
   <div class="govuk-error-summary"
        tabindex="-1"
        data-testid="errorSummary"
@@ -118,7 +126,9 @@ exports[`Form renders submit error with custom message when \`SubmitError\` thro
 `;
 
 exports[`Form renders submit error with default href when \`SubmitError\` thrown with invalid field 1`] = `
-<form id="test-form">
+<form id="test-form"
+      novalidate
+>
   <div class="govuk-error-summary"
        tabindex="-1"
        data-testid="errorSummary"
@@ -146,7 +156,9 @@ exports[`Form renders submit error with default href when \`SubmitError\` thrown
 `;
 
 exports[`Form renders submit error with default message when error thrown 1`] = `
-<form id="test-form">
+<form id="test-form"
+      novalidate
+>
   <div class="govuk-error-summary"
        tabindex="-1"
        data-testid="errorSummary"

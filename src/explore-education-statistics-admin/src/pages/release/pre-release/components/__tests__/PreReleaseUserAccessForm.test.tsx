@@ -1,10 +1,10 @@
 import _preReleaseUserService, {
   PreReleaseUser,
 } from '@admin/services/preReleaseUserService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
+import render from '@common-test/render';
 
 const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService
@@ -110,10 +110,11 @@ describe('PreReleaseUserAccessForm', () => {
 
   describe('inviting new users', () => {
     test('shows validation message when there are no email values', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -121,8 +122,9 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await user.click(screen.getByLabelText('Invite new users by email'));
-      await user.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -134,10 +136,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when the number of email lines exceeds the upper limit', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -148,7 +151,10 @@ describe('PreReleaseUserAccessForm', () => {
       const emailsTextarea = screen.getByLabelText('Invite new users by email');
       // type values up to but not exceeding the limit of lines
       await user.type(emailsTextarea, `test@test.com{enter}`.repeat(50));
-      await user.tab();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -160,7 +166,10 @@ describe('PreReleaseUserAccessForm', () => {
 
       // now exceed the limit
       await user.type(emailsTextarea, `{enter}test@test.com`);
-      await user.tab();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -172,10 +181,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when emails contains invalid values', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -195,7 +205,9 @@ describe('PreReleaseUserAccessForm', () => {
         screen.getByLabelText('Invite new users by email'),
         '{enter}invalid-2',
       );
-      await user.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -207,10 +219,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when email has more than one @', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -222,7 +235,9 @@ describe('PreReleaseUserAccessForm', () => {
         screen.getByLabelText('Invite new users by email'),
         'test@test.com@test',
       );
-      await user.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -237,10 +252,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when email has invalid domain', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -252,8 +268,9 @@ describe('PreReleaseUserAccessForm', () => {
         screen.getByLabelText('Invite new users by email'),
         'test@test.',
       );
-      await user.tab();
-
+      await user.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
       await waitFor(() => {
         expect(
           screen.getByText("'test@test.' is not a valid email address", {
@@ -264,10 +281,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('submitting form with no values shows a validation error', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -289,10 +307,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('submitting form with invalid values shows a validation error', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -327,10 +346,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('whitespace is trimmed and blank lines are filtered without causing a validation error', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -356,10 +376,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('accepts a range of valid values without causing a validation error', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -376,7 +397,6 @@ describe('PreReleaseUserAccessForm', () => {
           'test@education.gov.uk{enter}' +
           'test@gov.wales',
       );
-      await user.tab();
 
       await user.click(
         screen.getByRole('button', { name: 'Invite new users' }),
@@ -398,10 +418,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('submitting the form opens confirmation modal with invite plan', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -491,10 +512,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('cancelling the confirmation closes the modal', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -539,8 +561,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('confirmation modal displays correct notifications warning when release is approved', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <PreReleaseUserAccessForm releaseId="release-1" isReleaseApproved />,
       );
 
@@ -579,10 +600,11 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('accepting the confirmation modal adds newly invited users to list', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(
@@ -657,10 +679,11 @@ describe('PreReleaseUserAccessForm', () => {
 
   describe('removing user', () => {
     test('clicking Remove button removes user from the list', async () => {
-      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+      const { user } = render(
+        <PreReleaseUserAccessForm releaseId="release-1" />,
+      );
 
       await waitFor(() => {
         expect(

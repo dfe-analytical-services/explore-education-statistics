@@ -200,6 +200,7 @@ export default function ChartDataGroupingForm({
         numberOfGroupsQuantiles: dataSetConfig.dataGrouping.numberOfGroups,
         copyCustomGroups: undefined,
       }}
+      mode="onBlur"
       validationSchema={validationSchema}
     >
       {({ resetField, setValue, watch }) => {

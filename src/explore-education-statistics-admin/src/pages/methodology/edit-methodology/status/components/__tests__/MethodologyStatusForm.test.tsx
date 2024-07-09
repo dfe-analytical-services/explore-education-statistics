@@ -2,12 +2,12 @@ import MethodologyStatusForm, {
   MethodologyStatusFormValues,
 } from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
 import { IdTitlePair } from '@admin/services/types/common';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { MethodologyStatusPermissions } from '@admin/services/permissionService';
+import render from '@common-test/render';
 
 describe('MethodologyStatusForm', () => {
   const testUnpublishedReleases: IdTitlePair[] = [
@@ -189,7 +189,7 @@ describe('MethodologyStatusForm', () => {
   });
 
   test('shows validation error if internal note is empty and status is approved', async () => {
-    render(
+    const { user } = render(
       <MethodologyStatusForm
         methodology={
           {
@@ -203,9 +203,9 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('Approved for publication'));
-    await userEvent.click(screen.getByLabelText('Internal note'));
-    await userEvent.tab();
+    await user.click(screen.getByLabelText('Approved for publication'));
+
+    await user.click(screen.getByRole('button', { name: 'Update status' }));
 
     await waitFor(() => {
       expect(
@@ -218,7 +218,7 @@ describe('MethodologyStatusForm', () => {
   });
 
   test('shows validation error if a release is not selected when publish strategy is with release', async () => {
-    render(
+    const { user } = render(
       <MethodologyStatusForm
         methodology={
           {
@@ -232,9 +232,9 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('With a specific release'));
-    await userEvent.click(screen.getByLabelText('Select release'));
-    await userEvent.tab();
+    await user.click(screen.getByLabelText('With a specific release'));
+
+    await user.click(screen.getByRole('button', { name: 'Update status' }));
 
     await waitFor(() => {
       expect(
@@ -246,7 +246,7 @@ describe('MethodologyStatusForm', () => {
   test('fails to submit with invalid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <MethodologyStatusForm
         methodology={
           {
@@ -261,9 +261,7 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Update status' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Update status' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -281,7 +279,7 @@ describe('MethodologyStatusForm', () => {
   test('successfully submits with valid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <MethodologyStatusForm
         methodology={
           {
@@ -296,18 +294,16 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    await userEvent.type(
+    await user.type(
       screen.getByLabelText('Internal note'),
       'Test release note',
     );
 
-    await userEvent.selectOptions(screen.getByLabelText('Select release'), [
+    await user.selectOptions(screen.getByLabelText('Select release'), [
       'test-release-1',
     ]);
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Update status' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Update status' }));
 
     const expectedValues: MethodologyStatusFormValues = {
       latestInternalReleaseNote: 'Test release note',

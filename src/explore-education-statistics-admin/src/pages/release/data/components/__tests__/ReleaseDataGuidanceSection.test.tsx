@@ -2,8 +2,8 @@ import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/Rel
 import _releaseDataGuidanceService, {
   ReleaseDataGuidance,
 } from '@admin/services/releaseDataGuidanceService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('@admin/services/releaseDataGuidanceService');
@@ -145,7 +145,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
@@ -177,7 +177,7 @@ describe('ReleaseDataGuidanceSection', () => {
         '<p>Test data set 1 content</p>',
       );
 
-      await userEvent.click(
+      await user.click(
         dataSet1.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
@@ -199,9 +199,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
       expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      await userEvent.click(
-        dataSet1.getByRole('button', { name: 'Footnotes' }),
-      );
+      await user.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
 
       const dataSet1Footnotes = within(
         dataSet1.getByTestId('Footnotes'),
@@ -227,7 +225,7 @@ describe('ReleaseDataGuidanceSection', () => {
         '<p>Test data set 2 content</p>',
       );
 
-      await userEvent.click(
+      await user.click(
         dataSet2.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
@@ -249,9 +247,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
       expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      await userEvent.click(
-        dataSet2.getByRole('button', { name: 'Footnotes' }),
-      );
+      await user.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
 
       const dataSet2Footnotes = within(
         dataSet2.getByTestId('Footnotes'),
@@ -266,7 +262,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
@@ -276,7 +272,7 @@ describe('ReleaseDataGuidanceSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Preview guidance' }),
       );
 
@@ -322,7 +318,7 @@ describe('ReleaseDataGuidanceSection', () => {
       `,
       );
 
-      await userEvent.click(
+      await user.click(
         dataSet1.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
@@ -344,9 +340,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
       expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      await userEvent.click(
-        dataSet1.getByRole('button', { name: 'Footnotes' }),
-      );
+      await user.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
 
       const dataSet1Footnotes = within(
         dataSet1.getByTestId('Footnotes'),
@@ -382,7 +376,7 @@ describe('ReleaseDataGuidanceSection', () => {
       `,
       );
 
-      await userEvent.click(
+      await user.click(
         dataSet2.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
@@ -404,9 +398,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
       expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      await userEvent.click(
-        dataSet2.getByRole('button', { name: 'Footnotes' }),
-      );
+      await user.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
 
       const dataSet2Footnotes = within(
         dataSet2.getByTestId('Footnotes'),
@@ -421,7 +413,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
@@ -439,8 +431,8 @@ describe('ReleaseDataGuidanceSection', () => {
         screen.queryByRole('link', { name: 'Enter main guidance content' }),
       ).not.toBeInTheDocument();
 
-      await userEvent.clear(mainGuidanceContent);
-      await userEvent.tab();
+      await user.clear(mainGuidanceContent);
+      await user.click(screen.getByRole('button', { name: 'Save guidance' }));
 
       await waitFor(() => {
         expect(
@@ -459,7 +451,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
@@ -480,8 +472,8 @@ describe('ReleaseDataGuidanceSection', () => {
         }),
       ).not.toBeInTheDocument();
 
-      await userEvent.clear(fileGuidanceContent);
-      await userEvent.tab();
+      await user.clear(fileGuidanceContent);
+      await user.click(screen.getByRole('button', { name: 'Save guidance' }));
 
       await waitFor(() => {
         expect(
@@ -502,7 +494,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
@@ -512,15 +504,13 @@ describe('ReleaseDataGuidanceSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Main guidance content'));
+      await user.clear(screen.getByLabelText('Main guidance content'));
 
       expect(
         releaseDataGuidanceService.updateDataGuidance,
       ).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Save guidance' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Save guidance' }));
 
       await waitFor(() => {
         expect(
@@ -540,7 +530,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
@@ -550,7 +540,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       const dataSets = screen.getAllByTestId('accordionSection');
 
-      await userEvent.clear(
+      await user.clear(
         within(dataSets[0]).getByLabelText('File guidance content'),
       );
 
@@ -558,9 +548,7 @@ describe('ReleaseDataGuidanceSection', () => {
         releaseDataGuidanceService.updateDataGuidance,
       ).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Save guidance' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Save guidance' }));
 
       await waitFor(() => {
         expect(
@@ -580,7 +568,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
@@ -590,8 +578,8 @@ describe('ReleaseDataGuidanceSection', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Main guidance content'));
-      await userEvent.type(
+      await user.clear(screen.getByLabelText('Main guidance content'));
+      await user.type(
         screen.getByLabelText('Main guidance content'),
         '<p>Updated main guidance content</p>',
       );
@@ -601,14 +589,14 @@ describe('ReleaseDataGuidanceSection', () => {
       const dataSet1 = within(dataSets[0]);
       const dataSet2 = within(dataSets[1]);
 
-      await userEvent.clear(dataSet1.getByLabelText('File guidance content'));
-      await userEvent.type(
+      await user.clear(dataSet1.getByLabelText('File guidance content'));
+      await user.type(
         dataSet1.getByLabelText('File guidance content'),
         '<p>Updated data set 1 guidance content</p>',
       );
 
-      await userEvent.clear(dataSet2.getByLabelText('File guidance content'));
-      await userEvent.type(
+      await user.clear(dataSet2.getByLabelText('File guidance content'));
+      await user.type(
         dataSet2.getByLabelText('File guidance content'),
         '<p>Updated data set 2 guidance content</p>',
       );
@@ -623,9 +611,7 @@ describe('ReleaseDataGuidanceSection', () => {
         releaseDataGuidanceService.updateDataGuidance,
       ).not.toHaveBeenCalled();
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Save guidance' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Save guidance' }));
 
       await waitFor(() => {
         expect(
@@ -746,7 +732,7 @@ describe('ReleaseDataGuidanceSection', () => {
         testDataGuidance,
       );
 
-      render(
+      const { user } = render(
         <ReleaseDataGuidanceSection
           releaseId="release-1"
           canUpdateRelease={false}
@@ -785,7 +771,7 @@ describe('ReleaseDataGuidanceSection', () => {
               </p>
           `);
 
-      await userEvent.click(
+      await user.click(
         dataSet1.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
@@ -807,9 +793,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
       expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      await userEvent.click(
-        dataSet1.getByRole('button', { name: 'Footnotes' }),
-      );
+      await user.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
 
       const dataSet1Footnotes = within(
         dataSet1.getByTestId('Footnotes'),
@@ -838,7 +822,7 @@ describe('ReleaseDataGuidanceSection', () => {
               </p>
           `);
 
-      await userEvent.click(
+      await user.click(
         dataSet2.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
@@ -860,9 +844,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
       expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      await userEvent.click(
-        dataSet2.getByRole('button', { name: 'Footnotes' }),
-      );
+      await user.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
 
       const dataSet2Footnotes = within(
         dataSet2.getByTestId('Footnotes'),

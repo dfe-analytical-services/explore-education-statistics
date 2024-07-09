@@ -2,9 +2,9 @@ import Form from '@common/components/form/Form';
 import FormProvider from '@common/components/form/FormProvider';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import Yup from '@common/validation/yup';
+import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import React from 'react';
 
 describe('FormFieldRadioGroup', () => {
@@ -145,7 +145,7 @@ describe('FormFieldRadioGroup', () => {
   });
 
   test('checking an option checks it', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: '',
@@ -168,13 +168,13 @@ describe('FormFieldRadioGroup', () => {
 
     expect(radio.checked).toBe(false);
 
-    await userEvent.click(radio);
+    await user.click(radio);
 
     expect(radio.checked).toBe(true);
   });
 
   test('checking another option un-checks the currently checked option', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: '1',
@@ -199,7 +199,7 @@ describe('FormFieldRadioGroup', () => {
     expect(radio1.checked).toBe(true);
     expect(radio2.checked).toBe(false);
 
-    await userEvent.click(radio2);
+    await user.click(radio2);
 
     expect(radio1.checked).toBe(false);
     expect(radio2.checked).toBe(true);
@@ -207,7 +207,7 @@ describe('FormFieldRadioGroup', () => {
 
   describe('error messages', () => {
     test('displays validation message when form is submitted', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -237,17 +237,17 @@ describe('FormFieldRadioGroup', () => {
         </FormProvider>,
       );
 
-      expect(screen.queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
       });
     });
 
-    test('displays validation message when radios have been touched', async () => {
-      render(
+    test('updates validation message when update values after form is submitted', async () => {
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -256,55 +256,44 @@ describe('FormFieldRadioGroup', () => {
             test: Yup.string().ensure().required('Select an option'),
           })}
         >
-          <FormFieldRadioGroup
-            name="test"
-            id="radios"
-            legend="Test radios"
-            options={[
-              { id: 'radio-1', value: '1', label: 'Radio 1' },
-              { id: 'radio-2', value: '2', label: 'Radio 2' },
-              { id: 'radio-3', value: '3', label: 'Radio 3' },
-            ]}
-          />
+          <Form
+            id="testForm"
+            showErrorSummary={false}
+            onSubmit={Promise.resolve}
+          >
+            <FormFieldRadioGroup
+              name="test"
+              id="radios"
+              legend="Test radios"
+              options={[
+                { id: 'radio-1', value: '1', label: 'Radio 1' },
+                { id: 'radio-2', value: '2', label: 'Radio 2' },
+                { id: 'radio-3', value: '3', label: 'Radio 3' },
+              ]}
+            />
+
+            <button type="submit">Submit</button>
+          </Form>
         </FormProvider>,
       );
 
-      await userEvent.tab();
-      await userEvent.tab();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
       });
-    });
 
-    test('does not display validation message when radios are untouched', async () => {
-      render(
-        <FormProvider
-          initialValues={{
-            test: '',
-          }}
-          validationSchema={Yup.object({
-            test: Yup.string().ensure().required('Select an option'),
-          })}
-        >
-          <FormFieldRadioGroup
-            name="test"
-            id="radios"
-            legend="Test radios"
-            options={[
-              { id: 'radio-1', value: '1', label: 'Radio 1' },
-              { id: 'radio-2', value: '2', label: 'Radio 2' },
-              { id: 'radio-3', value: '3', label: 'Radio 3' },
-            ]}
-          />
-        </FormProvider>,
+      await user.click(screen.getByLabelText('Radio 3'));
+
+      await waitFor(() =>
+        expect(screen.queryByText('Select an option')).not.toBeInTheDocument(),
       );
-
-      expect(screen.queryByText('Select an option')).toBeNull();
     });
 
     test('does not display validation message when `showError` is false', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -338,12 +327,12 @@ describe('FormFieldRadioGroup', () => {
       const radio = screen.getByLabelText('Radio 1') as HTMLInputElement;
 
       expect(radio.checked).toBe(false);
-      expect(screen.queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       expect(radio.checked).toBe(false);
-      expect(screen.queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
     });
   });
 });

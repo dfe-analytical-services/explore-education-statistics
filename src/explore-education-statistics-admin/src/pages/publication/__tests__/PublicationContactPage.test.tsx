@@ -7,17 +7,11 @@ import {
 import _publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -71,7 +65,7 @@ describe('PublicationContactPage', () => {
   test('clicking the edit button shows the edit form', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
 
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -79,7 +73,7 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
@@ -100,7 +94,7 @@ describe('PublicationContactPage', () => {
   test('clicking the cancel button switches back to readOnly view', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
 
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -108,13 +102,13 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
     expect(screen.getByLabelText('Team name')).toHaveValue('Team Smith');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.getByTestId('Team name')).toHaveTextContent('Team Smith');
 
@@ -135,7 +129,7 @@ describe('PublicationContactPage', () => {
   test('shows validation errors when there are no contact details', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
 
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -143,18 +137,18 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    await userEvent.clear(screen.getByLabelText('Team name'));
-    await userEvent.clear(screen.getByLabelText('Team email'));
-    await userEvent.clear(screen.getByLabelText('Contact name'));
-    await userEvent.clear(
-      screen.getByLabelText('Contact telephone (optional)'),
-    );
+    await user.clear(screen.getByLabelText('Team name'));
+    await user.clear(screen.getByLabelText('Team email'));
+    await user.clear(screen.getByLabelText('Contact name'));
+    await user.clear(screen.getByLabelText('Contact telephone (optional)'));
 
-    await userEvent.tab();
+    await user.click(
+      screen.getByRole('button', { name: 'Update contact details' }),
+    );
 
     await waitFor(() => {
       expect(
@@ -184,7 +178,7 @@ describe('PublicationContactPage', () => {
     async telNo => {
       publicationService.getContact.mockResolvedValue(testContact);
 
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(
@@ -192,20 +186,20 @@ describe('PublicationContactPage', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit contact details' }),
       );
 
-      await userEvent.clear(
-        screen.getByLabelText('Contact telephone (optional)'),
-      );
+      await user.clear(screen.getByLabelText('Contact telephone (optional)'));
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
 
-      await userEvent.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Update contact details' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -230,7 +224,7 @@ describe('PublicationContactPage', () => {
     async telNo => {
       publicationService.getContact.mockResolvedValue(testContact);
 
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(
@@ -238,20 +232,20 @@ describe('PublicationContactPage', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit contact details' }),
       );
 
-      await userEvent.clear(
-        screen.getByLabelText('Contact telephone (optional)'),
-      );
+      await user.clear(screen.getByLabelText('Contact telephone (optional)'));
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
 
-      await userEvent.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Update contact details' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -271,7 +265,7 @@ describe('PublicationContactPage', () => {
     async telNo => {
       publicationService.getContact.mockResolvedValue(testContact);
 
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(
@@ -279,20 +273,20 @@ describe('PublicationContactPage', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit contact details' }),
       );
 
-      await userEvent.clear(
-        screen.getByLabelText('Contact telephone (optional)'),
-      );
+      await user.clear(screen.getByLabelText('Contact telephone (optional)'));
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
 
-      await userEvent.tab();
+      await user.click(
+        screen.getByRole('button', { name: 'Update contact details' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -307,7 +301,7 @@ describe('PublicationContactPage', () => {
   test('show validation error when contact email is not valid', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
 
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -315,18 +309,17 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    await userEvent.clear(screen.getByLabelText('Team email'));
+    await user.clear(screen.getByLabelText('Team email'));
 
-    await userEvent.type(
-      screen.getByLabelText('Team email'),
-      'not a valid email',
+    await user.type(screen.getByLabelText('Team email'), 'not a valid email');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Update contact details' }),
     );
-
-    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -340,7 +333,7 @@ describe('PublicationContactPage', () => {
   test('shows a confirmation modal on submit', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
 
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -348,13 +341,13 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
     expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -366,12 +359,12 @@ describe('PublicationContactPage', () => {
     expect(modal.getByRole('heading')).toHaveTextContent(
       'Confirm contact changes',
     );
-    await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    await user.click(modal.getByRole('button', { name: 'Confirm' }));
   });
 
   test('clicking confirm calls the publication service', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -379,7 +372,7 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
@@ -387,7 +380,7 @@ describe('PublicationContactPage', () => {
       target: { value: 'new team name' },
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -395,7 +388,7 @@ describe('PublicationContactPage', () => {
       expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(publicationService.updateContact).toHaveBeenCalledWith(
@@ -415,7 +408,7 @@ describe('PublicationContactPage', () => {
       teamEmail: testContact.teamEmail,
       teamName: testContact.teamName,
     });
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -423,11 +416,11 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -435,7 +428,7 @@ describe('PublicationContactPage', () => {
       expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(publicationService.updateContact).toHaveBeenCalledWith(
@@ -457,7 +450,7 @@ describe('PublicationContactPage', () => {
       teamName: 'updated team name',
     });
 
-    renderPage(testPublication);
+    const { user } = renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -465,11 +458,11 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -477,7 +470,7 @@ describe('PublicationContactPage', () => {
       expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(
@@ -501,7 +494,7 @@ describe('PublicationContactPage', () => {
 });
 
 function renderPage(publication: PublicationWithPermissions) {
-  render(
+  return render(
     <MemoryRouter>
       <PublicationContextProvider
         publication={publication}

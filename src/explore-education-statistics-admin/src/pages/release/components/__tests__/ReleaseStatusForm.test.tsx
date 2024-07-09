@@ -2,14 +2,14 @@ import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import { ReleaseChecklistErrorCode } from '@admin/services/releaseService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { format } from 'date-fns';
 import React from 'react';
 import ReleaseStatusForm, {
   ReleaseStatusFormValues,
 } from '@admin/pages/release/components/ReleaseStatusForm';
 import noop from 'lodash/noop';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
 
 describe('ReleaseStatusForm', () => {
   const testStatusPermissions: ReleaseStatusPermissions = {
@@ -189,10 +189,9 @@ describe('ReleaseStatusForm', () => {
 
   describe('in Draft', () => {
     test('submits successfully without changing values', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={testRelease}
           statusPermissions={testStatusPermissions}
@@ -220,11 +219,9 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('submits successfully with updated values', async () => {
-      const user = userEvent.setup();
-
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={testRelease}
           statusPermissions={testStatusPermissions}
@@ -271,9 +268,7 @@ describe('ReleaseStatusForm', () => {
 
   describe('in Higher Level Review', () => {
     test('shows error message when internal note is empty', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -286,7 +281,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       await user.click(screen.getByLabelText('Internal note'));
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Update status' }));
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -298,11 +293,9 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('fails to submit with invalid values', async () => {
-      const user = userEvent.setup();
-
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -328,10 +321,9 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('submits successfully with updated values', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -506,9 +498,7 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('shows error message when internal note is empty', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -521,7 +511,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       await user.click(screen.getByLabelText('Internal note'));
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Update status' }));
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -533,9 +523,7 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('shows error message when no publishing method selected', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -548,9 +536,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       // Focus the field above before tabbing through the options
-      await user.click(screen.getByLabelText('Internal note'));
-      await user.tab();
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Update status' }));
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -562,9 +548,7 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('shows error message when no publish date', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -577,10 +561,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       await user.click(screen.getByLabelText('On a specific date'));
-      await user.tab();
-      await user.tab();
-      await user.tab();
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Update status' }));
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -592,10 +573,9 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('fails to submit with invalid values', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -631,9 +611,8 @@ describe('ReleaseStatusForm', () => {
             { code: checklistError, message: '' },
           ]);
         });
-        const user = userEvent.setup();
 
-        render(
+        const { user } = render(
           <ReleaseStatusForm
             release={testRelease}
             statusPermissions={testStatusPermissions}
@@ -665,9 +644,8 @@ describe('ReleaseStatusForm', () => {
           { code: 'UnexpectedError', message: '' },
         ]);
       });
-      const user = userEvent.setup();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={testRelease}
           statusPermissions={testStatusPermissions}
@@ -693,10 +671,9 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('submits successfully with updated values and Draft status', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -741,9 +718,7 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('shows confirmation modal when submitting with valid values and publish date', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -787,8 +762,7 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('does not show confirmation modal when submitting invalid values with valid publish date', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -824,14 +798,13 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('shows error modal when submitted with publish date that could not be scheduled', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn().mockImplementation(() => {
         throw createServerValidationErrorMock([
           { code: 'PublishDateCannotBeScheduled', message: '' },
         ]);
       });
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -890,10 +863,9 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('submits successfully with updated values and publish date', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -961,10 +933,9 @@ describe('ReleaseStatusForm', () => {
     });
 
     test('submits successfully with updated values and immediate publish', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseStatusForm
           release={{
             ...testRelease,
@@ -1038,10 +1009,9 @@ describe('ReleaseStatusForm', () => {
       });
 
       test('renders default values for `notifySubscribers` and `updatePublishedDate` options when status is changed to Approved', async () => {
-        const user = userEvent.setup();
         const handleSubmit = jest.fn();
 
-        render(
+        const { user } = render(
           <ReleaseStatusForm
             release={{
               ...testRelease,
@@ -1089,10 +1059,9 @@ describe('ReleaseStatusForm', () => {
       });
 
       test('shows warning message when `updatePublishedDate` is selected', async () => {
-        const user = userEvent.setup();
         const handleSubmit = jest.fn();
 
-        render(
+        const { user } = render(
           <ReleaseStatusForm
             release={{
               ...testRelease,
@@ -1133,10 +1102,9 @@ describe('ReleaseStatusForm', () => {
       });
 
       test('submits successfully with updated values', async () => {
-        const user = userEvent.setup();
         const handleSubmit = jest.fn();
 
-        render(
+        const { user } = render(
           <ReleaseStatusForm
             release={{
               ...testRelease,

@@ -38,12 +38,11 @@ export default function ChartReferenceLineConfigurationForm({
   majorAxisOptions,
   onSave,
 }: Props) {
-  const { formState, setError, watch } =
+  const { formState, setError, watch, trigger } =
     useFormContext<ChartAxisConfigurationFormValues>();
   const values = watch();
   const referenceLine = values.referenceLines?.[index];
   const { axis, type: axisType } = axisDefinition || {};
-
   return (
     <>
       <td className="dfe-vertical-align--bottom">
@@ -68,6 +67,7 @@ export default function ChartReferenceLineConfigurationForm({
                     ]
                   : []),
               ]}
+              onBlur={() => trigger(`referenceLines.${index}.position`)}
             />
             {referenceLine?.position ===
               otherAxisPositionTypes.betweenDataPoints && (
@@ -88,6 +88,9 @@ export default function ChartReferenceLineConfigurationForm({
                   placeholder="Start point"
                   order={FormSelect.unordered}
                   options={majorAxisOptions}
+                  onBlur={() =>
+                    trigger(`referenceLines.${index}.otherAxisStart`)
+                  }
                 />
                 <br />
                 <FormFieldSelect<ChartAxisConfigurationFormValues>
@@ -99,6 +102,7 @@ export default function ChartReferenceLineConfigurationForm({
                   placeholder="End point"
                   order={FormSelect.unordered}
                   options={majorAxisOptions}
+                  onBlur={() => trigger(`referenceLines.${index}.otherAxisEnd`)}
                 />
               </FormFieldset>
             )}
@@ -110,6 +114,7 @@ export default function ChartReferenceLineConfigurationForm({
             label="Position"
             formGroup={false}
             hideLabel
+            onBlur={() => trigger(`referenceLines.${index}.position`)}
           />
         )}
       </td>
@@ -137,6 +142,9 @@ export default function ChartReferenceLineConfigurationForm({
                   value: otherAxisPositionTypes.betweenDataPoints,
                 },
               ]}
+              onBlur={() =>
+                trigger(`referenceLines.${index}.otherAxisPositionType`)
+              }
             />
 
             {referenceLine?.otherAxisPositionType !==
@@ -151,6 +159,9 @@ export default function ChartReferenceLineConfigurationForm({
                       label={`Percent along ${axis === 'x' ? 'Y' : 'X'} axis`}
                       formGroup={false}
                       width={10}
+                      onBlur={() =>
+                        trigger(`referenceLines.${index}.otherAxisPosition`)
+                      }
                     />
                   </div>
                 ) : (
@@ -171,6 +182,9 @@ export default function ChartReferenceLineConfigurationForm({
                       placeholder="Start point"
                       order={FormSelect.unordered}
                       options={majorAxisOptions}
+                      onBlur={() =>
+                        trigger(`referenceLines.${index}.otherAxisStart`)
+                      }
                     />
                     <br />
                     <FormFieldSelect<ChartAxisConfigurationFormValues>
@@ -182,6 +196,9 @@ export default function ChartReferenceLineConfigurationForm({
                       placeholder="End point"
                       order={FormSelect.unordered}
                       options={majorAxisOptions}
+                      onBlur={() =>
+                        trigger(`referenceLines.${index}.otherAxisEnd`)
+                      }
                     />
                   </FormFieldset>
                 )}
@@ -202,6 +219,7 @@ export default function ChartReferenceLineConfigurationForm({
                 : ''
             }`}
             width={10}
+            onBlur={() => trigger(`referenceLines.${index}.otherAxisPosition`)}
           />
         )}
       </td>
@@ -212,6 +230,7 @@ export default function ChartReferenceLineConfigurationForm({
           label="Label"
           formGroup={false}
           hideLabel
+          onBlur={() => trigger(`referenceLines.${index}.label`)}
         />
       </td>
       <td className="dfe-vertical-align--bottom">
@@ -223,6 +242,7 @@ export default function ChartReferenceLineConfigurationForm({
           formGroup={false}
           hideLabel
           width={10}
+          onBlur={() => trigger(`referenceLines.${index}.labelWidth`)}
         />
       </td>
       <td className="dfe-vertical-align--bottom">
@@ -239,6 +259,7 @@ export default function ChartReferenceLineConfigurationForm({
             { label: 'Solid', value: 'solid' },
             { label: 'None', value: 'none' },
           ]}
+          onBlur={() => trigger(`referenceLines.${index}.style`)}
         />
       </td>
       <td className="dfe-vertical-align--bottom">

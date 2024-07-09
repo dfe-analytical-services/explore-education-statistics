@@ -235,6 +235,7 @@ const ChartLegendConfiguration = ({
     <FormProvider
       enableReinitialize
       initialValues={initialValues}
+      mode="onBlur"
       validationSchema={validationSchema}
     >
       {({ formState, watch }) => {

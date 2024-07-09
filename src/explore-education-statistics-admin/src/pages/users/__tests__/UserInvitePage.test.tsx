@@ -13,7 +13,6 @@ import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { administrationUserInviteRoute } from '@admin/routes/administrationRoutes';
-import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/userService');
@@ -25,7 +24,10 @@ const userService = _userService as jest.Mocked<typeof _userService>;
 
 describe('UserInvitePage', () => {
   test('renders correctly', async () => {
-    await renderPage();
+    renderPage();
+    expect(
+      await screen.findByText('Manage access to this service'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'Invite user' }),
@@ -49,11 +51,12 @@ describe('UserInvitePage', () => {
   });
 
   test('shows validation error if user email is empty', async () => {
-    const user = userEvent.setup();
-    await renderPage();
+    const { user } = renderPage();
+    expect(
+      await screen.findByText('Manage access to this service'),
+    ).toBeInTheDocument();
 
-    await user.click(screen.getByLabelText('User email'));
-    await user.tab();
+    await user.click(screen.getByRole('button', { name: 'Send invite' }));
 
     expect(await screen.findByText('There is a problem')).toBeInTheDocument();
     expect(
@@ -68,13 +71,15 @@ describe('UserInvitePage', () => {
   });
 
   test('shows validation error if role is empty', async () => {
-    const user = userEvent.setup();
-    await renderPage();
+    const { user } = renderPage();
+    expect(
+      await screen.findByText('Manage access to this service'),
+    ).toBeInTheDocument();
 
     await user.type(screen.getByLabelText('User email'), 'test@test.com');
 
     await user.selectOptions(screen.getByLabelText('Role'), 'Choose role');
-    await user.tab();
+    await user.click(screen.getByRole('button', { name: 'Send invite' }));
 
     expect(await screen.findByText('There is a problem')).toBeInTheDocument();
     expect(
@@ -90,8 +95,10 @@ describe('UserInvitePage', () => {
 
   describe('adding release roles', () => {
     test('shows validation error if release is empty', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Add release role' }),
@@ -103,8 +110,10 @@ describe('UserInvitePage', () => {
     });
 
     test('shows validation error if release role is empty', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Add release role' }),
@@ -116,8 +125,10 @@ describe('UserInvitePage', () => {
     });
 
     test('shows validation error if try to add another role for a release', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
       await user.selectOptions(
@@ -142,8 +153,10 @@ describe('UserInvitePage', () => {
     });
 
     test('successfully adds release roles', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
       await user.selectOptions(
@@ -182,8 +195,10 @@ describe('UserInvitePage', () => {
     });
 
     test('successfully removes release roles', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
       await user.selectOptions(
@@ -216,8 +231,10 @@ describe('UserInvitePage', () => {
 
   describe('adding publication roles', () => {
     test('shows validation error if publication is empty', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Add publication role' }),
@@ -229,8 +246,10 @@ describe('UserInvitePage', () => {
     });
 
     test('shows validation error if publication role is empty', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Add publication role' }),
@@ -242,8 +261,10 @@ describe('UserInvitePage', () => {
     });
 
     test('shows validation error if try to add another role for a publication', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.selectOptions(
         screen.getByLabelText('Publication'),
@@ -277,8 +298,10 @@ describe('UserInvitePage', () => {
     });
 
     test('successfully adds publication roles', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.selectOptions(
         screen.getByLabelText('Publication'),
@@ -328,8 +351,10 @@ describe('UserInvitePage', () => {
     });
 
     test('successfully removes publication roles', async () => {
-      const user = userEvent.setup();
-      await renderPage();
+      const { user } = renderPage();
+      expect(
+        await screen.findByText('Manage access to this service'),
+      ).toBeInTheDocument();
 
       await user.selectOptions(
         screen.getByLabelText('Publication'),
@@ -366,8 +391,10 @@ describe('UserInvitePage', () => {
   });
 
   test('submits successfully without release or publication roles', async () => {
-    const user = userEvent.setup();
-    await renderPage();
+    const { user } = renderPage();
+    expect(
+      await screen.findByText('Manage access to this service'),
+    ).toBeInTheDocument();
 
     await user.type(screen.getByLabelText('User email'), 'test@test.com');
 
@@ -387,8 +414,10 @@ describe('UserInvitePage', () => {
   });
 
   test('submits successfully with release and publication roles', async () => {
-    const user = userEvent.setup();
-    await renderPage();
+    const { user } = renderPage();
+    expect(
+      await screen.findByText('Manage access to this service'),
+    ).toBeInTheDocument();
 
     await user.type(screen.getByLabelText('User email'), 'test@test.com');
 
@@ -429,7 +458,7 @@ describe('UserInvitePage', () => {
     });
   });
 
-  const renderPage = async () => {
+  const renderPage = () => {
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,
     );
@@ -437,7 +466,7 @@ describe('UserInvitePage', () => {
     userService.getResourceRoles.mockResolvedValue(testResourceRoles);
     userService.getReleases.mockResolvedValue(testReleases);
 
-    render(
+    return render(
       <MemoryRouter initialEntries={[administrationUserInviteRoute.path]}>
         <TestConfigContextProvider>
           <Route
@@ -447,9 +476,5 @@ describe('UserInvitePage', () => {
         </TestConfigContextProvider>
       </MemoryRouter>,
     );
-
-    expect(
-      await screen.findByText('Manage access to this service'),
-    ).toBeInTheDocument();
   };
 });

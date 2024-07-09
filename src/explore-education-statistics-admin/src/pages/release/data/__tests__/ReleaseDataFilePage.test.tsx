@@ -6,8 +6,8 @@ import {
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
@@ -41,7 +41,10 @@ describe('ReleaseDataFilePage', () => {
   test('renders form with initial values', async () => {
     releaseDataFileService.getDataFile.mockResolvedValue(testFile);
 
-    await renderPage();
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Edit data file details')).toBeInTheDocument();
+    });
 
     expect(screen.getByLabelText('Title')).toHaveValue('Test data file');
   });
@@ -51,7 +54,10 @@ describe('ReleaseDataFilePage', () => {
       new Error('Could not find data file'),
     );
 
-    await renderPage();
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Edit data file details')).toBeInTheDocument();
+    });
 
     expect(
       screen.getByText('Could not load data file details'),
@@ -62,10 +68,13 @@ describe('ReleaseDataFilePage', () => {
   test('shows validation message if `title` field is empty', async () => {
     releaseDataFileService.getDataFile.mockResolvedValue(testFile);
 
-    await renderPage();
+    const { user } = renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Edit data file details')).toBeInTheDocument();
+    });
 
-    await userEvent.clear(screen.getByLabelText('Title'));
-    await userEvent.tab();
+    await user.clear(screen.getByLabelText('Title'));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(
@@ -80,9 +89,12 @@ describe('ReleaseDataFilePage', () => {
       title: '',
     });
 
-    await renderPage();
+    const { user } = renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Edit data file details')).toBeInTheDocument();
+    });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(
@@ -94,14 +106,17 @@ describe('ReleaseDataFilePage', () => {
   test('successfully submitting form sends update request to service', async () => {
     releaseDataFileService.getDataFile.mockResolvedValue(testFile);
 
-    await renderPage();
+    const { user } = renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Edit data file details')).toBeInTheDocument();
+    });
 
     const input = screen.getByLabelText('Title');
 
-    await userEvent.clear(input);
-    await userEvent.type(input, 'Updated test data file');
+    await user.clear(input);
+    await user.type(input, 'Updated test data file');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(releaseDataFileService.updateFile).toHaveBeenCalledWith<
@@ -117,9 +132,12 @@ describe('ReleaseDataFilePage', () => {
 
     const history = createMemoryHistory();
 
-    await renderPage(history);
+    const { user } = renderPage(history);
+    await waitFor(() => {
+      expect(screen.getByText('Edit data file details')).toBeInTheDocument();
+    });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(
@@ -129,7 +147,7 @@ describe('ReleaseDataFilePage', () => {
     });
   });
 
-  async function renderPage(history: MemoryHistory = createMemoryHistory()) {
+  function renderPage(history: MemoryHistory = createMemoryHistory()) {
     history.push(
       generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
         publicationId: 'publication-1',
@@ -138,7 +156,7 @@ describe('ReleaseDataFilePage', () => {
       }),
     );
 
-    render(
+    return render(
       <Router history={history}>
         <Route
           path={releaseDataFileRoute.path}
@@ -146,9 +164,5 @@ describe('ReleaseDataFilePage', () => {
         />
       </Router>,
     );
-
-    await waitFor(() => {
-      expect(screen.getByText('Edit data file details')).toBeInTheDocument();
-    });
   }
 });

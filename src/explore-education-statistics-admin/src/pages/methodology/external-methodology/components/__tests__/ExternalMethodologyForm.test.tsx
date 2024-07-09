@@ -1,22 +1,24 @@
 import ExternalMethodologyForm from '@admin/pages/methodology/external-methodology/components/ExternalMethodologyForm';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
 
 describe('ExternalMethodologyForm', () => {
   test('can submit with valid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(<ExternalMethodologyForm onSubmit={handleSubmit} onCancel={noop} />);
+    const { user } = render(
+      <ExternalMethodologyForm onSubmit={handleSubmit} onCancel={noop} />,
+    );
 
-    await userEvent.type(screen.getByLabelText('Link title'), 'Test title');
+    await user.type(screen.getByLabelText('Link title'), 'Test title');
 
-    await userEvent.type(screen.getByLabelText('URL'), 'hive.co.uk');
+    await user.type(screen.getByLabelText('URL'), 'hive.co.uk');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -27,10 +29,11 @@ describe('ExternalMethodologyForm', () => {
   });
 
   test('show validation errors when no external methodology link title', async () => {
-    render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
+    const { user } = render(
+      <ExternalMethodologyForm onSubmit={noop} onCancel={noop} />,
+    );
 
-    await userEvent.click(screen.getByLabelText('Link title'));
-    await userEvent.tab();
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(
@@ -42,10 +45,12 @@ describe('ExternalMethodologyForm', () => {
   });
 
   test('show validation error when no external methodology URL', async () => {
-    render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
+    const { user } = render(
+      <ExternalMethodologyForm onSubmit={noop} onCancel={noop} />,
+    );
 
-    await userEvent.clear(screen.getByLabelText('URL'));
-    await userEvent.tab();
+    await user.clear(screen.getByLabelText('URL'));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(
@@ -57,10 +62,12 @@ describe('ExternalMethodologyForm', () => {
   });
 
   test('show validation error when invalid external methodology URL', async () => {
-    render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
+    const { user } = render(
+      <ExternalMethodologyForm onSubmit={noop} onCancel={noop} />,
+    );
 
-    await userEvent.type(screen.getByLabelText('URL'), 'not a valid url');
-    await userEvent.tab();
+    await user.type(screen.getByLabelText('URL'), 'not a valid url');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(

@@ -1,11 +1,6 @@
 import EditableEmbedForm from '@admin/components/editable/EditableEmbedForm';
-import {
-  render as baseRender,
-  RenderResult,
-  screen,
-  waitFor,
-} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import baseRender from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactNode } from 'react';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
@@ -41,10 +36,12 @@ describe('EditableEmbedForm', () => {
   });
 
   test('shows a validation error when no title is set', async () => {
-    render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
+    const { user } = render(
+      <EditableEmbedForm onCancel={noop} onSubmit={noop} />,
+    );
 
-    await userEvent.click(screen.getByLabelText('Title'));
-    await userEvent.tab();
+    await user.click(screen.getByLabelText('Title'));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -57,10 +54,12 @@ describe('EditableEmbedForm', () => {
   });
 
   test('shows a validation error when no url is set', async () => {
-    render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
+    const { user } = render(
+      <EditableEmbedForm onCancel={noop} onSubmit={noop} />,
+    );
 
-    await userEvent.click(screen.getByLabelText('URL'));
-    await userEvent.tab();
+    await user.click(screen.getByLabelText('URL'));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -73,11 +72,12 @@ describe('EditableEmbedForm', () => {
   });
 
   test('shows a validation error when the url is invalid', async () => {
-    render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
+    const { user } = render(
+      <EditableEmbedForm onCancel={noop} onSubmit={noop} />,
+    );
 
-    await userEvent.type(screen.getByLabelText('URL'), 'Not a url');
-    await userEvent.tab();
-
+    await user.type(screen.getByLabelText('URL'), 'Not a url');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
       expect(
@@ -89,10 +89,12 @@ describe('EditableEmbedForm', () => {
   });
 
   test('shows a validation error when the url is not from an allowed domain', async () => {
-    render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
+    const { user } = render(
+      <EditableEmbedForm onCancel={noop} onSubmit={noop} />,
+    );
 
-    await userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
-    await userEvent.tab();
+    await user.type(screen.getByLabelText('URL'), 'http://test.com');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(
@@ -105,14 +107,16 @@ describe('EditableEmbedForm', () => {
 
   test('calls `onSubmit` with the form values when submitted successfully', async () => {
     const handleSubmit = jest.fn();
-    render(<EditableEmbedForm onCancel={noop} onSubmit={handleSubmit} />);
+    const { user } = render(
+      <EditableEmbedForm onCancel={noop} onSubmit={handleSubmit} />,
+    );
 
-    await userEvent.type(screen.getByLabelText('Title'), 'Dashboard title');
-    await userEvent.type(
+    await user.type(screen.getByLabelText('Title'), 'Dashboard title');
+    await user.type(
       screen.getByLabelText('URL'),
       'https://department-for-education.shinyapps.io/test-dashboard',
     );
-    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -122,7 +126,7 @@ describe('EditableEmbedForm', () => {
     });
   });
 
-  function render(child: ReactNode): RenderResult {
+  function render(child: ReactNode) {
     return baseRender(
       <TestConfigContextProvider>{child}</TestConfigContextProvider>,
     );
