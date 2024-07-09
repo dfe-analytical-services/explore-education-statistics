@@ -28,7 +28,7 @@ public class PublicationSubscriptionManager(
     IEmailService emailService,
     IPublicationSubscriptionRepository publicationSubscriptionRepository,
     INotificationClientProvider notificationClientProvider,
-    IValidator<NewPendingSubscriptionRequest> requestValidator)
+    IValidator<NewPendingPublicationSubscriptionRequest> requestValidator)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -42,7 +42,7 @@ public class PublicationSubscriptionManager(
     // ReSharper disable once UnusedMember.Global
     public async Task<IActionResult> RequestPendingSubscriptionFunc(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/request-pending-subscription/")]
-        [FromBody] NewPendingSubscriptionRequest req,
+        [FromBody] NewPendingPublicationSubscriptionRequest req,
         FunctionContext context,
         CancellationToken cancellationToken)
     {

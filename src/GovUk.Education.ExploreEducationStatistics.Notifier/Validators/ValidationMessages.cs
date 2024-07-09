@@ -1,0 +1,21 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+namespace GovUk.Education.ExploreEducationStatistics.Notifier.Validators;
+
+public static class ValidationMessages
+{
+    public static readonly LocalizableMessage ApiPendingSubscriptionAlreadyExists = new(
+        Code: nameof(ApiPendingSubscriptionAlreadyExists),
+        Message: "The user already has a pending subscription for the API data set. They must verify their subscription."
+    );
+
+    public static readonly LocalizableMessage ApiVerifiedSubscriptionAlreadyExists = new(
+        Code: nameof(ApiVerifiedSubscriptionAlreadyExists),
+        Message: "The user is already subscribed to the API data set."
+    );
+
+    public static readonly LocalizableMessage AuthorizationTokenInvalid = new(
+        Code: nameof(AuthorizationTokenInvalid),
+        Message: "The authorization token is invalid."
+    );
+}

@@ -1,15 +1,15 @@
-using FluentValidation;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
 var host = new HostBuilder()
@@ -32,14 +32,20 @@ var host = new HostBuilder()
             .AddApplicationInsightsTelemetryWorkerService()
             .ConfigureFunctionsApplicationInsights()
             .AddFluentValidation()
+            .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.AppSettings))
+            .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.GovUkNotify))
+            //.AddSingleton(serviceProvider =>
+            //{
+            //    var options = serviceProvider.GetRequiredService<IOptions<AppSettingsOptions>>();
+            //    return new TableServiceClient(options.Value.TableStorageConnectionString);
+            //})
+            .AddTransient<IApiSubscriptionTableStorageService, ApiSubscriptionTableStorageService>()
             .AddTransient<IEmailService, EmailService>()
             .AddTransient<INotificationClientProvider, NotificationClientProvider>()
             .AddTransient<IPublicationSubscriptionRepository, PublicationSubscriptionRepository>()
-            .AddTransient<ITokenService, TokenService>()
-            .AddScoped<IValidator<NewPendingSubscriptionRequest>,
-                NewPendingSubscriptionRequest.Validator>()
-            .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.AppSettings))
-            .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.GovUkNotify));
+            .AddTransient<IApiSubscriptionRepository, ApiSubscriptionRepository>()
+            .AddTransient<IApiSubscriptionService, ApiSubscriptionService>()
+            .AddTransient<ITokenService, TokenService>();
     })
     .Build();
 

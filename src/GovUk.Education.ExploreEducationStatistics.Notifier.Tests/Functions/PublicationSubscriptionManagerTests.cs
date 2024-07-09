@@ -69,7 +69,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingSubscriptionRequest
+        var request = new NewPendingPublicationSubscriptionRequest
         {
             Id = "test-id-1",
             Slug = "test-publication-slug-1",
@@ -141,7 +141,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingSubscriptionRequest
+        var request = new NewPendingPublicationSubscriptionRequest
         {
             Id = "test-id-2",
             Slug = "test-publication-slug-2",
@@ -215,7 +215,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingSubscriptionRequest
+        var request = new NewPendingPublicationSubscriptionRequest
         {
             Id = "test-id-3",
             Slug = "test-publication-slug-3",
@@ -281,7 +281,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingSubscriptionRequest
+        var request = new NewPendingPublicationSubscriptionRequest
         {
             Id = "",
             Slug = "test-publication-slug",
@@ -297,7 +297,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingSubscriptionRequest.Id));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Id));
     }
 
     [Fact]
@@ -334,7 +334,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingSubscriptionRequest
+        var request = new NewPendingPublicationSubscriptionRequest
         {
             Id = "123abc",
             Slug = "test-publication-slug",
@@ -350,7 +350,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingSubscriptionRequest.Title));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Title));
     }
 
     [Fact]
@@ -387,7 +387,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingSubscriptionRequest
+        var request = new NewPendingPublicationSubscriptionRequest
         {
             Id = "123abc",
             Slug = "test-publication-slug",
@@ -403,7 +403,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingSubscriptionRequest.Email));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Email));
     }
 
     [Fact]
@@ -440,7 +440,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingSubscriptionRequest
+        var request = new NewPendingPublicationSubscriptionRequest
         {
             Id = "123abc",
             Slug = "",
@@ -456,7 +456,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingSubscriptionRequest.Slug));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Slug));
     }
 
 
@@ -618,5 +618,5 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
             notificationClientProvider ?? Mock.Of<INotificationClientProvider>(MockBehavior.Strict),
-            new NewPendingSubscriptionRequest.Validator());
+            new NewPendingPublicationSubscriptionRequest.Validator());
 }
