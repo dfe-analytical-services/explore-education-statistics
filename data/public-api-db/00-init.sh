@@ -22,4 +22,10 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     GRANT USAGE ON SCHEMA public TO app_public_data_processor;
     GRANT USAGE ON SCHEMA public TO app_admin;
     GRANT USAGE ON SCHEMA public TO app_publisher;
+
+    /*
+     * Create an admin group role which can be granted to user roles requiring privileges on public schema objects.
+     * Privileges are granted to this admin group role by the initial migration.
+     */
+    CREATE ROLE public_data_admin WITH NOLOGIN;
 EOSQL
