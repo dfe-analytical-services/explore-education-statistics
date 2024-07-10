@@ -217,10 +217,12 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                     foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
                     {
-                        var locationOptionMeta = Assert.Single(
-                            locationMeta.Options,
+                        var locationOptionMetaLink = Assert.Single(
+                            locationMeta.OptionLinks,
                             o => o.PublicId == locationOptionMetaViewModel.Id);
 
+                        var locationOptionMeta = locationOptionMetaLink.Option;
+                        
                         switch (locationOptionMeta)
                         {
                             case LocationCodedOptionMeta codedMeta:

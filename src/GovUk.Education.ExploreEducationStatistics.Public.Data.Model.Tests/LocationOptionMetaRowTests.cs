@@ -12,7 +12,6 @@ public abstract class LocationOptionMetaRowTests
             HashSet<string> excludedProperties =
             [
                 nameof(LocationOptionMetaRow.Id),
-                nameof(LocationOptionMetaRow.PublicId),
             ];
 
             var expectedProperties = typeof(LocationOptionMetaRow)
@@ -24,7 +23,6 @@ public abstract class LocationOptionMetaRowTests
             var optionRow = new LocationOptionMetaRow
             {
                 Id = 1,
-                PublicId = nameof(LocationOptionMetaRow.PublicId),
                 Type = nameof(LocationOptionMetaRow.Type),
                 Label = nameof(LocationOptionMetaRow.Label),
                 Code = nameof(LocationOptionMetaRow.Code),

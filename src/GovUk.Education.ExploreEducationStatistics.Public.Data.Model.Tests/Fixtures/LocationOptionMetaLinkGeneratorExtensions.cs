@@ -11,6 +11,11 @@ public static class LocationOptionMetaLinkGeneratorExtensions
         this Generator<LocationOptionMetaLink> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
+    public static Generator<LocationOptionMetaLink> WithPublicId(
+        this Generator<LocationOptionMetaLink> generator,
+        string publicId)
+        => generator.ForInstance(s => s.SetPublicId(publicId));
+
     public static Generator<LocationOptionMetaLink> WithMeta(
         this Generator<LocationOptionMetaLink> generator,
         LocationMeta meta)
@@ -38,7 +43,12 @@ public static class LocationOptionMetaLinkGeneratorExtensions
 
     public static InstanceSetters<LocationOptionMetaLink> SetDefaults(
         this InstanceSetters<LocationOptionMetaLink> setters)
-        => setters;
+        => setters
+            .SetDefault(m => m.PublicId);
+    public static InstanceSetters<LocationOptionMetaLink> SetPublicId(
+        this InstanceSetters<LocationOptionMetaLink> setters,
+        string publicId)
+        => setters.Set(m => m.PublicId, publicId);
 
     public static InstanceSetters<LocationOptionMetaLink> SetMeta(
         this InstanceSetters<LocationOptionMetaLink> setters,

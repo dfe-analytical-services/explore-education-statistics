@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    partial class PublicDataDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240710122937_EES4954_MovePublicIdToLocationMetaOptionLinkTable")]
+    partial class EES4954_MovePublicIdToLocationMetaOptionLinkTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,24 +28,124 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.HasSequence<int>("FilterOptionMetaLink_seq");
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonBool", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonFragment", b =>
                 {
-                    b.Property<bool>("BoolValue")
-                        .HasColumnType("boolean");
+                    b.Property<string>("JsonString")
+                        .HasColumnType("text");
 
                     b.ToTable((string)null);
 
                     b.ToView(null, (string)null);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonFragment", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilterOptions", b =>
                 {
-                    b.Property<string>("JsonValue")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                    b.ToTable((string)null);
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.ToView(null, (string)null);
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("ChangeSetFilterOptions");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilters", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("ChangeSetFilters");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetIndicators", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("ChangeSetIndicators");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetLocations", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("ChangeSetLocations");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetTimePeriods", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("ChangeSetTimePeriods");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
@@ -273,34 +376,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToTable("FilterMetas");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMetaChange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int?>("CurrentStateId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("PreviousStateId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentStateId");
-
-                    b.HasIndex("DataSetVersionId");
-
-                    b.HasIndex("PreviousStateId");
-
-                    b.ToTable("FilterMetaChanges");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", b =>
                 {
                     b.Property<int>("Id")
@@ -319,24 +394,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasKey("Id");
 
                     b.ToTable("FilterOptionMetas");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaChange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DataSetVersionId");
-
-                    b.ToTable("FilterOptionMetaChanges");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaLink", b =>
@@ -392,35 +449,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToTable("GeographicLevelMetas");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMetaChange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int?>("CurrentStateId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("PreviousStateId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentStateId");
-
-                    b.HasIndex("DataSetVersionId")
-                        .IsUnique();
-
-                    b.HasIndex("PreviousStateId");
-
-                    b.ToTable("GeographicLevelMetaChanges");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", b =>
                 {
                     b.Property<int>("Id")
@@ -461,34 +489,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToTable("IndicatorMetas");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMetaChange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int?>("CurrentStateId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("PreviousStateId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentStateId");
-
-                    b.HasIndex("DataSetVersionId");
-
-                    b.HasIndex("PreviousStateId");
-
-                    b.ToTable("IndicatorMetaChanges");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", b =>
                 {
                     b.Property<int>("Id")
@@ -517,34 +517,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsUnique();
 
                     b.ToTable("LocationMetas");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMetaChange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int?>("CurrentStateId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("PreviousStateId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentStateId");
-
-                    b.HasIndex("DataSetVersionId");
-
-                    b.HasIndex("PreviousStateId");
-
-                    b.ToTable("LocationMetaChanges");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta", b =>
@@ -605,24 +577,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaChange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DataSetVersionId");
-
-                    b.ToTable("LocationOptionMetaChanges");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaLink", b =>
                 {
                     b.Property<int>("MetaId")
@@ -631,44 +585,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<int>("OptionId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("MetaId", "OptionId");
 
                     b.HasIndex("OptionId");
 
                     b.ToTable("LocationOptionMetaLinks");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.PreviewToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("CreatedByUserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("Expiry")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTimeOffset?>("Updated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DataSetVersionId");
-
-                    b.ToTable("PreviewTokens");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", b =>
@@ -705,34 +630,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToTable("TimePeriodMetas");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMetaChange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int?>("CurrentStateId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("DataSetVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("PreviousStateId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentStateId");
-
-                    b.HasIndex("DataSetVersionId");
-
-                    b.HasIndex("PreviousStateId");
-
-                    b.ToTable("TimePeriodMetaChanges");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationCodedOptionMeta", b =>
                 {
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta");
@@ -766,6 +663,513 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta");
 
                     b.HasDiscriminator().HasValue("SCH");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilterOptions", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("FilterOptionChanges")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Change<GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionChangeState>", "Changes", b1 =>
+                        {
+                            b1.Property<Guid>("ChangeSetFilterOptionsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("Identifier")
+                                .HasColumnType("uuid")
+                                .HasAnnotation("Relational:JsonPropertyName", "Id");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("ChangeSetFilterOptionsId", "Id");
+
+                            b1.ToTable("ChangeSetFilterOptions");
+
+                            b1.ToJson("Changes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChangeSetFilterOptionsId");
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionChangeState", "CurrentState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetFilterOptionsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("FilterId")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<bool?>("IsAggregate")
+                                        .HasColumnType("boolean");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("ChangeSetFilterOptionsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetFilterOptions");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetFilterOptionsId", "ChangeId");
+                                });
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionChangeState", "PreviousState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetFilterOptionsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("FilterId")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<bool?>("IsAggregate")
+                                        .HasColumnType("boolean");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("ChangeSetFilterOptionsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetFilterOptions");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetFilterOptionsId", "ChangeId");
+                                });
+
+                            b1.Navigation("CurrentState");
+
+                            b1.Navigation("PreviousState");
+                        });
+
+                    b.Navigation("Changes");
+
+                    b.Navigation("DataSetVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilters", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("FilterChanges")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Change<GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterChangeState>", "Changes", b1 =>
+                        {
+                            b1.Property<Guid>("ChangeSetFiltersId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("Identifier")
+                                .HasColumnType("uuid")
+                                .HasAnnotation("Relational:JsonPropertyName", "Id");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("ChangeSetFiltersId", "Id");
+
+                            b1.ToTable("ChangeSetFilters");
+
+                            b1.ToJson("Changes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChangeSetFiltersId");
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterChangeState", "CurrentState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetFiltersId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Hint")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("ChangeSetFiltersId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetFilters");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetFiltersId", "ChangeId");
+                                });
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterChangeState", "PreviousState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetFiltersId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Hint")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("ChangeSetFiltersId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetFilters");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetFiltersId", "ChangeId");
+                                });
+
+                            b1.Navigation("CurrentState");
+
+                            b1.Navigation("PreviousState");
+                        });
+
+                    b.Navigation("Changes");
+
+                    b.Navigation("DataSetVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetIndicators", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("IndicatorChanges")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Change<GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorChangeState>", "Changes", b1 =>
+                        {
+                            b1.Property<Guid>("ChangeSetIndicatorsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("Identifier")
+                                .HasColumnType("uuid")
+                                .HasAnnotation("Relational:JsonPropertyName", "Id");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("ChangeSetIndicatorsId", "Id");
+
+                            b1.ToTable("ChangeSetIndicators");
+
+                            b1.ToJson("Changes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChangeSetIndicatorsId");
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorChangeState", "CurrentState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetIndicatorsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<byte?>("DecimalPlaces")
+                                        .HasColumnType("smallint");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Unit")
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("ChangeSetIndicatorsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetIndicators");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetIndicatorsId", "ChangeId");
+                                });
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorChangeState", "PreviousState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetIndicatorsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<byte?>("DecimalPlaces")
+                                        .HasColumnType("smallint");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Unit")
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("ChangeSetIndicatorsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetIndicators");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetIndicatorsId", "ChangeId");
+                                });
+
+                            b1.Navigation("CurrentState");
+
+                            b1.Navigation("PreviousState");
+                        });
+
+                    b.Navigation("Changes");
+
+                    b.Navigation("DataSetVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetLocations", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("LocationChanges")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Change<GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationChangeState>", "Changes", b1 =>
+                        {
+                            b1.Property<Guid>("ChangeSetLocationsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("Identifier")
+                                .HasColumnType("uuid")
+                                .HasAnnotation("Relational:JsonPropertyName", "Id");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("ChangeSetLocationsId", "Id");
+
+                            b1.ToTable("ChangeSetLocations");
+
+                            b1.ToJson("Changes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChangeSetLocationsId");
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationChangeState", "CurrentState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetLocationsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Code")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Level")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("ChangeSetLocationsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetLocations");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetLocationsId", "ChangeId");
+                                });
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationChangeState", "PreviousState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetLocationsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Code")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Id")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<int>("Level")
+                                        .HasColumnType("integer");
+
+                                    b2.HasKey("ChangeSetLocationsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetLocations");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetLocationsId", "ChangeId");
+                                });
+
+                            b1.Navigation("CurrentState");
+
+                            b1.Navigation("PreviousState");
+                        });
+
+                    b.Navigation("Changes");
+
+                    b.Navigation("DataSetVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetTimePeriods", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("TimePeriodChanges")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Change<GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodChangeState>", "Changes", b1 =>
+                        {
+                            b1.Property<Guid>("ChangeSetTimePeriodsId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("Identifier")
+                                .HasColumnType("uuid")
+                                .HasAnnotation("Relational:JsonPropertyName", "Id");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("ChangeSetTimePeriodsId", "Id");
+
+                            b1.ToTable("ChangeSetTimePeriods");
+
+                            b1.ToJson("Changes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChangeSetTimePeriodsId");
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodChangeState", "CurrentState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetTimePeriodsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Code")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<int>("Year")
+                                        .HasColumnType("integer");
+
+                                    b2.HasKey("ChangeSetTimePeriodsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetTimePeriods");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetTimePeriodsId", "ChangeId");
+                                });
+
+                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodChangeState", "PreviousState", b2 =>
+                                {
+                                    b2.Property<Guid>("ChangeSetTimePeriodsId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("ChangeId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Code")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<int>("Year")
+                                        .HasColumnType("integer");
+
+                                    b2.HasKey("ChangeSetTimePeriodsId", "ChangeId");
+
+                                    b2.ToTable("ChangeSetTimePeriods");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ChangeSetTimePeriodsId", "ChangeId");
+                                });
+
+                            b1.Navigation("CurrentState");
+
+                            b1.Navigation("PreviousState");
+                        });
+
+                    b.Navigation("Changes");
+
+                    b.Navigation("DataSetVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
@@ -934,130 +1338,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("DataSetVersion");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMetaChange", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", "CurrentState")
-                        .WithMany()
-                        .HasForeignKey("CurrentStateId");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithMany("FilterMetaChanges")
-                        .HasForeignKey("DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", "PreviousState")
-                        .WithMany()
-                        .HasForeignKey("PreviousStateId");
-
-                    b.Navigation("CurrentState");
-
-                    b.Navigation("DataSetVersion");
-
-                    b.Navigation("PreviousState");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaChange", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithMany("FilterOptionMetaChanges")
-                        .HasForeignKey("DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaChange+State", "CurrentState", b1 =>
-                        {
-                            b1.Property<long>("FilterOptionMetaChangeId")
-                                .HasColumnType("bigint");
-
-                            b1.Property<int>("MetaId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("OptionId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("FilterOptionMetaChangeId");
-
-                            b1.HasIndex("MetaId");
-
-                            b1.HasIndex("OptionId");
-
-                            b1.ToTable("FilterOptionMetaChanges");
-
-                            b1.WithOwner()
-                                .HasForeignKey("FilterOptionMetaChangeId");
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", "Meta")
-                                .WithMany()
-                                .HasForeignKey("MetaId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", "Option")
-                                .WithMany()
-                                .HasForeignKey("OptionId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.Navigation("Meta");
-
-                            b1.Navigation("Option");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaChange+State", "PreviousState", b1 =>
-                        {
-                            b1.Property<long>("FilterOptionMetaChangeId")
-                                .HasColumnType("bigint");
-
-                            b1.Property<int>("MetaId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("OptionId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("FilterOptionMetaChangeId");
-
-                            b1.HasIndex("MetaId");
-
-                            b1.HasIndex("OptionId");
-
-                            b1.ToTable("FilterOptionMetaChanges");
-
-                            b1.WithOwner()
-                                .HasForeignKey("FilterOptionMetaChangeId");
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", "Meta")
-                                .WithMany()
-                                .HasForeignKey("MetaId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", "Option")
-                                .WithMany()
-                                .HasForeignKey("OptionId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.Navigation("Meta");
-
-                            b1.Navigation("Option");
-                        });
-
-                    b.Navigation("CurrentState");
-
-                    b.Navigation("DataSetVersion");
-
-                    b.Navigation("PreviousState");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaLink", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", "Meta")
@@ -1088,29 +1368,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("DataSetVersion");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMetaChange", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMeta", "CurrentState")
-                        .WithMany()
-                        .HasForeignKey("CurrentStateId");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithOne("GeographicLevelMetaChange")
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMetaChange", "DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMeta", "PreviousState")
-                        .WithMany()
-                        .HasForeignKey("PreviousStateId");
-
-                    b.Navigation("CurrentState");
-
-                    b.Navigation("DataSetVersion");
-
-                    b.Navigation("PreviousState");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
@@ -1122,29 +1379,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("DataSetVersion");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMetaChange", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", "CurrentState")
-                        .WithMany()
-                        .HasForeignKey("CurrentStateId");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithMany("IndicatorMetaChanges")
-                        .HasForeignKey("DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", "PreviousState")
-                        .WithMany()
-                        .HasForeignKey("PreviousStateId");
-
-                    b.Navigation("CurrentState");
-
-                    b.Navigation("DataSetVersion");
-
-                    b.Navigation("PreviousState");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
@@ -1154,122 +1388,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsRequired();
 
                     b.Navigation("DataSetVersion");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMetaChange", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", "CurrentState")
-                        .WithMany()
-                        .HasForeignKey("CurrentStateId");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithMany("LocationMetaChanges")
-                        .HasForeignKey("DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", "PreviousState")
-                        .WithMany()
-                        .HasForeignKey("PreviousStateId");
-
-                    b.Navigation("CurrentState");
-
-                    b.Navigation("DataSetVersion");
-
-                    b.Navigation("PreviousState");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaChange", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithMany("LocationOptionMetaChanges")
-                        .HasForeignKey("DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaChange+State", "CurrentState", b1 =>
-                        {
-                            b1.Property<long>("LocationOptionMetaChangeId")
-                                .HasColumnType("bigint");
-
-                            b1.Property<int>("MetaId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("OptionId")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("LocationOptionMetaChangeId");
-
-                            b1.HasIndex("MetaId");
-
-                            b1.HasIndex("OptionId");
-
-                            b1.ToTable("LocationOptionMetaChanges");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationOptionMetaChangeId");
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", "Meta")
-                                .WithMany()
-                                .HasForeignKey("MetaId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta", "Option")
-                                .WithMany()
-                                .HasForeignKey("OptionId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.Navigation("Meta");
-
-                            b1.Navigation("Option");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaChange+State", "PreviousState", b1 =>
-                        {
-                            b1.Property<long>("LocationOptionMetaChangeId")
-                                .HasColumnType("bigint");
-
-                            b1.Property<int>("MetaId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("OptionId")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("LocationOptionMetaChangeId");
-
-                            b1.HasIndex("MetaId");
-
-                            b1.HasIndex("OptionId");
-
-                            b1.ToTable("LocationOptionMetaChanges");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationOptionMetaChangeId");
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", "Meta")
-                                .WithMany()
-                                .HasForeignKey("MetaId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta", "Option")
-                                .WithMany()
-                                .HasForeignKey("OptionId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b1.Navigation("Meta");
-
-                            b1.Navigation("Option");
-                        });
-
-                    b.Navigation("CurrentState");
-
-                    b.Navigation("DataSetVersion");
-
-                    b.Navigation("PreviousState");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaLink", b =>
@@ -1291,17 +1409,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("Option");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.PreviewToken", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithMany("PreviewTokens")
-                        .HasForeignKey("DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DataSetVersion");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
@@ -1313,29 +1420,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("DataSetVersion");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMetaChange", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", "CurrentState")
-                        .WithMany()
-                        .HasForeignKey("CurrentStateId");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithMany("TimePeriodMetaChanges")
-                        .HasForeignKey("DataSetVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", "PreviousState")
-                        .WithMany()
-                        .HasForeignKey("PreviousStateId");
-
-                    b.Navigation("CurrentState");
-
-                    b.Navigation("DataSetVersion");
-
-                    b.Navigation("PreviousState");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
                     b.Navigation("Versions");
@@ -1343,31 +1427,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", b =>
                 {
-                    b.Navigation("FilterMetaChanges");
+                    b.Navigation("FilterChanges");
 
                     b.Navigation("FilterMetas");
 
-                    b.Navigation("FilterOptionMetaChanges");
+                    b.Navigation("FilterOptionChanges");
 
                     b.Navigation("GeographicLevelMeta");
 
-                    b.Navigation("GeographicLevelMetaChange");
-
                     b.Navigation("Imports");
 
-                    b.Navigation("IndicatorMetaChanges");
+                    b.Navigation("IndicatorChanges");
 
                     b.Navigation("IndicatorMetas");
 
-                    b.Navigation("LocationMetaChanges");
+                    b.Navigation("LocationChanges");
 
                     b.Navigation("LocationMetas");
 
-                    b.Navigation("LocationOptionMetaChanges");
-
-                    b.Navigation("PreviewTokens");
-
-                    b.Navigation("TimePeriodMetaChanges");
+                    b.Navigation("TimePeriodChanges");
 
                     b.Navigation("TimePeriodMetas");
                 });

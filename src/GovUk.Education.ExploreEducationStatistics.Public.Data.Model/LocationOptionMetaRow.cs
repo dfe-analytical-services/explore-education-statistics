@@ -13,9 +13,6 @@ public class LocationOptionMetaRow
     public int Id { get; set; }
 
     [Column(CanBeNull = false)]
-    public required string PublicId { get; set; }
-
-    [Column(CanBeNull = false)]
     public required string Type { get; set; }
 
     [Column(CanBeNull = false)]

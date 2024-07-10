@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
 
@@ -8,7 +9,7 @@ public static class LocationOptionMetaTestExtensions
     public static void AssertEqual(this LocationOptionMeta expectedOption, ParquetLocationOption actualOption)
     {
         Assert.Equal(expectedOption.Label, actualOption.Label);
-        Assert.Equal(expectedOption.PublicId, actualOption.PublicId);
+        Assert.Equal(SqidEncoder.Encode(expectedOption.Id), actualOption.PublicId);
 
         switch (expectedOption)
         {
