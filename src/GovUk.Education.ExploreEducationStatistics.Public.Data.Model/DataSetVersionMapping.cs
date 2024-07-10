@@ -122,6 +122,7 @@ public abstract record Mapping<TMappableElement>
     where TMappableElement : MappableElement
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public MappingType Type { get; set; } = MappingType.None;
 
     public TMappableElement Source { get; set; } = null!;
