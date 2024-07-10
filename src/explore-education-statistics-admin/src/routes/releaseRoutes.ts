@@ -1,5 +1,6 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
+import ReleaseApiDataSetLocationsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
@@ -112,6 +113,13 @@ export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId',
   title: 'API data set details',
   component: ReleaseApiDataSetDetailsPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetLocationsMappingRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/locations-mapping',
+  title: 'API data set locations mapping',
+  component: ReleaseApiDataSetLocationsMappingPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 

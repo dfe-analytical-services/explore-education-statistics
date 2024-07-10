@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, {
+  createElement,
   forwardRef,
   MouseEventHandler,
   ReactNode,
@@ -14,8 +15,10 @@ export interface ErrorSummaryMessage {
 
 interface BaseErrorSummaryProps {
   children: ReactNode;
+  headingTag?: 'h2' | 'h3' | 'h4';
   testId?: string;
   title: string;
+  updateDocumentTitle?: boolean;
   visuallyHidden?: boolean;
 }
 
@@ -23,15 +26,23 @@ export const BaseErrorSummary = forwardRef<
   HTMLDivElement,
   BaseErrorSummaryProps
 >((props, ref) => {
-  const { children, testId = 'errorSummary', title, visuallyHidden } = props;
+  const {
+    children,
+    headingTag = 'h2',
+    testId = 'errorSummary',
+    title,
+    updateDocumentTitle = true,
+    visuallyHidden,
+  } = props;
 
   useEffect(() => {
-    document.title = `ERROR: ${document.title.replace(/ERROR: /g, '')}`;
-
+    if (updateDocumentTitle) {
+      document.title = `ERROR: ${document.title.replace(/ERROR: /g, '')}`;
+    }
     return () => {
       document.title = document.title.replace(/ERROR: /g, '');
     };
-  }, []);
+  }, [updateDocumentTitle]);
 
   return (
     <div
@@ -43,7 +54,11 @@ export const BaseErrorSummary = forwardRef<
       data-testid={testId}
     >
       <div role="alert">
-        <h2 className="govuk-error-summary__title">{title}</h2>
+        {createElement(
+          headingTag,
+          { className: 'govuk-error-summary__title' },
+          title,
+        )}
         <div className="govuk-error-summary__body">{children}</div>
       </div>
     </div>
@@ -53,8 +68,10 @@ BaseErrorSummary.displayName = 'BaseErrorSummary';
 
 interface ErrorSummaryProps {
   errors: ErrorSummaryMessage[];
+  headingTag?: 'h2' | 'h3' | 'h4';
   focusOnError?: boolean;
   title?: string;
+  updateDocumentTitle?: boolean;
   visuallyHidden?: boolean;
   onFocus?: () => void;
   onErrorClick?: MouseEventHandler<HTMLAnchorElement>;
@@ -63,7 +80,9 @@ interface ErrorSummaryProps {
 const ErrorSummary = ({
   errors,
   focusOnError = false,
+  headingTag = 'h2',
   title = 'There is a problem',
+  updateDocumentTitle,
   visuallyHidden = false,
   onFocus,
   onErrorClick,
@@ -86,7 +105,13 @@ const ErrorSummary = ({
   }, [errors, focusOnError, onFocus]);
 
   return errors.length > 0 ? (
-    <BaseErrorSummary ref={ref} title={title} visuallyHidden={visuallyHidden}>
+    <BaseErrorSummary
+      ref={ref}
+      headingTag={headingTag}
+      title={title}
+      updateDocumentTitle={updateDocumentTitle}
+      visuallyHidden={visuallyHidden}
+    >
       <ul className="govuk-list govuk-error-summary__list">
         {errors.map((error, index) => (
           // eslint-disable-next-line react/no-array-index-key

@@ -70,3 +70,14 @@ table,
     padding: 0;
   }
 }
+
+.hasRowHighlights {
+  td:first-child {
+    border-left: govuk-spacing(1) solid transparent;
+    padding-left: govuk-spacing(1);
+  }
+
+  .rowHighlight--alert td:first-child {
+    border-left-color: govuk-colour('red');
+  }
+}
