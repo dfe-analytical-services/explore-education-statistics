@@ -27,7 +27,6 @@ public class PublicationSubscriptionManager(
     ITokenService tokenService,
     IEmailService emailService,
     IPublicationSubscriptionRepository publicationSubscriptionRepository,
-    INotificationClientProvider notificationClientProvider,
     IValidator<NewPendingPublicationSubscriptionRequest> requestValidator)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
@@ -35,8 +34,6 @@ public class PublicationSubscriptionManager(
     private readonly ITokenService _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
     private readonly IEmailService _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
     private readonly IPublicationSubscriptionRepository _publicationSubscriptionRepository = publicationSubscriptionRepository ?? throw new ArgumentNullException(nameof(publicationSubscriptionRepository));
-    private readonly INotificationClientProvider _notificationClientProvider = notificationClientProvider ??
-        throw new ArgumentNullException(nameof(notificationClientProvider));
 
     [Function("RequestPendingSubscription")]
     // ReSharper disable once UnusedMember.Global
@@ -54,8 +51,6 @@ public class PublicationSubscriptionManager(
             logger.LogError("{FunctionName} failed because the {req} did not contain a valid JSON object.", context.FunctionDefinition.Name, req);
             return validationResult.Left;
         }
-
-        var notificationClient = _notificationClientProvider.Get();
 
         var subscription = await publicationSubscriptionRepository.GetSubscription(req.Id, req.Email);
         var pendingSubscriptionTable =
@@ -88,7 +83,7 @@ public class PublicationSubscriptionManager(
                             }
                         };
 
-                        _emailService.SendEmail(notificationClient,
+                        _emailService.SendEmail(
                             email: req.Email,
                             templateId: _emailTemplateOptions.SubscriptionConfirmationId,
                             confirmationValues);
@@ -112,7 +107,7 @@ public class PublicationSubscriptionManager(
                         }
                     };
 
-                    _emailService.SendEmail(notificationClient,
+                    _emailService.SendEmail(
                         email: req.Email,
                         templateId: _emailTemplateOptions.SubscriptionVerificationId,
                         values);
@@ -192,8 +187,6 @@ public class PublicationSubscriptionManager(
 
         var email = _tokenService.GetEmailFromToken(token);
 
-        var notificationClient = _notificationClientProvider.Get();
-
         if (email != null)
         {
             var subscriptionsTbl = await _publicationSubscriptionRepository.GetTable(NotifierSubscriptionsTableName);
@@ -225,7 +218,7 @@ public class PublicationSubscriptionManager(
                     }
                 };
 
-                _emailService.SendEmail(notificationClient,
+                _emailService.SendEmail(
                     email: email,
                     templateId: _emailTemplateOptions.SubscriptionConfirmationId,
                     values);

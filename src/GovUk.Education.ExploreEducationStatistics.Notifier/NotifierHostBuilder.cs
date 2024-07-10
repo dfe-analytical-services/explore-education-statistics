@@ -1,0 +1,51 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Notify.Client;
+using Notify.Interfaces;
+
+namespace GovUk.Education.ExploreEducationStatistics.Notifier;
+
+public static class NotifierHostBuilder
+{
+    public static IHostBuilder ConfigureNotifierHostBuilder(this IHostBuilder hostBuilder)
+    {
+        return hostBuilder
+            .ConfigureAppConfiguration(builder =>
+            {
+                builder
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
+                    .AddEnvironmentVariables();
+            })
+            .ConfigureServices((hostContext, services) =>
+            {
+                services
+                    .AddApplicationInsightsTelemetryWorkerService()
+                    .ConfigureFunctionsApplicationInsights()
+                    .AddFluentValidation()
+                    .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.AppSettings))
+                    .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.GovUkNotify))
+                    .AddTransient<INotificationClient>(serviceProvider =>
+                    {
+                        var govUkNotifyOptions = serviceProvider.GetRequiredService<IOptions<GovUkNotifyOptions>>();
+
+                        return new NotificationClient(govUkNotifyOptions.Value.ApiKey);
+                    })
+                    .AddTransient<IApiSubscriptionTableStorageService, ApiSubscriptionTableStorageService>()
+                    .AddTransient<IEmailService, EmailService>()
+                    .AddTransient<IPublicationSubscriptionRepository, PublicationSubscriptionRepository>()
+                    .AddTransient<IApiSubscriptionRepository, ApiSubscriptionRepository>()
+                    .AddTransient<IApiSubscriptionService, ApiSubscriptionService>()
+                    .AddTransient<ITokenService, TokenService>();
+            });
+    }
+}

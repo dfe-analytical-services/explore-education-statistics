@@ -25,8 +25,7 @@ internal class ApiSubscriptionService(
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
-    IApiSubscriptionRepository apiSubscriptionRepository,
-    INotificationClientProvider notificationClientProvider) : IApiSubscriptionService
+    IApiSubscriptionRepository apiSubscriptionRepository) : IApiSubscriptionService
 {
     public async Task<Either<ActionResult, ApiSubscriptionViewModel>> RequestPendingSubscription(
         Guid dataSetId,
@@ -173,6 +172,17 @@ internal class ApiSubscriptionService(
 
     private async Task<Either<ActionResult, Unit>> VerifySubscription(ApiSubscription subscription, CancellationToken cancellationToken)
     {
+        if (subscription.Status is ApiSubscriptionStatus.Subscribed)
+        {
+            return ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Code = ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code,
+                Message = ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Message,
+                Detail = new ApiSubscriptionErrorDetail(Guid.Parse(subscription.PartitionKey), subscription.RowKey),
+                Path = nameof(NewPendingApiSubscriptionRequest.DataSetId).ToLowerFirst()
+            });
+        }
+
         subscription.ExpiryDateTime = null;
         subscription.Status = ApiSubscriptionStatus.Subscribed;
 
@@ -194,10 +204,10 @@ internal class ApiSubscriptionService(
             }
         };
 
-        SendEmail(
+        emailService.SendEmail(
             email: subscription.RowKey,
-            emailTemplateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionVerificationId,
-            emailTemplateVariables: emailTemplateVariables);
+            templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionVerificationId,
+            values: emailTemplateVariables);
     }
 
     private void SendConfirmationEmail(ApiSubscription subscription)
@@ -214,23 +224,9 @@ internal class ApiSubscriptionService(
             }
         };
 
-        SendEmail(
-            email: subscription.RowKey,
-            emailTemplateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionConfirmationId,
-            emailTemplateVariables: emailTemplateVariables);
-    }
-
-    private void SendEmail(
-        string email,
-        string emailTemplateId,
-        Dictionary<string, dynamic> emailTemplateVariables)
-    {
-        var notificationClient = notificationClientProvider.Get();
-
         emailService.SendEmail(
-            client: notificationClient,
-            email: email,
-            templateId: emailTemplateId,
+            email: subscription.RowKey,
+            templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionConfirmationId,
             values: emailTemplateVariables);
     }
 

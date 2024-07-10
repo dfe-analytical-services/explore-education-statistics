@@ -107,5 +107,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.NotNull(dateTimeOffset);
             dateTimeOffset.Value.AssertUtcNow(withinMillis: withinMillis);
         }
+
+        /// <summary>
+        /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
+        /// </summary>
+        public static void AssertEqual(
+            this DateTimeOffset dateTimeOffset,
+            DateTimeOffset expectedDateTimeOffset,
+            int withinMillis = TimeWithinMillis)
+        {
+            Assert.Equal(expectedDateTimeOffset, dateTimeOffset, TimeSpan.FromMilliseconds(withinMillis));
+        }
+
+        /// <summary>
+        /// Assert that the given DateTimeOffset is effectively "<paramref name="expectedDateTimeOffset"/>", within a given tolerance of milliseconds.
+        /// </summary>
+        /// <param name="expectedDateTimeOffset">the expected timestamp.</param>
+        public static void AssertEqual(
+            this DateTimeOffset? dateTimeOffset, 
+            DateTimeOffset expectedDateTimeOffset, 
+            int withinMillis = TimeWithinMillis)
+        {
+            Assert.NotNull(dateTimeOffset);
+            dateTimeOffset.Value.AssertEqual(expectedDateTimeOffset: expectedDateTimeOffset, withinMillis: withinMillis);
+        }
     }
 }

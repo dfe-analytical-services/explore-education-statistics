@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -15,10 +14,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Utils.NotifierTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
@@ -41,15 +40,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -58,14 +50,13 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test1@test.com",
                 "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -87,7 +78,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         Assert.IsType<OkObjectResult>(result);
 
         emailService.Verify(mock =>
-                mock.SendEmail(notificationClient,
+                mock.SendEmail(
                     "test1@test.com",
                     "subscription-verification-id",
                     It.Is<Dictionary<string, dynamic>>(d =>
@@ -103,7 +94,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task DoesNotSendEmailAgainIfSubIsPending()
     {
         // Arrange (data)
-        await fixture.AddTestSubscription(NotifierPendingSubscriptionsTableName,
+        await AddTestSubscription(NotifierPendingSubscriptionsTableName,
             new SubscriptionEntity("test-id-2",
                 "test2@test.com",
                 "Test Publication Title 2",
@@ -113,15 +104,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -130,14 +114,13 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test2@test.com",
                 "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -161,7 +144,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         Assert.Equal(200, okResult.StatusCode);
 
         emailService.Verify(mock =>
-                mock.SendEmail(notificationClient,
+                mock.SendEmail(
                     "test2@test.com",
                     "subscription-verification-id",
                     It.Is<Dictionary<string, dynamic>>(d =>
@@ -177,7 +160,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task SendsConfirmationEmailIfUserAlreadySubscribed()
     {
         // Arrange (data)
-        await fixture.AddTestSubscription(NotifierSubscriptionsTableName,
+        await AddTestSubscription(NotifierSubscriptionsTableName,
             new SubscriptionEntity("test-id-3",
                 "test3@test.com",
                 "Test Publication Title 3",
@@ -187,15 +170,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -204,14 +180,13 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test3@test.com",
                 "subscription-confirmation-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -235,7 +210,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         Assert.Equal(200, okResult.StatusCode);
 
         emailService.Verify(mock =>
-                mock.SendEmail(notificationClient,
+                mock.SendEmail(
                     "test3@test.com",
                     "subscription-confirmation-id",
                     It.Is<Dictionary<string, dynamic>>(d =>
@@ -253,15 +228,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -270,14 +238,13 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test@test.com",
                 "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -297,7 +264,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Id));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Id).ToLowerFirst());
     }
 
     [Fact]
@@ -306,15 +273,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -323,14 +283,13 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test@test.com",
                 "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -350,7 +309,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Title));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Title).ToLowerFirst());
     }
 
     [Fact]
@@ -359,15 +318,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -376,14 +328,13 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test@test.com",
                 "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -403,7 +354,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Email));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Email).ToLowerFirst());
     }
 
     [Fact]
@@ -412,15 +363,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -429,14 +373,13 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test@test.com",
                 "subscription-verification-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -456,7 +399,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Slug));
+        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Slug).ToLowerFirst());
     }
 
 
@@ -464,7 +407,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task SendsSubscriptionConfirmationEmail()
     {
         // Arrange (data)
-        await fixture.AddTestSubscription(NotifierPendingSubscriptionsTableName,
+        await AddTestSubscription(NotifierPendingSubscriptionsTableName,
             new SubscriptionEntity("test-id-4",
                 "test4@test.com",
                 "Test Publication Title 4",
@@ -475,15 +418,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -495,7 +431,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient,
+            mock.SendEmail(
                 "test4@test.com",
                 "subscription-confirmation-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
@@ -503,7 +439,6 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -517,7 +452,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         Assert.IsType<OkObjectResult>(result);
 
         emailService.Verify(mock =>
-                mock.SendEmail(notificationClient,
+                mock.SendEmail(
                     "test4@test.com",
                     "subscription-confirmation-id",
                     It.Is<Dictionary<string, dynamic>>(d =>
@@ -533,7 +468,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
     public async Task Unsubscribes()
     {
         // Arrange (data)
-        await fixture.AddTestSubscription(NotifierSubscriptionsTableName,
+        await AddTestSubscription(NotifierSubscriptionsTableName,
             new SubscriptionEntity("test-id-5",
                 "test5@test.com",
                 "Test Publication Title 5",
@@ -544,15 +479,8 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = fixture.TableStorageConnectionString()
+            TableStorageConnectionString = TableStorageConnectionString()
         }));
-
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
-
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -563,7 +491,6 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         var notifierFunction = BuildFunction(
             publicationSubscriptionRepository: publicationSubscriptionRepository,
-            notificationClientProvider: notificationClientProvider.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -601,11 +528,10 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         return true;
     }
 
-    private static PublicationSubscriptionManager BuildFunction(
+    private PublicationSubscriptionManager BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null,
-        INotificationClientProvider? notificationClientProvider = null) =>
+        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null) =>
         new(
             Mock.Of<ILogger<PublicationSubscriptionManager>>(),
             Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
@@ -617,6 +543,5 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
-            notificationClientProvider ?? Mock.Of<INotificationClientProvider>(MockBehavior.Strict),
             new NewPendingPublicationSubscriptionRequest.Validator());
 }

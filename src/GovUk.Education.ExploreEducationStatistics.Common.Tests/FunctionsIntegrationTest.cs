@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -48,6 +50,57 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
     {
         var context = GetDbContext<TDbContext>();
         await context.ClearTestData();
+    }
+
+    // The following code was taken from this article which explains a fast way to clear all rows from Azure Table Storage
+    // https://medium.com/medialesson/deleting-all-rows-from-azure-table-storage-as-fast-as-possible-79e03937c331
+    protected async Task ClearAzureDataTableTestData(string connectionString)
+    {
+        var tableServiceClient = new TableServiceClient(connectionString);
+
+        var tables = await tableServiceClient.QueryAsync().ToListAsync();
+
+        foreach (var table in tables)
+        {
+            var tableClient = tableServiceClient.GetTableClient(table.Name);
+
+            var entities = tableClient
+                .QueryAsync<TableEntity>(select: new List<string>() { "PartitionKey", "RowKey" }, maxPerPage: 1000);
+
+            await entities.AsPages().ForEachAwaitAsync(async page => {
+                // Since we don't know how many rows the table has and the results are ordered by PartitonKey+RowKey
+                // we'll delete each page immediately and not cache the whole table in memory
+                await BatchManipulateEntities(tableClient, page.Values, TableTransactionActionType.Delete).ConfigureAwait(false);
+            });
+        }
+    }
+
+    /// <summary>
+    /// Groups entities by PartitionKey into batches of max 100 for valid transactions
+    /// </summary>
+    /// <returns>List of Azure Responses for Transactions</returns>
+    private static async Task<List<Response<IReadOnlyList<Response>>>> BatchManipulateEntities<T>(
+        TableClient tableClient, 
+        IEnumerable<T> entities, 
+        TableTransactionActionType tableTransactionActionType) where T : class, ITableEntity, new()
+    {
+        var groups = entities.GroupBy(x => x.PartitionKey);
+        var responses = new List<Response<IReadOnlyList<Response>>>();
+        foreach (var group in groups)
+        {
+            List<TableTransactionAction> actions;
+            var items = group.AsEnumerable();
+            while (items.Any())
+            {
+                var batch = items.Take(100);
+                items = items.Skip(100);
+
+                actions = [.. batch.Select(e => new TableTransactionAction(tableTransactionActionType, e))];
+                var response = await tableClient.SubmitTransactionAsync(actions).ConfigureAwait(false);
+                responses.Add(response);
+            }
+        }
+        return responses;
     }
 
     protected void ResetDbContext<TDbContext>() where TDbContext : DbContext

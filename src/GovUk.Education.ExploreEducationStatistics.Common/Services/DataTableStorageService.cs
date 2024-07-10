@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
-public abstract class DataTableStorageService(string tableStorageConnectionString) : IDataTableStorageService
+public class DataTableStorageService(string tableStorageConnectionString) : IDataTableStorageService
 {
     private readonly TableServiceClient _client = new(tableStorageConnectionString);
 
