@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Hosting;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -579,39 +580,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 principalTable: "DataSetVersions",
                 principalColumn: "Id");
 
+            var isLocalEnvironment = 
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
+
             // Grant privileges on objects created by this resource's database user to the Admin App Service user.
-            var adminAppServiceIdentityName = Environment.GetEnvironmentVariable("AdminAppServiceIdentityName");
-            if (adminAppServiceIdentityName != null)
+            var adminAppServiceRoleName = isLocalEnvironment
+                ? "app_admin" 
+                : Environment.GetEnvironmentVariable("AdminAppServiceIdentityName");
+            if (adminAppServiceRoleName != null)
             {
                 migrationBuilder.Sql(
-                    $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{adminAppServiceIdentityName}\"");
+                    $"""GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO {adminAppServiceRoleName}""");
                 migrationBuilder.Sql(
-                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{adminAppServiceIdentityName}\"");
+                    $"""ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {adminAppServiceRoleName}""");
             }
 
             // Grant privileges on objects created by this resource's database user to the Public API Data Processor Function App user.
-            var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
-            if (dataProcessorFunctionAppIdentityName != null)
+            var dataProcessorFunctionAppRoleName = isLocalEnvironment
+                ? "app_public_data_processor" 
+                : Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
+            if (dataProcessorFunctionAppRoleName != null)
             {
                 migrationBuilder.Sql(
-                    $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+                    $"""GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO {dataProcessorFunctionAppRoleName}""");
                 migrationBuilder.Sql(
-                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{dataProcessorFunctionAppIdentityName}\"");
+                    $"""ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {dataProcessorFunctionAppRoleName}""");
 
                 migrationBuilder.Sql(
-                    $"GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+                    $"""GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO {dataProcessorFunctionAppRoleName}""");
                 migrationBuilder.Sql(
-                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, UPDATE ON SEQUENCES TO \"{dataProcessorFunctionAppIdentityName}\"");
+                    $"""ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, UPDATE ON SEQUENCES TO {dataProcessorFunctionAppRoleName}""");
             }
 
             // Grant privileges on objects created by this resource's database user to the Publisher Function App user.
-            var publisherFunctionAppIdentityName = Environment.GetEnvironmentVariable("PublisherFunctionAppIdentityName");
-            if (publisherFunctionAppIdentityName != null)
+            var publisherFunctionAppRoleName = isLocalEnvironment
+                ? "app_publisher" 
+                : Environment.GetEnvironmentVariable("PublisherFunctionAppIdentityName");
+            if (publisherFunctionAppRoleName != null)
             {
                 migrationBuilder.Sql(
-                    $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{publisherFunctionAppIdentityName}\"");
+                    $"""GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO {publisherFunctionAppRoleName}""");
                 migrationBuilder.Sql(
-                    $"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"{publisherFunctionAppIdentityName}\"");
+                    $"""ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {publisherFunctionAppRoleName}""");
             }
         }
 
