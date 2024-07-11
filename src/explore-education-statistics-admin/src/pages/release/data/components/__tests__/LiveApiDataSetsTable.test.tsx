@@ -1,9 +1,21 @@
 import LiveApiDataSetsTable, {
   LiveApiDataSetSummary,
 } from '@admin/pages/release/data/components/LiveApiDataSetsTable';
-import { render as baseRender, screen, within } from '@testing-library/react';
-import { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import _apiDataSetCandidateService, {
+  ApiDataSetCandidate,
+} from '@admin/services/apiDataSetCandidateService';
+import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import baseRender from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
+import { createMemoryHistory, History } from 'history';
+import { ReactElement } from 'react';
+import { Router } from 'react-router-dom';
+
+jest.mock('@admin/services/apiDataSetVersionService');
+jest.mock('@admin/services/apiDataSetCandidateService');
+
+const apiDataSetCandidateService = jest.mocked(_apiDataSetCandidateService);
+const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('LiveApiDataSetsTable', () => {
   const testDataSets: LiveApiDataSetSummary[] = [
@@ -48,10 +60,20 @@ describe('LiveApiDataSetsTable', () => {
     },
   ];
 
+  const testCandidates: ApiDataSetCandidate[] = [
+    {
+      releaseFileId: 'release-file-1',
+      title: 'Test data set 1',
+    },
+    {
+      releaseFileId: 'release-file-2',
+      title: 'Test data set 2',
+    },
+  ];
+
   test('renders live data set rows correctly', () => {
     render(
       <LiveApiDataSetsTable
-        canCreateNewVersions
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
@@ -127,7 +149,6 @@ describe('LiveApiDataSetsTable', () => {
   test("does not render 'Create new version' buttons when release cannot be updated", () => {
     render(
       <LiveApiDataSetsTable
-        canCreateNewVersions
         canUpdateRelease={false}
         dataSets={testDataSets}
         publicationId="publication-1"
@@ -153,7 +174,110 @@ describe('LiveApiDataSetsTable', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  function render(element: ReactNode) {
-    return baseRender(<MemoryRouter>{element}</MemoryRouter>);
+  test('clicking the create button opens modal form to create API data set version', async () => {
+    apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
+
+    const { user } = render(
+      <LiveApiDataSetsTable
+        canUpdateRelease
+        dataSets={testDataSets}
+        publicationId="publication-1"
+        releaseId="release-1"
+      />,
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    await user.click(
+      within(rows[1]).getByRole('button', {
+        name: 'Create new version for Data set 1 title',
+      }),
+    );
+
+    expect(
+      await screen.findByText('Create a new API data set version'),
+    ).toBeInTheDocument();
+
+    const modal = within(screen.getByRole('dialog'));
+
+    expect(
+      modal.getByRole('heading', { name: 'Create a new API data set version' }),
+    ).toBeInTheDocument();
+
+    expect(modal.getByLabelText('Data set')).toBeInTheDocument();
+
+    expect(
+      modal.getByRole('button', { name: 'Confirm new data set version' }),
+    ).toBeInTheDocument();
+  });
+
+  test('submitting the create version form calls the correct service and redirects to next page', async () => {
+    apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
+    apiDataSetVersionService.createVersion.mockResolvedValue({
+      id: 'data-set-id',
+      title: 'Test title',
+      summary: 'Test summary',
+      status: 'Draft',
+    });
+
+    const history = createMemoryHistory();
+
+    const { user } = render(
+      <LiveApiDataSetsTable
+        canUpdateRelease
+        dataSets={testDataSets}
+        publicationId="publication-1"
+        releaseId="release-1"
+      />,
+      { history },
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    await user.click(
+      within(rows[1]).getByRole('button', {
+        name: 'Create new version for Data set 1 title',
+      }),
+    );
+
+    expect(
+      await screen.findByText('Create a new API data set version'),
+    ).toBeInTheDocument();
+
+    await user.selectOptions(
+      await screen.findByLabelText('Data set'),
+      testCandidates[0].releaseFileId,
+    );
+
+    expect(apiDataSetVersionService.createVersion).not.toHaveBeenCalled();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Confirm new data set version' }),
+    );
+
+    await waitFor(() => {
+      expect(apiDataSetVersionService.createVersion).toHaveBeenCalledTimes(1);
+      expect(apiDataSetVersionService.createVersion).toHaveBeenCalledWith<
+        Parameters<typeof apiDataSetVersionService.createVersion>
+      >({
+        dataSetId: testDataSets[1].id,
+        releaseFileId: testCandidates[0].releaseFileId,
+      });
+    });
+
+    expect(history.location.pathname).toBe(
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+    );
+  });
+
+  function render(
+    ui: ReactElement,
+    options?: {
+      history: History;
+    },
+  ) {
+    const { history = createMemoryHistory() } = options ?? {};
+
+    return baseRender(<Router history={history}>{ui}</Router>);
   }
 });

@@ -19,11 +19,12 @@
   }
 }
 
-.rowHighlight {
-  border-left: 5px solid govuk-colour('red');
-}
+.table tbody {
+  tr {
+    border-left: 5px solid transparent;
+  }
 
-.versionTag {
-  text-align: center;
-  width: 100%;
+  .rowHighlight {
+    border-left-color: govuk-colour('red');
+  }
 }

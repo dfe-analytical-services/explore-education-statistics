@@ -99,6 +99,7 @@ describe('DraftApiDataSetsTable', () => {
   test('renders draft data set rows correctly', () => {
     render(
       <DraftApiDataSetsTable
+        canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
         releaseId="release-1"
@@ -128,7 +129,7 @@ describe('DraftApiDataSetsTable', () => {
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-1`);
     expect(
       within(row1Cells[4]).getByRole('button', {
-        name: 'Delete draft for Data set 1 title',
+        name: 'Remove draft for Data set 1 title',
       }),
     ).toBeInTheDocument();
 
@@ -149,7 +150,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row2Cells[4]).getByRole('button', {
-        name: 'Delete draft for Data set 2 title',
+        name: 'Remove draft for Data set 2 title',
       }),
     ).toBeInTheDocument();
 
@@ -169,7 +170,7 @@ describe('DraftApiDataSetsTable', () => {
     ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-3`);
     expect(
       within(row3Cells[4]).queryByRole('button', {
-        name: /Delete draft/,
+        name: /Remove draft/,
       }),
     ).not.toBeInTheDocument();
 
@@ -190,7 +191,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row4Cells[4]).getByRole('button', {
-        name: 'Delete draft for Data set 4 title',
+        name: 'Remove draft for Data set 4 title',
       }),
     ).toBeInTheDocument();
 
@@ -211,7 +212,7 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row5Cells[4]).getByRole('button', {
-        name: 'Delete draft for Data set 5 title',
+        name: 'Remove draft for Data set 5 title',
       }),
     ).toBeInTheDocument();
 
@@ -232,14 +233,117 @@ describe('DraftApiDataSetsTable', () => {
 
     expect(
       within(row6Cells[4]).getByRole('button', {
-        name: 'Delete draft for Data set 6 title',
+        name: 'Remove draft for Data set 6 title',
       }),
     ).toBeInTheDocument();
+  });
+
+  test('renders draft data set rows correctly when cannot update the release', () => {
+    render(
+      <DraftApiDataSetsTable
+        canUpdateRelease={false}
+        dataSets={testDataSets}
+        publicationId="publication-1"
+        releaseId="release-1"
+      />,
+    );
+
+    const baseDataSetUrl =
+      '/publication/publication-1/release/release-1/api-data-sets';
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    expect(rows).toHaveLength(7);
+
+    // Row 1
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(
+      within(row1Cells[4]).getByRole('link', {
+        name: 'View details for Data set 1 title',
+      }),
+    ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-1`);
+    expect(
+      within(row1Cells[4]).queryByRole('button', {
+        name: /Remove draft/,
+      }),
+    ).not.toBeInTheDocument();
+
+    // Row 2
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(
+      within(row2Cells[4]).getByRole('link', {
+        name: 'View details for Data set 2 title',
+      }),
+    ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-2`);
+    expect(
+      within(row2Cells[4]).queryByRole('button', {
+        name: /Remove draft/,
+      }),
+    ).not.toBeInTheDocument();
+
+    // Row 3
+
+    const row3Cells = within(rows[3]).getAllByRole('cell');
+    expect(
+      within(row3Cells[4]).getByRole('link', {
+        name: 'View details for Data set 3 title',
+      }),
+    ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-3`);
+    expect(
+      within(row3Cells[4]).queryByRole('button', {
+        name: /Remove draft/,
+      }),
+    ).not.toBeInTheDocument();
+
+    // Row 4
+
+    const row4Cells = within(rows[4]).getAllByRole('cell');
+    expect(
+      within(row4Cells[4]).getByRole('link', {
+        name: 'View details for Data set 4 title',
+      }),
+    ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-4`);
+    expect(
+      within(row4Cells[4]).queryByRole('button', {
+        name: /Remove draft/,
+      }),
+    ).not.toBeInTheDocument();
+
+    // Row 5
+
+    const row5Cells = within(rows[5]).getAllByRole('cell');
+    expect(
+      within(row5Cells[4]).getByRole('link', {
+        name: 'View details for Data set 5 title',
+      }),
+    ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-5`);
+    expect(
+      within(row5Cells[4]).queryByRole('button', {
+        name: /Remove draft/,
+      }),
+    ).not.toBeInTheDocument();
+
+    // Row 6
+
+    const row6Cells = within(rows[6]).getAllByRole('cell');
+    expect(
+      within(row6Cells[4]).getByRole('link', {
+        name: 'View details for Data set 6 title',
+      }),
+    ).toHaveAttribute('href', `${baseDataSetUrl}/data-set-6`);
+    expect(
+      within(row5Cells[4]).queryByRole('button', {
+        name: /Remove draft/,
+      }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders message when no data sets', () => {
     render(
       <DraftApiDataSetsTable
+        canUpdateRelease
         dataSets={[]}
         publicationId="publication-1"
         releaseId="release-1"

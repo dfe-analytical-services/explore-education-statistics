@@ -2,6 +2,7 @@ import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/ApiDataSetVersionSummaryList';
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
+import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
@@ -10,6 +11,7 @@ import {
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import { DataSetStatus } from '@admin/services/apiDataSetService';
+import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryCard from '@common/components/SummaryCard';
@@ -37,12 +39,18 @@ export default function ReleaseApiDataSetDetailsPage() {
   const { publicAppUrl } = useConfig();
   const { release } = useReleaseContext();
 
-  const { data: dataSet, isLoading } = useQuery({
+  const {
+    data: dataSet,
+    isLoading,
+    refetch,
+  } = useQuery({
     ...apiDataSetQueries.get(dataSetId),
     refetchInterval: data => {
       return data?.draftVersion?.status === 'Processing' ? 3000 : false;
     },
   });
+
+  const canUpdateRelease = release.approvalStatus !== 'Approved';
 
   const columnSizeClassName =
     dataSet?.latestLiveVersion && dataSet?.draftVersion
@@ -56,7 +64,7 @@ export default function ReleaseApiDataSetDetailsPage() {
       publicationId={release.publicationId}
       collapsibleButtonHiddenText="for draft version"
       actions={
-        dataSet.draftVersion.status !== 'Processing' ? (
+        canUpdateRelease && dataSet.draftVersion.status !== 'Processing' ? (
           <DeleteDraftVersionButton
             dataSet={dataSet}
             dataSetVersion={dataSet.draftVersion}
@@ -69,7 +77,7 @@ export default function ReleaseApiDataSetDetailsPage() {
               )
             }
           >
-            Delete draft version
+            Remove draft version
           </DeleteDraftVersionButton>
         ) : undefined
       }
@@ -227,6 +235,22 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </div>
               )}
             </div>
+            {canUpdateRelease && !dataSet.draftVersion && (
+              <ApiDataSetCreateModal
+                buttonText="Create a new version of this data set"
+                publicationId={release.publicationId}
+                releaseId={release.id}
+                submitText="Confirm new data set version"
+                title="Create a new API data set version"
+                onSubmit={async ({ releaseFileId }) => {
+                  await apiDataSetVersionService.createVersion({
+                    dataSetId: dataSet.id,
+                    releaseFileId,
+                  });
+                  refetch();
+                }}
+              />
+            )}
           </>
         )}
       </LoadingSpinner>

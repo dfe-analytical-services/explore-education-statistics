@@ -8,13 +8,20 @@ import LiveApiDataSetsTable, {
   LiveApiDataSetSummary,
 } from '@admin/pages/release/data/components/LiveApiDataSetsTable';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
+import apiDataSetService from '@admin/services/apiDataSetService';
+import {
+  releaseApiDataSetDetailsRoute,
+  ReleaseDataSetRouteParams,
+} from '@admin/routes/releaseRoutes';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
+import { generatePath, useHistory } from 'react-router-dom';
 
 export default function ReleaseApiDataSetsSection() {
+  const history = useHistory();
   const { release } = useReleaseContext();
   const { user } = useAuthContext();
 
@@ -74,6 +81,21 @@ export default function ReleaseApiDataSetsSection() {
               <ApiDataSetCreateModal
                 publicationId={release.publicationId}
                 releaseId={release.id}
+                onSubmit={async ({ releaseFileId }) => {
+                  const dataSet = await apiDataSetService.createDataSet({
+                    releaseFileId,
+                  });
+                  history.push(
+                    generatePath<ReleaseDataSetRouteParams>(
+                      releaseApiDataSetDetailsRoute.path,
+                      {
+                        publicationId: release.publicationId,
+                        releaseId: release.id,
+                        dataSetId: dataSet.id,
+                      },
+                    ),
+                  );
+                }}
               />
             ) : (
               <WarningMessage>
@@ -91,6 +113,7 @@ export default function ReleaseApiDataSetsSection() {
                 <h3>Draft API data sets</h3>
 
                 <DraftApiDataSetsTable
+                  canUpdateRelease={canUpdateRelease}
                   dataSets={draftDataSets}
                   publicationId={release.publicationId}
                   releaseId={release.id}
