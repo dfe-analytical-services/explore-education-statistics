@@ -59,6 +59,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public List<DataSetVersionImport> Imports { get; set; } = [];
 
+    public List<PreviewToken> PreviewTokens { get; set; } = [];
+
     public DateTimeOffset? Published { get; set; }
 
     public DateTimeOffset? Withdrawn { get; set; }
