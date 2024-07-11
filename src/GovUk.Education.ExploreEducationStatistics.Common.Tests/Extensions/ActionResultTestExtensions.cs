@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Namotion.Reflection;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
@@ -129,16 +128,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return validationProblem;
         }
 
-        public static void AssertBadRequestWithValidationErrors(this IActionResult result, List<ErrorViewModel> expectedErrors)
+        public static void AssertBadRequestWithValidationErrors(this IActionResult result,
+            List<ErrorViewModel> expectedErrors)
         {
-            var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
-            var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             Assert.NotNull(validationProblem);
 
-            var errors = validationProblem.Errors.ToList();
-
-            ResponseErrorAssertUtils.AssertHasErrors(errors, expectedErrors);
+            validationProblem.AssertHasErrors(expectedErrors);
         }
 
         public static ValidationProblemViewModel AssertNotFoundWithValidationProblem<TEntity, TId>(

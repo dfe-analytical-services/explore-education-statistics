@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -35,10 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<string> GetMimeType(IFormFile file)
         {
             // The Mime project is generally very good at determining mime types from file contents
-            await using var stream = file.OpenReadStream();
-            var mimeType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_TYPE);
+            var mimeType = GuessMagicInfo(file,  MagicOpenFlags.MAGIC_MIME_TYPE);
 
-            if (IsMimeTypeNullOrZip(mimeType))
+            if (mimeType is "application/octet-stream" or "application/zip") // i.e. is zip file
             {
                 var fileType = await GetMimeTypeUsingMimeDetective(file.OpenReadStream());
                 mimeType = fileType?.Mime ?? mimeType;
@@ -56,8 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
         {
-            using var stream = file.OpenReadStream();
-            var encodingType = GuessMagicInfo(stream,  MagicOpenFlags.MAGIC_MIME_ENCODING);
+            var encodingType = GuessMagicInfo(file,  MagicOpenFlags.MAGIC_MIME_ENCODING);
             return encodingTypes.Contains(encodingType);
         }
 
@@ -83,26 +82,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return AllowedCsvEncodingTypes.Contains(encodingType);
         }
 
+        public async Task<bool> IsValidZipFile(IFormFile zipFile)
+        {
+            return await HasMatchingMimeType(zipFile, FileTypeValidationUtils.AllowedArchiveMimeTypes)
+                && HasMatchingEncodingType(zipFile, FileTypeValidationUtils.AllowedArchiveEncodingTypes);
+        }
+
         private async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
         {
             // Mime Detective is much better at zip files
             return await stream.GetFileTypeAsync();
         }
 
-        private string GuessMagicInfo(Stream fileStream,  MagicOpenFlags flag)
+        private string GuessMagicInfo(IFormFile file, MagicOpenFlags flag)
         {
             var dbPath = _configuration.GetValue<string>("MagicFilePath");
             var magic = new Magic(flag, dbPath);
 
-            // I have no idea why wrapping the Stream as a StreamReader is necessary, but it is.
-            using var streamReader = new StreamReader(fileStream);
-            return magic.Read(streamReader.BaseStream, 1024); // magic.Read handles if buffer size is < 1024
-        }
-
-        private bool IsMimeTypeNullOrZip(string mimeType)
-        {
-            return mimeType == "application/octet-stream"
-                   || mimeType == "application/zip";
+            using var fileStream = file.OpenReadStream();
+            return magic.Read(fileStream, 1024); // magic.Read handles if buffer size is < 1024
         }
     }
 }

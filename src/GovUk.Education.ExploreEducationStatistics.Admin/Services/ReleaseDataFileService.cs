@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid fileId,
             bool forceDelete = false)
         {
-            return await Delete(releaseVersionId, new List<Guid> { fileId }, forceDelete: forceDelete);
+            return await Delete(releaseVersionId, [ fileId ], forceDelete: forceDelete);
         }
 
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
@@ -246,8 +246,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string? dataSetTitle = null,
-            Guid? replacingFileId = null)
+            string? dataSetTitle,
+            Guid? replacingFileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -335,8 +335,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
             IFormFile zipFormFile,
-            string? dataSetTitle = null,
-            Guid? replacingFileId = null)
+            string? dataSetTitle,
+            Guid? replacingFileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -360,12 +360,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var (replacingFile, archiveDataSet) = tuple;
 
-                            var zipFile = await _releaseDataFileRepository.CreateZip(
-                                filename: zipFormFile.FileName.ToLower(),
-                                contentLength: zipFormFile.Length,
-                                contentType: zipFormFile.ContentType,
-                                releaseVersionId: releaseVersionId,
-                                createdById: _userService.GetUserId());
+                            var zipFile = new File
+                            {
+                                CreatedById = _userService.GetUserId(),
+                                RootPath = releaseVersionId,
+                                ContentLength = zipFormFile.Length,
+                                ContentType = zipFormFile.ContentType,
+                                Filename = zipFormFile.FileName.ToLower(),
+                                Type = DataZip,
+                            };
+                            _contentDbContext.Files.Add(zipFile);
+                            await _contentDbContext.SaveChangesAsync();
 
                             var subjectId = await _releaseVersionRepository
                                 .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);

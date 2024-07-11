@@ -51,15 +51,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task Upload_Success()
+        public async Task UploadDataSet_Success()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
             var dataFileInfo = new DataFileInfo
             {
-                Name = "Subject name",
-                FileName = "subject-name.csv",
+                Name = "Data set title",
+                FileName = "data-set.csv",
                 Size = "1 Kb",
             };
 
@@ -68,27 +68,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
-                    "Subject name",
+                    "Data set title",
                     null))
                 .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var result = await controller.Upload(releaseVersionId: _releaseVersionId,
+            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
-                dataSetTitle: "Subject name",
+                title: "Data set title",
                 file: dataFile,
                 metaFile: metaFile);
 
             VerifyAllMocks(releaseDataFileService);
 
             var dataFileInfoResult = result.AssertOkResult();
-            Assert.Equal("Subject name", dataFileInfoResult.Name);
+            Assert.Equal("Data set title", dataFileInfoResult.Name);
         }
 
         [Fact]
-        public async Task Upload_Fail_ValidationProblem()
+        public async Task UploadDataSet_Fail_ValidationProblem()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -98,16 +98,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
-                    "Subject name",
+                    "Data set title",
                     null))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
             // Call the method under test
-            var result = await controller.Upload(releaseVersionId: _releaseVersionId,
+            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
-                dataSetTitle: "Subject name",
+                title: "Data set title",
                 file: dataFile,
                 metaFile: metaFile);
 

@@ -309,6 +309,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task IsValidZipFile_AllTypes()
+        {
+            var service = BuildService();
+
+            foreach (var type in AllTypes)
+            {
+                var expectedToSucceed = ArchiveTypes.Contains(type);
+
+                var fileInfo = type;
+
+                var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                    "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
+
+                var formFile = new Mock<IFormFile>();
+                formFile
+                    .Setup(f => f.OpenReadStream())
+                    .Returns(() => File.OpenRead(filePath));
+
+                var result = await service.IsValidZipFile(formFile.Object);
+
+                Assert.Equal(expectedToSucceed, result);
+            }
+        }
+
         private static async Task AssertMimeTypeCorrect(FileInfo fileInfo)
         {
             var service = BuildService();

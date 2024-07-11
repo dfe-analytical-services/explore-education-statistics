@@ -18,6 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -201,10 +202,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context
                 .ReleaseFiles
                 .Include(rf => rf.File)
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId
+                             && rf.File.Type == type)
                 .ToList()
-                .Any(rf => string.Equals(rf.File.Filename, filename, CurrentCultureIgnoreCase)
-                           && rf.File.Type == type);
+                .Any(rf => string.Equals(rf.File.Filename, filename, CurrentCultureIgnoreCase));
         }
 
         private List<ErrorViewModel> ValidateDataFileNames(

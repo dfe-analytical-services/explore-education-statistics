@@ -133,12 +133,7 @@ describe('DataFileUploadForm', () => {
   test('shows validation message when no bulk ZIP file selected', async () => {
     const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 
-    const file = new File([], 'test.zip', {
-      type: 'application/zip',
-    });
-
     await user.click(screen.getByLabelText('Bulk ZIP upload'));
-    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
     await user.click(
       screen.getByRole('button', {
         name: 'Upload data files',
@@ -147,7 +142,7 @@ describe('DataFileUploadForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Choose a zip file that is not empty', {
+        screen.getByText('Choose a zip file', {
           selector: '#dataFileUploadForm-bulkZipFile-error',
         }),
       ).toBeInTheDocument();

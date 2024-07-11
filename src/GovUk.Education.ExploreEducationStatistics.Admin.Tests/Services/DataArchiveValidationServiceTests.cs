@@ -1,10 +1,9 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -14,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static Moq.MockBehavior;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
@@ -43,11 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync([]);
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateDataArchiveFile(
                 releaseVersionId,
@@ -70,11 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("data-zip-valid.zip", fileName);
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(() => true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(() => true);
 
             var result = await service.ValidateDataArchiveFile(
                 Guid.NewGuid(),
@@ -100,11 +92,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("data-zip-invalid.zip");
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(() => true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(() => true);
 
             var result = await service.ValidateDataArchiveFile(
                 Guid.NewGuid(),
@@ -144,11 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync([]);
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateBulkDataArchiveFile(
                 releaseVersionId,
@@ -172,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("test-data.csv", longFilename);
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(false);
 
             var result = await service.ValidateBulkDataArchiveFile(
@@ -202,11 +188,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("bulk-data-zip-invalid-no-datasetnames-csv.zip");
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateBulkDataArchiveFile(
                 releaseVersionId,
@@ -236,11 +219,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("bulk-data-zip-invalid-datasetnames-headers.zip");
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateBulkDataArchiveFile(
                 releaseVersionId,
@@ -270,11 +250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("bulk-data-zip-invalid-files-not-found.zip");
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateBulkDataArchiveFile(
                 releaseVersionId,
@@ -301,11 +278,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("bulk-data-zip-invalid-duplicate-names.zip");
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateBulkDataArchiveFile(
                 releaseVersionId,
@@ -332,11 +306,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var archive = CreateFormFileFromResource("bulk-data-zip-invalid-filename-contains-extension.zip");
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, AllowedArchiveMimeTypes))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateBulkDataArchiveFile(
                 releaseVersionId,
@@ -372,11 +343,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync([]);
 
             fileTypeService
-                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .Setup(s => s.IsValidZipFile(archive))
                 .ReturnsAsync(true);
-            fileTypeService
-                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
-                .Returns(true);
 
             var result = await service.ValidateBulkDataArchiveFile(
                 releaseVersionId,

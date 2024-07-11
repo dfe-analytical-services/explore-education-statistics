@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Moq;
 
@@ -34,16 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 .Returns(size);
 
             return formFile;
-        }
-
-        public static ArchiveDataSetFile CreateArchiveDataSet(
-            string dataSetName,
-            string dataFileName,
-            string metaFileName,
-            long dataFileSize = 1048576,
-            long metaFileSize = 1024)
-        {
-            return new ArchiveDataSetFile(dataSetName, dataFileName, dataFileSize, metaFileName, metaFileSize);
         }
     }
 }

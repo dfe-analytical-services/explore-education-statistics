@@ -7,11 +7,13 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,20 +22,12 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTy
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class DataArchiveValidationService : IDataArchiveValidationService
+    public class DataArchiveValidationService(
+        IFileTypeService fileTypeService,
+        IFileUploadsValidatorService fileUploadsValidatorService)
+        : IDataArchiveValidationService
     {
-        private readonly IFileTypeService _fileTypeService;
-        private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
-
         public const int MaxFilenameSize = 150;
-
-        public DataArchiveValidationService(
-            IFileTypeService fileTypeService,
-            IFileUploadsValidatorService fileUploadsValidatorService)
-        {
-            _fileTypeService = fileTypeService;
-            _fileUploadsValidatorService = fileUploadsValidatorService;
-        }
 
         public async Task<Either<ActionResult, ArchiveDataSetFile>> ValidateDataArchiveFile(
             Guid releaseVersionId,
@@ -73,14 +67,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var archiveDataSet = new ArchiveDataSetFile(
                 dataSetTitle,
                 dataFile.FullName,
-                dataFile.Length,
                 metaFile.FullName,
+                dataFile.Length,
                 metaFile.Length);
 
             await using (var dataFileStream = dataFile.Open())
             await using (var metaFileStream = metaFile.Open())
             {
-                errors.AddRange(await _fileUploadsValidatorService
+                errors.AddRange(await fileUploadsValidatorService
                     .ValidateDataSetFilesForUpload(
                         releaseVersionId,
                         archiveDataSet,
@@ -125,22 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             unprocessedArchiveFiles.Remove(dataSetNamesFile);
 
-            await using var dataSetNamesStream = dataSetNamesFile.Open();
-            using var dataSetNamesReader = new StreamReader(dataSetNamesStream);
-            using var dataSetNamesCsvReader = new CsvReader(dataSetNamesReader, CultureInfo.InvariantCulture);
-
-            try
-            {
-                await dataSetNamesCsvReader.ReadAsync();
-                dataSetNamesCsvReader.ReadHeader();
+            List<string> headers;
+            await using (var dataSetNamesStream = dataSetNamesFile.Open()) {
+                headers = await CsvUtils.GetCsvHeaders(dataSetNamesStream);
             }
-            catch (ReaderException e)
-            {
-                return Common.Validators.ValidationUtils.ValidationResult(
-                    ValidationMessages.GenerateErrorDatasetNamesCsvReaderException(e.ToString())); // @MarkFix do we want an exception posting?
-            }
-
-            var headers = dataSetNamesCsvReader.HeaderRecord?.ToList() ?? new List<string>();
 
             if (headers is not ["file_name", "dataset_name"])
             {
@@ -151,25 +133,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
             }
 
-            using var csvDataReader = new CsvDataReader(dataSetNamesCsvReader);
+            var fileNameIndex = headers[0] == "file_name" ? 0 : 1;
+            var datasetNameIndex = headers[0] == "dataset_name" ? 0 : 1;
 
-            var lastLine = false; // Assume one row of data
-
-            // Read dataset_names.csv entries
-            var dataSetNamesCsvEntries = new List<(string BaseFilename, string Title)>();
-            while (!lastLine)
+            List<List<string>> rows;
+            await using (var dataSetNamesStream = dataSetNamesFile.Open())
             {
-                var filename = dataSetNamesCsvReader.GetField<string>("file_name");
-                var datasetName = dataSetNamesCsvReader.GetField<string>("dataset_name");
+                rows = await CsvUtils.GetCsvRows(dataSetNamesStream);
+            }
+
+            var dataSetNamesCsvEntries = new List<(string BaseFilename, string Title)>();
+            foreach (var row in rows)
+            {
+                var filename = row[fileNameIndex];
+                var datasetName = row[datasetNameIndex].Trim();
 
                 dataSetNamesCsvEntries.Add((BaseFilename: filename, Title: datasetName));
-
-                lastLine = !await dataSetNamesCsvReader.ReadAsync();
             }
 
             dataSetNamesCsvEntries
                 .Select(entry => entry.BaseFilename)
                 .Where(baseFilename => baseFilename.EndsWith(".csv"))
+                .ToList()
                 .ForEach(baseFilename =>
                 {
                     errors.Add(ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(baseFilename));
@@ -180,6 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .GroupBy(entry => entry.Title)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key)
+                .ToList()
                 .ForEach(duplicateTitle =>
                 {
                     errors.Add(ValidationMessages
@@ -191,6 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .GroupBy(entry  => entry.BaseFilename)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key)
+                .ToList()
                 .ForEach(duplicateFilename =>
                 {
                     errors.Add(ValidationMessages
@@ -231,14 +218,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var dataArchiveFile = new ArchiveDataSetFile(
                         entry.Title,
                         dataFile.FullName,
-                        dataFile.Length,
                         metaFile.FullName,
+                        dataFile.Length,
                         metaFile.Length);
 
                     await using (var dataFileStream = dataFile.Open())
                     await using (var metaFileStream = metaFile.Open())
                     {
-                        errors.AddRange(await _fileUploadsValidatorService.ValidateDataSetFilesForUpload(
+                        errors.AddRange(await fileUploadsValidatorService.ValidateDataSetFilesForUpload(
                             releaseVersionId,
                             dataArchiveFile,
                             dataFileStream: dataFileStream,
@@ -281,11 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(zipFile.FileName));
             }
 
-            if (!await _fileTypeService.HasMatchingMimeType(
-                    zipFile,
-                    AllowedArchiveMimeTypes
-                )
-                || !_fileTypeService.HasMatchingEncodingType(zipFile, AllowedArchiveEncodingTypes))
+            if (!await fileTypeService.IsValidZipFile(zipFile))
             {
                 errors.Add(ValidationMessages.GenerateErrorMustBeZipFile(zipFile.FileName));
             }

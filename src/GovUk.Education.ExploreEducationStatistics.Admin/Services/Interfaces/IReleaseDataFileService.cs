@@ -35,14 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string? dataSetTitle = null,
-            Guid? replacingFileId = null);
+            string? dataSetTitle,
+            Guid? replacingFileId);
 
         Task<Either<ActionResult, DataFileInfo>> UploadAsZip(
             Guid releaseVersionId,
             IFormFile zipFormFile,
-            string? dataSetTitle = null,
-            Guid? replacingFileId = null);
+            string? dataSetTitle,
+            Guid? replacingFileId);
 
         Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(
             Guid releaseVersionId,

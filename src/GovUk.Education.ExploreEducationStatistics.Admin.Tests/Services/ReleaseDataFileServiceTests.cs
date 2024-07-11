@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -1858,7 +1859,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
-                    dataSetTitle: subjectName);
+                    dataSetTitle: subjectName,
+                    replacingFileId: null);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2033,6 +2035,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
+                    dataSetTitle: null,
                     replacingFileId: originalDataReleaseFile.File.Id);
 
                 var dataFileInfo = result.AssertRight();
@@ -2246,7 +2249,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId: releaseVersion.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
-                    dataSetTitle: subjectName);
+                    dataSetTitle: subjectName,
+                    replacingFileId: null);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2325,7 +2329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
-            var archiveFile = CreateArchiveDataSet(subjectName, dataFileName, metaFileName);
+            var archiveFile = new ArchiveDataSetFile(subjectName, dataFileName, metaFileName);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
@@ -2377,7 +2381,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = (await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
-                    dataSetTitle: subjectName)).AssertRight();
+                    dataSetTitle: subjectName,
+                    replacingFileId: null)).AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataArchiveValidationService,
@@ -2504,7 +2509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var zipFormFile = CreateFormFileMock(zipFileName).Object;
-            var archiveFile = CreateArchiveDataSet(subjectName, dataFileName, metaFileName);
+            var archiveFile = new ArchiveDataSetFile(subjectName, dataFileName, metaFileName);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
@@ -2545,7 +2550,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
                     zipFormFile: zipFormFile,
-                    dataSetTitle: subjectName);
+                    dataSetTitle: subjectName,
+                    replacingFileId: null);
 
                 var dataFileInfo = result.AssertRight();
 
@@ -2657,7 +2663,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
-            var archiveFile = CreateArchiveDataSet(originalDataReleaseFile.Name, dataFileName, metaFileName);
+            var archiveFile = new ArchiveDataSetFile(originalDataReleaseFile.Name, dataFileName, metaFileName);
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
@@ -2701,7 +2707,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = (await service.UploadAsZip(
                     releaseVersionId: releaseVersion.Id,
-                    zipFormFile,
+                    zipFormFile: zipFormFile,
+                    dataSetTitle: null,
                     replacingFileId: originalDataReleaseFile.File.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService,
@@ -2827,8 +2834,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
 
-            var archiveFile1 = CreateArchiveDataSet("One", "one.csv", "one.meta.csv");
-            var archiveFile2 = CreateArchiveDataSet("Two", "two.csv", "two.meta.csv");
+            var archiveFile1 = new ArchiveDataSetFile("One", "one.csv", "one.meta.csv");
+            var archiveFile2 = new ArchiveDataSetFile("Two", "two.csv", "two.meta.csv");
 
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
@@ -3026,8 +3033,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
 
-            var archiveFile1 = CreateArchiveDataSet("One", "one.csv", "one.meta.csv");
-            var archiveFile2 = CreateArchiveDataSet("Two", "two.csv", "two.meta.csv");
+            var archiveFile1 = new ArchiveDataSetFile("One", "one.csv", "one.meta.csv");
+            var archiveFile2 = new ArchiveDataSetFile("Two", "two.csv", "two.meta.csv");
 
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);

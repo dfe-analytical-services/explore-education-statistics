@@ -95,9 +95,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 import.MetaFile.Path());
 
             return await
-                ValidateCsvFileType(metaFileStreamProvider, true)
-                    .OnSuccess(() => ValidateCsvFileType(dataFileStreamProvider, false))
-                    .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
+                ValidateCsvFileType(metaFileStreamProvider, isMetaFile: true)
+                    .OnSuccess(() => ValidateCsvFileType(dataFileStreamProvider, isMetaFile: false))
+                    .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider))
                     .OnSuccess(async _ =>
                     {
                         var dataFileColumnHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
@@ -135,8 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private async Task<Either<List<DataImportError>, (List<string> columnHeaders, int totalRows)>>
             ValidateMetadataFile(
                 File file,
-                Func<Task<Stream>> fileStreamProvider,
-                bool isMetaFile)
+                Func<Task<Stream>> fileStreamProvider)
         {
             _logger.LogDebug("Determining if CSV file {FileName} is correct shape", file.Filename);
 
@@ -167,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 if (cells.Count != csvHeaders.Count)
                 {
-                    var errorCode = isMetaFile ? MetaFileHasInvalidNumberOfColumns : DataFileHasInvalidNumberOfColumns;
+                    var errorCode = MetaFileHasInvalidNumberOfColumns;
                     errors.Add(new DataImportError($"Error at data row {index + 1}: {errorCode.GetEnumLabel()}"));
                 }
                 

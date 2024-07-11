@@ -1,4 +1,5 @@
 #nullable enable
+using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -27,10 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
-            var dataFile = archive.GetEntry(import.File.Filename);
-            var metaFile = archive.GetEntry(import.MetaFile.Filename);
+            var dataFile = archive.GetEntry(import.File.Filename) ??
+                           throw new FileNotFoundException($"Data file {import.File.Filename} not found in archive");
+            var metaFile = archive.GetEntry(import.MetaFile.Filename) ??
+                           throw new FileNotFoundException($"Meta file {import.MetaFile.Filename} not found in archive");
 
-            await using (var stream = dataFile!.Open()) // we should have validated file's existence previously
+            await using (var stream = dataFile.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
@@ -39,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     contentType: ContentTypes.Csv);
             }
 
-            await using (var stream = metaFile!.Open()) // we should have validated file's existence previously
+            await using (var stream = metaFile.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
