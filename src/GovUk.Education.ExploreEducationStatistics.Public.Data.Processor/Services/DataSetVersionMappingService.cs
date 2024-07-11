@@ -317,14 +317,14 @@ internal class DataSetVersionMappingService(
                             .Options
                             .Select(option => option.ToRow())
                             .ToDictionary(
-                                keySelector: LocationOptionKeyGenerator,
+                                keySelector: MappingKeyFunctions.LocationOptionKeyGenerator,
                                 elementSelector: option => new LocationOptionMapping
                                 {
                                     Source = CreateLocationOptionFromMetaRow(option)
                                 }),
                         Candidates = candidatesForLevel
                             .ToDictionary(
-                                keySelector: LocationOptionKeyGenerator,
+                                keySelector: MappingKeyFunctions.LocationOptionKeyGenerator,
                                 elementSelector: CreateLocationOptionFromMetaRow)
                     };
                 });
@@ -346,7 +346,7 @@ internal class DataSetVersionMappingService(
                     Candidates = meta
                         .optionsMeta
                         .ToDictionary(
-                            keySelector: LocationOptionKeyGenerator,
+                            keySelector: MappingKeyFunctions.LocationOptionKeyGenerator,
                             elementSelector: CreateLocationOptionFromMetaRow)
                 });
 
@@ -366,7 +366,7 @@ internal class DataSetVersionMappingService(
     {
         var filterMappings = sourceFilterMeta
             .ToDictionary(
-                keySelector: FilterKeyGenerator,
+                keySelector: MappingKeyFunctions.FilterKeyGenerator,
                 elementSelector: filter =>
                     new FilterMapping
                     {
@@ -374,7 +374,7 @@ internal class DataSetVersionMappingService(
                         OptionMappings = filter
                             .Options
                             .ToDictionary(
-                                keySelector: FilterOptionKeyGenerator,
+                                keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
                                 elementSelector: option =>
                                     new FilterOptionMapping { Source = CreateFilterOptionFromMetaRow(option) })
                     });
@@ -384,13 +384,13 @@ internal class DataSetVersionMappingService(
                 filterMeta: meta.Key,
                 optionsMeta: meta.Value))
             .ToDictionary(
-                keySelector: meta => FilterKeyGenerator(meta.filterMeta),
+                keySelector: meta => MappingKeyFunctions.FilterKeyGenerator(meta.filterMeta),
                 elementSelector: meta =>
                     new FilterMappingCandidate(meta.filterMeta.Label)
                     {
                         Options = meta.optionsMeta
                             .ToDictionary(
-                                keySelector: FilterOptionKeyGenerator,
+                                keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
                                 elementSelector: CreateFilterOptionFromMetaRow)
                     });
 

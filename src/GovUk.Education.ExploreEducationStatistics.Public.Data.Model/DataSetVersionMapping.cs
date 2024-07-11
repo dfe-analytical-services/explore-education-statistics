@@ -109,7 +109,7 @@ public abstract record MappableElementWithOptions<TMappableOption>(string Label)
     : MappableElement(Label)
     where TMappableOption : MappableElement
 {
-    public Dictionary<string, TMappableOption> Options { get; set; } = [];
+    public Dictionary<string, TMappableOption> Options { get; init; } = [];
 }
 
 /// <summary>
@@ -121,11 +121,13 @@ public abstract record MappableElementWithOptions<TMappableOption>(string Label)
 public abstract record Mapping<TMappableElement>
     where TMappableElement : MappableElement
 {
+    public TMappableElement Source { get; init; } = null!;
+
+    public string PublicId { get; init; } = string.Empty;
+
     [JsonConverter(typeof(JsonStringEnumConverter))]
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public MappingType Type { get; set; } = MappingType.None;
-
-    public TMappableElement Source { get; set; } = null!;
 
     public string? CandidateKey { get; set; }
 }
@@ -149,15 +151,15 @@ public abstract record ParentMapping<TMappableElement, TOption, TOptionMapping>
 /// </summary>
 public record MappableLocationOption(string Label) : MappableElement(Label)
 {
-    public string? Code { get; set; }
+    public string? Code { get; init; }
 
-    public string? OldCode { get; set; }
+    public string? OldCode { get; init; }
 
-    public string? Urn { get; set; }
+    public string? Urn { get; init; }
 
-    public string? LaEstab { get; set; }
+    public string? LaEstab { get; init; }
 
-    public string? Ukprn { get; set; }
+    public string? Ukprn { get; init; }
 };
 
 /// <summary>
@@ -172,9 +174,9 @@ public record LocationOptionMapping : Mapping<MappableLocationOption>;
 /// </summary>
 public record LocationLevelMappings
 {
-    public Dictionary<string, LocationOptionMapping> Mappings { get; set; } = [];
+    public Dictionary<string, LocationOptionMapping> Mappings { get; init; } = [];
 
-    public Dictionary<string, MappableLocationOption> Candidates { get; set; } = [];
+    public Dictionary<string, MappableLocationOption> Candidates { get; init; } = [];
 }
 
 /// <summary>
@@ -183,7 +185,7 @@ public record LocationLevelMappings
 /// </summary>
 public class LocationMappingPlan
 {
-    public Dictionary<GeographicLevel, LocationLevelMappings> Levels { get; set; } = [];
+    public Dictionary<GeographicLevel, LocationLevelMappings> Levels { get; init; } = [];
 }
 
 /// <summary>
@@ -223,7 +225,19 @@ public record FilterMapping : ParentMapping<MappableFilter, MappableFilterOption
 /// </summary>
 public record FilterMappingPlan
 {
-    public Dictionary<string, FilterMapping> Mappings { get; set; } = [];
+    public Dictionary<string, FilterMapping> Mappings { get; init; } = [];
 
-    public Dictionary<string, FilterMappingCandidate> Candidates { get; set; } = [];
+    public Dictionary<string, FilterMappingCandidate> Candidates { get; init; } = [];
+}
+
+public static class MappingKeyFunctions
+{
+    public static Func<LocationOptionMetaRow, string> LocationOptionKeyGenerator =>
+        option => $"{option.Label} :: {option.GetRowKey()}";
+
+    public static Func<FilterMeta, string> FilterKeyGenerator =>
+        filter => filter.PublicId;
+
+    public static Func<FilterOptionMeta, string> FilterOptionKeyGenerator =>
+        option => option.Label;
 }

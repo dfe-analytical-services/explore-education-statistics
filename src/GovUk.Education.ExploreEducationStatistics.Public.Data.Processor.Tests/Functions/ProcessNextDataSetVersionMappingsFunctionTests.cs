@@ -1276,11 +1276,8 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             importStage: DataSetVersionImportStage.Completing,
             status: DataSetVersionStatus.Published);
 
-        var dataSet = await GetDbContext<PublicDataDbContext>().DataSets.SingleAsync(dataSet =>
-            dataSet.Id == initialDataSetVersion.DataSet.Id);
-
         var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
-            dataSet: dataSet,
+            dataSetId: initialDataSetVersion.DataSetId,
             importStage: importStage,
             versionMajor: 1,
             versionMinor: 1);

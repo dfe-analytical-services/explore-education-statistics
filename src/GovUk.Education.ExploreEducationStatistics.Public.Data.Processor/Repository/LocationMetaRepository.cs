@@ -54,9 +54,10 @@ public class LocationMetaRepository(
         CancellationToken cancellationToken = default)
     {
         var metas = GetLocationMetas(dataSetVersion, allowedColumns);
-
         publicDataDbContext.LocationMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
 
         foreach (var meta in metas)
         {
@@ -136,7 +137,7 @@ public class LocationMetaRepository(
                     .Where(hasBatchRowKey)
                     .Select((option, index) => new LocationOptionMetaLink
                     {
-                        PublicId = SqidEncoder.Encode(option.Id),
+                        PublicId = CreatePublicIdForLocationOptionMetaLink(publicIdMappings, meta, option),
                         MetaId = meta.Id,
                         OptionId = option.Id
                     })
@@ -159,6 +160,18 @@ public class LocationMetaRepository(
                 );
             }
         }
+    }
+
+    private static string CreatePublicIdForLocationOptionMetaLink(
+        PublicIdMappings publicIdMappings,
+        GeographicLevel level,
+        LocationOptionMetaRow option)
+    {
+        return publicIdMappings
+                   .GetPublicIdForCandidate(
+                       level: level,
+                       MappingKeyFunctions.LocationOptionKeyGenerator(option))
+               ?? SqidEncoder.Encode(option.Id);
     }
 
     private async Task<List<LocationOptionMetaRow>> GetLocationOptionMetas(
@@ -241,15 +254,59 @@ public class LocationMetaRepository(
                 Label = label,
                 Ukprn = row[ProviderCsvColumns.Ukprn]
             },
-            GeographicLevel.RscRegion => new LocationRscRegionOptionMeta
-            {
-                Label = label
-            },
+            GeographicLevel.RscRegion => new LocationRscRegionOptionMeta { Label = label },
             _ => new LocationCodedOptionMeta
             {
                 Label = label,
                 Code = row[cols.Codes.First()]
             }
         };
+    }
+
+    private async Task<PublicIdMappings> CreatePublicIdMappings(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        var mappings = await EntityFrameworkQueryableExtensions
+            .SingleOrDefaultAsync(publicDataDbContext
+                    .DataSetVersionMappings,
+                mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id,
+                cancellationToken);
+
+        if (mappings is null)
+        {
+            return new PublicIdMappings();
+        }
+
+        var mappingsByLevel = mappings
+            .LocationMappingPlan
+            .Levels
+            .ToDictionary(
+                keySelector: level => level.Key,
+                elementSelector: level => level
+                    .Value
+                    .Mappings
+                    .Values
+                    .Where(mapping => mapping.Type is MappingType.AutoMapped or MappingType.ManualMapped)
+                    .ToDictionary(
+                        keySelector: mapping => mapping.CandidateKey!,
+                        elementSelector: mapping => mapping.PublicId));
+
+        return new PublicIdMappings { Levels = mappingsByLevel };
+    }
+
+    private record PublicIdMappings
+    {
+        public Dictionary<GeographicLevel, Dictionary<string, string>> Levels { get; init; } = [];
+
+        public string? GetPublicIdForCandidate(GeographicLevel level, string candidateKey)
+        {
+            if (!Levels.TryGetValue(level, out var mappingLevel))
+            {
+                return null;
+            }
+
+            return mappingLevel.GetValueOrDefault(candidateKey);
+        }
     }
 }

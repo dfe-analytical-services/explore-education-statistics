@@ -114,7 +114,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
         [Theory]
         [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
-        public async Task DataSetVersionMeta_CorrectLocations(ProcessorTestData testData, int metaInsertBatchSize)
+        public async Task DataSetVersionMeta_CorrectLocationOptions(ProcessorTestData testData, int metaInsertBatchSize)
         {
             var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
 
@@ -124,6 +124,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             var actualLocations = await publicDataDbContext.LocationMetas
                 .Include(lm => lm.Options)
+                .Include(lm => lm.OptionLinks)
                 .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
                 .OrderBy(lm => lm.Level)
                 .ToListAsync();
@@ -156,6 +157,152 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                                 ));
                         });
                 });
+
+            // Public Ids should be Sqids based on the option's id.
+            var actualLinks = actualLocations
+                .SelectMany(level => level.OptionLinks)
+                .ToList();
+            
+            Assert.Equal(15, actualLinks.Count);
+            Assert.All(actualLinks, link => 
+                Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
+        }
+        
+        [Theory]
+        [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
+        public async Task DataSetVersionMeta_CorrectLocationOptions_WithMappings(
+            ProcessorTestData testData, 
+            int metaInsertBatchSize)
+        {
+            var (sourceDataSetVersion, _) = await CreateDataSet(Stage.PreviousStage());
+            
+            var (targetDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
+                dataSetId: sourceDataSetVersion.DataSet.Id, 
+                importStage: DataSetVersionImportStage.ManualMapping, 
+                versionMinor: 1);
+
+            // In this test, we will create mappings for all the original location options.
+            // 2 of these mappings will have candidates, and the rest will have no candidates
+            // mapped.
+            
+            // Amend a couple of arbitrary mappings to identify some candidates.
+            var mappedOption1 = testData.ExpectedLocations.First().Options.First();
+            var mappedOption2 = testData.ExpectedLocations.Last().Options.Last();
+
+            var option1Mapping = new LocationOptionMapping
+            {
+                PublicId = "option-1-public-id",
+                Type = MappingType.AutoMapped,
+                CandidateKey = MappingKeyFunctions.LocationOptionKeyGenerator(mappedOption1.ToRow())
+            };
+            
+            var option2Mapping = new LocationOptionMapping
+            {
+                PublicId = "option-2-public-id",
+                Type = MappingType.ManualMapped,
+                CandidateKey = MappingKeyFunctions.LocationOptionKeyGenerator(mappedOption2.ToRow())
+            };
+            
+            var random = new Random();
+
+            var mappings = new DataSetVersionMapping
+            {
+                SourceDataSetVersionId = sourceDataSetVersion.Id,
+                TargetDataSetVersionId = targetDataSetVersion.Id,
+                FilterMappingPlan = new FilterMappingPlan(),
+                LocationMappingPlan = new LocationMappingPlan
+                {
+                    Levels = testData
+                        .ExpectedLocations
+                        .ToDictionary(
+                            keySelector: level => level.Level,
+                            elementSelector: level => new LocationLevelMappings
+                            {
+                                Mappings = level
+                                    .Options
+                                    .ToDictionary(
+                                        keySelector: option => 
+                                            MappingKeyFunctions.LocationOptionKeyGenerator(option.ToRow()),
+                                        elementSelector: option => 
+                                            option == mappedOption1 ? option1Mapping
+                                            : option == mappedOption2 ? option2Mapping
+                                            : new LocationOptionMapping
+                                            {
+                                                PublicId = SqidEncoder.Encode(option.Id),
+                                                Type = random.Next(1) == 0
+                                                    ? MappingType.AutoNone
+                                                    : MappingType.ManualNone
+                                            })
+                            })
+                }
+            };
+            
+            await AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            await ImportMetadata(testData, targetDataSetVersion, instanceId, metaInsertBatchSize);
+
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+            var actualLocations = await publicDataDbContext.LocationMetas
+                .Include(lm => lm.Options)
+                .Include(lm => lm.OptionLinks)
+                .ThenInclude(locationOptionMetaLink => locationOptionMetaLink.Option)
+                .Where(lm => lm.DataSetVersionId == targetDataSetVersion.Id)
+                .OrderBy(lm => lm.Level)
+                .ToListAsync();
+            
+            // Locations are expected in order of level
+            // Location options are expected in order of code(s) and then by label
+            Assert.Equal(testData.ExpectedLocations.Count, actualLocations.Count);
+            Assert.All(testData.ExpectedLocations,
+                (expectedLocation, index) =>
+                {
+                    var actualLocation = actualLocations[index];
+                    actualLocation.AssertDeepEqualTo(expectedLocation,
+                        notEqualProperties: AssertExtensions.Except<LocationMeta>(
+                            l => l.Id,
+                            l => l.DataSetVersionId,
+                            l => l.Options,
+                            l => l.OptionLinks,
+                            l => l.Created
+                        ));
+
+                    Assert.Equal(expectedLocation.Options.Count, actualLocation.Options.Count);
+                    Assert.All(expectedLocation.Options,
+                        (expectedOption, optionIndex) =>
+                        {
+                            var actualOption = actualLocation.Options[optionIndex];
+                            actualOption.AssertDeepEqualTo(expectedOption,
+                                notEqualProperties: AssertExtensions.Except<LocationOptionMeta>(
+                                    o => o.Metas,
+                                    o => o.MetaLinks
+                                ));
+                        });
+                });
+            
+            var actualLinks = actualLocations
+                .SelectMany(level => level.OptionLinks)
+                .ToList();
+            
+            // Public Ids should be SQIDs based on the option's id unless otherwise directed by the
+            // mappings.
+            var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Label);
+            Assert.Equal("option-1-public-id", actualMappedOption1Link.PublicId);
+
+            var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Label);
+            Assert.Equal("option-2-public-id", actualMappedOption2Link.PublicId);
+
+            var otherLinks = actualLocations
+                .SelectMany(level => level.OptionLinks)
+                .Where(link => link != actualMappedOption1Link && link != actualMappedOption2Link)
+                .ToList();
+            
+            Assert.Equal(13, otherLinks.Count);
+            Assert.All(otherLinks, link => 
+                Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
         }
 
         [Theory]
