@@ -65,7 +65,7 @@ export class LocationFilter extends Filter {
 
   public readonly level: string;
 
-  public readonly geoJson?: GeoJsonFeature[];
+  public readonly geoJson?: GeoJsonFeature;
 
   public constructor({
     id,
@@ -77,7 +77,7 @@ export class LocationFilter extends Filter {
   }: GroupedFilterOption & {
     id?: string;
     level: string;
-    geoJson?: GeoJsonFeature[];
+    geoJson?: GeoJsonFeature;
   }) {
     // Fallback to using the code if there's no id.
     // This is the case for historical Permalinks created prior to EES-2955.

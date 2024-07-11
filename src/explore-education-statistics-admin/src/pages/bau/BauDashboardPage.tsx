@@ -27,6 +27,19 @@ const BauDashboardPage = () => {
             </p>
           </div>
         )}
+
+        {user?.permissions.isBauUser && (
+          <div className="govuk-grid-column-one-third">
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+              <Link to="/administration/boundary-data">
+                Manage boundary data
+              </Link>
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-1">
+              View boundary level data, and upload new boundary files.
+            </p>
+          </div>
+        )}
       </div>
 
       <hr className="govuk-!-margin-top-9" />

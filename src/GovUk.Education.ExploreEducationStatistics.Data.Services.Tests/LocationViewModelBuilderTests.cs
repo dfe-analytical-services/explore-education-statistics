@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using GeoJSON.Net.Geometry;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.ViewModels.LocationViewModelBuilder;
@@ -75,7 +75,7 @@ public class LocationViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies: null);
 
         Assert.Equal(3, result.Count);
@@ -132,7 +132,7 @@ public class LocationViewModelBuilderTests
     }
 
     [Fact]
-    public void BuildLocationAttributeViewModels_Flat_GeoJsonProvided()
+    public void BuildLocationAttributeViewModels_Flat_BoundaryDataProvided()
     {
         var locations = new List<Location>
         {
@@ -190,12 +190,12 @@ public class LocationViewModelBuilderTests
         };
 
         // Provide GeoJson for some but not all of the local authorities and not for any other level
-        var geoJson = BuildGeoJson(_derby, _sunderland);
+        var boundaryData = BuildBoundaryData(_derby, _sunderland);
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies: null,
-                geoJson);
+                boundaryData);
 
         Assert.Equal(3, result.Count);
 
@@ -239,7 +239,7 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_derby.Name, la1.Label);
         Assert.Equal(_derby.Code, la1.Value);
         Assert.NotNull(la1.GeoJson);
-        Assert.Equal(_derby.Code, la1.GeoJson["code"].ToString());
+        Assert.Equal(_derby.Code, la1.GeoJson.Properties["Code"].ToString());
 
         var la2 = localAuthorities[1];
         Assert.Equal(locations[6].Id, la2.Id);
@@ -253,7 +253,7 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_sunderland.Name, la3.Label);
         Assert.Equal(_sunderland.Code, la3.Value);
         Assert.NotNull(la3.GeoJson);
-        Assert.Equal(_sunderland.Code, la3.GeoJson["code"].ToString());
+        Assert.Equal(_sunderland.Code, la3.GeoJson.Properties["Code"].ToString());
     }
 
     [Fact]
@@ -315,7 +315,7 @@ public class LocationViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies);
 
         Assert.Equal(3, result.Count);
@@ -388,7 +388,7 @@ public class LocationViewModelBuilderTests
     }
 
     [Fact]
-    public void BuildLocationAttributeViewModels_Hierarchical_GeoJsonProvided()
+    public void BuildLocationAttributeViewModels_Hierarchical_BoundaryDataProvided()
     {
         var locations = new List<Location>
         {
@@ -424,10 +424,10 @@ public class LocationViewModelBuilderTests
         };
 
         // Provide GeoJson for some but not all of the local authorities and not for any other level
-        var geoJson = BuildGeoJson(_sunderland, _derby);
+        var geoJson = BuildBoundaryData(_sunderland, _derby);
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies,
                 geoJson);
 
@@ -451,7 +451,7 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_sunderland.Name, laOption1SubOption1.Label);
         Assert.Equal(_sunderland.Code, laOption1SubOption1.Value);
         Assert.NotNull(laOption1SubOption1.GeoJson);
-        Assert.Equal(_sunderland.Code, laOption1SubOption1.GeoJson["code"].ToString());
+        Assert.Equal(_sunderland.Code, laOption1SubOption1.GeoJson.Properties["Code"].ToString());
 
         var laOption2 = localAuthorities[1];
         Assert.Null(laOption2.Id);
@@ -467,7 +467,7 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_derby.Name, laOption2SubOption1.Label);
         Assert.Equal(_derby.Code, laOption2SubOption1.Value);
         Assert.NotNull(laOption2SubOption1.GeoJson);
-        Assert.Equal(_derby.Code, laOption2SubOption1.GeoJson["code"].ToString());
+        Assert.Equal(_derby.Code, laOption2SubOption1.GeoJson.Properties["Code"].ToString());
 
         var laOption2SubOption2 = laOption2.Options[1];
         Assert.Equal(locations[2].Id, laOption2SubOption2.Id);
@@ -491,7 +491,7 @@ public class LocationViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies: null);
 
         Assert.Single(result);
@@ -566,7 +566,7 @@ public class LocationViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies);
 
         Assert.Equal(2, result.Count);
@@ -658,7 +658,7 @@ public class LocationViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 null);
 
         Assert.Single(result);
@@ -728,7 +728,7 @@ public class LocationViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies);
 
         Assert.Single(result);
@@ -796,7 +796,7 @@ public class LocationViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>) BuildLocationAttributeViewModels(locations,
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
                 hierarchies: null);
 
         Assert.Single(result);
@@ -818,24 +818,49 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_derby.Code, la2.Value);
     }
 
-    private static Dictionary<GeographicLevel, Dictionary<string, GeoJson>> BuildGeoJson(
+    private static Dictionary<string, object> BuildProperties(
+        string code,
+        string name)
+    {
+        return new()
+        {
+            { "OBJECTID", 1 },
+            { "ctry17cd", code },
+            { "ctry17nm", name },
+            { "ctry17nmw", "" },
+            { "bng_e", 394881 },
+            { "bng_n", 370341 },
+            { "long", -2 },
+            { "lat", 50 },
+            { "GlobalID", "1277674d-5d60-457d-9322-833b31f77014" },
+        };
+    }
+
+    private static Dictionary<GeographicLevel, Dictionary<string, BoundaryData>> BuildBoundaryData(
         params LocationAttribute[] locationAttributes)
     {
         return locationAttributes
             .GroupBy(locationAttribute => locationAttribute.GeographicLevel)
             .ToDictionary(grouping => grouping.Key,
                 grouping => grouping.ToDictionary(locationAttribute => locationAttribute.Code,
-                    locationAttribute => new GeoJson
+                    locationAttribute => new BoundaryData
                     {
-                        // Set a minimal JSON string as the value which contains the location code.
-                        // This should be enough to assert the correct GeoJson object has been selected
-                        // when the the location view model was built.
-                        Value = new JObject
+                        Name = locationAttribute.Name,
+                        Code = locationAttribute.Code,
+                        BoundaryLevel = new()
                         {
-                            {
-                                "code", locationAttribute.Code
-                            }
-                        }.ToString()
+                            Id = 1,
+                            Label = "Boundary Level 1",
+                            Level = GeographicLevel.Country,
+                            Published = DateTime.Now,
+                        },
+                        GeoJson = new(new MultiPolygon([[[
+                            [-71.17351189255714, 42.350224666504324],
+                            [-71.1677360907197, 42.34671571695422],
+                            [-71.16970919072628, 42.35326835618748],
+                            [-71.14341516047716, 42.36174674733808],
+                            [-71.17559093981981, 42.368232175909064],
+                            [-71.17351189255714, 42.350224666504324]]]]), BuildProperties(locationAttribute.Code, locationAttribute.Name), "1"),
                     }));
     }
 }
