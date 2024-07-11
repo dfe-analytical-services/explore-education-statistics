@@ -21,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -818,7 +817,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = FileType.Data,
                     Created = DateTime.UtcNow,
                     CreatedById = _user.Id
-                }
+                },
+                PublicApiDataSetId = Guid.NewGuid()
             };
 
             var metaReleaseFile = new ReleaseFile
@@ -870,6 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", fileInfo.Size);
                 Assert.Equal(dataReleaseFile.File.Created, fileInfo.Created);
                 Assert.Equal(COMPLETE, fileInfo.Status);
+                Assert.True(fileInfo.IsLinkedToApiDataSet);
             }
         }
 
@@ -1050,6 +1051,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", fileInfo.Size);
                 Assert.Equal(dataFile.Created, fileInfo.Created);
                 Assert.Equal(COMPLETE, fileInfo.Status);
+                Assert.False(fileInfo.IsLinkedToApiDataSet);
             }
         }
 
@@ -1274,6 +1276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 ReleaseVersion = releaseVersion,
                 Name = "Test subject 1",
+                PublicApiDataSetId = Guid.NewGuid(),
                 File = new File
                 {
                     Filename = "test-data-1.csv",
@@ -1369,6 +1372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", files[0].Size);
                 Assert.Equal(dataReleaseFile1.File.Created, files[0].Created);
                 Assert.Equal(COMPLETE, files[0].Status);
+                Assert.True(files[0].IsLinkedToApiDataSet);
 
                 Assert.Equal(dataReleaseFile2.File.Id, files[1].Id);
                 Assert.Equal("Test subject 2", files[1].Name);
@@ -1381,6 +1385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("20 Kb", files[1].Size);
                 Assert.Equal(dataReleaseFile2.File.Created, files[1].Created);
                 Assert.Equal(STAGE_2, files[1].Status);
+                Assert.False(files[1].IsLinkedToApiDataSet);
             }
         }
 
@@ -1501,6 +1506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", files[0].Size);
                 Assert.Equal(dataRelease1File.File.Created, files[0].Created);
                 Assert.Equal(COMPLETE, files[0].Status);
+                Assert.False(files[0].IsLinkedToApiDataSet);
             }
         }
 
@@ -1626,6 +1632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("20 Kb", files[0].Size);
                 Assert.Equal(dataFile2.Created, files[0].Created);
                 Assert.Equal(COMPLETE, files[0].Status);
+                Assert.False(files[0].IsLinkedToApiDataSet);
             }
         }
 
@@ -1738,6 +1745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", dataFileInfo.Size);
                 dataFileInfo.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, dataFileInfo.Status);
+                Assert.False(dataFileInfo.IsLinkedToApiDataSet);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1910,6 +1918,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", dataFileInfo.Size);
                 dataFileInfo.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, dataFileInfo.Status);
+                Assert.False(dataFileInfo.IsLinkedToApiDataSet);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2255,6 +2264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("1 Mb", result.Size);
                 result.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, result.Status);
+                Assert.False(result.IsLinkedToApiDataSet);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2590,6 +2600,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("1 Mb", result.Size);
                 result.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, result.Status);
+                Assert.False(result.IsLinkedToApiDataSet);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))

@@ -36,6 +36,8 @@ public class ReleaseFile
     public List<IndicatorGroupSequenceEntry>? IndicatorSequence { get; set; }
 
     public DateTime? Published { get; set; }
+
+    public bool IsLinkedToApiDataSet => PublicApiDataSetId is not null;
 }
 
 public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);

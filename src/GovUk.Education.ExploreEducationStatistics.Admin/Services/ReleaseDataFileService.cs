@@ -282,6 +282,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 replacingDataFile: replacingFile,
                                 order: releaseDataFileOrder);
 
+                            var dataReleaseFile = await _releaseFileRepository.Find(
+                                releaseVersionId: releaseVersionId,
+                                fileId: dataFile.Id);
+
                             var metaFile = await _releaseDataFileRepository.Create(
                                 releaseVersionId: releaseVersionId,
                                 subjectId: subjectId,
@@ -300,7 +304,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             var permissions = await _userService.GetDataFilePermissions(dataFile);
 
-                            return BuildDataFileViewModel(dataFile: dataFile,
+                            return BuildDataFileViewModel(
+                                dataReleaseFile: dataReleaseFile!,
                                 metaFile: metaFile,
                                 validSubjectName,
                                 dataImport.TotalRows,
@@ -359,6 +364,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         source: zipFile,
                                                         order: releaseDataFileOrder);
 
+                                                    var dataReleaseFile = await _releaseFileRepository.Find(
+                                                        releaseVersionId: releaseVersionId,
+                                                        fileId: dataFile.Id);
+
                                                     var metaFile = await _releaseDataFileRepository.Create(
                                                         releaseVersionId: releaseVersionId,
                                                         subjectId: subjectId,
@@ -378,7 +387,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     var permissions = await _userService.GetDataFilePermissions(dataFile);
 
-                                                    return BuildDataFileViewModel(dataFile: dataFile,
+                                                    return BuildDataFileViewModel(
+                                                        dataReleaseFile: dataReleaseFile!,
                                                         metaFile: metaFile,
                                                         validSubjectName,
                                                         dataImport.TotalRows,
@@ -401,7 +411,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var permissions = await _userService.GetDataFilePermissions(dataImport.File);
 
-            return BuildDataFileViewModel(dataFile: dataImport.File,
+            return BuildDataFileViewModel(
+                dataReleaseFile: releaseFile,
                 metaFile: dataImport.MetaFile,
                 releaseFile.Name,
                 dataImport.TotalRows,
@@ -431,19 +442,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToDictionaryAwaitAsync(rf => ValueTask.FromResult(rf.FileId),
                     async rf => await _userService.GetDataFilePermissions(rf.File));
 
-            return fileIds.Select(fileId =>
+            return releaseFiles.Select(releaseFile =>
             {
-                var dataImport = dataImports[fileId];
-                return BuildDataFileViewModel(dataFile: dataImport.File,
+                var dataImport = dataImports[releaseFile.FileId];
+                return BuildDataFileViewModel(
+                    dataReleaseFile: releaseFile,
                     metaFile: dataImport.MetaFile,
-                    subjectNames[fileId],
+                    subjectNames[releaseFile.FileId],
                     dataImport.TotalRows,
                     dataImport.Status,
-                    permissions[fileId]);
+                    permissions[releaseFile.FileId]);
             }).ToList();
         }
 
-        private static DataFileInfo BuildDataFileViewModel(File dataFile,
+        private static DataFileInfo BuildDataFileViewModel(
+            ReleaseFile dataReleaseFile,
             File metaFile,
             string? subjectName,
             int? totalRows,
@@ -452,18 +465,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return new DataFileInfo
             {
-                Id = dataFile.Id,
-                FileName = dataFile.Filename,
+                Id = dataReleaseFile.FileId,
+                FileName = dataReleaseFile.File.Filename,
                 Name = subjectName ?? "Unknown",
-                Size = dataFile.DisplaySize(),
+                Size = dataReleaseFile.File.DisplaySize(),
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename,
-                ReplacedBy = dataFile.ReplacedById,
+                ReplacedBy = dataReleaseFile.File.ReplacedById,
                 Rows = totalRows,
-                UserName = dataFile.CreatedBy?.Email ?? "",
+                UserName = dataReleaseFile.File.CreatedBy?.Email ?? "",
                 Status = importStatus,
-                Created = dataFile.Created,
-                Permissions = permissions
+                Created = dataReleaseFile.File.Created,
+                Permissions = permissions,
+                IsLinkedToApiDataSet = dataReleaseFile.IsLinkedToApiDataSet
             };
         }
 
