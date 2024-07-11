@@ -25,7 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         {
         }
 
-        public ReleasePublishingStatus(string publicationSlug,
+        public ReleasePublishingStatus(
+            string publicationSlug,
             DateTime? publish,
             Guid releaseVersionId,
             Guid releaseStatusId,
@@ -67,7 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 PublishingStage = value.Publishing.ToString();
                 OverallStage = value.Overall.ToString();
 
-                _state = new ReleasePublishingStatusState(value.Content, value.Files, value.Publishing,
+                _state = new ReleasePublishingStatusState(value.Content,
+                    value.Files,
+                    value.Publishing,
                     value.Overall);
                 _state.PropertyChanged += StateChangedCallback;
             }
@@ -116,5 +119,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             return State.Content == ReleasePublishingStatusContentStage.Complete &&
                    State.Files == ReleasePublishingStatusFilesStage.Complete;
         }
+
+        public ReleasePublishingKey AsTableRowKey()
+        {
+            return new ReleasePublishingKey(ReleaseVersionId, Id);
+        }
     }
+
+    public record ReleasePublishingKey(Guid ReleaseVersionId, Guid ReleaseStatusId);
 }

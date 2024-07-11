@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -72,8 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _options = options.Value;
         }
 
-        public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(
-            Guid releaseVersionId)
+        public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
         {
             return await _context
                 .ReleaseVersions
@@ -106,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ReleaseVersions
                 .HydrateReleaseForChecklist()
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-                .OnSuccessDo(releaseVersion => _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus))
+                .OnSuccessDo(releaseVersion =>
+                    _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus))
                 .OnSuccessDo(() => ValidatePublishDate(request))
                 .OnSuccess(async releaseVersion =>
                 {
@@ -135,12 +136,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         CreatedById = _userService.GetUserId()
                     };
 
+                    var releasePublishingKey = new ReleasePublishingKey(releaseVersionId, releaseStatus.Id);
+
                     return await
                         ValidateReleaseWithChecklist(releaseVersion)
                         .OnSuccess(() => RemoveUnusedImages(releaseVersion.Id))
                         .OnSuccess(() =>
                             SendEmailNotificationsAndInvites(request, releaseVersion)
-                            .OnSuccess(() => NotifyPublisher(releaseVersionId, request, oldStatus, releaseStatus))
+                            .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
                             .OnSuccessDo(async () =>
                             {
                                 _context.ReleaseVersions.Update(releaseVersion);
@@ -151,19 +154,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> NotifyPublisher(
-            Guid releaseVersionId,
+            ReleasePublishingKey releasePublishingKey,
             ReleaseStatusCreateRequest request,
-            ReleaseApprovalStatus oldStatus,
-            ReleaseStatus releaseStatus)
+            ReleaseApprovalStatus oldStatus)
         {
             // Only need to inform Publisher if changing release approval status to or from Approved
             if (oldStatus == ReleaseApprovalStatus.Approved ||
                 request.ApprovalStatus == ReleaseApprovalStatus.Approved)
             {
-                return await _publishingService.ReleaseChanged(
-                    releaseVersionId,
-                    releaseStatus.Id,
-                    request.PublishMethod == PublishMethod.Immediate);
+                return await _publishingService.ReleaseChanged(releasePublishingKey,
+                    immediate: request.PublishMethod == PublishMethod.Immediate);
             }
 
             return Unit.Instance;
@@ -350,7 +350,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return false;
         }
 
-        private static DateTime? GetNextOccurrenceForCronExpression(string cronExpression,
+        private static DateTime? GetNextOccurrenceForCronExpression(
+            string cronExpression,
             DateTime fromUtc,
             DateTime toUtc,
             TimeZoneInfo timeZoneInfo,

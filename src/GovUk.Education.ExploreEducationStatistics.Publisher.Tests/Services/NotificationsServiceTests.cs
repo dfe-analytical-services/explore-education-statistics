@@ -1,9 +1,9 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -91,51 +90,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
-            storageQueueService.Setup(mock => mock.AddMessages(
-                    ReleaseNotificationQueue,
-                    It.IsAny<List<ReleaseNotificationMessage>>()))
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+            notifierClient.Setup(mock => mock.NotifyPublicationSubscribers(
+                    It.IsAny<IReadOnlyList<ReleaseNotificationMessage>>(),
+                    CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var notificationsService = BuildNotificationsService(
-                    contentDbContext, storageQueueService.Object);
+                    contentDbContext,
+                    notifierClient: notifierClient.Object);
 
                 await notificationsService.NotifySubscribersIfApplicable(release1Version.Id,
                     release2Version.Id,
                     amendedReleaseVersion.Id);
 
-                storageQueueService.Verify(mock => mock.AddMessages(
-                    ReleaseNotificationQueue,
-                    ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
-                    {
-                        new()
+                notifierClient.Verify(mock => mock.NotifyPublicationSubscribers(
+                        ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
                         {
-                            PublicationId = release1Version.Publication.Id,
-                            PublicationName = release1Version.Publication.Title,
-                            PublicationSlug = release1Version.Publication.Slug,
-                            ReleaseName = release1Version.Title,
-                            ReleaseSlug = release1Version.Slug,
-                            Amendment = false,
-                            UpdateNote = "No update note provided.",
-                            SupersededPublications = new List<IdTitleViewModel>(),
-                        },
-                        new()
-                        {
-                            PublicationId = amendedReleaseVersion.Publication.Id,
-                            PublicationName = amendedReleaseVersion.Publication.Title,
-                            PublicationSlug = amendedReleaseVersion.Publication.Slug,
-                            ReleaseName = amendedReleaseVersion.Title,
-                            ReleaseSlug = amendedReleaseVersion.Slug,
-                            Amendment = true,
-                            UpdateNote = "latest update note",
-                            SupersededPublications = new List<IdTitleViewModel>(),
-                        },
-                    })), Times.Once);
+                            new()
+                            {
+                                PublicationId = release1Version.Publication.Id,
+                                PublicationName = release1Version.Publication.Title,
+                                PublicationSlug = release1Version.Publication.Slug,
+                                ReleaseName = release1Version.Title,
+                                ReleaseSlug = release1Version.Slug,
+                                Amendment = false,
+                                UpdateNote = "No update note provided.",
+                                SupersededPublications = new List<IdTitleViewModel>(),
+                            },
+                            new()
+                            {
+                                PublicationId = amendedReleaseVersion.Publication.Id,
+                                PublicationName = amendedReleaseVersion.Publication.Title,
+                                PublicationSlug = amendedReleaseVersion.Publication.Slug,
+                                ReleaseName = amendedReleaseVersion.Title,
+                                ReleaseSlug = amendedReleaseVersion.Slug,
+                                Amendment = true,
+                                UpdateNote = "latest update note",
+                                SupersededPublications = new List<IdTitleViewModel>(),
+                            },
+                        }),
+                        CancellationToken.None),
+                    Times.Once);
             }
 
-            MockUtils.VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(notifierClient);
         }
 
         [Fact]
@@ -173,45 +174,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
-            storageQueueService.Setup(mock => mock.AddMessages(
-                    ReleaseNotificationQueue,
-                    It.IsAny<List<ReleaseNotificationMessage>>()))
+            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
+            notifierClient.Setup(mock => mock.NotifyPublicationSubscribers(
+                    It.IsAny<IReadOnlyList<ReleaseNotificationMessage>>(),
+                    CancellationToken.None))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var notificationsService = BuildNotificationsService(
-                    contentDbContext, storageQueueService.Object);
+                    contentDbContext,
+                    notifierClient.Object);
 
                 await notificationsService.NotifySubscribersIfApplicable(releaseVersion.Id);
 
-                storageQueueService.Verify(mock => mock.AddMessages(
-                    ReleaseNotificationQueue,
-                    ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
-                    {
-                        new()
+                notifierClient.Verify(mock => mock.NotifyPublicationSubscribers(
+                        ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
                         {
-                            PublicationId = releaseVersion.Publication.Id,
-                            PublicationName = releaseVersion.Publication.Title,
-                            PublicationSlug = releaseVersion.Publication.Slug,
-                            ReleaseName = releaseVersion.Title,
-                            ReleaseSlug = releaseVersion.Slug,
-                            Amendment = false,
-                            UpdateNote = "No update note provided.",
-                            SupersededPublications = new List<IdTitleViewModel>
+                            new()
                             {
-                                new()
+                                PublicationId = releaseVersion.Publication.Id,
+                                PublicationName = releaseVersion.Publication.Title,
+                                PublicationSlug = releaseVersion.Publication.Slug,
+                                ReleaseName = releaseVersion.Title,
+                                ReleaseSlug = releaseVersion.Slug,
+                                Amendment = false,
+                                UpdateNote = "No update note provided.",
+                                SupersededPublications = new List<IdTitleViewModel>
                                 {
-                                    Id = supersededPublication.Id,
-                                    Title = supersededPublication.Title,
+                                    new()
+                                    {
+                                        Id = supersededPublication.Id,
+                                        Title = supersededPublication.Title,
+                                    },
                                 },
                             },
-                        },
-                    })), Times.Once);
+                        }),
+                        CancellationToken.None),
+                    Times.Once);
             }
 
-            MockUtils.VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(notifierClient);
         }
 
         [Fact]
@@ -222,17 +225,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await notificationsService.NotifySubscribersIfApplicable();
 
-            // No interaction with the storage queue service is expected
-            // since no releases are being published.
+            // No interaction with the queue client is expected since no releases are being published.
         }
 
         private static NotificationsService BuildNotificationsService(
             ContentDbContext contentDbContext,
-            IStorageQueueService? storageQueueService = null)
+            INotifierClient? notifierClient = null)
         {
-            return new (
+            return new NotificationsService(
                 contentDbContext,
-                storageQueueService ?? Mock.Of<IStorageQueueService>(MockBehavior.Strict));
+                notifierClient ?? Mock.Of<INotifierClient>(MockBehavior.Strict));
         }
     }
 }

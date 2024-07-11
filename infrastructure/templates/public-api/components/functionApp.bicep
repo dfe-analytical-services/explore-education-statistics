@@ -27,8 +27,8 @@ param appServicePlanOS string = 'Linux'
 ])
 param functionAppRuntime string = 'dotnet'
 
-@description('Specifies the additional setting to add to the functionapp.')
-param settings object = {}
+@description('Specifies the additional setting to add to the Function App')
+param appSettings object = {}
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -401,7 +401,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // site is being viewed.
       'SLOT_NAME'
     ]
-    commonSettings: union(settings, {
+    commonSettings: union(appSettings, {
 
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
       AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'

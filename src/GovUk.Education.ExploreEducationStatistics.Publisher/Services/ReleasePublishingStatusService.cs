@@ -21,7 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ILogger<ReleasePublishingStatusService> _logger;
         private readonly IPublisherTableStorageService _tableStorageService;
 
-        public ReleasePublishingStatusService(ContentDbContext context,
+        public ReleasePublishingStatusService(
+            ContentDbContext context,
             ILogger<ReleasePublishingStatusService> logger,
             IPublisherTableStorageService tableStorageService)
         {
@@ -30,9 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task<ReleasePublishingStatus> CreateAsync(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+        public async Task<ReleasePublishingKey> Create(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
@@ -40,29 +40,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releaseVersion = await _context.ReleaseVersions
                 .AsNoTracking()
                 .Include(rv => rv.Publication)
-                .FirstAsync(rv => rv.Id == releaseVersionId);
+                .FirstAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId);
 
             var releaseStatus = new ReleasePublishingStatus(publicationSlug: releaseVersion.Publication.Slug,
                 publish: immediate ? null : releaseVersion.PublishScheduled,
                 releaseVersionId: releaseVersion.Id,
-                releaseStatusId: releaseStatusId,
+                releaseStatusId: releasePublishingKey.ReleaseStatusId,
                 releaseSlug: releaseVersion.Slug,
                 state,
                 immediate: immediate,
                 logMessages);
 
             var tableResult = await GetTable().ExecuteAsync(TableOperation.Insert(releaseStatus));
-            return tableResult.Result as ReleasePublishingStatus;
+            return (tableResult.Result as ReleasePublishingStatus).AsTableRowKey();
         }
 
-        public async Task<ReleasePublishingStatus> GetAsync(Guid releaseVersionId,
-            Guid releaseStatusId)
+        public async Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey)
         {
             var tableResult = await GetTable().ExecuteAsync(
-                TableOperation.Retrieve<ReleasePublishingStatus>(releaseVersionId.ToString(),
-                    releaseStatusId.ToString(),
-                    new List<string>
-                    {
+                TableOperation.Retrieve<ReleasePublishingStatus>(
+                    partitionKey: releasePublishingKey.ReleaseVersionId.ToString(),
+                    rowkey: releasePublishingKey.ReleaseStatusId.ToString(),
+                    [
                         nameof(ReleasePublishingStatus.Created),
                         nameof(ReleasePublishingStatus.PublicationSlug),
                         nameof(ReleasePublishingStatus.Publish),
@@ -73,160 +72,162 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         nameof(ReleasePublishingStatus.OverallStage),
                         nameof(ReleasePublishingStatus.Immediate),
                         nameof(ReleasePublishingStatus.Messages)
-                    }));
+                    ]));
 
             return tableResult.Result as ReleasePublishingStatus;
         }
 
-        public async Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
         {
             var query = QueryPublishLessThanEndOfTodayWithStages(content, files, publishing, overall);
-            return await ExecuteQueryAsync(query);
+            var tableResult = await ExecuteQuery(query);
+            return tableResult.Select(status => status.AsTableRowKey()).ToList();
         }
 
-        public async Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayOrInFutureWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
+            IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
         {
             var query = QueryPublishTodayOrInFutureWithStages(content, files, publishing, overall);
-            return await ExecuteQueryAsync(query);
+            var tableResult = await ExecuteQuery(query);
+            return tableResult.Where(status => releaseVersionIds.Contains(status.ReleaseVersionId))
+                .Select(status => status.AsTableRowKey())
+                .ToList();
         }
 
 
-        public async Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseVersionId,
+        public async Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
+            Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
             var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                QueryComparisons.Equal, releaseVersionId.ToString());
+                QueryComparisons.Equal,
+                releaseVersionId.ToString());
 
             if (overallStages.Any())
             {
-                var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) =>
-                {
-                    var stageFilter = TableQuery.GenerateFilterCondition(
-                        nameof(ReleasePublishingStatus.OverallStage),
-                        QueryComparisons.Equal,
-                        stage.ToString()
-                    );
-
-                    if (acc == "")
+                var allStageFilters = overallStages.ToList().Aggregate("",
+                    (acc, stage) =>
                     {
-                        return stageFilter;
-                    }
+                        var stageFilter = TableQuery.GenerateFilterCondition(
+                            nameof(ReleasePublishingStatus.OverallStage),
+                            QueryComparisons.Equal,
+                            stage.ToString()
+                        );
 
-                    return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter);
-                });
+                        if (acc == "")
+                        {
+                            return stageFilter;
+                        }
+
+                        return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter);
+                    });
 
                 filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
             }
 
             var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
-            return await ExecuteQueryAsync(query);
+            return await ExecuteQuery(query);
         }
 
-        public async Task<ReleasePublishingStatus?> GetLatestAsync(Guid releaseVersionId)
+        public async Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId)
         {
             var query = new TableQuery<ReleasePublishingStatus>()
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                    QueryComparisons.Equal, releaseVersionId.ToString()));
+                    QueryComparisons.Equal,
+                    releaseVersionId.ToString()));
 
-            var result = await ExecuteQueryAsync(query);
-            return result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
+            var result = await ExecuteQuery(query);
+            return result.OrderByDescending(status => status.Created).FirstOrDefault();
         }
 
-        private Task<IEnumerable<ReleasePublishingStatus>> ExecuteQueryAsync(TableQuery<ReleasePublishingStatus> query)
+        private async Task<IReadOnlyList<ReleasePublishingStatus>> ExecuteQuery(
+            TableQuery<ReleasePublishingStatus> query)
         {
-            return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
+            return await _tableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
         }
 
-        public async Task UpdateStateAsync(Guid releaseVersionId,
-            Guid releaseStatusId,
+        public async Task UpdateState(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state)
         {
-            await UpdateRowAsync(releaseVersionId: releaseVersionId,
-                releaseStatusId: releaseStatusId,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
-            {
-                row.State = state;
-                return row;
-            });
+                {
+                    row.State = state;
+                    return row;
+                });
         }
 
-        public async Task UpdateContentStageAsync(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+        public async Task UpdateContentStage(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releaseVersionId: releaseVersionId,
-                releaseStatusId: releaseStatusId,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
-            {
-                row.State.Content = stage;
-                row.AppendLogMessage(logMessage);
-                return row;
-            });
+                {
+                    row.State.Content = stage;
+                    row.AppendLogMessage(logMessage);
+                    return row;
+                });
         }
 
-        public async Task UpdateFilesStageAsync(Guid releaseVersionId,
-            Guid releaseStatusId,
+        public async Task UpdateFilesStage(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releaseVersionId: releaseVersionId,
-                releaseStatusId: releaseStatusId,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
-            {
-                row.State.Files = stage;
-                row.AppendLogMessage(logMessage);
-                return row;
-            });
+                {
+                    row.State.Files = stage;
+                    row.AppendLogMessage(logMessage);
+                    return row;
+                });
         }
 
-        public async Task UpdatePublishingStageAsync(Guid releaseVersionId,
-            Guid releaseStatusId,
+        public async Task UpdatePublishingStage(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releaseVersionId: releaseVersionId,
-                releaseStatusId: releaseStatusId,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
-            {
-                row.State.Publishing = stage;
-                row.AppendLogMessage(logMessage);
-                return row;
-            });
+                {
+                    row.State.Publishing = stage;
+                    row.AppendLogMessage(logMessage);
+                    return row;
+                });
         }
 
         private async Task UpdateRowAsync(
-            Guid releaseVersionId,
-            Guid releaseStatusId,
+            ReleasePublishingKey releasePublishingKey,
             Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction,
             int retry = 0)
         {
             var table = GetTable();
-            var releaseStatus = await GetAsync(releaseVersionId: releaseVersionId,
-                releaseStatusId: releaseStatusId);
+            var releasePublishingStatus = await Get(releasePublishingKey);
 
             try
             {
-                await table.ExecuteAsync(TableOperation.Replace(updateFunction.Invoke(releaseStatus)));
+                await table.ExecuteAsync(TableOperation.Replace(updateFunction.Invoke(releasePublishingStatus)));
             }
             catch (StorageException e)
             {
-                if (e.RequestInformation.HttpStatusCode == (int) HttpStatusCode.PreconditionFailed)
+                if (e.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
                 {
                     _logger.LogDebug("Precondition failure as expected. ETag does not match");
                     if (retry++ < 5)
                     {
-                        await UpdateRowAsync(releaseVersionId: releaseVersionId,
-                            releaseStatusId: releaseStatusId,
+                        await UpdateRowAsync(releasePublishingKey,
                             updateFunction,
                             retry);
                     }

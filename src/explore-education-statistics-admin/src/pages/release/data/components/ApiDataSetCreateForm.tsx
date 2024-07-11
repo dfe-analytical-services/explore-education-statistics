@@ -15,12 +15,14 @@ export interface ApiDataSetCreateFormValues {
 
 export interface ApiDataSetCreateFormProps {
   dataSetCandidates: ApiDataSetCandidate[];
+  submitText?: string;
   onCancel: () => void;
   onSubmit: (values: ApiDataSetCreateFormValues) => void;
 }
 
 export default function ApiDataSetCreateForm({
   dataSetCandidates,
+  submitText = 'Confirm new API data set',
   onCancel,
   onSubmit,
 }: ApiDataSetCreateFormProps) {
@@ -49,7 +51,7 @@ export default function ApiDataSetCreateForm({
 
             <ButtonGroup>
               <Button type="submit" ariaDisabled={formState.isSubmitting}>
-                Confirm new API data set
+                {submitText}
               </Button>
               <ButtonText
                 ariaDisabled={formState.isSubmitting}

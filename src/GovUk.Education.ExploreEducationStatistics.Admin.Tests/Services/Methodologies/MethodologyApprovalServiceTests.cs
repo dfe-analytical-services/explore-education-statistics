@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -19,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -671,7 +671,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(true);
 
-            publishingService.Setup(mock => mock.PublishMethodologyFiles(methodologyVersion.Id))
+            publishingService.Setup(mock => mock.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None))
                 .ReturnsAsync(Unit.Instance);
 
             methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
@@ -727,10 +727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingImmediateStrategy_ScheduledWithReleaseIsCleared()
         {
-            var scheduledWithRelease = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            };
+            var scheduledWithRelease = new ReleaseVersion { Id = Guid.NewGuid() };
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -812,10 +809,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_NonLiveRelease()
         {
-            var publication = new Publication
-            {
-                Title = "Publication title"
-            };
+            var publication = new Publication { Title = "Publication title" };
 
             var scheduledWithReleaseVersion = new ReleaseVersion
             {
@@ -889,7 +883,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.NotNull(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(scheduledWithReleaseVersion.Id, updatedMethodologyVersion.ScheduledWithReleaseVersion!.Id);
-                Assert.Equal(scheduledWithReleaseVersion.Title, updatedMethodologyVersion.ScheduledWithReleaseVersion.Title);
+                Assert.Equal(scheduledWithReleaseVersion.Title,
+                    updatedMethodologyVersion.ScheduledWithReleaseVersion.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -911,10 +906,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseIdMissing()
         {
-            var publication = new Publication
-            {
-                Title = "Publication title"
-            };
+            var publication = new Publication { Title = "Publication title" };
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -961,10 +953,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseIdNotFound()
         {
-            var publication = new Publication
-            {
-                Title = "Publication title"
-            };
+            var publication = new Publication { Title = "Publication title" };
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -1012,10 +1001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseAlreadyPublished()
         {
-            var publication = new Publication
-            {
-                Title = "Publication title"
-            };
+            var publication = new Publication { Title = "Publication title" };
 
             // Create a release version that is already published which the methodology cannot be made dependant on
             var scheduledWithReleaseVersion = new ReleaseVersion
@@ -1281,12 +1267,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 });
 
             emailTemplateService.Setup(mock =>
-                    mock.SendMethodologyHigherReviewEmail("release-approver@email.com", methodologyVersion.Id,
+                    mock.SendMethodologyHigherReviewEmail("release-approver@email.com",
+                        methodologyVersion.Id,
                         methodologyVersion.Title))
                 .Returns(Unit.Instance);
 
             emailTemplateService.Setup(mock =>
-                    mock.SendMethodologyHigherReviewEmail("publication-approver@email.com", methodologyVersion.Id,
+                    mock.SendMethodologyHigherReviewEmail("publication-approver@email.com",
+                        methodologyVersion.Id,
                         methodologyVersion.Title))
                 .Returns(Unit.Instance);
 

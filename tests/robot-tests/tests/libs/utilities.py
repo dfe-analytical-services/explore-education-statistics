@@ -4,17 +4,19 @@ import json
 import os
 import re
 from typing import Union
-from urllib.parse import urlparse
 
+import time
 import pytz
 import utilities_init
 import visual
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException
 from SeleniumLibrary.utils import is_noney
 from tests.libs.logger import get_logger
 from tests.libs.selenium_elements import element_finder, sl, waiting
+from urllib.parse import urlparse, urlunparse
 
 logger = get_logger(__name__)
 
@@ -366,3 +368,25 @@ def get_www_url(publicUrl: str):
     protocol, hostnameAndPort = publicUrl.split("://")
 
     return protocol + "://www." + hostnameAndPort
+
+
+def remove_auth_from_url(publicUrl: str):
+    parsed_url = urlparse(publicUrl)
+    netloc = parsed_url.hostname
+
+    if parsed_url.port:
+        netloc += f":{parsed_url.port}"
+
+    modified_url_without_auth = urlunparse((parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment))
+    return modified_url_without_auth
+
+def get_child_element_with_retry(parent_locator: object, child_locator: str, max_retries=3, retry_delay=2):
+    retry_count = 0
+    while retry_count < max_retries:
+        try:
+            return get_child_element(parent_locator, child_locator)
+        except NoSuchElementException:
+            retry_count += 1
+            logger.warn(f"Child element not found, after ({max_retries}) retries")
+            time.sleep(retry_delay)
+    raise AssertionError(f"Failed to find child element after {max_retries} retries.")

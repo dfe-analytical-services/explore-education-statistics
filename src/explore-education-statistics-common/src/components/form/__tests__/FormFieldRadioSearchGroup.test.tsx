@@ -2,9 +2,9 @@ import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
 import Yup from '@common/validation/yup';
+import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 
 import noop from 'lodash/noop';
 import React from 'react';
@@ -88,7 +88,7 @@ describe('FormFieldRadioSearchGroup', () => {
   });
 
   test('checking an option checks it', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: '',
@@ -111,13 +111,13 @@ describe('FormFieldRadioSearchGroup', () => {
 
     expect(radio.checked).toBe(false);
 
-    await userEvent.click(radio);
+    await user.click(radio);
 
     expect(radio.checked).toBe(true);
   });
 
   test('checking another option un-checks the currently checked option', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: '1',
@@ -144,7 +144,7 @@ describe('FormFieldRadioSearchGroup', () => {
     expect(radio2.checked).toBe(false);
     expect(radio3.checked).toBe(false);
 
-    await userEvent.click(radio2);
+    await user.click(radio2);
 
     expect(radio1.checked).toBe(false);
     expect(radio2.checked).toBe(true);
@@ -153,7 +153,7 @@ describe('FormFieldRadioSearchGroup', () => {
 
   describe('error messages', () => {
     test('displays validation message when form is submitted', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -179,17 +179,17 @@ describe('FormFieldRadioSearchGroup', () => {
         </FormProvider>,
       );
 
-      expect(screen.queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
       });
     });
 
-    test('displays validation message when radios have been touched', async () => {
-      render(
+    test('updates validation message when change values after form is submitted', async () => {
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -209,47 +209,29 @@ describe('FormFieldRadioSearchGroup', () => {
                 { id: 'radio-3', value: '3', label: 'Radio 3' },
               ]}
             />
+
+            <button type="submit">Submit</button>
           </Form>
         </FormProvider>,
       );
 
-      await userEvent.tab();
-      await userEvent.tab();
-      await userEvent.tab();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
       });
-    });
 
-    test('does not display validation message when radios are untouched', async () => {
-      render(
-        <FormProvider
-          initialValues={{
-            test: '',
-          }}
-          validationSchema={Yup.object({
-            test: Yup.string().required('Select an option'),
-          })}
-        >
-          <FormFieldRadioSearchGroup
-            id="test-group"
-            name="test"
-            legend="Test radios"
-            options={[
-              { id: 'radio-1', value: '1', label: 'Radio 1' },
-              { id: 'radio-2', value: '2', label: 'Radio 2' },
-              { id: 'radio-3', value: '3', label: 'Radio 3' },
-            ]}
-          />
-        </FormProvider>,
-      );
+      await user.click(screen.getByLabelText('Radio 3'));
 
-      expect(screen.queryByText('Select an option')).toBeNull();
+      await waitFor(() => {
+        expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
+      });
     });
 
     test('does not display validation message when `showError` is false', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -281,7 +263,7 @@ describe('FormFieldRadioSearchGroup', () => {
       expect(radio.checked).toBe(false);
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       expect(radio.checked).toBe(false);
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
@@ -290,7 +272,7 @@ describe('FormFieldRadioSearchGroup', () => {
 
   describe('search', () => {
     test('providing a search term filters the radios', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -312,7 +294,7 @@ describe('FormFieldRadioSearchGroup', () => {
 
       const searchInput = screen.getByLabelText('Search') as HTMLInputElement;
 
-      await userEvent.type(searchInput, '2');
+      await user.type(searchInput, '2');
 
       await waitFor(() =>
         expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument(),
@@ -325,7 +307,7 @@ describe('FormFieldRadioSearchGroup', () => {
     });
 
     test('providing a search term does not remove a radio that has already been checked', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: '',
@@ -349,10 +331,10 @@ describe('FormFieldRadioSearchGroup', () => {
       const radio1 = screen.getByLabelText('Radio 1') as HTMLInputElement;
       const radio2 = screen.getByLabelText('Radio 2') as HTMLInputElement;
 
-      await userEvent.click(radio1);
+      await user.click(radio1);
       expect(radio1.checked).toBe(true);
 
-      await userEvent.type(searchInput, '2');
+      await user.type(searchInput, '2');
 
       await waitFor(() =>
         expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument(),

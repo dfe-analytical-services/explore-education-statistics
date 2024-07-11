@@ -21,7 +21,7 @@ export default function DeleteDraftVersionButton({
   children,
   dataSet,
   dataSetVersion,
-  modalTitle = 'Remove draft version',
+  modalTitle = 'Remove this draft API data set version',
   onDeleted,
 }: DeleteDraftVersionButtonProps) {
   const queryClient = useQueryClient();
@@ -41,15 +41,21 @@ export default function DeleteDraftVersionButton({
 
   return (
     <ModalConfirm
+      confirmText="Remove this API data set version"
+      submitButtonVariant="warning"
       title={modalTitle}
       triggerButton={<ButtonText variant="warning">{children}</ButtonText>}
       hiddenConfirmingText="Removing draft version"
       onConfirm={handleConfirm}
     >
-      <p data-testid="confirm-text">
-        Confirm that you want to delete the draft version{' '}
-        <strong>{dataSetVersion.version}</strong> for API data set: <br />
+      <p>Are you sure you want to remove the selected API data set version?</p>
+      <p>
         <strong>{dataSet.title}</strong>
+      </p>
+      <p>
+        Please note this doesn't affect the current live API data set in any
+        way. You can reassign a data set version at any time prior to this
+        release being published.
       </p>
     </ModalConfirm>
   );

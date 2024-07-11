@@ -50,8 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
                             QueryComparisons.Equal, releaseVersionId.ToString()));
 
-                    var result = await _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
-                    var first = result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
+                    var result = await _publisherTableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
+                    var first = result.OrderByDescending(status => status.Created).FirstOrDefault();
                     return _mapper.Map<ReleasePublishingStatusViewModel>(first);
                 });
         }

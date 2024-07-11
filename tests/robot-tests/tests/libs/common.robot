@@ -705,6 +705,13 @@ user checks url equals
     ${current_url}=    get location
     should be equal    ${current_url}    ${expected}
 
+user checks url without auth equals
+    [Arguments]    ${expected}
+    ${current_url}=    get location
+    ${remove_auth_current_url}=    remove auth from url      ${current_url}
+    set variable    ${remove_auth_current_url}
+    should contain    ${remove_auth_current_url}   ${expected}
+
 user checks page contains link
     [Arguments]
     ...    ${text}
@@ -1006,3 +1013,37 @@ user takes html snapshot of element
 
 user waits for caches to expire
     sleep    %{WAIT_CACHE_EXPIRY}
+
+user wait for option to be available and select it
+    [Arguments]  ${dropdown_locator}  ${option_text}  ${timeout}=%{TIMEOUT}
+    wait until keyword succeeds  ${timeout}  1s  check option exist in dropdown  ${dropdown_locator}  ${option_text}
+    select from list by label  ${dropdown_locator}  ${option_text}
+
+check option exist in dropdown
+    [Arguments]  ${dropdown_locator}  ${option_text}
+     ${options}=  get webelements    ${dropdown_locator} > option
+     ${all_texts}=  Create List
+
+     FOR    ${option}    IN    @{options}
+        ${text}=  get text  ${option}
+        Append To List  ${all_texts}  ${text}
+     END
+     # Adding logging to help catch intermittent test failures
+     Log to console  \n\tAll Texts: ${all_texts}
+     ${matched}=  Run Keyword And Return Status  Should Contain  ${all_texts}  ${option_text}
+
+     IF  ${matched}
+        # Adding logging to help catch intermittent test failures
+        Log to console  \n\tOption '${option_text}' found in the dropdown.
+     ELSE
+         # Adding logging to help catch intermittent test failures
+        Log to console  \n\tOption '${option_text}' not found in the dropdown.
+     END
+     Return From Keyword  ${matched}
+
+
+    
+    
+
+
+

@@ -390,9 +390,18 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasError(
         this ValidationProblemViewModel validationProblem,
         string? expectedPath,
-        string expectedCode)
+        string expectedCode,
+        string? expectedMessage = null)
     {
-        Predicate<ErrorViewModel> predicate = error => error.Path == expectedPath && error.Code == expectedCode;
+        Predicate<ErrorViewModel> predicate = error =>
+        {
+            if (expectedMessage is not null && error.Message != expectedMessage)
+            {
+                return false;
+            }
+            
+            return error.Path == expectedPath && error.Code == expectedCode;
+        };
 
         Assert.Contains(validationProblem.Errors, predicate);
 

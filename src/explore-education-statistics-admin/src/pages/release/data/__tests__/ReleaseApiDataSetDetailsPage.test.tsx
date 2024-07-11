@@ -171,6 +171,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(summary.getByTestId('Filters')).toHaveTextContent(
       'Test draft filter',
     );
+    expect(
+      screen.getByRole('button', { name: 'Remove draft version' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('heading', { name: 'Latest live version details' }),
@@ -216,6 +219,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     );
 
     expect(
+      screen.queryByRole('button', { name: 'Remove draft version' }),
+    ).not.toBeInTheDocument();
+    expect(
       screen.queryByRole('heading', { name: 'Draft version details' }),
     ).not.toBeInTheDocument();
   });
@@ -255,6 +261,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(draftSummary.getByTestId('Filters')).toHaveTextContent(
       'Test draft filter',
     );
+    expect(
+      draftSummary.getByRole('button', { name: 'Remove draft version' }),
+    ).toBeInTheDocument();
 
     // Latest live version
 
@@ -283,6 +292,83 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       'href',
       'http://localhost/data-catalogue/data-set/live-file-id',
     );
+  });
+
+  test('does not render the Remove draft version button when cannot update the release', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testDraftVersion,
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage({ release: { ...testRelease, approvalStatus: 'Approved' } });
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+
+    const draftSummary = within(screen.getByTestId('draft-version-summary'));
+    expect(
+      draftSummary.queryByRole('button', { name: 'Remove draft version' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders the create new version button when release can be updated and there is no draft version', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Latest live version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Create a new version of this data set',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not render the create new version button when cannot update the release', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage({ release: { ...testRelease, approvalStatus: 'Approved' } });
+
+    expect(
+      await screen.findByText('Latest live version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Create a new version of this data set',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render the create new version button when there is a draft version', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testDraftVersion,
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Latest live version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Create a new version of this data set',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   function renderPage(options?: { release?: Release; dataSetId?: string }) {

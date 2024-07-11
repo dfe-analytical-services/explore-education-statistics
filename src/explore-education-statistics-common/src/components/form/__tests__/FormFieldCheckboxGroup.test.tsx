@@ -2,9 +2,9 @@ import Yup from '@common/validation/yup';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
+import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import React from 'react';
 
 describe('FormFieldCheckboxGroup', () => {
@@ -149,7 +149,7 @@ describe('FormFieldCheckboxGroup', () => {
   });
 
   test('checking option checks it', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: [],
@@ -172,13 +172,13 @@ describe('FormFieldCheckboxGroup', () => {
 
     expect(checkbox).not.toBeChecked();
 
-    await userEvent.click(checkbox);
+    await user.click(checkbox);
 
     expect(checkbox).toBeChecked();
   });
 
   test('un-checking option un-checks it', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: ['1'],
@@ -201,13 +201,13 @@ describe('FormFieldCheckboxGroup', () => {
 
     expect(checkbox).toBeChecked();
 
-    await userEvent.click(checkbox);
+    await user.click(checkbox);
 
     expect(checkbox).not.toBeChecked();
   });
 
   test('clicking `Select all 3 options` button checks all values', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: [],
@@ -235,7 +235,7 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox2).not.toBeChecked();
     expect(checkbox3).not.toBeChecked();
 
-    await userEvent.click(screen.getByText('Select all 3 options'));
+    await user.click(screen.getByText('Select all 3 options'));
 
     expect(checkbox1).toBeChecked();
     expect(checkbox2).toBeChecked();
@@ -243,7 +243,7 @@ describe('FormFieldCheckboxGroup', () => {
   });
 
   test('clicking `Unselect all 3 options` button un-checks all values', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: ['1', '2', '3'],
@@ -271,7 +271,7 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox2).toBeChecked();
     expect(checkbox3).toBeChecked();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     );
 
@@ -281,7 +281,7 @@ describe('FormFieldCheckboxGroup', () => {
   });
 
   test('checking all options renders the `Unselect all 3 options` button', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: [],
@@ -313,9 +313,9 @@ describe('FormFieldCheckboxGroup', () => {
       screen.queryByRole('button', { name: 'Unselect all 3 options' }),
     ).not.toBeInTheDocument();
 
-    await userEvent.click(checkbox1);
-    await userEvent.click(checkbox2);
-    await userEvent.click(checkbox3);
+    await user.click(checkbox1);
+    await user.click(checkbox2);
+    await user.click(checkbox3);
 
     expect(checkbox1).toBeChecked();
     expect(checkbox2).toBeChecked();
@@ -329,7 +329,7 @@ describe('FormFieldCheckboxGroup', () => {
   });
 
   test('un-checking any options renders the `Select all 3 options` button', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: ['1', '2', '3'],
@@ -359,7 +359,7 @@ describe('FormFieldCheckboxGroup', () => {
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     ).toBeInTheDocument();
 
-    await userEvent.click(checkbox);
+    await user.click(checkbox);
 
     expect(checkbox).not.toBeChecked();
     expect(
@@ -371,37 +371,8 @@ describe('FormFieldCheckboxGroup', () => {
   });
 
   describe('error messages', () => {
-    test('does not display validation message when checkboxes are untouched', async () => {
-      render(
-        <FormProvider
-          initialValues={{
-            test: [],
-          }}
-          validationSchema={Yup.object({
-            test: Yup.array().min(1, 'Select at least one option'),
-          })}
-        >
-          <FormFieldCheckboxGroup
-            name="test"
-            id="checkboxes"
-            legend="Test checkboxes"
-            selectAll
-            options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-            ]}
-          />
-        </FormProvider>,
-      );
-
-      expect(
-        screen.queryByText('Select at least one option'),
-      ).not.toBeInTheDocument();
-    });
-
     test('displays validation message when form is submitted', async () => {
-      render(
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: [],
@@ -431,7 +402,7 @@ describe('FormFieldCheckboxGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(
@@ -440,8 +411,8 @@ describe('FormFieldCheckboxGroup', () => {
       });
     });
 
-    test('displays validation message when checkboxes have been touched', async () => {
-      render(
+    test('updates validation message when change values after form is submitted', async () => {
+      const { user } = render(
         <FormProvider
           initialValues={{
             test: [],
@@ -450,116 +421,77 @@ describe('FormFieldCheckboxGroup', () => {
             test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
-          <FormFieldCheckboxGroup
-            name="test"
-            id="checkboxes"
-            legend="Test checkboxes"
-            options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-            ]}
-          />
+          <Form id="testId" showErrorSummary={false} onSubmit={Promise.resolve}>
+            <FormFieldCheckboxGroup
+              name="test"
+              id="checkboxes"
+              legend="Test checkboxes"
+              selectAll
+              options={[
+                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              ]}
+            />
+            <button type="submit">Submit</button>
+          </Form>
         </FormProvider>,
       );
 
-      await userEvent.tab();
-      await userEvent.tab();
+      expect(
+        screen.queryByText('Select at least one option'),
+      ).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(
           screen.getByText('Select at least one option'),
         ).toBeInTheDocument();
       });
-    });
 
-    test('displays validation message when no checkboxes are checked', async () => {
-      render(
-        <FormProvider
-          initialValues={{
-            test: ['1'],
-          }}
-          validationSchema={Yup.object({
-            test: Yup.array().min(1, 'Select at least one option'),
-          })}
-        >
-          <FormFieldCheckboxGroup
-            name="test"
-            id="checkboxes"
-            legend="Test checkboxes"
-            selectAll
-            options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-            ]}
-          />
-        </FormProvider>,
-      );
-
-      const checkbox = screen.getByLabelText('Checkbox 1');
-
-      expect(checkbox).toBeChecked();
-      expect(
-        screen.queryByText('Select at least one option'),
-      ).not.toBeInTheDocument();
-
-      await userEvent.click(checkbox);
-
-      expect(checkbox).not.toBeChecked();
-
-      await userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Select at least one option'),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('does not display validation message when `showError` is false', async () => {
-      render(
-        <FormProvider
-          initialValues={{
-            test: ['1'],
-          }}
-          validationSchema={Yup.object({
-            test: Yup.array().min(1, 'Select at least one option'),
-          })}
-        >
-          <FormFieldCheckboxGroup
-            name="test"
-            id="checkboxes"
-            legend="Test checkboxes"
-            selectAll
-            showError={false}
-            options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-            ]}
-          />
-        </FormProvider>,
-      );
-
-      const checkbox = screen.getByLabelText('Checkbox 1');
-
-      expect(checkbox).toBeChecked();
-      expect(
-        screen.queryByText('Select at least one option'),
-      ).not.toBeInTheDocument();
-
-      await userEvent.click(checkbox);
-
-      expect(checkbox).not.toBeChecked();
-
-      await userEvent.tab();
+      await user.click(screen.getByLabelText('Checkbox 2'));
 
       await waitFor(() => {
         expect(
           screen.queryByText('Select at least one option'),
         ).not.toBeInTheDocument();
       });
+    });
+
+    test('does not display validation message when `showError` is false', async () => {
+      const { user } = render(
+        <FormProvider
+          initialValues={{
+            test: [],
+          }}
+          validationSchema={Yup.object({
+            test: Yup.array().min(1, 'Select at least one option'),
+          })}
+        >
+          <Form id="testId" showErrorSummary={false} onSubmit={Promise.resolve}>
+            <FormFieldCheckboxGroup
+              name="test"
+              id="checkboxes"
+              legend="Test checkboxes"
+              selectAll
+              showError={false}
+              options={[
+                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              ]}
+            />
+            <button type="submit">Submit</button>
+          </Form>
+        </FormProvider>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+      expect(
+        screen.queryByText('Select at least one option'),
+      ).not.toBeInTheDocument();
     });
   });
 });

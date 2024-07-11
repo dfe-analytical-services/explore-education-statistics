@@ -1,5 +1,4 @@
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -20,8 +19,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
@@ -51,6 +52,11 @@ public static class PublisherHostBuilderExtensions
                     .AddEnvironmentVariables()
                     .AddConfiguration(hostBuilderContext.Configuration);
             })
+            .ConfigureLogging(logging =>
+            {
+                // TODO EES-5013 Why can't this be controlled through application settings?
+                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+            })
             .ConfigureServices((hostContext, services) =>
             {
                 var configuration = hostContext.Configuration;
@@ -62,13 +68,6 @@ public static class PublisherHostBuilderExtensions
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
-                    .Configure<JsonSerializerOptions>(options =>
-                    {
-                        // The 'IncludeFields' setting is necessary for the deserialization of the System.ValueTuple's used by
-                        // the StageReleaseContentMessage and PublishReleaseFilesMessage queue message types.
-                        // See https://github.com/dotnet/runtime/issues/70352
-                        options.IncludeFields = true;
-                    })
                     .AddMemoryCache()
                     .AddDbContext<ContentDbContext>(options =>
                         options.UseSqlServer(
@@ -102,21 +101,8 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                     .AddScoped<IMethodologyRepository, MethodologyRepository>()
                     .AddScoped<IMethodologyService, MethodologyService>()
-                    .AddScoped<INotificationsService, NotificationsService>(provider =>
-                        new NotificationsService(
-                            context: provider.GetRequiredService<ContentDbContext>(),
-                            storageQueueService: new StorageQueueService(
-                                configuration.GetValue<string>("NotificationStorage"),
-                                new StorageInstanceCreationUtil())))
-                    .AddScoped<IQueueService, QueueService>(provider =>
-                        new QueueService(
-                            storageQueueService: new StorageQueueService(
-                                configuration.GetValue<string>("PublisherStorage"),
-                                new StorageInstanceCreationUtil()
-                            ),
-                            releasePublishingStatusService:
-                            provider.GetRequiredService<IReleasePublishingStatusService>(),
-                            logger: provider.GetRequiredService<ILogger<QueueService>>()))
+                    .AddScoped<INotificationsService, NotificationsService>()
+                    .AddScoped<IQueueService, QueueService>()
                     .AddScoped<IReleasePublishingStatusService, ReleasePublishingStatusService>()
                     .AddScoped<IValidationService, ValidationService>()
                     .AddScoped<IFilterRepository, FilterRepository>()
@@ -127,6 +113,8 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
+                    .AddSingleton<INotifierClient, NotifierClient>(_ => new NotifierClient(configuration.GetValue<string>("NotificationStorage")))
+                    .AddSingleton<IPublisherClient, PublisherClient>(_ => new PublisherClient(configuration.GetValue<string>("PublisherStorage")))
                     .Configure<AppSettingsOptions>(configuration.GetSection(AppSettingsOptions.AppSettings));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,11 @@ public class PublicDataDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PublicDataDbContext).Assembly);
 
         modelBuilder.HasSequence<int>(FilterOptionMetaLinkSequence);
+
+        // These Json classes are DTOs for extracting JSON fragments / query results  from JSONB columns.
+        // They are mapped here to inform EF that they are not entities.
+        modelBuilder.Entity<JsonFragment>().HasNoKey().ToView(null);
+        modelBuilder.Entity<JsonBool>().HasNoKey().ToView(null);
     }
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
@@ -63,4 +69,8 @@ public class PublicDataDbContext : DbContext
     public DbSet<ChangeSetIndicators> ChangeSetIndicators { get; init; } = null!;
     public DbSet<ChangeSetLocations> ChangeSetLocations { get; init; } = null!;
     public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
+    
+    public DbSet<JsonFragment> JsonFragments { get; init; } = null!;
+    
+    public DbSet<JsonBool> JsonBool { get; init; } = null!;
 }

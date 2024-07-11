@@ -14,12 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         private static readonly Dictionary<DataImportStatus, double> ProcessingRatios =
             new()
             {
-                {STAGE_1, .1},
-                {STAGE_2, .1},
-                {STAGE_3, .8},
-                {CANCELLING, 1},
-                {CANCELLED, 1},
-                {COMPLETE, 1},
+                { STAGE_1, .1 },
+                { STAGE_2, .1 },
+                { STAGE_3, .8 },
+                { CANCELLING, 1 },
+                { CANCELLED, 1 },
+                { COMPLETE, 1 },
             };
 
         public Guid Id { get; set; }
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int PercentageComplete()
         {
-            return (int) (Status switch
+            return (int)(Status switch
             {
                 STAGE_1 => StagePercentageComplete * ProcessingRatios[STAGE_1],
                 STAGE_2 => ProcessingRatios[STAGE_1] * 100 +
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         /// </summary>
         public bool HasSoleGeographicLevel()
         {
-            return GeographicLevels is {Count: 1};
+            return GeographicLevels is { Count: 1 };
         }
 
         public override string ToString()
@@ -118,18 +118,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public static class DataImportStatusExtensions
     {
-        private static readonly List<DataImportStatus> FinishedStatuses = new List<DataImportStatus>
-        {
+        private static readonly List<DataImportStatus> AbortingStatuses = [CANCELLING];
+
+        private static readonly List<DataImportStatus> FinishedStatuses =
+        [
             COMPLETE,
             FAILED,
             NOT_FOUND,
             CANCELLED
-        };
+        ];
 
-        private static readonly List<DataImportStatus> AbortingStatuses = new()
-        {
+        public static readonly List<DataImportStatus> IncompleteStatuses =
+        [
+            QUEUED,
+            PROCESSING_ARCHIVE_FILE,
+            STAGE_1,
+            STAGE_2,
+            STAGE_3,
             CANCELLING
-        };
+        ];
 
         public static DataImportStatus GetFinishingStateOfAbortProcess(this DataImportStatus status)
         {
@@ -153,6 +160,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public static bool IsFinishedOrAborting(this DataImportStatus state)
         {
             return IsFinished(state) || IsAborting(state);
+        }
+
+        public static bool IsIncomplete(this DataImportStatus state)
+        {
+            return IncompleteStatuses.Contains(state);
         }
     }
 }

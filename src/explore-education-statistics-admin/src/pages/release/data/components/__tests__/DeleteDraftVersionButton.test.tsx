@@ -26,38 +26,43 @@ describe('DeleteDraftVersionButton', () => {
         dataSet={testDataSet}
         dataSetVersion={testDataSetVersion}
       >
-        Delete draft version
+        Remove draft version
       </DeleteDraftVersionButton>,
     );
 
     expect(
-      screen.getByRole('button', { name: 'Delete draft version' }),
+      screen.getByRole('button', { name: 'Remove draft version' }),
     ).toBeInTheDocument();
   });
 
-  test('clicking the `Confirm` button opens a confirmation modal', async () => {
+  test('clicking the `Remove` button opens a confirmation modal', async () => {
     const { user } = render(
       <DeleteDraftVersionButton
         dataSet={testDataSet}
         dataSetVersion={testDataSetVersion}
       >
-        Delete draft version
+        Remove draft version
       </DeleteDraftVersionButton>,
     );
 
     await user.click(
-      screen.getByRole('button', { name: 'Delete draft version' }),
+      screen.getByRole('button', { name: 'Remove draft version' }),
     );
 
     const modal = within(screen.getByRole('dialog'));
 
     expect(
-      modal.getByRole('heading', { name: 'Remove draft version' }),
+      modal.getByRole('heading', {
+        name: 'Remove this draft API data set version',
+      }),
     ).toBeInTheDocument();
 
-    expect(modal.getByTestId('confirm-text')).toHaveTextContent(
-      'Confirm that you want to delete the draft version 1.0 for API data set: Data set title',
-    );
+    expect(
+      modal.getByText(
+        'Are you sure you want to remove the selected API data set version?',
+      ),
+    ).toBeInTheDocument();
+    expect(modal.getByText('Data set title')).toBeInTheDocument();
   });
 
   test('confirming the deletion calls the correct service', async () => {
@@ -66,19 +71,21 @@ describe('DeleteDraftVersionButton', () => {
         dataSet={testDataSet}
         dataSetVersion={testDataSetVersion}
       >
-        Delete draft version
+        Remove draft version
       </DeleteDraftVersionButton>,
     );
 
     await user.click(
-      screen.getByRole('button', { name: 'Delete draft version' }),
+      screen.getByRole('button', { name: 'Remove draft version' }),
     );
 
     const modal = within(screen.getByRole('dialog'));
 
     expect(apiDataSetVersionService.deleteVersion).not.toHaveBeenCalled();
 
-    await user.click(modal.getByRole('button', { name: 'Confirm' }));
+    await user.click(
+      modal.getByRole('button', { name: 'Remove this API data set version' }),
+    );
 
     expect(apiDataSetVersionService.deleteVersion).toHaveBeenCalledWith(
       testDataSetVersion.id,
@@ -91,20 +98,24 @@ describe('DeleteDraftVersionButton', () => {
         dataSet={testDataSet}
         dataSetVersion={testDataSetVersion}
       >
-        Delete draft version
+        Remove draft version
       </DeleteDraftVersionButton>,
     );
 
     await user.click(
-      screen.getByRole('button', { name: 'Delete draft version' }),
+      screen.getByRole('button', { name: 'Remove draft version' }),
     );
 
     const modal = within(screen.getByRole('dialog'));
 
-    await user.click(modal.getByRole('button', { name: 'Confirm' }));
+    await user.click(
+      modal.getByRole('button', { name: 'Remove this API data set version' }),
+    );
 
     await waitFor(() => {
-      expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Remove this API data set version'),
+      ).not.toBeInTheDocument();
     });
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

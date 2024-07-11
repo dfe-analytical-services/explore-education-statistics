@@ -14,8 +14,8 @@ using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribut
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class CreateNextDataSetVersionFunction(
-    ILogger<CreateNextDataSetVersionFunction> logger,
+public class CreateNextDataSetVersionMappingsFunction(
+    ILogger<CreateNextDataSetVersionMappingsFunction> logger,
     IDataSetVersionService dataSetVersionService,
     IValidator<NextDataSetVersionCreateRequest> requestValidator)
 {
@@ -60,7 +60,7 @@ public class CreateNextDataSetVersionFunction(
         Guid instanceId,
         CancellationToken cancellationToken)
     {
-        const string orchestratorName = nameof(ProcessNextDataSetVersionFunction.ProcessNextDataSetVersion);
+        const string orchestratorName = nameof(ProcessNextDataSetVersionMappingsFunction.ProcessNextDataSetVersionMappings);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 

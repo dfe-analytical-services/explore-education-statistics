@@ -1,19 +1,20 @@
 import ReleaseSeriesLegacyLinkForm from '@admin/pages/legacy-releases/components/ReleaseSeriesLegacyLinkForm';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 
 describe('ReleaseSeriesLegacyLinkForm', () => {
   test('shows validation error for empty `description`', async () => {
-    render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
+    const { user } = render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
     expect(screen.queryByText('Enter a description')).not.toBeInTheDocument();
 
-    const description = screen.getByLabelText('Description');
-
-    await userEvent.click(description);
-    await userEvent.tab();
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Save legacy release',
+      }),
+    );
 
     await waitFor(() => {
       expect(
@@ -25,12 +26,15 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
   });
 
   test('shows validation error for empty `url`', async () => {
-    render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
+    const { user } = render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
     expect(screen.queryByText('Enter a URL')).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByLabelText('URL'));
-    await userEvent.tab();
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Save legacy release',
+      }),
+    );
 
     await waitFor(() => {
       expect(
@@ -42,12 +46,17 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
   });
 
   test('shows validation error for invalid `url`', async () => {
-    render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
+    const { user } = render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
     expect(screen.queryByText('Enter a valid URL')).not.toBeInTheDocument();
 
-    await userEvent.type(screen.getByLabelText('URL'), 'not a url');
-    await userEvent.tab();
+    await user.type(screen.getByLabelText('URL'), 'not a url');
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Save legacy release',
+      }),
+    );
 
     await waitFor(() => {
       expect(
@@ -69,9 +78,11 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
     test('cannot submit with only invalid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
+      const { user } = render(
+        <ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />,
+      );
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -85,14 +96,13 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
     test('cannot submit with some invalid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
-
-      await userEvent.type(
-        screen.getByLabelText('Description'),
-        'Test description',
+      const { user } = render(
+        <ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />,
       );
 
-      await userEvent.click(
+      await user.type(screen.getByLabelText('Description'), 'Test description');
+
+      await user.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -106,15 +116,14 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
     test('can submit with valid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
-
-      await userEvent.type(
-        screen.getByLabelText('Description'),
-        'Test description',
+      const { user } = render(
+        <ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />,
       );
-      await userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
 
-      await userEvent.click(
+      await user.type(screen.getByLabelText('Description'), 'Test description');
+      await user.type(screen.getByLabelText('URL'), 'http://test.com');
+
+      await user.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -148,11 +157,13 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
     test('cannot submit with invalid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
+      const { user } = render(
+        <ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />,
+      );
 
-      await userEvent.clear(screen.getByLabelText('Description'));
+      await user.clear(screen.getByLabelText('Description'));
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -166,7 +177,7 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
     test('can submit with valid initial values', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: 'Test description',
@@ -176,7 +187,7 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
         />,
       );
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -193,7 +204,7 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
     test('can submit with valid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(
+      const { user } = render(
         <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: 'Test description',
@@ -203,10 +214,10 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Description'), ' 2');
-      await userEvent.type(screen.getByLabelText('URL'), '/updated');
+      await user.type(screen.getByLabelText('Description'), ' 2');
+      await user.type(screen.getByLabelText('URL'), '/updated');
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -19,11 +20,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -122,7 +123,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "2030-march",
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 PublishScheduled = DateTime.UtcNow,
-                NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
+                NextReleaseDate = new PartialDate
+                {
+                    Day = "15",
+                    Month = "6",
+                    Year = "2039"
+                },
                 PreReleaseAccessList = "Access list",
             };
 
@@ -140,7 +146,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Day = "1",
+                Month = "1",
+                Year = "2040"
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -198,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication {Title = "Old publication"},
+                Publication = new Publication { Title = "Old publication" },
                 ReleaseName = "2030",
                 Slug = "2030",
                 PublishScheduled = DateTime.UtcNow,
@@ -241,7 +252,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
-                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -287,7 +302,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = null,
-                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -329,7 +348,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "",
-                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -385,7 +408,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2022-12-31",
-                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -446,7 +473,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-06-06",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -504,7 +535,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-01",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -565,7 +600,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-06-07",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -623,7 +662,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-08", // Sunday
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -682,7 +725,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-01",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2000"
+                            }
                         }
                     );
 
@@ -761,10 +808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EmailSent = false,
             };
 
-            var existingUser2 = new User
-            {
-                Email = "test2@test.com"
-            };
+            var existingUser2 = new User { Email = "test2@test.com" };
 
             var existingUser2SentInvite = new UserReleaseInvite
             {
@@ -809,8 +853,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.ReleaseVersions.Add(releaseVersion);
                 context.Users.AddRange(existingUser1, existingUser2, existingUser3);
                 context.UserReleaseInvites.AddRange(
-                    existingUser1Invite, existingUser2SentInvite, existingUser3NonPreReleaseInvite,
-                    nonExistingUserPreReleaseInvite, nonExistingUserNonPreReleaseInvite);
+                    existingUser1Invite,
+                    existingUser2SentInvite,
+                    existingUser3NonPreReleaseInvite,
+                    nonExistingUserPreReleaseInvite,
+                    nonExistingUserNonPreReleaseInvite);
                 await context.SaveChangesAsync();
             }
 
@@ -828,9 +875,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == releaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    false,
+                    CancellationToken.None
                 ))
                 .ReturnsAsync(Unit.Instance);
 
@@ -862,7 +909,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.Is<UserReleaseInvite>(i => i.Email == nonExistingUserPreReleaseInvite.Email)))
                 .Returns(Task.CompletedTask);
 
-            var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Month = "12",
+                Year = "2000"
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -951,9 +1002,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == releaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    true,
+                    CancellationToken.None
                 ))
                 .ReturnsAsync(Unit.Instance);
 
@@ -961,7 +1012,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Month = "12",
+                Year = "2000"
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1062,9 +1117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == amendedReleaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == amendedReleaseVersion.Id),
+                    false,
+                    CancellationToken.None
                 ))
                 .ReturnsAsync(Unit.Instance);
 
@@ -1117,7 +1172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication {Title = "Old publication"},
+                Publication = new Publication { Title = "Old publication" },
                 ReleaseName = "2030",
                 Slug = "2030",
                 Version = 0,
@@ -1164,12 +1219,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication {Title = "Old publication"},
+                Publication = new Publication { Title = "Old publication" },
                 ReleaseName = "2030",
                 TimePeriodCoverage = TimeIdentifier.March,
                 Slug = "2030-march",
                 PublishScheduled = DateTime.UtcNow,
-                NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
+                NextReleaseDate = new PartialDate
+                {
+                    Day = "15",
+                    Month = "6",
+                    Year = "2039"
+                },
                 PreReleaseAccessList = "Access list",
                 Version = 0
             };
@@ -1224,7 +1284,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Day = "1",
+                Month = "1",
+                Year = "2040"
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1257,11 +1322,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication {Title = "Old publication"},
+                Publication = new Publication { Title = "Old publication" },
                 ReleaseName = "2030",
                 TimePeriodCoverage = TimeIdentifier.March,
                 PublishScheduled = DateTime.UtcNow,
-                NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
+                NextReleaseDate = new PartialDate
+                {
+                    Day = "15",
+                    Month = "6",
+                    Year = "2039"
+                },
                 PreReleaseAccessList = "Access list",
                 Version = 0,
             };
@@ -1306,18 +1376,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<HtmlBlock>());
 
             releaseFileService.Setup(mock =>
-                    mock.Delete(releaseVersion.Id, new List<Guid>
-                    {
-                        imageFile1.File.Id,
-                        imageFile2.File.Id
-                    }, false))
+                    mock.Delete(releaseVersion.Id,
+                        new List<Guid>
+                        {
+                            imageFile1.File.Id,
+                            imageFile2.File.Id
+                        },
+                        false))
                 .ReturnsAsync(Unit.Instance);
 
             userReleaseRoleService.Setup(mock =>
                     mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
                 .ReturnsAsync(ListOf<UserReleaseRole>());
 
-            var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Day = "1",
+                Month = "1",
+                Year = "2040"
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1339,11 +1416,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 releaseFileService.Verify(mock =>
-                    mock.Delete(releaseVersion.Id, new List<Guid>
-                    {
-                        imageFile1.File.Id,
-                        imageFile2.File.Id
-                    }, false), Times.Once);
+                        mock.Delete(releaseVersion.Id,
+                            new List<Guid>
+                            {
+                                imageFile1.File.Id,
+                                imageFile2.File.Id
+                            },
+                            false),
+                    Times.Once);
 
                 VerifyAllMocks(contentService, releaseFileService, userReleaseRoleService);
 
@@ -1422,7 +1502,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.Is<UserReleaseInvite>(i => i.Email == invite2.Email)))
                 .Returns(Task.CompletedTask);
 
-            var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Month = "12",
+                Year = "2000"
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1524,9 +1608,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == releaseVersion.Id),
-                    It.IsAny<Guid>(),
-                    It.IsAny<bool>()
+                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    false,
+                    CancellationToken.None
                 ))
                 .ReturnsAsync(new BadRequestResult());
 
@@ -1534,7 +1618,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Month = "12",
+                Year = "2000"
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1634,7 +1722,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2077" }
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2077"
+                            }
                         });
 
                 VerifyAllMocks(contentService,
@@ -1677,14 +1769,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userReleaseRole1 = new UserReleaseRole
             {
-                User = new User { Id = Guid.NewGuid(), Email = "test@test.com"},
+                User = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Email = "test@test.com"
+                },
                 ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
 
             var userReleaseRole2 = new UserReleaseRole
             {
-                User = new User { Id = Guid.NewGuid(), Email = "test2@test.com"},
+                User = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Email = "test2@test.com"
+                },
                 ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
@@ -1734,7 +1834,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2077"
+                            },
                         });
 
                 VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
@@ -1774,7 +1878,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userPublicationApproverRole = new UserPublicationRole
             {
-                User = new User { Id = Guid.NewGuid(), Email = "test@test.com" },
+                User = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Email = "test@test.com"
+                },
                 Publication = releaseVersion.Publication,
                 Role = PublicationRole.Approver
             };
@@ -1821,7 +1929,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2077"
+                            },
                         });
 
                 VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
@@ -1862,14 +1974,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userReleaseRole1 = new UserReleaseRole
             {
-                User = new User { Id = Guid.NewGuid(), Email = "test@test.com"},
+                User = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Email = "test@test.com"
+                },
                 ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
 
             var userReleaseRole2 = new UserReleaseRole
             {
-                User = new User { Id = Guid.NewGuid(), Email = "test2@test.com"},
+                User = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Email = "test2@test.com"
+                },
                 ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
@@ -1919,7 +2039,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
+                            NextReleaseDate = new PartialDate
+                            {
+                                Month = "12",
+                                Year = "2077"
+                            },
                         });
 
                 VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
@@ -1955,36 +2079,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var (release, otherRelease) = _fixture
                     .DefaultRelease()
-                    .ForIndex(0, r => r.SetVersions(_fixture
-                        .DefaultReleaseVersion()
-                        .ForIndex(0, rv => rv
-                            .SetVersion(0)
-                            .SetReleaseStatuses(_fixture
+                    .ForIndex(0,
+                        r => r.SetVersions(_fixture
+                            .DefaultReleaseVersion()
+                            .ForIndex(0,
+                                rv => rv
+                                    .SetVersion(0)
+                                    .SetReleaseStatuses(_fixture
+                                        .DefaultReleaseStatus()
+                                        .WithCreatedBy(User)
+                                        .ForIndex(0,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-4)))
+                                        .ForIndex(1,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-3)))
+                                        .Generate(2)))
+                            .ForIndex(1,
+                                rv => rv
+                                    .SetVersion(1)
+                                    .SetReleaseStatuses(_fixture
+                                        .DefaultReleaseStatus()
+                                        .WithCreatedBy(User)
+                                        .ForIndex(0,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-2)))
+                                        .ForIndex(1,
+                                            rs => rs
+                                                .SetCreated(DateTime.UtcNow.AddDays(-1)))
+                                        .Generate(2)))
+                            .Generate(2)))
+                    .ForIndex(1,
+                        r => r.SetVersions(_fixture
+                            .DefaultReleaseVersion()
+                            .WithReleaseStatuses(_fixture
                                 .DefaultReleaseStatus()
                                 .WithCreatedBy(User)
-                                .ForIndex(0, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-4)))
-                                .ForIndex(1, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-3)))
-                                .Generate(2)))
-                        .ForIndex(1, rv => rv
-                            .SetVersion(1)
-                            .SetReleaseStatuses(_fixture
-                                .DefaultReleaseStatus()
-                                .WithCreatedBy(User)
-                                .ForIndex(0, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-2)))
-                                .ForIndex(1, rs => rs
-                                    .SetCreated(DateTime.UtcNow.AddDays(-1)))
-                                .Generate(2)))
-                        .Generate(2)))
-                    .ForIndex(1, r => r.SetVersions(_fixture
-                        .DefaultReleaseVersion()
-                        .WithReleaseStatuses(_fixture
-                            .DefaultReleaseStatus()
-                            .WithCreatedBy(User)
-                            .Generate(1))
-                        .Generate(1)))
+                                .Generate(1))
+                            .Generate(1)))
                     .Generate(2)
                     .ToTuple2();
 
@@ -2007,19 +2139,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var viewModels = result.AssertRight();
                     Assert.Equal(expectedReleaseStatuses.Count, viewModels.Count);
 
-                    Assert.All(expectedReleaseStatuses.Zip(viewModels), tuple =>
-                    {
-                        var (releaseStatus, viewModel) = tuple;
+                    Assert.All(expectedReleaseStatuses.Zip(viewModels),
+                        tuple =>
+                        {
+                            var (releaseStatus, viewModel) = tuple;
 
-                        Assert.Multiple(
-                            () => Assert.Equal(releaseStatus.Id, viewModel.ReleaseStatusId),
-                            () => Assert.Equal(releaseStatus.InternalReleaseNote, viewModel.InternalReleaseNote),
-                            () => Assert.Equal(releaseStatus.ApprovalStatus, viewModel.ApprovalStatus),
-                            () => Assert.Equal(releaseStatus.Created, viewModel.Created),
-                            () => Assert.Equal(releaseStatus.CreatedBy!.Email, viewModel.CreatedByEmail),
-                            () => Assert.Equal(releaseStatus.ReleaseVersion.Version, viewModel.ReleaseVersion)
-                        );
-                    });
+                            Assert.Multiple(
+                                () => Assert.Equal(releaseStatus.Id, viewModel.ReleaseStatusId),
+                                () => Assert.Equal(releaseStatus.InternalReleaseNote, viewModel.InternalReleaseNote),
+                                () => Assert.Equal(releaseStatus.ApprovalStatus, viewModel.ApprovalStatus),
+                                () => Assert.Equal(releaseStatus.Created, viewModel.Created),
+                                () => Assert.Equal(releaseStatus.CreatedBy!.Email, viewModel.CreatedByEmail),
+                                () => Assert.Equal(releaseStatus.ReleaseVersion.Version, viewModel.ReleaseVersion)
+                            );
+                        });
                 }
             }
 

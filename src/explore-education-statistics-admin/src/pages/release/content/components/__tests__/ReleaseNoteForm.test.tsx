@@ -1,6 +1,6 @@
 import ReleaseNoteForm from '@admin/pages/release/content/components/ReleaseNoteForm';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -30,8 +30,7 @@ describe('ReleaseNoteForm', () => {
     });
 
     test('shows a validation error if no reason is given', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <ReleaseNoteForm
           id="test-id"
           initialValues={{ reason: '' }}
@@ -40,8 +39,7 @@ describe('ReleaseNoteForm', () => {
         />,
       );
 
-      await user.click(screen.getByLabelText('New release note'));
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Save note' }));
 
       expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
@@ -57,9 +55,8 @@ describe('ReleaseNoteForm', () => {
     });
 
     test('submits successfully', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
-      render(
+      const { user } = render(
         <ReleaseNoteForm
           id="test-id"
           initialValues={{ reason: '' }}
@@ -107,8 +104,7 @@ describe('ReleaseNoteForm', () => {
     });
 
     test('shows a validation error if no reason is given', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <ReleaseNoteForm
           id="test-id"
           initialValues={{ on: new Date('2024-01-01'), reason: 'Test note' }}
@@ -118,7 +114,7 @@ describe('ReleaseNoteForm', () => {
       );
 
       await user.clear(screen.getByLabelText('Edit release note'));
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Update note' }));
 
       expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
@@ -134,8 +130,7 @@ describe('ReleaseNoteForm', () => {
     });
 
     test('shows a validation error if no date is given', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <ReleaseNoteForm
           id="test-id"
           initialValues={{ on: new Date('2024-01-01'), reason: 'Test note' }}
@@ -147,7 +142,7 @@ describe('ReleaseNoteForm', () => {
       await user.clear(screen.getByLabelText('Day'));
       await user.clear(screen.getByLabelText('Month'));
       await user.clear(screen.getByLabelText('Year'));
-      await user.tab();
+      await user.click(screen.getByRole('button', { name: 'Update note' }));
 
       expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
@@ -163,9 +158,8 @@ describe('ReleaseNoteForm', () => {
     });
 
     test('submits successfully with updated values', async () => {
-      const user = userEvent.setup();
       const handleSubmit = jest.fn();
-      render(
+      const { user } = render(
         <ReleaseNoteForm
           id="test-id"
           initialValues={{ on: new Date('2024-01-01'), reason: 'Test note' }}

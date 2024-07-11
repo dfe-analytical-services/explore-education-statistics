@@ -15,6 +15,7 @@ interface Props {
   hiddenConfirmingText?: string;
   open?: boolean;
   showCancel?: boolean;
+  submitButtonVariant?: 'secondary' | 'warning';
   title: string;
   triggerButton?: ReactNode;
   underlayClass?: string;
@@ -32,6 +33,7 @@ export default function ModalConfirm({
   hiddenConfirmingText = 'Confirming',
   open: initialOpen = false,
   showCancel = true,
+  submitButtonVariant = 'secondary',
   title,
   triggerButton,
   underlayClass,
@@ -107,16 +109,16 @@ export default function ModalConfirm({
 
       <ButtonGroup className="govuk-!-margin-top-6">
         {showCancel && (
-          <Button
-            disabled={isConfirming}
-            variant="secondary"
-            onClick={handleCancel}
-          >
+          <Button disabled={isConfirming} onClick={handleCancel}>
             {cancelText}
           </Button>
         )}
 
-        <Button disabled={isCancelling} onClick={handleConfirm}>
+        <Button
+          disabled={isCancelling}
+          variant={submitButtonVariant}
+          onClick={handleConfirm}
+        >
           {confirmText}
         </Button>
 

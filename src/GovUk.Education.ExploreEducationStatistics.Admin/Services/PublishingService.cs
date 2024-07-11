@@ -1,11 +1,12 @@
+#nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -13,28 +14,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class PublishingService : IPublishingService
+    public class PublishingService(
+        ContentDbContext context,
+        IPublisherClient publisherClient,
+        IUserService userService,
+        ILogger<PublishingService> logger)
+        : IPublishingService
     {
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IStorageQueueService _storageQueueService;
-        private readonly IUserService _userService;
-        private readonly ILogger _logger;
-
-        public PublishingService(IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IStorageQueueService storageQueueService,
-            IUserService userService,
-            ILogger<PublishingService> logger)
-        {
-            _persistenceHelper = persistenceHelper;
-            _storageQueueService = storageQueueService;
-            _userService = userService;
-            _logger = logger;
-        }
-
         /// <summary>
         /// Retry the publishing of a release version.
         /// </summary>
@@ -42,12 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// This results in the Publisher updating the latest ReleaseStatus for this release version rather than creating a new one.
         /// </remarks>
         /// <param name="releaseVersionId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> RetryReleasePublishing(Guid releaseVersionId)
+        public async Task<Either<ActionResult, Unit>> RetryReleasePublishing(
+            Guid releaseVersionId, CancellationToken cancellationToken = default)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(releaseVersion => _userService.CheckCanPublishReleaseVersion(releaseVersion))
+            return await context.ReleaseVersions
+                .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
+                .OnSuccess(userService.CheckCanPublishReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     if (releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
@@ -55,10 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReleaseNotApproved);
                     }
 
-                    await _storageQueueService.AddMessageAsync(
-                        RetryReleasePublishingQueue, new RetryReleasePublishingMessage(releaseVersionId));
+                    await publisherClient.RetryReleasePublishing(releaseVersionId, cancellationToken);
 
-                    _logger.LogTrace("Sent publishing retry message for ReleaseVersion: {0}", releaseVersionId);
+                    logger.LogTrace("Sent publishing retry message for ReleaseVersion: {ReleaseVersionId}",
+                        releaseVersionId);
                     return new Either<ActionResult, Unit>(Unit.Instance);
                 });
         }
@@ -79,26 +70,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// Since the Data task deletes all existing statistical data before copying there will be downtime if this is called with a release version that is already published.
         /// A future schedule for publishing a release version that's not yet started will be cancelled.
         /// </remarks>
-        /// <param name="releaseVersionId"></param>
-        /// <param name="releaseStatusId"></param>
+        /// <param name="releasePublishingKey"></param>
         /// <param name="immediate">If true, runs all of the stages of the publishing workflow except that they are combined to act immediately.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> ReleaseChanged(Guid releaseVersionId,
-            Guid releaseStatusId,
-            bool immediate = false)
+        public async Task<Either<ActionResult, Unit>> ReleaseChanged(
+            ReleasePublishingKey releasePublishingKey,
+            bool immediate = false,
+            CancellationToken cancellationToken = default)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccessVoid(async releaseVersion =>
+            return await context.ReleaseVersions
+                .FirstOrNotFoundAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId, cancellationToken)
+                .OnSuccessVoid(async _ =>
                 {
-                    await _storageQueueService.AddMessageAsync(
-                        NotifyChangeQueue,
-                        new NotifyChangeMessage(immediate,
-                            releaseVersionId: releaseVersion.Id,
-                            releaseStatusId: releaseStatusId));
+                    await publisherClient.HandleReleaseChanged(releasePublishingKey, immediate, cancellationToken);
 
-                    _logger.LogTrace("Sent message for ReleaseVersion: {0}, ReleaseStatusId: {1}", releaseVersionId,
-                        releaseStatusId);
+                    logger.LogTrace(
+                        "Sent message for ReleaseVersion: {ReleaseVersionId}, ReleaseStatusId: {ReleaseStatusId}",
+                        releasePublishingKey.ReleaseVersionId,
+                        releasePublishingKey.ReleaseStatusId);
                 });
         }
 
@@ -106,17 +96,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// Notify the Publisher that it should publish the Methodology files.
         /// </summary>
         /// <param name="methodologyVersionId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> PublishMethodologyFiles(Guid methodologyVersionId)
+        public async Task<Either<ActionResult, Unit>> PublishMethodologyFiles(
+            Guid methodologyVersionId, CancellationToken cancellationToken = default)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
-                .OnSuccessVoid(async release =>
+            return await context.MethodologyVersions
+                .FirstOrNotFoundAsync(mv => mv.Id == methodologyVersionId, cancellationToken)
+                .OnSuccessVoid(async _ =>
                 {
-                    await _storageQueueService.AddMessageAsync(PublishMethodologyFilesQueue,
-                        new PublishMethodologyFilesMessage(methodologyVersionId));
+                    await publisherClient.PublishMethodologyFiles(methodologyVersionId, cancellationToken);
 
-                    _logger.LogTrace("Sent message for Methodology: {0}", methodologyVersionId);
+                    logger.LogTrace("Sent message for MethodologyVersion: {MethodologyVersionId}",
+                        methodologyVersionId);
                 });
         }
 
@@ -124,12 +116,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// Notify the Publisher that there has been a change to the
         /// taxonomy, such as themes and topics.
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> TaxonomyChanged()
+        public async Task<Either<ActionResult, Unit>> TaxonomyChanged(CancellationToken cancellationToken = default)
         {
-            await _storageQueueService.AddMessageAsync(PublishTaxonomyQueue, new PublishTaxonomyMessage());
+            await publisherClient.PublishTaxonomy(cancellationToken);
 
-            _logger.LogTrace("Sent PublishTaxonomy message");
+            logger.LogTrace("Sent PublishTaxonomy message");
 
             return Unit.Instance;
         }

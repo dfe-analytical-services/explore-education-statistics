@@ -1,70 +1,55 @@
 #nullable enable
-using System;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public abstract class PublishingServicePermissionTests
 {
-    public class PublishingServicePermissionTests
+    private readonly DataFixture _dataFixture = new();
+
+    public class RetryReleasePublishingTests : PublishingServicePermissionTests
     {
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
-            ApprovalStatus = ReleaseApprovalStatus.Approved,
-            Version = 0,
-            PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
-        };
-
         [Fact]
-        public void RetryReleasePublishing()
+        public async Task SecurityPolicyChecked()
         {
-            var mocks = Mocks();
-            var publishingService = BuildPublishingService(mocks);
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved);
 
-            AssertSecurityPoliciesChecked(service =>
-                    service.RetryReleasePublishing(_releaseVersion.Id),
-                _releaseVersion,
-                mocks.UserService,
-                publishingService,
-                CanPublishSpecificRelease);
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(releaseVersion, SecurityPolicies.CanPublishSpecificRelease)
+                .AssertForbidden(async userService =>
+                {
+                    await using var context = InMemoryApplicationDbContext();
+                    context.ReleaseVersions.Add(releaseVersion);
+                    await context.SaveChangesAsync();
+
+                    var service = BuildService(context, userService: userService.Object);
+                    return await service.RetryReleasePublishing(releaseVersion.Id);
+                });
         }
+    }
 
-        private PublishingService BuildPublishingService((Mock<IStorageQueueService> storageQueueService,
-            Mock<IUserService> userService,
-            Mock<ILogger<PublishingService>> logger) mocks)
-        {
-            var (storageQueueService, userService, logger) = mocks;
-
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
-            MockUtils.SetupCall(persistenceHelper, _releaseVersion.Id, _releaseVersion);
-
-            return new PublishingService(persistenceHelper.Object,
-                storageQueueService.Object,
-                userService.Object,
-                logger.Object);
-        }
-
-        private static (Mock<IStorageQueueService> StorageQueueService,
-            Mock<IUserService> UserService,
-            Mock<ILogger<PublishingService>> Logger) Mocks()
-        {
-            var mockConf = new Mock<IConfiguration>();
-            mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);
-
-            return (
-                new Mock<IStorageQueueService>(),
-                MockUtils.AlwaysTrueUserService(),
-                new Mock<ILogger<PublishingService>>());
-        }
+    private static PublishingService BuildService(
+        ContentDbContext context,
+        IPublisherClient? publisherClient = null,
+        IUserService? userService = null)
+    {
+        return new PublishingService(
+            context,
+            publisherClient ?? Mock.Of<IPublisherClient>(MockBehavior.Strict),
+            userService ?? MockUtils.AlwaysTrueUserService().Object,
+            Mock.Of<ILogger<PublishingService>>());
     }
 }

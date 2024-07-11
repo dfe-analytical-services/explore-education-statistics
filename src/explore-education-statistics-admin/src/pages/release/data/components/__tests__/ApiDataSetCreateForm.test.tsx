@@ -60,7 +60,9 @@ describe('ApiDataSetCreateForm', () => {
     );
 
     await user.click(screen.getByLabelText('Data set'));
-    await user.tab();
+    await user.click(
+      screen.getByRole('button', { name: 'Confirm new API data set' }),
+    );
 
     expect(
       await screen.findByText('Choose a data set', {

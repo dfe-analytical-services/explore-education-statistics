@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -14,65 +13,51 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class DataImportService : IDataImportService
+    public class DataImportService(
+        ContentDbContext contentDbContext,
+        IDataImportRepository dataImportRepository,
+        IDataProcessorClient dataProcessorClient,
+        IReleaseFileService releaseFileService,
+        IUserService userService)
+        : IDataImportService
     {
-        private readonly ContentDbContext _contentDbContext;
-        private readonly IDataImportRepository _dataImportRepository;
-        private readonly IReleaseFileService _releaseFileService;
-        private readonly IStorageQueueService _queueService;
-        private readonly IUserService _userService;
-
-        public DataImportService(
-            ContentDbContext contentDbContext,
-            IDataImportRepository dataImportRepository,
-            IReleaseFileService releaseFileService,
-            IStorageQueueService queueService,
-            IUserService userService)
-        {
-            _contentDbContext = contentDbContext;
-            _dataImportRepository = dataImportRepository;
-            _releaseFileService = releaseFileService;
-            _queueService = queueService;
-            _userService = userService;
-        }
-
         public async Task<DataImport?> GetImport(Guid fileId)
         {
-            return await _dataImportRepository.GetByFileId(fileId);
+            return await dataImportRepository.GetByFileId(fileId);
         }
 
-        public async Task<Either<ActionResult, Unit>> CancelImport(Guid releaseVersionId,
+        public async Task<Either<ActionResult, Unit>> CancelImport(
+            Guid releaseVersionId,
             Guid fileId)
         {
-            return await _releaseFileService.CheckFileExists(releaseVersionId: releaseVersionId,
+            return await releaseFileService.CheckFileExists(releaseVersionId: releaseVersionId,
                     fileId: fileId,
                     FileType.Data)
-                .OnSuccess(_userService.CheckCanCancelFileImport)
+                .OnSuccess(userService.CheckCanCancelFileImport)
                 .OnSuccessVoid(async file =>
                 {
-                    var import = await _dataImportRepository.GetByFileId(file.Id);
+                    var import = await dataImportRepository.GetByFileId(file.Id);
                     if (import != null)
                     {
-                        await _queueService.AddMessageAsync(ImportsCancellingQueue, new CancelImportMessage(import.Id));
+                        await dataProcessorClient.CancelImport(import.Id);
                     }
                 });
         }
 
         public async Task DeleteImport(Guid fileId)
         {
-            await _dataImportRepository.DeleteByFileId(fileId);
+            await dataImportRepository.DeleteByFileId(fileId);
         }
 
         public async Task<bool> HasIncompleteImports(Guid releaseVersionId)
         {
-            return await _contentDbContext.ReleaseFiles
+            return await contentDbContext.ReleaseFiles
                 .AsQueryable()
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId)
-                .Join(_contentDbContext.DataImports,
+                .Join(contentDbContext.DataImports,
                     rf => rf.FileId,
                     i => i.FileId,
                     (file, import) => import)
@@ -81,14 +66,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<DataImportStatusViewModel> GetImportStatus(Guid fileId)
         {
-            var import = await _dataImportRepository.GetByFileId(fileId);
+            var import = await dataImportRepository.GetByFileId(fileId);
 
             if (import == null)
             {
                 return DataImportStatusViewModel.NotFound();
             }
 
-            await _contentDbContext.Entry(import)
+            await contentDbContext.Entry(import)
                 .Collection(i => i.Errors)
                 .LoadAsync();
 
@@ -104,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile)
         {
-            var import = await _dataImportRepository.Add(new DataImport
+            var import = await dataImportRepository.Add(new DataImport
             {
                 Created = DateTime.UtcNow,
                 FileId = dataFile.Id,
@@ -113,13 +98,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = DataImportStatus.QUEUED
             });
 
-            await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
+            await dataProcessorClient.Import(import.Id);
+
             return import;
         }
 
         public async Task<DataImport> ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile)
         {
-            var import = await _dataImportRepository.Add(new DataImport
+            var import = await dataImportRepository.Add(new DataImport
             {
                 Created = DateTime.UtcNow,
                 FileId = dataFile.Id,
@@ -129,7 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = DataImportStatus.QUEUED
             });
 
-            await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
+            await dataProcessorClient.Import(import.Id);
+
             return import;
         }
     }

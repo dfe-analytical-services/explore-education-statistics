@@ -6,6 +6,7 @@ import _apiDataSetService from '@admin/services/apiDataSetService';
 import baseRender from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import { createMemoryHistory, History } from 'history';
+import noop from 'lodash/noop';
 import { ReactElement } from 'react';
 import { Router } from 'react-router-dom';
 
@@ -34,6 +35,7 @@ describe('ApiDataSetCreateModal', () => {
       <ApiDataSetCreateModal
         publicationId="publication-id"
         releaseId="release-id"
+        onSubmit={noop}
       />,
     );
 
@@ -57,6 +59,7 @@ describe('ApiDataSetCreateModal', () => {
       <ApiDataSetCreateModal
         publicationId="publication-id"
         releaseId="release-id"
+        onSubmit={noop}
       />,
     );
 
@@ -85,7 +88,7 @@ describe('ApiDataSetCreateModal', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('submitting the form calls correct service and redirects to next page', async () => {
+  test('submitting the form calls onSubmit', async () => {
     apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
     apiDataSetService.createDataSet.mockResolvedValue({
       id: 'data-set-id',
@@ -95,11 +98,13 @@ describe('ApiDataSetCreateModal', () => {
     });
 
     const history = createMemoryHistory();
+    const handleSubmit = jest.fn();
 
     const { user } = render(
       <ApiDataSetCreateModal
         publicationId="publication-id"
         releaseId="release-id"
+        onSubmit={handleSubmit}
       />,
       { history },
     );
@@ -115,24 +120,18 @@ describe('ApiDataSetCreateModal', () => {
       testCandidates[0].releaseFileId,
     );
 
-    expect(apiDataSetService.createDataSet).not.toHaveBeenCalled();
+    expect(handleSubmit).not.toHaveBeenCalled();
 
     await user.click(
       screen.getByRole('button', { name: 'Confirm new API data set' }),
     );
 
     await waitFor(() => {
-      expect(apiDataSetService.createDataSet).toHaveBeenCalledTimes(1);
-      expect(apiDataSetService.createDataSet).toHaveBeenCalledWith<
-        Parameters<typeof apiDataSetService.createDataSet>
-      >({
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith({
         releaseFileId: testCandidates[0].releaseFileId,
       });
     });
-
-    expect(history.location.pathname).toBe(
-      '/publication/publication-id/release/release-id/api-data-sets/data-set-id',
-    );
   });
 
   function render(

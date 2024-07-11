@@ -7,12 +7,12 @@ import _publicationService, {
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import { PublicationSummary } from '@common/services/publicationService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
-import userEvent from '@testing-library/user-event';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/themeService');
 const themeService = _themeService as jest.Mocked<typeof _themeService>;
@@ -147,7 +147,10 @@ describe('PublicationDetailsPage', () => {
   });
 
   test('shows the superseding publication if the publication is archived', async () => {
-    renderPage({ ...testPublication, supersededById: 'publication-2' });
+    renderPage({
+      ...testPublication,
+      supersededById: 'publication-2',
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Publication details')).toBeInTheDocument();
@@ -160,13 +163,13 @@ describe('PublicationDetailsPage', () => {
 
   describe('details form', () => {
     test('shows the form when the edit button is clicked', async () => {
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -225,13 +228,13 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('updates the topics dropdown when change the theme', async () => {
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -249,7 +252,7 @@ describe('PublicationDetailsPage', () => {
       expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
       expect(topics[1]).toHaveValue('theme-1-topic-2');
 
-      await userEvent.selectOptions(screen.getByLabelText('Select theme'), [
+      await user.selectOptions(screen.getByLabelText('Select theme'), [
         'theme-2',
       ]);
 
@@ -265,13 +268,13 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('clicking the cancel button switches back to readOnly view', async () => {
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -283,7 +286,7 @@ describe('PublicationDetailsPage', () => {
         'Publication 1',
       );
 
-      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByTestId('Publication title')).toHaveTextContent(
         'Publication 1',
@@ -306,13 +309,13 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('shows validation errors when there is no title', async () => {
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -320,8 +323,10 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Publication title'));
-      await userEvent.tab();
+      await user.clear(screen.getByLabelText('Publication title'));
+      await user.click(
+        screen.getByRole('button', { name: 'Update publication details' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -333,13 +338,13 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('shows validation errors when there is no summary', async () => {
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -349,8 +354,10 @@ describe('PublicationDetailsPage', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Publication summary'));
-      await userEvent.tab();
+      await user.clear(screen.getByLabelText('Publication summary'));
+      await user.click(
+        screen.getByRole('button', { name: 'Update publication details' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -362,13 +369,13 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('shows a confirmation modal on submit', async () => {
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -378,7 +385,7 @@ describe('PublicationDetailsPage', () => {
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -388,7 +395,7 @@ describe('PublicationDetailsPage', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Confirm',
         }),
@@ -396,7 +403,7 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('confirmation modal renders correctly when title is changed to match the slug', async () => {
-      renderPage({
+      const { user } = renderPage({
         ...testPublication,
         title: 'Publication 1',
         slug: 'publication-1-updated', // to prevent URL change text in modal from displaying
@@ -406,7 +413,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -414,15 +421,15 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Publication title'));
-      await userEvent.type(
+      await user.clear(screen.getByLabelText('Publication title'));
+      await user.type(
         screen.getByLabelText('Publication title'),
         'Publication 1 updated',
       );
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -442,7 +449,7 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('confirmation modal renders correctly when a publication title remains the same, but the slug is changed to match the title', async () => {
-      renderPage({
+      const { user } = renderPage({
         ...testPublication,
         title: 'Publication 1 updated',
         slug: 'publication-1', // even with no changes by the user, slug will be changed to match title
@@ -452,7 +459,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -462,7 +469,7 @@ describe('PublicationDetailsPage', () => {
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -489,7 +496,7 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('confirmation modal renders correctly when title and slug are changed', async () => {
-      renderPage({
+      const { user } = renderPage({
         ...testPublication,
         title: 'Publication 1',
         slug: 'publication-1',
@@ -499,7 +506,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -507,15 +514,15 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Publication title'));
-      await userEvent.type(
+      await user.clear(screen.getByLabelText('Publication title'));
+      await user.type(
         screen.getByLabelText('Publication title'),
         'Publication 1 updated',
       );
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -542,13 +549,13 @@ describe('PublicationDetailsPage', () => {
     });
 
     test('successfully submits with updated values', async () => {
-      renderPage(testPublication);
+      const { user } = renderPage(testPublication);
 
       await waitFor(() => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -556,25 +563,22 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Publication title'),
-        ' updated',
-      );
+      await user.type(screen.getByLabelText('Publication title'), ' updated');
 
-      await userEvent.selectOptions(screen.getByLabelText('Select theme'), [
+      await user.selectOptions(screen.getByLabelText('Select theme'), [
         'theme-2',
       ]);
 
-      await userEvent.selectOptions(screen.getByLabelText('Select topic'), [
+      await user.selectOptions(screen.getByLabelText('Select topic'), [
         'theme-2-topic-2',
       ]);
 
-      await userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Superseding publication'),
         ['publication-2'],
       );
 
-      await userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -584,7 +588,7 @@ describe('PublicationDetailsPage', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(publicationService.updatePublication).toHaveBeenCalledWith<
@@ -601,7 +605,7 @@ describe('PublicationDetailsPage', () => {
 });
 
 function renderPage(publication: PublicationWithPermissions) {
-  render(
+  return render(
     <MemoryRouter>
       <TestConfigContextProvider>
         <PublicationContextProvider

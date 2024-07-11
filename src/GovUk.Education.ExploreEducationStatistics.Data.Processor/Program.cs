@@ -1,9 +1,10 @@
+using System.Text.Json;
 using System.Threading.Tasks;
+using Azure.Storage.Queues;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
@@ -15,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 var host = new HostBuilder()
@@ -26,6 +28,11 @@ var host = new HostBuilder()
             .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
             .AddEnvironmentVariables();
     })
+    .ConfigureLogging(logging =>
+    {
+        // TODO EES-5013 Why can't this be controlled through application settings?
+        logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+    })
     .ConfigureServices((hostContext, services) =>
     {
         services
@@ -35,9 +42,6 @@ var host = new HostBuilder()
                 options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
                     providerOptions => providerOptions.EnableCustomRetryOnFailure()))
             .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>()
-            .AddSingleton<IStorageQueueService, StorageQueueService>(_ =>
-                new StorageQueueService(hostContext.Configuration.GetValue<string>("CoreStorage"),
-                    new StorageInstanceCreationUtil()))
             .AddTransient<IFileImportService, FileImportService>()
             .AddTransient<IImporterService, ImporterService>()
             .AddTransient<ImporterLocationService>()
@@ -56,6 +60,7 @@ var host = new HostBuilder()
     .Build();
 
 LoadLocationCache();
+await ClearQueues();
 await RestartImports();
 await host.RunAsync();
 return;
@@ -68,10 +73,28 @@ void LoadLocationCache()
     locationCache.LoadLocations(statisticsDbContext);
 }
 
+async Task ClearQueues()
+{
+    var config = host.Services.GetRequiredService<IConfiguration>();
+    var connectionString = config.GetValue<string>("CoreStorage");
+
+    var importsPendingQueueClient = new QueueClient(connectionString, queueName: ImportsPendingQueue);
+    await importsPendingQueueClient.CreateIfNotExistsAsync();
+    await importsPendingQueueClient.ClearMessagesAsync();
+
+    var restartImportsQueueClient = new QueueClient(connectionString, queueName: RestartImportsQueue);
+    await restartImportsQueueClient.CreateIfNotExistsAsync();
+    await restartImportsQueueClient.ClearMessagesAsync();
+}
+
 async Task RestartImports()
 {
-    var storageQueueService = host.Services.GetRequiredService<IStorageQueueService>();
-    await storageQueueService.Clear(ImportsPendingQueue);
-    await storageQueueService.Clear(RestartImportsQueue);
-    storageQueueService.AddMessage(RestartImportsQueue, new RestartImportsMessage());
+    var config = host.Services.GetRequiredService<IConfiguration>();
+    var connectionString = config.GetValue<string>("CoreStorage");
+
+    QueueClientOptions queueOptions = 
+        new() { MessageEncoding = QueueMessageEncoding.Base64 };
+
+    var restartImportsQueueClient = new QueueClient(connectionString, queueName: RestartImportsQueue, queueOptions);
+    await restartImportsQueueClient.SendMessageAsync(JsonSerializer.Serialize(new RestartImportsMessage()));
 }

@@ -45,12 +45,12 @@ user waits until element does not contain chart tooltip
 
 user checks chart title contains
     [Arguments]    ${locator}    ${text}
-    ${element}=    get child element    ${locator}    testid:chart-title
+    ${element}=    get child element with retry    ${locator}    testid:chart-title
     user waits until element contains    ${element}    ${text}
 
 user checks chart subtitle contains
     [Arguments]    ${locator}    ${text}
-    ${element}=    get child element    ${locator}    testid:chart-subtitle
+    ${element}=    get child element with retry    ${locator}    testid:chart-subtitle
     user waits until element contains    ${element}    ${text}
 
 user checks chart height
