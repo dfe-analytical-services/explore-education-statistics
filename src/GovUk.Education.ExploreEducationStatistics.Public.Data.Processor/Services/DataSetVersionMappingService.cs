@@ -24,15 +24,6 @@ internal class DataSetVersionMappingService(
         MappingType.AutoNone
     ];
 
-    private static Func<LocationOptionMetaRow, string> LocationOptionKeyGenerator =>
-        option => $"{option.Label} :: {option.GetRowKey()}";
-
-    private static Func<FilterMeta, string> FilterKeyGenerator =>
-        filter => filter.PublicId;
-
-    private static Func<FilterOptionMeta, string> FilterOptionKeyGenerator =>
-        option => option.Label;
-
     public async Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -317,14 +308,14 @@ internal class DataSetVersionMappingService(
                             .Options
                             .Select(option => option.ToRow())
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionKeyGenerator,
+                                keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
                                 elementSelector: option => new LocationOptionMapping
                                 {
                                     Source = CreateLocationOptionFromMetaRow(option)
                                 }),
                         Candidates = candidatesForLevel
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionKeyGenerator,
+                                keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
                                 elementSelector: CreateLocationOptionFromMetaRow)
                     };
                 });
@@ -346,7 +337,7 @@ internal class DataSetVersionMappingService(
                     Candidates = meta
                         .optionsMeta
                         .ToDictionary(
-                            keySelector: MappingKeyFunctions.LocationOptionKeyGenerator,
+                            keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
                             elementSelector: CreateLocationOptionFromMetaRow)
                 });
 

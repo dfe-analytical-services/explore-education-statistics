@@ -262,7 +262,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         Mappings = levelMeta
                             .Options
                             .ToDictionary(
-                                keySelector: option => $"{option.Label} :: {option.ToRow().GetRowKey()}",
+                                keySelector: MappingKeyFunctions.LocationOptionMetaKeyGenerator,
                                 elementSelector: option => new LocationOptionMapping
                                 {
                                     CandidateKey = null,
@@ -331,7 +331,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             Candidates = levelMeta
                                 .options
                                 .ToDictionary(
-                                    keySelector: option => $"{option.Label} :: {option.ToRow().GetRowKey()}",
+                                    keySelector: MappingKeyFunctions.LocationOptionMetaKeyGenerator,
                                     elementSelector: option => new MappableLocationOption(option.Label)
                                     {
                                         Code = option.ToRow().Code,
@@ -379,7 +379,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             var expectedFilterMappings = initialFilterMeta
                 .ToDictionary(
-                    keySelector: filter => filter.PublicId,
+                    keySelector: MappingKeyFunctions.FilterKeyGenerator,
                     elementSelector: filter =>
                         new FilterMapping
                         {
@@ -389,7 +389,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             OptionMappings = filter
                                 .Options
                                 .ToDictionary(
-                                    keySelector: option => option.Label,
+                                    keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
                                     elementSelector: option =>
                                         new FilterOptionMapping
                                         {
@@ -421,14 +421,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .AbsenceSchool
                 .ExpectedFilters
                 .ToDictionary(
-                    keySelector: filterAndOptions => filterAndOptions.PublicId,
-                    elementSelector: filterAndOptions =>
-                        new FilterMappingCandidate(filterAndOptions.Label)
+                    keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                    elementSelector: filter =>
+                        new FilterMappingCandidate(filter.Label)
                         {
-                            Options = filterAndOptions
+                            Options = filter
                                 .Options
                                 .ToDictionary(
-                                    keySelector: optionMeta => optionMeta.Label,
+                                    keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
                                     elementSelector: optionMeta =>
                                         new MappableFilterOption(optionMeta.Label))
                         });

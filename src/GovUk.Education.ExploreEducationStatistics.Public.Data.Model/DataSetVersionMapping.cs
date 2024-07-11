@@ -232,8 +232,11 @@ public record FilterMappingPlan
 
 public static class MappingKeyFunctions
 {
-    public static Func<LocationOptionMetaRow, string> LocationOptionKeyGenerator =>
-        option => $"{option.Label} :: {option.GetRowKey()}";
+    public static Func<LocationOptionMetaRow, string> LocationOptionMetaRowKeyGenerator =>
+        option => $"{option.Label} :: {option.GetRowKeyPretty()}";
+    
+    public static Func<LocationOptionMeta, string> LocationOptionMetaKeyGenerator =>
+        option => LocationOptionMetaRowKeyGenerator(option.ToRow());
 
     public static Func<FilterMeta, string> FilterKeyGenerator =>
         filter => filter.PublicId;

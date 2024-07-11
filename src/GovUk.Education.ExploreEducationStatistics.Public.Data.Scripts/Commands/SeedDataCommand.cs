@@ -620,7 +620,6 @@ public class SeedDataCommand : ICommand
                         foreach (var option in newOptions)
                         {
                             option.Id = startIndex++;
-                            option.PublicId = SqidEncoder.Encode(option.Id);
                         }
 
                         await optionTable.BulkCopyAsync(
@@ -639,6 +638,7 @@ public class SeedDataCommand : ICommand
                         .Where(hasBatchRowKey)
                         .Select((option, index) => new LocationOptionMetaLink
                         {
+                            PublicId = SqidEncoder.Encode(option.Id),
                             MetaId = meta.Id,
                             OptionId = option.Id
                         })
@@ -676,32 +676,27 @@ public class SeedDataCommand : ICommand
             {
                 GeographicLevel.LocalAuthority => new LocationLocalAuthorityOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Code = row[LocalAuthorityCsvColumns.NewCode],
                     OldCode = row[LocalAuthorityCsvColumns.OldCode]
                 },
                 GeographicLevel.School => new LocationSchoolOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Urn = row[SchoolCsvColumns.Urn],
                     LaEstab = row[SchoolCsvColumns.LaEstab]
                 },
                 GeographicLevel.Provider => new LocationProviderOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Ukprn = row[ProviderCsvColumns.Ukprn]
                 },
                 GeographicLevel.RscRegion => new LocationRscRegionOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label
                 },
                 _ => new LocationCodedOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Code = row[cols.Codes.First()]
                 }
@@ -962,7 +957,7 @@ public class SeedDataCommand : ICommand
                     insertRow.AppendValue(id++);
                     insertRow.AppendValue(option.Label);
                     insertRow.AppendValue(location.Level.GetEnumValue());
-                    insertRow.AppendValue(option.PublicId);
+                    insertRow.AppendValue(link.PublicId);
 
                     switch (option)
                     {

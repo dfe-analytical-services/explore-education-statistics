@@ -11,25 +11,25 @@ public abstract class LocationOptionMetaRowTests
         {
             HashSet<string> excludedProperties =
             [
-                nameof(LocationOptionMetaRow.Id),
+                $"{nameof(LocationOptionMetaRow.Id)} value",
             ];
 
             var expectedProperties = typeof(LocationOptionMetaRow)
                 .GetProperties()
-                .Select(p => p.Name)
+                .Select(p => $"{p.Name} value")
                 .Except(excludedProperties)
                 .ToHashSet();
 
             var optionRow = new LocationOptionMetaRow
             {
                 Id = 1,
-                Type = nameof(LocationOptionMetaRow.Type),
-                Label = nameof(LocationOptionMetaRow.Label),
-                Code = nameof(LocationOptionMetaRow.Code),
-                OldCode = nameof(LocationOptionMetaRow.OldCode),
-                Urn = nameof(LocationOptionMetaRow.Urn),
-                LaEstab = nameof(LocationOptionMetaRow.LaEstab),
-                Ukprn = nameof(LocationOptionMetaRow.Ukprn),
+                Type = nameof(LocationOptionMetaRow.Type) + " value",
+                Label = nameof(LocationOptionMetaRow.Label) + " value",
+                Code = nameof(LocationOptionMetaRow.Code) + " value",
+                OldCode = nameof(LocationOptionMetaRow.OldCode) + " value",
+                Urn = nameof(LocationOptionMetaRow.Urn) + " value",
+                LaEstab = nameof(LocationOptionMetaRow.LaEstab) + " value",
+                Ukprn = nameof(LocationOptionMetaRow.Ukprn) + " value"
             };
 
             var rowKey = optionRow.GetRowKey();
@@ -37,6 +37,75 @@ public abstract class LocationOptionMetaRowTests
 
             Assert.Equal(expectedProperties, properties);
         }
+    }
+    
+    public class GetRowKeyPrettyTests
+    {
+        [Fact]
+        public void ContainsKeyProperties()
+        {
+            HashSet<string> excludedProperties =
+            [
+                $"{nameof(LocationOptionMetaRow.Id)}:{nameof(LocationOptionMetaRow.Id)} value",
+            ];
+
+            var expectedProperties = typeof(LocationOptionMetaRow)
+                .GetProperties()
+                .Select(p => $"{p.Name}:{p.Name} value")
+                .Except(excludedProperties)
+                .ToHashSet();
+
+            var optionRow = new LocationOptionMetaRow
+            {
+                Id = 1,
+                Type = nameof(LocationOptionMetaRow.Type) + " value",
+                Label = nameof(LocationOptionMetaRow.Label) + " value",
+                Code = nameof(LocationOptionMetaRow.Code) + " value",
+                OldCode = nameof(LocationOptionMetaRow.OldCode) + " value",
+                Urn = nameof(LocationOptionMetaRow.Urn) + " value",
+                LaEstab = nameof(LocationOptionMetaRow.LaEstab) + " value",
+                Ukprn = nameof(LocationOptionMetaRow.Ukprn) + " value"
+            };
+
+            var rowKey = optionRow.GetRowKeyPretty();
+            var properties = rowKey.Split(',').ToHashSet();
+
+            Assert.Equal(expectedProperties, properties);
+        }
+    }
+    
+    [Fact]
+    public void OmitsNullProperties()
+    {
+        HashSet<string> excludedProperties =
+        [
+            $"{nameof(LocationOptionMetaRow.Id)}:{nameof(LocationOptionMetaRow.Id)} value",
+            $"{nameof(LocationOptionMetaRow.OldCode)}:{nameof(LocationOptionMetaRow.OldCode)} value",
+            $"{nameof(LocationOptionMetaRow.Ukprn)}:{nameof(LocationOptionMetaRow.Ukprn)} value",
+        ];
+
+        var expectedProperties = typeof(LocationOptionMetaRow)
+            .GetProperties()
+            .Select(p => $"{p.Name}:{p.Name} value")
+            .Except(excludedProperties)
+            .ToHashSet();
+
+        var optionRow = new LocationOptionMetaRow
+        {
+            Id = 1,
+            Type = nameof(LocationOptionMetaRow.Type) + " value",
+            Label = nameof(LocationOptionMetaRow.Label) + " value",
+            Code = nameof(LocationOptionMetaRow.Code) + " value",
+            OldCode = null,
+            Urn = nameof(LocationOptionMetaRow.Urn) + " value",
+            LaEstab = nameof(LocationOptionMetaRow.LaEstab) + " value",
+            Ukprn = null
+        };
+
+        var rowKey = optionRow.GetRowKeyPretty();
+        var properties = rowKey.Split(',').ToHashSet();
+
+        Assert.Equal(expectedProperties, properties);
     }
 
     public class PropertyTests

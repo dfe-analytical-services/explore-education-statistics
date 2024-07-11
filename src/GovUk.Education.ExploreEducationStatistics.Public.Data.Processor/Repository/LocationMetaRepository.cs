@@ -170,7 +170,7 @@ public class LocationMetaRepository(
         return publicIdMappings
                    .GetPublicIdForCandidate(
                        level: level,
-                       MappingKeyFunctions.LocationOptionKeyGenerator(option))
+                       candidateKey: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator(option))
                ?? SqidEncoder.Encode(option.Id);
     }
 
