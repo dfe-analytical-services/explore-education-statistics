@@ -25,6 +25,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.HasSequence<int>("FilterOptionMetaLink_seq");
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonBool", b =>
+                {
+                    b.Property<bool>("BoolValue")
+                        .HasColumnType("boolean");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonFragment", b =>
+                {
+                    b.Property<string>("JsonValue")
+                        .HasColumnType("text");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilterOptions", b =>
                 {
                     b.Property<Guid>("Id")
