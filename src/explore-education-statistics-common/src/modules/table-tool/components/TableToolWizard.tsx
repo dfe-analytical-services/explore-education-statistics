@@ -32,7 +32,8 @@ import publicationService, {
   Theme,
 } from '@common/services/publicationService';
 import tableBuilderService, {
-  FeaturedTable, FullTableQuery,
+  FeaturedTable,
+  FullTableQuery,
   LocationOption,
   ReleaseTableDataQuery,
   Subject,
@@ -40,7 +41,7 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { Dictionary } from 'lodash';
+import { Dictionary, update } from 'lodash';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -433,21 +434,22 @@ export default function TableToolWizard({
       draft.response = undefined;
     });
 
-    const query: FullTableQuery = {
-      subjectId: state.query.subjectId,
-      locationIds: state.query.locationIds,
-      timePeriod: state.query.timePeriod,
-      indicators: indicators,
+    const updatedReleaseTableDataQuery = {
+      ...state.query,
       filters: Object.values(filters).flat(),
+      indicators,
     };
 
-    const tableData = await tableBuilderService.getTableData({ ...query,
-      subjectId: query.subjectId,
-      locationIds: query.locationIds,
-      timePeriod: query.timePeriod,
-      filters: query.filters,
-      indicators: query.indicators,
-    }, undefined);
+    const tableData = await tableBuilderService.getTableData(
+      {
+        subjectId: updatedReleaseTableDataQuery.subjectId,
+        locationIds: updatedReleaseTableDataQuery.locationIds,
+        timePeriod: updatedReleaseTableDataQuery.timePeriod,
+        filters: updatedReleaseTableDataQuery.filters,
+        indicators: updatedReleaseTableDataQuery.indicators,
+      } as FullTableQuery,
+      updatedReleaseTableDataQuery.releaseId,
+    );
 
     if (!tableData.results.length || !tableData.subjectMeta) {
       throw new SubmitError(
@@ -463,11 +465,11 @@ export default function TableToolWizard({
     }
 
     updateState(draft => {
-      draft.query = query;
-      draft.response = {
-        table,
-        tableHeaders,
-      };
+      (draft.query = updatedReleaseTableDataQuery),
+        (draft.response = {
+          table,
+          tableHeaders,
+        });
     });
 
     onStepSubmit?.({ nextStepNumber: 6, nextStepTitle: stepTitles.final });

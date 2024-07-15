@@ -235,7 +235,7 @@ const tableBuilderService = {
       : dataApi.get(`/meta/subject/${subjectId}`);
   },
   async filterSubjectMeta(
-    { ...query }: LocationsOrTimePeriodsQuery,
+    query: LocationsOrTimePeriodsQuery,
     releaseId?: string,
   ): Promise<SubjectMeta> {
     return releaseId
@@ -243,7 +243,7 @@ const tableBuilderService = {
       : dataApi.post('/meta/subject', query);
   },
   async getTableData(
-    { ...query }: FullTableQuery,
+    query: FullTableQuery,
     releaseId?: string,
   ): Promise<TableDataResponse> {
     return releaseId

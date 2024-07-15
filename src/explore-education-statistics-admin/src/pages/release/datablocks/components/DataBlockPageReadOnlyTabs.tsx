@@ -33,11 +33,10 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
   const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
     const query: ReleaseTableDataQuery = {
       ...dataBlock.query,
-      releaseId,
-      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
+      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'), // @MarkFix unused?
     };
 
-    const tableData = await tableBuilderService.getTableData(query);
+    const tableData = await tableBuilderService.getTableData(query, releaseId);
     const table = mapFullTable(tableData);
 
     const tableHeaders = mapTableHeadersConfig(

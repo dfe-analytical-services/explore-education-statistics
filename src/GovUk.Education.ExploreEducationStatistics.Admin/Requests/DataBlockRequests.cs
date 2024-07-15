@@ -15,7 +15,7 @@ public record DataBlockCreateRequest
 
     public string Source { get; init; } = string.Empty;
 
-    public FullTableQueryRequest QueryRequest { get; init; } = null!;
+    public FullTableQueryRequest Query { get; init; } = null!;
 
     public List<IChart> Charts { get; init; } = new();
 
