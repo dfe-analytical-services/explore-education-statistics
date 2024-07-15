@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 {
-    public class ObservationQueryContext : IEquatable<ObservationQueryContext>
+    public record ObservationQueryContext
     {
         public Guid SubjectId { get; set; }
 
@@ -21,30 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public long? BoundaryLevel { get; set; }
 
         public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
-
-        public override string ToString()
-        {
-            return
-                $"{nameof(SubjectId)}: {SubjectId}, " +
-                $"{nameof(TimePeriod)}: {TimePeriod}, " +
-                $"{nameof(Filters)}: [{(Filters.IsNullOrEmpty() ? string.Empty : Filters.JoinToString(", "))}], " +
-                $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
-                $"{nameof(Indicators)}: [{(Indicators.IsNullOrEmpty() ? string.Empty : Indicators.JoinToString(", "))}], " +
-                $"{nameof(LocationIds)}: [{LocationIds.JoinToString(", ")}]";
-        }
-
-        public bool Equals(ObservationQueryContext? ctx)
-        {
-            return ctx?.SubjectId == this.SubjectId
-                   && ctx.LocationIds == this.LocationIds
-                   && ctx.TimePeriod == this.TimePeriod
-                   && ctx.Filters.Equals(this.Filters)
-                   && ctx.Indicators.Equals(this.Indicators)
-                   && ctx.BoundaryLevel == this.BoundaryLevel;
-        }
     }
 
-    public class FullTableQueryRequest
+    public record FullTableQueryRequest
     {
         // @MarkFix check all properties are actually used
         public Guid SubjectId { get; set; }
@@ -55,20 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 
         public IEnumerable<Guid> Filters { get; set; } = new List<Guid>();
 
-        public long? BoundaryLevel { get; set; } // @MarkFix not needed?
-
         public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
-
-        public override string ToString()
-        {
-            return
-                $"{nameof(SubjectId)}: {SubjectId}, " +
-                $"{nameof(TimePeriod)}: {TimePeriod}, " +
-                $"{nameof(Filters)}: [{(Filters.IsNullOrEmpty() ? string.Empty : Filters.JoinToString(", "))}], " +
-                $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
-                $"{nameof(Indicators)}: [{(Indicators.IsNullOrEmpty() ? string.Empty : Indicators.JoinToString(", "))}], " +
-                $"{nameof(LocationIds)}: [{LocationIds.JoinToString(", ")}]";
-        }
 
         public class Validator : AbstractValidator<FullTableQueryRequest>
         {
@@ -87,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         }
     }
 
-    public class TimePeriodsQueryRequest : ObservationQueryContext
+    public record TimePeriodsQueryRequest : ObservationQueryContext
     {
         public class Validator : AbstractValidator<TimePeriodsQueryRequest>
         {
@@ -105,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         }
     }
 
-    public class LocationsQueryRequest : ObservationQueryContext
+    public record LocationsQueryRequest : ObservationQueryContext
     {
         public class Validator : AbstractValidator<LocationsQueryRequest>
         {
@@ -128,29 +93,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
     // be set.
     public class LocationsOrTimePeriodsQueryRequest
     {
-        // @MarkFix check all properties are actually used
         public Guid SubjectId { get; set; }
 
         public List<Guid> LocationIds { get; set; } = new();
 
         public TimePeriodQuery? TimePeriod { get; set; }
 
-        //public IEnumerable<Guid> Filters { get; set; } = new List<Guid>();
-
-        //public long? BoundaryLevel { get; set; } // @MarkFix not needed?
-
-        //public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
-
-        public override string ToString()
-        {
-            return
-                $"{nameof(SubjectId)}: {SubjectId}, " +
-                $"{nameof(TimePeriod)}: {TimePeriod}, " +
-                //$"{nameof(Filters)}: [{(Filters.IsNullOrEmpty() ? string.Empty : Filters.JoinToString(", "))}], " +
-                //$"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
-                //$"{nameof(Indicators)}: [{(Indicators.IsNullOrEmpty() ? string.Empty : Indicators.JoinToString(", "))}], " +
-                $"{nameof(LocationIds)}: [{LocationIds.JoinToString(", ")}]";
-        }
         public class Validator : AbstractValidator<LocationsOrTimePeriodsQueryRequest>
         {
             public Validator()
@@ -159,11 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
                     .NotEmpty();
 
                 // No TimePeriods check, as it may be null, but also could be set
-
-                //RuleFor(context => context.Filters)
-                //    .Empty();
-                //RuleFor(context => context.Indicators)
-                //    .Empty();
             }
         }
     }
@@ -179,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
                 TimePeriod = fullTableQueryRequest.TimePeriod,
                 Filters = fullTableQueryRequest.Filters,
                 Indicators = fullTableQueryRequest.Indicators,
-                BoundaryLevel = fullTableQueryRequest.BoundaryLevel,
+                BoundaryLevel = null,
             };
         }
 
@@ -192,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
                 TimePeriod = locationsOrTimePeriodsQueryRequest.TimePeriod,
                 Filters = [],
                 Indicators = [],
-                BoundaryLevel = null, // @MarkFix correct?
+                BoundaryLevel = null,
             };
         }
     }
