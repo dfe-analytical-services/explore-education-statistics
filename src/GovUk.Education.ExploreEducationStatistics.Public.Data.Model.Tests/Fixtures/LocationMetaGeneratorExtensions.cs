@@ -35,7 +35,7 @@ public static class LocationMetaGeneratorExtensions
         Guid dataSetVersionId)
         => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
 
-    public static Generator<LocationMeta> WithLevel(
+    public static Generator<LocationMeta> WithLabel(
         this Generator<LocationMeta> generator,
         GeographicLevel level)
         => generator.ForInstance(s => s.SetLevel(level));
