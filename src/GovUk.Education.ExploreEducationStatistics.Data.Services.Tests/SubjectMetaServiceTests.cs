@@ -897,49 +897,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        // @MarkFix this can be removed? Because LocationsOrTimePeriodsQueryRequest.Validator
-        // should prevent this? But maybe another test needs adding elsewhere?
-        //[Fact]
-        //public async Task FilterSubjectMeta_InvalidCombination_NoTimePeriodsOrLocations()
-        //{
-        //    var statisticsReleaseVersion = new ReleaseVersion();
-        //    var subject = new Subject
-        //    {
-        //        Id = Guid.NewGuid()
-        //    };
-
-        //    var releaseSubject = new ReleaseSubject
-        //    {
-        //        ReleaseVersion = statisticsReleaseVersion,
-        //        Subject = subject
-        //    };
-
-        //    var query = new LocationsOrTimePeriodsQueryRequest
-        //    {
-        //        SubjectId = subject.Id,
-        //        LocationIds = new List<Guid>(),
-        //        TimePeriod = null
-        //    };
-
-        //    var statisticsDbContextId = Guid.NewGuid().ToString();
-        //    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        //    {
-        //        await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-        //        await statisticsDbContext.SaveChangesAsync();
-        //    }
-
-        //    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        //    {
-        //        var service = BuildSubjectMetaService(statisticsDbContext);
-
-        //        var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-        //            () => service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, default));
-
-        //        Assert.Equal("Unable to determine which SubjectMeta information has requested " +
-        //                     "(Parameter 'subjectMetaStep')", exception.Message);
-        //    }
-        //}
-
         [Fact]
         public async Task UpdateSubjectFilters()
         {

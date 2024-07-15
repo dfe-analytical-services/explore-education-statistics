@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -23,7 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -1221,7 +1220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var createRequest = new DataBlockCreateViewModel
+            var createRequest = new DataBlockCreateRequest
             {
                 Heading = "Test heading",
                 Name = "Test name",
@@ -1370,7 +1369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var createRequest = new DataBlockCreateViewModel
+            var createRequest = new DataBlockCreateRequest
             {
                 Heading = "Test heading",
                 QueryRequest = new FullTableQueryRequest
@@ -1423,7 +1422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var createRequest = new DataBlockCreateViewModel();
+            var createRequest = new DataBlockCreateRequest();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -1489,7 +1488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new DataBlockUpdateViewModel
+            var updateRequest = new DataBlockUpdateRequest
             {
                 Heading = "New heading",
                 Name = "New name",
@@ -1612,7 +1611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new DataBlockUpdateViewModel
+            var updateRequest = new DataBlockUpdateRequest
             {
                 Heading = "New heading",
                 QueryRequest = new FullTableQueryRequest
@@ -1685,7 +1684,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using var context = InMemoryContentDbContext(contextId);
 
             var service = BuildDataBlockService(context);
-            var result = await service.Update(Guid.NewGuid(), new DataBlockUpdateViewModel());
+            var result = await service.Update(Guid.NewGuid(), new DataBlockUpdateRequest());
 
             result.AssertNotFound();
         }
@@ -1745,7 +1744,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new DataBlockUpdateViewModel
+            var updateRequest = new DataBlockUpdateRequest
             {
                 QueryRequest = new FullTableQueryRequest
                 {

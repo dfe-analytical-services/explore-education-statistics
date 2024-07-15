@@ -88,10 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(p => p.Topic.Theme));
 
             CreateContentBlockMap();
-            CreateMap<DataBlockCreateViewModel, DataBlock>()
+            CreateMap<DataBlockCreateRequest, DataBlock>()
                 .ForMember(dest => dest.Query,
                     m => m.MapFrom(c => c.QueryRequest.AsObservationQueryContext()));
-            CreateMap<DataBlockUpdateViewModel, DataBlock>()
+            CreateMap<DataBlockUpdateRequest, DataBlock>()
                 .ForMember(dest => dest.Query,
                     m => m.MapFrom(c => c.QueryRequest.AsObservationQueryContext()));
 

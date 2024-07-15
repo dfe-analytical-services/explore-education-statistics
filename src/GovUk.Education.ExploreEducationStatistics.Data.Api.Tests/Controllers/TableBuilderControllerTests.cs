@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -57,16 +56,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .WithQuery(new ObservationQueryContext
                 {
                     SubjectId = Guid.NewGuid(),
-                    Filters = new List<Guid>(),
-                    Indicators = new List<Guid>(),
-                    LocationIds = new List<Guid>(),
+                    LocationIds = new List<Guid>{ Guid.NewGuid(), }, // using a collection expression creates a test failure
                     TimePeriod = new TimePeriodQuery
                     {
                         StartYear = 2021,
                         StartCode = CalendarYear,
                         EndYear = 2022,
                         EndCode = CalendarYear
-                    }
+                    },
+                    Filters = new List<Guid>(),
+                    Indicators = new List<Guid>{ Guid.NewGuid(), },
                 })
                 .WithTable(new TableBuilderConfiguration
                 {
@@ -178,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync("/api/tablebuilder",
-                    content: new JsonNetContent(ObservationQueryContext),
+                    content: new JsonNetContent(ObservationQueryContext), // binds to FullTableQueryRequest
                     headers: new Dictionary<string, string>
                     {
                         { HeaderNames.Accept, ContentTypes.Csv }
