@@ -45,13 +45,13 @@ internal class ProcessorClient(
         Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
-        var request = new NextDataSetVersionCreateRequest
+        var request = new NextDataSetVersionCreateMappingsRequest
         {
             ReleaseFileId = releaseFileId,
             DataSetId = dataSetId
         };
 
-        return await SendPost<NextDataSetVersionCreateRequest, ProcessDataSetVersionResponseViewModel>(
+        return await SendPost<NextDataSetVersionCreateMappingsRequest, ProcessDataSetVersionResponseViewModel>(
             "api/CreateNextDataSetVersion",
             request,
             cancellationToken: cancellationToken);

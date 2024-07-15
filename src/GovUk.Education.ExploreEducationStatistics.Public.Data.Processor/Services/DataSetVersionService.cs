@@ -57,7 +57,8 @@ internal class DataSetVersionService(
             .OnSuccess(dataSetVersion => dataSetVersion.Id);
     }
 
-    public async Task<Either<ActionResult, Unit>> BulkDeleteVersions(Guid releaseVersionId, CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, Unit>> BulkDeleteVersions(Guid releaseVersionId,
+        CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.RequireTransaction(() =>
             GetReleaseFiles(releaseVersionId, cancellationToken)
@@ -69,9 +70,13 @@ internal class DataSetVersionService(
                     return CheckCanDeleteDataSetVersions(dataSetVersions)
                         .OnSuccess(() => (releaseFiles, dataSetVersions));
                 })
-                .OnSuccessDo(async releaseFilesAndDataSetVersions => await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles, cancellationToken))
-                .OnSuccessDo(async releaseFilesAndDataSetVersions => await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
-                .OnSuccessVoid(releaseFilesAndDataSetVersions => DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions)));
+                .OnSuccessDo(async releaseFilesAndDataSetVersions =>
+                    await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles,
+                        cancellationToken))
+                .OnSuccessDo(async releaseFilesAndDataSetVersions =>
+                    await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
+                .OnSuccessVoid(releaseFilesAndDataSetVersions =>
+                    DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions)));
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
@@ -112,7 +117,8 @@ internal class DataSetVersionService(
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
-    private static Either<ActionResult, Unit> CheckCanDeleteDataSetVersions(IReadOnlyList<DataSetVersion> dataSetVersions)
+    private static Either<ActionResult, Unit> CheckCanDeleteDataSetVersions(
+        IReadOnlyList<DataSetVersion> dataSetVersions)
     {
         var versionsWhichCanNotBeDeleted = dataSetVersions
             .Where(dsv => !dsv.CanBeDeleted)
@@ -161,7 +167,8 @@ internal class DataSetVersionService(
         await UnlinkReleaseFilesFromApiDataSets(releaseFiles, cancellationToken);
     }
 
-    private async Task DeleteDataSetVersions(IReadOnlyList<DataSetVersion> dataSetVersions, CancellationToken cancellationToken)
+    private async Task DeleteDataSetVersions(IReadOnlyList<DataSetVersion> dataSetVersions,
+        CancellationToken cancellationToken)
     {
         var dataSetsWithNoOtherVersions = dataSetVersions
             .Where(dsv => dsv.IsFirstVersion)
@@ -193,7 +200,8 @@ internal class DataSetVersionService(
         return await releaseFileRepository.GetByFileType(releaseVersionId, cancellationToken, FileType.Data);
     }
 
-    private async Task UnlinkReleaseFilesFromApiDataSets(IReadOnlyList<ReleaseFile> releaseFiles, CancellationToken cancellationToken)
+    private async Task UnlinkReleaseFilesFromApiDataSets(IReadOnlyList<ReleaseFile> releaseFiles,
+        CancellationToken cancellationToken)
     {
         foreach (var releaseFile in releaseFiles)
         {
@@ -270,10 +278,9 @@ internal class DataSetVersionService(
             .FirstOrDefaultAsync(dataSet => dataSet.Id == dataSetId, cancellationToken);
 
         return dataSet is null
-            ? ValidationUtils.ValidationResult(CreateDataSetIdError(
-                message: ValidationMessages.DataSetNotFound,
-                dataSetId: dataSetId
-            ))
+            ? ValidationUtils.NotFoundResult<DataSet, Guid>(
+                id: dataSetId,
+                path: nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst())
             : dataSet;
     }
 
@@ -341,10 +348,9 @@ internal class DataSetVersionService(
             .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
 
         return releaseFile is null
-            ? ValidationUtils.ValidationResult(CreateReleaseFileIdError(
-                message: ValidationMessages.FileNotFound,
-                releaseFileId: releaseFileId
-            ))
+            ? ValidationUtils.NotFoundResult<ReleaseFile, Guid>(
+                id: releaseFileId,
+                path: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst())
             : releaseFile;
     }
 
@@ -516,7 +522,7 @@ internal class DataSetVersionService(
         {
             Code = message.Code,
             Message = message.Message,
-            Path = nameof(NextDataSetVersionCreateRequest.DataSetId).ToLowerFirst(),
+            Path = nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst(),
             Detail = new InvalidErrorDetail<Guid>(dataSetId)
         };
     }

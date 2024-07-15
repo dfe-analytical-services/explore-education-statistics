@@ -136,13 +136,13 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task ReleaseFileIdIsNotFound_ReturnsValidationProblem()
         {
-            var result = await CreateDataSet(releaseFileId: Guid.NewGuid());
+            var releaseFileId = Guid.NewGuid();
 
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            var result = await CreateDataSet(releaseFileId: releaseFileId);
 
-            validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
-                expectedCode: ValidationMessages.FileNotFound.Code);
+            result.AssertNotFoundWithValidationProblem<ReleaseFile, Guid>(
+                expectedId: releaseFileId,
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
         }
 
         [Fact]

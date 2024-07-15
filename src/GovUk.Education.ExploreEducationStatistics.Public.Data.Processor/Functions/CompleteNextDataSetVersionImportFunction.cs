@@ -24,12 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CompleteNextDataSetVersionImportFunction(
     ILogger<CompleteNextDataSetVersionImportFunction> logger,
     PublicDataDbContext publicDataDbContext,
-    IValidator<DataSetVersionProcessRequest> requestValidator)
+    IValidator<NextDataSetVersionCompleteImportRequest> requestValidator)
 {
     [Function(nameof(CompleteNextDataSetVersionImport))]
     public async Task<IActionResult> CompleteNextDataSetVersionImport(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CompleteNextDataSetVersionImport))] [FromBody]
-        DataSetVersionProcessRequest request,
+        NextDataSetVersionCompleteImportRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
@@ -64,7 +64,7 @@ public class CompleteNextDataSetVersionImportFunction(
     }
 
     private static Either<ActionResult, DataSetVersionImport> GetImportInManualMappingStage(
-        DataSetVersionProcessRequest request,
+        NextDataSetVersionCompleteImportRequest request,
         DataSetVersion nextDataSetVersion)
     {
         var importToContinue = nextDataSetVersion
@@ -80,7 +80,7 @@ public class CompleteNextDataSetVersionImportFunction(
     }
 
     private async Task<Either<ActionResult, DataSetVersion>> GetNextDataSetVersionInMappingStatus(
-        DataSetVersionProcessRequest request,
+        NextDataSetVersionCompleteImportRequest request,
         CancellationToken cancellationToken)
     {
         var nextVersion = await publicDataDbContext
@@ -93,9 +93,9 @@ public class CompleteNextDataSetVersionImportFunction(
 
         if (nextVersion is null)
         {
-            return CreateDataSetVersionIdError(
-                message: ValidationMessages.DataSetVersionNotFound,
-                dataSetVersionId: request.DataSetVersionId);
+            return ValidationUtils.NotFoundResult<DataSetVersion, Guid>(
+                request.DataSetVersionId, 
+                nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst());
         }
 
         if (nextVersion.Status != DataSetVersionStatus.Mapping)
@@ -109,7 +109,7 @@ public class CompleteNextDataSetVersionImportFunction(
     }
 
     private async Task<Either<ActionResult, DataSetVersionMapping>> GetCompletedDataSetVersionMapping(
-        DataSetVersionProcessRequest request,
+        NextDataSetVersionCompleteImportRequest request,
         CancellationToken cancellationToken)
     {
         var mapping = await publicDataDbContext
@@ -170,7 +170,7 @@ public class CompleteNextDataSetVersionImportFunction(
         {
             Code = message.Code,
             Message = message.Message,
-            Path = nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
+            Path = nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
             Detail = new InvalidErrorDetail<Guid>(dataSetVersionId)
         });
     }

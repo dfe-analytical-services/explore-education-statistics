@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DurableTask;
@@ -18,6 +17,8 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using ValidationMessages =
+    GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
@@ -102,20 +103,20 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst());
+                nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst());
         }
 
         [Fact]
-        public async Task DataSetVersionIsNotFound_ReturnsValidationProblem()
+        public async Task DataSetVersionIsNotFound_ReturnsNotFound()
         {
+            var dataSetVersionId = Guid.NewGuid();
+
             var result = await CompleteNextDataSetVersionImport(
-                dataSetVersionId: Guid.NewGuid());
+                dataSetVersionId: dataSetVersionId);
 
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
-
-            validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
-                expectedCode: ValidationMessages.DataSetVersionNotFound.Code);
+            result.AssertNotFoundWithValidationProblem<DataSetVersion, Guid>(
+                expectedId: dataSetVersionId,
+                expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst());
         }
 
         [Fact]
@@ -140,7 +141,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetVersionNotInMappingStatus.Code);
         }
 
@@ -164,7 +165,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetVersionMappingNotFound.Code);
         }
 
@@ -190,7 +191,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetVersionMappingsNotComplete.Code);
         }
 
@@ -216,7 +217,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetVersionMappingsNotComplete.Code);
         }
 
@@ -242,7 +243,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetVersionProcessRequest.DataSetVersionId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
                 expectedCode: ValidationMessages.ImportInManualMappingStateNotFound.Code);
         }
 
@@ -357,7 +358,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
         {
             var function = GetRequiredService<CompleteNextDataSetVersionImportFunction>();
             return await function.CompleteNextDataSetVersionImport(
-                new DataSetVersionProcessRequest { DataSetVersionId = dataSetVersionId },
+                new NextDataSetVersionCompleteImportRequest { DataSetVersionId = dataSetVersionId },
                 durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
                 CancellationToken.None);
         }

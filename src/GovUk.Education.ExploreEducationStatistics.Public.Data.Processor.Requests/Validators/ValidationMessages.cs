@@ -4,11 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Reque
 
 public static class ValidationMessages
 {
-    public static readonly LocalizableMessage FileNotFound = new(
-        Code: nameof(FileNotFound),
-        Message: "The file could not be found."
-    );
-
     public static readonly LocalizableMessage FileHasApiDataSetVersion = new(
         Code: nameof(FileHasApiDataSetVersion),
         Message: "The file has already been used for an API data set version."
@@ -45,16 +40,6 @@ public static class ValidationMessages
         "The data set version is not in a draft status, or is currently being processed, so cannot be deleted."
     );
 
-    public static readonly LocalizableMessage DataSetNotFound = new(
-        Code: nameof(DataSetNotFound),
-        Message: "The data set could not be found."
-    );
-
-    public static readonly LocalizableMessage DataSetVersionNotFound = new(
-        Code: nameof(DataSetVersionNotFound),
-        Message: "The data set version could not be found."
-    );
-
     public static readonly LocalizableMessage DataSetMustHaveNoExistingVersions = new(
         Code: nameof(DataSetMustHaveNoExistingVersions),
         Message: "The data set must have no existing versions when creating the initial version."
@@ -83,7 +68,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage DataSetVersionMappingNotFound = new(
         Code: nameof(DataSetVersionMappingNotFound),
-        Message: "The data set version mapping could not be found."
+        Message: "A data set version mapping could not be found."
     );
 
     public static readonly LocalizableMessage DataSetVersionMappingsNotComplete = new(

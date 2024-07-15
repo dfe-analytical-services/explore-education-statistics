@@ -131,7 +131,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst());
+                nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst());
         }
 
         [Fact]
@@ -144,7 +144,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                nameof(NextDataSetVersionCreateRequest.DataSetId).ToLowerFirst());
+                nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst());
         }
 
         [Fact]
@@ -152,15 +152,15 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         {
             var (releaseFile, _) = await AddDataAndMetadataFiles(Guid.NewGuid());
 
+            var dataSetId = Guid.NewGuid();
+
             var result = await CreateNextDataSetVersion(
-                dataSetId: Guid.NewGuid(),
+                dataSetId: dataSetId,
                 releaseFileId: releaseFile.Id);
 
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
-
-            validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateRequest.DataSetId).ToLowerFirst(),
-                expectedCode: ValidationMessages.DataSetNotFound.Code);
+            result.AssertNotFoundWithValidationProblem<DataSet, Guid>(
+                expectedId: dataSetId,
+                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst());
         }
 
         [Fact]
@@ -168,15 +168,15 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         {
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
 
+            var releaseFileId = Guid.NewGuid();
+
             var result = await CreateNextDataSetVersion(
                 dataSetId: dataSet.Id,
-                releaseFileId: Guid.NewGuid());
+                releaseFileId: releaseFileId);
 
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
-
-            validationProblem.AssertHasError(
-                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
-                expectedCode: ValidationMessages.FileNotFound.Code);
+            result.AssertNotFoundWithValidationProblem<ReleaseFile, Guid>(
+                expectedId: releaseFileId,
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
         }
 
         [Fact]
@@ -214,7 +214,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
         }
 
@@ -224,7 +224,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
 
             var subjectId = Guid.NewGuid();
-            
+
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithApprovalStatus(ReleaseApprovalStatus.Approved))
@@ -323,7 +323,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileNotInDataSetPublication.Code
             );
         }
@@ -346,7 +346,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateRequest.DataSetId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetNoLiveVersion.Code
             );
         }
@@ -370,7 +370,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 .WithPublicationId(dataSet.PublicationId);
 
             var subjectId = Guid.NewGuid();
-            
+
             var (nextDataFile, nextMetaFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseAmendment)
@@ -397,7 +397,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
             );
         }
@@ -441,7 +441,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         private async Task<(ReleaseFile, ReleaseFile)> AddDataAndMetadataFiles(Guid publicationId)
         {
             var subjectId = Guid.NewGuid();
-            
+
             var (dataFile, metaFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture
@@ -458,7 +458,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 .GenerateList()
                 .ToTuple2();
 
-            await AddTestData<ContentDbContext>(context => 
+            await AddTestData<ContentDbContext>(context =>
                 context.ReleaseFiles.AddRange(dataFile, metaFile));
 
             return (dataFile, metaFile);
@@ -470,7 +470,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             DurableTaskClient? durableTaskClient = null)
         {
             var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
-            return await function.CreateNextDataSetVersion(new NextDataSetVersionCreateRequest
+            return await function.CreateNextDataSetVersion(
+                new NextDataSetVersionCreateMappingsRequest
                 {
                     DataSetId = dataSetId,
                     ReleaseFileId = releaseFileId
