@@ -162,15 +162,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ReleaseSubject releaseSubject,
             CancellationToken cancellationToken)
         {
-            SubjectMetaQueryStep? subjectMetaStep = null;
-            if (!query.LocationIds.IsNullOrEmpty() && query.TimePeriod == null)
-            {
-                subjectMetaStep = SubjectMetaQueryStep.GetTimePeriods;
-            }
-            else if (query.TimePeriod != null && query.Filters.IsNullOrEmpty())
-            {
-                subjectMetaStep = SubjectMetaQueryStep.GetFilterItems;
-            }
+            // we already know query.Locations is not empty due to LocationsOrTimePeriodsQueryContext validator
+            var subjectMetaStep = query.TimePeriod == null
+                ? SubjectMetaQueryStep.GetTimePeriods
+                : SubjectMetaQueryStep.GetFilterItems;
 
             // Only data relevant to the step being executed in the table tool needs to be returned, so only the
             // minimum requisite DB calls for the task are performed.
@@ -208,7 +203,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .SingleAsync(cancellationToken: cancellationToken);
 
                     var observations =
-                        await observationService.GetMatchedObservations(query, cancellationToken);
+                        await observationService.GetMatchedObservations(
+                            query.AsObservationQueryContext(),
+                            cancellationToken);
                     logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 

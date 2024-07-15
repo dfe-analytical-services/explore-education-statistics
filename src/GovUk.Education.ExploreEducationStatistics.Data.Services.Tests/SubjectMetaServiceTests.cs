@@ -665,7 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
             };
 
-            var query = new LocationsOrTimePeriodsQueryRequest
+            var queryReq = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = releaseSubject.SubjectId,
                 LocationIds = ListOf(Guid.NewGuid()),
@@ -704,7 +704,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var observationService = new Mock<IObservationService>(MockBehavior.Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(query, cancellationToken))
+                    .Setup(s => s.GetMatchedObservations(
+                        It.Is<ObservationQueryContext>(ctx => ctx
+                                .Equals(queryReq.AsObservationQueryContext())),
+                        cancellationToken))
                     .ReturnsAsync(statisticsDbContext.MatchedObservations);
 
                 var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
@@ -783,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result =
-                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, queryReq, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(
@@ -894,46 +897,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        [Fact]
-        public async Task FilterSubjectMeta_InvalidCombination_NoTimePeriodsOrLocations()
-        {
-            var statisticsReleaseVersion = new ReleaseVersion();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+        // @MarkFix this can be removed? Because LocationsOrTimePeriodsQueryRequest.Validator
+        // should prevent this? But maybe another test needs adding elsewhere?
+        //[Fact]
+        //public async Task FilterSubjectMeta_InvalidCombination_NoTimePeriodsOrLocations()
+        //{
+        //    var statisticsReleaseVersion = new ReleaseVersion();
+        //    var subject = new Subject
+        //    {
+        //        Id = Guid.NewGuid()
+        //    };
 
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersion = statisticsReleaseVersion,
-                Subject = subject
-            };
+        //    var releaseSubject = new ReleaseSubject
+        //    {
+        //        ReleaseVersion = statisticsReleaseVersion,
+        //        Subject = subject
+        //    };
 
-            var query = new LocationsOrTimePeriodsQueryRequest
-            {
-                SubjectId = subject.Id,
-                LocationIds = new List<Guid>(),
-                TimePeriod = null
-            };
+        //    var query = new LocationsOrTimePeriodsQueryRequest
+        //    {
+        //        SubjectId = subject.Id,
+        //        LocationIds = new List<Guid>(),
+        //        TimePeriod = null
+        //    };
 
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
+        //    var statisticsDbContextId = Guid.NewGuid().ToString();
+        //    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        //    {
+        //        await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+        //        await statisticsDbContext.SaveChangesAsync();
+        //    }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildSubjectMetaService(statisticsDbContext);
+        //    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        //    {
+        //        var service = BuildSubjectMetaService(statisticsDbContext);
 
-                var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                    () => service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, default));
+        //        var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+        //            () => service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, default));
 
-                Assert.Equal("Unable to determine which SubjectMeta information has requested " +
-                             "(Parameter 'subjectMetaStep')", exception.Message);
-            }
-        }
+        //        Assert.Equal("Unable to determine which SubjectMeta information has requested " +
+        //                     "(Parameter 'subjectMetaStep')", exception.Message);
+        //    }
+        //}
 
         [Fact]
         public async Task UpdateSubjectFilters()

@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 
         public IEnumerable<Guid> Filters { get; set; } = new List<Guid>();
 
-        public long? BoundaryLevel { get; set; }
+        public long? BoundaryLevel { get; set; } // @MarkFix not needed?
 
         public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
@@ -84,22 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
                 RuleFor(context => context.Indicators)
                     .NotEmpty();
             }
-        }
-    }
-
-    public static class FullTableQueryContextMappingExtensions
-    {
-        public static ObservationQueryContext AsObservationQueryContext(this FullTableQueryRequest fullTableQueryRequest)
-        {
-            return new ObservationQueryContext
-            {
-                SubjectId = fullTableQueryRequest.SubjectId,
-                LocationIds = fullTableQueryRequest.LocationIds,
-                TimePeriod = fullTableQueryRequest.TimePeriod,
-                Filters = fullTableQueryRequest.Filters,
-                Indicators = fullTableQueryRequest.Indicators,
-                BoundaryLevel = fullTableQueryRequest.BoundaryLevel,
-            };
         }
     }
 
@@ -142,20 +126,75 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
     // NOTE: This covers the both queries made after the locations step and the time periods step
     // in the table tool. This is why we don't check TimePeriods in validation, as it may or may not
     // be set.
-    public class LocationsOrTimePeriodsQueryRequest : ObservationQueryContext
+    public class LocationsOrTimePeriodsQueryRequest
     {
+        // @MarkFix check all properties are actually used
+        public Guid SubjectId { get; set; }
+
+        public List<Guid> LocationIds { get; set; } = new();
+
+        public TimePeriodQuery? TimePeriod { get; set; }
+
+        //public IEnumerable<Guid> Filters { get; set; } = new List<Guid>();
+
+        //public long? BoundaryLevel { get; set; } // @MarkFix not needed?
+
+        //public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
+
+        public override string ToString()
+        {
+            return
+                $"{nameof(SubjectId)}: {SubjectId}, " +
+                $"{nameof(TimePeriod)}: {TimePeriod}, " +
+                //$"{nameof(Filters)}: [{(Filters.IsNullOrEmpty() ? string.Empty : Filters.JoinToString(", "))}], " +
+                //$"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
+                //$"{nameof(Indicators)}: [{(Indicators.IsNullOrEmpty() ? string.Empty : Indicators.JoinToString(", "))}], " +
+                $"{nameof(LocationIds)}: [{LocationIds.JoinToString(", ")}]";
+        }
         public class Validator : AbstractValidator<LocationsOrTimePeriodsQueryRequest>
         {
             public Validator()
             {
                 RuleFor(context => context.LocationIds)
                     .NotEmpty();
+
                 // No TimePeriods check, as it may be null, but also could be set
-                RuleFor(context => context.Filters)
-                    .Empty();
-                RuleFor(context => context.Indicators)
-                    .Empty();
+
+                //RuleFor(context => context.Filters)
+                //    .Empty();
+                //RuleFor(context => context.Indicators)
+                //    .Empty();
             }
         }
     }
+
+    public static class QueryContextMappingExtensions
+    {
+        public static ObservationQueryContext AsObservationQueryContext(this FullTableQueryRequest fullTableQueryRequest)
+        {
+            return new ObservationQueryContext
+            {
+                SubjectId = fullTableQueryRequest.SubjectId,
+                LocationIds = fullTableQueryRequest.LocationIds,
+                TimePeriod = fullTableQueryRequest.TimePeriod,
+                Filters = fullTableQueryRequest.Filters,
+                Indicators = fullTableQueryRequest.Indicators,
+                BoundaryLevel = fullTableQueryRequest.BoundaryLevel,
+            };
+        }
+
+        public static ObservationQueryContext AsObservationQueryContext(this LocationsOrTimePeriodsQueryRequest locationsOrTimePeriodsQueryRequest)
+        {
+            return new ObservationQueryContext
+            {
+                SubjectId = locationsOrTimePeriodsQueryRequest.SubjectId,
+                LocationIds = locationsOrTimePeriodsQueryRequest.LocationIds,
+                TimePeriod = locationsOrTimePeriodsQueryRequest.TimePeriod,
+                Filters = [],
+                Indicators = [],
+                BoundaryLevel = null, // @MarkFix correct?
+            };
+        }
+    }
+
 }
