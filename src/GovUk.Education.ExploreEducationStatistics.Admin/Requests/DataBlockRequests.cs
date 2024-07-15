@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -32,7 +32,7 @@ public record DataBlockUpdateRequest
 
     public string Source { get; init; } = string.Empty;
 
-    public FullTableQueryRequest QueryRequest { get; init; } = null!;
+    public FullTableQueryRequest Query { get; init; } = null!;
 
     public List<IChart> Charts { get; init; } = new();
 

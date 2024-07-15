@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -72,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var request = new PermalinkCreateRequest
             {
-                QueryRequest =
+                Query =
                 {
                     SubjectId = Guid.NewGuid()
                 }
@@ -86,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync((ReleaseVersion?) null);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(request.QueryRequest.SubjectId, default))
+                .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
                 .ReturnsAsync(_publicationId);
 
             var service = BuildService(releaseVersionRepository: releaseVersionRepository.Object,
@@ -272,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 {
                     TableHeaders = new TableHeaders()
                 },
-                QueryRequest =
+                Query =
                 {
                     SubjectId = subject.Id
                 }
@@ -366,7 +367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             tableBuilderService
                 .Setup(s => s.Query(releaseVersion.Id,
                     It.Is<ObservationQueryContext>(ctx =>
-                        ctx.Equals(request.QueryRequest.AsObservationQueryContext())),
+                        ctx.Equals(request.Query.AsObservationQueryContext())),
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
@@ -607,7 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 {
                     TableHeaders = new TableHeaders()
                 },
-                QueryRequest =
+                Query =
                 {
                     SubjectId = subject.Id
                 }
@@ -689,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             tableBuilderService
                 .Setup(s => s.Query(releaseVersion.Id,
                     It.Is<ObservationQueryContext>(ctx =>
-                        ctx.Equals(request.QueryRequest.AsObservationQueryContext())),
+                        ctx.Equals(request.Query.AsObservationQueryContext())),
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 

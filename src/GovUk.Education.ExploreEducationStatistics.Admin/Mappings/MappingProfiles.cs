@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -93,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(c => c.Query.AsObservationQueryContext()));
             CreateMap<DataBlockUpdateRequest, DataBlock>()
                 .ForMember(dest => dest.Query,
-                    m => m.MapFrom(c => c.QueryRequest.AsObservationQueryContext()));
+                    m => m.MapFrom(c => c.Query.AsObservationQueryContext()));
 
             CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
             CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("data/release/{releaseVersionId:guid}/meta/subject")] // @MarkFix split into two endpoints for locations and timeperiods steps
+        [HttpPost("data/release/{releaseVersionId:guid}/meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
             Guid releaseVersionId,
             [FromBody] LocationsOrTimePeriodsQueryRequest query,

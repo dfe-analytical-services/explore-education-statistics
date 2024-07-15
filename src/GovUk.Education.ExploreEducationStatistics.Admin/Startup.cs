@@ -122,6 +122,7 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {

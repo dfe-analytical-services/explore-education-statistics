@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -1493,7 +1494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "New heading",
                 Name = "New name",
                 Source = "New source",
-                QueryRequest = new FullTableQueryRequest
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1543,7 +1544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectId, updateResult.DataSetId);
                 Assert.Equal("test file", updateResult.DataSetName);
 
-                updateRequest.QueryRequest.AsObservationQueryContext()
+                updateRequest.Query.AsObservationQueryContext()
                     .AssertDeepEqualTo(updateResult.Query);
                 Assert.Equal(updateRequest.Table, updateResult.Table);
                 Assert.Equal(updateRequest.Charts, updateResult.Charts);
@@ -1558,7 +1559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
-                updateRequest.QueryRequest.AsObservationQueryContext()
+                updateRequest.Query.AsObservationQueryContext()
                     .AssertDeepEqualTo(updatedDataBlock.Query);
                 updateRequest.Table.AssertDeepEqualTo(updatedDataBlock.Table);
                 updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
@@ -1614,7 +1615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var updateRequest = new DataBlockUpdateRequest
             {
                 Heading = "New heading",
-                QueryRequest = new FullTableQueryRequest
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1746,7 +1747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var updateRequest = new DataBlockUpdateRequest
             {
-                QueryRequest = new FullTableQueryRequest
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },

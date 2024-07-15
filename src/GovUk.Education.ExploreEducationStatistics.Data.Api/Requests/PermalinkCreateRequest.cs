@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 
@@ -11,5 +11,5 @@ public record PermalinkCreateRequest
 
     public TableBuilderConfiguration Configuration { get; init; } = new();
 
-    public FullTableQueryRequest QueryRequest { get; init; } = new();
+    public FullTableQueryRequest Query { get; init; } = new();
 }
