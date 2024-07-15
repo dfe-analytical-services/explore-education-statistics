@@ -207,7 +207,7 @@ describe('DataCataloguePage', () => {
   });
 
   describe('filtering by theme', () => {
-    beforeEach(async () => {
+    test('populates and enables the publications dropdown', async () => {
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
         results: testDataSetFileSummaries,
         paging: testPaging,
@@ -231,13 +231,14 @@ describe('DataCataloguePage', () => {
         ),
       ).toHaveLength(1);
 
-      user.selectOptions(screen.getByLabelText('Filter by Theme'), ['theme-2']);
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
 
       await waitFor(() => {
         expect(screen.getByText('2 data sets')).toBeInTheDocument();
       });
-    });
-    test('populates and enables the publications dropdown', async () => {
+
       const publicationsSelect = screen.getByLabelText('Filter by Publication');
       expect(publicationsSelect).not.toBeDisabled();
 
@@ -260,12 +261,60 @@ describe('DataCataloguePage', () => {
     });
 
     test('updates the data sets list', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
       expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
 
       expect(screen.queryAllByTestId(/data-set-file-summary/)).toHaveLength(2);
     });
 
     test('updates the query params', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
       expect(mockRouter).toMatchObject({
         pathname: '/data-catalogue',
         query: { themeId: 'theme-2' },
@@ -273,6 +322,30 @@ describe('DataCataloguePage', () => {
     });
 
     test('shows the remove theme filter and reset filters buttons', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
       expect(
         screen.getByRole('button', {
           name: 'Remove filter: Theme Theme title 2',
@@ -285,7 +358,7 @@ describe('DataCataloguePage', () => {
   });
 
   describe('filtering by publication', () => {
-    beforeEach(async () => {
+    test('populates the releases dropdown and selects the latest release', async () => {
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
         results: testDataSetFileSummaries,
         paging: testPaging,
@@ -307,7 +380,9 @@ describe('DataCataloguePage', () => {
         expect(screen.getByText('30 data sets')).toBeInTheDocument();
       });
 
-      user.selectOptions(screen.getByLabelText('Filter by Theme'), ['theme-2']);
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
 
       await waitFor(() => {
         expect(screen.getByText('2 data sets')).toBeInTheDocument();
@@ -316,16 +391,14 @@ describe('DataCataloguePage', () => {
       expect(publicationService.listReleases).not.toHaveBeenCalled();
 
       // Select publication
-      user.selectOptions(screen.getByLabelText('Filter by Publication'), [
+      await user.selectOptions(screen.getByLabelText('Filter by Publication'), [
         'publication-2',
       ]);
 
       await waitFor(() => {
         expect(screen.getByText('1 data set')).toBeInTheDocument();
       });
-    });
 
-    test('populates the releases dropdown and selects the latest release', async () => {
       expect(publicationService.listReleases).toHaveBeenCalledWith(
         'publication-slug-2',
       );
@@ -355,12 +428,88 @@ describe('DataCataloguePage', () => {
     });
 
     test('updates the data sets list', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+      publicationService.listReleases.mockResolvedValue(testReleases);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
+      // Select publication
+      await user.selectOptions(screen.getByLabelText('Filter by Publication'), [
+        'publication-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('1 data set')).toBeInTheDocument();
+      });
+
       expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
 
       expect(screen.queryAllByTestId(/data-set-file-summary/)).toHaveLength(1);
     });
 
     test('updates the query params', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+      publicationService.listReleases.mockResolvedValue(testReleases);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
+      // Select publication
+      await user.selectOptions(screen.getByLabelText('Filter by Publication'), [
+        'publication-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('1 data set')).toBeInTheDocument();
+      });
+
       expect(mockRouter).toMatchObject({
         pathname: '/data-catalogue',
         query: {
@@ -372,6 +521,44 @@ describe('DataCataloguePage', () => {
     });
 
     test('shows the remove publication and release filter buttons', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+      publicationService.listReleases.mockResolvedValue(testReleases);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
+      // Select publication
+      await user.selectOptions(screen.getByLabelText('Filter by Publication'), [
+        'publication-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('1 data set')).toBeInTheDocument();
+      });
+
       expect(
         screen.getByRole('button', {
           name: 'Remove filter: Theme Theme title 2',
@@ -392,7 +579,45 @@ describe('DataCataloguePage', () => {
       ).toBeInTheDocument();
     });
 
-    test('shows the release information and download all data sets button', () => {
+    test('shows the release information and download all data sets button', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+      publicationService.listReleases.mockResolvedValue(testReleases);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
+      // Select publication
+      await user.selectOptions(screen.getByLabelText('Filter by Publication'), [
+        'publication-2',
+      ]);
+
+      await waitFor(() => {
+        expect(screen.getByText('1 data set')).toBeInTheDocument();
+      });
+
       const releaseInfo = within(screen.getByTestId('release-info'));
 
       expect(
@@ -450,14 +675,16 @@ describe('DataCataloguePage', () => {
       const releasesSelect = screen.getByLabelText('Filter by Releases');
 
       // Select theme
-      user.selectOptions(screen.getByLabelText('Filter by Theme'), ['theme-2']);
+      await user.selectOptions(screen.getByLabelText('Filter by Theme'), [
+        'theme-2',
+      ]);
 
       await waitFor(() => {
         expect(screen.getByText('2 data sets')).toBeInTheDocument();
       });
 
       // Select publication
-      user.selectOptions(screen.getByLabelText('Filter by Publication'), [
+      await user.selectOptions(screen.getByLabelText('Filter by Publication'), [
         'publication-2',
       ]);
 
@@ -465,7 +692,7 @@ describe('DataCataloguePage', () => {
         expect(screen.getByText('1 data set')).toBeInTheDocument();
       });
 
-      user.selectOptions(releasesSelect, ['release-1']);
+      await user.selectOptions(releasesSelect, ['release-1']);
 
       await waitFor(() => {
         expect(screen.getByText('2 data sets')).toBeInTheDocument();
@@ -545,7 +772,7 @@ describe('DataCataloguePage', () => {
 
       const releasesSelect = screen.getByLabelText('Filter by Releases');
 
-      user.selectOptions(releasesSelect, ['all']);
+      await user.selectOptions(releasesSelect, ['all']);
 
       await waitFor(() => {
         expect(releasesSelect).toHaveValue('all');
@@ -558,7 +785,7 @@ describe('DataCataloguePage', () => {
         },
       });
 
-      user.selectOptions(releasesSelect, ['latest']);
+      await user.selectOptions(releasesSelect, ['latest']);
 
       await waitFor(() => {
         expect(releasesSelect).toHaveValue('latest');
@@ -574,7 +801,7 @@ describe('DataCataloguePage', () => {
   });
 
   describe('filtering by search term', () => {
-    beforeEach(async () => {
+    test('updates the data sets list', async () => {
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
         results: testDataSetFileSummaries,
         paging: testPaging,
@@ -597,15 +824,36 @@ describe('DataCataloguePage', () => {
       await waitFor(() => {
         expect(screen.getByText('2 data sets')).toBeInTheDocument();
       });
-    });
 
-    test('updates the data sets list', async () => {
       expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
 
       expect(screen.queryAllByTestId(/data-set-file-summary/)).toHaveLength(2);
     });
 
     test('updates the query params', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValue({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.type(screen.getByLabelText('Search data sets'), 'find me');
+      await user.click(screen.getByRole('button', { name: 'Search' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
       expect(mockRouter).toMatchObject({
         pathname: '/data-catalogue',
         query: { searchTerm: 'find me' },
@@ -613,6 +861,29 @@ describe('DataCataloguePage', () => {
     });
 
     test('shows the remove search filter and reset filters buttons', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValue({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.type(screen.getByLabelText('Search data sets'), 'find me');
+      await user.click(screen.getByRole('button', { name: 'Search' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
       expect(
         screen.getByRole('button', {
           name: 'Remove filter: Search find me',
@@ -976,7 +1247,7 @@ describe('DataCataloguePage', () => {
       expect(publicationsSelect).toHaveValue('all');
       expect(within(publicationsSelect).getAllByRole('option')).toHaveLength(3);
 
-      user.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Remove filter: Theme Theme title 2',
         }),
@@ -1049,7 +1320,7 @@ describe('DataCataloguePage', () => {
         }),
       ).toBeInTheDocument();
 
-      user.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Remove filter: Theme Theme title 2',
         }),
@@ -1227,7 +1498,7 @@ describe('DataCataloguePage', () => {
         expect(screen.getByText('2 data sets')).toBeInTheDocument();
       });
 
-      user.click(
+      await user.click(
         screen.getByRole('button', {
           name: 'Remove filter: Search find me',
         }),
@@ -1344,7 +1615,7 @@ describe('DataCataloguePage', () => {
         expect(screen.getByText('30 data sets')).toBeInTheDocument();
       });
 
-      user.click(screen.getByLabelText('A to Z'));
+      await user.click(screen.getByLabelText('A to Z'));
 
       await waitFor(() => {
         expect(mockRouter).toMatchObject({
@@ -1372,7 +1643,7 @@ describe('DataCataloguePage', () => {
       });
 
       await user.type(screen.getByLabelText('Search data sets'), 'Find me');
-      await await user.click(screen.getByRole('button', { name: 'Search' }));
+      await user.click(screen.getByRole('button', { name: 'Search' }));
 
       await waitFor(() => {
         expect(screen.getByText('2 data sets')).toBeInTheDocument();
