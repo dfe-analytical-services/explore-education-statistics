@@ -147,10 +147,10 @@ export const testMapTableData: TableDataResponse = {
           geoJson: {
             type: 'Feature',
             properties: {
-              code: 'E08000035',
-              lat: 53.8227005,
-              long: -1.50735998,
-              name: 'Leeds',
+              Code: 'E08000035',
+              LAT: 53.8227005,
+              LONG: -1.50735998,
+              Name: 'Leeds',
             },
             geometry: {
               type: 'Polygon',
@@ -235,10 +235,10 @@ export const testMapTableData: TableDataResponse = {
           geoJson: {
             type: 'Feature',
             properties: {
-              code: 'E08000003',
-              lat: 53.4701004,
-              long: -2.23358989,
-              name: 'Manchester',
+              Code: 'E08000003',
+              LAT: 53.4701004,
+              LONG: -2.23358989,
+              Name: 'Manchester',
             },
             geometry: {
               type: 'Polygon',
@@ -294,10 +294,10 @@ export const testMapTableData: TableDataResponse = {
           geoJson: {
             type: 'Feature',
             properties: {
-              code: 'E08000019',
-              lat: 53.40359879,
-              long: -1.54253995,
-              name: 'Sheffield',
+              Code: 'E08000019',
+              LAT: 53.40359879,
+              LONG: -1.54253995,
+              Name: 'Sheffield',
             },
             geometry: {
               type: 'Polygon',
@@ -421,20 +421,20 @@ export const testGeoJsonFeature: GeoJsonFeature = {
   type: 'Feature',
   geometry: { type: 'Polygon', coordinates: [] },
   properties: {
-    code: '',
-    name: '',
-    lat: 1,
-    long: 2,
+    Code: '',
+    Name: '',
+    LAT: 1,
+    LONG: 2,
   },
 };
 
 export const testGeoJsonFeature1: GeoJsonFeature = {
   type: 'Feature',
   properties: {
-    code: 'location-1',
-    lat: 53.8227005,
-    long: -1.50735998,
-    name: 'Location 1',
+    Code: 'location-1',
+    LAT: 53.8227005,
+    LONG: -1.50735998,
+    Name: 'Location 1',
   },
   geometry: {
     type: 'Polygon',
@@ -515,10 +515,10 @@ export const testGeoJsonFeature1: GeoJsonFeature = {
 export const testGeoJsonFeature2: GeoJsonFeature = {
   type: 'Feature',
   properties: {
-    code: 'location-2',
-    lat: 53.4701004,
-    long: -2.23358989,
-    name: 'Location 2',
+    Code: 'location-2',
+    LAT: 53.4701004,
+    LONG: -2.23358989,
+    Name: 'Location 2',
   },
   geometry: {
     type: 'Polygon',
@@ -570,10 +570,10 @@ export const testGeoJsonFeature2: GeoJsonFeature = {
 export const testGeoJsonFeature3: GeoJsonFeature = {
   type: 'Feature',
   properties: {
-    code: 'location-3',
-    lat: 53.40359879,
-    long: -1.54253995,
-    name: 'Location 3',
+    Code: 'location-3',
+    LAT: 53.40359879,
+    LONG: -1.54253995,
+    Name: 'Location 3',
   },
   geometry: {
     type: 'Polygon',

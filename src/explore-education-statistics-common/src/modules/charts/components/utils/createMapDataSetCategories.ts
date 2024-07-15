@@ -25,21 +25,11 @@ export default function createMapDataSetCategories(
     includeNonNumericData: true,
   })
     .map(category => {
-      const geo = meta.locations.find(
-        location => location.id === category.filter.id,
-      )?.geoJson;
-
       return {
         ...category,
-        geoJson: {
-          ...geo,
-          properties: {
-            code: geo?.properties.Code,
-            name: geo?.properties.Name,
-            lat: geo?.properties.LAT,
-            long: geo?.properties.LONG,
-          },
-        },
+        geoJson: meta.locations.find(
+          location => location.id === category.filter.id,
+        )?.geoJson,
       };
     })
     .filter(category => !!category?.geoJson) as MapDataSetCategory[];
