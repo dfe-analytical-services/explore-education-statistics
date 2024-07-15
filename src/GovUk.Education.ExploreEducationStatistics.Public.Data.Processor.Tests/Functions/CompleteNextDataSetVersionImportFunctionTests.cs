@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -30,6 +31,17 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CompleteNextDataSetVersionImportFunctionTests(fixture)
     {
+        public static TheoryData<DataSetVersionStatus> NonMappingDataSetVersionStatuses =
+            new(EnumUtil
+                .GetEnums<DataSetVersionStatus>()
+                .Except([DataSetVersionStatus.Mapping]));
+        
+        public static TheoryData<DataSetVersionImportStage> NonManualMappingStages =
+            new(EnumUtil
+                .GetEnums<DataSetVersionImportStage>()
+                .Except([DataSetVersionImportStage.ManualMapping]));
+
+        
         [Fact]
         public async Task Success()
         {
@@ -42,7 +54,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             durableTaskClientMock.Setup(client =>
                     client.ScheduleNewOrchestrationInstanceAsync(
                         nameof(ProcessCompletionOfNextDataSetVersionFunction
-                            .CompleteNextDataSetVersionImportProcessing),
+                            .ProcessCompletionOfNextDataSetVersion),
                         It.IsAny<ProcessDataSetVersionContext>(),
                         It.IsAny<StartOrchestrationOptions>(),
                         It.IsAny<CancellationToken>()))
@@ -70,6 +82,9 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             VerifyAllMocks(durableTaskClientMock);
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
+
+            Assert.Equal(nextVersion.Id, responseViewModel.DataSetVersionId);
+            Assert.Equal(nextVersion.DataSetId, responseViewModel.DataSetId);
 
             // Assert that the pre-existing import entry for the next data set version is re-used.
             var updatedDataSetVersionImport = publicDataDbContext
@@ -119,8 +134,10 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst());
         }
 
-        [Fact]
-        public async Task DataSetVersionNotInMappingStatus_ReturnsValidationProblem()
+        [Theory]
+        [MemberData(nameof(NonMappingDataSetVersionStatuses))]
+        public async Task DataSetVersionNotInMappingStatus_ReturnsValidationProblem(
+            DataSetVersionStatus status)
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
@@ -131,7 +148,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .DataSetVersions
                 .SingleAsync(dsv => dsv.Id == nextVersion.Id);
 
-            nextVersionWithIncorrectStatus.Status = DataSetVersionStatus.Draft;
+            nextVersionWithIncorrectStatus.Status = status;
 
             await publicDataDbContext.SaveChangesAsync();
 
@@ -221,8 +238,10 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 expectedCode: ValidationMessages.DataSetVersionMappingsNotComplete.Code);
         }
 
-        [Fact]
-        public async Task DataSetVersionImportInManualMappingStateNotFound_ReturnsValidationProblem()
+        [Theory]
+        [MemberData(nameof(NonManualMappingStages))]
+        public async Task DataSetVersionImportInManualMappingStateNotFound_ReturnsValidationProblem(
+            DataSetVersionImportStage importStage)
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
@@ -233,7 +252,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .DataSetVersionImports
                 .SingleAsync(import => import.DataSetVersionId == nextVersion.Id);
 
-            importWithIncorrectStatus.Stage = DataSetVersionImportStage.AutoMapping;
+            importWithIncorrectStatus.Stage = importStage;
 
             await publicDataDbContext.SaveChangesAsync();
 

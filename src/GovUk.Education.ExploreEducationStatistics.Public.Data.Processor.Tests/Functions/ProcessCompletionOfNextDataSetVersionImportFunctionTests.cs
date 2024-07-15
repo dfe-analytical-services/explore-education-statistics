@@ -124,7 +124,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class CompleteInitialDataSetVersionProcessingTests(
+    public class CompleteNextDataSetVersionImportProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
     {
@@ -177,8 +177,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
         private async Task CompleteProcessing(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.CompleteInitialDataSetVersionProcessing(instanceId, CancellationToken.None);
+            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
+            await function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
         }
     }
 }
