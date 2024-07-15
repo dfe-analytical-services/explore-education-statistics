@@ -8,7 +8,7 @@ import {
   Topic,
   ThemeAndTopics,
   SubjectMeta,
-  TableQuery,
+  FullTableQuery,
   OverallStage,
 } from './types';
 
@@ -517,7 +517,7 @@ export class AdminService {
     };
   }
 
-  tableQuery({ releaseId, query }: { releaseId: string; query: TableQuery }) {
+  tableQuery({ releaseId, query }: { releaseId: string; query: FullTableQuery }) {
     const { response, json } = this.client.post<{ results: { id: string }[] }>(
       `/api/data/tablebuilder/release/${releaseId}`,
       JSON.stringify(query),

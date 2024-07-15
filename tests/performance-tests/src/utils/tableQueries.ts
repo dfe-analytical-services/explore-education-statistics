@@ -1,4 +1,4 @@
-import { SubjectMeta, TableQuery } from './types';
+import { SubjectMeta, FullTableQuery } from './types';
 
 export function createTableBuilderQuery({
   subjectId,
@@ -6,7 +6,7 @@ export function createTableBuilderQuery({
 }: {
   subjectId: string;
   subjectMeta: SubjectMeta;
-}): TableQuery {
+}): FullTableQuery {
   const oneFilterItemIdFromEachFilter = Object.values(
     subjectMeta.filters,
   ).flatMap(filter =>

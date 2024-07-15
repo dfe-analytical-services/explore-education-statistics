@@ -1,5 +1,5 @@
 import HttpClient from './httpClient';
-import { SubjectMeta, TableQuery } from './types';
+import { SubjectMeta, FullTableQuery } from './types';
 
 const applicationJsonHeaders = {
   'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ class DataService {
     };
   }
 
-  tableQuery(query: TableQuery) {
+  tableQuery(query: FullTableQuery) {
     const { response, json } = this.client.post<{ results: { id: string }[] }>(
       '/tablebuilder',
       JSON.stringify(query),

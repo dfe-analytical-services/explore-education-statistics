@@ -134,13 +134,8 @@ export interface TimePeriodQuery {
   endCode: string;
 }
 
-export interface TableDataQuery {
+export interface TableDataQuery extends FullTableQuery {
   publicationId?: string;
-  subjectId: string;
-  filters: string[];
-  indicators: string[];
-  timePeriod?: TimePeriodQuery;
-  locationIds: string[];
   includeGeoJson?: boolean;
   boundaryLevel?: number;
 }
@@ -149,11 +144,18 @@ export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseId?: string;
 }
 
-export interface ReleaseSubjectMetaQuery {
-  releaseId?: string;
+export interface FullTableQuery {
   subjectId: string;
+  locationIds: string[];
   timePeriod?: TimePeriodQuery;
-  locationIds?: string[];
+  filters: string[];
+  indicators: string[];
+}
+
+export interface LocationsOrTimePeriodsQuery {
+  subjectId: string;
+  locationIds: string[];
+  timePeriod?: TimePeriodQuery;
 }
 
 export interface TableDataSubjectMeta {
@@ -232,18 +234,18 @@ const tableBuilderService = {
       ? dataApi.get(`/release/${releaseId}/meta/subject/${subjectId}`)
       : dataApi.get(`/meta/subject/${subjectId}`);
   },
-  async filterSubjectMeta({
-    releaseId,
-    ...query
-  }: ReleaseSubjectMetaQuery): Promise<SubjectMeta> {
+  async filterSubjectMeta(
+    { ...query }: LocationsOrTimePeriodsQuery,
+    releaseId?: string,
+  ): Promise<SubjectMeta> {
     return releaseId
       ? dataApi.post(`/release/${releaseId}/meta/subject`, query)
       : dataApi.post('/meta/subject', query);
   },
-  async getTableData({
-    releaseId,
-    ...query
-  }: ReleaseTableDataQuery): Promise<TableDataResponse> {
+  async getTableData(
+    { ...query }: FullTableQuery,
+    releaseId?: string,
+  ): Promise<TableDataResponse> {
     return releaseId
       ? dataApi.post(`/tablebuilder/release/${releaseId}`, query)
       : dataApi.post('/tablebuilder', query);

@@ -32,7 +32,7 @@ import publicationService, {
   Theme,
 } from '@common/services/publicationService';
 import tableBuilderService, {
-  FeaturedTable,
+  FeaturedTable, FullTableQuery,
   LocationOption,
   ReleaseTableDataQuery,
   Subject,
@@ -283,11 +283,13 @@ export default function TableToolWizard({
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler =
     async ({ locationIds }) => {
-      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-        releaseId: state.query.releaseId,
-        locationIds,
-        subjectId: state.query.subjectId,
-      });
+      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+        {
+          locationIds,
+          subjectId: state.query.subjectId,
+        },
+        state.query.releaseId,
+      );
 
       const { timePeriod } = state.query;
 
@@ -329,11 +331,13 @@ export default function TableToolWizard({
   const handleTimePeriodStepBack = async () => {
     const { releaseId, subjectId, locationIds } = state.query;
 
-    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+      {
+        subjectId,
+        locationIds,
+      },
       releaseId,
-      subjectId,
-      locationIds,
-    });
+    );
 
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
@@ -351,17 +355,19 @@ export default function TableToolWizard({
       const [startYear, startCode] = parseYearCodeTuple(values.start);
       const [endYear, endCode] = parseYearCodeTuple(values.end);
 
-      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-        releaseId,
-        subjectId,
-        locationIds,
-        timePeriod: {
-          startYear,
-          startCode,
-          endYear,
-          endCode,
+      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+        {
+          subjectId,
+          locationIds,
+          timePeriod: {
+            startYear,
+            startCode,
+            endYear,
+            endCode,
+          },
         },
-      });
+        releaseId,
+      );
 
       const indicatorValues = new Set(
         Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
@@ -402,12 +408,14 @@ export default function TableToolWizard({
   const handleFiltersStepBack = async () => {
     const { releaseId, subjectId, locationIds, timePeriod } = state.query;
 
-    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+      {
+        subjectId,
+        locationIds,
+        timePeriod,
+      },
       releaseId,
-      subjectId,
-      locationIds,
-      timePeriod,
-    });
+    );
 
     updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
@@ -425,13 +433,21 @@ export default function TableToolWizard({
       draft.response = undefined;
     });
 
-    const query: ReleaseTableDataQuery = {
-      ...state.query,
-      indicators,
+    const query: FullTableQuery = {
+      subjectId: state.query.subjectId,
+      locationIds: state.query.locationIds,
+      timePeriod: state.query.timePeriod,
+      indicators: indicators,
       filters: Object.values(filters).flat(),
     };
 
-    const tableData = await tableBuilderService.getTableData(query);
+    const tableData = await tableBuilderService.getTableData({ ...query,
+      subjectId: query.subjectId,
+      locationIds: query.locationIds,
+      timePeriod: query.timePeriod,
+      filters: query.filters,
+      indicators: query.indicators,
+    }, undefined);
 
     if (!tableData.results.length || !tableData.subjectMeta) {
       throw new SubmitError(
