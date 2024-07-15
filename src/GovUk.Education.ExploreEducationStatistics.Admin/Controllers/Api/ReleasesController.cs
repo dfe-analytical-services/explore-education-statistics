@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseVersionId:guid}/data")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> UploadDataSet(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseVersionId:guid}/zip-data")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZip(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseVersionId:guid}/bulk-zip-data")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<List<DataFileInfo>>> UploadDataSetsAsBulkZip(
             Guid releaseVersionId,
