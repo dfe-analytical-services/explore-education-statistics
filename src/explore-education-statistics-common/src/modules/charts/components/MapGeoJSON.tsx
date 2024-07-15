@@ -142,7 +142,7 @@ export default function MapGeoJSON({
 
             return (
               `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
-              `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
+              `<p><strong data-testid="chartTooltip-label">${feature.properties.Name}</strong></p>` +
               `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">${content}</p>` +
               `</div>`
             );
