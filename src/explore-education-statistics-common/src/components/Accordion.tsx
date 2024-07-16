@@ -26,6 +26,7 @@ export interface AccordionProps {
   id: string;
   openAll?: boolean;
   showOpenAll?: boolean;
+  testId?: string;
   toggleAllHiddenText?: string;
   onToggleAll?: (open: boolean) => void;
   onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
@@ -37,6 +38,7 @@ const Accordion = ({
   id,
   openAll,
   showOpenAll = true,
+  testId = 'accordion',
   toggleAllHiddenText,
   onToggleAll,
   onSectionOpen,
@@ -164,7 +166,7 @@ const Accordion = ({
       className={classNames('govuk-accordion', styles.accordion, className)}
       id={id}
       ref={ref}
-      data-testid="accordion"
+      data-testid={testId}
     >
       {isMounted && showOpenAll && (
         <div className="govuk-accordion__controls">

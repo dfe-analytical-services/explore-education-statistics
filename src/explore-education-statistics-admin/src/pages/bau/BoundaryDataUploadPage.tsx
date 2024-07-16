@@ -15,7 +15,9 @@ import {
 import { useHistory } from 'react-router-dom';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Link from '@admin/components/Link';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import Yup from '@common/validation/yup';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { ObjectSchema } from 'yup';
@@ -76,7 +78,7 @@ export default function BoundaryDataUploadPage() {
             { value: '', label: '' },
           ];
 
-          Object.keys(locationLevelsMap).map(key => {
+          (Object.keys(locationLevelsMap) as LocationLevelKey[]).map(key => {
             return options.push({
               value: locationLevelsMap[key].label.replace(/\s/g, ''),
               label: `${locationLevelsMap[key].code} - ${locationLevelsMap[key].label}`,

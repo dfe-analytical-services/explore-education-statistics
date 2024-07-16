@@ -4,8 +4,10 @@ import { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
 
 export interface ButtonOptions {
   ariaControls?: string;
+  ariaCurrent?: 'page';
   ariaDisabled?: boolean;
   ariaExpanded?: boolean;
+  ariaLabel?: string;
   children: ReactNode;
   className?: string;
   disabled?: boolean;
@@ -18,8 +20,10 @@ export interface ButtonOptions {
 
 export default function useButton({
   ariaControls,
+  ariaCurrent,
   ariaDisabled,
   ariaExpanded,
+  ariaLabel,
   children,
   className,
   disabled,
@@ -56,8 +60,10 @@ export default function useButton({
 
   return {
     'aria-controls': ariaControls,
+    'aria-current': ariaCurrent,
     'aria-disabled': isDisabled,
     'aria-expanded': ariaExpanded,
+    'aria-label': ariaLabel,
     children,
     className,
     'data-testid': testId,

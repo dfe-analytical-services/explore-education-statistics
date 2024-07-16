@@ -1,50 +1,60 @@
-import ApiDataSetUnmappedAndManuallyMappedLocationsTable from '@admin/pages/release/data/components/ApiDataSetUnmappedAndManuallyMappedLocationsTable';
-import { UnmappedAndManuallyMappedLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import ApiDataSetMappableLocationsTable from '@admin/pages/release/data/components/ApiDataSetMappableLocationsTable';
+import { MappableLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
 
-describe('ApiDataSetUnmappedAndManuallyMappedLocationsTable', () => {
-  const testLocations: UnmappedAndManuallyMappedLocation[] = [
+describe('ApiDataSetMappableLocationsTable', () => {
+  const testLocations: MappableLocation[] = [
     {
       mapping: {
-        type: 'AutoNone',
+        publicId: 'location-1-public-id',
         source: {
           label: 'Location 1',
           code: 'location-1-code',
         },
+        sourceKey: 'Location1SourceKey',
+        type: 'AutoNone',
       },
     },
     {
       candidate: {
         label: 'Location 2 updated',
         code: 'location-2-code',
+        key: 'Location2CandidateKey',
       },
       mapping: {
-        candidateKey: 'Location2Key',
-        type: 'ManualMapped',
+        publicId: 'location-2-public-id',
+        candidateKey: 'Location2CandidateKey',
         source: {
           label: 'Location 2',
           code: 'location-2-code',
         },
+        sourceKey: 'Location2SourceKey',
+        type: 'ManualMapped',
       },
     },
     {
       mapping: {
-        type: 'ManualNone',
+        publicId: 'location-3-public-id',
+
         source: {
           label: 'Location 3',
           code: 'location-3-code',
         },
+        sourceKey: 'Location3SourceKey',
+        type: 'ManualNone',
       },
     },
   ];
 
   test('renders the table correctly', () => {
     render(
-      <ApiDataSetUnmappedAndManuallyMappedLocationsTable
+      <ApiDataSetMappableLocationsTable
         level="localAuthority"
         locations={testLocations}
+        newLocations={[]}
+        onUpdate={Promise.resolve}
       />,
     );
 
@@ -56,17 +66,17 @@ describe('ApiDataSetUnmappedAndManuallyMappedLocationsTable', () => {
     expect(row1Cells[0]).toHaveTextContent('Location 1');
     expect(row1Cells[0]).toHaveTextContent('location-1-code');
     expect(row1Cells[1]).toHaveTextContent('Unmapped');
+    expect(row1Cells[2]).toHaveTextContent('N/A');
     expect(
-      within(row1Cells[2]).getByRole('button', {
+      within(row1Cells[3]).getByRole('button', {
         name: 'No mapping for Location 1',
       }),
     );
     expect(
-      within(row1Cells[2]).getByRole('button', {
+      within(row1Cells[3]).getByRole('button', {
         name: 'Edit mapping for Location 1',
       }),
     ).toBeInTheDocument();
-    expect(row1Cells[3]).toHaveTextContent('N/A');
 
     // Row 2 - ManualMapped
     const row2Cells = within(rows[2]).getAllByRole('cell');
@@ -74,41 +84,43 @@ describe('ApiDataSetUnmappedAndManuallyMappedLocationsTable', () => {
     expect(row2Cells[0]).toHaveTextContent('location-2-code');
     expect(row2Cells[1]).toHaveTextContent('Location 2 updated');
     expect(row2Cells[1]).toHaveTextContent('location-2-code');
+    expect(row2Cells[2]).toHaveTextContent('Minor');
     expect(
-      within(row2Cells[2]).getByRole('button', {
+      within(row2Cells[3]).getByRole('button', {
         name: 'No mapping for Location 2',
       }),
     ).toBeInTheDocument();
     expect(
-      within(row2Cells[2]).getByRole('button', {
+      within(row2Cells[3]).getByRole('button', {
         name: 'Edit mapping for Location 2',
       }),
     ).toBeInTheDocument();
-    expect(row2Cells[3]).toHaveTextContent('Minor');
 
     // Row 3 - ManualNone
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('Location 3');
     expect(row3Cells[0]).toHaveTextContent('location-3-code');
     expect(row3Cells[1]).toHaveTextContent('No mapping available');
+    expect(row3Cells[2]).toHaveTextContent('Major');
     expect(
-      within(row3Cells[2]).queryByRole('button', {
+      within(row3Cells[3]).queryByRole('button', {
         name: 'No mapping for Location 2',
       }),
     ).not.toBeInTheDocument();
     expect(
-      within(row3Cells[2]).getByRole('button', {
+      within(row3Cells[3]).getByRole('button', {
         name: 'Edit mapping for Location 3',
       }),
     ).toBeInTheDocument();
-    expect(row3Cells[3]).toHaveTextContent('Major');
   });
 
   test('shows the number of mapped and unmapped locations in the table caption', () => {
     render(
-      <ApiDataSetUnmappedAndManuallyMappedLocationsTable
+      <ApiDataSetMappableLocationsTable
         level="localAuthority"
         locations={testLocations}
+        newLocations={[]}
+        onUpdate={Promise.resolve}
       />,
     );
 
@@ -117,5 +129,39 @@ describe('ApiDataSetUnmappedAndManuallyMappedLocationsTable', () => {
         name: 'Local Authorities 1 unmapped location 2 mapped locations',
       }),
     ).toBeInTheDocument();
+  });
+
+  test('hides the buttons if there is a pending update for the mapping', () => {
+    render(
+      <ApiDataSetMappableLocationsTable
+        level="localAuthority"
+        locations={testLocations}
+        newLocations={[]}
+        pendingUpdates={[
+          {
+            previousMapping: testLocations[1].mapping,
+            level: 'localAuthority',
+            sourceKey: 'Location2SourceKey',
+            type: 'ManualMapped',
+          },
+        ]}
+        onUpdate={Promise.resolve}
+      />,
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+
+    expect(
+      within(row2Cells[3]).queryByRole('button', {
+        name: 'No mapping for Location 2',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(row2Cells[3]).queryByRole('button', {
+        name: 'Edit mapping for Location 2',
+      }),
+    ).not.toBeInTheDocument();
   });
 });
