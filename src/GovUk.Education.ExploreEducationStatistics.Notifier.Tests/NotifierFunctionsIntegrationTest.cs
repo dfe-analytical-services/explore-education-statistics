@@ -8,12 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
+using Notify.Interfaces;
 using Testcontainers.Azurite;
 using Xunit;
 
@@ -29,8 +29,8 @@ public abstract class NotifierFunctionsIntegrationTest
 
     public Task DisposeAsync()
     {
-        MockUtils.VerifyAllMocks(fixture._emailService);
-        fixture._emailService.Reset();
+        MockUtils.VerifyAllMocks(fixture._notificationClient);
+        fixture._notificationClient.Reset();
 
         return ClearAzureDataTableTestData(TableStorageConnectionString());
     }
@@ -91,7 +91,7 @@ public abstract class NotifierFunctionsIntegrationTest
 // ReSharper disable once ClassNeverInstantiated.Global
 public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
 {
-    public readonly Mock<IEmailService> _emailService = new(MockBehavior.Strict);
+    public readonly Mock<INotificationClient> _notificationClient = new(MockBehavior.Strict);
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
         .WithImage("mcr.microsoft.com/azure-storage/azurite:3.27.0")
@@ -129,7 +129,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
             .ConfigureServices((hostContext, services) =>
             {
                 services
-                    .ReplaceService(_emailService);
+                    .ReplaceService(_notificationClient);
             });
     }
 

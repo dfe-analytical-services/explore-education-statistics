@@ -11,6 +11,11 @@ public class EmailService(INotificationClient notificationClient) : IEmailServic
         string templateId,
         Dictionary<string, dynamic> values)
     {
-        notificationClient.SendEmail(email, templateId, values);
+        notificationClient.SendEmail(
+            emailAddress: email,
+            templateId: templateId, 
+            personalisation: values,
+            clientReference: null,
+            emailReplyToId: null);
     }
 }

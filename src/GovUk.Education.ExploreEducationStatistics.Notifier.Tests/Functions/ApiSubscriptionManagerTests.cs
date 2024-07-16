@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Moq;
+using Notify.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ public abstract class ApiSubscriptionManagerTests(NotifierFunctionsIntegrationTe
         public async Task Success()
         {
             string verificationLink = null!;
-            fixture._emailService
+            fixture._notificationClient
                 .Setup(mock => mock.SendEmail(
                     email,
                     GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionVerificationId,
@@ -43,8 +44,11 @@ public abstract class ApiSubscriptionManagerTests(NotifierFunctionsIntegrationTe
                             dataSetTitle,
                             $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{dataSetId}/confirm-subscription/",
                             null)
-                    )))
-                .Callback((string email, string templateId, Dictionary<string, dynamic> values)
+                    ),
+                    null,
+                    null))
+                .Returns(It.IsAny<EmailNotificationResponse>())
+                .Callback((string email, string templateId, Dictionary<string, dynamic> values, string clientReference, string emailReplyToId)
                     => verificationLink = values["verification_link"]); ;
 
             var result = await RequestPendingApiSubscription(
@@ -227,7 +231,7 @@ public abstract class ApiSubscriptionManagerTests(NotifierFunctionsIntegrationTe
             await CreateApiSubscription(pendingSubscription);
 
             string unsubscribeLink = null!;
-            fixture._emailService
+            fixture._notificationClient
                 .Setup(mock => mock.SendEmail(
                     email,
                     GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionConfirmationId,
@@ -237,8 +241,11 @@ public abstract class ApiSubscriptionManagerTests(NotifierFunctionsIntegrationTe
                             dataSetTitle,
                             null,
                             $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{dataSetId}/confirm-unsubscription/")
-                    )))
-                .Callback((string email, string templateId, Dictionary<string, dynamic> values)
+                    ),
+                    null,
+                    null))
+                .Returns(It.IsAny<EmailNotificationResponse>())
+                .Callback((string email, string templateId, Dictionary<string, dynamic> values, string clientReference, string emailReplyToId)
                     => unsubscribeLink = values["unsubscribe_link"]);
 
             var tokenService = GetRequiredService<ITokenService>();
