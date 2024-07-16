@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,6 +62,15 @@ public class PreviewTokenService(
             .OnSuccess(MapPreviewToken);
     }
 
+    public async Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
+            .OnSuccess(async () => await DoList(dataSetVersionId, cancellationToken));
+    }
+
     private async Task<Either<ActionResult, DataSetVersion>> CheckDataSetVersionExists(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
@@ -81,6 +91,23 @@ public class PreviewTokenService(
                 Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id)
             })
             : Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> DoList(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var previewTokens = await publicDataDbContext
+            .PreviewTokens
+            .AsNoTracking()
+            .Where(pt => pt.DataSetVersionId == dataSetVersionId)
+            .ToListAsync(cancellationToken);
+
+        return await previewTokens
+            .ToAsyncEnumerable()
+            .SelectAwait(async pt => await MapPreviewToken(pt))
+            .OrderByDescending(pt => pt.Expiry)
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<PreviewTokenViewModel> MapPreviewToken(PreviewToken previewToken)
