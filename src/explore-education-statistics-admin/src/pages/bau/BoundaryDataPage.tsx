@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import boundaryDataQueries from '@admin/queries/boundaryDataQueries';
 import boundaryTypesMap from '@common/utils/boundaryTypesMap';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
+import InsetText from '@common/components/InsetText';
 import classNames from 'classnames';
 import styles from './BoundaryDataPage.module.scss';
 
@@ -61,10 +62,8 @@ const BoundaryDataPage = () => {
           </dl>
         </Details>
 
-        <Details
-          summary="New data uploads: before you start"
-          id="beforeYouStart"
-        >
+        <InsetText>
+          <h2>New data uploads: before you start</h2>
           <p>
             If the GeoJSON file has been downloaded direcly from the Open
             Geography Portal then the coordinate system may need converting from
@@ -93,7 +92,7 @@ const BoundaryDataPage = () => {
               Rename the downloaded file's extension from .json to .geojson
             </li>
           </ol>
-        </Details>
+        </InsetText>
 
         <Link to="boundary-data/upload" className="govuk-button">
           Upload boundary data file
