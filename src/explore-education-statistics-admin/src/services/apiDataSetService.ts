@@ -10,6 +10,7 @@ export interface ApiDataSetSummary {
   supersedingDataSetId?: string;
   draftVersion?: ApiDataSetDraftVersionSummary;
   latestLiveVersion?: ApiDataSetLiveVersionSummary;
+  previousReleaseIds: string[];
 }
 
 export interface ApiDataSetVersionSummary {
@@ -36,6 +37,7 @@ export interface ApiDataSet {
   supersedingDataSetId?: string;
   draftVersion?: ApiDataSetDraftVersion;
   latestLiveVersion?: ApiDataSetLiveVersion;
+  previousReleaseIds: string[];
 }
 
 export interface ApiDataSetVersion {

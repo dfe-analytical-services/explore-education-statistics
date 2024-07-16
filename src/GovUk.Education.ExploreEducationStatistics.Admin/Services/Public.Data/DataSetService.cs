@@ -40,20 +40,20 @@ internal class DataSetService(
             {
                 var dataSetsQueryable = publicDataDbContext.DataSets
                     .AsNoTracking()
+                    .Include(ds => ds.Versions)
                     .Include(ds => ds.LatestDraftVersion)
                     .Include(ds => ds.LatestLiveVersion)
                     .Where(ds => ds.PublicationId == publicationId);
 
-                var dataSets = (await dataSetsQueryable
-                        .OrderByDescending(ds =>
-                            ds.LatestLiveVersion != null ? ds.LatestLiveVersion.Published : DateTimeOffset.MinValue)
-                        .ThenBy(ds => ds.Title)
-                        .ThenBy(ds => ds.Id)
-                        .Paginate(page: page, pageSize: pageSize)
-                        .ToListAsync(cancellationToken: cancellationToken)
-                    )
-                    .Select(MapDataSetSummary)
-                    .ToList();
+                var dataSets = await dataSetsQueryable
+                    .OrderByDescending(ds =>
+                        ds.LatestLiveVersion != null ? ds.LatestLiveVersion.Published : DateTimeOffset.MinValue)
+                    .ThenBy(ds => ds.Title)
+                    .ThenBy(ds => ds.Id)
+                    .Paginate(page: page, pageSize: pageSize)
+                    .ToAsyncEnumerable()
+                    .SelectAwait(async dataSet => await MapDataSetSummary(dataSet, cancellationToken))
+                    .ToListAsync(cancellationToken);
 
                 return new PaginatedListViewModel<DataSetSummaryViewModel>(
                     dataSets,
@@ -88,7 +88,9 @@ internal class DataSetService(
             .OnSuccess(async dataSet => await MapDataSet(dataSet, cancellationToken));
     }
 
-    private static DataSetSummaryViewModel MapDataSetSummary(DataSet dataSet)
+    private async Task<DataSetSummaryViewModel> MapDataSetSummary(
+        DataSet dataSet,
+        CancellationToken cancellationToken)
     {
         return new DataSetSummaryViewModel
         {
@@ -99,6 +101,7 @@ internal class DataSetService(
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
             DraftVersion = MapDraftSummaryVersion(dataSet.LatestDraftVersion),
             LatestLiveVersion = MapLiveSummaryVersion(dataSet.LatestLiveVersion),
+            PreviousReleaseIds = await GetDataSetPreviousReleaseIds(dataSet, cancellationToken)
         };
     }
 
@@ -148,6 +151,9 @@ internal class DataSetService(
                 releaseFilesByVersion[dataSet.LatestLiveVersion]
             );
 
+        var previousReleaseIds = await
+            GetDataSetPreviousReleaseIds(dataSet, cancellationToken);
+
         return new DataSetViewModel
         {
             Id = dataSet.Id,
@@ -157,7 +163,34 @@ internal class DataSetService(
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
             DraftVersion = draftVersion,
             LatestLiveVersion = latestLiveVersion,
+            PreviousReleaseIds = previousReleaseIds
         };
+    }
+
+    private async Task<List<Guid>> GetDataSetPreviousReleaseIds(DataSet dataSet, CancellationToken cancellationToken)
+    {
+        var previousReleaseFileIds = dataSet
+            .Versions
+            .Select(version => version.ReleaseFileId)
+            .ToList();
+
+        return await GetReleaseIdsForReleaseFiles(
+            contentDbContext,
+            previousReleaseFileIds,
+            cancellationToken);
+    }
+
+    private static async Task<List<Guid>> GetReleaseIdsForReleaseFiles(
+        ContentDbContext contentDbContext,
+        List<Guid> releaseFileIds,
+        CancellationToken cancellationToken)
+    {
+        return await contentDbContext
+            .ReleaseFiles
+            .Include(releaseFile => releaseFile.ReleaseVersion)
+            .Where(releaseFile => releaseFileIds.Contains(releaseFile.Id))
+            .Select(releaseFile => releaseFile.ReleaseVersion.ReleaseId)
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<IReadOnlyDictionary<DataSetVersion, ReleaseFile>> GetReleaseFilesByDataSetVersion(
@@ -275,6 +308,7 @@ internal class DataSetService(
         return publicDataDbContext.DataSets
             .AsNoTracking()
             .Where(ds => ds.Id == dataSetId)
+            .Include(ds => ds.Versions)
             .Include(ds => ds.LatestDraftVersion)
             .Include(ds => ds.LatestLiveVersion);
     }

@@ -21,6 +21,7 @@ export interface ReleasePermissions {
 
 export interface Release {
   id: string;
+  releaseSeriesId: string;
   slug: string;
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers?: boolean;

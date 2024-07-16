@@ -27,6 +27,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     title: 'Data set title',
     summary: 'Data set summary',
     status: 'Published',
+    previousReleaseIds: ['release-id'],
   };
 
   const testLiveVersion: ApiDataSetLiveVersion = {
@@ -359,6 +360,30 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
 
     renderPage();
+
+    expect(
+      await screen.findByText('Latest live version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Create a new version of this data set',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render the create new version button when release series includes a previous version of this data set', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage({
+      release: {
+        ...testRelease,
+        releaseSeriesId: testDataSet.previousReleaseIds[0],
+      },
+    });
 
     expect(
       await screen.findByText('Latest live version details'),

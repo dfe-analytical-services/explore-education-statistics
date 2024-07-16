@@ -31,6 +31,7 @@ describe('LiveApiDataSetsTable', () => {
         status: 'Published',
         type: 'Major',
       },
+      previousReleaseIds: ['previous-release-id'],
     },
     {
       id: 'data-set-1',
@@ -44,6 +45,7 @@ describe('LiveApiDataSetsTable', () => {
         status: 'Published',
         type: 'Major',
       },
+      previousReleaseIds: ['previous-release-id'],
     },
     {
       id: 'data-set-3',
@@ -57,6 +59,7 @@ describe('LiveApiDataSetsTable', () => {
         status: 'Published',
         type: 'Minor',
       },
+      previousReleaseIds: ['previous-release-id'],
     },
   ];
 
@@ -78,6 +81,7 @@ describe('LiveApiDataSetsTable', () => {
         dataSets={testDataSets}
         publicationId="publication-1"
         releaseId="release-1"
+        releaseSeriesId="release-id"
       />,
     );
 
@@ -153,6 +157,23 @@ describe('LiveApiDataSetsTable', () => {
         dataSets={testDataSets}
         publicationId="publication-1"
         releaseId="release-1"
+        releaseSeriesId="release-id"
+      />,
+    );
+
+    expect(
+      screen.queryAllByRole('button', { name: /Create new version/ }),
+    ).toHaveLength(0);
+  });
+
+  test("does not render 'Create new version' buttons when release series contains previous version of this data set", () => {
+    render(
+      <LiveApiDataSetsTable
+        canUpdateRelease
+        dataSets={testDataSets}
+        publicationId="publication-1"
+        releaseId="release-1"
+        releaseSeriesId="previous-release-id"
       />,
     );
 
@@ -167,6 +188,7 @@ describe('LiveApiDataSetsTable', () => {
         dataSets={[]}
         publicationId="publication-1"
         releaseId="release-1"
+        releaseSeriesId="release-id"
       />,
     );
 
@@ -183,6 +205,7 @@ describe('LiveApiDataSetsTable', () => {
         dataSets={testDataSets}
         publicationId="publication-1"
         releaseId="release-1"
+        releaseSeriesId="release-id"
       />,
     );
 
@@ -218,6 +241,7 @@ describe('LiveApiDataSetsTable', () => {
       title: 'Test title',
       summary: 'Test summary',
       status: 'Draft',
+      previousReleaseIds: [],
     });
 
     const history = createMemoryHistory();
@@ -228,6 +252,7 @@ describe('LiveApiDataSetsTable', () => {
         dataSets={testDataSets}
         publicationId="publication-1"
         releaseId="release-1"
+        releaseSeriesId="release-id"
       />,
       { history },
     );

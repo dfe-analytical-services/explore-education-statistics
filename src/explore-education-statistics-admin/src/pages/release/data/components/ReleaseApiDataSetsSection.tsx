@@ -130,6 +130,7 @@ export default function ReleaseApiDataSetsSection() {
                   dataSets={liveDataSets}
                   publicationId={release.publicationId}
                   releaseId={release.id}
+                  releaseSeriesId={release.releaseSeriesId}
                 />
               </>
             )}

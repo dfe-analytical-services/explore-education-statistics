@@ -28,6 +28,7 @@ interface Props {
   dataSets: LiveApiDataSetSummary[];
   publicationId: string;
   releaseId: string;
+  releaseSeriesId: string;
 }
 
 export default function LiveApiDataSetsTable({
@@ -35,6 +36,7 @@ export default function LiveApiDataSetsTable({
   dataSets,
   publicationId,
   releaseId,
+  releaseSeriesId,
 }: Props) {
   const history = useHistory();
 
@@ -82,36 +84,37 @@ export default function LiveApiDataSetsTable({
                   View details
                   <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
                 </Link>
-                {canUpdateRelease && (
-                  <ApiDataSetCreateModal
-                    buttonText={
-                      <>
-                        Create new version
-                        <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
-                      </>
-                    }
-                    publicationId={publicationId}
-                    releaseId={releaseId}
-                    submitText="Confirm new data set version"
-                    title="Create a new API data set version"
-                    onSubmit={async ({ releaseFileId }) => {
-                      await apiDataSetVersionService.createVersion({
-                        dataSetId: dataSet.id,
-                        releaseFileId,
-                      });
-                      history.push(
-                        generatePath<ReleaseDataSetRouteParams>(
-                          releaseApiDataSetDetailsRoute.path,
-                          {
-                            publicationId,
-                            releaseId,
-                            dataSetId: dataSet.id,
-                          },
-                        ),
-                      );
-                    }}
-                  />
-                )}
+                {canUpdateRelease &&
+                  !dataSet.previousReleaseIds.includes(releaseSeriesId) && (
+                    <ApiDataSetCreateModal
+                      buttonText={
+                        <>
+                          Create new version
+                          <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
+                        </>
+                      }
+                      publicationId={publicationId}
+                      releaseId={releaseId}
+                      submitText="Confirm new data set version"
+                      title="Create a new API data set version"
+                      onSubmit={async ({ releaseFileId }) => {
+                        await apiDataSetVersionService.createVersion({
+                          dataSetId: dataSet.id,
+                          releaseFileId,
+                        });
+                        history.push(
+                          generatePath<ReleaseDataSetRouteParams>(
+                            releaseApiDataSetDetailsRoute.path,
+                            {
+                              publicationId,
+                              releaseId,
+                              dataSetId: dataSet.id,
+                            },
+                          ),
+                        );
+                      }}
+                    />
+                  )}
               </ButtonGroup>
             </td>
           </tr>

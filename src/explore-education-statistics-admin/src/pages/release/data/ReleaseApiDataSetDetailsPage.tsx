@@ -246,22 +246,24 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </div>
               )}
             </div>
-            {canUpdateRelease && !dataSet.draftVersion && (
-              <ApiDataSetCreateModal
-                buttonText="Create a new version of this data set"
-                publicationId={release.publicationId}
-                releaseId={release.id}
-                submitText="Confirm new data set version"
-                title="Create a new API data set version"
-                onSubmit={async ({ releaseFileId }) => {
-                  await apiDataSetVersionService.createVersion({
-                    dataSetId: dataSet.id,
-                    releaseFileId,
-                  });
-                  refetch();
-                }}
-              />
-            )}
+            {canUpdateRelease &&
+              !dataSet.draftVersion &&
+              !dataSet.previousReleaseIds.includes(release.releaseSeriesId) && (
+                <ApiDataSetCreateModal
+                  buttonText="Create a new version of this data set"
+                  publicationId={release.publicationId}
+                  releaseId={release.id}
+                  submitText="Confirm new data set version"
+                  title="Create a new API data set version"
+                  onSubmit={async ({ releaseFileId }) => {
+                    await apiDataSetVersionService.createVersion({
+                      dataSetId: dataSet.id,
+                      releaseFileId,
+                    });
+                    refetch();
+                  }}
+                />
+              )}
           </>
         )}
       </LoadingSpinner>

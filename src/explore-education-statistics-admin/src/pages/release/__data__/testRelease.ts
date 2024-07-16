@@ -3,6 +3,7 @@ import { Release } from '@admin/services/releaseService';
 // eslint-disable-next-line import/prefer-default-export
 export const testRelease: Release = {
   id: 'release-1',
+  releaseSeriesId: 'release-series-1',
   slug: 'release-1-slug',
   approvalStatus: 'Draft',
   latestRelease: false,

@@ -27,6 +27,7 @@ const testRelease: Release = {
   amendment: false,
   approvalStatus: 'Draft',
   id: 'release-1',
+  releaseSeriesId: 'release-series-1',
   latestInternalReleaseNote: 'release1-release-note',
   latestRelease: true,
   live: false,

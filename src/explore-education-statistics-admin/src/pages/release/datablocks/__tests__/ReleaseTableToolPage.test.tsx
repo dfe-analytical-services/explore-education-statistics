@@ -37,6 +37,7 @@ const testPublication: Publication = {
 
 const testRelease: Release = {
   id: '123',
+  releaseSeriesId: '456',
   slug: '123',
   approvalStatus: 'Draft',
   updatePublishedDate: false,

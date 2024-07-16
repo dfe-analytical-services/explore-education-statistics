@@ -43,14 +43,41 @@ public abstract class DataSetsControllerTests(
         [Fact]
         public async Task PublicationHasSingleDataSet_Success_CorrectViewModel()
         {
-            Publication publication = DataFixture.DefaultPublication();
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
+                        .Generate(3)
+                );
+
+            var liveReleaseVersion = publication.ReleaseVersions.First(rv => rv.Published is not null);
+
+            var draftReleaseVersion = publication.ReleaseVersions.First(rv =>
+                rv.Published is null
+                && rv.ReleaseId != liveReleaseVersion.ReleaseId);
+
+            ReleaseFile liveReleaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(liveReleaseVersion);
+
+            ReleaseFile draftReleaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(draftReleaseVersion);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.AddRange(liveReleaseFile, draftReleaseFile);
+            });
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished()
                 .WithPublicationId(publication.Id);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion draftDataSetVersion = DataFixture
@@ -58,12 +85,14 @@ public abstract class DataSetsControllerTests(
                 .WithVersionNumber(1, 1)
                 .WithStatusDraft()
                 .WithDataSet(dataSet)
+                .WithReleaseFileId(draftReleaseFile.Id)
                 .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
 
             DataSetVersion liveDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
+                .WithReleaseFileId(liveReleaseFile.Id)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -98,7 +127,9 @@ public abstract class DataSetsControllerTests(
                 () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
                 () => Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(),
-                    dataSetViewModel.LatestLiveVersion?.Published)
+                    dataSetViewModel.LatestLiveVersion?.Published),
+                () => Assert.Equal(new[] { liveReleaseVersion.ReleaseId, draftReleaseVersion.ReleaseId }.Order(),
+                    dataSetViewModel.PreviousReleaseIds.Order())
             );
         }
 
@@ -475,12 +506,14 @@ public abstract class DataSetsControllerTests(
                 .WithReleases(
                     DataFixture
                         .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                        .Generate(1)
+                        .Generate(3)
                 );
 
-            var liveReleaseVersion = publication.ReleaseVersions.Single(rv => rv.Published is not null);
+            var liveReleaseVersion = publication.ReleaseVersions.First(rv => rv.Published is not null);
 
-            var draftReleaseVersion = publication.ReleaseVersions.Single(rv => rv.Published is null);
+            var draftReleaseVersion = publication.ReleaseVersions.First(rv =>
+                rv.Published is null
+                && rv.ReleaseId != liveReleaseVersion.ReleaseId);
 
             ReleaseFile liveReleaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -583,7 +616,10 @@ public abstract class DataSetsControllerTests(
                 viewModel.DraftVersion.TimePeriods);
             Assert.Equal(
                 draftDataSetVersion.MetaSummary!.Indicators,
-                viewModel.DraftVersion.Indicators);
+                viewModel.DraftVersion.Indicators); 
+
+            Assert.Equal(new[] { draftReleaseVersion.ReleaseId, liveReleaseVersion.ReleaseId }.Order(),
+                viewModel.PreviousReleaseIds.Order());
         }
 
         [Fact]
@@ -710,6 +746,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(dataSet.Title, viewModel.Title);
             Assert.Equal(dataSet.Summary, viewModel.Summary);
             Assert.Equal(dataSet.Status, viewModel.Status);
+            Assert.Equal(new[] { releaseVersion.ReleaseId }, viewModel.PreviousReleaseIds);
 
             Assert.Equal(dataSetVersion.Id, viewModel.LatestLiveVersion!.Id);
             Assert.Equal(dataSetVersion.Version, viewModel.LatestLiveVersion.Version);
@@ -773,6 +810,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(dataSet.Title, viewModel.Title);
             Assert.Equal(dataSet.Summary, viewModel.Summary);
             Assert.Equal(dataSet.Status, viewModel.Status);
+            Assert.Equal(new[] { releaseVersion.ReleaseId }, viewModel.PreviousReleaseIds);
 
             Assert.Equal(dataSetVersion.Id, viewModel.DraftVersion!.Id);
             Assert.Equal(dataSetVersion.Version, viewModel.DraftVersion.Version);
@@ -806,6 +844,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(dataSet.Title, viewModel.Title);
             Assert.Equal(dataSet.Summary, viewModel.Summary);
             Assert.Equal(dataSet.Status, viewModel.Status);
+            Assert.Empty(viewModel.PreviousReleaseIds);
 
             Assert.Null(viewModel.DraftVersion);
             Assert.Null(viewModel.LatestLiveVersion);

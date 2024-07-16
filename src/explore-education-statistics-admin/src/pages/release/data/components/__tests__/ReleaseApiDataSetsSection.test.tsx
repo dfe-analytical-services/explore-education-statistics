@@ -50,6 +50,7 @@ describe('ReleaseApiDataSetsSection', () => {
         status: 'Draft',
         type: 'Major',
       },
+      previousReleaseIds: [],
     },
     {
       id: 'data-set-2',
@@ -69,6 +70,7 @@ describe('ReleaseApiDataSetsSection', () => {
         type: 'Major',
         published: '2024-05-01T09:30:00+00:00',
       },
+      previousReleaseIds: [],
     },
     {
       id: 'data-set-3',
@@ -82,6 +84,7 @@ describe('ReleaseApiDataSetsSection', () => {
         type: 'Major',
         published: '2024-05-01T09:30:00+00:00',
       },
+      previousReleaseIds: [],
     },
   ];
 
@@ -234,6 +237,7 @@ describe('ReleaseApiDataSetsSection', () => {
       title: 'Test title',
       summary: 'Test summary',
       status: 'Draft',
+      previousReleaseIds: [],
     });
 
     const history = createMemoryHistory();
