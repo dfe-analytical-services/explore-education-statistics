@@ -31,6 +31,26 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     public DateTimeOffset Created { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
+    
+    public LocationLevelMappings GetLocationLevelMappings(GeographicLevel level)
+    {
+        return LocationMappingPlan.Levels[level];
+    }
+    
+    public LocationOptionMapping GetLocationOptionMapping(GeographicLevel level, string locationOptionKey)
+    {
+        return GetLocationLevelMappings(level).Mappings[locationOptionKey];
+    }
+
+    public FilterMapping GetFilterMapping(string filterKey)
+    {
+        return FilterMappingPlan.Mappings[filterKey];
+    }
+    
+    public FilterOptionMapping GetFilterOptionMapping(string filterKey, string filterOptionKey)
+    {
+        return GetFilterMapping(filterKey).OptionMappings[filterOptionKey];
+    }
 
     internal class Config : IEntityTypeConfiguration<DataSetVersionMapping>
     {

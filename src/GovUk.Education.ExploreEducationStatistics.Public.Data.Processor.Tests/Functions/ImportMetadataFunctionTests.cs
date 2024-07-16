@@ -191,7 +191,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
-                    .LocationMappingPlanFromTestData(sourceLocations: testData.ExpectedLocations));
+                    .LocationMappingPlanFromLocationMeta(sourceLocations: testData.ExpectedLocations));
             
             var random = new Random();
 
@@ -206,8 +206,8 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             var lastLevel = testData.ExpectedLocations.Last();
             var mappedOption1Key = MappingKeyFunctions.LocationOptionMetaKeyGenerator(firstLevel.Options.First());
             var mappedOption2Key = MappingKeyFunctions.LocationOptionMetaKeyGenerator(lastLevel.Options.Last());
-            var mappedOption1 = mappings.LocationMappingPlan.Levels[firstLevel.Level].Mappings[mappedOption1Key];
-            var mappedOption2 = mappings.LocationMappingPlan.Levels[lastLevel.Level].Mappings[mappedOption2Key];
+            var mappedOption1 = mappings.GetLocationOptionMapping(firstLevel.Level, mappedOption1Key);
+            var mappedOption2 = mappings.GetLocationOptionMapping(lastLevel.Level, mappedOption2Key);
 
             mappings.LocationMappingPlan.Levels[firstLevel.Level].Mappings[mappedOption1Key] = mappedOption1 with
             {
@@ -275,10 +275,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             // Public Ids should be SQIDs based on the option's id unless otherwise directed by the
             // mappings.
-            var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Label);
+            var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Source.Label);
             Assert.Equal("option-1-public-id", actualMappedOption1Link.PublicId);
 
-            var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Label);
+            var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Source.Label);
             Assert.Equal("option-2-public-id", actualMappedOption2Link.PublicId);
 
             var otherLinks = actualLocations

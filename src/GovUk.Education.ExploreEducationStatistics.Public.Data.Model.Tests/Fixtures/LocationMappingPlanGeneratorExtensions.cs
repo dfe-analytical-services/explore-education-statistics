@@ -11,7 +11,7 @@ public static class LocationMappingPlanGeneratorExtensions
     public static Generator<LocationMappingPlan> DefaultLocationMappingPlan(this DataFixture fixture)
         => fixture.Generator<LocationMappingPlan>();
 
-    public static Generator<LocationMappingPlan> LocationMappingPlanFromTestData(
+    public static Generator<LocationMappingPlan> LocationMappingPlanFromLocationMeta(
         this DataFixture fixture,
         List<LocationMeta>? sourceLocations = null,
         List<LocationMeta>? targetLocations = null)
