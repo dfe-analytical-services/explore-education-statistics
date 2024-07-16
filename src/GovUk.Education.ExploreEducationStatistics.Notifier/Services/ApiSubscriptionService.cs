@@ -1,3 +1,5 @@
+using Azure;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
@@ -14,6 +16,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ValidationMessages;
@@ -31,7 +35,7 @@ internal class ApiSubscriptionService(
         Guid dataSetId,
         string dataSetTitle,
         string email,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -54,7 +58,7 @@ internal class ApiSubscriptionService(
         catch
         {
             await Rollback(
-                dataSetId: dataSetId, 
+                dataSetId: dataSetId,
                 email: email,
                 cancellationToken: cancellationToken);
 
@@ -65,7 +69,7 @@ internal class ApiSubscriptionService(
     public async Task<Either<ActionResult, ApiSubscriptionViewModel>> VerifySubscription(
         Guid dataSetId,
         string token,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await GetEmailFromToken(token)
             .OnSuccessCombineWith(email => GetSubscription(
@@ -85,6 +89,17 @@ internal class ApiSubscriptionService(
                 cancellationToken: cancellationToken))
             .OnSuccessDo(SendConfirmationEmail)
             .OnSuccess(MapSubscription);
+    }
+
+    public async Task RemoveExpiredApiSubscriptions(CancellationToken cancellationToken = default)
+    {
+        var expiredSubscriptions = await GetExpiredApiSubscriptions(cancellationToken);
+
+        await expiredSubscriptions
+            .AsPages()
+            .ForEachAwaitAsync(
+                async page => await BatchDeleteApiSubscriptions(page, cancellationToken),
+                cancellationToken);
     }
 
     private async Task<Either<ActionResult, Unit>> HandleIfResubmission(
@@ -257,6 +272,28 @@ internal class ApiSubscriptionService(
         await apiSubscriptionRepository.DeleteSubscription(
             dataSetId: dataSetId,
             email: email,
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)
+    {
+        Expression<Func<ApiSubscription, bool>> filter = s =>
+            s.Status.Equals(ApiSubscriptionStatus.SubscriptionPending.ToString())
+            && s.ExpiryDateTime <= DateTimeOffset.UtcNow;
+
+        return await apiSubscriptionRepository.QuerySubscriptions(
+            filter: filter,
+            select: new List<string>() { nameof(ApiSubscription.PartitionKey), nameof(ApiSubscription.RowKey) },
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task BatchDeleteApiSubscriptions(
+        Page<ApiSubscription> subscriptions,
+        CancellationToken cancellationToken)
+    {
+        await apiSubscriptionRepository.BatchManipulateSubscriptions(
+            subscriptions: subscriptions.Values,
+            tableTransactionActionType: TableTransactionActionType.Delete,
             cancellationToken: cancellationToken);
     }
 }

@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
@@ -67,6 +71,34 @@ internal class ApiSubscriptionRepository(
             tableName: _apiSubscriptionsTableName,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<AsyncPageable<ApiSubscription>> QuerySubscriptions(
+        Expression<Func<ApiSubscription, bool>>? filter = null, 
+        int? maxPerPage = 1000, 
+        IEnumerable<string>? select = null, 
+        CancellationToken cancellationToken = default)
+    {
+        filter ??= subscription => true;
+
+        return await apiSubscriptionTableStorage.QueryEntitiesAsync(
+            tableName: _apiSubscriptionsTableName,
+            filter: filter,
+            maxPerPage: maxPerPage,
+            select: select,
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task BatchManipulateSubscriptions(
+        IEnumerable<ApiSubscription> subscriptions,
+        TableTransactionActionType tableTransactionActionType, 
+        CancellationToken cancellationToken = default)
+    {
+        await apiSubscriptionTableStorage.BatchManipulateEntities(
+            tableName: _apiSubscriptionsTableName,
+            entities: subscriptions,
+            tableTransactionActionType: tableTransactionActionType,
             cancellationToken: cancellationToken);
     }
 }

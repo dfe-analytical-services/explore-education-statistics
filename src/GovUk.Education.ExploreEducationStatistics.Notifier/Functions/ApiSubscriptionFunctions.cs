@@ -65,4 +65,13 @@ public class ApiSubscriptionFunctions(
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+    [Function("RemoveExpiredApiSubscriptions")]
+    public async Task RemoveExpiredApiSubscriptions(
+        [TimerTrigger("0 0 * * * *")] TimerInfo timerInfo,
+        FunctionContext context,
+        CancellationToken cancellationToken)
+    {
+        await apiSubscriptionService.RemoveExpiredApiSubscriptions(cancellationToken);
+    }
 }
