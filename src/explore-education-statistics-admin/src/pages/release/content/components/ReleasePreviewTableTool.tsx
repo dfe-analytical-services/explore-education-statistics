@@ -43,9 +43,12 @@ const ReleasePreviewTableTool = ({
 
       const [subjectMeta, tableData] = await Promise.all([
         tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
-        tableBuilderService.getTableData({
-          ...query,
-        }, releaseId),
+        tableBuilderService.getTableData(
+          {
+            ...query,
+          },
+          releaseId,
+        ),
       ]);
 
       const fullTable = mapFullTable(tableData);

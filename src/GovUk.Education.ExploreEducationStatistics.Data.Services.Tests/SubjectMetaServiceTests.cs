@@ -393,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var query = new LocationsOrTimePeriodsQueryRequest
+                var request = new LocationsOrTimePeriodsQueryRequest
                 {
                     SubjectId = releaseSubject.SubjectId,
                     LocationIds = ListOf(Guid.NewGuid())
@@ -405,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result =
-                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var query = new LocationsOrTimePeriodsQueryRequest
+                var request = new LocationsOrTimePeriodsQueryRequest
                 {
                     SubjectId = releaseSubject.SubjectId,
                     LocationIds = ListOf(Guid.NewGuid()),
@@ -474,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = (await service.FilterSubjectMeta(null, query, cancellationToken))
+                var result = (await service.FilterSubjectMeta(null, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -532,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 LocalAuthority = _sunderland
             };
 
-            var query = new LocationsOrTimePeriodsQueryRequest
+            var request = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = subject.Id,
                 LocationIds = ListOf(location1.Id, location2.Id, location3.Id)
@@ -621,7 +621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object);
 
                 var result =
-                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -665,7 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
             };
 
-            var queryReq = new LocationsOrTimePeriodsQueryRequest
+            var request = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = releaseSubject.SubjectId,
                 LocationIds = ListOf(Guid.NewGuid()),
@@ -706,7 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 observationService
                     .Setup(s => s.GetMatchedObservations(
                         It.Is<ObservationQueryContext>(ctx => ctx
-                                .Equals(queryReq.AsObservationQueryContext())),
+                                .Equals(request.AsObservationQueryContext())),
                         cancellationToken))
                     .ReturnsAsync(statisticsDbContext.MatchedObservations);
 
@@ -786,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result =
-                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, queryReq, cancellationToken))
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(

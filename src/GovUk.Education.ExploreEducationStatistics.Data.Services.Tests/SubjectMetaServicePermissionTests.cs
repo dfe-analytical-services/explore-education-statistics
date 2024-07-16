@@ -126,12 +126,12 @@ public class SubjectMetaServicePermissionTests
                         releaseSubjectService: releaseSubjectService.Object
                     );
 
-                    var query = new LocationsOrTimePeriodsQueryRequest
+                    var request = new LocationsOrTimePeriodsQueryRequest
                     {
                         SubjectId = SubjectId
                     };
 
-                    return await service.FilterSubjectMeta(ReleaseVersionId, query, new CancellationTokenSource().Token);
+                    return await service.FilterSubjectMeta(ReleaseVersionId, request, new CancellationTokenSource().Token);
                 }
             );
     }
@@ -166,12 +166,12 @@ public class SubjectMetaServicePermissionTests
                         contentDbContext: contextDbContext,
                         releaseSubjectService: releaseSubjectService.Object);
 
-                    var query = new LocationsOrTimePeriodsQueryRequest
+                    var request = new LocationsOrTimePeriodsQueryRequest
                     {
                         SubjectId = SubjectId
                     };
 
-                    return await service.FilterSubjectMeta(null, query, new CancellationTokenSource().Token);
+                    return await service.FilterSubjectMeta(null, request, new CancellationTokenSource().Token);
                 }
             );
     }

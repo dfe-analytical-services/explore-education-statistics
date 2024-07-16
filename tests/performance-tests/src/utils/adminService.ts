@@ -517,7 +517,13 @@ export class AdminService {
     };
   }
 
-  tableQuery({ releaseId, query }: { releaseId: string; query: FullTableQuery }) {
+  tableQuery({
+    releaseId,
+    query,
+  }: {
+    releaseId: string;
+    query: FullTableQuery;
+  }) {
     const { response, json } = this.client.post<{ results: { id: string }[] }>(
       `/api/data/tablebuilder/release/${releaseId}`,
       JSON.stringify(query),

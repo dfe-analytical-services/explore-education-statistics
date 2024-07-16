@@ -41,10 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpPost("data/release/{releaseVersionId:guid}/meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
             Guid releaseVersionId,
-            [FromBody] LocationsOrTimePeriodsQueryRequest query,
+            [FromBody] LocationsOrTimePeriodsQueryRequest request,
             CancellationToken cancellationToken)
         {
-            return _subjectMetaService.FilterSubjectMeta(releaseVersionId, query, cancellationToken)
+            return _subjectMetaService.FilterSubjectMeta(releaseVersionId, request, cancellationToken)
                 .HandleFailuresOrOk();
         }
 

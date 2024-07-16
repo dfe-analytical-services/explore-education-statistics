@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .WithQuery(new ObservationQueryContext
                 {
                     SubjectId = Guid.NewGuid(),
-                    LocationIds = new List<Guid>{ Guid.NewGuid(), }, // using a collection expression creates a test failure
+                    LocationIds = [ Guid.NewGuid(), ],
                     TimePeriod = new TimePeriodQuery
                     {
                         StartYear = 2021,
@@ -65,16 +65,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                         EndCode = CalendarYear
                     },
                     Filters = new List<Guid>(),
-                    Indicators = new List<Guid>{ Guid.NewGuid(), },
+                    Indicators = new List<Guid> // use collection expression -> test failures
+                    {
+                        Guid.NewGuid(),
+                    },
                 })
                 .WithTable(new TableBuilderConfiguration
                 {
                     TableHeaders = new TableHeaders
                     {
-                        Rows = new List<TableHeader>
-                        {
-                            new("table header 1", TableHeaderType.Filter)
-                        }
+                        Rows = new List<TableHeader> { new("table header 1", TableHeaderType.Filter) }
                     }
                 })
                 .WithCharts(ListOf<IChart>(new LineChart
@@ -120,14 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             },
             Results = new List<ObservationViewModel>
             {
-                new()
-                {
-                    TimePeriod = "2020_AY"
-                },
-                new()
-                {
-                    TimePeriod = "2021_AY"
-                }
+                new() { TimePeriod = "2020_AY" },
+                new() { TimePeriod = "2021_AY" }
             },
         };
 
@@ -178,10 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var response = await client
                 .PostAsync("/api/tablebuilder",
                     content: new JsonNetContent(ObservationQueryContext), // binds to FullTableQueryRequest
-                    headers: new Dictionary<string, string>
-                    {
-                        { HeaderNames.Accept, ContentTypes.Csv }
-                    }
+                    headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
             VerifyAllMocks(tableBuilderService);
@@ -247,10 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var response = await client
                 .PostAsync($"/api/tablebuilder/release/{ReleaseVersionId}",
                     content: new JsonNetContent(ObservationQueryContext),
-                    headers: new Dictionary<string, string>
-                    {
-                        { HeaderNames.Accept, ContentTypes.Csv }
-                    }
+                    headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
             VerifyAllMocks(tableBuilderService);
@@ -328,14 +316,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
                 new Dictionary<string, string>
                 {
-                    {
-                        HeaderNames.IfModifiedSince,
-                        ifModifiedSinceDate.ToUniversalTime().ToString("R")
-                    },
-                    {
-                        HeaderNames.IfNoneMatch,
-                        $"W/\"{TableBuilderController.ApiVersion}\""
-                    }
+                    { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" }
                 }
             );
 
@@ -385,14 +367,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
                 new Dictionary<string, string>
                 {
-                    {
-                        HeaderNames.IfModifiedSince,
-                        ifModifiedSinceDate.ToUniversalTime().ToString("R")
-                    },
-                    {
-                        HeaderNames.IfNoneMatch,
-                        "\"not the same etag\""
-                    }
+                    { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, "\"not the same etag\"" }
                 }
             );
 
@@ -440,14 +416,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
                 new Dictionary<string, string>
                 {
-                    {
-                        HeaderNames.IfModifiedSince,
-                        yearBeforePublishedDate.ToUniversalTime().ToString("R")
-                    },
-                    {
-                        HeaderNames.IfNoneMatch,
-                        $"W/\"{TableBuilderController.ApiVersion}\""
-                    }
+                    { HeaderNames.IfModifiedSince, yearBeforePublishedDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" }
                 }
             );
 
@@ -609,7 +579,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                         services.ReplaceService(BlobCacheService);
 
                         services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
-                        services.AddTransient(_ => releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
+                        services.AddTransient(_ =>
+                            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
                         services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
                     }
                 );

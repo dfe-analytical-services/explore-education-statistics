@@ -41,7 +41,7 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { Dictionary, update } from 'lodash';
+import { Dictionary } from 'lodash';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -434,7 +434,7 @@ export default function TableToolWizard({
       draft.response = undefined;
     });
 
-    const updatedReleaseTableDataQuery = {
+    const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
       filters: Object.values(filters).flat(),
       indicators,
@@ -465,11 +465,11 @@ export default function TableToolWizard({
     }
 
     updateState(draft => {
-      (draft.query = updatedReleaseTableDataQuery),
-        (draft.response = {
-          table,
-          tableHeaders,
-        });
+      draft.query = updatedReleaseTableDataQuery;
+      draft.response = {
+        table,
+        tableHeaders,
+      };
     });
 
     onStepSubmit?.({ nextStepNumber: 6, nextStepTitle: stepTitles.final });

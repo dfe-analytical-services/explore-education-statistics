@@ -54,14 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Create(
             Guid releaseVersionId,
-            DataBlockCreateRequest dataBlockCreate)
+            DataBlockCreateRequest createRequest)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
+                    var dataBlock = _mapper.Map<DataBlock>(createRequest);
                     dataBlock.Id = Guid.NewGuid();
                     dataBlock.Created = DateTime.UtcNow;
                     dataBlock.ReleaseVersionId = releaseVersionId;
@@ -211,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Update(
             Guid dataBlockVersionId,
-            DataBlockUpdateRequest dataBlockUpdate)
+            DataBlockUpdateRequest updateRequest)
         {
             return await GetDataBlockVersion(dataBlockVersionId)
                 .OnSuccessDo(dataBlock => _userService.CheckCanUpdateReleaseVersion(dataBlock.ReleaseVersion))
@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO EES-753 Alter this when multiple charts are supported
                     var infographicChart = dataBlockVersion.Charts.OfType<InfographicChart>().FirstOrDefault();
                     var updatedInfographicChart =
-                        dataBlockUpdate.Charts.OfType<InfographicChart>().FirstOrDefault();
+                        updateRequest.Charts.OfType<InfographicChart>().FirstOrDefault();
 
                     if (infographicChart != null &&
                         infographicChart.FileId != updatedInfographicChart?.FileId)
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             fileId: new Guid(infographicChart.FileId));
                     }
 
-                    _mapper.Map(dataBlockUpdate, dataBlockVersion.ContentBlock);
+                    _mapper.Map(updateRequest, dataBlockVersion.ContentBlock);
 
                     _context.DataBlocks.Update(dataBlockVersion.ContentBlock);
 

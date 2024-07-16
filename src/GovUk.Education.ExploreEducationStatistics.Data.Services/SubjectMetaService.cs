@@ -88,14 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(
             Guid? releaseVersionId,
-            LocationsOrTimePeriodsQueryRequest query,
+            LocationsOrTimePeriodsQueryRequest request,
             CancellationToken cancellationToken)
         {
-            return await releaseSubjectService.Find(subjectId: query.SubjectId,
+            return await releaseSubjectService.Find(subjectId: request.SubjectId,
                     releaseVersionId: releaseVersionId)
                 .OnSuccess(userService.CheckCanViewSubjectData)
                 .OnSuccess(releaseSubject =>
-                    GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
+                    GetSubjectMetaViewModelFromRequest(request, releaseSubject, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateSubjectFilters(
@@ -157,13 +157,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(
-            LocationsOrTimePeriodsQueryRequest query,
+        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromRequest(
+            LocationsOrTimePeriodsQueryRequest request,
             ReleaseSubject releaseSubject,
             CancellationToken cancellationToken)
         {
             // we already know query.Locations is not empty due to LocationsOrTimePeriodsQueryContext validator
-            var subjectMetaStep = query.TimePeriod == null
+            var subjectMetaStep = request.TimePeriod == null
                 ? SubjectMetaQueryStep.GetTimePeriods
                 : SubjectMetaQueryStep.GetFilterItems;
 
@@ -179,8 +179,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .Observation
                         .AsNoTracking()
                         .Where(o =>
-                            o.SubjectId == query.SubjectId &&
-                            EF.Constant(query.LocationIds).Contains(o.LocationId));
+                            o.SubjectId == request.SubjectId &&
+                            EF.Constant(request.LocationIds).Contains(o.LocationId));
 
                     var timePeriods = await GetTimePeriods(observations);
 
@@ -204,13 +204,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     var observations =
                         await observationService.GetMatchedObservations(
-                            query.AsObservationQueryContext(),
+                            request.AsObservationQueryContext(),
                             cancellationToken);
                     logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var filterItems = await
-                        filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
+                        filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations);
                     var filters =
                         FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                             filterItems, releaseFile.FilterSequence);
