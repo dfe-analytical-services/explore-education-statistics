@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,16 +40,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
             return value;
         }
-        
+
         public static T AssertObjectResult<T>(
             this IActionResult result,
-            HttpStatusCode expectedStatusCode, 
+            HttpStatusCode expectedStatusCode,
             T? expectedValue = null) where T : class
         {
             var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
-            Assert.Equal((int) expectedStatusCode, objectResult.StatusCode);
+            Assert.Equal((int)expectedStatusCode, objectResult.StatusCode);
             var value = Assert.IsAssignableFrom<T>(objectResult.Value);
-            
+
             if (expectedValue != null)
             {
                 Assert.Equal(expectedValue, value);
@@ -125,7 +126,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return validationProblem;
         }
 
-        private static void AssertBadRequestWithValidationErrors(this IActionResult result, params Enum[] expectedErrorCodes)
+        public static ValidationProblemViewModel AssertNotFoundWithValidationProblem<TEntity, TId>(
+            this IActionResult result,
+            TId expectedId,
+            string expectedPath)
+        {
+            var notFound = Assert.IsAssignableFrom<NotFoundObjectResult>(result);
+            var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(notFound.Value);
+
+            validationProblem.AssertHasError(
+                expectedPath: expectedPath,
+                expectedCode: "NotFound",
+                expectedMessage: $"{typeof(TEntity).Name} not found",
+                expectedDetail: new InvalidErrorDetail<TId>(expectedId));
+
+            return validationProblem;
+        }
+
+        private static void AssertBadRequestWithValidationErrors(this IActionResult result,
+            params Enum[] expectedErrorCodes)
         {
             var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
             var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);

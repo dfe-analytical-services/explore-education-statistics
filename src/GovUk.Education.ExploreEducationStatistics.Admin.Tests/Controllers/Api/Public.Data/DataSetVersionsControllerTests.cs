@@ -83,7 +83,7 @@ public abstract class DataSetVersionsControllerTests(
                         context.DataSets.Update(savedDataSet);
                     });
 
-                    return new CreateDataSetResponseViewModel
+                    return new ProcessDataSetVersionResponseViewModel
                     {
                         DataSetId = dataSet.Id,
                         DataSetVersionId = nextVersion.Id,

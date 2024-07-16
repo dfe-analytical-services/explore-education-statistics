@@ -15,4 +15,7 @@ internal static class ActivityNames
     public const string ApplyAutoMappings = nameof(ProcessNextDataSetVersionMappingsFunction.ApplyAutoMappings);
     public const string CompleteNextDataSetVersionMappingProcessing = 
         nameof(ProcessNextDataSetVersionMappingsFunction.CompleteNextDataSetVersionMappingProcessing);
+    
+    public const string CompleteNextDataSetVersionImportProcessing = 
+        nameof(ProcessCompletionOfNextDataSetVersionFunction.CompleteNextDataSetVersionImportProcessing);
 }

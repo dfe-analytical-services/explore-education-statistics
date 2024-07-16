@@ -17,22 +17,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CreateNextDataSetVersionMappingsFunction(
     ILogger<CreateNextDataSetVersionMappingsFunction> logger,
     IDataSetVersionService dataSetVersionService,
-    IValidator<NextDataSetVersionCreateRequest> requestValidator)
+    IValidator<NextDataSetVersionCreateMappingsRequest> requestValidator)
 {
     [Function(nameof(CreateNextDataSetVersion))]
     public async Task<IActionResult> CreateNextDataSetVersion(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateNextDataSetVersion))] [FromBody]
-        NextDataSetVersionCreateRequest request,
+        NextDataSetVersionCreateMappingsRequest mappingsRequest,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
         // Identifier of the scheduled processing orchestration instance
         var instanceId = Guid.NewGuid();
 
-        return await requestValidator.Validate(request, cancellationToken)
+        return await requestValidator.Validate(mappingsRequest, cancellationToken)
             .OnSuccess(() => dataSetVersionService.CreateNextVersion(
-                dataSetId: request.DataSetId,
-                releaseFileId: request.ReleaseFileId,
+                dataSetId: mappingsRequest.DataSetId,
+                releaseFileId: mappingsRequest.ReleaseFileId,
                 instanceId,
                 cancellationToken: cancellationToken
             ))
@@ -44,9 +44,9 @@ public class CreateNextDataSetVersionMappingsFunction(
                     instanceId: instanceId,
                     cancellationToken);
 
-                return new CreateDataSetResponseViewModel
+                return new ProcessDataSetVersionResponseViewModel
                 {
-                    DataSetId = request.DataSetId,
+                    DataSetId = mappingsRequest.DataSetId,
                     DataSetVersionId = dataSetVersionId,
                     InstanceId = instanceId
                 };
