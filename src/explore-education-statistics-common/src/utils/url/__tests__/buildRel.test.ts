@@ -12,12 +12,12 @@ describe('buildRel', () => {
   });
 
   test('removes empty values', () => {
-    const result = buildRel([''], 'noopener noreferrer');
+    const result = buildRel(['', '   '], 'noopener noreferrer');
     expect(result).toBe('noopener noreferrer');
   });
 
   test('returns new values if no existing rel values', () => {
-    const result = buildRel(['noopener', 'noreferrer'], undefined);
+    const result = buildRel(['noopener', 'noreferrer']);
     expect(result).toBe('noopener noreferrer');
   });
 });

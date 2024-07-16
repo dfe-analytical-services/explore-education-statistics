@@ -27,11 +27,10 @@ const Link = ({
   rel: originalRel,
   ...props
 }: LinkProps) => {
-  const { target, rel } = getPropsForExternality(
-    to.toString(),
-    undefined,
-    originalRel,
-  );
+  const { target, rel } = getPropsForExternality({
+    url: to.toString(),
+    rel: originalRel,
+  });
 
   return (
     <RouterLink

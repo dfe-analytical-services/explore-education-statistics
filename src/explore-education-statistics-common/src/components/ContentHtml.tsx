@@ -16,14 +16,17 @@ import parseHtmlString, {
 import React, { ReactElement, useMemo } from 'react';
 import getPropsForExternality from '@common/utils/url/getPropsForExternality';
 
-export interface ContentHtmlProps {
+export interface ContentHtmlProps extends ContentHtmlLinkProps {
   className?: string;
-  formatLinks?: boolean;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   html: string;
   sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
+}
+
+interface ContentHtmlLinkProps {
+  formatLinks?: boolean;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
@@ -70,35 +73,12 @@ export default function ContentHtml({
       }
 
       if (node.name === 'a') {
-        const targetUrl = node.attribs.href;
-
-        if (
-          transformFeaturedTableLinks &&
-          typeof node.attribs['data-featured-table'] !== 'undefined'
-        ) {
-          const text = domToReact(node.children);
-          return isMounted && typeof text === 'string'
-            ? transformFeaturedTableLinks(targetUrl, text)
-            : undefined;
-        }
-
-        if (formatLinks) {
-          const text = domToReact(node.children);
-          const { url, target, rel, externality } =
-            getPropsForExternality(targetUrl);
-
-          return externality !== 'internal' &&
-            typeof node.attribs['data-featured-table'] === 'undefined' ? (
-            // eslint-disable-next-line react/jsx-no-target-blank
-            <a href={url} target={target} rel={rel}>
-              {text} (opens in a new tab)
-            </a>
-          ) : (
-            <a href={url} rel={rel}>
-              {text}
-            </a>
-          );
-        }
+        return renderLink({
+          node,
+          isMounted,
+          formatLinks,
+          transformFeaturedTableLinks,
+        });
       }
 
       if (node.name === 'figure' && node.attribs.class === 'table') {
@@ -113,6 +93,45 @@ export default function ContentHtml({
     <div className={classNames('dfe-content', className)} data-testid={testId}>
       {parsedContent}
     </div>
+  );
+}
+
+function renderLink(
+  params: ContentHtmlLinkProps & { node: Element; isMounted: boolean },
+): ReactElement | void | null {
+  const { node, isMounted, formatLinks, transformFeaturedTableLinks } = params;
+  const targetUrl = node.attribs.href;
+
+  if (
+    transformFeaturedTableLinks &&
+    typeof node.attribs['data-featured-table'] !== 'undefined'
+  ) {
+    const text = domToReact(node.children);
+    return isMounted && typeof text === 'string'
+      ? transformFeaturedTableLinks(targetUrl, text)
+      : null;
+  }
+
+  const text = domToReact(node.children);
+
+  if (!formatLinks) {
+    return <a href={node.attribs.href}>{text}</a>;
+  }
+
+  const { url, target, rel, externality } = getPropsForExternality({
+    url: targetUrl,
+  });
+
+  return externality !== 'internal' &&
+    typeof node.attribs['data-featured-table'] === 'undefined' ? (
+    // eslint-disable-next-line react/jsx-no-target-blank
+    <a href={url} target={target} rel={rel}>
+      {text} (opens in a new tab)
+    </a>
+  ) : (
+    <a href={url} rel={rel}>
+      {text}
+    </a>
   );
 }
 

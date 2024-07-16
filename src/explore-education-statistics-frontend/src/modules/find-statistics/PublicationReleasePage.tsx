@@ -346,17 +346,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                                 return null;
                               }
 
-                              const { url, target, rel, text } =
-                                getPropsForExternality(
-                                  legacyLinkUrl,
-                                  description,
-                                );
-
                               return (
                                 <li key={id} data-testid="other-release-item">
-                                  <a href={url} target={target} rel={rel}>
-                                    {text}
-                                  </a>
+                                  <Link to={legacyLinkUrl}>{description}</Link>
                                 </li>
                               );
                             }
@@ -418,18 +410,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <nav role="navigation" aria-labelledby="related-pages">
                   <ul className="govuk-list">
                     {release.relatedInformation &&
-                      release.relatedInformation.map(link => {
-                        const { url, target, rel, text } =
-                          getPropsForExternality(link.url, link.description);
-
-                        return (
-                          <li key={link.id}>
-                            <a href={url} rel={rel} target={target}>
-                              {text}
-                            </a>
-                          </li>
-                        );
-                      })}
+                      release.relatedInformation.map(link => (
+                        <li key={link.id}>
+                          <Link to={link.url}>{link.description}</Link>
+                        </li>
+                      ))}
                   </ul>
                 </nav>
               </>

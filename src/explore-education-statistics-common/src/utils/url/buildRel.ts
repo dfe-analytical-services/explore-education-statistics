@@ -1,8 +1,10 @@
+import compact from 'lodash/compact';
+
 export default function buildRel(
   newValues: string[],
   existingRel?: string,
 ): string {
-  const relValues = existingRel ? existingRel.split(' ') : [];
+  const relValues = existingRel ? compact(existingRel.split(' ')) : [];
 
   newValues.forEach(value => {
     if (!relValues.includes(value)) {

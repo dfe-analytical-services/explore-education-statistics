@@ -4,26 +4,25 @@ import buildRel from '@common/utils/url/buildRel';
 
 interface ExternalityProps {
   url: string;
-  target: '_blank' | undefined;
-  rel: string | undefined;
+  target?: '_blank';
+  rel?: string;
   externality: Externality;
   text?: string;
 }
 
-export default function getPropsForExternality(
-  url: string,
-  text?: string,
-  rel?: string,
-): ExternalityProps {
+export default function getPropsForExternality(options: {
+  url: string;
+  text?: string;
+  rel?: string;
+}): ExternalityProps {
+  const { url, text, rel } = options;
   const externality = getExternality(url);
-  const formattedUrl = formatContentLink(url, externality);
+  const formattedUrl = formatContentLink(url);
 
   switch (externality) {
     case 'internal':
       return {
         url: formattedUrl,
-        target: undefined,
-        rel: undefined,
         externality,
         text,
       };
@@ -34,9 +33,7 @@ export default function getPropsForExternality(
         target: '_blank',
         rel: buildRel(['nofollow', 'noopener', 'noreferrer'], rel),
         externality,
-        text: text?.includes('(opens in a new tab)')
-          ? text
-          : `${text} (opens in a new tab)`.trim(),
+        text: addNewTabWarning(text),
       };
     default:
       return {
@@ -44,9 +41,20 @@ export default function getPropsForExternality(
         target: '_blank',
         rel: buildRel(['noopener', 'noreferrer', 'nofollow', 'external'], rel),
         externality,
-        text: text?.includes('(opens in a new tab)')
-          ? text
-          : `${text} (opens in a new tab)`.trim(),
+        text: addNewTabWarning(text),
       };
   }
+}
+
+export function addNewTabWarning(text?: string): string {
+  const trimmedText = text?.trim();
+  if (trimmedText === undefined || trimmedText === '') {
+    return '(opens in a new tab)';
+  }
+
+  if (trimmedText.endsWith('(opens in a new tab)')) {
+    return trimmedText;
+  }
+
+  return `${trimmedText} (opens in a new tab)`;
 }

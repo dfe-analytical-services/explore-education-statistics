@@ -8,14 +8,16 @@ const PUBLIC_HOSTNAME = 'explore-education-statistics.service.gov.uk';
 const ADMIN_HOSTNAME = 'admin.explore-education-statistics.service.gov.uk';
 
 export default function getExternality(url: string): Externality {
+  // TODO: replace with if (!URL.canParse(url)) when we can use this in common
   if ((url.startsWith('/') || url.startsWith('?')) && !url.includes('://')) {
-    // Assume internal link if it's a relative URL
+    // Assume internal if it's not a parseable URL
+    // i.e. it's a hash, query, absolute or relative path
     return 'internal';
   }
 
   const { host } = new URL(url);
 
-  switch (host.toLowerCase()) {
+  switch (host) {
     case PUBLIC_HOSTNAME:
       return 'internal';
     case ADMIN_HOSTNAME:
