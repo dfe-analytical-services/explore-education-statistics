@@ -69,7 +69,8 @@ public class PublicDataDbContext : DbContext
     public DbSet<ChangeSetIndicators> ChangeSetIndicators { get; init; } = null!;
     public DbSet<ChangeSetLocations> ChangeSetLocations { get; init; } = null!;
     public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
-    
+    public DbSet<PreviewToken> PreviewTokens { get; init; } = null!;
+
     public DbSet<JsonFragment> JsonFragments { get; init; } = null!;
     
     public DbSet<JsonBool> JsonBool { get; init; } = null!;
