@@ -192,7 +192,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
-                    .LocationMappingPlanFromTestData(sourceLocations: testData.ExpectedLocations));
+                    .LocationMappingPlanFromLocationMeta(sourceLocations: testData.ExpectedLocations));
             
             var random = new Random();
 

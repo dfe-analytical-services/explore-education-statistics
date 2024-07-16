@@ -147,7 +147,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                             locationOptionMetaGenerator.Value.Invoke(),
                             locationOptionMetaGenerator.Value.Invoke()
                         })
-                        .WithLabel(locationOptionMetaGenerator.Key))
+                        .WithLevel(locationOptionMetaGenerator.Key))
                     .Select(locationMeta => (LocationMeta)locationMeta)
                     .ToList();
 
