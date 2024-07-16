@@ -396,8 +396,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         {
             var pendingAndExpiredSubscription = new ApiSubscription
             {
-                PartitionKey = Guid.NewGuid().ToString(),
-                RowKey = email,
+                PartitionKey = email,
+                RowKey = Guid.NewGuid().ToString(),
                 DataSetTitle = dataSetTitle,
                 Status = ApiSubscriptionStatus.SubscriptionPending,
                 ExpiryDateTime = DateTime.UtcNow.AddHours(-1),
@@ -405,8 +405,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var pendingSubscription = new ApiSubscription
             {
-                PartitionKey = Guid.NewGuid().ToString(),
-                RowKey = email,
+                PartitionKey = email,
+                RowKey = Guid.NewGuid().ToString(),
                 DataSetTitle = dataSetTitle,
                 Status = ApiSubscriptionStatus.SubscriptionPending,
                 ExpiryDateTime = DateTime.UtcNow.AddHours(1),
@@ -414,8 +414,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var subscribedSubscription = new ApiSubscription
             {
-                PartitionKey = Guid.NewGuid().ToString(),
-                RowKey = email,
+                PartitionKey = email,
+                RowKey = Guid.NewGuid().ToString(),
                 DataSetTitle = dataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed,
                 ExpiryDateTime = null,
