@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
@@ -20,6 +21,15 @@ public record DataBlockCreateRequest
     public List<IChart> Charts { get; init; } = new();
 
     public TableBuilderConfiguration Table { get; init; } = null!;
+
+    public class Validator : AbstractValidator<DataBlockCreateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Query)
+                .SetValidator(new FullTableQueryRequest.Validator());
+        }
+    }
 }
 
 public record DataBlockUpdateRequest
@@ -37,4 +47,13 @@ public record DataBlockUpdateRequest
     public List<IChart> Charts { get; init; } = new();
 
     public TableBuilderConfiguration Table { get; init; } = null!;
+
+    public class Validator : AbstractValidator<DataBlockUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Query)
+                .SetValidator(new FullTableQueryRequest.Validator());
+        }
+    }
 }
