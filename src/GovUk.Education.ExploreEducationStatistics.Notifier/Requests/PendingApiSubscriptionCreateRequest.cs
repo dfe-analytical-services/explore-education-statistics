@@ -3,13 +3,13 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 
-public record NewPendingApiSubscriptionRequest
+public record PendingApiSubscriptionCreateRequest
 {
     public required string Email { get; init; }
     public required Guid DataSetId { get; init; }
     public required string DataSetTitle { get; init; }
 
-    public class Validator : AbstractValidator<NewPendingApiSubscriptionRequest>
+    public class Validator : AbstractValidator<PendingApiSubscriptionCreateRequest>
     {
         public Validator()
         {

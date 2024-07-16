@@ -19,7 +19,7 @@ internal class ApiSubscriptionRepository(
         string email,
         CancellationToken cancellationToken = default)
     {
-        return await apiSubscriptionTableStorage.GetEntityIfExistsAsync<ApiSubscription>(
+        return await apiSubscriptionTableStorage.GetEntityIfExists<ApiSubscription>(
             tableName: _apiSubscriptionsTableName,
             partitionKey: email,
             rowKey: dataSetId.ToString(),
@@ -30,7 +30,7 @@ internal class ApiSubscriptionRepository(
         Guid dataSetId,
         string dataSetTitle,
         string email,
-        DateTimeOffset expiryDateTime,
+        DateTimeOffset expiry,
         CancellationToken cancellationToken = default)
     {
         var subscription = new ApiSubscription
@@ -39,10 +39,10 @@ internal class ApiSubscriptionRepository(
             RowKey = dataSetId.ToString(),
             DataSetTitle = dataSetTitle,
             Status = ApiSubscriptionStatus.SubscriptionPending,
-            ExpiryDateTime = expiryDateTime
+            Expiry = expiry
         };
 
-        await apiSubscriptionTableStorage.CreateEntityAsync(
+        await apiSubscriptionTableStorage.CreateEntity(
             tableName: _apiSubscriptionsTableName,
             entity: subscription,
             cancellationToken: cancellationToken);
@@ -52,7 +52,7 @@ internal class ApiSubscriptionRepository(
         ApiSubscription subscription,
         CancellationToken cancellationToken = default)
     {
-        await apiSubscriptionTableStorage.UpdateEntityAsync(
+        await apiSubscriptionTableStorage.UpdateEntity(
             tableName: _apiSubscriptionsTableName,
             entity: subscription,
             cancellationToken: cancellationToken);
@@ -63,7 +63,7 @@ internal class ApiSubscriptionRepository(
         string email,
         CancellationToken cancellationToken = default)
     {
-        await apiSubscriptionTableStorage.DeleteEntityAsync(
+        await apiSubscriptionTableStorage.DeleteEntity(
             tableName: _apiSubscriptionsTableName,
             partitionKey: email,
             rowKey: dataSetId.ToString(),

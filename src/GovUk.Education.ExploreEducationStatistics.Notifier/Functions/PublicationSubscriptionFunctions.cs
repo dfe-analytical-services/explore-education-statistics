@@ -20,14 +20,14 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interface
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
-public class PublicationSubscriptionManager(
-    ILogger<PublicationSubscriptionManager> logger,
+public class PublicationSubscriptionFunctions(
+    ILogger<PublicationSubscriptionFunctions> logger,
     IOptions<AppSettingsOptions> appSettingsOptions,
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
     IPublicationSubscriptionRepository publicationSubscriptionRepository,
-    IValidator<NewPendingPublicationSubscriptionRequest> requestValidator)
+    IValidator<PendingPublicationSubscriptionCreateRequest> requestValidator)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -39,7 +39,7 @@ public class PublicationSubscriptionManager(
     // ReSharper disable once UnusedMember.Global
     public async Task<IActionResult> RequestPendingSubscriptionFunc(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/request-pending-subscription/")]
-        [FromBody] NewPendingPublicationSubscriptionRequest req,
+        [FromBody] PendingPublicationSubscriptionCreateRequest req,
         FunctionContext context,
         CancellationToken cancellationToken)
     {

@@ -14,15 +14,15 @@ using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
-public class ApiSubscriptionManager(
-    ILogger<ApiSubscriptionManager> logger,
+public class ApiSubscriptionFunctions(
+    ILogger<ApiSubscriptionFunctions> logger,
     IApiSubscriptionService apiSubscriptionService,
-    IValidator<NewPendingApiSubscriptionRequest> newPendingApiSubscriptionRequestValidator)
+    IValidator<PendingApiSubscriptionCreateRequest> newPendingApiSubscriptionRequestValidator)
 {
     [Function("RequestPendingApiSubscription")]
     public async Task<IActionResult> RequestPendingApiSubscription(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/request-pending-subscription/")]
-        [FromBody] NewPendingApiSubscriptionRequest request,
+        [FromBody] PendingApiSubscriptionCreateRequest request,
         FunctionContext context,
         CancellationToken cancellationToken)
     {

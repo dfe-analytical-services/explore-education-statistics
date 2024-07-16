@@ -110,14 +110,14 @@ internal class ApiSubscriptionService(
                     Code = ValidationMessages.ApiPendingSubscriptionAlreadyExists.Code,
                     Message = ValidationMessages.ApiPendingSubscriptionAlreadyExists.Message,
                     Detail = new ApiSubscriptionErrorDetail(dataSetId, email),
-                    Path = nameof(NewPendingApiSubscriptionRequest.DataSetId).ToLowerFirst()
+                    Path = nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst()
                 })
                 : ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code,
                     Message = ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Message,
                     Detail = new ApiSubscriptionErrorDetail(dataSetId, email),
-                    Path = nameof(NewPendingApiSubscriptionRequest.DataSetId).ToLowerFirst()
+                    Path = nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst()
                 })
             );
     }
@@ -179,11 +179,11 @@ internal class ApiSubscriptionService(
                 Code = ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code,
                 Message = ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Message,
                 Detail = new ApiSubscriptionErrorDetail(Guid.Parse(subscription.RowKey), subscription.PartitionKey),
-                Path = nameof(NewPendingApiSubscriptionRequest.DataSetId).ToLowerFirst()
+                Path = nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst()
             });
         }
 
-        subscription.ExpiryDateTime = null;
+        subscription.Expiry = null;
         subscription.Status = ApiSubscriptionStatus.Subscribed;
 
         await apiSubscriptionRepository.UpdateSubscription(subscription, cancellationToken);
@@ -193,7 +193,7 @@ internal class ApiSubscriptionService(
 
     private void SendVerificationEmail(ApiSubscription subscription)
     {
-        var activationCode = tokenService.GenerateToken(subscription.PartitionKey, subscription.ExpiryDateTime!.Value.UtcDateTime);
+        var activationCode = tokenService.GenerateToken(subscription.PartitionKey, subscription.Expiry!.Value.UtcDateTime);
 
         var emailTemplateVariables = new Dictionary<string, dynamic>
         {

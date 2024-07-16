@@ -1,13 +1,15 @@
 {
   "GovUkNotify" : {
     "ApiKey": "change-me",
-    "EmailTemplates" : {
+    "EmailTemplates": {
       "ReleaseAmendmentPublishedId": "change-me",
       "ReleaseAmendmentPublishedSupersededSubscribersId": "change-me",
       "ReleasePublishedId": "change-me",
       "ReleasePublishedSupersededSubscribersId": "change-me",
       "SubscriptionConfirmationId": "change-me",
-      "SubscriptionVerificationId": "change-me"
+      "SubscriptionVerificationId": "change-me",
+      "ApiSubscriptionConfirmationId": "change-me",
+      "ApiSubscriptionVerificationId": "change-me"
     }
   }
 }

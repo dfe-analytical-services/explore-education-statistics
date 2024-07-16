@@ -12,21 +12,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
 {
     private readonly TableServiceClient _client = new(tableStorageConnectionString);
 
-    /// <summary>
-    /// Gets a table by name, will create the table if it does not exist
-    /// </summary>
-    /// <param name="tableName">The name of the table to get.</param>
-    /// <returns>The table</returns>
-    public async Task<TableClient> GetTableClient(string tableName)
-    {
-        var tableClient = _client.GetTableClient(tableName);
-
-        await tableClient.CreateIfNotExistsAsync();
-
-        return tableClient;
-    }
-
-    public async Task<TEntity?> GetEntityIfExistsAsync<TEntity>(
+    public async Task<TEntity?> GetEntityIfExists<TEntity>(
         string tableName, 
         string partitionKey, 
         string rowKey,
@@ -47,7 +33,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             : null;
     }
 
-    public async Task CreateEntityAsync(
+    public async Task CreateEntity(
         string tableName, 
         ITableEntity entity,
         CancellationToken cancellationToken = default)
@@ -59,7 +45,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             cancellationToken: cancellationToken);
     }
 
-    public async Task UpdateEntityAsync(
+    public async Task UpdateEntity(
         string tableName,
         ITableEntity entity,
         TableUpdateMode updateMode = TableUpdateMode.Replace,
@@ -74,7 +60,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             cancellationToken: cancellationToken);
     }
 
-    public async Task DeleteEntityAsync(
+    public async Task DeleteEntity(
         string tableName, 
         string partitionKey,
         string rowKey,
@@ -87,5 +73,19 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             rowKey: rowKey,
             ifMatch: ETag.All,
             cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets a table by name, will create the table if it does not exist
+    /// </summary>
+    /// <param name="tableName">The name of the table to get.</param>
+    /// <returns>The table</returns>
+    private async Task<TableClient> GetTableClient(string tableName)
+    {
+        var tableClient = _client.GetTableClient(tableName);
+
+        await tableClient.CreateIfNotExistsAsync();
+
+        return tableClient;
     }
 }

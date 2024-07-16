@@ -66,7 +66,7 @@ public abstract class NotifierFunctionsIntegrationTest
 
         var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
 
-        await dataTableStorageService.CreateEntityAsync(
+        await dataTableStorageService.CreateEntity(
             tableName: appSettingsOptions.ApiSubscriptionsTableName,
             entity: subscription);
     }
@@ -80,7 +80,7 @@ public abstract class NotifierFunctionsIntegrationTest
 
         var dataTableStorageService = new DataTableStorageService(appSettingsOptions.Value.TableStorageConnectionString);
 
-        return await dataTableStorageService.GetEntityIfExistsAsync<ApiSubscription>(
+        return await dataTableStorageService.GetEntityIfExists<ApiSubscription>(
             tableName: appSettingsOptions.Value.ApiSubscriptionsTableName,
             partitionKey: email,
             rowKey: dataSetId.ToString(),
@@ -137,9 +137,9 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
     {
         return
         [
-            typeof(PublicationSubscriptionManager),
+            typeof(PublicationSubscriptionFunctions),
             typeof(ReleaseNotifier),
-            typeof(ApiSubscriptionManager)
+            typeof(ApiSubscriptionFunctions)
         ];
     }
 }

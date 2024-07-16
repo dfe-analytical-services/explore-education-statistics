@@ -8,9 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 public interface IDataTableStorageService
 {
-    Task<TableClient> GetTableClient(string tableName);
-
-    Task<TEntity?> GetEntityIfExistsAsync<TEntity>(
+    Task<TEntity?> GetEntityIfExists<TEntity>(
         string tableName,
         string partitionKey,
         string rowKey,
@@ -18,18 +16,18 @@ public interface IDataTableStorageService
         CancellationToken cancellationToken = default)
         where TEntity : class, ITableEntity;
 
-    Task CreateEntityAsync(
+    Task CreateEntity(
         string tableName,
         ITableEntity entity,
         CancellationToken cancellationToken = default);
 
-    Task UpdateEntityAsync(
+    Task UpdateEntity(
         string tableName,
         ITableEntity entity,
         TableUpdateMode updateMode = TableUpdateMode.Replace,
         CancellationToken cancellationToken = default);
 
-    Task DeleteEntityAsync(
+    Task DeleteEntity(
         string tableName,
         string partitionKey,
         string rowKey,

@@ -21,7 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
-public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTestFixture fixture)
+public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationTestFixture fixture)
     : NotifierFunctionsIntegrationTest(fixture)
 {
     private static readonly GovUkNotifyOptions.EmailTemplateOptions EmailTemplateOptions = new()
@@ -60,7 +60,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingPublicationSubscriptionRequest
+        var request = new PendingPublicationSubscriptionCreateRequest
         {
             Id = "test-id-1",
             Slug = "test-publication-slug-1",
@@ -124,7 +124,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingPublicationSubscriptionRequest
+        var request = new PendingPublicationSubscriptionCreateRequest
         {
             Id = "test-id-2",
             Slug = "test-publication-slug-2",
@@ -190,7 +190,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingPublicationSubscriptionRequest
+        var request = new PendingPublicationSubscriptionCreateRequest
         {
             Id = "test-id-3",
             Slug = "test-publication-slug-3",
@@ -248,7 +248,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingPublicationSubscriptionRequest
+        var request = new PendingPublicationSubscriptionCreateRequest
         {
             Id = "",
             Slug = "test-publication-slug",
@@ -264,7 +264,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Id).ToLowerFirst());
+        validationProblem.AssertHasNotEmptyError(nameof(PendingPublicationSubscriptionCreateRequest.Id).ToLowerFirst());
     }
 
     [Fact]
@@ -293,7 +293,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingPublicationSubscriptionRequest
+        var request = new PendingPublicationSubscriptionCreateRequest
         {
             Id = "123abc",
             Slug = "test-publication-slug",
@@ -309,7 +309,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Title).ToLowerFirst());
+        validationProblem.AssertHasNotEmptyError(nameof(PendingPublicationSubscriptionCreateRequest.Title).ToLowerFirst());
     }
 
     [Fact]
@@ -338,7 +338,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingPublicationSubscriptionRequest
+        var request = new PendingPublicationSubscriptionCreateRequest
         {
             Id = "123abc",
             Slug = "test-publication-slug",
@@ -354,7 +354,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Email).ToLowerFirst());
+        validationProblem.AssertHasNotEmptyError(nameof(PendingPublicationSubscriptionCreateRequest.Email).ToLowerFirst());
     }
 
     [Fact]
@@ -383,7 +383,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
-        var request = new NewPendingPublicationSubscriptionRequest
+        var request = new PendingPublicationSubscriptionCreateRequest
         {
             Id = "123abc",
             Slug = "",
@@ -399,7 +399,7 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
 
         // Assert
         var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasNotEmptyError(nameof(NewPendingPublicationSubscriptionRequest.Slug).ToLowerFirst());
+        validationProblem.AssertHasNotEmptyError(nameof(PendingPublicationSubscriptionCreateRequest.Slug).ToLowerFirst());
     }
 
 
@@ -528,12 +528,12 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
         return true;
     }
 
-    private PublicationSubscriptionManager BuildFunction(
+    private PublicationSubscriptionFunctions BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
         IPublicationSubscriptionRepository? publicationSubscriptionRepository = null) =>
         new(
-            Mock.Of<ILogger<PublicationSubscriptionManager>>(),
+            Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
             Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
             Options.Create(new GovUkNotifyOptions
             {
@@ -543,5 +543,5 @@ public class PublicationSubscriptionManagerTests(NotifierFunctionsIntegrationTes
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
-            new NewPendingPublicationSubscriptionRequest.Validator());
+            new PendingPublicationSubscriptionCreateRequest.Validator());
 }
