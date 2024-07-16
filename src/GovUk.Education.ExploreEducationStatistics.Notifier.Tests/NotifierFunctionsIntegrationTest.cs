@@ -94,7 +94,8 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
     public readonly Mock<INotificationClient> _notificationClient = new(MockBehavior.Strict);
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.27.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.31.0")
+        .WithInMemoryPersistence()
         .Build();
 
     public async Task DisposeAsync()
