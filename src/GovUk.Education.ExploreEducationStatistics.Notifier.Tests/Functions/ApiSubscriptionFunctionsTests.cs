@@ -388,6 +388,64 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         }
     }
 
+    public class RemoveExpiredApiSubscriptionsTests(NotifierFunctionsIntegrationTestFixture fixture)
+        : ApiSubscriptionManagerTests(fixture)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            var pendingAndExpiredSubscription = new ApiSubscription
+            {
+                PartitionKey = Guid.NewGuid().ToString(),
+                RowKey = email,
+                DataSetTitle = dataSetTitle,
+                Status = ApiSubscriptionStatus.SubscriptionPending,
+                ExpiryDateTime = DateTime.UtcNow.AddHours(-1),
+            };
+
+            var pendingSubscription = new ApiSubscription
+            {
+                PartitionKey = Guid.NewGuid().ToString(),
+                RowKey = email,
+                DataSetTitle = dataSetTitle,
+                Status = ApiSubscriptionStatus.SubscriptionPending,
+                ExpiryDateTime = DateTime.UtcNow.AddHours(1),
+            };
+
+            var subscribedSubscription = new ApiSubscription
+            {
+                PartitionKey = Guid.NewGuid().ToString(),
+                RowKey = email,
+                DataSetTitle = dataSetTitle,
+                Status = ApiSubscriptionStatus.Subscribed,
+                ExpiryDateTime = null,
+            };
+
+            await CreateApiSubscriptions(pendingAndExpiredSubscription, pendingSubscription, subscribedSubscription);
+
+            await RemoveExpiredApiSubscriptions();
+
+            var subscriptions = await QueryApiSubscriptions();
+
+            Assert.Equal(2, subscriptions.Count);
+
+            Assert.Single(subscriptions, s => s.PartitionKey == pendingSubscription.PartitionKey);
+            Assert.Single(subscriptions, s => s.PartitionKey == subscribedSubscription.PartitionKey);
+        }
+
+        private async Task RemoveExpiredApiSubscriptions(
+            TimerInfo? timerInfo = null,
+            FunctionContext? functionContext = null)
+        {
+            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionManager>();
+
+            await apiSubscriptionManager.RemoveExpiredApiSubscriptions(
+                timerInfo: timerInfo ?? new TimerInfo(),
+                context: functionContext ?? new TestFunctionContext(),
+                cancellationToken: CancellationToken.None);
+        }
+    }
+
     private string? ExtractEmailFromSubscriptionLinkToken(string subscriptionLink)
     {
         var tokenService = GetRequiredService<ITokenService>();
