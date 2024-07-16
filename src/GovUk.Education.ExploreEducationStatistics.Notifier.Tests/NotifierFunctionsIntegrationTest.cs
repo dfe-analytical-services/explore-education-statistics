@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -69,12 +70,10 @@ public abstract class NotifierFunctionsIntegrationTest
 
         var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
 
-        foreach (var subscription in subscriptions)
-        {
-            await dataTableStorageService.CreateEntityAsync(
-                tableName: appSettingsOptions.ApiSubscriptionsTableName,
-                entity: subscription);
-        }
+        await dataTableStorageService.BatchManipulateEntities(
+            tableName: appSettingsOptions.ApiSubscriptionsTableName,
+            entities: subscriptions,
+            tableTransactionActionType: TableTransactionActionType.Add);
     }
 
     public async Task CreateApiSubscription(ApiSubscription subscription)
