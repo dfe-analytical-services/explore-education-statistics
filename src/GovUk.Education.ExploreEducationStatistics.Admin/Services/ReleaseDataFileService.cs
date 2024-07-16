@@ -282,9 +282,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 replacingDataFile: replacingFile,
                                 order: releaseDataFileOrder);
 
-                            var dataReleaseFile = await _releaseFileRepository.Find(
-                                releaseVersionId: releaseVersionId,
-                                fileId: dataFile.Id);
+                            var dataReleaseFile = await _contentDbContext.ReleaseFiles
+                                .Include(rf => rf.File)
+                                .SingleAsync(rf =>
+                                    rf.ReleaseVersionId == releaseVersionId
+                                    && rf.FileId == dataFile.Id);
 
                             var metaFile = await _releaseDataFileRepository.Create(
                                 releaseVersionId: releaseVersionId,
@@ -305,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var permissions = await _userService.GetDataFilePermissions(dataFile);
 
                             return BuildDataFileViewModel(
-                                dataReleaseFile: dataReleaseFile!,
+                                dataReleaseFile: dataReleaseFile,
                                 metaFile: metaFile,
                                 validSubjectName,
                                 dataImport.TotalRows,
@@ -364,9 +366,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         source: zipFile,
                                                         order: releaseDataFileOrder);
 
-                                                    var dataReleaseFile = await _releaseFileRepository.Find(
-                                                        releaseVersionId: releaseVersionId,
-                                                        fileId: dataFile.Id);
+                                                    var dataReleaseFile = await _contentDbContext.ReleaseFiles
+                                                        .Include(rf => rf.File)
+                                                        .SingleAsync(rf =>
+                                                            rf.ReleaseVersionId == releaseVersionId
+                                                            && rf.FileId == dataFile.Id);
 
                                                     var metaFile = await _releaseDataFileRepository.Create(
                                                         releaseVersionId: releaseVersionId,
@@ -388,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                     var permissions = await _userService.GetDataFilePermissions(dataFile);
 
                                                     return BuildDataFileViewModel(
-                                                        dataReleaseFile: dataReleaseFile!,
+                                                        dataReleaseFile: dataReleaseFile,
                                                         metaFile: metaFile,
                                                         validSubjectName,
                                                         dataImport.TotalRows,
