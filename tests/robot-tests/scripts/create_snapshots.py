@@ -38,10 +38,10 @@ class SnapshotService:
         self.timeout = 10
         self.page_size = 10
         self.snapshots = [
-            #"data_catalogue_snapshot.json", # EES-5270
-            #"find_statistics_snapshot.json", # EES-5270
-            "methodologies_snapshot.json",
-            "table_tool_snapshot.json",
+            #"data_catalogue_snapshot.json",
+            "find_statistics_snapshot.json",
+            #"methodologies_snapshot.json", # @MarkFix uncomment when finished
+            #"table_tool_snapshot.json", # @MarkFix uncomment when finished
         ]
 
     def _gets_parsed_html_from_page(self, url: str) -> BeautifulSoup:
@@ -128,11 +128,11 @@ class SnapshotService:
                 except NoSuchElementException:
                     publication_summary = ""
 
-                release_type = publication.find_element(By.XPATH, "./dl//dd[@data-testid='release-type']").text
+                release_type = publication.find_element(By.XPATH, "./dl//dd[@data-testid='Release type-value']").text
 
-                theme = publication.find_element(By.XPATH, "./dl//dd[@data-testid='theme']").text
+                theme = publication.find_element(By.XPATH, "./dl//dd[@data-testid='Theme-value']").text
 
-                published = publication.find_element(By.XPATH, "./dl//dd[@data-testid='published']").text
+                published = publication.find_element(By.XPATH, "./dl//dd[@data-testid='Published-value']").text
 
                 publications.append(
                     {
