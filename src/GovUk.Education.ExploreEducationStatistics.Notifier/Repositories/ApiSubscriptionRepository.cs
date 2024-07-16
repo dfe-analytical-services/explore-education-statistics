@@ -21,8 +21,8 @@ internal class ApiSubscriptionRepository(
     {
         return await apiSubscriptionTableStorage.GetEntityIfExistsAsync<ApiSubscription>(
             tableName: _apiSubscriptionsTableName,
-            partitionKey: dataSetId.ToString(),
-            rowKey: email,
+            partitionKey: email,
+            rowKey: dataSetId.ToString(),
             cancellationToken: cancellationToken);
     }
 
@@ -35,8 +35,8 @@ internal class ApiSubscriptionRepository(
     {
         var subscription = new ApiSubscription
         {
-            PartitionKey = dataSetId.ToString(),
-            RowKey = email,
+            PartitionKey = email,
+            RowKey = dataSetId.ToString(),
             DataSetTitle = dataSetTitle,
             Status = ApiSubscriptionStatus.SubscriptionPending,
             ExpiryDateTime = expiryDateTime
@@ -65,8 +65,8 @@ internal class ApiSubscriptionRepository(
     {
         await apiSubscriptionTableStorage.DeleteEntityAsync(
             tableName: _apiSubscriptionsTableName,
-            partitionKey: dataSetId.ToString(),
-            rowKey: email,
+            partitionKey: email,
+            rowKey: dataSetId.ToString(),
             cancellationToken: cancellationToken);
     }
 }
