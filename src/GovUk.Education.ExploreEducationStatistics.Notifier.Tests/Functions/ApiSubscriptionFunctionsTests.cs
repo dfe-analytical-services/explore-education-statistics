@@ -429,8 +429,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             Assert.Equal(2, subscriptions.Count);
 
-            Assert.Single(subscriptions, s => s.PartitionKey == pendingSubscription.PartitionKey);
-            Assert.Single(subscriptions, s => s.PartitionKey == subscribedSubscription.PartitionKey);
+            Assert.Single(subscriptions, s => s.RowKey == pendingSubscription.RowKey);
+            Assert.Single(subscriptions, s => s.RowKey == subscribedSubscription.RowKey);
         }
 
         private async Task RemoveExpiredApiSubscriptions(
