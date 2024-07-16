@@ -1,5 +1,5 @@
 import { OmitStrict } from '@common/types';
-import getPropsForExternality from '@common/utils/url/getPropsForExternality';
+import getContentLinkProps from '@common/utils/url/getContentLinkProps';
 import classNames from 'classnames';
 import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
@@ -27,7 +27,7 @@ const Link = ({
   rel: originalRel,
   ...props
 }: LinkProps) => {
-  const { target, rel } = getPropsForExternality({
+  const { target, rel } = getContentLinkProps({
     url: to.toString(),
     rel: originalRel,
   });

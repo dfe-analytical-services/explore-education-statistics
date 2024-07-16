@@ -14,7 +14,7 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
-import getPropsForExternality from '@common/utils/url/getPropsForExternality';
+import getContentLinkProps from '@common/utils/url/getContentLinkProps';
 
 export interface ContentHtmlProps extends ContentHtmlLinkProps {
   className?: string;
@@ -118,11 +118,11 @@ function renderLink(
     return <a href={node.attribs.href}>{text}</a>;
   }
 
-  const { url, target, rel, externality } = getPropsForExternality({
+  const { url, target, rel, origin } = getContentLinkProps({
     url: targetUrl,
   });
 
-  return externality !== 'internal' &&
+  return origin !== 'public' &&
     typeof node.attribs['data-featured-table'] === 'undefined' ? (
     // eslint-disable-next-line react/jsx-no-target-blank
     <a href={url} target={target} rel={rel}>

@@ -4,6 +4,14 @@ import userEvent from '@testing-library/user-event';
 import ContentHtml from '@common/components/ContentHtml';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import { within } from '@testing-library/dom';
+import * as hostUrl from '@common/utils/url/hostUrl';
+
+jest.mock('@common/utils/url/hostUrl');
+jest
+  .spyOn(hostUrl, 'getHostUrl')
+  .mockReturnValue(
+    new URL('https://explore-education-statistics.servce.gov.uk/'),
+  );
 
 describe('ContentHtml', () => {
   test('renders correctly with required props', () => {

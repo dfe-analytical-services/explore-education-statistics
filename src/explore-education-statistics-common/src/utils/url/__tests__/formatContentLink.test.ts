@@ -1,4 +1,12 @@
 import formatContentLink from '@common/utils/url/formatContentLink';
+import * as hostUrl from '@common/utils/url/hostUrl';
+
+jest.mock('@common/utils/url/hostUrl');
+jest
+  .spyOn(hostUrl, 'getHostUrl')
+  .mockReturnValue(
+    new URL('https://explore-education-statistics.servce.gov.uk/'),
+  );
 
 describe('formatContentLink', () => {
   test('converts EES links to lowercase', () => {

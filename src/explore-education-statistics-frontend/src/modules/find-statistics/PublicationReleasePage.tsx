@@ -30,7 +30,6 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import getPropsForExternality from '@common/utils/url/getPropsForExternality';
 
 interface Props {
   release: Release;

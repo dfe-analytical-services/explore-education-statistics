@@ -1,38 +1,38 @@
-import getExternality, { Externality } from '@common/utils/url/getExternality';
+import getUrlOrigin, { UrlOrigin } from '@common/utils/url/getUrlOrigin';
 import formatContentLink from '@common/utils/url/formatContentLink';
 import buildRel from '@common/utils/url/buildRel';
 
-interface ExternalityProps {
+interface ContentLinkProps {
   url: string;
   target?: '_blank';
   rel?: string;
-  externality: Externality;
+  origin: UrlOrigin;
   text?: string;
 }
 
-export default function getPropsForExternality(options: {
+export default function getContentLinkProps(options: {
   url: string;
   text?: string;
   rel?: string;
-}): ExternalityProps {
+}): ContentLinkProps {
   const { url, text, rel } = options;
-  const externality = getExternality(url);
+  const origin = getUrlOrigin(url);
   const formattedUrl = formatContentLink(url);
 
-  switch (externality) {
-    case 'internal':
+  switch (origin) {
+    case 'public':
       return {
         url: formattedUrl,
-        externality,
+        origin,
         text,
       };
-    case 'external-admin':
+    case 'admin':
     case 'external-trusted':
       return {
         url: formattedUrl,
         target: '_blank',
         rel: buildRel(['nofollow', 'noopener', 'noreferrer'], rel),
-        externality,
+        origin,
         text: addNewTabWarning(text),
       };
     default:
@@ -40,7 +40,7 @@ export default function getPropsForExternality(options: {
         url: formattedUrl,
         target: '_blank',
         rel: buildRel(['noopener', 'noreferrer', 'nofollow', 'external'], rel),
-        externality,
+        origin,
         text: addNewTabWarning(text),
       };
   }

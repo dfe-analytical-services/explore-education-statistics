@@ -1,25 +1,31 @@
-import getPropsForExternality, {
+import getContentLinkProps, {
   addNewTabWarning,
-} from '@common/utils/url/getPropsForExternality';
+} from '@common/utils/url/getContentLinkProps';
+import * as hostUrl from '@common/utils/url/hostUrl';
 
-describe('getPropsForExternality', () => {
-  test('internal links', () => {
-    const anchorTagProps = getPropsForExternality({
+jest.mock('@common/utils/url/hostUrl');
+jest
+  .spyOn(hostUrl, 'getHostUrl')
+  .mockReturnValue(
+    new URL('https://explore-education-statistics.servce.gov.uk/'),
+  );
+
+describe('getContentLinkProps', () => {
+  test('public links', () => {
+    const anchorTagProps = getContentLinkProps({
       url: 'https://EXPLORE-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools',
       text: 'Click this link!',
     });
 
     expect(anchorTagProps).toEqual({
       url: 'https://explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools',
-      target: undefined,
       text: 'Click this link!',
-      externality: 'internal',
-      rel: undefined,
+      origin: 'public',
     });
   });
 
   test('admin links', () => {
-    const { url, target, text, externality, rel } = getPropsForExternality({
+    const { url, target, text, origin, rel } = getContentLinkProps({
       url: 'https://aDmIn.EXPLORE-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools',
       text: 'Click this admin link!',
     });
@@ -29,14 +35,14 @@ describe('getPropsForExternality', () => {
     );
     expect(target).toBe('_blank');
     expect(text).toBe('Click this admin link! (opens in a new tab)');
-    expect(externality).toBe('external-admin');
+    expect(origin).toBe('admin');
     expect(rel).toContain('nofollow');
     expect(rel).toContain('noopener');
     expect(rel).toContain('noreferrer');
   });
 
   test('external links', () => {
-    const { url, target, text, externality, rel } = getPropsForExternality({
+    const { url, target, text, origin, rel } = getContentLinkProps({
       url: 'https://stackoverflow.com/Some-Upper-PATH',
       text: 'Click this external link!',
     });
@@ -44,7 +50,7 @@ describe('getPropsForExternality', () => {
     expect(url).toBe('https://stackoverflow.com/Some-Upper-PATH');
     expect(target).toBe('_blank');
     expect(text).toBe('Click this external link! (opens in a new tab)');
-    expect(externality).toBe('external');
+    expect(origin).toBe('external');
     expect(rel).toContain('nofollow');
     expect(rel).toContain('noopener');
     expect(rel).toContain('noreferrer');

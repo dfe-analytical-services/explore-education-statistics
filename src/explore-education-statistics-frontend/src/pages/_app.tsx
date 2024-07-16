@@ -10,6 +10,7 @@ import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivity
 import composeProviders from '@common/hocs/composeProviders';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
+import { setHostUrl } from '@common/utils/url/hostUrl';
 import { useCookies } from '@frontend/hooks/useCookies';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
@@ -50,6 +51,7 @@ type Props = AppProps<{ dehydratedState: unknown }> & {
 export default function App({ Component, pageProps, cookies }: Props) {
   const router = useRouter();
   const { getCookie } = useCookies(cookies);
+  setHostUrl(process.env.PUBLIC_URL);
 
   useMounted(() => {
     if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
