@@ -71,6 +71,21 @@ public class PreviewTokenService(
             .OnSuccess(async () => await DoList(dataSetVersionId, cancellationToken));
     }
 
+    public async Task<Either<ActionResult, Unit>> RevokePreviewToken(
+        Guid previewTokenId,
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccess(async () => await publicDataDbContext.PreviewTokens
+                .SingleOrNotFoundAsync(pt => pt.Id == previewTokenId, cancellationToken: cancellationToken))
+            .OnSuccessDo(ValidatePreviewToken)
+            .OnSuccessVoid(async previewToken =>
+            {
+                previewToken.Expiry = DateTimeOffset.UtcNow;
+                await publicDataDbContext.SaveChangesAsync(cancellationToken);
+            });
+    }
+
     private async Task<Either<ActionResult, DataSetVersion>> CheckDataSetVersionExists(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
@@ -89,6 +104,19 @@ public class PreviewTokenService(
                 Message = ValidationMessages.DataSetVersionStatusNotDraft.Message,
                 Path = nameof(PreviewTokenCreateRequest.DataSetVersionId).ToLowerFirst(),
                 Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id)
+            })
+            : Unit.Instance;
+    }
+
+    private static Either<ActionResult, Unit> ValidatePreviewToken(PreviewToken previewToken)
+    {
+        return previewToken.Status is PreviewTokenStatus.Expired
+            ? ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Code = ValidationMessages.PreviewTokenExpired.Code,
+                Message = ValidationMessages.PreviewTokenExpired.Message,
+                Path = "previewTokenId",
+                Detail = new InvalidErrorDetail<Guid>(previewToken.Id)
             })
             : Unit.Instance;
     }

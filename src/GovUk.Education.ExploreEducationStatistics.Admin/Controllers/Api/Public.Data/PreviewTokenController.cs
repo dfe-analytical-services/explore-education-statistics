@@ -47,4 +47,14 @@ public class PreviewTokenController(IPreviewTokenService previewTokenService) : 
             .ListPreviewTokens(dataSetVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
+
+    [HttpDelete("{previewTokenId:guid}")]
+    public async Task<ActionResult> RevokePreviewToken(
+        Guid previewTokenId,
+        CancellationToken cancellationToken)
+    {
+        return await previewTokenService
+            .RevokePreviewToken(previewTokenId, cancellationToken)
+            .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
+    }
 }

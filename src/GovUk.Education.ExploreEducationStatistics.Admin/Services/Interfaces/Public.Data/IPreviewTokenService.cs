@@ -23,4 +23,8 @@ public interface IPreviewTokenService
     Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, Unit>> RevokePreviewToken(
+        Guid previewTokenId,
+        CancellationToken cancellationToken = default);
 }
