@@ -56,6 +56,10 @@ export interface ApiDataSetDraftVersion extends ApiDataSetVersion {
   geographicLevels?: string[];
   filters?: string[];
   indicators?: string[];
+  mappingStatus?: {
+    locationsComplete: boolean;
+    filtersComplete: boolean;
+  }
 }
 
 export interface ApiDataSetLiveVersion extends ApiDataSetVersion {

@@ -140,7 +140,10 @@ internal class DataSetService(
         var draftVersion = dataSet.LatestDraftVersion is null
             ? null
             : MapDraftVersion(
-                dataSet.LatestDraftVersion,
+                dataSetVersion: dataSet.LatestDraftVersion,
+                mappings: await GetDataSetVersionMappings(
+                    nextDataSetVersionId: dataSet.LatestDraftVersion.Id,
+                    cancellationToken),
                 releaseFilesByVersion[dataSet.LatestDraftVersion]
             );
 
@@ -229,11 +232,12 @@ internal class DataSetService(
             );
     }
 
-    private static DataSetVersionViewModel MapDraftVersion(
+    private static DataSetDraftVersionViewModel MapDraftVersion(
         DataSetVersion dataSetVersion,
+        MappingStatusViewModel? mappings,
         ReleaseFile releaseFile)
-    {
-        return new DataSetVersionViewModel
+    {   
+        return new DataSetDraftVersionViewModel
         {
             Id = dataSetVersion.Id,
             Version = dataSetVersion.Version,
@@ -250,7 +254,27 @@ internal class DataSetService(
                 : null,
             Filters = dataSetVersion.MetaSummary?.Filters ?? null,
             Indicators = dataSetVersion.MetaSummary?.Indicators ?? null,
+            MappingStatus = mappings
         };
+    }
+
+    private async Task<MappingStatusViewModel?> GetDataSetVersionMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var statuses = await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .Select(mapping => new Tuple<bool, bool>(mapping.LocationMappingsComplete, mapping.FilterMappingsComplete))
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return statuses is not null 
+            ? new MappingStatusViewModel
+            {
+                LocationsComplete = statuses.Item1,
+                FiltersComplete = statuses.Item2
+            }
+            : null;
     }
 
     private static DataSetLiveVersionViewModel MapLiveVersion(

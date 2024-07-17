@@ -8,7 +8,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
-public record DataSetVersionViewModel
+public abstract record DataSetVersionViewModel
 {
     public required Guid Id { get; init; }
 
@@ -33,6 +33,11 @@ public record DataSetVersionViewModel
     public IReadOnlyList<string>? Filters { get; init; }
 
     public IReadOnlyList<string>? Indicators { get; init; }
+}
+
+public record DataSetDraftVersionViewModel : DataSetVersionViewModel
+{
+    public MappingStatusViewModel? MappingStatus { get; init; }
 }
 
 public record DataSetLiveVersionViewModel : DataSetVersionViewModel
@@ -66,4 +71,11 @@ public record DataSetVersionSummaryViewModel
 public record DataSetLiveVersionSummaryViewModel : DataSetVersionSummaryViewModel
 {
     public required DateTimeOffset Published { get; init; }
+}
+
+public record MappingStatusViewModel
+{
+    public required bool LocationsComplete { get; init; }
+    
+    public required bool FiltersComplete { get; init; }
 }
