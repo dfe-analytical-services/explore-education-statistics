@@ -29,6 +29,7 @@ import {
   releaseTableToolRoute,
   releaseApiDataSetsRoute,
   releaseApiDataSetDetailsRoute,
+  releaseApiDataSetLocationsMappingRoute,
 } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
@@ -57,6 +58,7 @@ const routes = [
   releaseDataFileReplacementCompleteRoute,
   releaseApiDataSetsRoute,
   releaseApiDataSetDetailsRoute,
+  releaseApiDataSetLocationsMappingRoute,
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
