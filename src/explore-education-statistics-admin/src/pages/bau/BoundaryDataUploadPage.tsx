@@ -50,7 +50,9 @@ export default function BoundaryDataUploadPage() {
     return Yup.object({
       boundaryLevel: Yup.string().required('Select a boundary level type'),
       boundaryLevelLabel: Yup.string().required('Enter a boundary level name'),
-      boundaryDataFile: Yup.file().required('Select a boundary file'),
+      boundaryDataFile: Yup.file()
+        .required('Select a boundary file')
+        .maxSize(134217728, 'Boundary file must be under 128mb in size'),
       boundaryLevelPublishedDate: Yup.date().required(
         'Enter a boundary file publication date',
       ),
@@ -119,7 +121,7 @@ export default function BoundaryDataUploadPage() {
                   id="boundaryDataFile"
                   name="boundaryDataFile"
                   label="Upload new boundary data file"
-                  hint="Must be a GeoJSON file type"
+                  hint="Must be a GeoJSON file type, and no larger than 128mb"
                 />
               </FormFieldset>
 
