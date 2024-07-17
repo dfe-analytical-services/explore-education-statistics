@@ -55,5 +55,5 @@ public interface IDataTableStorageService
         IEnumerable<TEntity> entities,
         TableTransactionActionType tableTransactionActionType,
         CancellationToken cancellationToken = default) 
-        where TEntity : class, ITableEntity, new();
+        where TEntity : class, ITableEntity;
 }

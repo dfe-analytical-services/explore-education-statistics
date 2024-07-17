@@ -108,7 +108,7 @@ public abstract class NotifierFunctionsIntegrationTest
 
         var dataTableStorageService = new DataTableStorageService(appSettingsOptions.Value.TableStorageConnectionString);
 
-        var pagedSubscriptions = await dataTableStorageService.QueryEntitiesAsync(
+        var pagedSubscriptions = await dataTableStorageService.QueryEntities(
             tableName: appSettingsOptions.Value.ApiSubscriptionsTableName,
             filter: filter,
             maxPerPage: maxPerPage,

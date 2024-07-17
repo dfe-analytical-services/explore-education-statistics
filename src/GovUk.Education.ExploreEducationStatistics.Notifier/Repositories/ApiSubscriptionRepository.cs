@@ -82,7 +82,7 @@ internal class ApiSubscriptionRepository(
     {
         filter ??= subscription => true;
 
-        return await apiSubscriptionTableStorage.QueryEntitiesAsync(
+        return await apiSubscriptionTableStorage.QueryEntities(
             tableName: _apiSubscriptionsTableName,
             filter: filter,
             maxPerPage: maxPerPage,

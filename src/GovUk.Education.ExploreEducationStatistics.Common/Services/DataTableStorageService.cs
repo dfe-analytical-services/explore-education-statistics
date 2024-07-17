@@ -19,7 +19,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     /// <summary>
     /// Gets a list of tables from the storage account
     /// </summary>
-    public AsyncPageable<TableItem> GetTablesAsync(
+    public AsyncPageable<TableItem> GetTables(
         Expression<Func<TableItem, bool>>? filter = null,
         int? maxPerPage = null,
         CancellationToken cancellationToken = default)
@@ -40,7 +40,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         CancellationToken cancellationToken = default)
         where TEntity : class, ITableEntity
     {
-        var tableClient = await GetTableClientAsync(tableName, cancellationToken);
+        var tableClient = await GetTableClient(tableName, cancellationToken);
 
         var createdEntity = await tableClient.GetEntityIfExistsAsync<TEntity>(
             partitionKey: partitionKey,
@@ -58,7 +58,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         ITableEntity entity,
         CancellationToken cancellationToken = default)
     {
-        var tableClient = await GetTableClientAsync(tableName, cancellationToken);
+        var tableClient = await GetTableClient(tableName, cancellationToken);
 
         await tableClient.AddEntityAsync(
             entity: entity,
@@ -71,7 +71,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         TableUpdateMode updateMode = TableUpdateMode.Replace,
         CancellationToken cancellationToken = default)
     {
-        var tableClient = await GetTableClientAsync(tableName, cancellationToken);
+        var tableClient = await GetTableClient(tableName, cancellationToken);
 
         await tableClient.UpdateEntityAsync(
             entity: entity,
@@ -86,7 +86,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         string rowKey,
         CancellationToken cancellationToken = default)
     {
-        var tableClient = await GetTableClientAsync(tableName, cancellationToken);
+        var tableClient = await GetTableClient(tableName, cancellationToken);
 
         await tableClient.DeleteEntityAsync(
             partitionKey: partitionKey,
@@ -95,7 +95,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             cancellationToken: cancellationToken);
     }
 
-    public async Task<AsyncPageable<TEntity>> QueryEntitiesAsync<TEntity>(
+    public async Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
         string tableName,
         Expression<Func<TEntity, bool>>? filter = null,
         int? maxPerPage = 1000,
@@ -105,7 +105,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     {
         filter ??= entity => true;
 
-        var tableClient = await GetTableClientAsync(tableName, cancellationToken);
+        var tableClient = await GetTableClient(tableName, cancellationToken);
 
         return tableClient.QueryAsync(
             filter: filter,
@@ -119,9 +119,9 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         IEnumerable<TEntity> entities, 
         TableTransactionActionType tableTransactionActionType,
         CancellationToken cancellationToken = default)
-        where TEntity : class, ITableEntity, new()
+        where TEntity : class, ITableEntity
     {
-        var tableClient = await GetTableClientAsync(tableName, cancellationToken);
+        var tableClient = await GetTableClient(tableName, cancellationToken);
 
         await DataTableStorageUtils.BatchManipulateEntities(
             tableClient: tableClient,
@@ -130,16 +130,11 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             cancellationToken: cancellationToken);
     }
 
-    /// <summary>
-    /// Gets a table by name, will create the table if it does not exist
-    /// </summary>
-    /// <param name="tableName">The name of the table to get.</param>
-    /// <returns>The table</returns>
-    private async Task<TableClient> GetTableClient(string tableName)
+    private async Task<TableClient> GetTableClient(string tableName, CancellationToken cancellationToken)
     {
         var tableClient = _client.GetTableClient(tableName);
 
-        await tableClient.CreateIfNotExistsAsync();
+        await tableClient.CreateIfNotExistsAsync(cancellationToken);
 
         return tableClient;
     }

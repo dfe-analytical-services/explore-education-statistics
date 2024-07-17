@@ -19,7 +19,7 @@ public static class DataTableStorageUtils
         IEnumerable<TEntity> entities,
         TableTransactionActionType tableTransactionActionType,
         CancellationToken cancellationToken = default) 
-        where TEntity : class, ITableEntity, new()
+        where TEntity : class, ITableEntity
     {
         var groups = entities.GroupBy(entity => entity.PartitionKey);
 

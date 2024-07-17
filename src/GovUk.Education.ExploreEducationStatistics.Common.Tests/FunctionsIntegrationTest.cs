@@ -58,11 +58,11 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
     {
         var dataTableStorageService = new DataTableStorageService(connectionString);
 
-        var tables = await dataTableStorageService.GetTablesAsync().ToListAsync();
+        var tables = await dataTableStorageService.GetTables().ToListAsync();
 
         foreach (var table in tables)
         {
-            var entities = await dataTableStorageService.QueryEntitiesAsync<TableEntity>(
+            var entities = await dataTableStorageService.QueryEntities<TableEntity>(
                 tableName: table.Name,
                 select: new List<string>() { nameof(TableEntity.PartitionKey), nameof(TableEntity.RowKey) });
 

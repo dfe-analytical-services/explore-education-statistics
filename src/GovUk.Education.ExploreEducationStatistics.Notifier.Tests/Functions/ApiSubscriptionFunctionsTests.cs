@@ -389,36 +389,36 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
     }
 
     public class RemoveExpiredApiSubscriptionsTests(NotifierFunctionsIntegrationTestFixture fixture)
-        : ApiSubscriptionManagerTests(fixture)
+        : ApiSubscriptionFunctionsTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             var pendingAndExpiredSubscription = new ApiSubscription
             {
-                PartitionKey = email,
+                PartitionKey = _email,
                 RowKey = Guid.NewGuid().ToString(),
-                DataSetTitle = dataSetTitle,
+                DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.SubscriptionPending,
-                ExpiryDateTime = DateTime.UtcNow.AddHours(-1),
+                Expiry = DateTime.UtcNow.AddHours(-1),
             };
 
             var pendingSubscription = new ApiSubscription
             {
-                PartitionKey = email,
+                PartitionKey = _email,
                 RowKey = Guid.NewGuid().ToString(),
-                DataSetTitle = dataSetTitle,
+                DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.SubscriptionPending,
-                ExpiryDateTime = DateTime.UtcNow.AddHours(1),
+                Expiry = DateTime.UtcNow.AddHours(1),
             };
 
             var subscribedSubscription = new ApiSubscription
             {
-                PartitionKey = email,
+                PartitionKey = _email,
                 RowKey = Guid.NewGuid().ToString(),
-                DataSetTitle = dataSetTitle,
+                DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed,
-                ExpiryDateTime = null,
+                Expiry = null,
             };
 
             await CreateApiSubscriptions(pendingAndExpiredSubscription, pendingSubscription, subscribedSubscription);
@@ -437,7 +437,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             TimerInfo? timerInfo = null,
             FunctionContext? functionContext = null)
         {
-            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionManager>();
+            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionFunctions>();
 
             await apiSubscriptionManager.RemoveExpiredApiSubscriptions(
                 timerInfo: timerInfo ?? new TimerInfo(),

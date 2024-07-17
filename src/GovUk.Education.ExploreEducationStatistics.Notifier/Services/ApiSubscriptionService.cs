@@ -279,7 +279,7 @@ internal class ApiSubscriptionService(
     {
         Expression<Func<ApiSubscription, bool>> filter = s =>
             s.Status.Equals(ApiSubscriptionStatus.SubscriptionPending.ToString())
-            && s.ExpiryDateTime <= DateTimeOffset.UtcNow;
+            && s.Expiry <= DateTimeOffset.UtcNow;
 
         return await apiSubscriptionRepository.QuerySubscriptions(
             filter: filter,
