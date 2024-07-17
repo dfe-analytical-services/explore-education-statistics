@@ -631,9 +631,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<int>("OptionId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("MetaId", "OptionId");
 
                     b.HasIndex("OptionId");
+
+                    b.HasIndex("PublicId");
 
                     b.ToTable("LocationOptionMetaLinks");
                 });
