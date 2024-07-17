@@ -1,30 +1,25 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
-using ValidationMessages =
-    GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
 public class CompleteNextDataSetVersionImportFunction(
     ILogger<CompleteNextDataSetVersionImportFunction> logger,
     PublicDataDbContext publicDataDbContext,
-    IValidator<NextDataSetVersionCompleteImportRequest> requestValidator)
+    IValidator<NextDataSetVersionCompleteImportRequest> requestValidator,
+    IDataSetVersionMappingService mappingService)
 {
     [Function(nameof(CompleteNextDataSetVersionImport))]
     public async Task<IActionResult> CompleteNextDataSetVersionImport(
@@ -35,10 +30,7 @@ public class CompleteNextDataSetVersionImportFunction(
     {
         return await requestValidator
             .Validate(request, cancellationToken)
-            .OnSuccess(_ => GetNextDataSetVersionInMappingStatus(request, cancellationToken))
-            .OnSuccessDo(_ => GetCompletedDataSetVersionMapping(request, cancellationToken))
-            .OnSuccessCombineWith(nextDataSetVersion =>
-                GetImportInManualMappingStage(request, nextDataSetVersion))
+            .OnSuccess(_ => mappingService.GetManualMappingVersionAndImport(request, cancellationToken))
             .OnSuccess(async versionAndImport =>
             {
                 var (nextVersion, importToContinue) = versionAndImport;
@@ -61,79 +53,6 @@ public class CompleteNextDataSetVersionImportFunction(
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
-    }
-
-    private static Either<ActionResult, DataSetVersionImport> GetImportInManualMappingStage(
-        NextDataSetVersionCompleteImportRequest request,
-        DataSetVersion nextDataSetVersion)
-    {
-        var importToContinue = nextDataSetVersion
-            .Imports
-            .SingleOrDefault(import => import.DataSetVersionId == nextDataSetVersion.Id
-                                       && import.Stage == DataSetVersionImportStage.ManualMapping);
-
-        return importToContinue is null
-            ? CreateDataSetVersionIdError(
-                message: ValidationMessages.ImportInManualMappingStateNotFound,
-                dataSetVersionId: request.DataSetVersionId)
-            : importToContinue;
-    }
-
-    private async Task<Either<ActionResult, DataSetVersion>> GetNextDataSetVersionInMappingStatus(
-        NextDataSetVersionCompleteImportRequest request,
-        CancellationToken cancellationToken)
-    {
-        var nextVersion = await publicDataDbContext
-            .DataSetVersions
-            .AsNoTracking()
-            .Include(dataSetVersion => dataSetVersion.Imports)
-            .SingleOrDefaultAsync(
-                dataSetVersion => dataSetVersion.Id == request.DataSetVersionId,
-                cancellationToken);
-
-        if (nextVersion is null)
-        {
-            return ValidationUtils.NotFoundResult<DataSetVersion, Guid>(
-                request.DataSetVersionId, 
-                nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst());
-        }
-
-        if (nextVersion.Status != DataSetVersionStatus.Mapping)
-        {
-            return CreateDataSetVersionIdError(
-                message: ValidationMessages.DataSetVersionNotInMappingStatus,
-                dataSetVersionId: request.DataSetVersionId);
-        }
-
-        return nextVersion;
-    }
-
-    private async Task<Either<ActionResult, DataSetVersionMapping>> GetCompletedDataSetVersionMapping(
-        NextDataSetVersionCompleteImportRequest request,
-        CancellationToken cancellationToken)
-    {
-        var mapping = await publicDataDbContext
-            .DataSetVersionMappings
-            .AsNoTracking()
-            .SingleOrDefaultAsync(
-                mapping => mapping.TargetDataSetVersionId == request.DataSetVersionId,
-                cancellationToken);
-
-        if (mapping is null)
-        {
-            return CreateDataSetVersionIdError(
-                message: ValidationMessages.DataSetVersionMappingNotFound,
-                dataSetVersionId: request.DataSetVersionId);
-        }
-
-        if (!mapping.FilterMappingsComplete || !mapping.LocationMappingsComplete)
-        {
-            return CreateDataSetVersionIdError(
-                message: ValidationMessages.DataSetVersionMappingsNotComplete,
-                dataSetVersionId: request.DataSetVersionId);
-        }
-
-        return mapping;
     }
 
     private async Task ProcessCompletionOfNextDataSetVersionImport(
@@ -160,18 +79,5 @@ public class CompleteNextDataSetVersionImportFunction(
             input,
             options,
             cancellationToken);
-    }
-
-    private static BadRequestObjectResult CreateDataSetVersionIdError(
-        LocalizableMessage message,
-        Guid dataSetVersionId)
-    {
-        return ValidationUtils.ValidationResult(new ErrorViewModel
-        {
-            Code = message.Code,
-            Message = message.Message,
-            Path = nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
-            Detail = new InvalidErrorDetail<Guid>(dataSetVersionId)
-        });
     }
 }
