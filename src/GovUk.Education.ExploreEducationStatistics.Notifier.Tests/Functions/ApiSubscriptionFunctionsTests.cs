@@ -46,9 +46,15 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                             null)
                     ),
                     null,
+                    null,
                     null))
                 .Returns(It.IsAny<EmailNotificationResponse>())
-                .Callback((string email, string templateId, Dictionary<string, dynamic> values, string clientReference, string emailReplyToId)
+                .Callback((string email,
+                           string templateId,
+                           Dictionary<string, dynamic> values,
+                           string clientReference,
+                           string emailReplyToId,
+                           string oneClickUnsubscribeURL)
                     => verificationLink = values["verification_link"]); ;
 
             var result = await RequestPendingApiSubscription(
@@ -243,9 +249,15 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                             $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
                     ),
                     null,
+                    null,
                     null))
                 .Returns(It.IsAny<EmailNotificationResponse>())
-                .Callback((string email, string templateId, Dictionary<string, dynamic> values, string clientReference, string emailReplyToId)
+                .Callback((string email,
+                           string templateId,
+                           Dictionary<string, dynamic> values,
+                           string clientReference,
+                           string emailReplyToId,
+                           string oneClickUnsubscribeURL)
                     => unsubscribeLink = values["unsubscribe_link"]);
 
             var tokenService = GetRequiredService<ITokenService>();

@@ -16,6 +16,7 @@ public class EmailService(INotificationClient notificationClient) : IEmailServic
             templateId: templateId, 
             personalisation: values,
             clientReference: null,
-            emailReplyToId: null);
+            emailReplyToId: null,
+            oneClickUnsubscribeURL: null);
     }
 }
