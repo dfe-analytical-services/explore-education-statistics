@@ -69,12 +69,11 @@ public class ProcessNextDataSetVersionMappingsFunction(
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.Completing, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ManualMapping, cancellationToken);
 
         var dataSetVersion = dataSetVersionImport.DataSetVersion;
         dataSetVersion.Status = DataSetVersionStatus.Mapping;
 
-        dataSetVersionImport.Completed = DateTimeOffset.UtcNow;
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 }

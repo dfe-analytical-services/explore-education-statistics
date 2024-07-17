@@ -1,9 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -12,8 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ValidationMessages =
-    GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
@@ -68,13 +63,9 @@ public class DataSetService(
             .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
 
         return releaseFile is null
-            ? ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.FileNotFound.Code,
-                Message = ValidationMessages.FileNotFound.Message,
-                Path = nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
-                Detail = new InvalidErrorDetail<Guid>(releaseFileId)
-            })
+            ? ValidationUtils.NotFoundResult<ReleaseFile, Guid>(
+                releaseFileId, 
+                nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst())
             : releaseFile;
     }
 }

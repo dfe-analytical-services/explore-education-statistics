@@ -29,7 +29,7 @@ export default function createMapDataSetCategories(
         ...category,
         geoJson: meta.locations.find(
           location => location.id === category.filter.id,
-        )?.geoJson?.[0],
+        )?.geoJson,
       };
     })
     .filter(category => !!category?.geoJson) as MapDataSetCategory[];

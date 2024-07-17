@@ -6,6 +6,13 @@ import InvitedUsersPage from '@admin/pages/users/InvitedUsersPage';
 import ManageUserPage from '@admin/pages/users/ManageUserPage';
 import PreReleaseUsersPage from '@admin/pages/users/PreReleaseUsersPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
+import BoundaryDataPage from '@admin/pages/bau/BoundaryDataPage';
+import BoundaryLevelEditPage from '@admin/pages/bau/BoundaryLevelEditPage';
+import BoundaryDataUploadPage from '@admin/pages/bau/BoundaryDataUploadPage';
+
+export type BoundaryLevelEditPageRouteParams = {
+  boundaryLevelId: number;
+};
 
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
@@ -18,6 +25,27 @@ export const administrationImportsRoute: ProtectedRouteProps = {
   path: '/administration/imports',
   component: BauImportsPage,
   protectionAction: permissions => permissions.canAccessAllImports,
+  exact: true,
+};
+
+export const administrationBoundaryDataRoute: ProtectedRouteProps = {
+  path: '/administration/boundary-data',
+  component: BoundaryDataPage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
+export const administrationBoundaryDataEditRoute: ProtectedRouteProps = {
+  path: '/administration/boundary-data/boundary-level/:id',
+  component: BoundaryLevelEditPage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
+export const administrationBoundaryDataUploadRoute: ProtectedRouteProps = {
+  path: '/administration/boundary-data/upload',
+  component: BoundaryDataUploadPage,
+  protectionAction: permissions => permissions.isBauUser,
   exact: true,
 };
 
@@ -58,6 +86,9 @@ export const administrationUserManageRoute: ProtectedRouteProps = {
 const administrationRoutes = {
   administrationIndexRoute,
   administrationImportsRoute,
+  administrationBoundaryDataRoute,
+  administrationBoundaryDataEditRoute,
+  administrationBoundaryDataUploadRoute,
   administrationUsersRoute,
   administrationUserInviteRoute,
   administrationInvitedUsersRoute,

@@ -18,9 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public EmailNotificationResponse SendEmail(string emailAddress, string templateId, 
+        public EmailNotificationResponse SendEmail(string emailAddress,
+            string templateId,
             Dictionary<string, dynamic> personalisation = null,
-            string clientReference = null, string emailReplyToId = null)
+            string clientReference = null,
+            string emailReplyToId = null,
+            string oneClickUnsubscribeURL = null)
         {
             return new EmailNotificationResponse();
         }

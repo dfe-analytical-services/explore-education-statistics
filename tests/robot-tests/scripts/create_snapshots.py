@@ -12,6 +12,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 from slack_sdk.webhook import WebhookClient
 
 """
@@ -38,8 +39,8 @@ class SnapshotService:
         self.timeout = 10
         self.page_size = 10
         self.snapshots = [
-            #"data_catalogue_snapshot.json", # EES-5270
-            #"find_statistics_snapshot.json", # EES-5270
+            "data_catalogue_snapshot.json",
+            "find_statistics_snapshot.json",
             "methodologies_snapshot.json",
             "table_tool_snapshot.json",
         ]
@@ -128,11 +129,11 @@ class SnapshotService:
                 except NoSuchElementException:
                     publication_summary = ""
 
-                release_type = publication.find_element(By.XPATH, "./dl//dd[@data-testid='release-type']").text
+                release_type = publication.find_element(By.XPATH, "./dl//dd[@data-testid='Release type-value']").text
 
-                theme = publication.find_element(By.XPATH, "./dl//dd[@data-testid='theme']").text
+                theme = publication.find_element(By.XPATH, "./dl//dd[@data-testid='Theme-value']").text
 
-                published = publication.find_element(By.XPATH, "./dl//dd[@data-testid='published']").text
+                published = publication.find_element(By.XPATH, "./dl//dd[@data-testid='Published-value']").text
 
                 publications.append(
                     {
@@ -179,22 +180,24 @@ class SnapshotService:
     def _create_data_catalogue_snapshot(self) -> str:
         driver.get(f"{self.public_url}/data-catalogue")
 
-        theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themeId-"]')
+        num_datasets = driver.find_element(By.XPATH, '//*[@data-testid="total-results"]').text
 
-        themes = []
+        result = {"num_datasets": num_datasets, "themes": []}
 
-        for theme_label in theme_labels:
-            theme_label.click()
-            theme = {"theme_heading": theme_label.text, "publications": []}
+        theme_select = Select(driver.find_element(By.XPATH, '//select[@id="filters-form-theme"]'))
+        theme_list = []
+        for theme_option in theme_select.options:
+            theme_option.click()
 
-            publication_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-publications-"]')
+            publication_select = Select(driver.find_element(By.XPATH, '//select[@id="filters-form-publication"]'))
+            publication_labels = [option.text for option in publication_select.options]
 
-            for publication_label in publication_labels:
-                theme["publications"].append(publication_label.text)
+            theme = {"theme_heading": theme_option.text, "publications": publication_labels}
+            theme_list.append(theme)
 
-            themes.append(theme)
+        result["themes"] = theme_list
 
-        return json.dumps(themes, sort_keys=True, indent=2)
+        return json.dumps(result, sort_keys=True, indent=2)
 
     def _create_methodologies_snapshot(self) -> str:
         parsed_html = self._gets_parsed_html_from_page(f"{self.public_url}/methodology")

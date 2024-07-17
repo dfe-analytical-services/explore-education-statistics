@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Testcontainers.Azurite;
 using Testcontainers.PostgreSql;
 
@@ -173,8 +172,8 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                     options =>
                     {
                         options.UseNpgsql(
-                                _postgreSqlContainer.GetConnectionString(),
-                                psqlOptions => psqlOptions.EnableRetryOnFailure());
+                            _postgreSqlContainer.GetConnectionString(),
+                            psqlOptions => psqlOptions.EnableRetryOnFailure());
                     });
 
                 using var serviceScope = services.BuildServiceProvider()
@@ -194,6 +193,8 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             typeof(ProcessInitialDataSetVersionFunction),
             typeof(CreateNextDataSetVersionMappingsFunction),
             typeof(ProcessNextDataSetVersionMappingsFunction),
+            typeof(CompleteNextDataSetVersionImportFunction),
+            typeof(ProcessCompletionOfNextDataSetVersionFunction),
             typeof(DeleteDataSetVersionFunction),
             typeof(CopyCsvFilesFunction),
             typeof(ImportMetadataFunction),

@@ -262,7 +262,7 @@ export default function MapBlock({
               decimalPlaces={
                 selectedDataSetConfig.dataSet.indicator.decimalPlaces
               }
-              heading={selectedFeature?.properties.name}
+              heading={selectedFeature?.properties.Name}
               title={selectedDataSetConfig.config.label}
               unit={selectedDataSetConfig.dataSet.indicator.unit}
               value={selectedDataSet?.value}

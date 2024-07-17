@@ -967,7 +967,7 @@ public abstract class DataSetsControllerTests(
                         context.DataSets.Update(dataSet);
                     });
 
-                    return new CreateDataSetResponseViewModel
+                    return new ProcessDataSetVersionResponseViewModel
                     {
                         DataSetId = dataSet.Id,
                         DataSetVersionId = dataSetVersion.Id,

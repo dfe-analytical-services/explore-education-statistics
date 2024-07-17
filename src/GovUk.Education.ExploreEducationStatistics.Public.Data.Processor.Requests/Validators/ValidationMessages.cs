@@ -4,11 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Reque
 
 public static class ValidationMessages
 {
-    public static readonly LocalizableMessage FileNotFound = new(
-        Code: nameof(FileNotFound),
-        Message: "The file could not be found."
-    );
-
     public static readonly LocalizableMessage FileHasApiDataSetVersion = new(
         Code: nameof(FileHasApiDataSetVersion),
         Message: "The file has already been used for an API data set version."
@@ -41,12 +36,8 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage DataSetVersionCanNotBeDeleted = new(
         Code: nameof(DataSetVersionCanNotBeDeleted),
-        Message: $"The data set version is not in a draft status, or is currently being processed, so cannot be deleted."
-    );
-
-    public static readonly LocalizableMessage DataSetNotFound = new(
-        Code: nameof(DataSetNotFound),
-        Message: "The data set could not be found."
+        Message:
+        "The data set version is not in a draft status, or is currently being processed, so cannot be deleted."
     );
 
     public static readonly LocalizableMessage DataSetMustHaveNoExistingVersions = new(
@@ -61,6 +52,27 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage MultipleDataSetVersionsCanNotBeDeleted = new(
         Code: nameof(MultipleDataSetVersionsCanNotBeDeleted),
-        Message: $"One or more data set versions are not in a draft status, or are currently being processed, so cannot be deleted."
-);
+        Message: "One or more data set versions are not in a draft status, " +
+                 "or are currently being processed, so cannot be deleted."
+    );
+
+    public static readonly LocalizableMessage DataSetVersionNotInMappingStatus = new(
+        Code: nameof(DataSetVersionNotInMappingStatus),
+        Message: "The data set version must be in the 'Mapping' status."
+    );
+
+    public static readonly LocalizableMessage ImportInManualMappingStateNotFound = new(
+        Code: nameof(ImportInManualMappingStateNotFound),
+        Message: "An import in mapping state could not be found."
+    );
+
+    public static readonly LocalizableMessage DataSetVersionMappingNotFound = new(
+        Code: nameof(DataSetVersionMappingNotFound),
+        Message: "A data set version mapping could not be found."
+    );
+
+    public static readonly LocalizableMessage DataSetVersionMappingsNotComplete = new(
+        Code: nameof(DataSetVersionMappingsNotComplete),
+        Message: "The data set version mappings are not complete."
+    );
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.AllowedValueValidator;
 
@@ -391,7 +392,8 @@ public static class ValidationProblemViewModelTestExtensions
         this ValidationProblemViewModel validationProblem,
         string? expectedPath,
         string expectedCode,
-        string? expectedMessage = null)
+        string? expectedMessage = null,
+        object? expectedDetail = null)
     {
         Predicate<ErrorViewModel> predicate = error =>
         {
@@ -399,7 +401,12 @@ public static class ValidationProblemViewModelTestExtensions
             {
                 return false;
             }
-            
+
+            if (expectedDetail is not null && (error.Detail is null || !error.Detail.Equals(expectedDetail)))
+            {
+                return false;
+            }
+
             return error.Path == expectedPath && error.Code == expectedCode;
         };
 

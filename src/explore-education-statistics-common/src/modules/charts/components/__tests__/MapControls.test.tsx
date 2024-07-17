@@ -35,7 +35,7 @@ describe('MapControls', () => {
     label: 'Location 1',
     group: 'LA group 1',
     level: 'localAuthority',
-    geoJson: [testGeoJsonFeature],
+    geoJson: testGeoJsonFeature,
   });
   const testLocation2 = new LocationFilter({
     id: 'location-2-id',
@@ -43,7 +43,7 @@ describe('MapControls', () => {
     label: 'Location 2',
     group: 'LA group 1',
     level: 'localAuthority',
-    geoJson: [testGeoJsonFeature],
+    geoJson: testGeoJsonFeature,
   });
   const testLocation3 = new LocationFilter({
     id: 'location-3-id',
@@ -51,7 +51,7 @@ describe('MapControls', () => {
     label: 'Location 3',
     group: 'Region group 1',
     level: 'region',
-    geoJson: [testGeoJsonFeature],
+    geoJson: testGeoJsonFeature,
   });
   const testLocation4 = new LocationFilter({
     id: 'location-4-id',
@@ -59,7 +59,7 @@ describe('MapControls', () => {
     label: 'Location 4',
     group: 'Region group 1',
     level: 'region',
-    geoJson: [testGeoJsonFeature],
+    geoJson: testGeoJsonFeature,
   });
   const testLocation5 = new LocationFilter({
     id: 'location-5-id',
@@ -67,7 +67,7 @@ describe('MapControls', () => {
     label: 'Location 5',
     group: 'Country group',
     level: 'country',
-    geoJson: [testGeoJsonFeature],
+    geoJson: testGeoJsonFeature,
   });
   const testLocation6 = new LocationFilter({
     id: 'location-6-id',
@@ -75,7 +75,7 @@ describe('MapControls', () => {
     label: 'Location 6',
     group: 'LAD group 1',
     level: 'localAuthorityDistrict',
-    geoJson: [testGeoJsonFeature],
+    geoJson: testGeoJsonFeature,
   });
   const testLocation7 = new LocationFilter({
     id: 'location-7-id',
@@ -83,7 +83,7 @@ describe('MapControls', () => {
     label: 'Location 7',
     group: 'LAD group 1',
     level: 'localAuthorityDistrict',
-    geoJson: [testGeoJsonFeature],
+    geoJson: testGeoJsonFeature,
   });
 
   const testDataSet1: DataSet = {

@@ -1,6 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
+using GeoJSON.Net.Feature;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -8,6 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
@@ -81,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         /// we created an abstract base class with a type parameter).
         /// </summary>
         protected StatisticsDbContext(
-            DbContextOptions options, 
-            int? timeout, 
+            DbContextOptions options,
+            int? timeout,
             bool updateTimestamps = true) : base(options)
         {
             Configure(timeout, updateTimestamps);
@@ -102,6 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             }
         }
 
+        public DbSet<BoundaryData> BoundaryData { get; set; } = null!;
         public DbSet<BoundaryLevel> BoundaryLevel { get; set; } = null!;
         public DbSet<Filter> Filter { get; set; } = null!;
         public DbSet<FilterFootnote> FilterFootnote { get; set; } = null!;
@@ -110,7 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<FilterItem> FilterItem { get; set; } = null!;
         public DbSet<FilterItemFootnote> FilterItemFootnote { get; set; } = null!;
         public DbSet<Footnote> Footnote { get; set; } = null!;
-        public DbSet<GeoJson> GeoJson { get; set; } = null!;
         public DbSet<Indicator> Indicator { get; set; } = null!;
         public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; } = null!;
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; } = null!;
@@ -129,9 +130,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConfigureBoundaryData(modelBuilder);
             ConfigureBoundaryLevel(modelBuilder);
             ConfigureIndicator(modelBuilder);
-            ConfigureGeoJson(modelBuilder);
             ConfigureFilter(modelBuilder);
             ConfigureFilterFootnote(modelBuilder);
             ConfigureFilterGroupFootnote(modelBuilder);
@@ -150,6 +151,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
+        }
+
+        private static void ConfigureBoundaryData(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.Code)
+                .HasMaxLength(9);
+
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.Name)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<BoundaryData>()
+                .HasOne(boundaryData => boundaryData.BoundaryLevel)
+                .WithMany();
+
+            modelBuilder.Entity<BoundaryData>()
+                .Property(boundaryData => boundaryData.GeoJson)
+                .HasConversion(
+                    feature => JsonConvert.SerializeObject(feature),
+                    feature => JsonConvert.DeserializeObject<Feature>(feature));
+
+            modelBuilder.Entity<BoundaryData>()
+                .HasIndex(boundaryData => boundaryData.Code);
         }
 
         private void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
@@ -463,11 +488,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Subject>()
                 .HasQueryFilter(s => !s.SoftDeleted);
-        }
-
-        private static void ConfigureGeoJson(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");
         }
     }
 }

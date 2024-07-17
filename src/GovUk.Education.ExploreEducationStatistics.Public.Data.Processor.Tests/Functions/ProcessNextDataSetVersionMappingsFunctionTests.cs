@@ -1238,7 +1238,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
     {
-        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
+        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ManualMapping;
 
         [Fact]
         public async Task Success()
@@ -1257,7 +1257,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
-            savedImport.Completed.AssertUtcNow();
+            Assert.Null(savedImport.Completed);
 
             Assert.Equal(DataSetVersionStatus.Mapping, savedImport.DataSetVersion.Status);
         }

@@ -40,11 +40,11 @@ export interface BoundaryLevel {
 }
 
 export interface GeoJsonFeatureProperties {
-  // these are what is required
-  code: string;
-  name: string;
-  long: number;
-  lat: number;
+  // these are what is required - Note the casing here.
+  Code: string;
+  Name: string;
+  LONG: number;
+  LAT: number;
 
   // the following are just named here for easier finding in code completion and not required
   objectid?: number;
@@ -65,14 +65,14 @@ export interface LocationOption {
   value: string;
   level?: string;
   options?: LocationLeafOption[];
-  geoJson?: GeoJsonFeature[];
+  geoJson?: GeoJsonFeature;
 }
 
 export interface LocationLeafOption {
   id?: string;
   label: string;
   value: string;
-  geoJson?: GeoJsonFeature[];
+  geoJson?: GeoJsonFeature;
 }
 
 export interface Subject {

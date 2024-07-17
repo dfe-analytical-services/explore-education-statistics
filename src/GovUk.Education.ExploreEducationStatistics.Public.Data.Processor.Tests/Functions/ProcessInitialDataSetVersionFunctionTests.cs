@@ -21,7 +21,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    private readonly string[] _allDataSetVersionFiles =
+    private static readonly string[] AllDataSetVersionFiles =
     [
         DataSetFilenames.CsvDataFile,
         DataSetFilenames.CsvMetadataFile,
@@ -58,7 +58,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                 ActivityNames.ImportMetadata,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
-                ActivityNames.CompleteInitialDataSetVersionProcessing,
+                ActivityNames.CompleteInitialDataSetVersionProcessing
             ];
 
             foreach (var activityName in expectedActivitySequence)
@@ -172,7 +172,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var directoryPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
             Directory.CreateDirectory(directoryPath);
-            foreach (var filename in _allDataSetVersionFiles)
+            foreach (var filename in AllDataSetVersionFiles)
             {
                 await File.Create(Path.Combine(directoryPath, filename)).DisposeAsync();
             }
@@ -181,15 +181,15 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
 
             // Ensure the duck db database file is the only file that was deleted
             AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion,
-                _allDataSetVersionFiles
+                AllDataSetVersionFiles
                     .Where(file => file != DataSetFilenames.DuckDbDatabaseFile)
                     .ToArray());
         }
 
         private async Task CompleteProcessing(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessInitialDataSetVersionFunction>();
-            await function.CompleteInitialDataSetVersionProcessing(instanceId, CancellationToken.None);
+            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
+            await function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
         }
     }
 }
