@@ -82,8 +82,8 @@ public abstract class NotifierFunctionsIntegrationTest
 
         return await dataTableStorageService.GetEntityIfExists<ApiSubscription>(
             tableName: appSettingsOptions.Value.ApiSubscriptionsTableName,
-            partitionKey: email,
-            rowKey: dataSetId.ToString(),
+            partitionKey: dataSetId.ToString(),
+            rowKey: email,
             select: select);
     }
 }

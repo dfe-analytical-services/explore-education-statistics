@@ -72,8 +72,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 email: _email);
 
             Assert.NotNull(subscription);
-            Assert.Equal(_email, subscription.PartitionKey);
-            Assert.Equal(_dataSetId.ToString(), subscription.RowKey);
+            Assert.Equal(_email, subscription.RowKey);
+            Assert.Equal(_dataSetId.ToString(), subscription.PartitionKey);
             Assert.Equal(_dataSetTitle, subscription.DataSetTitle);
             Assert.Equal(ApiSubscriptionStatus.SubscriptionPending, subscription.Status);
             subscription.Expiry.AssertEqual(DateTimeOffset.UtcNow.AddHours(1));
@@ -85,8 +85,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         {
             var subscription = new ApiSubscription
             {
-                PartitionKey = _email,
-                RowKey = _dataSetId.ToString(),
+                PartitionKey = _dataSetId.ToString(),
+                RowKey = _email,
                 DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.SubscriptionPending,
                 Expiry = DateTimeOffset.UtcNow.AddHours(1),
@@ -111,8 +111,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         {
             var subscription = new ApiSubscription
             {
-                PartitionKey = _email,
-                RowKey = _dataSetId.ToString(),
+                PartitionKey = _dataSetId.ToString(),
+                RowKey = _email,
                 DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed
             };
@@ -221,8 +221,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         {
             var pendingSubscription = new ApiSubscription
             {
-                PartitionKey = _email,
-                RowKey = _dataSetId.ToString(),
+                PartitionKey = _dataSetId.ToString(),
+                RowKey =_email,
                 DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.SubscriptionPending,
                 Expiry = DateTime.UtcNow,
@@ -249,7 +249,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     => unsubscribeLink = values["unsubscribe_link"]);
 
             var tokenService = GetRequiredService<ITokenService>();
-            var subscribeToken = tokenService.GenerateToken(pendingSubscription.PartitionKey, pendingSubscription.Expiry.Value.UtcDateTime);
+            var subscribeToken = tokenService.GenerateToken(pendingSubscription.RowKey, pendingSubscription.Expiry.Value.UtcDateTime);
 
             var result = await VerifyApiSubscription(
                 dataSetId: _dataSetId,
@@ -271,8 +271,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 email: _email);
 
             Assert.NotNull(verifiedSubscription);
-            Assert.Equal(_email, verifiedSubscription.PartitionKey);
-            Assert.Equal(_dataSetId.ToString(), verifiedSubscription.RowKey);
+            Assert.Equal(_email, verifiedSubscription.RowKey);
+            Assert.Equal(_dataSetId.ToString(), verifiedSubscription.PartitionKey);
             Assert.Equal(_dataSetTitle, verifiedSubscription.DataSetTitle);
             Assert.Equal(ApiSubscriptionStatus.Subscribed, verifiedSubscription.Status);
             Assert.Null(verifiedSubscription.Expiry);
@@ -297,8 +297,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         {
             var verifiedSubscription = new ApiSubscription
             {
-                PartitionKey = _email,
-                RowKey = _dataSetId.ToString(),
+                PartitionKey = _dataSetId.ToString(),
+                RowKey = _email,
                 DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed
             };
@@ -306,7 +306,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             await CreateApiSubscription(verifiedSubscription);
 
             var tokenService = GetRequiredService<ITokenService>();
-            var subscribeToken = tokenService.GenerateToken(verifiedSubscription.PartitionKey, DateTime.UtcNow);
+            var subscribeToken = tokenService.GenerateToken(verifiedSubscription.RowKey, DateTime.UtcNow);
 
             var result = await VerifyApiSubscription(
                 dataSetId: _dataSetId,

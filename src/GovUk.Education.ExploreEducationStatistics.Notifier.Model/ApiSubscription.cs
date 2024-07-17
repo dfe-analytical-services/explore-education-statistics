@@ -7,13 +7,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 public class ApiSubscription : ITableEntity
 {
     /// <summary>
-    /// This should be set to the <b>email address</b> of the user subscribing.
+    /// This should be set to the API <b>Data Set ID</b> that the user is subscribing to.
     /// <br/><br/>
     /// <inheritdoc/>
     /// </summary>
     public required string PartitionKey { get; set; }
     /// <summary>
-    /// This should be set to the API <b>Data Set ID</b> that the user is subscribing to.
+    /// This should be set to the <b>email address</b> of the user subscribing.
     /// <br/><br/>
     /// <inheritdoc/>
     /// </summary>
