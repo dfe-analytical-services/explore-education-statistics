@@ -50,7 +50,9 @@ export default function BoundaryDataUploadPage() {
     return Yup.object({
       boundaryLevel: Yup.string().required('Select a boundary level type'),
       boundaryLevelLabel: Yup.string().required('Enter a boundary level name'),
-      boundaryDataFile: Yup.file().required('Select a boundary file').maxSize(134217728, 'Boundary file must be under 128mb in size'),
+      boundaryDataFile: Yup.file()
+        .required('Select a boundary file')
+        .maxSize(134217728, 'Boundary file must be under 128mb in size'),
       boundaryLevelPublishedDate: Yup.date().required(
         'Enter a boundary file publication date',
       ),
