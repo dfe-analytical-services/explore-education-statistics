@@ -68,7 +68,7 @@ public class ApiSubscriptionFunctions(
 
     [Function("RemoveExpiredApiSubscriptions")]
     public async Task RemoveExpiredApiSubscriptions(
-        [TimerTrigger("0 0 * * * *")] TimerInfo timerInfo,
+        [TimerTrigger("0 * * * * *")] TimerInfo timerInfo,
         FunctionContext context,
         CancellationToken cancellationToken)
     {
