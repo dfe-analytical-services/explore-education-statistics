@@ -123,7 +123,7 @@ Validate Contact page
 Validate Accessibility statement page
     user clicks link    Accessibility statement
     user waits until h1 is visible    Accessibility statement for Explore education statistics
-    user waits until h2 is visible    What we’re doing to improve accessibility
+    user waits until h2 is visible    How you should be able to use this website
 
     user checks url contains    %{PUBLIC_URL}/accessibility-statement
 
