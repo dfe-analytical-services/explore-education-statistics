@@ -24,6 +24,7 @@ import InsetText from '@common/components/InsetText';
 import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';
 import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { formId } from './ReleaseStatusForm';
 
 interface ChecklistMessage {
@@ -37,6 +38,8 @@ interface Props {
 }
 
 const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
+  const { user } = useAuthContext();
+
   const releaseRouteParams = useMemo<ReleaseRouteParams>(
     () => ({
       releaseId: release.id,
@@ -50,6 +53,13 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
       releaseDataRoute.path,
       releaseRouteParams,
     )}#${releaseDataPageTabIds.dataUploads}`;
+
+    const apiDataSetsTabRoute = user?.permissions.isBauUser
+      ? `${generatePath<ReleaseRouteParams>(
+          releaseDataRoute.path,
+          releaseRouteParams,
+        )}#${releaseDataPageTabIds.apiDataSets}`
+      : undefined;
 
     return checklist.errors.map(error => {
       switch (error.code) {
@@ -126,25 +136,25 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'PublicApiDataSetImportsMustBeCompleted':
           return {
-            message: 'All Public API data set imports must be completed',
-            link: dataUploadsTabRoute,
+            message: 'All public API data set processing must be completed',
+            link: apiDataSetsTabRoute,
           };
         case 'PublicApiDataSetCancellationsMustBeResolved':
           return {
             message:
-              'All cancelled Public API data set imports must be removed or completed',
-            link: dataUploadsTabRoute,
+              'All cancelled public API data sets must be removed or completed',
+            link: apiDataSetsTabRoute,
           };
         case 'PublicApiDataSetFailuresMustBeResolved':
           return {
             message:
-              'All failed Public API data set imports must be retried or removed',
-            link: dataUploadsTabRoute,
+              'All failed public API data sets must be retried or removed',
+            link: apiDataSetsTabRoute,
           };
         case 'PublicApiDataSetMappingsMustBeCompleted':
           return {
-            message: 'All Public API data set mappings must be completed',
-            link: dataUploadsTabRoute,
+            message: 'All public API data set mappings must be completed',
+            link: apiDataSetsTabRoute,
           };
         default:
           // Show error code, even if there is no mapping,
@@ -154,7 +164,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
       }
     });
-  }, [checklist.errors, releaseRouteParams]);
+  }, [checklist.errors, releaseRouteParams, user?.permissions.isBauUser]);
 
   const warnings = useMemo<ChecklistMessage[]>(() => {
     return checklist.warnings.map(warning => {
