@@ -27,4 +27,6 @@ public class ApiSubscription : ITableEntity
     public DateTimeOffset? Expiry { get; set; }
     public DateTimeOffset? Timestamp { get; set; }
     public ETag ETag { get; set; }
+
+    public bool HasExpired => Expiry <= DateTimeOffset.UtcNow;
 }

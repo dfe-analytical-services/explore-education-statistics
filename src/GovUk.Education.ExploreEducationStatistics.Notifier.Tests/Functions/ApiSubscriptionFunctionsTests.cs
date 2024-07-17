@@ -225,7 +225,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 RowKey =_email,
                 DataSetTitle = _dataSetTitle,
                 Status = ApiSubscriptionStatus.SubscriptionPending,
-                Expiry = DateTime.UtcNow,
+                Expiry = DateTime.UtcNow.AddHours(1),
             };
 
             await CreateApiSubscription(pendingSubscription);
@@ -317,6 +317,34 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             validationProblem.AssertHasError(
                 expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst(),
                 expectedCode: ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code);
+        }
+
+        [Fact]
+        public async Task PendingSubscriptionAlreadyExpired_400()
+        {
+            var verifiedSubscription = new ApiSubscription
+            {
+                PartitionKey = _dataSetId.ToString(),
+                RowKey = _email,
+                DataSetTitle = _dataSetTitle,
+                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Expiry = DateTimeOffset.UtcNow.AddHours(-1)
+            };
+
+            await CreateApiSubscription(verifiedSubscription);
+
+            var tokenService = GetRequiredService<ITokenService>();
+            var subscribeToken = tokenService.GenerateToken(verifiedSubscription.RowKey, DateTime.UtcNow);
+
+            var result = await VerifyApiSubscription(
+                dataSetId: _dataSetId,
+                token: subscribeToken);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst(),
+                expectedCode: ValidationMessages.ApiPendingSubscriptionAlreadyExpired.Code);
         }
 
         [Fact]

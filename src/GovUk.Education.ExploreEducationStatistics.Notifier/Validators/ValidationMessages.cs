@@ -14,6 +14,11 @@ public static class ValidationMessages
         Message: "The user is already subscribed to the API data set."
     );
 
+    public static readonly LocalizableMessage ApiPendingSubscriptionAlreadyExpired = new(
+        Code: nameof(ApiPendingSubscriptionAlreadyExpired),
+        Message: "The unverified subscription has expired. The user must request a new subscription."
+    );
+
     public static readonly LocalizableMessage AuthorizationTokenInvalid = new(
         Code: nameof(AuthorizationTokenInvalid),
         Message: "The authorization token is invalid."

@@ -183,6 +183,17 @@ internal class ApiSubscriptionService(
             });
         }
 
+        if (subscription.HasExpired)
+        {
+            return ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Code = ValidationMessages.ApiPendingSubscriptionAlreadyExpired.Code,
+                Message = ValidationMessages.ApiPendingSubscriptionAlreadyExpired.Message,
+                Detail = new ApiSubscriptionErrorDetail(Guid.Parse(subscription.PartitionKey), subscription.RowKey),
+                Path = nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst()
+            });
+        }
+
         subscription.Expiry = null;
         subscription.Status = ApiSubscriptionStatus.Subscribed;
 
