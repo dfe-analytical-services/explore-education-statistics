@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -10,9 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public record DataBlockCreateRequest
 {
-    [Required] public string Heading { get; init; } = string.Empty;
+    public required string Heading { get; init; }
 
-    [Required] public string Name { get; init; } = string.Empty;
+    public required string Name { get; init; }
 
     public string Source { get; init; } = string.Empty;
 
@@ -26,6 +25,12 @@ public record DataBlockCreateRequest
     {
         public Validator()
         {
+            RuleFor(request => request.Heading)
+                .NotEmpty();
+
+            RuleFor(request => request.Name)
+                .NotEmpty();
+
             RuleFor(request => request.Query)
                 .SetValidator(new FullTableQueryRequest.Validator());
         }
@@ -34,11 +39,9 @@ public record DataBlockCreateRequest
 
 public record DataBlockUpdateRequest
 {
-    [Required]
-    public string Heading { get; init; } = string.Empty;
+    public required string Heading { get; init; }
 
-    [Required]
-    public string Name { get; init; } = string.Empty;
+    public required string Name { get; init; }
 
     public string Source { get; init; } = string.Empty;
 
@@ -52,6 +55,12 @@ public record DataBlockUpdateRequest
     {
         public Validator()
         {
+            RuleFor(request => request.Heading)
+                .NotEmpty();
+
+            RuleFor(request => request.Name)
+                .NotEmpty();
+
             RuleFor(request => request.Query)
                 .SetValidator(new FullTableQueryRequest.Validator());
         }

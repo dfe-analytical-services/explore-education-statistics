@@ -91,10 +91,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateContentBlockMap();
             CreateMap<DataBlockCreateRequest, DataBlock>()
                 .ForMember(dest => dest.Query,
-                    m => m.MapFrom(c => c.Query.AsObservationQueryContext()));
+                    m => m.MapFrom(c => c.Query.AsFullTableQuery()));
             CreateMap<DataBlockUpdateRequest, DataBlock>()
                 .ForMember(dest => dest.Query,
-                    m => m.MapFrom(c => c.Query.AsObservationQueryContext()));
+                    m => m.MapFrom(c => c.Query.AsFullTableQuery()));
 
             CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
             CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();

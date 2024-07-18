@@ -167,8 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddHttpContextAccessor();
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssemblyContaining<FullTableQueryRequest.Validator>();
-            services.AddValidatorsFromAssemblyContaining<LocationsOrTimePeriodsQueryRequest.Validator>();
+            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
 
             services.AddMvc(options =>
             {

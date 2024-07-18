@@ -53,7 +53,7 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
 
     public async Task<Either<ActionResult, SubjectCsvMetaViewModel>> GetSubjectCsvMeta(
         ReleaseSubject releaseSubject,
-        ObservationQueryContext query,
+        FullTableQuery query,
         IList<Observation> observations,
         CancellationToken cancellationToken = default)
     {
@@ -195,7 +195,7 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
     }
 
     private async Task<Dictionary<string, IndicatorCsvMetaViewModel>> GetIndicators(
-        ObservationQueryContext query)
+        FullTableQuery query)
     {
         return await _statisticsDbContext.Indicator
             .AsNoTracking()

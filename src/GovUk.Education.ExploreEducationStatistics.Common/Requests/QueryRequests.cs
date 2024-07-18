@@ -18,6 +18,19 @@ public record FullTableQueryRequest
 
     public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
+    public FullTableQuery AsFullTableQuery()
+    {
+        return new FullTableQuery
+        {
+            SubjectId = this.SubjectId,
+            LocationIds = this.LocationIds,
+            TimePeriod = this.TimePeriod,
+            Filters = this.Filters,
+            Indicators = this.Indicators,
+            BoundaryLevel = null,
+        };
+    }
+
     public class Validator : AbstractValidator<FullTableQueryRequest>
     {
         public Validator()
@@ -46,6 +59,19 @@ public class LocationsOrTimePeriodsQueryRequest
 
     public TimePeriodQuery? TimePeriod { get; set; }
 
+    public FullTableQuery AsFullTableQuery()
+    {
+        return new FullTableQuery
+        {
+            SubjectId = this.SubjectId,
+            LocationIds = this.LocationIds,
+            TimePeriod = this.TimePeriod,
+            Filters = [],
+            Indicators = [],
+            BoundaryLevel = null,
+        };
+    }
+
     public class Validator : AbstractValidator<LocationsOrTimePeriodsQueryRequest>
     {
         public Validator()
@@ -55,36 +81,5 @@ public class LocationsOrTimePeriodsQueryRequest
 
             // No TimePeriods check, as it may be null, but also could be set
         }
-    }
-}
-
-public static class QueryContextMappingExtensions
-{
-    public static ObservationQueryContext AsObservationQueryContext(
-        this FullTableQueryRequest fullTableQueryRequest)
-    {
-        return new ObservationQueryContext
-        {
-            SubjectId = fullTableQueryRequest.SubjectId,
-            LocationIds = fullTableQueryRequest.LocationIds,
-            TimePeriod = fullTableQueryRequest.TimePeriod,
-            Filters = fullTableQueryRequest.Filters,
-            Indicators = fullTableQueryRequest.Indicators,
-            BoundaryLevel = null,
-        };
-    }
-
-    public static ObservationQueryContext AsObservationQueryContext(
-        this LocationsOrTimePeriodsQueryRequest locationsOrTimePeriodsQueryRequest)
-    {
-        return new ObservationQueryContext
-        {
-            SubjectId = locationsOrTimePeriodsQueryRequest.SubjectId,
-            LocationIds = locationsOrTimePeriodsQueryRequest.LocationIds,
-            TimePeriod = locationsOrTimePeriodsQueryRequest.TimePeriod,
-            Filters = [],
-            Indicators = [],
-            BoundaryLevel = null,
-        };
     }
 }

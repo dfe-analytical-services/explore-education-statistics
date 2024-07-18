@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Source { get; init; }  = string.Empty;
 
-        public ObservationQueryContext Query { get; init; } = null!;
+        public FullTableQuery Query { get; init; } = null!;
 
         public List<IChart> Charts { get; init; } = new();
 

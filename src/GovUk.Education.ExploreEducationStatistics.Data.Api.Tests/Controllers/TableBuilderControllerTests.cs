@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .DefaultDataBlockVersion()
                 .WithReleaseVersion(ReleaseVersion)
                 .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(new ObservationQueryContext
+                .WithQuery(new FullTableQuery
                 {
                     SubjectId = Guid.NewGuid(),
                     LocationIds = [ Guid.NewGuid(), ],
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private static readonly Guid DataBlockParentId = DataBlockParent.Id;
 
-        private static readonly ObservationQueryContext ObservationQueryContext =
+        private static readonly FullTableQuery FullTableQuery =
             DataBlockParent.LatestPublishedVersion!.Query;
 
         private static readonly TableBuilderConfiguration TableConfiguration =
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             tableBuilderService
                 .Setup(
                     s => s.Query(
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
             var response = await client
-                .PostAsync("/api/tablebuilder", new JsonNetContent(ObservationQueryContext));
+                .PostAsync("/api/tablebuilder", new JsonNetContent(FullTableQuery));
 
             VerifyAllMocks(tableBuilderService);
 
@@ -157,13 +157,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             tableBuilderService
                 .Setup(
                     s => s.QueryToCsvStream(
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<Stream>(),
                         It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
-                .Callback<ObservationQueryContext, Stream, CancellationToken>(
+                .Callback<FullTableQuery, Stream, CancellationToken>(
                     (_, stream, _) => { stream.WriteText("Test csv"); }
                 );
 
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync("/api/tablebuilder",
-                    content: new JsonNetContent(ObservationQueryContext), // binds to FullTableQueryRequest
+                    content: new JsonNetContent(FullTableQuery), // binds to FullTableQueryRequest
                     headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(
                     s => s.Query(
                         ReleaseVersionId,
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync($"/api/tablebuilder/release/{ReleaseVersionId}",
-                    new JsonNetContent(ObservationQueryContext));
+                    new JsonNetContent(FullTableQuery));
 
             VerifyAllMocks(tableBuilderService);
 
@@ -222,13 +222,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(
                     s => s.QueryToCsvStream(
                         ReleaseVersionId,
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<Stream>(),
                         It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, ObservationQueryContext, Stream, CancellationToken>(
+                .Callback<Guid, FullTableQuery, Stream, CancellationToken>(
                     (_, _, stream, _) => { stream.WriteText("Test csv"); }
                 );
 
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync($"/api/tablebuilder/release/{ReleaseVersionId}",
-                    content: new JsonNetContent(ObservationQueryContext),
+                    content: new JsonNetContent(FullTableQuery),
                     headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
@@ -487,11 +487,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var queryViewModel = viewModel.Query;
             Assert.NotNull(queryViewModel);
             Assert.Equal(PublicationId, queryViewModel.PublicationId);
-            Assert.Equal(ObservationQueryContext.SubjectId, viewModel.Query.SubjectId);
-            Assert.Equal(ObservationQueryContext.TimePeriod, viewModel.Query.TimePeriod);
-            Assert.Equal(ObservationQueryContext.Filters, viewModel.Query.Filters);
-            Assert.Equal(ObservationQueryContext.Indicators, viewModel.Query.Indicators);
-            Assert.Equal(ObservationQueryContext.LocationIds, viewModel.Query.LocationIds);
+            Assert.Equal(FullTableQuery.SubjectId, viewModel.Query.SubjectId);
+            Assert.Equal(FullTableQuery.TimePeriod, viewModel.Query.TimePeriod);
+            Assert.Equal(FullTableQuery.Filters, viewModel.Query.Filters);
+            Assert.Equal(FullTableQuery.Indicators, viewModel.Query.Indicators);
+            Assert.Equal(FullTableQuery.LocationIds, viewModel.Query.LocationIds);
         }
 
         [Fact]

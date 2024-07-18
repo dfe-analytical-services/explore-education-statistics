@@ -93,7 +93,7 @@ public static class ProcessorHostBuilder
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
                 
-                services.AddValidatorsFromAssemblyContaining<DataSetCreateRequest.Validator>();
+                services.AddValidatorsFromAssembly(typeof(DataSetCreateRequest.Validator).Assembly); // Adds *all* validators from Public.Data.Processor
             });
     }
 }

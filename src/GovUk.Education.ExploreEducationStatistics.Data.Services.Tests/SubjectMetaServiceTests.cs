@@ -705,8 +705,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 observationService
                     .Setup(s => s.GetMatchedObservations(
-                        It.Is<ObservationQueryContext>(ctx => ctx
-                                .Equals(request.AsObservationQueryContext())),
+                        It.Is<FullTableQuery>(ctx => ctx
+                                .Equals(request.AsFullTableQuery())),
                         cancellationToken))
                     .ReturnsAsync(statisticsDbContext.MatchedObservations);
 

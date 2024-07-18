@@ -204,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     var observations =
                         await observationService.GetMatchedObservations(
-                            request.AsObservationQueryContext(),
+                            request.AsFullTableQuery(),
                             cancellationToken);
                     logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();

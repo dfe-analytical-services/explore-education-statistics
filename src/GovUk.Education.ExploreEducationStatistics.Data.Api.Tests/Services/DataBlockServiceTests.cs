@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         s =>
                             s.Query(
                                 dataBlockVersion.ReleaseVersionId,
-                                It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
+                                It.Is<FullTableQuery>(q => q.SubjectId == subjectId),
                                 default
                             )
                     )

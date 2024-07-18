@@ -69,7 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.Create(ReleaseVersion.Id, new DataBlockCreateRequest());
+                        return service.Create(ReleaseVersion.Id, new DataBlockCreateRequest
+                        {
+                            Heading = "Heading 1",
+                            Name = "Name 1",
+                        });
                     });
         }
 
@@ -82,7 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.Update(DataBlockVersion.Id, new DataBlockUpdateRequest());
+                        return service.Update(DataBlockVersion.Id, new DataBlockUpdateRequest
+                        {
+                            Heading = "Heading 1",
+                            Name = "Name 1",
+                        });
                     });
         }
 

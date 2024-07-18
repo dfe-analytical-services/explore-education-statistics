@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .OnSuccess(releaseVersionId =>
                 {
                     return _tableBuilderService.Query(releaseVersionId,
-                            request.Query.AsObservationQueryContext(),
+                            request.Query.AsFullTableQuery(),
                             cancellationToken)
                         .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                         {

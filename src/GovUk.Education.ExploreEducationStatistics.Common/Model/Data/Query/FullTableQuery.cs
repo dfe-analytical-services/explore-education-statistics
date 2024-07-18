@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 {
-    public record ObservationQueryContext
+    public record FullTableQuery
     {
         public Guid SubjectId { get; set; }
 
@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 
         public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
-        // TODO EES-3328 - remove BoundaryLevel from ObservationQueryContext as we now store it on
+        // TODO EES-3328 - remove BoundaryLevel from FullTableQuery as we now store it on
         // MapChart configuration instead
         public long? BoundaryLevel { get; set; }
     }

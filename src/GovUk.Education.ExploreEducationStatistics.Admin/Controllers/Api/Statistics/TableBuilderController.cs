@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
                 return await _tableBuilderService.QueryToCsvStream(
                     releaseVersionId: releaseVersionId,
-                    queryContext: request.AsObservationQueryContext(),
+                    query: request.AsFullTableQuery(),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationToken
                 )
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, request.AsObservationQueryContext(), cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 

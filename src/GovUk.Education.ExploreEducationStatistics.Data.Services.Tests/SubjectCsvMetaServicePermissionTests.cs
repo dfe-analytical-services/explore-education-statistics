@@ -39,7 +39,7 @@ public class SubjectCsvMetaServicePermissionTests
                 {
                     var service = BuildService(userService.Object);
 
-                    var query = new ObservationQueryContext
+                    var query = new FullTableQuery
                     {
                         SubjectId = SubjectId
                     };

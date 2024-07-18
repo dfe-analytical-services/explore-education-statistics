@@ -45,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             }
         };
 
-        private static readonly ObservationQueryContext ObservationQueryContext =
-            FullTableQueryRequest.AsObservationQueryContext();
+        private static readonly FullTableQuery FullTableQuery =
+            FullTableQueryRequest.AsFullTableQuery();
 
         private readonly TableBuilderResultViewModel _tableBuilderResults = new()
         {
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             tableBuilderService
                 .Setup(s => s.Query(
                     ReleaseVersionId,
-                    ItIs.DeepEqualTo(ObservationQueryContext),
+                    ItIs.DeepEqualTo(FullTableQuery),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_tableBuilderResults);
 
@@ -103,11 +103,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             tableBuilderService
                 .Setup(s => s.QueryToCsvStream(
                     ReleaseVersionId,
-                    ItIs.DeepEqualTo(ObservationQueryContext),
+                    ItIs.DeepEqualTo(FullTableQuery),
                     It.IsAny<Stream>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, ObservationQueryContext, Stream, CancellationToken>(
+                .Callback<Guid, FullTableQuery, Stream, CancellationToken>(
                     (_, _, stream, _) => { stream.WriteText("Test csv"); });
 
             var client = SetupApp(tableBuilderService: tableBuilderService.Object)

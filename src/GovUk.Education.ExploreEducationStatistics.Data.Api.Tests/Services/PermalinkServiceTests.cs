@@ -366,8 +366,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             tableBuilderService
                 .Setup(s => s.Query(releaseVersion.Id,
-                    It.Is<ObservationQueryContext>(ctx =>
-                        ctx.Equals(request.Query.AsObservationQueryContext())),
+                    It.Is<FullTableQuery>(ctx =>
+                        ctx.Equals(request.Query.AsFullTableQuery())),
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
@@ -689,8 +689,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             tableBuilderService
                 .Setup(s => s.Query(releaseVersion.Id,
-                    It.Is<ObservationQueryContext>(ctx =>
-                        ctx.Equals(request.Query.AsObservationQueryContext())),
+                    It.Is<FullTableQuery>(ctx =>
+                        ctx.Equals(request.Query.AsFullTableQuery())),
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 

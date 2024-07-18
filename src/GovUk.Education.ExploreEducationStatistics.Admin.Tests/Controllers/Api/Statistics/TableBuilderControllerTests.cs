@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersionId(ReleaseVersionId)
-                    .WithQuery(FullTableQueryRequest.AsObservationQueryContext()))
+                    .WithQuery(FullTableQueryRequest.AsFullTableQuery()))
                 .Generate();
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     s =>
                         s.Query(
                             ReleaseVersionId,
-                            It.Is<ObservationQueryContext>(
+                            It.Is<FullTableQuery>(
                                 q => q.SubjectId == FullTableQueryRequest.SubjectId
                             ),
                             cancellationToken

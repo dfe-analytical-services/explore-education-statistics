@@ -92,8 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             });
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssemblyContaining<FullTableQueryRequest.Validator>();
-            services.AddValidatorsFromAssemblyContaining<LocationsOrTimePeriodsQueryRequest.Validator>();
+            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options

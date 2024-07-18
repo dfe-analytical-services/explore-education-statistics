@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Response.ContentDispositionAttachment(ContentTypes.Csv);
 
                 return await _tableBuilderService.QueryToCsvStream(
-                    queryContext: request.AsObservationQueryContext(),
+                    query: request.AsFullTableQuery(),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationToken
                 )
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return await _tableBuilderService
-                .Query(request.AsObservationQueryContext(), cancellationToken)
+                .Query(request.AsFullTableQuery(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
                 return await _tableBuilderService.QueryToCsvStream(
                         releaseVersionId: releaseVersionId,
-                        queryContext: request.AsObservationQueryContext(),
+                        query: request.AsFullTableQuery(),
                         stream: Response.BodyWriter.AsStream(),
                         cancellationToken: cancellationToken
                     )
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, request.AsObservationQueryContext(), cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
