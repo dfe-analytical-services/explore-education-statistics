@@ -327,7 +327,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst(),
+                expectedPath: "dataSetId",
                 expectedCode: ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code);
         }
 
@@ -355,7 +355,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst(),
+                expectedPath: "dataSetId",
                 expectedCode: ValidationMessages.ApiPendingSubscriptionAlreadyExpired.Code);
         }
 
@@ -387,7 +387,126 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 cancellationToken: CancellationToken.None);
         }
     }
+    
+    public class ApiUnsubscribeTests(NotifierFunctionsIntegrationTestFixture fixture)
+        : ApiSubscriptionFunctionsTests(fixture)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            var subscription = new ApiSubscription
+            {
+                PartitionKey = _dataSetId.ToString(),
+                RowKey = _email,
+                DataSetTitle = _dataSetTitle,
+                Status = ApiSubscriptionStatus.Subscribed,
+                Expiry = null,
+            };
 
+            await CreateApiSubscription(subscription);
+
+            var tokenService = GetRequiredService<ITokenService>();
+            var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, DateTime.UtcNow.AddYears(1));
+
+            var result = await Unsubscribe(
+                dataSetId: _dataSetId,
+                token: unsubscribeToken);
+
+            result.AssertNoContent();
+
+            var deletedSubscription = await GetApiSubscriptionIfExists(
+                dataSetId: _dataSetId,
+                email: _email);
+
+            Assert.Null(deletedSubscription);
+        }
+
+        [Fact]
+        public async Task SubscriptionDoesNotExist_404()
+        {
+            var tokenService = GetRequiredService<ITokenService>();
+            var unsubscribeToken = tokenService.GenerateToken(_email, DateTime.UtcNow.AddYears(1));
+
+            var result = await Unsubscribe(
+                dataSetId: _dataSetId,
+                token: unsubscribeToken);
+
+            result.AssertNotFoundResult();
+        }
+
+        [Fact]
+        public async Task SubscriptionIsStillPending_400()
+        {
+            var subscription = new ApiSubscription
+            {
+                PartitionKey = _dataSetId.ToString(),
+                RowKey = _email,
+                DataSetTitle = _dataSetTitle,
+                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Expiry = DateTimeOffset.UtcNow,
+            };
+
+            await CreateApiSubscription(subscription);
+
+            var tokenService = GetRequiredService<ITokenService>();
+            var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, subscription.Expiry.Value.UtcDateTime);
+
+            var result = await Unsubscribe(
+                dataSetId: _dataSetId,
+                token: unsubscribeToken);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "dataSetId",
+                expectedCode: ValidationMessages.ApiSubscriptionHasNotBeenVerified.Code);
+        }
+
+        [Fact]
+        public async Task UnsubscribeTokenInvalid_400()
+        {
+            var result = await Unsubscribe(
+                dataSetId: _dataSetId,
+                token: "");
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "token",
+                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code);
+        }
+
+        [Fact]
+        public async Task UnsubscribeTokenExpired_400()
+        {
+            var tokenService = GetRequiredService<ITokenService>();
+            var unsubscribeToken = tokenService.GenerateToken(_email, DateTime.UtcNow.AddYears(-1));
+
+            var result = await Unsubscribe(
+                dataSetId: _dataSetId,
+                token: unsubscribeToken);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "token",
+                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code);
+        }
+
+        private async Task<IActionResult> Unsubscribe(
+            Guid dataSetId,
+            string token,
+            FunctionContext? functionContext = null)
+        {
+            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionFunctions>();
+
+            return await apiSubscriptionManager.ApiUnsubscribe(
+                context: functionContext ?? new TestFunctionContext(),
+                dataSetId: dataSetId,
+                token: token,
+                cancellationToken: CancellationToken.None);
+        }
+    }
     public class RemoveExpiredApiSubscriptionsTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
