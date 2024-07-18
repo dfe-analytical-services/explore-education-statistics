@@ -17,15 +17,27 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
 
     /*
      * Grant the other application user roles privileges to look up objects on the public schema.
-     * Additional privileges are granted to these application user roles by the initial migration.
      */
     GRANT USAGE ON SCHEMA public TO app_public_data_processor;
     GRANT USAGE ON SCHEMA public TO app_admin;
     GRANT USAGE ON SCHEMA public TO app_publisher;
 
     /*
-     * Create an admin group role which can be granted to user roles requiring privileges on public schema objects.
-     * Privileges are granted to this admin group role by the initial migration.
+     * Create a public_data_read_write group role which can be granted to user roles requiring read and write privileges on public schema objects.
      */
-    CREATE ROLE public_data_admin WITH NOLOGIN;
+    CREATE ROLE public_data_read_write WITH NOLOGIN;
+
+    /*
+     * Grant privileges to the public_data_read_write group role for all tables and sequences in the public schema subsequently created by app_public_data_api.
+     */
+    ALTER DEFAULT PRIVILEGES FOR ROLE app_public_data_api IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES ON TABLES TO public_data_read_write;
+    ALTER DEFAULT PRIVILEGES FOR ROLE app_public_data_api IN SCHEMA public GRANT SELECT, UPDATE ON SEQUENCES TO public_data_read_write;
+
+    /*
+     * Grant membership of the public_data_read_write group role to the application user roles.
+     */
+    GRANT public_data_read_write TO app_public_data_api;
+    GRANT public_data_read_write TO app_public_data_processor;
+    GRANT public_data_read_write TO app_admin;
+    GRANT public_data_read_write TO app_publisher;
 EOSQL
