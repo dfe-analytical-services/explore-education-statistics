@@ -572,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasColumnName("DataBlock_Query")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
+                    v => JsonConvert.DeserializeObject<FullTableQuery>(v));
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)

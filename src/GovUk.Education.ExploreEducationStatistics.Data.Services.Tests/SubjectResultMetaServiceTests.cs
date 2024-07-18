@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_SubjectNotFound()
         {
-            var query = new ObservationQueryContext();
+            var query = new FullTableQuery();
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var observations = new List<Observation>();
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -298,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -523,7 +523,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -762,7 +762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             });
 
             // Setup a query requesting GeoJSON (by virtue of having a boundary level set)
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 BoundaryLevel = 123,
                 Indicators = new List<Guid>(),

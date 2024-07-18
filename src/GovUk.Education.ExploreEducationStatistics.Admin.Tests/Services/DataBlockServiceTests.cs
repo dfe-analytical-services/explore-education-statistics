@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -23,7 +24,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -391,7 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Order = 5,
                 Created = new DateTime(2000, 1, 1),
                 ContentSectionId = Guid.NewGuid(),
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     Filters = new List<Guid>
                     {
@@ -442,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Source = "Test source 2",
                 Order = 7,
                 Created = new DateTime(2001, 2, 2),
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     Filters = new List<Guid>
                     {
@@ -569,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Order = 5,
                 Created = new DateTime(2000, 1, 1),
                 ContentSectionId = Guid.NewGuid(),
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     Filters = new List<Guid>
                     {
@@ -1221,12 +1221,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var createRequest = new DataBlockCreateViewModel
+            var createRequest = new DataBlockCreateRequest
             {
                 Heading = "Test heading",
                 Name = "Test name",
                 Source = "Test source",
-                Query = new ObservationQueryContext
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId,
                     Filters = new List<Guid>
@@ -1274,7 +1274,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.Name, viewModel.Name);
                 Assert.Equal(createRequest.Source, viewModel.Source);
 
-                createRequest.Query.AssertDeepEqualTo(viewModel.Query);
+                createRequest.Query.AsFullTableQuery()
+                    .AssertDeepEqualTo(viewModel.Query);
                 Assert.Equal(createRequest.Table, viewModel.Table);
                 Assert.Equal(createRequest.Charts, viewModel.Charts);
 
@@ -1321,7 +1322,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.Name, dataBlock.Name);
                 Assert.Equal(createRequest.Source, dataBlock.Source);
 
-                createRequest.Query.AssertDeepEqualTo(dataBlock.Query);
+                createRequest.Query.AsFullTableQuery()
+                    .AssertDeepEqualTo(dataBlock.Query);
                 createRequest.Table.AssertDeepEqualTo(dataBlock.Table);
                 createRequest.Charts.AssertDeepEqualTo(dataBlock.Charts);
 
@@ -1368,10 +1370,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var createRequest = new DataBlockCreateViewModel
+            var createRequest = new DataBlockCreateRequest
             {
                 Heading = "Test heading",
-                Query = new ObservationQueryContext
+                Name = "Test name",
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1421,7 +1424,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var createRequest = new DataBlockCreateViewModel();
+            var createRequest = new DataBlockCreateRequest
+            {
+                Heading = "Heading 1",
+                Name = "Name 1",
+            };
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -1487,12 +1494,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new DataBlockUpdateViewModel
+            var updateRequest = new DataBlockUpdateRequest
             {
                 Heading = "New heading",
                 Name = "New name",
                 Source = "New source",
-                Query = new ObservationQueryContext
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1542,7 +1549,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectId, updateResult.DataSetId);
                 Assert.Equal("test file", updateResult.DataSetName);
 
-                Assert.Equal(updateRequest.Query, updateResult.Query);
+                updateRequest.Query.AsFullTableQuery()
+                    .AssertDeepEqualTo(updateResult.Query);
                 Assert.Equal(updateRequest.Table, updateResult.Table);
                 Assert.Equal(updateRequest.Charts, updateResult.Charts);
             }
@@ -1556,7 +1564,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
-                updateRequest.Query.AssertDeepEqualTo(updatedDataBlock.Query);
+                updateRequest.Query.AsFullTableQuery()
+                    .AssertDeepEqualTo(updatedDataBlock.Query);
                 updateRequest.Table.AssertDeepEqualTo(updatedDataBlock.Table);
                 updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
             }
@@ -1608,10 +1617,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new DataBlockUpdateViewModel
+            var updateRequest = new DataBlockUpdateRequest
             {
                 Heading = "New heading",
-                Query = new ObservationQueryContext
+                Name = "New name",
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },
@@ -1681,7 +1691,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using var context = InMemoryContentDbContext(contextId);
 
             var service = BuildDataBlockService(context);
-            var result = await service.Update(Guid.NewGuid(), new DataBlockUpdateViewModel());
+            var result = await service.Update(Guid.NewGuid(),
+                new DataBlockUpdateRequest()
+                {
+                    Heading = "Heading 1",
+                    Name = "Name 1",
+                });
 
             result.AssertNotFound();
         }
@@ -1741,9 +1756,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new DataBlockUpdateViewModel
+            var updateRequest = new DataBlockUpdateRequest
             {
-                Query = new ObservationQueryContext
+                Heading = "Test heading",
+                Name = "Test name",
+                Query = new FullTableQueryRequest
                 {
                     SubjectId = subjectId
                 },

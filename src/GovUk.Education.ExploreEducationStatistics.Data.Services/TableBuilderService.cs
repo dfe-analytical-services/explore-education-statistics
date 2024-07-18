@@ -72,23 +72,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             CancellationToken cancellationToken = default)
         {
-            return await FindLatestPublishedReleaseVersionId(queryContext.SubjectId)
-                .OnSuccess(releaseVersionId => Query(releaseVersionId, queryContext, cancellationToken));
+            return await FindLatestPublishedReleaseVersionId(query.SubjectId)
+                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseVersionId,
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             CancellationToken cancellationToken = default)
         {
-            return await CheckReleaseSubjectExists(subjectId: queryContext.SubjectId,
+            return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
                     releaseVersionId: releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
-                .OnSuccessDo(() => CheckQueryHasValidTableSize(queryContext))
-                .OnSuccess(() => ListQueryObservations(queryContext, cancellationToken))
+                .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
+                .OnSuccess(() => ListQueryObservations(query, cancellationToken))
                 .OnSuccess(async observations =>
                 {
                     if (!observations.Any())
@@ -97,41 +97,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return await _subjectResultMetaService
-                        .GetSubjectMeta(releaseVersionId, queryContext, observations)
+                        .GetSubjectMeta(releaseVersionId, query, observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel
                             {
                                 SubjectMeta = subjectMetaViewModel,
                                 Results = observations.Select(observation =>
-                                    ObservationViewModelBuilder.BuildObservation(observation, queryContext.Indicators))
+                                    ObservationViewModelBuilder.BuildObservation(observation, query.Indicators))
                             };
                         });
                 });
         }
 
         public async Task<Either<ActionResult, Unit>> QueryToCsvStream(
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             Stream stream,
             CancellationToken cancellationToken = default)
         {
-            return await FindLatestPublishedReleaseVersionId(queryContext.SubjectId)
-                .OnSuccessVoid(releaseId => QueryToCsvStream(releaseId, queryContext, stream, cancellationToken));
+            return await FindLatestPublishedReleaseVersionId(query.SubjectId)
+                .OnSuccessVoid(releaseId => QueryToCsvStream(releaseId, query, stream, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> QueryToCsvStream(
             Guid releaseVersionId,
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             Stream stream,
             CancellationToken cancellationToken = default)
         {
-            return await CheckReleaseSubjectExists(subjectId: queryContext.SubjectId,
+            return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
                     releaseVersionId: releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
-                .OnSuccessDo(() => CheckQueryHasValidTableSize(queryContext))
-                .OnSuccess(releaseSubject => ListQueryObservations(queryContext, cancellationToken)
+                .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
+                .OnSuccess(releaseSubject => ListQueryObservations(query, cancellationToken)
                     .OnSuccessCombineWith(observations =>
-                        _subjectCsvMetaService.GetSubjectCsvMeta(releaseSubject, queryContext, observations, cancellationToken))
+                        _subjectCsvMetaService.GetSubjectCsvMeta(releaseSubject, query, observations, cancellationToken))
                 )
                 .OnSuccessVoid(
                     async tuple =>
@@ -148,11 +148,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private async Task<Either<ActionResult, List<Observation>>> ListQueryObservations(
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             CancellationToken cancellationToken)
         {
             var matchedObservationIds =
-                (await _observationService.GetMatchedObservations(queryContext, cancellationToken))
+                (await _observationService.GetMatchedObservations(query, cancellationToken))
                 .Select(row => row.Id);
 
             return await _context
@@ -164,9 +164,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToListAsync(cancellationToken);
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckQueryHasValidTableSize(ObservationQueryContext queryContext)
+        private async Task<Either<ActionResult, Unit>> CheckQueryHasValidTableSize(FullTableQuery query)
         {
-            if (await GetMaximumTableCellCount(queryContext) > _options.MaxTableCellsAllowed)
+            if (await GetMaximumTableCellCount(query) > _options.MaxTableCellsAllowed)
             {
                 return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
             }
@@ -174,9 +174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return Unit.Instance;
         }
 
-        private async Task<int> GetMaximumTableCellCount(ObservationQueryContext queryContext)
+        private async Task<int> GetMaximumTableCellCount(FullTableQuery query)
         {
-            var filterItemIds = queryContext.Filters.ToList();
+            var filterItemIds = query.Filters.ToList();
             var countsOfFilterItemsByFilter = filterItemIds.Count == 0
                 ? new List<int>()
                 : (await _filterItemRepository.CountFilterItemsByFilter(filterItemIds))
@@ -191,9 +191,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             // here rather than assuming the Subject has all time periods between the start and end range.
 
             return MaximumTableCellCount(
-                countOfIndicators: queryContext.Indicators.Count(),
-                countOfLocations: queryContext.LocationIds.Count,
-                countOfTimePeriods: TimePeriodUtil.Range(queryContext.TimePeriod).Count,
+                countOfIndicators: query.Indicators.Count(),
+                countOfLocations: query.LocationIds.Count,
+                countOfTimePeriods: TimePeriodUtil.Range(query.TimePeriod).Count,
                 countsOfFilterItemsByFilter: countsOfFilterItemsByFilter
             );
         }

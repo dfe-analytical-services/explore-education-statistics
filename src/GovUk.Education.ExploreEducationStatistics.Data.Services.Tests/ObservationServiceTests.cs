@@ -37,14 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var sqlParameters = ListOf(new SqlParameter("param1", "value"));
 
-            var observationQueryContext = new ObservationQueryContext
+            var fullTableQuery = new FullTableQuery
             {
                 SubjectId = Guid.NewGuid(),
                 Filters = ListOf(Guid.NewGuid()),
                 LocationIds = ListOf(Guid.NewGuid()),
                 TimePeriod = new TimePeriodQuery()
             };
-            
+
             var queryGenerator = new Mock<IMatchingObservationsQueryGenerator>(Strict);
 
             var tempTable1 = new Mock<ITempTableQuery<IdTempTable>>(Strict);
@@ -53,19 +53,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ForEach(tempTable => tempTable
                     .Setup(t => t.DisposeAsync())
                     .Returns(new ValueTask()));
-            
+
             var tempTableList = ListOf(tempTable1.Object, tempTable2.Object)
                 .Cast<IAsyncDisposable>()
                 .ToList();
-            
+
             queryGenerator
                 .Setup(s => s
                     .GetMatchingObservationsQuery(
-                        context, 
-                        observationQueryContext.SubjectId, 
-                        ItIs.ListSequenceEqualTo(observationQueryContext.Filters),
-                        ItIs.ListSequenceEqualTo(observationQueryContext.LocationIds),
-                        observationQueryContext.TimePeriod,
+                        context,
+                        fullTableQuery.SubjectId,
+                        ItIs.ListSequenceEqualTo(fullTableQuery.Filters),
+                        ItIs.ListSequenceEqualTo(fullTableQuery.LocationIds),
+                        fullTableQuery.TimePeriod,
                         cancellationToken))
                 .ReturnsAsync((sql, sqlParameters, tempTableList));
 
@@ -76,11 +76,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Task.CompletedTask);
 
             var service = BuildService(
-                context, 
+                context,
                 queryGenerator.Object,
                 sqlExecutor.Object);
-            
-            await service.GetMatchedObservations(observationQueryContext, cancellationToken);
+
+            await service.GetMatchedObservations(fullTableQuery, cancellationToken);
             VerifyAllMocks(queryGenerator, sqlExecutor, tempTable1, tempTable2);
         }
         

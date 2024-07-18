@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             },
         };
 
-        private static readonly ObservationQueryContext Query = new()
+        private static readonly FullTableQueryRequest FullTableQueryRequest = new()
         {
             SubjectId = SubjectId,
         };
@@ -68,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersionId(ReleaseVersionId)
-                    .WithQuery(Query))
+                    .WithQuery(FullTableQueryRequest.AsFullTableQuery()))
                 .Generate();
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -95,8 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     s =>
                         s.Query(
                             ReleaseVersionId,
-                            It.Is<ObservationQueryContext>(
-                                q => q.SubjectId == Query.SubjectId
+                            It.Is<FullTableQuery>(
+                                q => q.SubjectId == FullTableQueryRequest.SubjectId
                             ),
                             cancellationToken
                         )

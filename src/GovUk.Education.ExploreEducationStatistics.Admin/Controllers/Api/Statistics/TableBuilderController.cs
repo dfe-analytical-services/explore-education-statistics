@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [CancellationTokenTimeout(TableBuilderQuery)]
         public async Task<ActionResult> Query(
             Guid releaseVersionId,
-            [FromBody] ObservationQueryContext query,
+            [FromBody] FullTableQueryRequest request,
             CancellationToken cancellationToken = default)
         {
             if (Request.AcceptsCsv(exact: true))
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
                 return await _tableBuilderService.QueryToCsvStream(
                     releaseVersionId: releaseVersionId,
-                    queryContext: query,
+                    query: request.AsFullTableQuery(),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationToken
                 )
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, query, cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 

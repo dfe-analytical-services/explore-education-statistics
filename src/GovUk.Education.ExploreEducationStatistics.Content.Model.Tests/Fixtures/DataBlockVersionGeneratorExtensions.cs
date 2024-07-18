@@ -34,7 +34,7 @@ public static class DataBlockVersionGeneratorExtensions
         => generator.ForInstance(d => d.SetVersion(version));
 
     public static Generator<DataBlockVersion> WithQuery(this Generator<DataBlockVersion> generator,
-        ObservationQueryContext query)
+        FullTableQuery query)
         => generator.ForInstance(d => d.SetQuery(query));
 
     public static Generator<DataBlockVersion> WithTable(this Generator<DataBlockVersion> generator,
@@ -71,7 +71,7 @@ public static class DataBlockVersionGeneratorExtensions
             .SetDefault(d => d.Order, offset: 1)
             .SetDefault(d => d.Source)
             .SetDefault(d => d.Version)
-            .SetQuery(new ObservationQueryContext
+            .SetQuery(new FullTableQuery
             {
                 SubjectId = Guid.NewGuid(),
                 Filters = new List<Guid>
@@ -132,7 +132,7 @@ public static class DataBlockVersionGeneratorExtensions
 
     public static InstanceSetters<DataBlockVersion> SetQuery(
         this InstanceSetters<DataBlockVersion> setters,
-        ObservationQueryContext query)
+        FullTableQuery query)
         => setters.Set(d => d.Query, query);
 
     public static InstanceSetters<DataBlockVersion> SetTable(

@@ -2,7 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -126,12 +126,12 @@ public class SubjectMetaServicePermissionTests
                         releaseSubjectService: releaseSubjectService.Object
                     );
 
-                    var query = new ObservationQueryContext
+                    var request = new LocationsOrTimePeriodsQueryRequest
                     {
                         SubjectId = SubjectId
                     };
 
-                    return await service.FilterSubjectMeta(ReleaseVersionId, query, new CancellationTokenSource().Token);
+                    return await service.FilterSubjectMeta(ReleaseVersionId, request, new CancellationTokenSource().Token);
                 }
             );
     }
@@ -166,12 +166,12 @@ public class SubjectMetaServicePermissionTests
                         contentDbContext: contextDbContext,
                         releaseSubjectService: releaseSubjectService.Object);
 
-                    var query = new ObservationQueryContext
+                    var request = new LocationsOrTimePeriodsQueryRequest
                     {
                         SubjectId = SubjectId
                     };
 
-                    return await service.FilterSubjectMeta(null, query, new CancellationTokenSource().Token);
+                    return await service.FilterSubjectMeta(null, request, new CancellationTokenSource().Token);
                 }
             );
     }

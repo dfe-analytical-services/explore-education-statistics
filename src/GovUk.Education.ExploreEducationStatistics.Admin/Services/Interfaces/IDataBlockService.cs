@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IDataBlockService
     {
         Task<Either<ActionResult, DataBlockViewModel>> Create(Guid releaseVersionId,
-            DataBlockCreateViewModel dataBlockCreate);
+            DataBlockCreateRequest createRequest);
 
         Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
             Guid dataBlockVersionId);
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseVersionId);
 
         Task<Either<ActionResult, DataBlockViewModel>> Update(Guid dataBlockVersionId,
-            DataBlockUpdateViewModel dataBlockUpdate);
+            DataBlockUpdateRequest updateRequest);
 
         Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlanViewModel deletePlan);
 

@@ -162,7 +162,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id).ToList()
@@ -311,7 +311,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id)
@@ -428,7 +428,7 @@ public class SubjectCsvMetaServiceTests
                 releaseFileBlobService: releaseFileBlobService.Object);
 
             // Only indicators from the query will be included in the meta
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators[1..2]
@@ -528,7 +528,7 @@ public class SubjectCsvMetaServiceTests
             );
 
             // Indicator ids don't match any in the database
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid())
@@ -632,7 +632,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id)
@@ -719,7 +719,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
             };
@@ -847,7 +847,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id).ToList()
@@ -1026,7 +1026,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id).ToList()
@@ -1162,7 +1162,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = ListOf(indicators[1].Id, indicators[3].Id)
@@ -1287,7 +1287,7 @@ public class SubjectCsvMetaServiceTests
                 releaseFileBlobService: releaseFileBlobService.Object);
 
             // Indicator ids don't matching any saved in the database
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid())
@@ -1411,7 +1411,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id)
@@ -1580,7 +1580,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id).ToList()
@@ -1673,7 +1673,7 @@ public class SubjectCsvMetaServiceTests
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id).ToList()
@@ -1798,7 +1798,7 @@ public class SubjectCsvMetaServiceTests
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object);
 
-            var query = new ObservationQueryContext
+            var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = indicators.Select(i => i.Id).ToList()

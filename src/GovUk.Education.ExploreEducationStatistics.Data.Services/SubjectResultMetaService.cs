@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
             Guid releaseVersionId,
-            ObservationQueryContext query,
+            FullTableQuery query,
             IList<Observation> observations)
         {
             return await CheckReleaseSubjectExists(releaseVersionId: releaseVersionId,
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
-        private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query,
+        private List<IndicatorMetaViewModel> GetIndicatorViewModels(FullTableQuery query,
             List<IndicatorGroupSequenceEntry>? indicatorSequence)
         {
             var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);

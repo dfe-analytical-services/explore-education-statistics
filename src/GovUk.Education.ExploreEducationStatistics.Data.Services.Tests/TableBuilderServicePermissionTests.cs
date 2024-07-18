@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         );
 
                         return await service.Query(
-                            new ObservationQueryContext
+                            new FullTableQuery
                             {
                                 SubjectId = _subject.Id
                             }
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         );
                         return await service.Query(
                             ReleaseVersionId,
-                            new ObservationQueryContext
+                            new FullTableQuery
                             {
                                 SubjectId = _subject.Id
                             }
