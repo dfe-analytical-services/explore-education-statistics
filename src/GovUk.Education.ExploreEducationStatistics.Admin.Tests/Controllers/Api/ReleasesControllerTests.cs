@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -52,15 +51,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
+        public async Task UploadDataSet_Success()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
             var dataFileInfo = new DataFileInfo
             {
-                Name = "Subject name",
-                FileName = "subject-name.csv",
+                Name = "Data set title",
+                FileName = "data-set.csv",
                 Size = "1 Kb",
             };
 
@@ -69,27 +68,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
-                    null,
-                    "Subject name"))
+                    "Data set title",
+                    null))
                 .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var result = await controller.AddDataFilesAsync(releaseVersionId: _releaseVersionId,
+            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
-                subjectName: "Subject name",
+                title: "Data set title",
                 file: dataFile,
                 metaFile: metaFile);
 
             VerifyAllMocks(releaseDataFileService);
 
             var dataFileInfoResult = result.AssertOkResult();
-            Assert.Equal("Subject name", dataFileInfoResult.Name);
+            Assert.Equal("Data set title", dataFileInfoResult.Name);
         }
 
         [Fact]
-        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
+        public async Task UploadDataSet_Fail_ValidationProblem()
         {
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -99,16 +98,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseVersionId,
                     dataFile,
                     metaFile,
-                    null,
-                    "Subject name"))
+                    "Data set title",
+                    null))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
             // Call the method under test
-            var result = await controller.AddDataFilesAsync(releaseVersionId: _releaseVersionId,
+            var result = await controller.UploadDataSet(releaseVersionId: _releaseVersionId,
                 replacingFileId: null,
-                subjectName: "Subject name",
+                title: "Data set title",
                 file: dataFile,
                 metaFile: metaFile);
 
@@ -154,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task DeleteDataFilesAsync_Returns_OK()
+        public async Task DeleteDataFiles_Success()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -174,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task DeleteDataFilesAsync_Returns_ValidationProblem()
+        public async Task DeleteDataFiles_Fail_UnableToFindMetaFileToDelete()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -257,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task CancelFileImportButNotAllowed()
+        public async Task CancelFileImport_Fail_Forbidden()
         {
             var importService = new Mock<IDataImportService>(Strict);
 

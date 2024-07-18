@@ -28,7 +28,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
@@ -283,8 +282,9 @@ public class DataSetFileService : IDataSetFileService
             containerName: BlobContainers.PublicReleaseFiles,
             path: releaseFile.PublicPath());
 
-        using var dataFileReader = new StreamReader(await datafileStreamProvider.Invoke());
-        using var csvReader = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
+        await using var stream = await datafileStreamProvider.Invoke();
+        using var streamReader = new StreamReader(stream);
+        using var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture);
         await csvReader.ReadAsync();
         csvReader.ReadHeader();
         var headers = csvReader.HeaderRecord?.ToList() ?? new List<string>();

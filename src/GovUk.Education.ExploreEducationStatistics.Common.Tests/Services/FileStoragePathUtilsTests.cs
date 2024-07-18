@@ -160,6 +160,7 @@ public class FileStoragePathUtilsTests
         Assert.Equal($"{rootPath}/chart/", FileStoragePathUtils.FilesPath(rootPath, FileType.Chart));
         Assert.Equal($"{rootPath}/data/", FileStoragePathUtils.FilesPath(rootPath, FileType.Data));
         Assert.Equal($"{rootPath}/data-zip/", FileStoragePathUtils.FilesPath(rootPath, FileType.DataZip));
+        Assert.Equal($"{rootPath}/bulk-data-zip/", FileStoragePathUtils.FilesPath(rootPath, FileType.BulkDataZip));
         Assert.Equal($"{rootPath}/image/", FileStoragePathUtils.FilesPath(rootPath, FileType.Image));
         Assert.Equal($"{rootPath}/data/", FileStoragePathUtils.FilesPath(rootPath, FileType.Metadata));
         Assert.Equal($"{rootPath}/zip/", FileStoragePathUtils.FilesPath(rootPath, FileType.AllFilesZip));

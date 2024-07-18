@@ -183,7 +183,7 @@ export function mapServerFieldErrors<FormValues>(
 
             acc.push({
               field: targetField,
-              message: mappedMessage,
+              message: error.message || mappedMessage,
               mapped: true,
             });
           }
