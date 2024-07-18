@@ -460,6 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetService, DataSetService>();
                 services.AddTransient<IDataSetVersionService, DataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
+                services.AddTransient<IPreviewTokenService, PreviewTokenService>();
             }
             else
             {
@@ -473,6 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
+                services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -814,6 +816,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
             BatchFilterOptionMappingUpdatesRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+    }
+
+    internal class NoOpPreviewTokenService : IPreviewTokenService
+    {
+        public Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
+            Guid dataSetVersionId,
+            string label,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(
+            Guid previewTokenId,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
     }
