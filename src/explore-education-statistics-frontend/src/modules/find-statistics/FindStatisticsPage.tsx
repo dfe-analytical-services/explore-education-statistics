@@ -130,7 +130,7 @@ const FindStatisticsPage: NextPage = () => {
         : {
             ...omit(router.query, 'page'),
             [filterType]: nextValue,
-            sortBy: filterType === 'search' ? 'relevance' : sortBy,
+            sortBy,
           };
 
     await updateQueryParams(newParams);

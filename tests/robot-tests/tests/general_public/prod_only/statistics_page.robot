@@ -83,10 +83,11 @@ Remove release type filter
 
 Searching
     user clicks element    id:searchForm-search
+    user clicks radio    Oldest
     user presses keys    Pupil absence in schools in England
     user clicks button    Search
     user checks page contains button    Pupil absence in schools in England
-    user checks radio is checked    Relevance
+    user checks radio is checked    Oldest
     user checks list item contains    testid:publicationsList    1    Pupil absence in schools in England
 
 Removing search

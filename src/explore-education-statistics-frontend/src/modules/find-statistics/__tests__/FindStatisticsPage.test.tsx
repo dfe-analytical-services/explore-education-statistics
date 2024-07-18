@@ -741,7 +741,7 @@ describe('FindStatisticsPage', () => {
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
-      query: { search: 'Find me', sortBy: 'relevance' },
+      query: { search: 'Find me', sortBy: 'newest' },
     });
 
     await waitFor(() => {
@@ -858,7 +858,7 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[2]).toBeChecked();
   });
 
-  test('sorts by relevance when have a search filter', async () => {
+  test('sorts by previously selected method when applying a search filter', async () => {
     publicationService.listPublications
       .mockResolvedValueOnce({
         results: testPublications,
@@ -905,7 +905,7 @@ describe('FindStatisticsPage', () => {
     const updatedSortOptions = sortGroup.getAllByRole('radio');
     expect(updatedSortOptions).toHaveLength(4);
     expect(updatedSortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
-    expect(updatedSortOptions[0]).not.toBeChecked();
+    expect(updatedSortOptions[0]).toBeChecked();
     expect(updatedSortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
     expect(updatedSortOptions[1]).not.toBeChecked();
     expect(updatedSortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
@@ -913,7 +913,7 @@ describe('FindStatisticsPage', () => {
     expect(updatedSortOptions[3]).toEqual(
       sortGroup.getByLabelText('Relevance'),
     );
-    expect(updatedSortOptions[3]).toBeChecked();
+    expect(updatedSortOptions[3]).not.toBeChecked();
   });
 
   test('reverts the sorting to `newest` when the search filter is removed', async () => {
