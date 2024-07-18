@@ -66,12 +66,10 @@ public abstract class NotifierFunctionsIntegrationTest
 
     public async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)
     {
-        var appSettingsOptions = GetAppSettingsOptions();
-
         var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
 
         await dataTableStorageService.BatchManipulateEntities(
-            tableName: appSettingsOptions.ApiSubscriptionsTableName,
+            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             entities: subscriptions,
             tableTransactionActionType: TableTransactionActionType.Add);
     }
@@ -104,12 +102,10 @@ public abstract class NotifierFunctionsIntegrationTest
         int? maxPerPage = null,
         IEnumerable<string>? select = null)
     {
-        var appSettingsOptions = GetRequiredService<IOptions<AppSettingsOptions>>();
-
-        var dataTableStorageService = new DataTableStorageService(appSettingsOptions.Value.TableStorageConnectionString);
+        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
 
         var pagedSubscriptions = await dataTableStorageService.QueryEntities(
-            tableName: appSettingsOptions.Value.ApiSubscriptionsTableName,
+            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             filter: filter,
             maxPerPage: maxPerPage,
             select: select,
