@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
@@ -34,6 +35,16 @@ public class PreviewTokenController(IPreviewTokenService previewTokenService) : 
     {
         return await previewTokenService
             .GetPreviewToken(previewTokenId, cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
+        [FromQuery] Guid dataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        return await previewTokenService
+            .ListPreviewTokens(dataSetVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
 }

@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -19,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
@@ -328,6 +330,198 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             client ??= BuildApp().CreateClient();
 
             var uri = new Uri($"{BaseUrl}/{previewTokenId}", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    public class ListPreviewTokensTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() => DataFixture.DefaultPreviewToken()
+                    .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
+                    .WithCreatedByUserId(CreatedByBauUser.Id)
+                    .Generate(2))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
+
+            var response = await ListPreviewTokens(dataSetVersion.Id);
+
+            var expectedViewModels = dataSetVersion.PreviewTokens
+                .Select(pt => new PreviewTokenViewModel
+                {
+                    Id = pt.Id,
+                    Label = pt.Label,
+                    Status = pt.Status,
+                    Created = pt.Created,
+                    CreatedByEmail = CreatedByBauUser.Email,
+                    Expiry = pt.Expiry,
+                    Updated = pt.Updated
+                })
+                .ToList();
+
+            response.AssertOk(expectedViewModels);
+        }
+
+        [Fact]
+        public async Task MultipleDataSetVersions_FiltersByDataSetVersion()
+        {
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var (dataSetVersion1, dataSetVersion2) = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() => DataFixture.DefaultPreviewToken()
+                    .WithCreatedByUserId(CreatedByBauUser.Id)
+                    .Generate(1))
+                .Generate(2)
+                .ToTuple2();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersion1, dataSetVersion2);
+                context.DataSets.Update(dataSet);
+            });
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
+
+            var response = await ListPreviewTokens(dataSetVersion1.Id);
+
+            var viewModels = response.AssertOk<List<PreviewTokenViewModel>>();
+
+            Assert.Single(viewModels);
+            Assert.Equal(dataSetVersion1.PreviewTokens[0].Id, viewModels[0].Id);
+        }
+
+        [Fact]
+        public async Task DataSetVersionHasMultiplePreviewTokens_OrdersByDescendingExpiry()
+        {
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() => DataFixture.DefaultPreviewToken()
+                    .ForIndex(0, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddHours(1)))
+                    .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(-1)))
+                    .ForIndex(2, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
+                    .ForIndex(3, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(1)))
+                    .WithCreatedByUserId(CreatedByBauUser.Id)
+                    .Generate(4))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
+
+            var response = await ListPreviewTokens(dataSetVersion.Id);
+
+            var viewModels = response.AssertOk<List<PreviewTokenViewModel>>();
+
+            // Preview tokens are expected in descending expiry date order
+            Guid[] expectedPreviewTokenIds =
+            [
+                dataSetVersion.PreviewTokens[3].Id,
+                dataSetVersion.PreviewTokens[0].Id,
+                dataSetVersion.PreviewTokens[2].Id,
+                dataSetVersion.PreviewTokens[1].Id
+            ];
+            Assert.Equal(expectedPreviewTokenIds, viewModels.Select(vm => vm.Id));
+        }
+
+        [Fact]
+        public async Task DataSetVersionHasNoPreviewTokens_ReturnsEmpty()
+        {
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await ListPreviewTokens(dataSetVersion.Id);
+
+            var result = response.AssertOk<List<PreviewTokenViewModel>>();
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task NoDataSetVersion_ReturnsNotFound()
+        {
+            var response = await ListPreviewTokens(dataSetVersionId: Guid.NewGuid());
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task NotBauUser_ReturnsForbidden()
+        {
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var client = BuildApp(AuthenticatedUser()).CreateClient();
+
+            var response = await ListPreviewTokens(dataSetVersion.Id, client);
+
+            response.AssertForbidden();
+        }
+
+        private async Task<HttpResponseMessage> ListPreviewTokens(
+            Guid dataSetVersionId,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var queryParams = new Dictionary<string, string?>
+            {
+                { "dataSetVersionId", dataSetVersionId.ToString() },
+            };
+
+            var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
 
             return await client.GetAsync(uri);
         }
