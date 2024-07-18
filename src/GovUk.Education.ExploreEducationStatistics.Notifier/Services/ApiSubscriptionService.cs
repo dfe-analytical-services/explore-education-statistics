@@ -91,6 +91,19 @@ internal class ApiSubscriptionService(
             .OnSuccess(MapSubscription);
     }
 
+    public async Task<Either<ActionResult, Unit>> Unsubscribe(
+        Guid dataSetId,
+        string token,
+        CancellationToken cancellationToken = default)
+    {
+        return await GetEmailFromToken(token)
+            .OnSuccess(email => GetSubscription(
+                dataSetId: dataSetId,
+                email: email,
+                cancellationToken: cancellationToken))
+            .OnSuccess(subscription => DeleteSubscription(subscription: subscription, cancellationToken: cancellationToken));
+    }
+
     public async Task RemoveExpiredApiSubscriptions(CancellationToken cancellationToken = default)
     {
         var expiredSubscriptions = await GetExpiredApiSubscriptions(cancellationToken);
@@ -273,6 +286,29 @@ internal class ApiSubscriptionService(
             dataSetId: dataSetId,
             email: email,
             cancellationToken: cancellationToken);
+    }
+
+    private async Task<Either<ActionResult, Unit>> DeleteSubscription(
+        ApiSubscription subscription,
+        CancellationToken cancellationToken = default)
+    {
+        if (subscription.Status is not ApiSubscriptionStatus.Subscribed)
+        {
+            return ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Code = ValidationMessages.ApiSubscriptionHasNotBeenVerified.Code,
+                Message = ValidationMessages.ApiSubscriptionHasNotBeenVerified.Message,
+                Detail = new ApiSubscriptionErrorDetail(Guid.Parse(subscription.PartitionKey), subscription.RowKey),
+                Path = nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst()
+            });
+        }
+
+        await apiSubscriptionRepository.DeleteSubscription(
+            dataSetId: Guid.Parse(subscription.PartitionKey),
+            email: subscription.RowKey,
+            cancellationToken: cancellationToken);
+
+        return Unit.Instance;
     }
 
     private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)

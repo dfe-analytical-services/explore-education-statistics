@@ -20,5 +20,10 @@ public interface IApiSubscriptionService
         string token,
         CancellationToken cancellationToken = default);
 
+    Task<Either<ActionResult, Unit>> Unsubscribe(
+        Guid dataSetId,
+        string token,
+        CancellationToken cancellationToken = default);
+
     Task RemoveExpiredApiSubscriptions(CancellationToken cancellationToken = default);
 }

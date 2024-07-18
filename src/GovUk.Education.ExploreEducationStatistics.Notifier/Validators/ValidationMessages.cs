@@ -19,6 +19,11 @@ public static class ValidationMessages
         Message: "The unverified subscription has expired. The user must request a new subscription."
     );
 
+    public static readonly LocalizableMessage ApiSubscriptionHasNotBeenVerified = new(
+        Code: nameof(ApiSubscriptionHasNotBeenVerified),
+        Message: "The subscription has not been verified."
+    );
+
     public static readonly LocalizableMessage AuthorizationTokenInvalid = new(
         Code: nameof(AuthorizationTokenInvalid),
         Message: "The authorization token is invalid."

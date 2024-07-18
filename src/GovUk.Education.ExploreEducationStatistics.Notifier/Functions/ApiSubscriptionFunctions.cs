@@ -45,7 +45,7 @@ public class ApiSubscriptionFunctions(
 
     [Function("VerifyApiSubscription")]
     public async Task<IActionResult> VerifyApiSubscription(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "public-api/{dataSetId:guid}/verify-subscription/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "public-api/{dataSetId:guid}/verify-subscription/{token}")]
         FunctionContext context,
         Guid dataSetId,
         string token,
@@ -58,6 +58,29 @@ public class ApiSubscriptionFunctions(
                 token: token,
                 cancellationToken: cancellationToken)
                 .HandleFailuresOr(subscription => new OkObjectResult(subscription));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(VerifyApiSubscription));
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [Function("ApiUnsubscribe")]
+    public async Task<IActionResult> ApiUnsubscribe(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe/{token}")]
+        FunctionContext context,
+        Guid dataSetId,
+        string token,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await apiSubscriptionService.Unsubscribe(
+                dataSetId: dataSetId,
+                token: token,
+                cancellationToken: cancellationToken)
+                .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
         catch (Exception ex)
         {
