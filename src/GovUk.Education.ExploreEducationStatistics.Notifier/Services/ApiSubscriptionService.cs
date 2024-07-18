@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ErrorDetail
 using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Semver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,6 +104,26 @@ internal class ApiSubscriptionService(
                 cancellationToken: cancellationToken))
             .OnSuccess(subscription =>
                 DeleteSubscription(subscription: subscription, cancellationToken: cancellationToken));
+    }
+
+
+    public async Task NotifyApiSubscribers(
+        Guid dataSetId,
+        SemVersion version,
+        CancellationToken cancellationToken = default)
+    {
+        var dataSetSubscribers = await apiSubscriptionRepository.QuerySubscriptions(
+            filter: s => s.PartitionKey == dataSetId.ToString(),
+            select: new List<string>() { nameof(ApiSubscription.PartitionKey), nameof(ApiSubscription.RowKey) },
+            cancellationToken: cancellationToken);
+
+        await dataSetSubscribers
+            .AsPages()
+            .ForEachAsync(
+                page => BatchNotifySubscribers(
+                    subscribers: page,
+                    version: version),
+                cancellationToken);
     }
 
     public async Task RemoveExpiredApiSubscriptions(CancellationToken cancellationToken = default)
@@ -307,6 +328,40 @@ internal class ApiSubscriptionService(
             cancellationToken: cancellationToken);
 
         return Unit.Instance;
+    }
+
+    private void BatchNotifySubscribers(
+        Page<ApiSubscription> subscribers,
+        SemVersion version)
+    {
+        foreach (var subscriber in subscribers.Values)
+        {
+            SendNotification(subscriber, version);
+        }
+    }
+
+    private void SendNotification(ApiSubscription subscription, SemVersion version)
+    {
+        var expiryDateTime = DateTime.UtcNow.AddYears(1);
+        var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, expiryDateTime);
+
+        var emailTemplateVariables = new Dictionary<string, dynamic>
+        {
+            { "api_dataset", subscription.DataSetTitle },
+            {
+                "changelog-link",
+                $"{appSettingsOptions.Value.PublicAppUrl}/???/{subscription.PartitionKey}/{version}"
+            },
+            {
+                "unsubscribe_link",
+                $"{appSettingsOptions.Value.PublicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{unsubscribeToken}"
+            }
+        };
+
+        emailService.SendEmail(
+            email: subscription.RowKey,
+            templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionNotificationId,
+            values: emailTemplateVariables);
     }
 
     private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)

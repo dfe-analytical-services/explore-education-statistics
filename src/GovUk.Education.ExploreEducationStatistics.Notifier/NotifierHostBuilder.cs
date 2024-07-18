@@ -52,6 +52,8 @@ public static class NotifierHostBuilder
                     .AddTransient<IApiSubscriptionRepository, ApiSubscriptionRepository>()
                     .AddTransient<IApiSubscriptionService, ApiSubscriptionService>()
                     .AddTransient<ITokenService, TokenService>();
+
+                // add configuration here to add fluent validation validators from the Models assembly?
             });
     }
 }

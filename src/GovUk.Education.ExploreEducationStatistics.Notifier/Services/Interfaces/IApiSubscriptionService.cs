@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Semver;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,11 @@ public interface IApiSubscriptionService
     Task<Either<ActionResult, Unit>> Unsubscribe(
         Guid dataSetId,
         string token,
+        CancellationToken cancellationToken = default);
+
+    Task NotifyApiSubscribers(
+        Guid dataSetId,
+        SemVersion version,
         CancellationToken cancellationToken = default);
 
     Task RemoveExpiredApiSubscriptions(CancellationToken cancellationToken = default);

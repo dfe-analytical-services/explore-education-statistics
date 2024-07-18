@@ -11,6 +11,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
@@ -94,5 +95,17 @@ public class ApiSubscriptionFunctions(
         CancellationToken cancellationToken)
     {
         await apiSubscriptionService.RemoveExpiredApiSubscriptions(cancellationToken);
+    }
+
+    [Function("NotifyApiSubscribers")]
+    public async Task NotifyApiSubscribers(
+        [QueueTrigger(NotifierQueues.ApiNotificationQueue)] ApiNotificationMessage msg,
+        FunctionContext context,
+        CancellationToken cancellationToken)
+    {
+        await apiSubscriptionService.NotifyApiSubscribers(
+            dataSetId: msg.DataSetId,
+            version: msg.Version,
+            cancellationToken: cancellationToken);
     }
 }

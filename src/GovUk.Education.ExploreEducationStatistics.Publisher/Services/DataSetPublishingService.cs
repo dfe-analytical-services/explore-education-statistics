@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -14,12 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
 public class DataSetPublishingService(
     ContentDbContext contentDbContext,
-    PublicDataDbContext publicDataDbContext
+    PublicDataDbContext publicDataDbContext,
+    INotifierClient notifierClient
     ) : IDataSetPublishingService
 {
     public async Task PublishDataSets(Guid[] releaseVersionIds)
     {
-        await PromoteDraftDataSetVersions(releaseVersionIds);
+        var publishedDataSetVersions = await PromoteDraftDataSetVersions(releaseVersionIds);
+        await NotifyApiSubscribers(publishedDataSetVersions);
         await UpdateDataSetVersionFileIdsForAmendments(releaseVersionIds);
     }
 
@@ -28,7 +31,7 @@ public class DataSetPublishingService(
     /// of their data set. If the data set has not been published before, this will
     /// also be marked as published.
     /// </summary>
-    private async Task PromoteDraftDataSetVersions(IEnumerable<Guid> releaseVersionIds)
+    private async Task<IReadOnlyList<DataSetVersion>> PromoteDraftDataSetVersions(IEnumerable<Guid> releaseVersionIds)
     {
         var releaseFileIds = (await GetReleaseFiles(releaseVersionIds))
             .Select(releaseFile => releaseFile.Id);
@@ -58,6 +61,27 @@ public class DataSetPublishingService(
         }
 
         await publicDataDbContext.SaveChangesAsync();
+
+        return dataSets
+            .Select(ds => ds.LatestLiveVersion!)
+            .ToList();
+    }
+
+    /// <summary>
+    /// For any published data set versions, notify all API subscribers of the changes.
+    /// </summary>
+    private async Task NotifyApiSubscribers(IReadOnlyList<DataSetVersion> publishedDataSetVersions)
+    {
+        var messages = publishedDataSetVersions
+            .Select(CreateApiNotificationMessage)
+            .ToList();
+
+        if (!messages.Any())
+        {
+            return;
+        }
+
+        await notifierClient.NotifyApiSubscribers(messages);
     }
 
     /// <summary>
@@ -108,6 +132,15 @@ public class DataSetPublishingService(
         }
 
         await publicDataDbContext.SaveChangesAsync();
+    }
+
+    private ApiNotificationMessage CreateApiNotificationMessage(DataSetVersion version)
+    {
+        return new ApiNotificationMessage
+        {
+            DataSetId = version.DataSetId,
+            Version = version.FullSemanticVersion()
+        };
     }
 
     private async Task<List<ReleaseFile>> GetReleaseFiles(IEnumerable<Guid> releaseVersionIds)

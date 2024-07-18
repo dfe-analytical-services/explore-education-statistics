@@ -8,4 +8,7 @@ public interface INotifierClient
 {
     public Task NotifyPublicationSubscribers(
         IReadOnlyList<ReleaseNotificationMessage> messages, CancellationToken cancellationToken = default);
+
+    public Task NotifyApiSubscribers(
+        IReadOnlyList<ApiNotificationMessage> messages, CancellationToken cancellationToken = default);
 }
