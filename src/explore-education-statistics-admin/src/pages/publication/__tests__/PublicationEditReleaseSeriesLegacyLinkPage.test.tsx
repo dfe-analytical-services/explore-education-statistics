@@ -98,7 +98,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
           {
             id: 'release-version-1',
 
-            releaseVersionId: 'release-1',
+            releaseId: 'release-1',
           },
           {
             id: 'legacy-release-2',

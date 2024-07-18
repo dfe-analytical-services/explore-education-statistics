@@ -117,7 +117,7 @@ export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
 };
 
 export const releaseApiDataSetLocationsMappingRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/locations-mapping',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/locations-mapping',
   title: 'API data set locations mapping',
   component: ReleaseApiDataSetLocationsMappingPage,
   protectionAction: permissions => permissions.isBauUser,

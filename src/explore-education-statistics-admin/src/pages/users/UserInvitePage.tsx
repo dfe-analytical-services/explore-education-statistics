@@ -83,7 +83,8 @@ export default function UserInvitePage({
     const userReleaseRoles =
       values.userReleaseRoles?.map(userReleaseRole => {
         return {
-          releaseVersionId: userReleaseRole.releaseVersionId,
+          // TODO rename to releaseVersionId
+          releaseId: userReleaseRole.releaseVersionId,
           releaseRole: userReleaseRole.releaseRole,
         };
       }) ?? [];

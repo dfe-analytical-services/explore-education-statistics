@@ -12,15 +12,15 @@ import publicationService, {
 } from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
-import { generatePath, RouteComponentProps, useHistory } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
+import {generatePath, RouteComponentProps, useHistory} from 'react-router';
+import {useQuery} from '@tanstack/react-query';
 
 export const mapToReleaseSeriesItemUpdateRequest = (
   releaseSeries: ReleaseSeriesTableEntry[],
 ): ReleaseSeriesItemUpdateRequest[] => {
   return releaseSeries.map(seriesItem => ({
     id: seriesItem.id,
-    releaseVersionId: seriesItem.releaseId,
+    releaseId: seriesItem.releaseId,
     legacyLinkDescription: seriesItem.isLegacyLink
       ? seriesItem.description
       : undefined,
@@ -29,13 +29,13 @@ export const mapToReleaseSeriesItemUpdateRequest = (
 };
 
 export default function PublicationEditReleaseSeriesLegacyLinkPage({
-  match,
-}: RouteComponentProps<PublicationEditReleaseSeriesLegacyLinkRouteParams>) {
-  const { releaseSeriesItemId } = match.params;
-  const { publicationId } = usePublicationContext();
+                                                                     match,
+                                                                   }: RouteComponentProps<PublicationEditReleaseSeriesLegacyLinkRouteParams>) {
+  const {releaseSeriesItemId} = match.params;
+  const {publicationId} = usePublicationContext();
   const history = useHistory();
 
-  const { data: releaseSeries = [], isLoading } = useQuery(
+  const {data: releaseSeries = [], isLoading} = useQuery(
     publicationQueries.getReleaseSeries(publicationId),
   );
 
@@ -75,10 +75,10 @@ export default function PublicationEditReleaseSeriesLegacyLinkPage({
             const updatedReleaseSeries = releaseSeries.map(release => {
               return release.id === releaseSeriesItemId
                 ? {
-                    ...release,
-                    description: values.description,
-                    legacyLinkUrl: values.url,
-                  }
+                  ...release,
+                  description: values.description,
+                  legacyLinkUrl: values.url,
+                }
                 : release;
             });
 

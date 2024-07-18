@@ -1,5 +1,5 @@
 import client from '@admin/services/utils/service';
-import { IdTitlePair } from 'src/services/types/common';
+import {IdTitlePair} from 'src/services/types/common';
 
 export interface UserStatus {
   id: string;
@@ -33,7 +33,8 @@ export interface UserPublicationRole {
 }
 
 export interface UserReleaseRoleSubmission {
-  releaseVersionId: string;
+  // TODO rename to releaseVersionId
+  releaseId: string;
   releaseRole: string;
 }
 
@@ -45,7 +46,11 @@ export interface UserPublicationRoleSubmission {
 export interface UserInvite {
   email: string;
   roleId: string;
-  userReleaseRoles: { releaseVersionId: string; releaseRole: string }[];
+  userReleaseRoles: {
+    // TODO rename to releaseVersionId
+    releaseId: string;
+    releaseRole: string
+  }[];
   userPublicationRoles: { publicationId: string; publicationRole: string }[];
 }
 
@@ -74,9 +79,13 @@ export interface ResourceRoles {
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
+
   getReleases(): Promise<IdTitlePair[]>;
+
   getResourceRoles(): Promise<ResourceRoles>;
+
   getUser(userId: string): Promise<User>;
+
   addUserReleaseRole: (
     userId: string,
     userReleaseRole: UserReleaseRoleSubmission,
@@ -93,13 +102,17 @@ export interface UsersService {
   ) => Promise<boolean>;
 
   getUsers(): Promise<UserStatus[]>;
+
   getPreReleaseUsers(): Promise<UserStatus[]>;
+
   getPendingInvites(): Promise<PendingInvite[]>;
+
   inviteUser: (invite: UserInvite) => Promise<boolean>;
   inviteContributor: (
     email: string,
     publicationId: string,
-    releaseVersionIds: string[],
+    // TODO rename to releaseVersionId
+    releaseIds: string[],
   ) => Promise<boolean>;
   removeContributorReleaseInvites: (
     email: string,
@@ -182,7 +195,8 @@ const userService: UsersService = {
       `/user-management/publications/${publicationId}/invites/contributor`,
       {
         email,
-        releaseVersionIds,
+        // TODO rename to releaseVersionId
+        releaseIds: releaseVersionIds,
       },
     );
   },
@@ -192,7 +206,7 @@ const userService: UsersService = {
   ): Promise<boolean> {
     return client.delete(
       `/user-management/publications/${publicationId}/release-invites/contributor`,
-      { data: { email } },
+      {data: {email}},
     );
   },
   cancelInvite(email: string): Promise<boolean> {

@@ -450,7 +450,7 @@ describe('UserInvitePage', () => {
       email: 'test@test.com',
       roleId: 'role-1-id',
       userReleaseRoles: [
-        { releaseVersionId: 'release-1-id', releaseRole: 'Approver' },
+        { releaseId: 'release-1-id', releaseRole: 'Approver' },
       ],
       userPublicationRoles: [
         { publicationId: 'publication-1-id', publicationRole: 'Approver' },

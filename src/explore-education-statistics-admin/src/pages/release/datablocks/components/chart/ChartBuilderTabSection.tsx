@@ -103,7 +103,7 @@ const ChartBuilderTabSection = ({
 
       const tableData = await tableBuilderService.getTableData(
         nextQuery,
-        releaseId,
+        releaseVersionId,
       );
 
       onTableUpdate({
@@ -111,7 +111,7 @@ const ChartBuilderTabSection = ({
         query: nextQuery,
       });
     },
-    [onTableUpdate, query, releaseId],
+    [onTableUpdate, query, releaseVersionId],
   );
 
   return (

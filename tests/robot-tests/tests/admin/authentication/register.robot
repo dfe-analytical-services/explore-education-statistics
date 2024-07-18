@@ -30,7 +30,7 @@ Invite the user as an Analyst with publication and release roles
     user waits until h1 is visible    Invite user
     user enters text into element    name:userEmail    %{PENDING_INVITE_USER_EMAIL}
 
-    user chooses select option    name:releaseId    ${RELEASE_NAME}
+    user chooses select option    name:releaseVersionId    ${RELEASE_NAME}
     user chooses select option    name:releaseRole    Approver
     user clicks button    Add release role
 

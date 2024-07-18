@@ -11,10 +11,10 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import tableBuilderService from '@common/services/tableBuilderService';
 import ButtonText from '@common/components/ButtonText';
 import ReleasePreviewTableToolFinalStep from '@admin/pages/release/content/components/ReleasePreviewTableToolFinalStep';
-import { Publication } from '@admin/services/publicationService';
-import { Publication as ContentPublication } from '@common/services/publicationService';
-import React, { useState } from 'react';
-import { ReleaseType } from '@common/services/types/releaseType';
+import {Publication} from '@admin/services/publicationService';
+import {Publication as ContentPublication} from '@common/services/publicationService';
+import React, {useState} from 'react';
+import {ReleaseType} from '@common/services/types/releaseType';
 
 interface Props {
   featuredTableId?: string;
@@ -22,15 +22,16 @@ interface Props {
   releaseType: ReleaseType;
   publication: Publication | ContentPublication;
 }
+
 const ReleasePreviewTableTool = ({
-  featuredTableId,
-  releaseVersionId,
-  releaseType,
-  publication,
-}: Props) => {
+                                   featuredTableId,
+                                   releaseVersionId,
+                                   releaseType,
+                                   publication,
+                                 }: Props) => {
   const [dataBlockId, setDataBlockId] = useState(featuredTableId ?? '');
 
-  const { value: initialState, isLoading } = useAsyncHandledRetry<
+  const {value: initialState, isLoading} = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
     const [featuredTables, subjects] = await Promise.all([
@@ -39,7 +40,7 @@ const ReleasePreviewTableTool = ({
     ]);
 
     if (dataBlockId) {
-      const { table, query } = await dataBlockService.getDataBlock(dataBlockId);
+      const {table, query} = await dataBlockService.getDataBlock(dataBlockId);
 
       const [subjectMeta, tableData] = await Promise.all([
         tableBuilderService.getSubjectMeta(query.subjectId, releaseVersionId),
@@ -47,7 +48,7 @@ const ReleasePreviewTableTool = ({
           {
             ...query,
           },
-          releaseId: releaseVersionId,
+          releaseVersionId,
         ),
       ]);
 
@@ -106,7 +107,7 @@ const ReleasePreviewTableTool = ({
                 {featuredTable.name}
               </ButtonText>
             )}
-            finalStep={({ query, table, tableHeaders, onReorder }) => (
+            finalStep={({query, table, tableHeaders, onReorder}) => (
               <WizardStep>
                 {wizardStepProps => (
                   <>

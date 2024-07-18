@@ -1,9 +1,9 @@
 import Link from '@admin/components/Link';
-import { useConfig } from '@admin/contexts/ConfigContext';
+import {useConfig} from '@admin/contexts/ConfigContext';
 import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/ApiDataSetVersionSummaryList';
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
-import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseContext';
+import {useReleaseVersionContext} from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetLocationsMappingRoute,
@@ -11,19 +11,19 @@ import {
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
-import { DataSetStatus } from '@admin/services/apiDataSetService';
+import {DataSetStatus} from '@admin/services/apiDataSetService';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryCard from '@common/components/SummaryCard';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Tag, { TagProps } from '@common/components/Tag';
+import Tag, {TagProps} from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
 import TaskListItem from '@common/components/TaskListItem';
-import { useQuery } from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import React from 'react';
-import { generatePath, useHistory, useParams } from 'react-router-dom';
+import {generatePath, useHistory, useParams} from 'react-router-dom';
 
 // TODO: Version mapping
 const showDraftVersionTasks = false;
@@ -33,11 +33,11 @@ const showChangelog = false;
 const showVersionHistory = false;
 
 export default function ReleaseApiDataSetDetailsPage() {
-  const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
+  const {dataSetId} = useParams<ReleaseDataSetRouteParams>();
   const history = useHistory();
 
-  const { publicAppUrl } = useConfig();
-  const { releaseVersion } = useReleaseVersionContext();
+  const {publicAppUrl} = useConfig();
+  const {releaseVersion} = useReleaseVersionContext();
 
   const {
     data: dataSet,
@@ -156,7 +156,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </Tag>
               </SummaryListItem>
               <SummaryListItem term="Summary">
-                <ContentHtml html={dataSet.summary} />
+                <ContentHtml html={dataSet.summary}/>
               </SummaryListItem>
             </SummaryList>
 
@@ -182,8 +182,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                           to={generatePath<ReleaseDataSetRouteParams>(
                             releaseApiDataSetLocationsMappingRoute.path,
                             {
-                              publicationId: release.publicationId,
-                              releaseId: release.id,
+                              publicationId: releaseVersion.publicationId,
+                              releaseVersionId: releaseVersion.id,
                               dataSetId,
                             },
                           )}
@@ -257,7 +257,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                   releaseVersionId={releaseVersion.id}
                   submitText="Confirm new data set version"
                   title="Create a new API data set version"
-                  onSubmit={async ({ releaseFileId }) => {
+                  onSubmit={async ({releaseFileId}) => {
                     await apiDataSetVersionService.createVersion({
                       dataSetId: dataSet.id,
                       releaseFileId,

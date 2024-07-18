@@ -66,7 +66,8 @@ const DataBlockPageTabs = ({
         initialStep: 1,
         subjects,
         query: {
-          releaseVersionId,
+          // TODO rename to releaseVersionId
+          releaseId: releaseVersionId,
           subjectId: '',
           locationIds: [],
           filters: [],
@@ -82,7 +83,7 @@ const DataBlockPageTabs = ({
       includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
     };
 
-    const tableData = await tableBuilderService.getTableData(query, releaseId);
+    const tableData = await tableBuilderService.getTableData(query);
     const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(
       query,
       tableData,

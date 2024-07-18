@@ -1,7 +1,7 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import {TestConfigContextProvider} from '@admin/contexts/ConfigContext';
+import {testReleaseVersion} from '@admin/pages/release/__data__/testReleaseVersion';
 import ReleaseApiDataSetLocationsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import {ReleaseVersionContextProvider} from '@admin/pages/release/contexts/ReleaseContext';
 import {
   releaseApiDataSetLocationsMappingRoute,
   ReleaseDataSetRouteParams,
@@ -11,11 +11,11 @@ import _apiDataSetService, {
 } from '@admin/services/apiDataSetService';
 import testLocationsMapping from '@admin/pages/release/data/__data__/testLocationsMapping';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
-import { Release } from '@admin/services/releaseService';
+import {ReleaseVersion} from '@admin/services/releaseService';
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import {screen, within} from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import {generatePath, MemoryRouter, Route} from 'react-router-dom';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -418,19 +418,19 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     expect(screen.queryByTestId('auto-mapped')).not.toBeInTheDocument();
   });
 
-  function renderPage(options?: { release?: Release; dataSetId?: string }) {
-    const { release = testRelease, dataSetId = 'data-set-id' } = options ?? {};
+  function renderPage(options?: { releaseVersion?: ReleaseVersion; dataSetId?: string }) {
+    const {releaseVersion = testReleaseVersion, dataSetId = 'data-set-id'} = options ?? {};
 
     render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
                 releaseApiDataSetLocationsMappingRoute.path,
                 {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: releaseVersion.id,
                   dataSetId,
                 },
               ),
@@ -441,7 +441,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
               path={releaseApiDataSetLocationsMappingRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

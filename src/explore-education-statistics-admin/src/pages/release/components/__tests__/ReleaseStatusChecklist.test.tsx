@@ -1,10 +1,10 @@
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
-import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import { render, screen } from '@testing-library/react';
+import {testReleaseVersion} from '@admin/pages/release/__data__/testReleaseVersion';
+import {render, screen} from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter } from 'react-router';
-import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
-import { GlobalPermissions } from '@admin/services/authService';
+import {MemoryRouter} from 'react-router';
+import {AuthContextTestProvider, User} from '@admin/contexts/AuthContext';
+import {GlobalPermissions} from '@admin/services/authService';
 
 describe('ReleaseStatusChecklist', () => {
   test('renders correctly with errors', () => {
@@ -24,19 +24,19 @@ describe('ReleaseStatusChecklist', () => {
               valid: false,
               warnings: [],
               errors: [
-                { code: 'DataFileImportsMustBeCompleted' },
-                { code: 'DataFileReplacementsMustBeCompleted' },
-                { code: 'PublicDataGuidanceRequired' },
-                { code: 'ReleaseNoteRequired' },
-                { code: 'SummarySectionContainsEmptyHtmlBlock' },
-                { code: 'EmptyContentSectionExists' },
-                { code: 'GenericSectionsContainEmptyHtmlBlock' },
-                { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
-                { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
-                { code: 'PublicApiDataSetImportsMustBeCompleted' },
-                { code: 'PublicApiDataSetCancellationsMustBeResolved' },
-                { code: 'PublicApiDataSetFailuresMustBeResolved' },
-                { code: 'PublicApiDataSetMappingsMustBeCompleted' },
+                {code: 'DataFileImportsMustBeCompleted'},
+                {code: 'DataFileReplacementsMustBeCompleted'},
+                {code: 'PublicDataGuidanceRequired'},
+                {code: 'ReleaseNoteRequired'},
+                {code: 'SummarySectionContainsEmptyHtmlBlock'},
+                {code: 'EmptyContentSectionExists'},
+                {code: 'GenericSectionsContainEmptyHtmlBlock'},
+                {code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock'},
+                {code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock'},
+                {code: 'PublicApiDataSetImportsMustBeCompleted'},
+                {code: 'PublicApiDataSetCancellationsMustBeResolved'},
+                {code: 'PublicApiDataSetFailuresMustBeResolved'},
+                {code: 'PublicApiDataSetMappingsMustBeCompleted'},
               ],
             }}
             release={testReleaseVersion}
@@ -47,11 +47,11 @@ describe('ReleaseStatusChecklist', () => {
     );
 
     expect(
-      screen.queryByRole('heading', { name: 'All checks passed' }),
+      screen.queryByRole('heading', {name: 'All checks passed'}),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Errors' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: 'Errors'})).toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { name: 'Warnings' }),
+      screen.queryByRole('heading', {name: 'Warnings'}),
     ).not.toBeInTheDocument();
 
     expect(screen.getByText('13 issues')).toBeInTheDocument();
@@ -191,22 +191,22 @@ describe('ReleaseStatusChecklist', () => {
               valid: false,
               warnings: [],
               errors: [
-                { code: 'DataFileImportsMustBeCompleted' },
-                { code: 'DataFileReplacementsMustBeCompleted' },
-                { code: 'PublicDataGuidanceRequired' },
-                { code: 'ReleaseNoteRequired' },
-                { code: 'SummarySectionContainsEmptyHtmlBlock' },
-                { code: 'EmptyContentSectionExists' },
-                { code: 'GenericSectionsContainEmptyHtmlBlock' },
-                { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
-                { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
-                { code: 'PublicApiDataSetImportsMustBeCompleted' },
-                { code: 'PublicApiDataSetCancellationsMustBeResolved' },
-                { code: 'PublicApiDataSetFailuresMustBeResolved' },
-                { code: 'PublicApiDataSetMappingsMustBeCompleted' },
+                {code: 'DataFileImportsMustBeCompleted'},
+                {code: 'DataFileReplacementsMustBeCompleted'},
+                {code: 'PublicDataGuidanceRequired'},
+                {code: 'ReleaseNoteRequired'},
+                {code: 'SummarySectionContainsEmptyHtmlBlock'},
+                {code: 'EmptyContentSectionExists'},
+                {code: 'GenericSectionsContainEmptyHtmlBlock'},
+                {code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock'},
+                {code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock'},
+                {code: 'PublicApiDataSetImportsMustBeCompleted'},
+                {code: 'PublicApiDataSetCancellationsMustBeResolved'},
+                {code: 'PublicApiDataSetFailuresMustBeResolved'},
+                {code: 'PublicApiDataSetMappingsMustBeCompleted'},
               ],
             }}
-            release={testRelease}
+            release={testReleaseVersion}
           />
         </MemoryRouter>
         ,
@@ -265,7 +265,7 @@ describe('ReleaseStatusChecklist', () => {
           checklist={{
             valid: true,
             warnings: [
-              { code: 'NoMethodology' },
+              {code: 'NoMethodology'},
               {
                 code: 'MethodologyNotApproved',
                 methodologyId: 'methodology-1',
@@ -274,11 +274,11 @@ describe('ReleaseStatusChecklist', () => {
                 code: 'MethodologyNotApproved',
                 methodologyId: 'methodology-2',
               },
-              { code: 'NoNextReleaseDate' },
-              { code: 'NoFootnotesOnSubjects', totalSubjects: 3 },
-              { code: 'NoFeaturedTables' },
-              { code: 'NoDataFiles' },
-              { code: 'NoPublicPreReleaseAccessList' },
+              {code: 'NoNextReleaseDate'},
+              {code: 'NoFootnotesOnSubjects', totalSubjects: 3},
+              {code: 'NoFeaturedTables'},
+              {code: 'NoDataFiles'},
+              {code: 'NoPublicPreReleaseAccessList'},
             ],
             errors: [],
           }}
@@ -288,13 +288,13 @@ describe('ReleaseStatusChecklist', () => {
     );
 
     expect(
-      screen.queryByRole('heading', { name: 'All checks passed' }),
+      screen.queryByRole('heading', {name: 'All checks passed'}),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { name: 'Errors' }),
+      screen.queryByRole('heading', {name: 'Errors'}),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Warnings' }),
+      screen.getByRole('heading', {name: 'Warnings'}),
     ).toBeInTheDocument();
 
     expect(screen.getByText('8 things')).toBeInTheDocument();
@@ -366,8 +366,8 @@ describe('ReleaseStatusChecklist', () => {
         <ReleaseStatusChecklist
           checklist={{
             valid: true,
-            warnings: [{ code: 'NoMethodology' }],
-            errors: [{ code: 'PublicDataGuidanceRequired' }],
+            warnings: [{code: 'NoMethodology'}],
+            errors: [{code: 'PublicDataGuidanceRequired'}],
           }}
           release={testReleaseVersion}
         />
@@ -375,11 +375,11 @@ describe('ReleaseStatusChecklist', () => {
     );
 
     expect(
-      screen.queryByRole('heading', { name: 'All checks passed' }),
+      screen.queryByRole('heading', {name: 'All checks passed'}),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Errors' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: 'Errors'})).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Warnings' }),
+      screen.getByRole('heading', {name: 'Warnings'}),
     ).toBeInTheDocument();
 
     expect(screen.getByText('1 issue')).toBeInTheDocument();
@@ -413,13 +413,13 @@ describe('ReleaseStatusChecklist', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'All checks passed' }),
+      screen.getByRole('heading', {name: 'All checks passed'}),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { name: 'Errors' }),
+      screen.queryByRole('heading', {name: 'Errors'}),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { name: 'Warnings' }),
+      screen.queryByRole('heading', {name: 'Warnings'}),
     ).not.toBeInTheDocument();
   });
 });

@@ -23,7 +23,7 @@ const addReleaseFormErrorMappings = [
 ];
 
 interface FormValues {
-  releaseVersionId: string;
+  releaseId: string;
   releaseRole: string;
 }
 
@@ -56,7 +56,7 @@ export default function ReleaseAccessForm({
     <FormProvider
       errorMappings={addReleaseFormErrorMappings}
       initialValues={{
-        releaseVersionId: orderBy(releases, release => release)?.[0]?.id ?? '',
+        releaseId: orderBy(releases, release => release)?.[0]?.id ?? '',
         releaseRole:
           orderBy(releaseRoles, releaseRole => releaseRole)?.[0] ?? '',
       }}
@@ -74,7 +74,7 @@ export default function ReleaseAccessForm({
                 <div className="govuk-grid-column-one-half">
                   <FormFieldSelect<FormValues>
                     label="Release"
-                    name="releaseVersionId"
+                    name="releaseId"
                     options={releases?.map(release => ({
                       label: release.title,
                       value: release.id,
