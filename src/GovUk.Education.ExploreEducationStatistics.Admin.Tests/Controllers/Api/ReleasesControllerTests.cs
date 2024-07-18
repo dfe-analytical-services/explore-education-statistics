@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task Create_Release_Returns_Ok()
         {
-            var returnedViewModel = new ReleaseViewModel();
+            var returnedViewModel = new ReleaseVersionViewModel();
 
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     It.Is<Guid>(id => id.Equals(_releaseVersionId)),
                     It.IsAny<ReleaseUpdateRequest>())
                 )
-                .ReturnsAsync(new ReleaseViewModel { Id = _releaseVersionId });
+                .ReturnsAsync(new ReleaseVersionViewModel { Id = _releaseVersionId });
 
             var controller = BuildController(releaseService: releaseService.Object);
 
@@ -388,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseService = new Mock<IReleaseService>(Strict);
 
             var request = new ReleaseStatusCreateRequest();
-            var returnedReleaseViewModel = new ReleaseViewModel();
+            var returnedReleaseViewModel = new ReleaseVersionViewModel();
 
             releaseApprovalService
                 .Setup(s => s.CreateReleaseStatus(_releaseVersionId, request))

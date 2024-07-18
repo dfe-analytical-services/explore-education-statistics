@@ -1,4 +1,4 @@
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseContext';
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
@@ -20,20 +20,20 @@ export const releasePreReleaseAccessPageTabs = {
 };
 
 const ReleasePreReleaseAccessPage = () => {
-  const { releaseId } = useReleaseContext();
+  const { releaseVersionId } = useReleaseVersionContext();
 
   const {
     value: release,
     isLoading,
     setState: setRelease,
   } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [releaseId],
+    () => releaseService.getRelease(releaseVersionId),
+    [releaseVersionId],
   );
 
   const { value: canUpdateRelease = false } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
-    [releaseId],
+    () => permissionService.canUpdateRelease(releaseVersionId),
+    [releaseVersionId],
   );
 
   return (
@@ -82,7 +82,7 @@ const ReleasePreReleaseAccessPage = () => {
                     preReleaseContentRoute.path,
                     {
                       publicationId: release.publicationId,
-                      releaseId: release.id,
+                      releaseVersionId: release.id,
                     },
                   )}`}
                 />

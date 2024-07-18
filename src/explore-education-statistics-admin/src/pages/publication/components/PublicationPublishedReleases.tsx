@@ -5,7 +5,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import publicationService from '@admin/services/publicationService';
 import releaseService, {
-  ReleaseSummaryWithPermissions,
+  ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -41,7 +41,7 @@ export default function PublicationPublishedReleases({
   } = useInfiniteQuery(
     ['publicationPublishedReleases', publicationId],
     ({ pageParam = 1 }) => {
-      return publicationService.listReleases<ReleaseSummaryWithPermissions>(
+      return publicationService.listReleases<ReleaseVersionSummaryWithPermissions>(
         publicationId,
         {
           live: true,
@@ -110,7 +110,7 @@ export default function PublicationPublishedReleases({
                 history.push(
                   generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                     publicationId,
-                    releaseId: amendmentId,
+                    releaseVersionId: amendmentId,
                   }),
                 );
               }}

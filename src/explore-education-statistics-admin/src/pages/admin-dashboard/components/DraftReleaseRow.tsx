@@ -2,8 +2,8 @@ import Link from '@admin/components/Link';
 import DraftReleaseRowIssues from '@admin/pages/admin-dashboard/components/DraftReleaseRowIssues';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseService, {
-  ReleaseSummaryWithPermissions,
-  DashboardReleaseSummary,
+  ReleaseVersionSummaryWithPermissions,
+  DashboardReleaseVersionSummary,
   DeleteReleasePlan,
 } from '@admin/services/releaseService';
 import {
@@ -19,7 +19,8 @@ import CancelAmendmentModal from './CancelAmendmentModal';
 
 interface Props {
   isBauUser: boolean;
-  release: DashboardReleaseSummary & ReleaseSummaryWithPermissions;
+  release: DashboardReleaseVersionSummary &
+    ReleaseVersionSummaryWithPermissions;
   onChangeRelease: () => void;
 }
 
@@ -45,7 +46,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId: release.publication.id,
-            releaseId: release.id,
+            releaseVersionId: release.id,
           })}
         >
           {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
@@ -57,7 +58,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
             className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId: release.publication.id,
-              releaseId: release.previousVersionId,
+              releaseVersionId: release.previousVersionId,
             })}
           >
             View existing version

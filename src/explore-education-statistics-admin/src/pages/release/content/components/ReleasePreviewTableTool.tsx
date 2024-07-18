@@ -47,7 +47,7 @@ const ReleasePreviewTableTool = ({
           {
             ...query,
           },
-          releaseId,
+          releaseVersionId: releaseId,
         ),
       ]);
 

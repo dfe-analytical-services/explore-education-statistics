@@ -15,25 +15,25 @@ const ReleaseFootnoteEditPage = ({
   match,
   history,
 }: RouteComponentProps<ReleaseFootnoteRouteParams>) => {
-  const { publicationId, releaseId, footnoteId } = match.params;
+  const { publicationId, releaseVersionId, footnoteId } = match.params;
 
   const { value: footnoteMeta, isLoading: isFootnoteMetaLoading } =
     useAsyncHandledRetry(
-      () => footnoteService.getFootnoteMeta(releaseId),
-      [releaseId],
+      () => footnoteService.getFootnoteMeta(releaseVersionId),
+      [releaseVersionId],
     );
 
   const { value: footnote, isLoading: isFootnoteLoading } =
     useAsyncHandledRetry(
-      () => footnoteService.getFootnote(releaseId, footnoteId),
-      [releaseId, footnoteId],
+      () => footnoteService.getFootnote(releaseVersionId, footnoteId),
+      [releaseVersionId, footnoteId],
     );
 
   const footnotesPath = generatePath<ReleaseRouteParams>(
     releaseFootnotesRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
     },
   );
 
@@ -52,7 +52,7 @@ const ReleaseFootnoteEditPage = ({
             footnoteMeta={footnoteMeta}
             onSubmit={async values => {
               await footnoteService.updateFootnote(
-                releaseId,
+                releaseVersionId,
                 footnoteId,
                 values,
               );

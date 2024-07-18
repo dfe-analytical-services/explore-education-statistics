@@ -94,7 +94,7 @@ export default function LiveApiDataSetsTable({
                         </>
                       }
                       publicationId={publicationId}
-                      releaseId={releaseVersionId}
+                      releaseVersionId={releaseVersionId}
                       submitText="Confirm new data set version"
                       title="Create a new API data set version"
                       onSubmit={async ({ releaseFileId }) => {

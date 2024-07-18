@@ -65,7 +65,7 @@ const PrototypeReleaseContent = ({
 
   const addSummaryBlock = useCallback(async () => {
     await addContentSectionBlock({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       sectionId: release.summarySection.id,
       sectionKey: 'summarySection',
       block: {
@@ -79,7 +79,7 @@ const PrototypeReleaseContent = ({
   const addRelatedDashboardsBlock = useCallback(async () => {
     if (release.relatedDashboardsSection) {
       await addContentSectionBlock({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         sectionId: release.relatedDashboardsSection.id,
         sectionKey: 'relatedDashboardsSection',
         block: {
@@ -173,7 +173,7 @@ const PrototypeReleaseContent = ({
                       allowComments
                       block={block}
                       publicationId={release.publication.id}
-                      releaseId={release.id}
+                      releaseVersionId={release.id}
                     />
                   )}
                 />
@@ -250,7 +250,7 @@ const PrototypeReleaseContent = ({
                       releaseDataGuidanceRoute.path,
                       {
                         publicationId: release.publication.id,
-                        releaseId: release.id,
+                        releaseVersionId: release.id,
                       },
                     ),
                     state: {
@@ -270,7 +270,7 @@ const PrototypeReleaseContent = ({
                         preReleaseAccessListRoute.path,
                         {
                           publicationId: release.publication.id,
-                          releaseId: release.id,
+                          releaseVersionId: release.id,
                         },
                       ),
                       state: {
@@ -395,7 +395,7 @@ const PrototypeReleaseContent = ({
                   releaseDataGuidanceRoute.path,
                   {
                     publicationId: release.publication.id,
-                    releaseId: release.id,
+                    releaseVersionId: release.id,
                   },
                 ),
                 state: {
@@ -426,7 +426,7 @@ const PrototypeReleaseContent = ({
                     allowComments
                     block={block}
                     publicationId={release.publication.id}
-                    releaseId={release.id}
+                    releaseVersionId={release.id}
                   />
                 )}
               />

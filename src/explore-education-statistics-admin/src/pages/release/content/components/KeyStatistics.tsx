@@ -43,7 +43,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   const saveOrder = useCallback(async () => {
     if (reorderKeyStatistics) {
       await reorderKeyStatistics({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         keyStatistics,
       });
       toggleReordering.off();

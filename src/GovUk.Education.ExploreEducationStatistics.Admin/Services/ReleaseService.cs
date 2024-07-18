@@ -101,13 +101,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _cacheService = cacheService;
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId)
+        public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersion)
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion => _mapper
-                    .Map<ReleaseViewModel>(releaseVersion) with
+                    .Map<ReleaseVersionViewModel>(releaseVersion) with
                     {
                         PreReleaseUsersOrInvitesAdded = _context
                             .UserReleaseRoles
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
+        public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
             return await ReleaseCreateRequestValidator.Validate(releaseCreate)
                 .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(
+        public async Task<Either<ActionResult, ReleaseVersionViewModel>> UpdateReleaseVersion(
             Guid releaseVersionId, ReleaseUpdateRequest request)
         {
             return await ReleaseUpdateRequestValidator.Validate(request)

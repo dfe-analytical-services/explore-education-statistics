@@ -39,7 +39,7 @@ describe('ReleaseStatusChecklist', () => {
                 { code: 'PublicApiDataSetMappingsMustBeCompleted' },
               ],
             }}
-            release={testRelease}
+            release={testReleaseVersion}
           />
         </MemoryRouter>
         ,
@@ -282,7 +282,7 @@ describe('ReleaseStatusChecklist', () => {
             ],
             errors: [],
           }}
-          release={testRelease}
+          release={testReleaseVersion}
         />
       </MemoryRouter>,
     );
@@ -369,7 +369,7 @@ describe('ReleaseStatusChecklist', () => {
             warnings: [{ code: 'NoMethodology' }],
             errors: [{ code: 'PublicDataGuidanceRequired' }],
           }}
-          release={testRelease}
+          release={testReleaseVersion}
         />
       </MemoryRouter>,
     );
@@ -407,7 +407,7 @@ describe('ReleaseStatusChecklist', () => {
             warnings: [],
             errors: [],
           }}
-          release={testRelease}
+          release={testReleaseVersion}
         />
       </MemoryRouter>,
     );

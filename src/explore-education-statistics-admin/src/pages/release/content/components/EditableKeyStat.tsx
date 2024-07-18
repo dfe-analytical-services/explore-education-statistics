@@ -41,11 +41,11 @@ const EditableKeyStat = ({
           isReordering={isReordering}
           onRemove={async () => {
             await deleteKeyStatistic({
-              releaseId,
+              releaseVersionId: releaseId,
               keyStatisticId: keyStat.id,
             });
             await updateUnattachedDataBlocks({
-              releaseId,
+              releaseVersionId: releaseId,
             });
           }}
           onSubmit={async values => {
@@ -54,7 +54,7 @@ const EditableKeyStat = ({
             };
 
             await updateKeyStatisticDataBlock({
-              releaseId,
+              releaseVersionId: releaseId,
               keyStatisticId: keyStat.id,
               request,
             });
@@ -70,7 +70,7 @@ const EditableKeyStat = ({
           isReordering={isReordering}
           onRemove={async () => {
             await deleteKeyStatistic({
-              releaseId,
+              releaseVersionId: releaseId,
               keyStatisticId: keyStat.id,
             });
           }}
@@ -79,7 +79,7 @@ const EditableKeyStat = ({
               ...values,
             };
             await updateKeyStatisticText({
-              releaseId,
+              releaseVersionId: releaseId,
               keyStatisticId: keyStat.id,
               request,
             });

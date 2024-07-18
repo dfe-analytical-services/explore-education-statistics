@@ -15,7 +15,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
 import {
-  Release,
+  ReleaseVersion,
   ReleaseChecklist,
   ReleaseChecklistError,
   ReleaseChecklistWarning,
@@ -34,7 +34,7 @@ interface ChecklistMessage {
 
 interface Props {
   checklist: ReleaseChecklist;
-  release: Release;
+  release: ReleaseVersion;
 }
 
 const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
@@ -42,7 +42,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
 
   const releaseRouteParams = useMemo<ReleaseRouteParams>(
     () => ({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       publicationId: release.publicationId,
     }),
     [release.id, release.publicationId],

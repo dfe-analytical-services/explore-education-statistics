@@ -24,7 +24,7 @@ const ReleaseBlock = ({
   const getChartFile = useGetChartFile(releaseId);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseId,
+    releaseVersionId: releaseId,
   });
 
   if (block.type === 'EmbedBlockLink') {

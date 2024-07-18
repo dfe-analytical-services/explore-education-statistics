@@ -49,7 +49,7 @@ export const calculatePraPeriodAdvice = (
 const PreReleasePageContainer = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+  const { publicationId, releaseVersionId } = match.params;
 
   const config = useConfig();
   const { user } = useAuthContext();
@@ -61,7 +61,7 @@ const PreReleasePageContainer = ({
   >(async () => {
     try {
       const preReleaseWindowStatus =
-        await permissionService.getPreReleaseWindowStatus(releaseId);
+        await permissionService.getPreReleaseWindowStatus(releaseVersionId);
 
       if (preReleaseWindowStatus.access === 'NoneSet') {
         errorPages.forbidden();
@@ -69,7 +69,7 @@ const PreReleasePageContainer = ({
       }
 
       const preReleaseSummary = await preReleaseService.getPreReleaseSummary(
-        releaseId,
+        releaseVersionId,
       );
       return {
         preReleaseWindowStatus,
@@ -79,7 +79,7 @@ const PreReleasePageContainer = ({
       handleError(err);
       return undefined;
     }
-  }, [errorPages, releaseId]);
+  }, [errorPages, releaseVersionId]);
 
   const renderPage = () => {
     if (!model) {
@@ -166,7 +166,7 @@ const PreReleasePageContainer = ({
               title: route.title,
               to: generatePath<ReleaseRouteParams>(route.path, {
                 publicationId,
-                releaseId,
+                releaseVersionId,
               }),
             }))}
             label="Pre-release"

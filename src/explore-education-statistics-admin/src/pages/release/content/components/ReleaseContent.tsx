@@ -70,7 +70,7 @@ const ReleaseContent = ({
 
   const addSummaryBlock = useCallback(async () => {
     await addContentSectionBlock({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       sectionId: release.summarySection.id,
       sectionKey: 'summarySection',
       block: {
@@ -84,7 +84,7 @@ const ReleaseContent = ({
   const addRelatedDashboardsBlock = useCallback(async () => {
     if (release.relatedDashboardsSection) {
       await addContentSectionBlock({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         sectionId: release.relatedDashboardsSection.id,
         sectionKey: 'relatedDashboardsSection',
         block: {
@@ -209,7 +209,7 @@ const ReleaseContent = ({
                       allowComments
                       block={block}
                       publicationId={release.publication.id}
-                      releaseId={release.id}
+                      releaseVersionId={release.id}
                       sectionId={release.summarySection.id}
                       sectionKey="summarySection"
                     />
@@ -288,7 +288,7 @@ const ReleaseContent = ({
                       releaseDataGuidanceRoute.path,
                       {
                         publicationId: release.publication.id,
-                        releaseId: release.id,
+                        releaseVersionId: release.id,
                       },
                     ),
                     state: {
@@ -308,7 +308,7 @@ const ReleaseContent = ({
                         preReleaseAccessListRoute.path,
                         {
                           publicationId: release.publication.id,
-                          releaseId: release.id,
+                          releaseVersionId: release.id,
                         },
                       ),
                       state: {
@@ -433,7 +433,7 @@ const ReleaseContent = ({
                   releaseDataGuidanceRoute.path,
                   {
                     publicationId: release.publication.id,
-                    releaseId: release.id,
+                    releaseVersionId: release.id,
                   },
                 ),
                 state: {
@@ -464,7 +464,7 @@ const ReleaseContent = ({
                     allowComments
                     block={block}
                     publicationId={release.publication.id}
-                    releaseId={release.id}
+                    releaseVersionId={release.id}
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     sectionId={release.relatedDashboardsSection!.id}
                     sectionKey="relatedDashboardsSection"

@@ -194,7 +194,7 @@ export default function TableToolWizard({
     updateState(draft => {
       draft.subjects = subjects;
       draft.featuredTables = featuredTables;
-      draft.query.releaseId = undefined;
+      draft.query.releaseVersionId = undefined;
       draft.query.publicationId = publication.id;
       draft.selectedPublication = {
         ...publication,
@@ -245,7 +245,7 @@ export default function TableToolWizard({
 
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       selectedSubjectId,
-      state.query.releaseId,
+      state.query.releaseVersionId,
     );
 
     setReorderedTableHeaders(undefined);
@@ -268,11 +268,11 @@ export default function TableToolWizard({
   };
 
   const handleLocationStepBack = async () => {
-    const { releaseId, subjectId } = state.query;
+    const { releaseVersionId, subjectId } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       subjectId,
-      releaseId,
+      releaseVersionId,
     );
 
     updateState(draft => {
@@ -289,7 +289,7 @@ export default function TableToolWizard({
           locationIds,
           subjectId: state.query.subjectId,
         },
-        state.query.releaseId,
+        state.query.releaseVersionId,
       );
 
       const { timePeriod } = state.query;
@@ -337,7 +337,7 @@ export default function TableToolWizard({
         subjectId,
         locationIds,
       },
-      releaseId,
+      releaseVersionId,
     );
 
     updateState(draft => {
@@ -352,7 +352,7 @@ export default function TableToolWizard({
 
   const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler =
     async values => {
-      const { releaseId, subjectId, locationIds } = state.query;
+      const { releaseVersionId, subjectId, locationIds } = state.query;
       const [startYear, startCode] = parseYearCodeTuple(values.start);
       const [endYear, endCode] = parseYearCodeTuple(values.end);
 
@@ -367,7 +367,7 @@ export default function TableToolWizard({
             endCode,
           },
         },
-        releaseId,
+        releaseVersionId,
       );
 
       const indicatorValues = new Set(
@@ -407,7 +407,7 @@ export default function TableToolWizard({
     };
 
   const handleFiltersStepBack = async () => {
-    const { releaseId, subjectId, locationIds, timePeriod } = state.query;
+    const { releaseVersionId, subjectId, locationIds, timePeriod } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
       {
@@ -415,7 +415,7 @@ export default function TableToolWizard({
         locationIds,
         timePeriod,
       },
-      releaseId,
+      releaseVersionId,
     );
 
     updateState(draft => {
@@ -448,7 +448,7 @@ export default function TableToolWizard({
         filters: updatedReleaseTableDataQuery.filters,
         indicators: updatedReleaseTableDataQuery.indicators,
       } as FullTableQuery,
-      updatedReleaseTableDataQuery.releaseId,
+      updatedReleaseTableDataQuery.releaseVersionId,
     );
 
     if (!tableData.results.length || !tableData.subjectMeta) {

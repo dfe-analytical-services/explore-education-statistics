@@ -2,7 +2,7 @@ import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseContext';
 import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
@@ -43,26 +43,26 @@ export default function ReleaseStatusPage() {
   const lastLocation = useLastLocation();
 
   const {
-    releaseId,
-    release: contextRelease,
+    releaseVersionId,
+    releaseVersion: contextRelease,
     onReleaseChange,
-  } = useReleaseContext();
+  } = useReleaseVersionContext();
 
   const { value: release, setState: setRelease } = useAsyncHandledRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseService.getRelease(releaseVersionId)
         : contextRelease,
-    [releaseId],
+    [releaseVersionId],
   );
 
   const { value: releaseStatuses } = useAsyncRetry<ReleaseStatus[]>(
-    () => releaseService.getReleaseStatuses(releaseId),
-    [releaseId, release],
+    () => releaseService.getReleaseStatuses(releaseVersionId),
+    [releaseVersionId, release],
   );
 
   const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
-    () => permissionService.getReleaseStatusPermissions(releaseId),
+    () => permissionService.getReleaseStatusPermissions(releaseVersionId),
   );
 
   const { publicAppUrl } = useConfig();
@@ -119,7 +119,7 @@ export default function ReleaseStatusPage() {
         {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
             <ReleasePublishingStatus
-              releaseId={releaseId}
+              releaseId={releaseVersionId}
               refreshPeriod={1000}
               onChange={handlePublishingStatusChange}
             />

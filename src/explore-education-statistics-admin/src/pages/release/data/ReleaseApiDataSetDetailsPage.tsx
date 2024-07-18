@@ -3,7 +3,7 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/ApiDataSetVersionSummaryList';
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetLocationsMappingRoute,
@@ -37,7 +37,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const history = useHistory();
 
   const { publicAppUrl } = useConfig();
-  const { release } = useReleaseContext();
+  const { releaseVersion } = useReleaseVersionContext();
 
   const {
     data: dataSet,
@@ -50,7 +50,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     },
   });
 
-  const canUpdateRelease = release.approvalStatus !== 'Approved';
+  const canUpdateRelease = releaseVersion.approvalStatus !== 'Approved';
 
   const columnSizeClassName =
     dataSet?.latestLiveVersion && dataSet?.draftVersion
@@ -61,7 +61,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet?.draftVersion}
       id="draft-version-summary"
-      publicationId={release.publicationId}
+      publicationId={releaseVersion.publicationId}
       collapsibleButtonHiddenText="for draft version"
       actions={
         canUpdateRelease && dataSet.draftVersion.status !== 'Processing' ? (
@@ -71,8 +71,8 @@ export default function ReleaseApiDataSetDetailsPage() {
             onDeleted={() =>
               history.push(
                 generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: releaseVersion.id,
                 }),
               )
             }
@@ -88,7 +88,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet.latestLiveVersion}
       id="live-version-summary"
-      publicationId={release.publicationId}
+      publicationId={releaseVersion.publicationId}
       collapsibleButtonHiddenText="for latest live version"
       actions={
         <ul className="govuk-list">
@@ -133,8 +133,8 @@ export default function ReleaseApiDataSetDetailsPage() {
         back
         className="govuk-!-margin-bottom-6"
         to={generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
-          releaseId: release.id,
-          publicationId: release.publicationId,
+          releaseVersionId: releaseVersion.id,
+          publicationId: releaseVersion.publicationId,
         })}
       >
         Back to API data sets
@@ -248,11 +248,13 @@ export default function ReleaseApiDataSetDetailsPage() {
             </div>
             {canUpdateRelease &&
               !dataSet.draftVersion &&
-              !dataSet.previousReleaseIds.includes(release.releaseId) && (
+              !dataSet.previousReleaseIds.includes(
+                releaseVersion.releaseId,
+              ) && (
                 <ApiDataSetCreateModal
                   buttonText="Create a new version of this data set"
-                  publicationId={release.publicationId}
-                  releaseId={release.id}
+                  publicationId={releaseVersion.publicationId}
+                  releaseVersionId={releaseVersion.id}
                   submitText="Confirm new data set version"
                   title="Create a new API data set version"
                   onSubmit={async ({ releaseFileId }) => {

@@ -140,7 +140,7 @@ export interface TableDataQuery extends FullTableQuery {
 }
 
 export interface ReleaseTableDataQuery extends TableDataQuery {
-  releaseId?: string;
+  releaseVersionId?: string;
 }
 
 export interface FullTableQuery {
@@ -219,38 +219,38 @@ const tableBuilderService = {
   ): Promise<FeaturedTable[]> {
     return dataApi.get(`/publications/${publicationId}/featured-tables`);
   },
-  listReleaseSubjects(releaseId: string): Promise<Subject[]> {
-    return dataApi.get(`/releases/${releaseId}/subjects`);
+  listReleaseSubjects(releaseVersionId: string): Promise<Subject[]> {
+    return dataApi.get(`/releases/${releaseVersionId}/subjects`);
   },
-  listReleaseFeaturedTables(releaseId: string): Promise<FeaturedTable[]> {
-    return dataApi.get(`/releases/${releaseId}/featured-tables`);
+  listReleaseFeaturedTables(releaseVersionId: string): Promise<FeaturedTable[]> {
+    return dataApi.get(`/releases/${releaseVersionId}/featured-tables`);
   },
   async getSubjectMeta(
     subjectId: string,
-    releaseId?: string,
+    releaseVersionId?: string,
   ): Promise<SubjectMeta> {
-    return releaseId
-      ? dataApi.get(`/release/${releaseId}/meta/subject/${subjectId}`)
+    return releaseVersionId
+      ? dataApi.get(`/release/${releaseVersionId}/meta/subject/${subjectId}`)
       : dataApi.get(`/meta/subject/${subjectId}`);
   },
   async filterSubjectMeta(
     query: LocationsOrTimePeriodsQuery,
-    releaseId?: string,
+    releaseVersionId?: string,
   ): Promise<SubjectMeta> {
-    return releaseId
-      ? dataApi.post(`/release/${releaseId}/meta/subject`, query)
+    return releaseVersionId
+      ? dataApi.post(`/release/${releaseVersionId}/meta/subject`, query)
       : dataApi.post('/meta/subject', query);
   },
   async getTableData(
     query: FullTableQuery,
-    releaseId?: string,
+    releaseVersionId?: string,
   ): Promise<TableDataResponse> {
     return releaseId
-      ? dataApi.post(`/tablebuilder/release/${releaseId}`, query)
+      ? dataApi.post(`/tablebuilder/release/${releaseVersionId}`, query)
       : dataApi.post('/tablebuilder', query);
   },
   async getTableCsv({
-    releaseId,
+    releaseVersionId,
     ...query
   }: ReleaseTableDataQuery): Promise<Blob> {
     const config: AxiosRequestConfig = {
@@ -260,16 +260,16 @@ const tableBuilderService = {
       responseType: 'blob',
     };
 
-    return releaseId
-      ? dataApi.post(`/tablebuilder/release/${releaseId}`, query, config)
+    return releaseVersionId
+      ? dataApi.post(`/tablebuilder/release/${releaseVersionId}`, query, config)
       : dataApi.post('/tablebuilder', query, config);
   },
   async getDataBlockTableData(
-    releaseId: string,
+    releaseVersionId: string,
     dataBlockParentId: string,
   ): Promise<TableDataResponse> {
     return dataApi.get(
-      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
+      `/tablebuilder/release/${releaseVersionId}/data-block/${dataBlockParentId}`,
     );
   },
   getFastTrackTableAndReleaseMeta(

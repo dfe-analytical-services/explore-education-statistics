@@ -653,7 +653,7 @@ async function renderPage({
   history.push(
     generatePath<PublicationTeamRouteParams>(publicationTeamAccessRoute.path, {
       publicationId: 'publication-1',
-      releaseId,
+      releaseVersionId: releaseId,
     }),
   );
 

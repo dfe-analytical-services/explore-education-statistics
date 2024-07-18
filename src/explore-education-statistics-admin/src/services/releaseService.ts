@@ -11,7 +11,7 @@ import {
 import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
-export interface ReleasePermissions {
+export interface ReleaseVersionPermissions {
   canAddPrereleaseUsers: boolean;
   canViewRelease: boolean;
   canUpdateRelease: boolean;
@@ -19,7 +19,7 @@ export interface ReleasePermissions {
   canMakeAmendmentOfRelease: boolean;
 }
 
-export interface Release {
+export interface ReleaseVersion {
   id: string;
   releaseId: string;
   slug: string;
@@ -44,10 +44,10 @@ export interface Release {
   preReleaseUsersOrInvitesAdded?: boolean;
   year: number;
   yearTitle: string;
-  permissions?: ReleasePermissions;
+  permissions?: ReleaseVersionPermissions;
 }
 
-export interface ReleaseSummary {
+export interface ReleaseVersionSummary {
   id: string;
   title: string;
   slug: string;
@@ -63,19 +63,21 @@ export interface ReleaseSummary {
   amendment: boolean;
   latestRelease: boolean;
   previousVersionId?: string;
-  permissions?: ReleasePermissions;
+  permissions?: ReleaseVersionPermissions;
   publication?: PublicationSummary;
 }
 
-export interface DashboardReleaseSummary extends ReleaseSummaryWithPermissions {
+export interface DashboardReleaseVersionSummary
+  extends ReleaseVersionSummaryWithPermissions {
   publication: PublicationSummary;
 }
 
-export interface ReleaseSummaryWithPermissions extends ReleaseSummary {
-  permissions: ReleasePermissions;
+export interface ReleaseVersionSummaryWithPermissions
+  extends ReleaseVersionSummary {
+  permissions: ReleaseVersionPermissions;
 }
 
-interface BaseReleaseRequest {
+interface BaseReleaseVersionRequest {
   year: number;
   timePeriodCoverage: {
     value: string;
@@ -83,12 +85,12 @@ interface BaseReleaseRequest {
   type: ReleaseType;
 }
 
-export interface CreateReleaseRequest extends BaseReleaseRequest {
+export interface CreateReleaseVersionRequest extends BaseReleaseVersionRequest {
   publicationId: string;
   templateReleaseId?: string;
 }
 
-export interface UpdateReleaseRequest extends BaseReleaseRequest {
+export interface UpdateReleaseVersionRequest extends BaseReleaseVersionRequest {
   preReleaseAccessList?: string;
 }
 
@@ -183,14 +185,6 @@ export interface ReleaseChecklist {
   warnings: ReleaseChecklistWarning[];
 }
 
-export interface ReleasePublicationStatus {
-  publishScheduled: string;
-  nextReleaseDate?: PartialDate;
-  approvalStatus: ReleaseApprovalStatus;
-  amendment: boolean;
-  live: boolean;
-}
-
 export interface ReleaseStatus {
   releaseStatusId: string;
   internalReleaseNote: string;
@@ -205,14 +199,16 @@ export interface DeleteReleasePlan {
 }
 
 const releaseService = {
-  createRelease(createRequest: CreateReleaseRequest): Promise<Release> {
+  createRelease(
+    createRequest: CreateReleaseVersionRequest,
+  ): Promise<ReleaseVersion> {
     return client.post(
       `/publications/${createRequest.publicationId}/releases`,
       createRequest,
     );
   },
 
-  getRelease(releaseId: string): Promise<Release> {
+  getRelease(releaseId: string): Promise<ReleaseVersion> {
     return client.get(`/releases/${releaseId}`);
   },
 
@@ -222,15 +218,15 @@ const releaseService = {
 
   updateRelease(
     releaseId: string,
-    updateRequest: UpdateReleaseRequest,
-  ): Promise<Release> {
+    updateRequest: UpdateReleaseVersionRequest,
+  ): Promise<ReleaseVersion> {
     return client.put(`/releases/${releaseId}`, updateRequest);
   },
 
   createReleaseStatus(
     releaseId: string,
     createRequest: CreateReleaseStatusRequest,
-  ): Promise<Release> {
+  ): Promise<ReleaseVersion> {
     return client.post(`/releases/${releaseId}/status`, createRequest);
   },
 
@@ -242,24 +238,16 @@ const releaseService = {
     return client.delete(`/release/${releaseId}`);
   },
 
-  listDraftReleases(): Promise<DashboardReleaseSummary[]> {
+  listDraftReleases(): Promise<DashboardReleaseVersionSummary[]> {
     return client.get('/releases/draft');
   },
 
-  listScheduledReleases(): Promise<DashboardReleaseSummary[]> {
+  listScheduledReleases(): Promise<DashboardReleaseVersionSummary[]> {
     return client.get('/releases/scheduled');
   },
 
-  listReleasesForApproval(): Promise<DashboardReleaseSummary[]> {
+  listReleasesForApproval(): Promise<DashboardReleaseVersionSummary[]> {
     return client.get('/releases/approvals');
-  },
-
-  getReleasePublicationStatus(
-    releaseId: string,
-  ): Promise<ReleasePublicationStatus> {
-    return client.get<ReleasePublicationStatus>(
-      `/releases/${releaseId}/publication-status`,
-    );
   },
 
   getReleaseStatus(releaseId: string): Promise<ReleaseStageStatus> {

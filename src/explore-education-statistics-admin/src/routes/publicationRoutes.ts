@@ -23,12 +23,12 @@ export type PublicationEditReleaseSeriesLegacyLinkRouteParams = {
 
 export type PublicationTeamRouteParams = {
   publicationId: string;
-  releaseId?: string;
+  releaseVersionId?: string;
 };
 
 export type PublicationManageTeamRouteParams = {
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
 };
 
 export interface PublicationRouteProps extends RouteProps {
@@ -73,20 +73,20 @@ export const publicationContactRoute: PublicationRouteProps = {
 };
 
 export const publicationTeamAccessRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/team/:releaseId?',
+  path: '/publication/:publicationId/team/:releaseVersionId?',
   title: 'Team access',
   component: PublicationTeamAccessPage,
 };
 
 export const publicationManageReleaseContributorsPageRoute: PublicationRouteProps =
   {
-    path: '/publication/:publicationId/team/:releaseId/manage-contributors',
+    path: '/publication/:publicationId/team/:releaseVersionId/manage-contributors',
     title: 'Add contributors',
     component: PublicationManageReleaseContributorsPage,
   };
 
 export const publicationInviteUsersPageRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/team/:releaseId/invite-users',
+  path: '/publication/:publicationId/team/:releaseVersionId/invite-users',
   title: 'Invite users',
   component: PublicationInviteUsersPage,
 };

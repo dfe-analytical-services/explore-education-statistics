@@ -23,7 +23,7 @@ import ContentHtml from '@common/components/ContentHtml';
 
 interface Props {
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   footnoteMeta: FootnoteMeta;
   footnotes: Footnote[];
   canUpdateRelease: boolean;
@@ -34,7 +34,7 @@ interface Props {
 
 const FootnotesList = ({
   publicationId,
-  releaseId,
+  releaseVersionId,
   footnotes,
   footnoteMeta,
   canUpdateRelease,
@@ -94,7 +94,7 @@ const FootnotesList = ({
                             releaseFootnotesEditRoute.path,
                             {
                               publicationId,
-                              releaseId,
+                              releaseVersionId,
                               footnoteId: id,
                             },
                           )}

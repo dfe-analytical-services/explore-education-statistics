@@ -48,7 +48,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
                   async content => {
                     if (release.keyStatisticsSecondarySection?.content) {
                       await deleteContentSectionBlock({
-                        releaseId: release.id,
+                        releaseVersionId: release.id,
                         sectionId: release.keyStatisticsSecondarySection.id,
                         blockId: content.id,
                         sectionKey: 'keyStatisticsSecondarySection',
@@ -77,7 +77,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
         await Promise.all(
           release.keyStatisticsSecondarySection.content.map(async content => {
             await deleteContentSectionBlock({
-              releaseId: release.id,
+              releaseVersionId: release.id,
               sectionId: release.keyStatisticsSecondarySection.id,
               blockId: content.id,
               sectionKey: 'keyStatisticsSecondarySection',
@@ -86,7 +86,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
         );
 
         await attachContentSectionBlock({
-          releaseId: release.id,
+          releaseVersionId: release.id,
           sectionId: release.keyStatisticsSecondarySection.id,
           sectionKey: 'keyStatisticsSecondarySection',
           block: {

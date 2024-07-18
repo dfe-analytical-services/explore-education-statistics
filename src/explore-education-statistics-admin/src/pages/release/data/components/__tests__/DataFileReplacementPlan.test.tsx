@@ -380,7 +380,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -594,7 +594,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -682,7 +682,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -713,7 +713,7 @@ describe('DataReplacementPlan', () => {
       <DataFileReplacementPlan
         cancelButton={<button type="button">Cancel</button>}
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         fileId="file-1"
         replacementFileId="file-2"
       />,
@@ -739,7 +739,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -784,7 +784,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -816,7 +816,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -862,7 +862,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -937,7 +937,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -970,7 +970,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -1023,7 +1023,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />
@@ -1101,7 +1101,7 @@ describe('DataReplacementPlan', () => {
         <DataFileReplacementPlan
           cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           fileId="file-1"
           replacementFileId="file-2"
         />

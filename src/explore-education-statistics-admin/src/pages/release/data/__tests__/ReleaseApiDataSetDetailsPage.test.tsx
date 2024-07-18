@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import { testReleaseVersion } from '@admin/pages/release/__data__/testReleaseVersion';
 import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
@@ -11,7 +11,7 @@ import _apiDataSetService, {
   ApiDataSetDraftVersion,
   ApiDataSetLiveVersion,
 } from '@admin/services/apiDataSetService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseService';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
@@ -302,7 +302,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       latestLiveVersion: testLiveVersion,
     });
 
-    renderPage({ release: { ...testRelease, approvalStatus: 'Approved' } });
+    renderPage({
+      releaseVersion: { ...testReleaseVersion, approvalStatus: 'Approved' },
+    });
 
     expect(
       await screen.findByText('Draft version details'),
@@ -339,7 +341,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       latestLiveVersion: testLiveVersion,
     });
 
-    renderPage({ release: { ...testRelease, approvalStatus: 'Approved' } });
+    renderPage({
+      releaseVersion: { ...testReleaseVersion, approvalStatus: 'Approved' },
+    });
 
     expect(
       await screen.findByText('Latest live version details'),
@@ -379,8 +383,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
 
     renderPage({
-      release: {
-        ...testRelease,
+      releaseVersion: {
+        ...testReleaseVersion,
         releaseId: testDataSet.previousReleaseIds[0],
       },
     });
@@ -396,19 +400,23 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  function renderPage(options?: { release?: Release; dataSetId?: string }) {
-    const { release = testRelease, dataSetId = 'data-set-id' } = options ?? {};
+  function renderPage(options?: {
+    releaseVersion?: ReleaseVersion;
+    dataSetId?: string;
+  }) {
+    const { releaseVersion = testReleaseVersion, dataSetId = 'data-set-id' } =
+      options ?? {};
 
     render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
                 releaseApiDataSetDetailsRoute.path,
                 {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: releaseVersion.id,
                   dataSetId,
                 },
               ),
@@ -419,7 +427,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
               path={releaseApiDataSetDetailsRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

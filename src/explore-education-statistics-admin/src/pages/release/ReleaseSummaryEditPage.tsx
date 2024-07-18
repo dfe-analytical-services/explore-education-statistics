@@ -2,7 +2,7 @@ import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -20,17 +20,17 @@ export default function ReleaseSummaryEditPage({
   const lastLocation = useLastLocation();
 
   const {
-    releaseId,
-    release: contextRelease,
+    releaseVersionId,
+    releaseVersion: contextRelease,
     onReleaseChange,
-  } = useReleaseContext();
+  } = useReleaseVersionContext();
 
   const { value: release, isLoading } = useAsyncRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseService.getRelease(releaseVersionId)
         : contextRelease,
-    [releaseId],
+    [releaseVersionId],
   );
 
   const handleSubmit = async (values: ReleaseSummaryFormValues) => {
@@ -38,7 +38,7 @@ export default function ReleaseSummaryEditPage({
       throw new Error('Could not update missing release');
     }
 
-    await releaseService.updateRelease(releaseId, {
+    await releaseService.updateRelease(releaseVersionId, {
       year: Number(values.timePeriodCoverageStartYear),
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
@@ -52,7 +52,7 @@ export default function ReleaseSummaryEditPage({
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
         publicationId: release.publicationId,
-        releaseId,
+        releaseVersionId,
       }),
     );
   };
@@ -65,7 +65,7 @@ export default function ReleaseSummaryEditPage({
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
         publicationId: release.publicationId,
-        releaseId,
+        releaseVersionId,
       }),
     );
   };

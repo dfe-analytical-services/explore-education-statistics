@@ -17,7 +17,7 @@ interface Props {
   canUpdateRelease?: boolean;
   file: AncillaryFile;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   onDelete?: () => void;
 }
 
@@ -25,7 +25,7 @@ export default function AncillaryFileSummaryList({
   canUpdateRelease,
   file,
   publicationId,
-  releaseId,
+  releaseVersionId,
   onDelete,
 }: Props) {
   return (
@@ -36,7 +36,7 @@ export default function AncillaryFileSummaryList({
         <ButtonText
           onClick={() =>
             releaseAncillaryFileService.downloadFile(
-              releaseId,
+              releaseVersionId,
               file.id,
               file.filename,
             )
@@ -73,7 +73,7 @@ export default function AncillaryFileSummaryList({
                   releaseAncillaryFileRoute.path,
                   {
                     publicationId,
-                    releaseId,
+                    releaseVersionId,
                     fileId: file.id,
                   },
                 )}

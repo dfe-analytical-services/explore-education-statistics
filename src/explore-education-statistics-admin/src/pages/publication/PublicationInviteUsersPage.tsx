@@ -12,7 +12,7 @@ const PublicationInviteUsersPage = ({
 }: RouteComponentProps<PublicationManageTeamRouteParams>) => {
   const { publicationId, publication } = usePublicationContext();
 
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
 
   const { value: allReleases = { results: [] }, isLoading } =
     useAsyncHandledRetry(() => publicationService.listReleases(publicationId));
@@ -24,7 +24,7 @@ const PublicationInviteUsersPage = ({
       <PublicationInviteNewUsersForm
         publication={publication}
         releases={releases}
-        releaseId={releaseId}
+        releaseVersionId={releaseVersionId}
       />
     </LoadingSpinner>
   );

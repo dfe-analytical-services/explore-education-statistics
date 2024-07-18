@@ -1,6 +1,6 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
 import _releaseService, {
-  ReleaseSummaryWithPermissions,
+  ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import {
   render as baseRender,
@@ -19,7 +19,7 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 describe('PublicationDraftReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testRelease1: ReleaseSummaryWithPermissions = {
+  const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
     id: 'release-1',
@@ -43,7 +43,7 @@ describe('PublicationDraftReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease2: ReleaseSummaryWithPermissions = {
+  const testRelease2: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     approvalStatus: 'HigherLevelReview',
     id: 'release-2',
@@ -52,7 +52,7 @@ describe('PublicationDraftReleases', () => {
     title: 'Release 2',
   };
 
-  const testRelease3: ReleaseSummaryWithPermissions = {
+  const testRelease3: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     amendment: true,
     id: 'release-3',

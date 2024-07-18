@@ -136,7 +136,7 @@ export default function ReleaseFileUploadsSection({
                     canUpdateRelease={canUpdateRelease}
                     file={file}
                     publicationId={publicationId}
-                    releaseId={releaseId}
+                    releaseVersionId={releaseId}
                     onDelete={() => setDeleteFile(file)}
                   />
                 </div>

@@ -4,7 +4,7 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseDataGuidanceService, {
   ReleaseDataGuidance,
 } from '@admin/services/releaseDataGuidanceService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseService, { ReleaseVersion } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import ReleaseDataGuidancePageContent from '@common/modules/release/components/ReleaseDataGuidancePageContent';
@@ -19,26 +19,26 @@ interface LocationState {
 
 interface Model {
   dataGuidance: ReleaseDataGuidance;
-  release: Release;
+  release: ReleaseVersion;
 }
 
 const ReleaseDataGuidancePage = ({
   match,
   location,
 }: RouteComponentProps<ReleaseRouteParams, StaticContext, LocationState>) => {
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [dataGuidance, release] = await Promise.all([
-      releaseDataGuidanceService.getDataGuidance(releaseId),
-      releaseService.getRelease(releaseId),
+      releaseDataGuidanceService.getDataGuidance(releaseVersionId),
+      releaseService.getRelease(releaseVersionId),
     ]);
 
     return {
       dataGuidance,
       release,
     };
-  }, [releaseId]);
+  }, [releaseVersionId]);
 
   const { publicAppUrl } = useConfig();
 

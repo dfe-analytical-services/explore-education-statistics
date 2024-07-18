@@ -198,7 +198,7 @@ describe('PreReleasePageContainer', () => {
           initialEntries={[
             generatePath<ReleaseRouteParams>(preReleaseRoute.path, {
               publicationId: 'publication-1',
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
             }),
           ]}
         >

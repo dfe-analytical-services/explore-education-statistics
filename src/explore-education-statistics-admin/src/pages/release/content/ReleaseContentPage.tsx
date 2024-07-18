@@ -159,19 +159,19 @@ const ReleaseContentPageLoaded = () => {
 const ReleaseContentPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
 
   const { value, isLoading } =
     useAsyncRetry<ReleaseContentContextState>(async () => {
       const { release, unattachedDataBlocks } =
-        await releaseContentService.getContent(releaseId);
+        await releaseContentService.getContent(releaseVersionId);
 
       const canUpdateRelease = await permissionService.canUpdateRelease(
-        releaseId,
+        releaseVersionId,
       );
 
       const featuredTables = await featuredTableService.listFeaturedTables(
-        releaseId,
+        releaseVersionId,
       );
 
       return {
@@ -180,7 +180,7 @@ const ReleaseContentPage = ({
         canUpdateRelease,
         featuredTables,
       };
-    }, [releaseId]);
+    }, [releaseVersionId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

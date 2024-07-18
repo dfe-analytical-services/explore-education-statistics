@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("publications/{publicationId:guid}/releases")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateRelease(ReleaseCreateRequest release,
+        public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest release,
             Guid publicationId)
         {
             release.PublicationId = publicationId;
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseVersionId:guid}")]
-        public async Task<ActionResult<ReleaseViewModel>> GetRelease(Guid releaseVersionId)
+        public async Task<ActionResult<ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
             return await _releaseService
                 .GetRelease(releaseVersionId)
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("releases/{releaseVersionId:guid}")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateRequest request,
+        public async Task<ActionResult<ReleaseVersionViewModel>> UpdateRelease(ReleaseUpdateRequest request,
             Guid releaseVersionId)
         {
             return await _releaseService
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("releases/{releaseVersionId:guid}/status")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseStatus(ReleaseStatusCreateRequest request,
+        public async Task<ActionResult<ReleaseVersionViewModel>> CreateReleaseStatus(ReleaseStatusCreateRequest request,
             Guid releaseVersionId)
         {
             return await _releaseApprovalService

@@ -40,7 +40,7 @@ export interface PermalinkSnapshot {
 }
 
 interface CreatePermalink {
-  releaseId?: string;
+  releaseVersionId?: string;
   query: TableDataQuery;
   configuration: {
     tableHeaders: UnmappedTableHeadersConfig;

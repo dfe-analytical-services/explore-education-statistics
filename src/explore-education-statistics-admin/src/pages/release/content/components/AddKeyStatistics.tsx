@@ -22,8 +22,11 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
 
   const addKeyStatDataBlock = useCallback(
     async (dataBlockId: string) => {
-      await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
-      await updateUnattachedDataBlocks({ releaseId: release.id });
+      await addKeyStatisticDataBlock({
+        releaseVersionId: release.id,
+        dataBlockId,
+      });
+      await updateUnattachedDataBlocks({ releaseVersionId: release.id });
       setFormType(undefined);
     },
     [release.id, addKeyStatisticDataBlock, updateUnattachedDataBlocks],
@@ -32,7 +35,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const addKeyStatText = useCallback(
     async (newKeyStatText: KeyStatisticTextCreateRequest) => {
       await addKeyStatisticText({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         keyStatisticText: newKeyStatText,
       });
       setFormType(undefined);

@@ -32,7 +32,7 @@ import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   canUpdateRelease: boolean;
   onDataFilesChange?: (dataFiles: DataFile[]) => void;
 }
@@ -44,7 +44,7 @@ interface DeleteDataFile {
 
 const ReleaseDataUploadsSection = ({
   publicationId,
-  releaseId,
+  releaseVersionId,
   canUpdateRelease,
   onDataFilesChange,
 }: Props) => {
@@ -86,7 +86,7 @@ const ReleaseDataUploadsSection = ({
     { totalRows, status }: DataFileImportStatus,
   ) => {
     const permissions = await permissionService.getDataFilePermissions(
-      releaseId,
+      releaseVersionId,
       dataFile.id,
     );
 
@@ -116,7 +116,7 @@ const ReleaseDataUploadsSection = ({
             return;
           }
           newFiles.push(
-            await releaseDataFileService.uploadDataFiles(releaseId, {
+            await releaseDataFileService.uploadDataFiles(releaseVersionId, {
               title: values.subjectTitle,
               dataFile: values.dataFile as File,
               metadataFile: values.metadataFile as File,
@@ -150,7 +150,7 @@ const ReleaseDataUploadsSection = ({
       setActiveFileIds(newFiles.map(file => file.id));
       setDataFiles(currentDataFiles => [...currentDataFiles, ...newFiles]);
     },
-    [releaseId],
+    [releaseVersionId],
   );
 
   return (
@@ -203,7 +203,7 @@ const ReleaseDataUploadsSection = ({
             onReorder={async (fileIds: string[]) => {
               setDataFiles(
                 await releaseDataFileService.updateDataFilesOrder(
-                  releaseId,
+                  releaseVersionId,
                   fileIds,
                 ),
               );
@@ -223,7 +223,7 @@ const ReleaseDataUploadsSection = ({
                   )}
                   <DataFileDetailsTable
                     dataFile={dataFile}
-                    releaseId={releaseId}
+                    releaseId={releaseVersionId}
                     onStatusChange={handleStatusChange}
                   >
                     {canUpdateRelease &&
@@ -237,7 +237,7 @@ const ReleaseDataUploadsSection = ({
                                   releaseDataFileRoute.path,
                                   {
                                     publicationId,
-                                    releaseId,
+                                    releaseVersionId,
                                     fileId: dataFile.id,
                                   },
                                 )}
@@ -263,7 +263,10 @@ const ReleaseDataUploadsSection = ({
                           <ButtonText
                             onClick={() =>
                               releaseDataFileService
-                                .getDeleteDataFilePlan(releaseId, dataFile)
+                                .getDeleteDataFilePlan(
+                                  releaseVersionId,
+                                  dataFile,
+                                )
                                 .then(plan => {
                                   setDeleteDataFile({
                                     plan,
@@ -278,7 +281,7 @@ const ReleaseDataUploadsSection = ({
                       )}
                     {dataFile.permissions.canCancelImport && (
                       <DataUploadCancelButton
-                        releaseId={releaseId}
+                        releaseId={releaseVersionId}
                         fileId={dataFile.id}
                       />
                     )}
@@ -304,7 +307,10 @@ const ReleaseDataUploadsSection = ({
             setFileDeleting(deleteDataFile, true);
 
             try {
-              await releaseDataFileService.deleteDataFiles(releaseId, file.id);
+              await releaseDataFileService.deleteDataFiles(
+                releaseVersionId,
+                file.id,
+              );
 
               setDataFiles(currentDataFiles =>
                 currentDataFiles.filter(dataFile => dataFile.id !== file.id),

@@ -18,7 +18,7 @@ import { generatePath, RouteComponentProps } from 'react-router';
 const ReleaseDataFileReplacementCompletePage = ({
   match,
 }: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
-  const { publicationId, releaseId, fileId } = match.params;
+  const { publicationId, releaseVersionId, fileId } = match.params;
 
   // Run the replacement plan against itself so we can just get the
   // data blocks and footnotes in a convenient way.
@@ -27,15 +27,20 @@ const ReleaseDataFileReplacementCompletePage = ({
     isLoading,
     error,
   } = useAsyncRetry(
-    () => dataReplacementService.getReplacementPlan(releaseId, fileId, fileId),
-    [releaseId, fileId],
+    () =>
+      dataReplacementService.getReplacementPlan(
+        releaseVersionId,
+        fileId,
+        fileId,
+      ),
+    [releaseVersionId, fileId],
   );
 
   const dataFilePath = generatePath<ReleaseDataFileReplaceRouteParams>(
     releaseDataFileReplaceRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
       fileId,
     },
   );
@@ -85,7 +90,7 @@ const ReleaseDataFileReplacementCompletePage = ({
                           releaseDataBlocksRoute.path,
                           {
                             publicationId,
-                            releaseId,
+                            releaseVersionId,
                             dataBlockId: dataBlock.id,
                           },
                         )}
@@ -115,7 +120,7 @@ const ReleaseDataFileReplacementCompletePage = ({
                           releaseFootnotesRoute.path,
                           {
                             publicationId,
-                            releaseId,
+                            releaseVersionId,
                             footnoteId: footnote.id,
                           },
                         )}

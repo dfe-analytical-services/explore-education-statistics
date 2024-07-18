@@ -26,9 +26,9 @@ export default function useReleaseContentActions() {
   const dispatch = useReleaseContentDispatch();
 
   const updateUnattachedDataBlocks = useCallback(
-    async ({ releaseId }: { releaseId: string }) => {
+    async ({ releaseVersionId }: { releaseVersionId: string }) => {
       const unattachedDataBlocks =
-        await dataBlockService.getUnattachedDataBlocks(releaseId);
+        await dataBlockService.getUnattachedDataBlocks(releaseVersionId);
 
       dispatch({
         type: 'SET_UNATTACHED_DATABLOCKS',
@@ -40,18 +40,18 @@ export default function useReleaseContentActions() {
 
   const deleteContentSectionBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       blockId,
       sectionKey,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       blockId: string;
       sectionKey: ContentSectionKeys;
     }) => {
       await releaseContentService.deleteContentSectionBlock(
-        releaseId,
+        releaseVersionId,
         sectionId,
         blockId,
       );
@@ -60,27 +60,27 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, blockId, sectionKey } },
       });
 
-      await updateUnattachedDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseVersionId });
     },
     [dispatch, updateUnattachedDataBlocks],
   );
 
   const updateContentSectionBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       blockId,
       sectionKey,
       bodyContent,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       blockId: string;
       sectionKey: ContentSectionKeys;
       bodyContent: string;
     }) => {
       const updateBlock = await releaseContentService.updateContentSectionBlock(
-        releaseId,
+        releaseVersionId,
         sectionId,
         blockId,
         { body: bodyContent },
@@ -99,13 +99,13 @@ export default function useReleaseContentActions() {
 
   const addBlockComment = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       blockId,
       comment,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
       blockId: string;
@@ -113,7 +113,7 @@ export default function useReleaseContentActions() {
     }): Promise<Comment> => {
       const newComment =
         await releaseContentCommentService.addContentSectionComment(
-          releaseId,
+          releaseVersionId,
           sectionId,
           blockId,
           comment,
@@ -139,7 +139,7 @@ export default function useReleaseContentActions() {
       blockId,
       commentId,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
       blockId: string;
@@ -165,7 +165,7 @@ export default function useReleaseContentActions() {
       blockId,
       comment,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
       blockId: string;
@@ -187,18 +187,18 @@ export default function useReleaseContentActions() {
 
   const addContentSectionBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       block,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
       block: ContentBlockPostModel;
     }) => {
       const newBlock = await releaseContentService.addContentSectionBlock(
-        releaseId,
+        releaseVersionId,
         sectionId,
         block,
       );
@@ -208,25 +208,25 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
 
-      await updateUnattachedDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseVersionId });
     },
     [dispatch, updateUnattachedDataBlocks],
   );
 
   const addEmbedSectionBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       request,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
       request: EmbedBlockCreateRequest;
     }) => {
       const newBlock = await releaseContentService.addEmbedSectionBlock(
-        releaseId,
+        releaseVersionId,
         request,
       );
 
@@ -240,17 +240,20 @@ export default function useReleaseContentActions() {
 
   const deleteEmbedSectionBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       blockId,
       sectionKey,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       blockId: string;
       sectionKey: ContentSectionKeys;
     }) => {
-      await releaseContentService.deleteEmbedSectionBlock(releaseId, blockId);
+      await releaseContentService.deleteEmbedSectionBlock(
+        releaseVersionId,
+        blockId,
+      );
       dispatch({
         type: 'REMOVE_SECTION_BLOCK',
         payload: { meta: { sectionId, blockId, sectionKey } },
@@ -261,20 +264,20 @@ export default function useReleaseContentActions() {
 
   const updateEmbedSectionBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       blockId,
       sectionKey,
       request,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       blockId: string;
       sectionKey: ContentSectionKeys;
       request: EmbedBlockUpdateRequest;
     }) => {
       const updateBlock = await releaseContentService.updateEmbedSectionBlock(
-        releaseId,
+        releaseVersionId,
         blockId,
         request,
       );
@@ -292,18 +295,18 @@ export default function useReleaseContentActions() {
 
   const attachContentSectionBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       block,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
       block: ContentBlockAttachRequest;
     }) => {
       const newBlock = await releaseContentService.attachContentSectionBlock(
-        releaseId,
+        releaseVersionId,
         sectionId,
         block,
       );
@@ -313,26 +316,26 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
 
-      await updateUnattachedDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseVersionId });
     },
     [dispatch, updateUnattachedDataBlocks],
   );
 
   const updateSectionBlockOrder = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       order,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
       order: Dictionary<number>;
     }) => {
       const sectionContent =
         await releaseContentService.updateContentSectionBlocksOrder(
-          releaseId,
+          releaseVersionId,
           sectionId,
           order,
         );
@@ -349,9 +352,15 @@ export default function useReleaseContentActions() {
   );
 
   const addContentSection = useCallback(
-    async ({ releaseId, order }: { releaseId: string; order: number }) => {
+    async ({
+      releaseVersionId,
+      order,
+    }: {
+      releaseVersionId: string;
+      order: number;
+    }) => {
       const newSection = await releaseContentService.addContentSection(
-        releaseId,
+        releaseVersionId,
         order,
       );
       dispatch({
@@ -366,14 +375,14 @@ export default function useReleaseContentActions() {
 
   const updateContentSectionsOrder = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       order,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       order: Dictionary<number>;
     }) => {
       const content = await releaseContentService.updateContentSectionsOrder(
-        releaseId,
+        releaseVersionId,
         order,
       );
 
@@ -389,14 +398,14 @@ export default function useReleaseContentActions() {
 
   const removeContentSection = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
     }) => {
       const content = await releaseContentService.removeContentSection(
-        releaseId,
+        releaseVersionId,
         sectionId,
       );
 
@@ -412,16 +421,16 @@ export default function useReleaseContentActions() {
 
   const updateContentSectionHeading = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       sectionId,
       title,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       sectionId: string;
       title: string;
     }) => {
       const section = await releaseContentService.updateContentSectionHeading(
-        releaseId,
+        releaseVersionId,
         sectionId,
         title,
       );
@@ -439,16 +448,19 @@ export default function useReleaseContentActions() {
 
   const addKeyStatisticDataBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       dataBlockId,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       dataBlockId: string;
     }) => {
       const keyStatisticDataBlock =
-        await keyStatisticService.createKeyStatisticDataBlock(releaseId, {
-          dataBlockId,
-        });
+        await keyStatisticService.createKeyStatisticDataBlock(
+          releaseVersionId,
+          {
+            dataBlockId,
+          },
+        );
       dispatch({
         type: 'ADD_KEY_STATISTIC',
         payload: { keyStatistic: keyStatisticDataBlock },
@@ -459,15 +471,15 @@ export default function useReleaseContentActions() {
 
   const addKeyStatisticText = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       keyStatisticText,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       keyStatisticText: KeyStatisticTextSaveRequest;
     }) => {
       const createdKeyStatText =
         await keyStatisticService.createKeyStatisticText(
-          releaseId,
+          releaseVersionId,
           keyStatisticText,
         );
       dispatch({
@@ -480,17 +492,17 @@ export default function useReleaseContentActions() {
 
   const updateKeyStatisticDataBlock = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       keyStatisticId,
       request,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       keyStatisticId: string;
       request: KeyStatisticDataBlockUpdateRequest;
     }) => {
       const updatedKeyStatisticDataBlock =
         await keyStatisticService.updateKeyStatisticDataBlock(
-          releaseId,
+          releaseVersionId,
           keyStatisticId,
           request,
         );
@@ -504,17 +516,17 @@ export default function useReleaseContentActions() {
 
   const updateKeyStatisticText = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       keyStatisticId,
       request,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       keyStatisticId: string;
       request: KeyStatisticTextUpdateRequest;
     }) => {
       const updatedKeyStatisticText =
         await keyStatisticService.updateKeyStatisticText(
-          releaseId,
+          releaseVersionId,
           keyStatisticId,
           request,
         );
@@ -528,13 +540,16 @@ export default function useReleaseContentActions() {
 
   const deleteKeyStatistic = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       keyStatisticId,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       keyStatisticId: string;
     }) => {
-      await keyStatisticService.deleteKeyStatistic(releaseId, keyStatisticId);
+      await keyStatisticService.deleteKeyStatistic(
+        releaseVersionId,
+        keyStatisticId,
+      );
 
       dispatch({
         type: 'REMOVE_KEY_STATISTIC',
@@ -546,15 +561,15 @@ export default function useReleaseContentActions() {
 
   const reorderKeyStatistics = useCallback(
     async ({
-      releaseId,
+      releaseVersionId,
       keyStatistics,
     }: {
-      releaseId: string;
+      releaseVersionId: string;
       keyStatistics: KeyStatistic[];
     }) => {
       const reorderedKeyStatistics =
         await keyStatisticService.reorderKeyStatistics(
-          releaseId,
+          releaseVersionId,
           keyStatistics.map(ks => ks.id),
         );
 

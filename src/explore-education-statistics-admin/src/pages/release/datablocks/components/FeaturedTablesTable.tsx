@@ -22,7 +22,7 @@ interface Props {
   dataBlocks: ReleaseDataBlockSummary[];
   featuredTables: FeaturedTable[];
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   onDelete: (dataBlock: ReleaseDataBlockSummary) => void;
   onSaveOrder: (reorderedTables: FeaturedTable[]) => Promise<void>;
 }
@@ -32,7 +32,7 @@ export default function FeaturedTablesTable({
   dataBlocks,
   featuredTables,
   publicationId,
-  releaseId,
+  releaseVersionId,
   onDelete,
   onSaveOrder,
 }: Props) {
@@ -125,7 +125,7 @@ export default function FeaturedTablesTable({
                             releaseDataBlockEditRoute.path,
                             {
                               publicationId,
-                              releaseId,
+                              releaseVersionId,
                               dataBlockId: featuredTable.dataBlockId,
                             },
                           )}

@@ -63,7 +63,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -93,7 +93,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -134,7 +134,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -188,7 +188,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -237,7 +237,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -280,7 +280,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -334,7 +334,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -371,7 +371,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -406,7 +406,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -470,7 +470,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -551,7 +551,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -646,7 +646,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({
@@ -721,7 +721,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -771,7 +771,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -791,7 +791,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableContentBlock({})}
@@ -822,7 +822,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableEmbedBlock({})}
@@ -839,7 +839,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         sectionId="section-1"
         sectionKey="content"
         block={generateEditableDataBlock({})}
@@ -854,7 +854,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -887,7 +887,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -922,7 +922,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -965,7 +965,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -1001,7 +1001,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -1039,7 +1039,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableDataBlock({ comments: testComments })}
@@ -1085,7 +1085,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1118,7 +1118,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1153,7 +1153,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1196,7 +1196,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1232,7 +1232,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}
@@ -1270,7 +1270,7 @@ describe('ReleaseEditableBlock', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           sectionId="section-1"
           sectionKey="content"
           block={generateEditableEmbedBlock({ comments: testComments })}

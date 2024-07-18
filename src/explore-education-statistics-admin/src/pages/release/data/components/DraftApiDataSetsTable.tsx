@@ -30,14 +30,14 @@ interface Props {
   canUpdateRelease: boolean;
   dataSets: DraftApiDataSetSummary[];
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
 }
 
 export default function DraftApiDataSetsTable({
   canUpdateRelease,
   dataSets,
   publicationId,
-  releaseId,
+  releaseVersionId,
 }: Props) {
   if (!dataSets.length) {
     return <InsetText>No draft API data sets for this publication.</InsetText>;
@@ -125,7 +125,7 @@ export default function DraftApiDataSetsTable({
                         releaseApiDataSetDetailsRoute.path,
                         {
                           publicationId,
-                          releaseId,
+                          releaseVersionId,
                           dataSetId: dataSet.id,
                         },
                       )}

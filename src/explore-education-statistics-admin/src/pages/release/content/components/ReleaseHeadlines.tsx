@@ -26,7 +26,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
 
   const addBlock = useCallback(async () => {
     await actions.addContentSectionBlock({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       sectionId: release.headlinesSection.id,
       sectionKey: 'headlinesSection',
       block: {
@@ -58,7 +58,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
               allowComments
               block={block}
               publicationId={release.publication.id}
-              releaseId={release.id}
+              releaseVersionId={release.id}
               sectionId={release.headlinesSection.id}
               sectionKey="headlinesSection"
             />

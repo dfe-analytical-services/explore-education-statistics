@@ -44,7 +44,7 @@ const PublicationReleaseContributorsForm = ({
         publicationTeamAccessRoute.path,
         {
           publicationId,
-          releaseId,
+          releaseVersionId: releaseId,
         },
       ),
     );
@@ -63,7 +63,7 @@ const PublicationReleaseContributorsForm = ({
                 publicationTeamAccessRoute.path,
                 {
                   publicationId,
-                  releaseId,
+                  releaseVersionId: releaseId,
                 },
               ),
             );
@@ -112,7 +112,7 @@ const PublicationReleaseContributorsForm = ({
                       publicationTeamAccessRoute.path,
                       {
                         publicationId,
-                        releaseId,
+                        releaseVersionId: releaseId,
                       },
                     ),
                   );

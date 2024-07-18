@@ -22,6 +22,7 @@ interface Model {
 }
 
 interface Props {
+  // TODO rename to releaseVersionId
   releaseId: string;
   dataBlock: ReleaseDataBlock;
 }

@@ -3,7 +3,7 @@ import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releas
 import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
 import releaseService, {
   DeleteReleasePlan,
-  ReleaseSummaryWithPermissions,
+  ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
@@ -19,7 +19,7 @@ import { generatePath } from 'react-router';
 
 interface Props {
   publicationId: string;
-  release: ReleaseSummaryWithPermissions;
+  release: ReleaseVersionSummaryWithPermissions;
   onAmendmentDelete?: () => void;
 }
 
@@ -62,7 +62,7 @@ const DraftReleaseRow = ({
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId,
-            releaseId: release.id,
+            releaseVersionId: release.id,
           })}
         >
           {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
@@ -74,7 +74,7 @@ const DraftReleaseRow = ({
             className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId,
-              releaseId: release.previousVersionId,
+              releaseVersionId: release.previousVersionId,
             })}
           >
             View existing version

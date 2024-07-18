@@ -1,17 +1,17 @@
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
 import ReleaseStatusForm from '@admin/pages/release/components/ReleaseStatusForm';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseService, { ReleaseVersion } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { formatISO } from 'date-fns';
 import React from 'react';
 
 interface Props {
-  release: Release;
+  release: ReleaseVersion;
   statusPermissions: ReleaseStatusPermissions;
   onCancel: () => void;
-  onUpdate: (values: Release) => void;
+  onUpdate: (values: ReleaseVersion) => void;
 }
 
 const ReleaseStatusEditPage = ({
