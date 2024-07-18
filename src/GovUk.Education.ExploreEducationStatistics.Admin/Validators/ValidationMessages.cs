@@ -14,6 +14,11 @@ public static class ValidationMessages
         Message: "The file cannot be deleted as it is linked to an API data set."
     );
 
+    public static readonly LocalizableMessage DataSetVersionStatusNotDraft = new(
+        Code: nameof(DataSetVersionStatusNotDraft),
+        Message: "The data set version is not in draft status."
+    );
+
     public static readonly LocalizableMessage DataSetVersionMappingSourcePathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingSourcePathDoesNotExist),
         Message: "The source mapping does not exist."
@@ -38,7 +43,7 @@ public static class ValidationMessages
         Code: nameof(CandidateKeyMustBeEmptyWithNoneMappingType),
         Message: $"Value must be empty if type is {nameof(MappingType.ManualNone)}"
     );
-    
+
     public static readonly LocalizableMessage OwningFilterNotMapped = new(
         Code: nameof(OwningFilterNotMapped),
         Message: "The filter that owns this filter option has not been mapped."
