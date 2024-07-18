@@ -14,10 +14,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 

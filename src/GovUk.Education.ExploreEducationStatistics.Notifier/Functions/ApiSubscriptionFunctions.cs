@@ -99,7 +99,7 @@ public class ApiSubscriptionFunctions(
 
     [Function("NotifyApiSubscribers")]
     public async Task NotifyApiSubscribers(
-        [QueueTrigger(NotifierQueues.ApiNotificationQueue)] ApiNotificationMessage msg,
+        [QueueTrigger(Constants.NotifierQueueStorage.ApiNotificationQueue)] ApiNotificationMessage msg,
         FunctionContext context,
         CancellationToken cancellationToken)
     {

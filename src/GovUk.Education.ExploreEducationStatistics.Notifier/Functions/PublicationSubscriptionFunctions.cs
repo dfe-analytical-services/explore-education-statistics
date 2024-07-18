@@ -15,8 +15,8 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 

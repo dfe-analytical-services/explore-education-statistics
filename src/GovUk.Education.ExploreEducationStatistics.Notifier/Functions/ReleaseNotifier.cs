@@ -8,10 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
@@ -43,7 +41,7 @@ public class ReleaseNotifier
 
     [Function("ReleaseNotifier")]
     public async Task ReleaseNotifierFunc(
-        [QueueTrigger(ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
+        [QueueTrigger(Constants.NotifierQueueStorage.ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
         FunctionContext context)
     {
         _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);

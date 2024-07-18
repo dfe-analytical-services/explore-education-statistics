@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.TableStorageTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
