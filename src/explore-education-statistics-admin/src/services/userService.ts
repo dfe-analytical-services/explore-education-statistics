@@ -33,7 +33,7 @@ export interface UserPublicationRole {
 }
 
 export interface UserReleaseRoleSubmission {
-  releaseId: string;
+  releaseVersionId: string;
   releaseRole: string;
 }
 
@@ -45,7 +45,7 @@ export interface UserPublicationRoleSubmission {
 export interface UserInvite {
   email: string;
   roleId: string;
-  userReleaseRoles: { releaseId: string; releaseRole: string }[];
+  userReleaseRoles: { releaseVersionId: string; releaseRole: string }[];
   userPublicationRoles: { publicationId: string; publicationRole: string }[];
 }
 
@@ -99,7 +99,7 @@ export interface UsersService {
   inviteContributor: (
     email: string,
     publicationId: string,
-    releaseIds: string[],
+    releaseVersionIds: string[],
   ) => Promise<boolean>;
   removeContributorReleaseInvites: (
     email: string,
@@ -176,13 +176,13 @@ const userService: UsersService = {
   inviteContributor(
     email: string,
     publicationId: string,
-    releaseIds: string[],
+    releaseVersionIds: string[],
   ): Promise<boolean> {
     return client.post(
       `/user-management/publications/${publicationId}/invites/contributor`,
       {
         email,
-        releaseIds,
+        releaseVersionIds,
       },
     );
   },

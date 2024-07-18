@@ -27,7 +27,7 @@ interface Props {
 const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
-      releaseId: string;
+      releaseVersionId: string;
     }
   >();
   return (
@@ -40,7 +40,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
           }`}
         </Tag>
       </td>
-      {!isBauUser && <DraftReleaseRowIssues releaseId={release.id} />}
+      {!isBauUser && <DraftReleaseRowIssues releaseVersionId={release.id} />}
       <td>
         <Link
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"
@@ -75,7 +75,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
                 onClick={async () => {
                   setDeleteReleasePlan({
                     ...(await releaseService.getDeleteReleasePlan(release.id)),
-                    releaseId: release.id,
+                    releaseVersionId: release.id,
                   });
                 }}
               >
@@ -85,7 +85,9 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
             }
             onConfirm={async () => {
               if (deleteReleasePlan) {
-                await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+                await releaseService.deleteRelease(
+                  deleteReleasePlan.releaseVersionId,
+                );
                 setDeleteReleasePlan(undefined);
                 onChangeRelease();
               }

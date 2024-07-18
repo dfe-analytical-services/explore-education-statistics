@@ -30,12 +30,15 @@ interface Props {
 const testId = (dataBlock: ReleaseDataBlock) =>
   `Data block - ${dataBlock.name}`;
 
-const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
+const DataBlockPageReadOnlyTabs = ({ releaseVersionId, dataBlock }: Props) => {
   const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
-    const tableData = await tableBuilderService.getTableData(
-      dataBlock.query,
-      releaseId,
-    );
+    const query: ReleaseTableDataQuery = {
+      ...dataBlock.query,
+      // TODO rename to releaseVersionId
+      releaseId: releaseVersionId,
+    };
+
+    const tableData = await tableBuilderService.getTableData(query);
     const table = mapFullTable(tableData);
 
     const tableHeaders = mapTableHeadersConfig(
@@ -47,7 +50,7 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
       table,
       tableHeaders,
     };
-  }, [releaseId, dataBlock]);
+  }, [releaseVersionId, dataBlock]);
 
   return (
     <LoadingSpinner text="Loading data block" loading={isLoading}>

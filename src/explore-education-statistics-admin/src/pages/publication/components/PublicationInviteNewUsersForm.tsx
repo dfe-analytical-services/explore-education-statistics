@@ -21,12 +21,12 @@ import { ObjectSchema } from 'yup';
 
 interface FormValues {
   email: string;
-  releaseIds: string[];
+  releaseVersionIds: string[];
 }
 
 export const errorMappings = [
   mapFieldErrors<FormValues>({
-    target: 'releaseIds',
+    target: 'releaseVersionIds',
     messages: {
       NotAllReleasesBelongToPublication:
         "Some of the releases don't belong to the publication",
@@ -54,7 +54,7 @@ const PublicationInviteNewUsersForm = ({
     await userService.inviteContributor(
       values.email,
       publication.id,
-      values.releaseIds,
+      values.releaseVersionIds,
     );
     history.push(
       generatePath<PublicationTeamRouteParams>(
@@ -69,7 +69,7 @@ const PublicationInviteNewUsersForm = ({
 
   const initialValues: FormValues = {
     email: '',
-    releaseIds: releases.map(r => r.id),
+    releaseVersionIds: releases.map(r => r.id),
   };
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
@@ -77,7 +77,7 @@ const PublicationInviteNewUsersForm = ({
       email: Yup.string()
         .required('Enter an email address')
         .email('Enter a valid email address'),
-      releaseIds: Yup.array()
+      releaseVersionIds: Yup.array()
         .of(Yup.string().defined())
         .min(1, 'Select at least one release')
         .required('Select at least one release'),
@@ -101,7 +101,7 @@ const PublicationInviteNewUsersForm = ({
                 label="Enter an email address"
               />
               <FormFieldCheckboxGroup<FormValues>
-                name="releaseIds"
+                name="releaseVersionIds"
                 legend="Select which releases you wish the user to have access"
                 legendSize="m"
                 disabled={formState.isSubmitting}

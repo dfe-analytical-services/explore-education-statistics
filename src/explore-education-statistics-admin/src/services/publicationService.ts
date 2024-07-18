@@ -85,7 +85,7 @@ export interface ReleaseSeriesLegacyLinkAddRequest {
 
 export interface ReleaseSeriesItemUpdateRequest {
   id: string;
-  releaseId?: string;
+  releaseVersionId?: string;
   legacyLinkDescription?: string;
   legacyLinkUrl?: string;
 }

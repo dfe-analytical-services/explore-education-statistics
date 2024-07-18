@@ -5,7 +5,7 @@ import {
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import _releaseContentService, {
-  EditableRelease,
+  EditableReleaseVersion,
   ReleaseContent,
 } from '@admin/services/releaseContentService';
 import _featuredTableService, {
@@ -64,7 +64,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 >;
 
 describe('ReleaseContentPage', () => {
-  const testEditableRelease: EditableRelease = {
+  const testEditableRelease: EditableReleaseVersion = {
     approvalStatus: 'Draft',
     content: [
       {
@@ -718,7 +718,7 @@ describe('ReleaseContentPage', () => {
     });
 
     test('transforms featured table links to buttons which open the table tool preview on scheduled releases', async () => {
-      const testScheduledRelease: EditableRelease = {
+      const testScheduledRelease: EditableReleaseVersion = {
         ...testReleaseContent.release,
         approvalStatus: 'Approved',
         publishScheduled: '3000-01-01',
@@ -774,7 +774,7 @@ describe('ReleaseContentPage', () => {
     });
 
     test('does not transform featured table links on published releases', async () => {
-      const testPublishedRelease: EditableRelease = {
+      const testPublishedRelease: EditableReleaseVersion = {
         ...testReleaseContent.release,
         approvalStatus: 'Approved',
         published: '2023-01-01',

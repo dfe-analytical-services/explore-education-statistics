@@ -150,7 +150,9 @@ describe('ReleaseContent', () => {
     return baseRender(
       <TestConfigContextProvider>
         unattachedDataBlocks: [], unattachedDataBlocks: [],
-        <ReleaseContentHubContextProvider releaseId={releaseContent.release.id}>
+        <ReleaseContentHubContextProvider
+          releaseVersionId={releaseContent.release.id}
+        >
           <ReleaseContentProvider
             value={{
               ...releaseContent,

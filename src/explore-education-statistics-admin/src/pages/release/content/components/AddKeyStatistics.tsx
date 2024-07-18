@@ -55,7 +55,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
             statistic.
           </WarningMessage>
           <KeyStatDataBlockSelectForm
-            releaseId={release.id}
+            releaseVersionId={release.id}
             onSelect={addKeyStatDataBlock}
             onCancel={() => setFormType(undefined)}
           />

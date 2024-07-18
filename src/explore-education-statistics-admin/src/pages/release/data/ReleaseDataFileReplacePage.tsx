@@ -215,7 +215,7 @@ const ReleaseDataFileReplacePage = ({
               <DataFileDetailsTable
                 dataFile={dataFile}
                 replacementDataFile={replacementDataFile}
-                releaseId={releaseVersionId}
+                releaseVersionId={releaseVersionId}
                 onStatusChange={handleStatusChange}
                 onReplacementStatusChange={handleReplacementStatusChange}
               />

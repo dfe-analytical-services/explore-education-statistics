@@ -6,23 +6,23 @@ export type CommentUpdate = Pick<Comment, 'id' | 'content'>;
 
 const releaseContentCommentService = {
   getContentSectionComments(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     contentBlockId: string,
   ): Promise<Comment[]> {
     return client.get(
-      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/block/${contentBlockId}/comments`,
     );
   },
 
   addContentSectionComment(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     contentBlockId: string,
     comment: CommentCreate,
   ): Promise<Comment> {
     return client.post(
-      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments/add`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/block/${contentBlockId}/comments/add`,
       comment,
     );
   },

@@ -22,40 +22,51 @@ type FeaturedTableUpdateRequest = FeaturedTableBasic;
 
 const featuredTableService = {
   getFeaturedTable(
-    releaseId: string,
+    releaseVersionId: string,
     dataBlockId: string,
   ): Promise<FeaturedTable> {
-    return client.get(`/releases/${releaseId}/featured-tables/${dataBlockId}`);
+    return client.get(
+      `/releases/${releaseVersionId}/featured-tables/${dataBlockId}`,
+    );
   },
-  listFeaturedTables(releaseId: string): Promise<FeaturedTable[]> {
-    return client.get(`/releases/${releaseId}/featured-tables`);
+  listFeaturedTables(releaseVersionId: string): Promise<FeaturedTable[]> {
+    return client.get(`/releases/${releaseVersionId}/featured-tables`);
   },
   createFeaturedTable(
-    releaseId: string,
+    releaseVersionId: string,
     featuredTable: FeaturedTableCreateRequest,
   ): Promise<FeaturedTable> {
-    return client.post(`/releases/${releaseId}/featured-tables`, featuredTable);
+    return client.post(
+      `/releases/${releaseVersionId}/featured-tables`,
+      featuredTable,
+    );
   },
   updateFeaturedTable(
-    releaseId: string,
+    releaseVersionId: string,
     dataBlockId: string,
     featuredTable: FeaturedTableUpdateRequest,
   ): Promise<FeaturedTable> {
     return client.post(
-      `/releases/${releaseId}/featured-tables/${dataBlockId}`,
+      `/releases/${releaseVersionId}/featured-tables/${dataBlockId}`,
       featuredTable,
     );
   },
-  deleteFeaturedTable(releaseId: string, dataBlockId: string): Promise<void> {
+  deleteFeaturedTable(
+    releaseVersionId: string,
+    dataBlockId: string,
+  ): Promise<void> {
     return client.delete(
-      `/releases/${releaseId}/featured-tables/${dataBlockId}`,
+      `/releases/${releaseVersionId}/featured-tables/${dataBlockId}`,
     );
   },
   reorderFeaturedTables(
-    releaseId: string,
+    releaseVersionId: string,
     newOrder: string[],
   ): Promise<FeaturedTable[]> {
-    return client.put(`releases/${releaseId}/featured-tables/order`, newOrder);
+    return client.put(
+      `releases/${releaseVersionId}/featured-tables/order`,
+      newOrder,
+    );
   },
 };
 

@@ -194,7 +194,7 @@ export default function TableToolWizard({
     updateState(draft => {
       draft.subjects = subjects;
       draft.featuredTables = featuredTables;
-      draft.query.releaseVersionId = undefined;
+      draft.query.releaseId = undefined;
       draft.query.publicationId = publication.id;
       draft.selectedPublication = {
         ...publication,
@@ -245,7 +245,7 @@ export default function TableToolWizard({
 
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       selectedSubjectId,
-      state.query.releaseVersionId,
+      state.query.releaseId,
     );
 
     setReorderedTableHeaders(undefined);
@@ -268,11 +268,11 @@ export default function TableToolWizard({
   };
 
   const handleLocationStepBack = async () => {
-    const { releaseVersionId, subjectId } = state.query;
+    const { releaseId, subjectId } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       subjectId,
-      releaseVersionId,
+      releaseId,
     );
 
     updateState(draft => {
@@ -289,7 +289,7 @@ export default function TableToolWizard({
           locationIds,
           subjectId: state.query.subjectId,
         },
-        state.query.releaseVersionId,
+        state.query.releaseId,
       );
 
       const { timePeriod } = state.query;
@@ -337,7 +337,7 @@ export default function TableToolWizard({
         subjectId,
         locationIds,
       },
-      releaseVersionId,
+      releaseId,
     );
 
     updateState(draft => {
@@ -367,7 +367,7 @@ export default function TableToolWizard({
             endCode,
           },
         },
-        releaseVersionId,
+        releaseId,
       );
 
       const indicatorValues = new Set(
@@ -407,7 +407,7 @@ export default function TableToolWizard({
     };
 
   const handleFiltersStepBack = async () => {
-    const { releaseVersionId, subjectId, locationIds, timePeriod } = state.query;
+    const { releaseId, subjectId, locationIds, timePeriod } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
       {
@@ -415,7 +415,7 @@ export default function TableToolWizard({
         locationIds,
         timePeriod,
       },
-      releaseVersionId,
+      releaseId,
     );
 
     updateState(draft => {
@@ -448,7 +448,7 @@ export default function TableToolWizard({
         filters: updatedReleaseTableDataQuery.filters,
         indicators: updatedReleaseTableDataQuery.indicators,
       } as FullTableQuery,
-      updatedReleaseTableDataQuery.releaseVersionId,
+      updatedReleaseTableDataQuery.releaseId,
     );
 
     if (!tableData.results.length || !tableData.subjectMeta) {

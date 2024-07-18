@@ -19,7 +19,7 @@ interface Props {
 
 const ScheduledReleaseRow = ({ publicationId, release }: Props) => {
   const { currentStatus, currentStatusDetail } = useReleasePublishingStatus({
-    releaseId: release.id,
+    releaseVersionId: release.id,
   });
 
   return (

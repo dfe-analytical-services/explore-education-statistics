@@ -223,7 +223,7 @@ const ReleaseDataUploadsSection = ({
                   )}
                   <DataFileDetailsTable
                     dataFile={dataFile}
-                    releaseId={releaseVersionId}
+                    releaseVersionId={releaseVersionId}
                     onStatusChange={handleStatusChange}
                   >
                     {canUpdateRelease &&
@@ -281,7 +281,7 @@ const ReleaseDataUploadsSection = ({
                       )}
                     {dataFile.permissions.canCancelImport && (
                       <DataUploadCancelButton
-                        releaseId={releaseVersionId}
+                        releaseVersionId={releaseVersionId}
                         fileId={dataFile.id}
                       />
                     )}

@@ -32,20 +32,24 @@ export default function InviteUserReleaseRoleForm({
   const selectedUserReleaseRoles = watch('userReleaseRoles') ?? [];
 
   const handleAddUserReleaseRole = () => {
-    const releaseId = getValues('releaseId');
+    const releaseVersionId = getValues('releaseVersionId');
     const releaseRole = getValues('releaseRole');
 
-    if (selectedUserReleaseRoles.find(role => role.releaseId === releaseId)) {
-      setError('releaseId', {
+    if (
+      selectedUserReleaseRoles.find(
+        role => role.releaseVersionId === releaseVersionId,
+      )
+    ) {
+      setError('releaseVersionId', {
         type: 'custom',
         message: 'You can only add one role for each release',
       });
       return;
     }
 
-    if (!releaseId || !releaseRole) {
-      if (!releaseId) {
-        setError('releaseId', {
+    if (!releaseVersionId || !releaseRole) {
+      if (!releaseVersionId) {
+        setError('releaseVersionId', {
           type: 'custom',
           message: 'Choose release to give the user access to',
         });
@@ -60,12 +64,12 @@ export default function InviteUserReleaseRoleForm({
       return;
     }
 
-    if (releaseId && releaseRole) {
+    if (releaseVersionId && releaseRole) {
       setValue('userReleaseRoles', [
         ...selectedUserReleaseRoles,
-        { releaseId, releaseRole },
+        { releaseVersionId, releaseRole },
       ]);
-      resetField('releaseId');
+      resetField('releaseVersionId');
       resetField('releaseRole');
     }
   };
@@ -93,7 +97,7 @@ export default function InviteUserReleaseRoleForm({
     >
       <FormFieldSelect<UserInviteFormValues>
         label="Release"
-        name="releaseId"
+        name="releaseVersionId"
         placeholder="Choose release"
         options={releases?.map(release => ({
           label: release.title,
@@ -132,12 +136,14 @@ export default function InviteUserReleaseRoleForm({
             {orderBy(
               selectedUserReleaseRoles,
               userReleaseRole =>
-                releaseTitlesById[userReleaseRole.releaseId].title,
+                releaseTitlesById[userReleaseRole.releaseVersionId].title,
             ).map(userReleaseRole => (
               <tr
-                key={`${userReleaseRole.releaseId}_${userReleaseRole.releaseRole}`}
+                key={`${userReleaseRole.releaseVersionId}_${userReleaseRole.releaseRole}`}
               >
-                <td>{releaseTitlesById[userReleaseRole.releaseId].title}</td>
+                <td>
+                  {releaseTitlesById[userReleaseRole.releaseVersionId].title}
+                </td>
                 <td>{userReleaseRole.releaseRole}</td>
                 <td>
                   <ButtonText

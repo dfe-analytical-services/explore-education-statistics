@@ -10,21 +10,22 @@ import Gate from '@common/components/Gate';
 
 interface Props {
   block: Block;
-  releaseId: string;
+  releaseVersionId: string;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
   visible?: boolean;
 }
 
 const ReleaseBlock = ({
   block,
-  releaseId,
+  releaseVersionId,
   transformFeaturedTableLinks,
   visible,
 }: Props) => {
-  const getChartFile = useGetChartFile(releaseId);
+  const getChartFile = useGetChartFile(releaseVersionId);
 
+  // TODO rename to releaseVersionId
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseVersionId: releaseId,
+    releaseId: releaseVersionId,
   });
 
   if (block.type === 'EmbedBlockLink') {
@@ -37,11 +38,12 @@ const ReleaseBlock = ({
 
   if (block.type === 'DataBlock') {
     return (
+      // TODO rename to releaseVersionId
       <Gate condition={!!visible}>
         <DataBlockTabs
           key={block.id}
           dataBlock={block}
-          releaseId={releaseId}
+          releaseId={releaseVersionId}
           getInfographic={getChartFile}
         />
       </Gate>

@@ -5,6 +5,7 @@ import KeyStat from '@common/modules/find-statistics/components/KeyStat';
 
 export interface KeyStatDataBlockProps {
   children?: ReactNode;
+  // TODO rename to releaseVersionId
   releaseId: string;
   dataBlockParentId: string;
   trend?: string;

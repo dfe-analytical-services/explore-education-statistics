@@ -31,28 +31,31 @@ function mapFile(file: FileInfo): ChartFile {
 
 const releaseChartFileService = {
   async uploadChartFile(
-    releaseId: string,
+    releaseVersionId: string,
     request: UploadChartFileRequest,
   ): Promise<ChartFile> {
     const data = new FormData();
     data.append('file', request.file);
 
     const file = await client.post<FileInfo>(
-      `/release/${releaseId}/chart`,
+      `/release/${releaseVersionId}/chart`,
       data,
     );
 
     return mapFile(file);
   },
 
-  async deleteChartFile(releaseId: string, id: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/chart/${id}`);
+  async deleteChartFile(releaseVersionId: string, id: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseVersionId}/chart/${id}`);
   },
 
-  getChartFile(releaseId: string, id: string): Promise<Blob> {
-    return client.get<Blob>(`/release/${releaseId}/file/${id}/download`, {
-      responseType: 'blob',
-    });
+  getChartFile(releaseVersionId: string, id: string): Promise<Blob> {
+    return client.get<Blob>(
+      `/release/${releaseVersionId}/file/${id}/download`,
+      {
+        responseType: 'blob',
+      },
+    );
   },
 };
 

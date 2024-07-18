@@ -49,18 +49,18 @@ function mapFile({ name, ...file }: AncillaryFileInfo): AncillaryFile {
 }
 
 const releaseAncillaryFileService = {
-  listFiles(releaseId: string): Promise<AncillaryFile[]> {
+  listFiles(releaseVersionId: string): Promise<AncillaryFile[]> {
     return client
-      .get<AncillaryFileInfo[]>(`/release/${releaseId}/ancillary`)
+      .get<AncillaryFileInfo[]>(`/release/${releaseVersionId}/ancillary`)
       .then(response => response.map(mapFile));
   },
-  getFile(releaseId: string, fileId: string): Promise<AncillaryFile> {
+  getFile(releaseVersionId: string, fileId: string): Promise<AncillaryFile> {
     return client
-      .get<AncillaryFileInfo>(`/release/${releaseId}/file/${fileId}`)
+      .get<AncillaryFileInfo>(`/release/${releaseVersionId}/file/${fileId}`)
       .then(mapFile);
   },
   async createFile(
-    releaseId: string,
+    releaseVersionId: string,
     request: UploadAncillaryFileRequest,
   ): Promise<AncillaryFile> {
     const data = new FormData();
@@ -69,14 +69,14 @@ const releaseAncillaryFileService = {
     data.append('summary', request.summary);
 
     const file = await client.post<AncillaryFileInfo>(
-      `/release/${releaseId}/ancillary`,
+      `/release/${releaseVersionId}/ancillary`,
       data,
     );
 
     return mapFile(file);
   },
   async updateFile(
-    releaseId: string,
+    releaseVersionId: string,
     fileId: string,
     request: AncillaryFileUpdateRequest,
   ): Promise<AncillaryFile> {
@@ -88,18 +88,24 @@ const releaseAncillaryFileService = {
     }
 
     const file = await client.put<AncillaryFileInfo>(
-      `release/${releaseId}/ancillary/${fileId}`,
+      `release/${releaseVersionId}/ancillary/${fileId}`,
       data,
     );
 
     return mapFile(file);
   },
-  deleteFile(releaseId: string, fileId: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/ancillary/${fileId}`);
+  deleteFile(releaseVersionId: string, fileId: string): Promise<void> {
+    return client.delete<void>(
+      `/release/${releaseVersionId}/ancillary/${fileId}`,
+    );
   },
-  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
+  downloadFile(
+    releaseVersionId: string,
+    id: string,
+    fileName: string,
+  ): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
+      .get<Blob>(`/release/${releaseVersionId}/file/${id}/download`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));

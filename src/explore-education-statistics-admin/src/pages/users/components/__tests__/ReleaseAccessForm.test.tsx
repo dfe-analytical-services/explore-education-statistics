@@ -74,7 +74,7 @@ describe('ReleaseAccessForm', () => {
     });
 
     expect(userService.addUserReleaseRole).toHaveBeenCalledWith('user-1-id', {
-      releaseId: 'release-1-id',
+      releaseVersionId: 'release-1-id',
       releaseRole: 'Contributor',
     });
     expect(handleUpdate).toHaveBeenCalledTimes(1);

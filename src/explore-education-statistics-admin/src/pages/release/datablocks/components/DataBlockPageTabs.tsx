@@ -75,9 +75,10 @@ const DataBlockPageTabs = ({
       };
     }
 
+    // TODO rename to releaseVersionId
     const query: ReleaseTableDataQuery = {
       ...dataBlock.query,
-      releaseVersionId,
+      releaseId: releaseVersionId,
       includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
     };
 
@@ -189,7 +190,7 @@ const DataBlockPageTabs = ({
         ...nextDataBlock,
         query: {
           ...(omit(nextDataBlock.query, [
-            'releaseVersionId',
+            'releaseId',
           ]) as SavedDataBlock['query']),
         },
       };
@@ -410,7 +411,7 @@ const DataBlockPageTabs = ({
                   key={saveNumber}
                   dataBlock={dataBlock}
                   query={query}
-                  releaseId={releaseVersionId}
+                  releaseVersionId={releaseVersionId}
                   table={response.table}
                   onDataBlockSave={handleDataBlockSave}
                   onTableUpdate={handleChartTableUpdate}

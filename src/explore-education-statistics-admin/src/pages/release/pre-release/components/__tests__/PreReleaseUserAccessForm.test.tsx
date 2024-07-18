@@ -26,7 +26,7 @@ describe('PreReleaseUserAccessForm', () => {
   test('renders correctly with list of users', async () => {
     preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-    render(<PreReleaseUserAccessForm releaseId="release-1" />);
+    render(<PreReleaseUserAccessForm releaseVersionId="release-1" />);
 
     await waitFor(() => {
       expect(
@@ -56,7 +56,7 @@ describe('PreReleaseUserAccessForm', () => {
   test('renders empty message when there are no users', async () => {
     preReleaseUserService.getUsers.mockResolvedValue([]);
 
-    render(<PreReleaseUserAccessForm releaseId="release-1" />);
+    render(<PreReleaseUserAccessForm releaseVersionId="release-1" />);
 
     await waitFor(() => {
       expect(
@@ -70,7 +70,9 @@ describe('PreReleaseUserAccessForm', () => {
   test('renders correctly when the release is live', async () => {
     preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
-    render(<PreReleaseUserAccessForm releaseId="release-1" isReleaseLive />);
+    render(
+      <PreReleaseUserAccessForm releaseVersionId="release-1" isReleaseLive />,
+    );
 
     await waitFor(() => {
       expect(
@@ -97,7 +99,7 @@ describe('PreReleaseUserAccessForm', () => {
       new Error('Something went wrong'),
     );
 
-    render(<PreReleaseUserAccessForm releaseId="release-1" />);
+    render(<PreReleaseUserAccessForm releaseVersionId="release-1" />);
 
     await waitFor(() => {
       expect(
@@ -113,7 +115,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -139,7 +141,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -184,7 +186,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -222,7 +224,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -255,7 +257,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -284,7 +286,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -310,7 +312,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -349,7 +351,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -379,7 +381,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -421,7 +423,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -515,7 +517,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -562,7 +564,10 @@ describe('PreReleaseUserAccessForm', () => {
 
     test('confirmation modal displays correct notifications warning when release is approved', async () => {
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" isReleaseApproved />,
+        <PreReleaseUserAccessForm
+          releaseVersionId="release-1"
+          isReleaseApproved
+        />,
       );
 
       await waitFor(() => {
@@ -603,7 +608,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {
@@ -682,7 +687,7 @@ describe('PreReleaseUserAccessForm', () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
-        <PreReleaseUserAccessForm releaseId="release-1" />,
+        <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
       await waitFor(() => {

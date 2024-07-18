@@ -3,9 +3,9 @@ import downloadFile from '@common/utils/file/downloadFile';
 import parseContentDisposition from '@common/utils/http/parseContentDisposition';
 
 const releaseFileService = {
-  downloadAllFilesZip(releaseId: string): Promise<void> {
+  downloadAllFilesZip(releaseVersionId: string): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/files`, {
+      .get<Blob>(`/release/${releaseVersionId}/files`, {
         responseType: 'blob',
         rawResponse: true,
       })

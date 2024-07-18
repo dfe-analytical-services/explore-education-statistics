@@ -6,7 +6,7 @@ import Hub, { Subscription } from './utils/Hub';
 export interface ReleaseContentBlockLockEvent {
   id: string;
   sectionId: string;
-  releaseId: string;
+  releaseVersionId: string;
   locked: string;
   lockedUntil: string;
   lockedBy: UserDetails;
@@ -15,16 +15,16 @@ export interface ReleaseContentBlockLockEvent {
 export interface ReleaseContentBlockUnlockEvent {
   id: string;
   sectionId: string;
-  releaseId: string;
+  releaseVersionId: string;
 }
 
 export class ReleaseContentHub extends Hub {
-  async joinReleaseGroup(releaseId: string): Promise<void> {
-    await this.send('JoinReleaseGroup', { id: releaseId });
+  async joinReleaseGroup(releaseVersionId: string): Promise<void> {
+    await this.send('JoinReleaseGroup', { id: releaseVersionId });
   }
 
-  async leaveReleaseGroup(releaseId: string): Promise<void> {
-    await this.send('LeaveReleaseGroup', { id: releaseId });
+  async leaveReleaseGroup(releaseVersionId: string): Promise<void> {
+    await this.send('LeaveReleaseGroup', { id: releaseVersionId });
   }
 
   lockContentBlock(

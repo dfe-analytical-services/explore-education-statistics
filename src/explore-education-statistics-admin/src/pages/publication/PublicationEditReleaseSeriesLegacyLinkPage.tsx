@@ -20,7 +20,7 @@ export const mapToReleaseSeriesItemUpdateRequest = (
 ): ReleaseSeriesItemUpdateRequest[] => {
   return releaseSeries.map(seriesItem => ({
     id: seriesItem.id,
-    releaseId: seriesItem.releaseId,
+    releaseVersionId: seriesItem.releaseId,
     legacyLinkDescription: seriesItem.isLegacyLink
       ? seriesItem.description
       : undefined,
@@ -54,6 +54,7 @@ export default function PublicationEditReleaseSeriesLegacyLinkPage({
     <LoadingSpinner loading={isLoading}>
       <h2>Edit legacy release</h2>
 
+      {/* TODO rename to releaseVersionId */}
       {!legacyRelease || legacyRelease.releaseId !== undefined ? (
         <>
           <p>Legacy release not found.</p>

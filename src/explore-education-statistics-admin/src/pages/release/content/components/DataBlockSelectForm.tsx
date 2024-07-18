@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 
 interface Props {
   id: string;
-  releaseId: string;
+  releaseVersionId: string;
   onSelect: (selectedDataBlockId: string) => void;
   onCancel?: () => void;
   hideCancel?: boolean;
@@ -18,7 +18,7 @@ interface Props {
 
 const DataBlockSelectForm = ({
   id,
-  releaseId,
+  releaseVersionId,
   onSelect,
   onCancel = () => {},
   hideCancel = false,
@@ -40,8 +40,9 @@ const DataBlockSelectForm = ({
           summary="Data block preview"
           open
         >
+          {/* TODO rename to releaseVersionId */}
           <DataBlockTabs
-            releaseId={releaseId}
+            releaseId={releaseVersionId}
             dataBlock={selectedDataBlock}
             id={`${id}-dataBlockPreview`}
             getInfographic={getChartFile}

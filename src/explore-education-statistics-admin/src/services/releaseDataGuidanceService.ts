@@ -8,11 +8,11 @@ export interface ReleaseDataGuidance {
 }
 
 const releaseDataGuidanceService = {
-  getDataGuidance(releaseId: string): Promise<ReleaseDataGuidance> {
-    return client.get(`/release/${releaseId}/data-guidance`);
+  getDataGuidance(releaseVersionId: string): Promise<ReleaseDataGuidance> {
+    return client.get(`/release/${releaseVersionId}/data-guidance`);
   },
   updateDataGuidance(
-    releaseId: string,
+    releaseVersionId: string,
     data: {
       content: string;
       dataSets: {
@@ -21,7 +21,7 @@ const releaseDataGuidanceService = {
       }[];
     },
   ): Promise<ReleaseDataGuidance> {
-    return client.patch(`/release/${releaseId}/data-guidance`, data);
+    return client.patch(`/release/${releaseVersionId}/data-guidance`, data);
   },
 };
 

@@ -4,7 +4,7 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   dataBlockId: string;
   onConfirm: () => void;
   onCancel: () => void;
@@ -12,15 +12,15 @@ interface Props {
 }
 
 const DataBlockDeletePlanModal = ({
-  releaseId,
+  releaseVersionId,
   dataBlockId,
   onConfirm,
   onCancel,
   onExit,
 }: Props) => {
   const { value: deletePlan } = useAsyncRetry(
-    () => dataBlocksService.getDeleteBlockPlan(releaseId, dataBlockId),
-    [releaseId, dataBlockId],
+    () => dataBlocksService.getDeleteBlockPlan(releaseVersionId, dataBlockId),
+    [releaseVersionId, dataBlockId],
   );
 
   if (!deletePlan) {
@@ -32,7 +32,7 @@ const DataBlockDeletePlanModal = ({
       title="Delete data block"
       open
       onConfirm={async () => {
-        await dataBlocksService.deleteDataBlock(releaseId, dataBlockId);
+        await dataBlocksService.deleteDataBlock(releaseVersionId, dataBlockId);
         onConfirm();
       }}
       onExit={onExit}

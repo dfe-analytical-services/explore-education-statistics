@@ -5,18 +5,18 @@ import { ReleaseStageStatus } from '@admin/services/releaseService';
 import React from 'react';
 
 interface ReleasePublishingStatusProps {
-  releaseId: string;
+  releaseVersionId: string;
   refreshPeriod?: number;
   onChange?: (status: ReleaseStageStatus) => void;
 }
 
 export default function ReleasePublishingStatus({
-  releaseId,
+  releaseVersionId,
   refreshPeriod,
   onChange,
 }: ReleasePublishingStatusProps) {
   const { currentStatus, currentStatusDetail } = useReleasePublishingStatus({
-    releaseId,
+    releaseVersionId,
     refreshPeriod,
     onChange,
   });

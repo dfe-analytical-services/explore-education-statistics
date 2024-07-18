@@ -50,7 +50,7 @@ const PublicationManageReleaseContributorsPage = ({
 
       <PublicationReleaseContributorsForm
         publicationId={publicationId}
-        releaseId={releaseVersionId}
+        releaseVersionId={releaseVersionId}
         publicationContributors={publicationContributors}
         releaseContributors={releaseContributors}
       />

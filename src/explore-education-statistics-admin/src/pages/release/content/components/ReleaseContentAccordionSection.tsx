@@ -192,7 +192,7 @@ const ReleaseContentAccordionSection = ({
             renderBlock={block => (
               <ReleaseBlock
                 block={block}
-                releaseId={release.id}
+                releaseVersionId={release.id}
                 transformFeaturedTableLinks={transformFeaturedTableLinks}
                 visible={open}
               />
@@ -217,7 +217,7 @@ const ReleaseContentAccordionSection = ({
               {showDataBlockForm && (
                 <DataBlockSelectForm
                   id={`dataBlockSelectForm-${sectionId}`}
-                  releaseId={release.id}
+                  releaseVersionId={release.id}
                   onSelect={async selectedDataBlockId => {
                     await attachDataBlock(selectedDataBlockId);
                     toggleDataBlockForm.off();

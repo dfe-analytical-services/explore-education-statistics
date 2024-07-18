@@ -4,22 +4,22 @@ import { UpdateIndicatorsRequest } from '@admin/pages/release/data/components/Re
 
 const tableBuilderService = {
   updateFilters(
-    releaseId: string,
+    releaseVersionId: string,
     subjectId: string,
     data: UpdateFiltersRequest,
   ): Promise<void> {
     return client.patch(
-      `data/release/${releaseId}/meta/subject/${subjectId}/filters`,
+      `data/release/${releaseVersionId}/meta/subject/${subjectId}/filters`,
       data,
     );
   },
   updateIndicators(
-    releaseId: string,
+    releaseVersionId: string,
     subjectId: string,
     data: UpdateIndicatorsRequest,
   ): Promise<void> {
     return client.patch(
-      `data/release/${releaseId}/meta/subject/${subjectId}/indicators`,
+      `data/release/${releaseVersionId}/meta/subject/${subjectId}/indicators`,
       data,
     );
   },

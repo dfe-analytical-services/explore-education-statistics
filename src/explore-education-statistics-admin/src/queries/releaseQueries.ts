@@ -14,10 +14,10 @@ const releaseQueries = createQueryKeys('release', {
     queryKey: null,
     queryFn: () => releaseService.listReleasesForApproval(),
   },
-  get(releaseId: string) {
+  get(releaseVersionId: string) {
     return {
-      queryKey: [releaseId],
-      queryFn: () => releaseService.getRelease(releaseId),
+      queryKey: [releaseVersionId],
+      queryFn: () => releaseService.getRelease(releaseVersionId),
     };
   },
 });

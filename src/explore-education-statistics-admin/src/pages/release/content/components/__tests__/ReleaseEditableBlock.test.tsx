@@ -174,7 +174,7 @@ describe('ReleaseEditableBlock', () => {
       if (methodName === 'LockContentBlock') {
         return Promise.resolve<ReleaseContentBlockLockEvent>({
           id: 'content-block-id',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
           sectionId: 'section-1',
           locked: '2022-02-16T12:05:00Z',
           lockedUntil: '2022-02-16T12:15:00Z',
@@ -586,7 +586,7 @@ describe('ReleaseEditableBlock', () => {
     // Simulates lock being renewed
     onContentBlockLocked({
       id: 'content-block-id',
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       sectionId: 'section-1',
       locked: '2022-02-16T12:08:00Z',
       lockedUntil: '2022-02-16T12:18:00Z',
@@ -632,7 +632,7 @@ describe('ReleaseEditableBlock', () => {
       if (methodName === 'LockContentBlock') {
         return Promise.resolve<ReleaseContentBlockLockEvent>({
           id: 'content-block-id',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
           sectionId: 'section-1',
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:20:00Z',
@@ -739,7 +739,7 @@ describe('ReleaseEditableBlock', () => {
     // Simulates locking of block by other user
     onContentBlockLocked({
       id: 'content-block-id',
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       sectionId: 'section-1',
       locked: '2022-02-16T12:00:00Z',
       lockedUntil: '2022-02-16T12:10:00Z',
@@ -1324,7 +1324,9 @@ describe('ReleaseEditableBlock', () => {
         }}
       >
         unattachedDataBlocks: [],
-        <ReleaseContentHubContextProvider releaseId={releaseContent.release.id}>
+        <ReleaseContentHubContextProvider
+          releaseVersionId={releaseContent.release.id}
+        >
           <ReleaseContentProvider
             value={{
               ...releaseContent,

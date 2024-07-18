@@ -16,7 +16,7 @@ describe('ReleasePublishingStatus', () => {
       publishingStage: 'NotStarted',
     });
 
-    render(<ReleasePublishingStatus releaseId="release-1" />);
+    render(<ReleasePublishingStatus releaseVersionId="release-1" />);
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
 
@@ -32,7 +32,7 @@ describe('ReleasePublishingStatus', () => {
       overallStage: 'Started',
     });
 
-    render(<ReleasePublishingStatus releaseId="release-1" />);
+    render(<ReleasePublishingStatus releaseVersionId="release-1" />);
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
 
@@ -64,7 +64,10 @@ describe('ReleasePublishingStatus', () => {
     const handleChange = jest.fn();
 
     render(
-      <ReleasePublishingStatus releaseId="release-1" onChange={handleChange} />,
+      <ReleasePublishingStatus
+        releaseVersionId="release-1"
+        onChange={handleChange}
+      />,
     );
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
@@ -104,7 +107,10 @@ describe('ReleasePublishingStatus', () => {
     const handleChange = jest.fn();
 
     render(
-      <ReleasePublishingStatus releaseId="release-1" onChange={handleChange} />,
+      <ReleasePublishingStatus
+        releaseVersionId="release-1"
+        onChange={handleChange}
+      />,
     );
 
     expect(await screen.findByText('Started')).toBeInTheDocument();

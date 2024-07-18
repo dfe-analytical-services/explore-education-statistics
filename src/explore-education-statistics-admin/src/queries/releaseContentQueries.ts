@@ -2,10 +2,10 @@ import { createQueryKeys } from '@lukemorales/query-key-factory';
 import releaseContentService from '@admin/services/releaseContentService';
 
 const releaseContentQueries = createQueryKeys('releaseContent', {
-  get(releaseId: string) {
+  get(releaseVersionId: string) {
     return {
-      queryKey: [releaseId],
-      queryFn: () => releaseContentService.getContent(releaseId),
+      queryKey: [releaseVersionId],
+      queryFn: () => releaseContentService.getContent(releaseVersionId),
     };
   },
 });

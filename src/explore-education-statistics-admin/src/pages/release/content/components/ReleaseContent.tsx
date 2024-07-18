@@ -200,7 +200,7 @@ const ReleaseContent = ({
                   renderBlock={block => (
                     <ReleaseBlock
                       block={block}
-                      releaseId={release.id}
+                      releaseVersionId={release.id}
                       transformFeaturedTableLinks={transformFeaturedTableLinks}
                     />
                   )}
@@ -395,7 +395,7 @@ const ReleaseContent = ({
       <hr />
 
       <ReleaseHeadlines
-        release={release}
+        releaseVersion={release}
         transformFeaturedTableLinks={transformFeaturedTableLinks}
       />
 
@@ -457,7 +457,7 @@ const ReleaseContent = ({
                 blocks={release.relatedDashboardsSection.content}
                 sectionId={release.relatedDashboardsSection.id}
                 renderBlock={block => (
-                  <ReleaseBlock block={block} releaseId={release.id} />
+                  <ReleaseBlock block={block} releaseVersionId={release.id} />
                 )}
                 renderEditableBlock={block => (
                   <ReleaseEditableBlock

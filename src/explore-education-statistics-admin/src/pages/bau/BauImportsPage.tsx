@@ -45,7 +45,7 @@ const BauImportsPage = () => {
                   <td>{subject.percentageComplete}%</td>
                   <td>
                     <Link
-                      to={`/publication/${subject.publicationId}/release/${subject.releaseId}/data`}
+                      to={`/publication/${subject.publicationId}/release/${subject.releaseVersionId}/data`}
                     >
                       {subject.publicationTitle} {subject.releaseTitle}
                     </Link>

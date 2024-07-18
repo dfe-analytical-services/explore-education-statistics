@@ -2,16 +2,17 @@ import releaseAncillaryFileService from '@admin/services/releaseAncillaryFileSer
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 const releaseAncillaryFileQueries = createQueryKeys('releaseAncillaryFile', {
-  get(releaseId: string, fileId: string) {
+  get(releaseVersionId: string, fileId: string) {
     return {
-      queryKey: [releaseId, fileId],
-      queryFn: () => releaseAncillaryFileService.getFile(releaseId, fileId),
+      queryKey: [releaseVersionId, fileId],
+      queryFn: () =>
+        releaseAncillaryFileService.getFile(releaseVersionId, fileId),
     };
   },
-  list(releaseId: string) {
+  list(releaseVersionId: string) {
     return {
-      queryKey: [releaseId],
-      queryFn: () => releaseAncillaryFileService.listFiles(releaseId),
+      queryKey: [releaseVersionId],
+      queryFn: () => releaseAncillaryFileService.listFiles(releaseVersionId),
     };
   },
 });

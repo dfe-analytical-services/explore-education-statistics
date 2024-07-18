@@ -27,7 +27,7 @@ const PublicationSectionBlocks = ({
   const getReleaseFile = useGetReleaseFile(release.id);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseVersionId: release.id,
+    releaseId: release.id,
     rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
   });
 

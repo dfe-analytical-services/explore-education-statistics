@@ -105,7 +105,7 @@ describe('UserInvitePage', () => {
       );
 
       expect(
-        screen.getByTestId('inviteUserForm-releaseId-error'),
+        screen.getByTestId('inviteUserForm-releaseVersionId-error'),
       ).toHaveTextContent('Choose release to give the user access to');
     });
 
@@ -148,7 +148,7 @@ describe('UserInvitePage', () => {
       );
 
       expect(
-        screen.getByTestId('inviteUserForm-releaseId-error'),
+        screen.getByTestId('inviteUserForm-releaseVersionId-error'),
       ).toHaveTextContent('You can only add one role for each release');
     });
 
@@ -450,7 +450,7 @@ describe('UserInvitePage', () => {
       email: 'test@test.com',
       roleId: 'role-1-id',
       userReleaseRoles: [
-        { releaseId: 'release-1-id', releaseRole: 'Approver' },
+        { releaseVersionId: 'release-1-id', releaseRole: 'Approver' },
       ],
       userPublicationRoles: [
         { publicationId: 'publication-1-id', publicationRole: 'Approver' },

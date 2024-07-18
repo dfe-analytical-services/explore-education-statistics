@@ -164,7 +164,7 @@ const PrototypeReleaseContent = ({
                   renderBlock={block => (
                     <ReleaseBlock
                       block={block}
-                      releaseId={release.id}
+                      releaseVersionId={release.id}
                       transformFeaturedTableLinks={transformFeaturedTableLinks}
                     />
                   )}
@@ -419,7 +419,7 @@ const PrototypeReleaseContent = ({
                 blocks={release.relatedDashboardsSection.content}
                 sectionId={release.relatedDashboardsSection.id}
                 renderBlock={block => (
-                  <ReleaseBlock block={block} releaseId={release.id} />
+                  <ReleaseBlock block={block} releaseVersionId={release.id} />
                 )}
                 renderEditableBlock={block => (
                   <PrototypeReleaseEditableBlock

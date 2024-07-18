@@ -36,7 +36,7 @@ const ReleaseTableToolPage = ({
       <LoadingSpinner loading={isLoading}>
         {publication && (
           <ReleasePreviewTableTool
-            releaseId={releaseVersionId}
+            releaseVersionId={releaseVersionId}
             publication={publication}
             releaseType={releaseVersion.type}
           />

@@ -10,7 +10,7 @@ import React, { FC, ReactNode } from 'react';
 jest.mock('@admin/services/hubs/utils/createConnection');
 
 const wrapper: FC = ({ children }: { children?: ReactNode }) => (
-  <ReleaseContentHubContextProvider releaseId="release-1">
+  <ReleaseContentHubContextProvider releaseVersionId="release-1">
     {children}
   </ReleaseContentHubContextProvider>
 );

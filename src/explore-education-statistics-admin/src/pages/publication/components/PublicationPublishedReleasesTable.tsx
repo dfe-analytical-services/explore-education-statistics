@@ -19,7 +19,7 @@ interface PublishedReleasesTableProps {
   focusReleaseId?: string;
   publicationId: string;
   releases: ReleaseVersionSummaryWithPermissions[];
-  onAmend: (releaseId: string) => void;
+  onAmend: (releaseVersionId: string) => void;
 }
 
 export default function PublicationPublishedReleasesTable({

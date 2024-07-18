@@ -36,7 +36,9 @@ describe('ImporterStatus', () => {
   });
 
   test('renders initial complete status correctly', () => {
-    render(<ImporterStatus releaseId="release-1" dataFile={testDataFile} />);
+    render(
+      <ImporterStatus releaseVersionId="release-1" dataFile={testDataFile} />,
+    );
 
     expect(screen.getByText('Complete')).toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
@@ -50,7 +52,9 @@ describe('ImporterStatus', () => {
       totalRows: 100,
     });
 
-    render(<ImporterStatus releaseId="release-1" dataFile={testDataFile} />);
+    render(
+      <ImporterStatus releaseVersionId="release-1" dataFile={testDataFile} />,
+    );
 
     expect(
       releaseDataFileService.getDataFileImportStatus,
@@ -67,7 +71,7 @@ describe('ImporterStatus', () => {
 
     render(
       <ImporterStatus
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataFile={{
           ...testDataFile,
           status: 'QUEUED',
@@ -98,7 +102,7 @@ describe('ImporterStatus', () => {
 
     render(
       <ImporterStatus
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataFile={{
           ...testDataFile,
           status: 'QUEUED',
@@ -176,7 +180,7 @@ describe('ImporterStatus', () => {
 
     render(
       <ImporterStatus
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataFile={{
           ...testDataFile,
           status: 'QUEUED',

@@ -32,7 +32,7 @@ describe('ReleaseContentAccordionSection', () => {
           }}
         >
           <ReleaseContentHubContextProvider
-            releaseId={testReleaseContent.release.id}
+            releaseVersionId={testReleaseContent.release.id}
           >
             <EditableAccordion
               onAddSection={noop}
@@ -89,7 +89,7 @@ describe('ReleaseContentAccordionSection', () => {
             }}
           >
             <ReleaseContentHubContextProvider
-              releaseId={testReleaseContent.release.id}
+              releaseVersionId={testReleaseContent.release.id}
             >
               <EditableAccordion
                 onAddSection={noop}
@@ -138,7 +138,7 @@ describe('ReleaseContentAccordionSection', () => {
           }}
         >
           <ReleaseContentHubContextProvider
-            releaseId={testReleaseContent.release.id}
+            releaseVersionId={testReleaseContent.release.id}
           >
             <EditableAccordion
               onAddSection={noop}
@@ -189,7 +189,7 @@ describe('ReleaseContentAccordionSection', () => {
           }}
         >
           <ReleaseContentHubContextProvider
-            releaseId={testReleaseContent.release.id}
+            releaseVersionId={testReleaseContent.release.id}
           >
             <EditableAccordion
               onAddSection={noop}
@@ -228,7 +228,7 @@ describe('ReleaseContentAccordionSection', () => {
           }}
         >
           <ReleaseContentHubContextProvider
-            releaseId={testReleaseContent.release.id}
+            releaseVersionId={testReleaseContent.release.id}
           >
             <EditableAccordion
               onAddSection={noop}
@@ -283,7 +283,7 @@ describe('ReleaseContentAccordionSection', () => {
           }}
         >
           <ReleaseContentHubContextProvider
-            releaseId={testReleaseContent.release.id}
+            releaseVersionId={testReleaseContent.release.id}
           >
             <EditableAccordion
               onAddSection={noop}

@@ -90,7 +90,7 @@ const ReleasePreReleaseAccessPage = () => {
             )}
 
             <PreReleaseUserAccessForm
-              releaseId={release.id}
+              releaseVersionId={release.id}
               isReleaseApproved={release.approvalStatus === 'Approved'}
               isReleaseLive={release.live}
             />

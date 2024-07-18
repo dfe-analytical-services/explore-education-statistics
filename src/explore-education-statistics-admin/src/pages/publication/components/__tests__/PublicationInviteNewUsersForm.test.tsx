@@ -151,7 +151,7 @@ describe('PublicationInviteNewUsersForm', () => {
       expect(userService.inviteContributor).toHaveBeenCalledTimes(0);
       expect(
         screen.getByText('Select at least one release', {
-          selector: '#inviteContributorForm-releaseIds-error',
+          selector: '#inviteContributorForm-releaseVersionIds-error',
         }),
       );
     });

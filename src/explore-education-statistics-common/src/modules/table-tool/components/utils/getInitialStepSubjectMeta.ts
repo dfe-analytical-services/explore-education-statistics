@@ -22,7 +22,7 @@ export default async function getInitialStepSubjectMeta(
   query: ReleaseTableDataQuery,
   tableData?: TableDataResponse,
 ): Promise<InitialStepSubjectMeta> {
-  if (!query.releaseVersionId) {
+  if (!query.releaseId) {
     return {
       initialStep: 1,
     };
@@ -36,7 +36,7 @@ export default async function getInitialStepSubjectMeta(
 
   const subjectMeta = await tableBuilderService.getSubjectMeta(
     query.subjectId,
-    query.releaseVersionId,
+    query.releaseId,
   );
 
   // Just do really basic checks to see if table can be rendered

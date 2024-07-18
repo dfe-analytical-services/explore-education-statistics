@@ -44,6 +44,7 @@ export interface ReleaseSeriesItem {
   id: string;
   isLegacyLink: boolean;
   description: string;
+  // TODO rename to releaseVersionId
   releaseId?: string;
   releaseSlug?: string;
   legacyLinkUrl?: string;

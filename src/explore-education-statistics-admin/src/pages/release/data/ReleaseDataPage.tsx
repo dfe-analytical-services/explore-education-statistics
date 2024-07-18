@@ -45,7 +45,7 @@ const ReleaseDataPage = () => {
         >
           <ReleaseFileUploadsSection
             publicationId={releaseVersion.publicationId}
-            releaseId={releaseVersionId}
+            releaseVersionId={releaseVersionId}
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
@@ -58,7 +58,7 @@ const ReleaseDataPage = () => {
             // Track data files so that we can re-render this
             // section automatically whenever there is a change
             key={dataFiles.filter(file => file.status === 'COMPLETE').length}
-            releaseId={releaseVersionId}
+            releaseVersionId={releaseVersionId}
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
@@ -69,7 +69,7 @@ const ReleaseDataPage = () => {
         >
           <ReleaseDataReorderSection
             key={dataFiles.filter(file => file.status === 'COMPLETE').length}
-            releaseId={releaseVersionId}
+            releaseVersionId={releaseVersionId}
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>

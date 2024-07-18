@@ -5,7 +5,7 @@ export interface ImportStatus {
   subjectId: string;
   publicationId: string;
   publicationTitle: string;
-  releaseId: string;
+  releaseVersionId: string;
   releaseTitle: string;
   dataFileName: string;
   totalRows?: number;

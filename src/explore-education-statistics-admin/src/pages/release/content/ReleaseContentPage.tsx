@@ -102,7 +102,9 @@ const ReleaseContentPageLoaded = () => {
                       {release.publication.title}
                     </h2>
 
-                    <ReleaseContentHubContextProvider releaseId={release.id}>
+                    <ReleaseContentHubContextProvider
+                      releaseVersionId={release.id}
+                    >
                       <ReleaseContent
                         transformFeaturedTableLinks={
                           canPreviewRelease
@@ -141,7 +143,7 @@ const ReleaseContentPageLoaded = () => {
                 )}
                 {editingMode === 'table-preview' && (
                   <ReleasePreviewTableTool
-                    releaseId={release.id}
+                    releaseVersionId={release.id}
                     releaseType={release.type}
                     publication={release.publication}
                     featuredTableId={previewFeaturedTableId}

@@ -19,7 +19,7 @@ import { Dictionary } from '@common/types';
 
 type ContentSectionViewModel = ContentSection<EditableBlock>;
 
-export interface EditableRelease
+export interface EditableReleaseVersion
   extends Omit<
     Release<EditableContentBlock, EditableDataBlock, EditableEmbedBlock>,
     'published'
@@ -31,7 +31,7 @@ export interface EditableRelease
 }
 
 export interface ReleaseContent {
-  release: EditableRelease;
+  release: EditableReleaseVersion;
   unattachedDataBlocks: DataBlock[];
 }
 
@@ -41,125 +41,133 @@ export interface ContentBlockAttachRequest {
 }
 
 const releaseContentService = {
-  getContent(releaseId: string, isPrerelease = false): Promise<ReleaseContent> {
-    return client.get<ReleaseContent>(`/release/${releaseId}/content`, {
+  getContent(
+    releaseVersionId: string,
+    isPrerelease = false,
+  ): Promise<ReleaseContent> {
+    return client.get<ReleaseContent>(`/release/${releaseVersionId}/content`, {
       params: { isPrerelease },
     });
   },
   addContentSection(
-    releaseId: string,
+    releaseVersionId: string,
     order: number,
   ): Promise<ContentSectionViewModel> {
     return client.post<ContentSectionViewModel>(
-      `/release/${releaseId}/content/sections/add`,
+      `/release/${releaseVersionId}/content/sections/add`,
       { order },
     );
   },
   updateContentSectionsOrder(
-    releaseId: string,
+    releaseVersionId: string,
     order: Dictionary<number>,
   ): Promise<ContentSectionViewModel[]> {
     return client.put<ContentSectionViewModel[]>(
-      `/release/${releaseId}/content/sections/order`,
+      `/release/${releaseVersionId}/content/sections/order`,
       order,
     );
   },
   removeContentSection(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
   ): Promise<ContentSectionViewModel[]> {
     return client.delete<ContentSectionViewModel[]>(
-      `/release/${releaseId}/content/section/${sectionId}`,
+      `/release/${releaseVersionId}/content/section/${sectionId}`,
     );
   },
 
   addContentSectionBlock(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     block: ContentBlockPostModel,
   ): Promise<EditableContentBlock> {
     return client.post<EditableContentBlock>(
-      `/release/${releaseId}/content/section/${sectionId}/blocks/add`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/blocks/add`,
       block,
     );
   },
 
   addEmbedSectionBlock(
-    releaseId: string,
+    releaseVersionId: string,
     request: EmbedBlockCreateRequest,
   ): Promise<EditableEmbedBlock> {
     return client.post<EditableEmbedBlock>(
-      `/release/${releaseId}/embed-blocks`,
+      `/release/${releaseVersionId}/embed-blocks`,
       request,
     );
   },
 
   updateEmbedSectionBlock(
-    releaseId: string,
+    releaseVersionId: string,
     contentBlockId: string,
     request: EmbedBlockUpdateRequest,
   ): Promise<EditableEmbedBlock> {
     return client.put<EditableEmbedBlock>(
-      `/release/${releaseId}/embed-blocks/${contentBlockId}`,
+      `/release/${releaseVersionId}/embed-blocks/${contentBlockId}`,
       request,
     );
   },
 
-  deleteEmbedSectionBlock(releaseId: string, blockId: string): Promise<void> {
-    return client.delete(`/release/${releaseId}/embed-blocks/${blockId}`);
+  deleteEmbedSectionBlock(
+    releaseVersionId: string,
+    blockId: string,
+  ): Promise<void> {
+    return client.delete(
+      `/release/${releaseVersionId}/embed-blocks/${blockId}`,
+    );
   },
 
   updateContentSectionHeading(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     heading: string,
   ): Promise<ContentSectionViewModel> {
     return client.put<ContentSectionViewModel>(
-      `/release/${releaseId}/content/section/${sectionId}/heading`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/heading`,
       { heading },
     );
   },
 
   updateContentSectionBlock(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     blockId: string,
     block: ContentBlockPutModel,
   ): Promise<EditableContentBlock> {
     return client.put<EditableContentBlock>(
-      `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/block/${blockId}`,
       block,
     );
   },
 
   updateContentSectionBlocksOrder(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     order: Dictionary<number>,
   ): Promise<EditableBlock[]> {
     return client.put<EditableBlock[]>(
-      `/release/${releaseId}/content/section/${sectionId}/blocks/order`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/blocks/order`,
       order,
     );
   },
 
   deleteContentSectionBlock(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     blockId: string,
   ): Promise<void> {
     return client.delete(
-      `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/block/${blockId}`,
     );
   },
 
   attachContentSectionBlock(
-    releaseId: string,
+    releaseVersionId: string,
     sectionId: string,
     block: ContentBlockAttachRequest,
   ): Promise<EditableBlock> {
     return client.post<EditableBlock>(
-      `/release/${releaseId}/content/section/${sectionId}/blocks/attach`,
+      `/release/${releaseVersionId}/content/section/${sectionId}/blocks/attach`,
       block,
     );
   },

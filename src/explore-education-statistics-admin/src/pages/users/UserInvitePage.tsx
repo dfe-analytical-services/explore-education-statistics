@@ -22,7 +22,7 @@ import { RouteComponentProps } from 'react-router';
 import orderBy from 'lodash/orderBy';
 
 export interface InviteUserReleaseRole {
-  releaseId: string;
+  releaseVersionId: string;
   releaseTitle?: string;
   releaseRole: string;
 }
@@ -40,7 +40,7 @@ export interface UserInviteFormValues {
   userPublicationRoles?: InviteUserPublicationRole[];
   publicationId?: string;
   publicationRole?: string;
-  releaseId?: string;
+  releaseVersionId?: string;
   releaseRole?: string;
 }
 
@@ -83,7 +83,7 @@ export default function UserInvitePage({
     const userReleaseRoles =
       values.userReleaseRoles?.map(userReleaseRole => {
         return {
-          releaseId: userReleaseRole.releaseId,
+          releaseVersionId: userReleaseRole.releaseVersionId,
           releaseRole: userReleaseRole.releaseRole,
         };
       }) ?? [];
@@ -114,7 +114,7 @@ export default function UserInvitePage({
       roleId: Yup.string().required('Choose role for the user'),
       userReleaseRoles: Yup.array().of(
         Yup.object({
-          releaseId: Yup.string().required(
+          releaseVersionId: Yup.string().required(
             'Choose release to give the user access to',
           ),
           releaseTitle: Yup.string(),
@@ -132,7 +132,7 @@ export default function UserInvitePage({
       ),
       publicationId: Yup.string(),
       publicationRole: Yup.string(),
-      releaseId: Yup.string(),
+      releaseVersionId: Yup.string(),
       releaseRole: Yup.string(),
     });
   }, []);

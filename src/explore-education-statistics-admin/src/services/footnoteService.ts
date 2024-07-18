@@ -78,39 +78,42 @@ export interface FootnoteMeta {
 }
 
 const footnoteService = {
-  getFootnoteMeta(releaseId: string): Promise<FootnoteMeta> {
-    return client.get(`/releases/${releaseId}/footnotes-meta`);
+  getFootnoteMeta(releaseVersionId: string): Promise<FootnoteMeta> {
+    return client.get(`/releases/${releaseVersionId}/footnotes-meta`);
   },
-  getFootnotes(releaseId: string): Promise<Footnote[]> {
-    return client.get(`/releases/${releaseId}/footnotes`);
+  getFootnotes(releaseVersionId: string): Promise<Footnote[]> {
+    return client.get(`/releases/${releaseVersionId}/footnotes`);
   },
-  getFootnote(releaseId: string, id: string): Promise<Footnote> {
-    return client.get(`/releases/${releaseId}/footnotes/${id}`);
+  getFootnote(releaseVersionId: string, id: string): Promise<Footnote> {
+    return client.get(`/releases/${releaseVersionId}/footnotes/${id}`);
   },
-  createFootnote(releaseId: string, footnote: BaseFootnote): Promise<Footnote> {
+  createFootnote(
+    releaseVersionId: string,
+    footnote: BaseFootnote,
+  ): Promise<Footnote> {
     return client.post(
-      `/releases/${releaseId}/footnotes`,
+      `/releases/${releaseVersionId}/footnotes`,
       footnoteToFlatFootnote(footnote),
     );
   },
   updateFootnote(
-    releaseId: string,
+    releaseVersionId: string,
     id: string,
     footnote: BaseFootnote,
   ): Promise<Footnote> {
     return client.put(
-      `/releases/${releaseId}/footnotes/${id}`,
+      `/releases/${releaseVersionId}/footnotes/${id}`,
       footnoteToFlatFootnote(footnote),
     );
   },
-  deleteFootnote(releaseId: string, id: string): Promise<void> {
-    return client.delete(`/releases/${releaseId}/footnotes/${id}`);
+  deleteFootnote(releaseVersionId: string, id: string): Promise<void> {
+    return client.delete(`/releases/${releaseVersionId}/footnotes/${id}`);
   },
   updateFootnotesOrder(
-    releaseId: string,
+    releaseVersionId: string,
     footnoteIds: string[],
   ): Promise<string[]> {
-    return client.patch(`/releases/${releaseId}/footnotes/`, {
+    return client.patch(`/releases/${releaseVersionId}/footnotes/`, {
       footnoteIds,
     });
   },

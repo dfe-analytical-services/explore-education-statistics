@@ -10,8 +10,10 @@ export interface PreReleaseSummary {
 }
 
 const preReleaseService = {
-  getPreReleaseSummary(releaseId: string): Promise<PreReleaseSummary> {
-    return client.get<PreReleaseSummary>(`/release/${releaseId}/prerelease`);
+  getPreReleaseSummary(releaseVersionId: string): Promise<PreReleaseSummary> {
+    return client.get<PreReleaseSummary>(
+      `/release/${releaseVersionId}/prerelease`,
+    );
   },
 };
 

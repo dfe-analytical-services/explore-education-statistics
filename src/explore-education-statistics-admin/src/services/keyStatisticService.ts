@@ -31,55 +31,64 @@ export type KeyStatisticTextUpdateRequest = KeyStatisticTextSaveRequest;
 
 const keyStatisticService = {
   createKeyStatisticDataBlock(
-    releaseId: string,
+    releaseVersionId: string,
     request: KeyStatisticDataBlockCreateRequest,
   ): Promise<KeyStatisticDataBlock> {
     return client.post(
-      `/release/${releaseId}/key-statistic-data-block`,
+      `/release/${releaseVersionId}/key-statistic-data-block`,
       request,
     );
   },
 
   createKeyStatisticText(
-    releaseId: string,
+    releaseVersionId: string,
     request: KeyStatisticTextCreateRequest,
   ): Promise<KeyStatisticText> {
-    return client.post(`/release/${releaseId}/key-statistic-text`, request);
+    return client.post(
+      `/release/${releaseVersionId}/key-statistic-text`,
+      request,
+    );
   },
 
   updateKeyStatisticDataBlock(
-    releaseId: string,
+    releaseVersionId: string,
     keyStatisticId: string,
     request: KeyStatisticDataBlockUpdateRequest,
   ): Promise<KeyStatisticDataBlock> {
     return client.put(
-      `/release/${releaseId}/key-statistic-data-block/${keyStatisticId}`,
+      `/release/${releaseVersionId}/key-statistic-data-block/${keyStatisticId}`,
       request,
     );
   },
 
   updateKeyStatisticText(
-    releaseId: string,
+    releaseVersionId: string,
     keyStatisticId: string,
     request: KeyStatisticTextUpdateRequest,
   ): Promise<KeyStatisticText> {
     return client.put(
-      `/release/${releaseId}/key-statistic-text/${keyStatisticId}`,
+      `/release/${releaseVersionId}/key-statistic-text/${keyStatisticId}`,
       request,
     );
   },
 
-  deleteKeyStatistic(releaseId: string, keyStatisticId: string): Promise<void> {
+  deleteKeyStatistic(
+    releaseVersionId: string,
+    keyStatisticId: string,
+  ): Promise<void> {
     return client.delete(
-      `/release/${releaseId}/key-statistic/${keyStatisticId}`,
+      `/release/${releaseVersionId}/key-statistic/${keyStatisticId}`,
     );
   },
 
   reorderKeyStatistics(
-    releaseId: string,
+    releaseVersionId: string,
     order: string[],
   ): Promise<KeyStatistic[]> {
-    return client.put(`/release/${releaseId}/key-statistic/order`, order);
+    return client.put(
+      `/release/${releaseVersionId}/key-statistic/order`,
+      order,
+    );
   },
 };
 

@@ -14,7 +14,7 @@ export interface StatusDetail {
 
 interface Options {
   refreshPeriod?: number;
-  releaseId: string;
+  releaseVersionId: string;
   onChange?: (status: ReleaseStageStatus) => void;
 }
 
@@ -23,7 +23,7 @@ interface Options {
  */
 export default function useReleasePublishingStatus({
   refreshPeriod = 10000,
-  releaseId,
+  releaseVersionId,
   onChange,
 }: Options): {
   currentStatus?: ReleaseStageStatus;
@@ -38,7 +38,7 @@ export default function useReleasePublishingStatus({
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchNextStatus = useCallback(async () => {
-    const status = await releaseService.getReleaseStatus(releaseId);
+    const status = await releaseService.getReleaseStatus(releaseVersionId);
 
     const setNextStatus = (nextStatus: ReleaseStageStatus) => {
       setCurrentStatus(prevStatus => {
@@ -63,7 +63,7 @@ export default function useReleasePublishingStatus({
       }
     }
     forceCheck();
-  }, [releaseId, onChange, refreshPeriod]);
+  }, [releaseVersionId, onChange, refreshPeriod]);
 
   function cancelTimer() {
     if (timeoutRef.current) {

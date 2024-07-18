@@ -119,7 +119,7 @@ export default function ReleaseStatusPage() {
         {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
             <ReleasePublishingStatus
-              releaseId={releaseVersionId}
+              releaseVersionId={releaseVersionId}
               refreshPeriod={1000}
               onChange={handlePublishingStatusChange}
             />

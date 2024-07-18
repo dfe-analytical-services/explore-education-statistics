@@ -77,8 +77,9 @@ const ReleaseEditableBlock = ({
   const { handleImageUpload, handleImageUploadCancel } =
     useReleaseImageUpload(releaseVersionId);
 
+  // TODO rename to releaseVersionId
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseVersionId,
+    releaseId: releaseVersionId,
   });
 
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
@@ -351,6 +352,7 @@ const ReleaseEditableBlock = ({
               )}
               onDelete={editable ? handleDelete : undefined}
             >
+              {/* TODO rename to releaseVersionId */}
               <Gate condition={!!visible}>
                 <DataBlockTabs
                   releaseId={releaseVersionId}

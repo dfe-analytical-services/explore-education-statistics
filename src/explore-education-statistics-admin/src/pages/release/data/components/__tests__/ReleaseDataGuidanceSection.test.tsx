@@ -73,7 +73,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -93,7 +96,10 @@ describe('ReleaseDataGuidanceSection', () => {
       });
 
       render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -122,7 +128,10 @@ describe('ReleaseDataGuidanceSection', () => {
       });
 
       render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -146,7 +155,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       const { user } = render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -263,7 +275,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       const { user } = render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -414,7 +429,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       const { user } = render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -452,7 +470,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       const { user } = render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -495,7 +516,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       const { user } = render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -531,7 +555,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       const { user } = render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -569,7 +596,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       const { user } = render(
-        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />,
       );
 
       await waitFor(() => {
@@ -644,7 +674,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       render(
         <ReleaseDataGuidanceSection
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease={false}
         />,
       );
@@ -665,7 +695,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       render(
         <ReleaseDataGuidanceSection
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease={false}
         />,
       );
@@ -687,7 +717,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       render(
         <ReleaseDataGuidanceSection
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease={false}
         />,
       );
@@ -707,7 +737,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       render(
         <ReleaseDataGuidanceSection
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease={false}
         />,
       );
@@ -734,7 +764,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       const { user } = render(
         <ReleaseDataGuidanceSection
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease={false}
         />,
       );

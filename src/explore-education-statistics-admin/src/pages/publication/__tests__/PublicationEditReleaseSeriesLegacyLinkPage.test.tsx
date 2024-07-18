@@ -32,11 +32,11 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
       legacyLinkUrl: 'https://gov.uk/1',
     },
     {
-      id: 'release-1',
+      id: 'release-version-1',
       isLegacyLink: false,
       description: 'Academic Year 2000/01',
 
-      releaseId: 'release-parent-1',
+      releaseId: 'release-1',
       releaseSlug: 'release-slug',
       isLatest: true,
       isPublished: true,
@@ -96,9 +96,9 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
             legacyLinkUrl: 'https://gov.uk/1/edit',
           },
           {
-            id: 'release-1',
+            id: 'release-version-1',
 
-            releaseId: 'release-parent-1',
+            releaseVersionId: 'release-1',
           },
           {
             id: 'legacy-release-2',

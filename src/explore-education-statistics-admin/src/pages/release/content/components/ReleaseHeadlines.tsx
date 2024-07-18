@@ -5,7 +5,7 @@ import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -14,20 +14,23 @@ import React, { useCallback } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
 
 interface Props {
-  release: EditableRelease;
+  releaseVersion: EditableReleaseVersion;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
-const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
+const ReleaseHeadlines = ({
+  releaseVersion,
+  transformFeaturedTableLinks,
+}: Props) => {
   const { editingMode } = useEditingContext();
   const actions = useReleaseContentActions();
 
-  const getChartFile = useGetChartFile(release.id);
+  const getChartFile = useGetChartFile(releaseVersion.id);
 
   const addBlock = useCallback(async () => {
     await actions.addContentSectionBlock({
-      releaseVersionId: release.id,
-      sectionId: release.headlinesSection.id,
+      releaseVersionId: releaseVersion.id,
+      sectionId: releaseVersion.headlinesSection.id,
       sectionKey: 'headlinesSection',
       block: {
         type: 'HtmlBlock',
@@ -35,21 +38,24 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
         body: '',
       },
     });
-  }, [actions, release.id, release.headlinesSection.id]);
+  }, [actions, releaseVersion.id, releaseVersion.headlinesSection.id]);
 
   const headlinesTab = (
     <TabsSection title="Summary">
       <section data-scroll id="releaseHeadlines-keyStatistics">
-        <KeyStatistics release={release} isEditing={editingMode === 'edit'} />
+        <KeyStatistics
+          release={releaseVersion}
+          isEditing={editingMode === 'edit'}
+        />
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
-          blocks={release.headlinesSection.content}
-          sectionId={release.headlinesSection.id}
+          blocks={releaseVersion.headlinesSection.content}
+          sectionId={releaseVersion.headlinesSection.id}
           renderBlock={block => (
             <ReleaseBlock
               block={block}
-              releaseId={release.id}
+              releaseVersionId={releaseVersion.id}
               transformFeaturedTableLinks={transformFeaturedTableLinks}
             />
           )}
@@ -57,16 +63,16 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
             <ReleaseEditableBlock
               allowComments
               block={block}
-              publicationId={release.publication.id}
-              releaseVersionId={release.id}
-              sectionId={release.headlinesSection.id}
+              publicationId={releaseVersion.publication.id}
+              releaseVersionId={releaseVersion.id}
+              sectionId={releaseVersion.headlinesSection.id}
               sectionKey="headlinesSection"
             />
           )}
         />
 
         {editingMode === 'edit' &&
-          release.headlinesSection.content?.length === 0 && (
+          releaseVersion.headlinesSection.content?.length === 0 && (
             <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
               <Button variant="secondary" onClick={addBlock}>
                 Add a headlines text block
@@ -84,23 +90,24 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
         data-scroll
         id="release-headlines-header"
       >
-        Headline facts and figures - {release.yearTitle}
+        Headline facts and figures - {releaseVersion.yearTitle}
       </h2>
 
-      {release.keyStatisticsSecondarySection.content?.length ? (
+      {releaseVersion.keyStatisticsSecondarySection.content?.length ? (
         <>
-          <AddSecondaryStats release={release} updating />
+          <AddSecondaryStats releaseVersion={releaseVersion} updating />
+          {/* TODO rename to releaseVersionId */}
           <DataBlockTabs
-            releaseId={release.id}
+            releaseId={releaseVersion.id}
             id="releaseHeadlines-dataBlock"
-            dataBlock={release.keyStatisticsSecondarySection.content[0]}
+            dataBlock={releaseVersion.keyStatisticsSecondarySection.content[0]}
             getInfographic={getChartFile}
             firstTabs={headlinesTab}
           />
         </>
       ) : (
         <>
-          <AddSecondaryStats release={release} />
+          <AddSecondaryStats releaseVersion={releaseVersion} />
           <Tabs id="releaseHeadlines-dataBlock">{headlinesTab}</Tabs>
         </>
       )}

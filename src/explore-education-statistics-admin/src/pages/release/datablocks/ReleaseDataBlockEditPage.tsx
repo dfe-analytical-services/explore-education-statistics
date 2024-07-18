@@ -166,7 +166,7 @@ const ReleaseDataBlockEditPage = ({
                 />
               ) : (
                 <DataBlockPageReadOnlyTabs
-                  releaseId={releaseVersionId}
+                  releaseVersionId={releaseVersionId}
                   dataBlock={dataBlock}
                 />
               )}
@@ -174,7 +174,7 @@ const ReleaseDataBlockEditPage = ({
 
             {isDeleting && canUpdateRelease && (
               <DataBlockDeletePlanModal
-                releaseId={releaseVersionId}
+                releaseVersionId={releaseVersionId}
                 dataBlockId={dataBlockId}
                 onConfirm={handleDataBlockDelete}
                 onCancel={toggleDeleting.off}

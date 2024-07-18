@@ -133,7 +133,7 @@ type TaskStage =
   | 'Scheduled';
 
 export interface ReleaseStageStatus {
-  releaseId?: string;
+  releaseVersionId?: string;
   contentStage?: TaskStage;
   filesStage?: TaskStage;
   publishingStage?: PublishingStage;
@@ -208,34 +208,36 @@ const releaseService = {
     );
   },
 
-  getRelease(releaseId: string): Promise<ReleaseVersion> {
-    return client.get(`/releases/${releaseId}`);
+  getRelease(releaseVersionId: string): Promise<ReleaseVersion> {
+    return client.get(`/releases/${releaseVersionId}`);
   },
 
-  getReleaseStatuses(releaseId: string): Promise<ReleaseStatus[]> {
-    return client.get(`/releases/${releaseId}/status`);
+  getReleaseStatuses(releaseVersionId: string): Promise<ReleaseStatus[]> {
+    return client.get(`/releases/${releaseVersionId}/status`);
   },
 
   updateRelease(
-    releaseId: string,
+    releaseVersionId: string,
     updateRequest: UpdateReleaseVersionRequest,
   ): Promise<ReleaseVersion> {
-    return client.put(`/releases/${releaseId}`, updateRequest);
+    return client.put(`/releases/${releaseVersionId}`, updateRequest);
   },
 
   createReleaseStatus(
-    releaseId: string,
+    releaseVersionId: string,
     createRequest: CreateReleaseStatusRequest,
   ): Promise<ReleaseVersion> {
-    return client.post(`/releases/${releaseId}/status`, createRequest);
+    return client.post(`/releases/${releaseVersionId}/status`, createRequest);
   },
 
-  getDeleteReleasePlan(releaseId: string): Promise<DeleteReleasePlan> {
-    return client.get<DeleteReleasePlan>(`/release/${releaseId}/delete-plan`);
+  getDeleteReleasePlan(releaseVersionId: string): Promise<DeleteReleasePlan> {
+    return client.get<DeleteReleasePlan>(
+      `/release/${releaseVersionId}/delete-plan`,
+    );
   },
 
-  deleteRelease(releaseId: string): Promise<void> {
-    return client.delete(`/release/${releaseId}`);
+  deleteRelease(releaseVersionId: string): Promise<void> {
+    return client.delete(`/release/${releaseVersionId}`);
   },
 
   listDraftReleases(): Promise<DashboardReleaseVersionSummary[]> {
@@ -250,18 +252,18 @@ const releaseService = {
     return client.get('/releases/approvals');
   },
 
-  getReleaseStatus(releaseId: string): Promise<ReleaseStageStatus> {
+  getReleaseStatus(releaseVersionId: string): Promise<ReleaseStageStatus> {
     return client.get<ReleaseStageStatus>(
-      `/releases/${releaseId}/stage-status`,
+      `/releases/${releaseVersionId}/stage-status`,
     );
   },
 
-  getReleaseChecklist(releaseId: string): Promise<ReleaseChecklist> {
-    return client.get(`/releases/${releaseId}/checklist`);
+  getReleaseChecklist(releaseVersionId: string): Promise<ReleaseChecklist> {
+    return client.get(`/releases/${releaseVersionId}/checklist`);
   },
 
-  createReleaseAmendment(releaseId: string): Promise<IdResponse> {
-    return client.post(`/release/${releaseId}/amendment`);
+  createReleaseAmendment(releaseVersionId: string): Promise<IdResponse> {
+    return client.post(`/release/${releaseVersionId}/amendment`);
   },
 };
 

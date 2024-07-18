@@ -74,7 +74,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -115,7 +115,7 @@ describe('ReorderIndicatorsList', () => {
     );
     render(
       <ReorderIndicatorsList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -132,7 +132,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -164,7 +164,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -194,7 +194,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -225,7 +225,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={handleSave}

@@ -3,7 +3,7 @@ import ReleaseNoteForm, {
   ReleaseNoteFormValues,
 } from '@admin/pages/release/content/components/ReleaseNoteForm';
 import ReleaseNote from '@admin/pages/release/content/components/ReleaseNote';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import releaseNoteService from '@admin/services/releaseNoteService';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
@@ -12,7 +12,7 @@ import { ReleaseNote as ReleaseNoteData } from '@common/services/publicationServ
 import React, { useState } from 'react';
 
 interface Props {
-  release: EditableRelease;
+  release: EditableReleaseVersion;
 }
 
 export default function ReleaseNotesSection({ release }: Props) {

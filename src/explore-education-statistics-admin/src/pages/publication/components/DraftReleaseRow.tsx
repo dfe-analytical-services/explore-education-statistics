@@ -33,7 +33,7 @@ const DraftReleaseRow = ({
 
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
-      releaseId: string;
+      releaseVersionId: string;
     }
   >();
 
@@ -91,7 +91,7 @@ const DraftReleaseRow = ({
                 onClick={async () => {
                   setDeleteReleasePlan({
                     ...(await releaseService.getDeleteReleasePlan(release.id)),
-                    releaseId: release.id,
+                    releaseVersionId: release.id,
                   });
                 }}
               >
@@ -101,7 +101,9 @@ const DraftReleaseRow = ({
             }
             onConfirm={async () => {
               if (deleteReleasePlan) {
-                await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+                await releaseService.deleteRelease(
+                  deleteReleasePlan.releaseVersionId,
+                );
                 setDeleteReleasePlan(undefined);
                 onAmendmentDelete?.();
               }

@@ -1,18 +1,18 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
 
 interface Props {
-  release: EditableRelease;
+  releaseVersion: EditableReleaseVersion;
   updating?: boolean;
 }
 
-const AddSecondaryStats = ({ release, updating = false }: Props) => {
+const AddSecondaryStats = ({ releaseVersion, updating = false }: Props) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const { editingMode } = useEditingContext();
 
@@ -44,12 +44,13 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
             }
             onConfirm={async () => {
               await Promise.all(
-                release.keyStatisticsSecondarySection.content.map(
+                releaseVersion.keyStatisticsSecondarySection.content.map(
                   async content => {
-                    if (release.keyStatisticsSecondarySection?.content) {
+                    if (releaseVersion.keyStatisticsSecondarySection?.content) {
                       await deleteContentSectionBlock({
-                        releaseVersionId: release.id,
-                        sectionId: release.keyStatisticsSecondarySection.id,
+                        releaseVersionId: releaseVersion.id,
+                        sectionId:
+                          releaseVersion.keyStatisticsSecondarySection.id,
                         blockId: content.id,
                         sectionKey: 'keyStatisticsSecondarySection',
                       });
@@ -71,23 +72,25 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
   return (
     <DataBlockSelectForm
       id="secondaryStats-dataBlockSelectForm"
-      releaseId={release.id}
+      releaseVersionId={releaseVersion.id}
       label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
       onSelect={async selectedDataBlockId => {
         await Promise.all(
-          release.keyStatisticsSecondarySection.content.map(async content => {
-            await deleteContentSectionBlock({
-              releaseVersionId: release.id,
-              sectionId: release.keyStatisticsSecondarySection.id,
-              blockId: content.id,
-              sectionKey: 'keyStatisticsSecondarySection',
-            });
-          }),
+          releaseVersion.keyStatisticsSecondarySection.content.map(
+            async content => {
+              await deleteContentSectionBlock({
+                releaseVersionId: releaseVersion.id,
+                sectionId: releaseVersion.keyStatisticsSecondarySection.id,
+                blockId: content.id,
+                sectionKey: 'keyStatisticsSecondarySection',
+              });
+            },
+          ),
         );
 
         await attachContentSectionBlock({
-          releaseVersionId: release.id,
-          sectionId: release.keyStatisticsSecondarySection.id,
+          releaseVersionId: releaseVersion.id,
+          sectionId: releaseVersion.keyStatisticsSecondarySection.id,
           sectionKey: 'keyStatisticsSecondarySection',
           block: {
             contentBlockId: selectedDataBlockId,

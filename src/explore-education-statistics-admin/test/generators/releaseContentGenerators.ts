@@ -1,5 +1,5 @@
 import {
-  EditableRelease,
+  EditableReleaseVersion,
   ReleaseContent,
 } from '@admin/services/releaseContentService';
 import {
@@ -177,7 +177,7 @@ export function generateEditableRelease({
   type = 'OfficialStatistics',
   updates = defaultUpdates,
   yearTitle = '2020/21',
-}: Partial<EditableRelease>): EditableRelease {
+}: Partial<EditableReleaseVersion>): EditableReleaseVersion {
   const releaseSlug = title.replaceAll(' ', '-');
   return {
     approvalStatus,

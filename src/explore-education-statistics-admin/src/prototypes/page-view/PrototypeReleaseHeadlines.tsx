@@ -4,7 +4,7 @@ import useGetChartFile from '@admin/hooks/useGetChartFile';
 import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -14,7 +14,7 @@ import AddSecondaryStats from '@admin/pages/release/content/components/AddSecond
 import PrototypeReleaseEditableBlock from './PrototypeReleaseEditableBlock';
 
 interface Props {
-  release: EditableRelease;
+  release: EditableReleaseVersion;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
@@ -49,7 +49,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
           renderBlock={block => (
             <ReleaseBlock
               block={block}
-              releaseId={release.id}
+              releaseVersionId={release.id}
               transformFeaturedTableLinks={transformFeaturedTableLinks}
             />
           )}
@@ -83,7 +83,9 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
 
       {release.keyStatisticsSecondarySection.content?.length ? (
         <>
-          <AddSecondaryStats release={release} updating />
+          <AddSecondaryStats releaseVersion={release} updating />
+
+          {/* TODO rename to releaseVersionId */}
           <DataBlockTabs
             releaseId={release.id}
             id="releaseHeadlines-dataBlock"
@@ -94,7 +96,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
         </>
       ) : (
         <>
-          <AddSecondaryStats release={release} />
+          <AddSecondaryStats releaseVersion={release} />
           <Tabs id="releaseHeadlines-dataBlock">{headlinesTab}</Tabs>
         </>
       )}

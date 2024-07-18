@@ -2,7 +2,7 @@ import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
 import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import useToggle from '@common/hooks/useToggle';
 import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
@@ -14,7 +14,7 @@ import { DragDropContext, Draggable, DropResult } from '@hello-pangea/dnd';
 import AddKeyStatistics from '@admin/pages/release/content/components/AddKeyStatistics';
 
 export interface KeyStatisticsProps {
-  release: EditableRelease;
+  release: EditableReleaseVersion;
   isEditing?: boolean;
 }
 
@@ -109,7 +109,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         <EditableKeyStat
                           key={keyStat.id}
                           keyStat={keyStat}
-                          releaseId={release.id}
+                          releaseVersionId={release.id}
                           isEditing={isEditing}
                           isReordering={isReordering}
                         />

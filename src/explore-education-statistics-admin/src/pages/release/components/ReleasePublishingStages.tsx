@@ -40,7 +40,9 @@ export default function ReleasePublishingStages({
         )}
       <ul className="govuk-list">
         {Object.entries(currentStatus).map(([key, val]) => {
-          if (['overallStage', 'releaseId', 'lastUpdated'].includes(key)) {
+          if (
+            ['overallStage', 'releaseVersionId', 'lastUpdated'].includes(key)
+          ) {
             return null;
           }
           const { color, text } = getStatusDetail(val);

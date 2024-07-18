@@ -236,7 +236,7 @@ const ReleaseDataBlocksPage = ({
 
       {deleteDataBlock && (
         <DataBlockDeletePlanModal
-          releaseId={releaseVersionId}
+          releaseVersionId={releaseVersionId}
           dataBlockId={deleteDataBlock.id}
           onConfirm={handleDelete}
           onCancel={handleDeleteCancel}
