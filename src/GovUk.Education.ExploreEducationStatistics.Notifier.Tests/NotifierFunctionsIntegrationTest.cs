@@ -62,12 +62,10 @@ public abstract class NotifierFunctionsIntegrationTest
 
     public async Task CreateApiSubscription(ApiSubscription subscription)
     {
-        var appSettingsOptions = GetAppSettingsOptions();
-
         var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
 
         await dataTableStorageService.CreateEntity(
-            tableName: appSettingsOptions.ApiSubscriptionsTableName,
+            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             entity: subscription);
     }
 
@@ -76,12 +74,10 @@ public abstract class NotifierFunctionsIntegrationTest
         string email,
         IEnumerable<string>? select = null)
     {
-        var appSettingsOptions = GetRequiredService<IOptions<AppSettingsOptions>>();
-
-        var dataTableStorageService = new DataTableStorageService(appSettingsOptions.Value.TableStorageConnectionString);
+        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
 
         return await dataTableStorageService.GetEntityIfExists<ApiSubscription>(
-            tableName: appSettingsOptions.Value.ApiSubscriptionsTableName,
+            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             select: select);

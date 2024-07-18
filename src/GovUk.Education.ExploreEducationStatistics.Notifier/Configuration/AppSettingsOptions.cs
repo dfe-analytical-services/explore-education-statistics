@@ -11,6 +11,4 @@ public class AppSettingsOptions
     public string TableStorageConnectionString { get; init; } = null!;
 
     public string TokenSecretKey { get; init; } = null!;
-
-    public string ApiSubscriptionsTableName { get; init; } = null!;
 }

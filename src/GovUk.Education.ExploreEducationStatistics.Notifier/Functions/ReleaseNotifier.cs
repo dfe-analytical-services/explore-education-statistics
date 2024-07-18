@@ -48,7 +48,7 @@ public class ReleaseNotifier
     {
         _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var subscribersTable = await _publicationSubscriptionRepository.GetTable(NotifierSubscriptionsTableName);
+        var subscribersTable = await _publicationSubscriptionRepository.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName);
 
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 

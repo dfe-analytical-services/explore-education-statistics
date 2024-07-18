@@ -12,7 +12,7 @@ internal class ApiSubscriptionRepository(
     IOptions<AppSettingsOptions> appSettingsOptions,
     IApiSubscriptionTableStorageService apiSubscriptionTableStorage) : IApiSubscriptionRepository
 {
-    private readonly string _apiSubscriptionsTableName = appSettingsOptions.Value.ApiSubscriptionsTableName;
+    private const string _apiSubscriptionsTableName = Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName;
 
     public async Task<ApiSubscription?> GetSubscription(
         Guid dataSetId,

@@ -71,7 +71,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -161,7 +161,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -266,7 +266,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -389,7 +389,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -494,7 +494,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
