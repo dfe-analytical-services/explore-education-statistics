@@ -48,7 +48,7 @@ public class PreviewTokenController(IPreviewTokenService previewTokenService) : 
             .HandleFailuresOrOk();
     }
 
-    [HttpDelete("{previewTokenId:guid}")]
+    [HttpPost("{previewTokenId:guid}/revoke")]
     public async Task<ActionResult> RevokePreviewToken(
         Guid previewTokenId,
         CancellationToken cancellationToken)

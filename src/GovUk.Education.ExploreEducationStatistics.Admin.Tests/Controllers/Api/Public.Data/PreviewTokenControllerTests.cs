@@ -646,9 +646,9 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             client ??= BuildApp().CreateClient();
 
-            var uri = new Uri($"{BaseUrl}/{previewTokenId}", UriKind.Relative);
+            var uri = new Uri($"{BaseUrl}/{previewTokenId}/revoke", UriKind.Relative);
 
-            return await client.DeleteAsync(uri);
+            return await client.PostAsync(uri, content: null);
         }
     }
 
