@@ -60,7 +60,6 @@ describe('ReleaseDataBlockEditPage', () => {
     highlightDescription: 'Test highlight description 1',
     source: 'Test source 1',
     query: {
-      includeGeoJson: false,
       subjectId: 'subject-1',
       locationIds: ['barnet'],
       timePeriod: {

@@ -77,7 +77,6 @@ const DataBlockPageTabs = ({
     const query: ReleaseTableDataQuery = {
       ...dataBlock.query,
       releaseId,
-      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
     };
 
     const tableData = await tableBuilderService.getTableData(query, releaseId);
@@ -190,7 +189,6 @@ const DataBlockPageTabs = ({
           ...(omit(nextDataBlock.query, [
             'releaseId',
           ]) as SavedDataBlock['query']),
-          includeGeoJson: nextDataBlock.charts[0]?.type === 'map',
         },
       };
 

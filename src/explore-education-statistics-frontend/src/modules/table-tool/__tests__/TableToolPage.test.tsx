@@ -139,7 +139,6 @@ describe('TableToolPage', () => {
         '0e8f9198-ce65-40ac-662a-08d9097c4255',
       ],
       locationIds: ['26100e90-c8c5-43a5-9999-296d402f02fb'],
-      includeGeoJson: false,
     },
   };
 

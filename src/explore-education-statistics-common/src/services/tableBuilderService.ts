@@ -136,7 +136,6 @@ export interface TimePeriodQuery {
 
 export interface TableDataQuery extends FullTableQuery {
   publicationId?: string;
-  includeGeoJson?: boolean; // @MarkFix can remove this?
   boundaryLevel?: number;
 }
 
