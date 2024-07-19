@@ -80,10 +80,12 @@ const DataBlockPageTabs = ({
     const query: ReleaseTableDataQuery = {
       ...dataBlock.query,
       releaseId: releaseVersionId,
-      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
     };
 
-    const tableData = await tableBuilderService.getTableData(query);
+    const tableData = await tableBuilderService.getTableData(
+      query,
+      releaseVersionId,
+    );
     const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(
       query,
       tableData,

@@ -5,9 +5,9 @@ import _releaseDataFileService, {
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
-import {screen, waitFor, within} from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import {MemoryRouter} from 'react-router';
+import { MemoryRouter } from 'react-router';
 import _permissionService, {
   DataFilePermissions,
 } from '@admin/services/permissionService';
@@ -150,7 +150,7 @@ describe('ReleaseDataUploadsSection', () => {
     const section1 = within(sections[0]);
 
     expect(
-      section1.getByRole('button', {name: /Test data 1/}),
+      section1.getByRole('button', { name: /Test data 1/ }),
     ).toBeInTheDocument();
 
     expect(section1.getByTestId('Subject title')).toHaveTextContent(
@@ -173,7 +173,7 @@ describe('ReleaseDataUploadsSection', () => {
     const section2 = within(sections[1]);
 
     expect(
-      section2.getByRole('button', {name: /Test data 2/}),
+      section2.getByRole('button', { name: /Test data 2/ }),
     ).toBeInTheDocument();
 
     expect(section2.getByTestId('Subject title')).toHaveTextContent(
@@ -227,7 +227,7 @@ describe('ReleaseDataUploadsSection', () => {
     const section1 = getAccordionSection(0);
 
     expect(
-      section1.getByRole('button', {name: /Test data 1/}),
+      section1.getByRole('button', { name: /Test data 1/ }),
     ).toBeInTheDocument();
 
     expect(section1.getByTestId('Status')).toHaveTextContent(
@@ -262,7 +262,7 @@ describe('ReleaseDataUploadsSection', () => {
   describe('deleting data file', () => {
     test('does not render delete files button if file is not ready for deletion', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
-        {...testDataFiles[0], status: 'QUEUED'},
+        { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
@@ -288,13 +288,13 @@ describe('ReleaseDataUploadsSection', () => {
       const section1 = within(sections[0]);
       expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
       expect(
-        section1.queryByRole('button', {name: 'Delete files'}),
+        section1.queryByRole('button', { name: 'Delete files' }),
       ).not.toBeInTheDocument();
 
       const section2 = within(sections[1]);
       expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(
-        section2.getByRole('button', {name: 'Delete files'}),
+        section2.getByRole('button', { name: 'Delete files' }),
       ).toBeInTheDocument();
     });
 
@@ -327,7 +327,7 @@ describe('ReleaseDataUploadsSection', () => {
         footnoteIds: ['footnote-1'],
       });
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -411,7 +411,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
       releaseDataFileService.deleteDataFiles.mockResolvedValue();
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -466,7 +466,7 @@ describe('ReleaseDataUploadsSection', () => {
   describe('replace data file', () => {
     test('does not render replace data button if file import is not completed', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
-        {...testDataFiles[0], status: 'QUEUED'},
+        { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
@@ -493,19 +493,19 @@ describe('ReleaseDataUploadsSection', () => {
       const section1 = within(sections[0]);
       expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
       expect(
-        section1.queryByRole('link', {name: 'Replace data'}),
+        section1.queryByRole('link', { name: 'Replace data' }),
       ).not.toBeInTheDocument();
 
       const section2 = within(sections[1]);
       expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(
-        section2.getByRole('link', {name: 'Replace data'}),
+        section2.getByRole('link', { name: 'Replace data' }),
       ).toBeInTheDocument();
     });
 
     test('renders replace data button with correct link', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
-        {...testDataFiles[0], status: 'QUEUED'},
+        { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
@@ -530,7 +530,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section2 = within(sections[1]);
       expect(
-        section2.getByRole('link', {name: 'Replace data'}),
+        section2.getByRole('link', { name: 'Replace data' }),
       ).toHaveAttribute(
         'href',
         '/publication/publication-1/release/release-1/data/data-2/replace',
@@ -544,7 +544,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('show validation message when no subject title', async () => {
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -570,7 +570,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('shows validation message when non-unique subject title', async () => {
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -600,7 +600,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload CSV files', async () => {
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -644,7 +644,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload ZIP file', async () => {
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -690,7 +690,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('cannot submit with invalid values when trying to upload bulk ZIP file', async () => {
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -725,7 +725,7 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -773,13 +773,13 @@ describe('ReleaseDataUploadsSection', () => {
       const section1 = within(sections[0]);
 
       expect(
-        section1.getByRole('button', {name: /Test data 1/}),
+        section1.getByRole('button', { name: /Test data 1/ }),
       ).toBeInTheDocument();
 
       const section2 = within(sections[1]);
 
       expect(
-        section2.getByRole('button', {name: /Test data 2/}),
+        section2.getByRole('button', { name: /Test data 2/ }),
       ).toBeInTheDocument();
 
       expect(section2.getByTestId('Subject title')).toHaveTextContent(
@@ -789,7 +789,7 @@ describe('ReleaseDataUploadsSection', () => {
       const section3 = within(sections[2]);
 
       expect(
-        section3.getByRole('button', {name: /Test title/}),
+        section3.getByRole('button', { name: /Test title/ }),
       ).toBeInTheDocument();
 
       expect(section3.getByTestId('Subject title')).toHaveTextContent(
@@ -825,7 +825,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -868,11 +868,11 @@ describe('ReleaseDataUploadsSection', () => {
       expect(sections).toHaveLength(3);
 
       expect(
-        section1.getByRole('button', {name: /Test data 1/}),
+        section1.getByRole('button', { name: /Test data 1/ }),
       ).toBeInTheDocument();
 
       expect(
-        section2.getByRole('button', {name: /Test data 2/}),
+        section2.getByRole('button', { name: /Test data 2/ }),
       ).toBeInTheDocument();
 
       expect(section2.getByTestId('Subject title')).toHaveTextContent(
@@ -880,7 +880,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       expect(
-        section3.getByRole('button', {name: /Test zip title/}),
+        section3.getByRole('button', { name: /Test zip title/ }),
       ).toBeInTheDocument();
 
       expect(section3.getByTestId('Subject title')).toHaveTextContent(
@@ -924,7 +924,7 @@ describe('ReleaseDataUploadsSection', () => {
         testQueuedImportStatus,
       );
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -962,15 +962,15 @@ describe('ReleaseDataUploadsSection', () => {
       expect(sections).toHaveLength(4);
 
       expect(
-        section1.getByRole('button', {name: /Test data 1/}),
+        section1.getByRole('button', { name: /Test data 1/ }),
       ).toBeInTheDocument();
 
       expect(
-        section2.getByRole('button', {name: /Test data 2/}),
+        section2.getByRole('button', { name: /Test data 2/ }),
       ).toBeInTheDocument();
 
       expect(
-        section3.getByRole('button', {name: /Test zip title/}),
+        section3.getByRole('button', { name: /Test zip title/ }),
       ).toBeInTheDocument();
       expect(section3.getByTestId('Subject title')).toHaveTextContent(
         'Test zip title',
@@ -996,7 +996,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       expect(
-        section4.getByRole('button', {name: /Test zip title 2/}),
+        section4.getByRole('button', { name: /Test zip title 2/ }),
       ).toBeInTheDocument();
       expect(section4.getByTestId('Subject title')).toHaveTextContent(
         'Test zip title 2',
@@ -1034,7 +1034,7 @@ describe('ReleaseDataUploadsSection', () => {
         {} as DataFilePermissions,
       );
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1101,7 +1101,7 @@ describe('ReleaseDataUploadsSection', () => {
         {} as DataFilePermissions,
       );
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1180,7 +1180,7 @@ describe('ReleaseDataUploadsSection', () => {
         const section = getAccordionSection(0);
 
         expect(
-          section.getByRole('button', {name: 'Cancel'}),
+          section.getByRole('button', { name: 'Cancel' }),
         ).toBeInTheDocument();
       });
 
@@ -1214,7 +1214,7 @@ describe('ReleaseDataUploadsSection', () => {
         const section = getAccordionSection(0);
 
         expect(
-          section.queryByRole('button', {name: 'Cancel'}),
+          section.queryByRole('button', { name: 'Cancel' }),
         ).not.toBeInTheDocument();
       });
     });
@@ -1232,7 +1232,7 @@ describe('ReleaseDataUploadsSection', () => {
         testUploadedDataFile,
       ]);
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1248,7 +1248,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await user.click(section.getByRole('button', {name: 'Cancel'}));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1268,10 +1268,10 @@ describe('ReleaseDataUploadsSection', () => {
         ),
       ).toBeInTheDocument();
 
-      expect(modal.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
 
       expect(
-        modal.getByRole('button', {name: 'Confirm'}),
+        modal.getByRole('button', { name: 'Confirm' }),
       ).toBeInTheDocument();
     });
 
@@ -1280,7 +1280,7 @@ describe('ReleaseDataUploadsSection', () => {
         testUploadedDataFile,
       ]);
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1296,7 +1296,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await user.click(section.getByRole('button', {name: 'Cancel'}));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1305,7 +1305,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      await user.click(modal.getByRole('button', {name: 'Confirm'}));
+      await user.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
@@ -1322,7 +1322,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(
-        section.queryByRole('button', {name: 'Cancel'}),
+        section.queryByRole('button', { name: 'Cancel' }),
       ).not.toBeInTheDocument();
     });
 
@@ -1331,7 +1331,7 @@ describe('ReleaseDataUploadsSection', () => {
         testUploadedDataFile,
       ]);
 
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1347,7 +1347,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await user.click(section.getByRole('button', {name: 'Cancel'}));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1356,7 +1356,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      await user.click(modal.getByRole('button', {name: 'Cancel'}));
+      await user.click(modal.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).not.toHaveBeenCalled();
@@ -1368,7 +1368,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(
-        section.getByRole('button', {name: 'Cancel'}),
+        section.getByRole('button', { name: 'Cancel' }),
       ).toBeInTheDocument();
     });
 
@@ -1379,7 +1379,7 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
         testUploadedDataFile,
       ]);
-      const {user} = render(
+      const { user } = render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
             publicationId="publication-1"
@@ -1395,7 +1395,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      await user.click(section.getByRole('button', {name: 'Cancel'}));
+      await user.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1404,7 +1404,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      await user.click(modal.getByRole('button', {name: 'Confirm'}));
+      await user.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
@@ -1422,7 +1422,7 @@ describe('ReleaseDataUploadsSection', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
       expect(
-        section.queryByRole('button', {name: 'Cancel'}),
+        section.queryByRole('button', { name: 'Cancel' }),
       ).not.toBeInTheDocument();
 
       expect(screen.getByText('Cancellation failed')).toBeInTheDocument();

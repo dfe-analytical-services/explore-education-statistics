@@ -72,7 +72,8 @@ const PreReleaseTableToolPage = ({
           query: {
             ...query,
             publicationId,
-            releaseVersionId,
+            // TODO rename to releaseVersionId
+            releaseId: releaseVersionId,
           },
           subjectMeta,
           response: {
@@ -88,7 +89,8 @@ const PreReleaseTableToolPage = ({
         featuredTables,
         query: {
           publicationId,
-          releaseVersionId,
+          // TODO rename to releaseVersionId
+          releaseId: releaseVersionId,
           subjectId: '',
           indicators: [],
           filters: [],

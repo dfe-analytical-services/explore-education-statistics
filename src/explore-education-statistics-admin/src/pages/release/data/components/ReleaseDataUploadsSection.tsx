@@ -5,7 +5,7 @@ import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileD
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
-import {terminalImportStatuses} from '@admin/pages/release/data/components/ImporterStatus';
+import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import {
   releaseDataFileReplaceRoute,
@@ -26,9 +26,9 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import logger from '@common/services/logger';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import React, {useCallback, useEffect, useState} from 'react';
-import {generatePath} from 'react-router';
-import {useQuery} from '@tanstack/react-query';
+import React, { useCallback, useEffect, useState } from 'react';
+import { generatePath } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   publicationId: string;
@@ -43,16 +43,16 @@ interface DeleteDataFile {
 }
 
 const ReleaseDataUploadsSection = ({
-                                     publicationId,
-                                     releaseVersionId,
-                                     canUpdateRelease,
-                                     onDataFilesChange,
-                                   }: Props) => {
+  publicationId,
+  releaseVersionId,
+  canUpdateRelease,
+  onDataFilesChange,
+}: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [activeFileIds, setActiveFileIds] = useState<string[]>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
 
-  const {data: initialDataFiles = [], isLoading} = useQuery(
+  const { data: initialDataFiles = [], isLoading } = useQuery(
     releaseDataFileQueries.list(releaseVersionId),
   );
 
@@ -74,16 +74,16 @@ const ReleaseDataUploadsSection = ({
         file.fileName !== dataFile.file.fileName
           ? file
           : {
-            ...file,
-            isDeleting: deleting,
-          },
+              ...file,
+              isDeleting: deleting,
+            },
       ),
     );
   };
 
   const handleStatusChange = async (
     dataFile: DataFile,
-    {totalRows, status}: DataFileImportStatus,
+    { totalRows, status }: DataFileImportStatus,
   ) => {
     const permissions = await permissionService.getDataFilePermissions(
       releaseVersionId,
@@ -97,11 +97,11 @@ const ReleaseDataUploadsSection = ({
         file.fileName !== dataFile.fileName
           ? file
           : {
-            ...dataFile,
-            rows: totalRows,
-            status,
-            permissions,
-          },
+              ...dataFile,
+              rows: totalRows,
+              status,
+              permissions,
+            },
       ),
     );
   };
@@ -184,14 +184,14 @@ const ReleaseDataUploadsSection = ({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit}/>
+        <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
         </WarningMessage>
       )}
 
-      <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6"/>
+      <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
       <LoadingSpinner loading={isLoading}>
         {dataFiles.length > 0 ? (
@@ -217,9 +217,9 @@ const ReleaseDataUploadsSection = ({
                 headingTag="h3"
                 open={activeFileIds?.includes(dataFile.id)}
               >
-                <div style={{position: 'relative'}}>
+                <div style={{ position: 'relative' }}>
                   {dataFile.isDeleting && (
-                    <LoadingSpinner text="Deleting files" overlay/>
+                    <LoadingSpinner text="Deleting files" overlay />
                   )}
                   <DataFileDetailsTable
                     dataFile={dataFile}
@@ -301,7 +301,7 @@ const ReleaseDataUploadsSection = ({
           onExit={() => setDeleteDataFile(undefined)}
           onCancel={() => setDeleteDataFile(undefined)}
           onConfirm={async () => {
-            const {file} = deleteDataFile;
+            const { file } = deleteDataFile;
 
             setDeleteDataFile(undefined);
             setFileDeleting(deleteDataFile, true);
@@ -326,49 +326,49 @@ const ReleaseDataUploadsSection = ({
 
           {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.length >
             0 && (
-              <>
-                <p>The following data blocks will also be deleted:</p>
+            <>
+              <p>The following data blocks will also be deleted:</p>
 
-                <ul>
-                  {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.map(
-                    block => (
-                      <li key={block.name}>
-                        <p>{block.name}</p>
-                        {block.contentSectionHeading && (
-                          <p>
-                            {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
-                          </p>
-                        )}
-                        {block.infographicFilesInfo.length > 0 && (
-                          <p>
-                            The following infographic files will also be removed:
-                            <ul>
-                              {block.infographicFilesInfo.map(fileInfo => (
-                                <li key={fileInfo.filename}>
-                                  <p>{fileInfo.filename}</p>
-                                </li>
-                              ))}
-                            </ul>
-                          </p>
-                        )}
-                        {block.isKeyStatistic && (
-                          <p>
-                            A key statistic associated with this data block will
-                            be removed.
-                          </p>
-                        )}
-                        {block.featuredTable && (
-                          <p>
-                            The featured table "{`${block.featuredTable?.name}`}"
-                            using this data block will be removed.
-                          </p>
-                        )}
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </>
-            )}
+              <ul>
+                {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.map(
+                  block => (
+                    <li key={block.name}>
+                      <p>{block.name}</p>
+                      {block.contentSectionHeading && (
+                        <p>
+                          {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
+                        </p>
+                      )}
+                      {block.infographicFilesInfo.length > 0 && (
+                        <p>
+                          The following infographic files will also be removed:
+                          <ul>
+                            {block.infographicFilesInfo.map(fileInfo => (
+                              <li key={fileInfo.filename}>
+                                <p>{fileInfo.filename}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        </p>
+                      )}
+                      {block.isKeyStatistic && (
+                        <p>
+                          A key statistic associated with this data block will
+                          be removed.
+                        </p>
+                      )}
+                      {block.featuredTable && (
+                        <p>
+                          The featured table "{`${block.featuredTable?.name}`}"
+                          using this data block will be removed.
+                        </p>
+                      )}
+                    </li>
+                  ),
+                )}
+              </ul>
+            </>
+          )}
           {deleteDataFile.plan.footnoteIds.length > 0 && (
             <p>
               {`${deleteDataFile.plan.footnoteIds.length} ${

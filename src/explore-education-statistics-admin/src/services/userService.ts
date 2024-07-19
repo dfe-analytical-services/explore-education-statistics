@@ -1,5 +1,5 @@
 import client from '@admin/services/utils/service';
-import {IdTitlePair} from 'src/services/types/common';
+import { IdTitlePair } from 'src/services/types/common';
 
 export interface UserStatus {
   id: string;
@@ -49,7 +49,7 @@ export interface UserInvite {
   userReleaseRoles: {
     // TODO rename to releaseVersionId
     releaseId: string;
-    releaseRole: string
+    releaseRole: string;
   }[];
   userPublicationRoles: { publicationId: string; publicationRole: string }[];
 }
@@ -206,7 +206,7 @@ const userService: UsersService = {
   ): Promise<boolean> {
     return client.delete(
       `/user-management/publications/${publicationId}/release-invites/contributor`,
-      {data: {email}},
+      { data: { email } },
     );
   },
   cancelInvite(email: string): Promise<boolean> {

@@ -1,12 +1,12 @@
 import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
-import {ConfirmContextProvider} from '@common/contexts/ConfirmContext';
+import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
   TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
-import {LocationFiltersFormSubmitHandler} from '@common/modules/table-tool/components/LocationFiltersForm';
+import { LocationFiltersFormSubmitHandler } from '@common/modules/table-tool/components/LocationFiltersForm';
 import LocationStep from '@common/modules/table-tool/components/LocationStep';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
 import PublicationForm, {
@@ -20,9 +20,9 @@ import TimePeriodForm, {
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import {FullTable} from '@common/modules/table-tool/types/fullTable';
-import {SelectedPublication} from '@common/modules/table-tool/types/selectedPublication';
-import {TableHeadersConfig} from '@common/modules/table-tool/types/tableHeaders';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
+import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import applyTableHeadersOrder from '@common/modules/table-tool/utils/applyTableHeadersOrder';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -39,9 +39,9 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import React, {ReactElement, ReactNode, useMemo, useState} from 'react';
-import {useImmer} from 'use-immer';
-import {Dictionary} from 'lodash';
+import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
+import { useImmer } from 'use-immer';
+import { Dictionary } from 'lodash';
 
 const defaultLocationStepTitle = 'Choose locations';
 const defaultDataSetStepTitle = 'Select a data set';
@@ -89,9 +89,9 @@ export interface TableToolWizardProps {
   onPublicationStepBack?: () => void;
   onStepChange?: (nextStep: number, previousStep: number) => void;
   onStepSubmit?: ({
-                    nextStepNumber,
-                    nextStepTitle,
-                  }: {
+    nextStepNumber,
+    nextStepTitle,
+  }: {
     nextStepNumber: number;
     nextStepTitle: string;
   }) => void;
@@ -112,24 +112,24 @@ export interface TableToolWizardProps {
 }
 
 export default function TableToolWizard({
-                                          currentStep,
-                                          finalStep,
-                                          hidePublicationStep,
-                                          initialState = {},
-                                          loadingFastTrack = false,
-                                          renderFeaturedTableLink,
-                                          scrollOnMount,
-                                          showTableQueryErrorDownload = true,
-                                          themeMeta = [],
-                                          onPublicationFormSubmit,
-                                          onPublicationStepBack,
-                                          onStepChange,
-                                          onStepSubmit,
-                                          onSubjectFormSubmit,
-                                          onSubjectStepBack,
-                                          onSubmit,
-                                          onTableQueryError,
-                                        }: TableToolWizardProps) {
+  currentStep,
+  finalStep,
+  hidePublicationStep,
+  initialState = {},
+  loadingFastTrack = false,
+  renderFeaturedTableLink,
+  scrollOnMount,
+  showTableQueryErrorDownload = true,
+  themeMeta = [],
+  onPublicationFormSubmit,
+  onPublicationStepBack,
+  onStepChange,
+  onStepSubmit,
+  onSubjectFormSubmit,
+  onSubjectStepBack,
+  onSubmit,
+  onTableQueryError,
+}: TableToolWizardProps) {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
     subjects: [],
@@ -174,8 +174,8 @@ export default function TableToolWizard({
   };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
-                                                                             publication,
-                                                                           }) => {
+    publication,
+  }) => {
     onPublicationFormSubmit?.(publication);
 
     const [subjects, featuredTables] = await Promise.all([
@@ -214,7 +214,7 @@ export default function TableToolWizard({
     });
 
     setDataSetStepTitle(updatedDataSetTitle);
-    onStepSubmit?.({nextStepNumber: 2, nextStepTitle: updatedDataSetTitle});
+    onStepSubmit?.({ nextStepNumber: 2, nextStepTitle: updatedDataSetTitle });
   };
 
   const handlePublicationStepBack = () => {
@@ -231,12 +231,12 @@ export default function TableToolWizard({
     });
 
     onSubjectStepBack?.(state.selectedPublication);
-    onStepSubmit?.({nextStepNumber: 2, nextStepTitle: dataSetStepTitle});
+    onStepSubmit?.({ nextStepNumber: 2, nextStepTitle: dataSetStepTitle });
   };
 
   const handleDataSetFormSubmit: DataSetFormSubmitHandler = async ({
-                                                                     subjectId: selectedSubjectId,
-                                                                   }) => {
+    subjectId: selectedSubjectId,
+  }) => {
     if (state.selectedPublication) {
       onSubjectFormSubmit?.({
         publication: state.selectedPublication,
@@ -266,11 +266,11 @@ export default function TableToolWizard({
       draft.query.timePeriod = undefined;
     });
 
-    onStepSubmit?.({nextStepNumber: 3, nextStepTitle: updatedLocationsTitle});
+    onStepSubmit?.({ nextStepNumber: 3, nextStepTitle: updatedLocationsTitle });
   };
 
   const handleLocationStepBack = async () => {
-    const {releaseId, subjectId} = state.query;
+    const { releaseId, subjectId } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       subjectId,
@@ -281,11 +281,11 @@ export default function TableToolWizard({
       draft.subjectMeta = nextSubjectMeta;
     });
 
-    onStepSubmit?.({nextStepNumber: 3, nextStepTitle: locationStepTitle});
+    onStepSubmit?.({ nextStepNumber: 3, nextStepTitle: locationStepTitle });
   };
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler =
-    async ({locationIds}) => {
+    async ({ locationIds }) => {
       const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
         {
           locationIds,
@@ -294,7 +294,7 @@ export default function TableToolWizard({
         state.query.releaseId,
       );
 
-      const {timePeriod} = state.query;
+      const { timePeriod } = state.query;
 
       // Check if selected time period is in the time period options so can reset it if not.
       const hasStartTimePeriod = nextSubjectMeta.timePeriod.options.some(
@@ -332,7 +332,7 @@ export default function TableToolWizard({
     };
 
   const handleTimePeriodStepBack = async () => {
-    const {releaseId, subjectId, locationIds} = state.query;
+    const { releaseId, subjectId, locationIds } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
       {
@@ -354,7 +354,7 @@ export default function TableToolWizard({
 
   const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler =
     async values => {
-      const {releaseId, subjectId, locationIds} = state.query;
+      const { releaseId, subjectId, locationIds } = state.query;
       const [startYear, startCode] = parseYearCodeTuple(values.start);
       const [endYear, endCode] = parseYearCodeTuple(values.end);
 
@@ -405,11 +405,11 @@ export default function TableToolWizard({
         };
       });
 
-      onStepSubmit?.({nextStepNumber: 5, nextStepTitle: stepTitles.filter});
+      onStepSubmit?.({ nextStepNumber: 5, nextStepTitle: stepTitles.filter });
     };
 
   const handleFiltersStepBack = async () => {
-    const {releaseId, subjectId, locationIds, timePeriod} = state.query;
+    const { releaseId, subjectId, locationIds, timePeriod } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
       {
@@ -425,13 +425,13 @@ export default function TableToolWizard({
       draft.subjectMeta.filters = nextSubjectMeta.filters;
     });
 
-    onStepSubmit?.({nextStepNumber: 5, nextStepTitle: stepTitles.filter});
+    onStepSubmit?.({ nextStepNumber: 5, nextStepTitle: stepTitles.filter });
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
-                                                                    filters,
-                                                                    indicators,
-                                                                  }) => {
+    filters,
+    indicators,
+  }) => {
     updateState(draft => {
       draft.response = undefined;
     });
@@ -474,7 +474,7 @@ export default function TableToolWizard({
       };
     });
 
-    onStepSubmit?.({nextStepNumber: 6, nextStepTitle: stepTitles.final});
+    onStepSubmit?.({ nextStepNumber: 6, nextStepTitle: stepTitles.final });
   };
 
   const orderedTableHeaders: TableHeadersConfig | undefined = useMemo(() => {
@@ -483,9 +483,9 @@ export default function TableToolWizard({
 
     return state.response?.tableHeaders && reorderedOrSavedTableHeaders
       ? applyTableHeadersOrder({
-        reorderedTableHeaders: reorderedOrSavedTableHeaders,
-        defaultTableHeaders: state.response.tableHeaders,
-      })
+          reorderedTableHeaders: reorderedOrSavedTableHeaders,
+          defaultTableHeaders: state.response.tableHeaders,
+        })
       : state.response?.tableHeaders;
   }, [
     initialState.response?.tableHeaders,
@@ -497,7 +497,7 @@ export default function TableToolWizard({
 
   return (
     <ConfirmContextProvider>
-      {({askConfirm}) => (
+      {({ askConfirm }) => (
         <>
           <Wizard
             scrollOnMount={scrollOnMount}
@@ -617,7 +617,7 @@ export default function TableToolWizard({
               })}
           </Wizard>
 
-          <PreviousStepModalConfirm/>
+          <PreviousStepModalConfirm />
         </>
       )}
     </ConfirmContextProvider>

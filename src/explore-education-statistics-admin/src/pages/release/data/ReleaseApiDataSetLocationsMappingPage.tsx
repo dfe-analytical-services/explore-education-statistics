@@ -1,10 +1,8 @@
 import Link from '@admin/components/Link';
 import ButtonLink from '@admin/components/ButtonLink';
-import ApiDataSetUnmappedAndManuallyMappedLocationsTable
-  from '@admin/pages/release/data/components/ApiDataSetUnmappedAndManuallyMappedLocationsTable';
+import ApiDataSetUnmappedAndManuallyMappedLocationsTable from '@admin/pages/release/data/components/ApiDataSetUnmappedAndManuallyMappedLocationsTable';
 import ApiDataSetNewLocationsTable from '@admin/pages/release/data/components/ApiDataSetNewLocationsTable';
-import ApiDataSetAutoMappedLocationsTable
-  from '@admin/pages/release/data/components/ApiDataSetAutoMappedLocationsTable';
+import ApiDataSetAutoMappedLocationsTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedLocationsTable';
 import getApiDataSetLocationMappings from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
 import {
@@ -18,23 +16,23 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ErrorSummary from '@common/components/ErrorSummary';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import PageNav, {NavItem} from '@common/components/PageNav';
+import PageNav, { NavItem } from '@common/components/PageNav';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
-import {useQuery} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import {generatePath, useParams} from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import camelCase from 'lodash/camelCase';
 
 export default function ReleaseApiDataSetLocationsMappingPage() {
-  const {dataSetId, releaseVersionId, publicationId} =
+  const { dataSetId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetRouteParams>();
 
-  const {data: dataSet, isLoading: isLoadingDataSet} = useQuery(
+  const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
   );
 
   const {
-    data: locationsMapping = {levels: {}},
+    data: locationsMapping = { levels: {} },
     isLoading: isLoadingMapping,
   } = useQuery({
     ...apiDataSetVersionQueries.getLocationsMapping(
@@ -80,7 +78,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
         };
       }),
     },
-    {id: 'auto-mapped-locations', text: 'Auto mapped locations'},
+    { id: 'auto-mapped-locations', text: 'Auto mapped locations' },
   ];
 
   return (
@@ -101,7 +99,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
       </Link>
       <LoadingSpinner loading={isLoadingDataSet || isLoadingMapping}>
         <div className="govuk-grid-row">
-          <PageNav items={navItems}/>
+          <PageNav items={navItems} />
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map locations</span>
             <h2>{dataSet?.title}</h2>

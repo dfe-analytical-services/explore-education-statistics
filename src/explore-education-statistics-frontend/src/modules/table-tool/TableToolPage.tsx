@@ -90,6 +90,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         featuredTables,
         query: {
           ...fastTrack.query,
+          // TODO rename to releaseVersionId
           releaseId: selectedPublication?.selectedRelease.id,
         },
         selectedPublication,
@@ -108,6 +109,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         featuredTables,
         query: {
           publicationId: selectedPublication?.id,
+          // TODO rename to releaseVersionId
           releaseId: selectedPublication?.selectedRelease.id,
           subjectId: selectedSubjectId,
           indicators: [],
@@ -125,6 +127,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       featuredTables,
       query: {
         publicationId: selectedPublication?.id,
+        // TODO rename to releaseVersionId
         releaseId: selectedPublication?.selectedRelease.id,
         subjectId: '',
         indicators: [],

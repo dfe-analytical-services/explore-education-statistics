@@ -244,6 +244,7 @@ const tableBuilderService = {
   },
   async getTableData(
     query: FullTableQuery,
+    // TODO rename to releaseVersionId
     releaseId?: string,
   ): Promise<TableDataResponse> {
     return releaseId

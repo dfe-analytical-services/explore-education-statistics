@@ -79,8 +79,8 @@ Check the initial manage user page
     user checks select contains option    //*[@name="roleId"]    Prerelease User
     user checks selected option label    //*[@name="roleId"]    Choose role
 
-    user checks select contains option    name:releaseVersionId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user checks select contains option    name:releaseVersionId    ${PUBLICATION_2_NAME} - ${RELEASE_2_NAME}
+    user checks select contains option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user checks select contains option    name:releaseId    ${PUBLICATION_2_NAME} - ${RELEASE_2_NAME}
     user checks select contains x options    name:releaseRole    5
     user checks select contains option    name:releaseRole    Approver
     user checks select contains option    name:releaseRole    Contributor
@@ -95,7 +95,7 @@ Check the initial manage user page
     user checks select contains option    name:publicationRole    Approver
 
 Give the user prerelease access to a release
-    user chooses select option    name:releaseVersionId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user chooses select option    name:releaseRole    PrereleaseViewer
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
@@ -111,7 +111,7 @@ Give the user prerelease access to a release
     user checks selected option label    //*[@name="roleId"]    Prerelease User
 
 Give the user approver access to a release
-    user chooses select option    name:releaseVersionId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user chooses select option    name:releaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    2    testid:releaseAccessTable
@@ -177,7 +177,7 @@ Remove publication owner access for one of the publications from user while they
     user checks selected option label    //*[@name="roleId"]    BAU User
 
 Give the user approver access to a release while they are BAU
-    user chooses select option    name:releaseVersionId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user chooses select option    name:releaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
@@ -198,7 +198,7 @@ Remove publication owner access for the final publication from user while they a
     user checks selected option label    //*[@name="roleId"]    BAU User
 
 Give the user approver access to a release while they are BAU and manually set their role to Analyst
-    user chooses select option    name:releaseVersionId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user chooses select option    name:releaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
