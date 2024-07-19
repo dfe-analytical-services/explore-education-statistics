@@ -458,7 +458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[] {originalFilterItem.Id},
@@ -905,7 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[]
@@ -1126,7 +1126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[]
@@ -1371,7 +1371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[]
@@ -1601,7 +1601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[] {originalFilterItem.Id},
@@ -2020,7 +2020,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[]
@@ -2455,7 +2455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new Guid[] { },
@@ -2996,7 +2996,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
@@ -3587,7 +3587,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
@@ -3885,7 +3885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = originalReleaseSubject.SubjectId,
                     Filters = new[] {originalFilterItem1.Id},

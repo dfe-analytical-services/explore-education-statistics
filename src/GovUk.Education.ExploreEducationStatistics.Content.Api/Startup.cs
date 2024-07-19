@@ -1,13 +1,13 @@
 #nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
-using AutoMapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -85,7 +85,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssemblyContaining<DataSetFileListRequest.Validator>();
+            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
+            services.AddValidatorsFromAssembly(typeof(DataSetFileListRequest.Validator).Assembly); // Adds *all* validators from Content
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options

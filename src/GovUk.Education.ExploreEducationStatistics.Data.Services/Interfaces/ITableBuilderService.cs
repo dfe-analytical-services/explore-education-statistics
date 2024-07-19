@@ -13,22 +13,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
     public interface ITableBuilderService
     {
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseVersionId,
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> QueryToCsvStream(
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             Stream stream,
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> QueryToCsvStream(
             Guid releaseVersionId,
-            ObservationQueryContext queryContext,
+            FullTableQuery query,
             Stream stream,
             CancellationToken cancellationToken = default);
     }

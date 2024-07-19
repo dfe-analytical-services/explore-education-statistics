@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Source { get; init; }  = string.Empty;
 
-        public ObservationQueryContext Query { get; init; } = null!;
+        public FullTableQuery Query { get; init; } = null!;
 
         public List<IChart> Charts { get; init; } = new();
 
@@ -50,37 +49,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public DateTimeOffset? LockedUntil { get; init; }
 
         public UserDetailsViewModel? LockedBy { get; init; }
-    }
-
-    public record DataBlockCreateViewModel
-    {
-        [Required] public string Heading { get; init; } = string.Empty;
-
-        [Required] public string Name { get; init; } = string.Empty;
-
-        public string Source { get; init; } = string.Empty;
-
-        public ObservationQueryContext Query { get; init; } = null!;
-
-        public List<IChart> Charts { get; init; } = new();
-
-        public TableBuilderConfiguration Table { get; init; } = null!;
-    }
-
-    public record DataBlockUpdateViewModel
-    {
-        [Required]
-        public string Heading { get; init; } = string.Empty;
-
-        [Required]
-        public string Name { get; init; } = string.Empty;
-
-        public string Source { get; init; } = string.Empty;
-
-        public ObservationQueryContext Query { get; init; } = null!;
-
-        public List<IChart> Charts { get; init; } = new();
-
-        public TableBuilderConfiguration Table { get; init; } = null!;
     }
 }

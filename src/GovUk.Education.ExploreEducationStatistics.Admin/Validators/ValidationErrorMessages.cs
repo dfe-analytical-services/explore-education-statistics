@@ -1,4 +1,3 @@
-#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 {
     public enum ValidationErrorMessages
@@ -56,35 +55,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileSizeLimitExceeded,
 
         // Data file
-        SubjectTitleCannotBeEmpty,
-        SubjectTitleCannotContainSpecialCharacters,
-        SubjectTitleMustBeUnique,
-        DataFilenameNotUnique,
-        DataAndMetadataFilesCannotHaveTheSameName,
-        DataFileCannotBeEmpty,
-        DataFileMustBeCsvFile,
-        DataFilenameCannotContainSpacesOrSpecialCharacters,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         FileTypeMustBeData,
         FileIdsShouldBeDistinct,
         IncorrectNumberOfFileIds,
-        DataFilenameTooLong,
 
         // Data zip file
-        DataZipMustBeZipFile,
         DataZipFileCanOnlyContainTwoFiles,
         DataZipFileDoesNotContainCsvFiles,
-        DataZipFilenameTooLong,
-        DataZipContentFilenamesTooLong,
 
         // Meta file
-        MetadataFileCannotBeEmpty,
-        MetaFileMustBeCsvFile,
         UnableToFindMetadataFileToDelete,
-        MetaFilenameCannotContainSpacesOrSpecialCharacters,
-        MetaFileIsIncorrectlyNamed,
-        MetaFilenameTooLong,
 
         // Data replacement
         ReplacementMustBeValid,

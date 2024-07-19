@@ -7,6 +7,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -19,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -54,14 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Create(
             Guid releaseVersionId,
-            DataBlockCreateViewModel dataBlockCreate)
+            DataBlockCreateRequest createRequest)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
+                    var dataBlock = _mapper.Map<DataBlock>(createRequest);
                     dataBlock.Id = Guid.NewGuid();
                     dataBlock.Created = DateTime.UtcNow;
                     dataBlock.ReleaseVersionId = releaseVersionId;
@@ -211,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Update(
             Guid dataBlockVersionId,
-            DataBlockUpdateViewModel dataBlockUpdate)
+            DataBlockUpdateRequest updateRequest)
         {
             return await GetDataBlockVersion(dataBlockVersionId)
                 .OnSuccessDo(dataBlock => _userService.CheckCanUpdateReleaseVersion(dataBlock.ReleaseVersion))
@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO EES-753 Alter this when multiple charts are supported
                     var infographicChart = dataBlockVersion.Charts.OfType<InfographicChart>().FirstOrDefault();
                     var updatedInfographicChart =
-                        dataBlockUpdate.Charts.OfType<InfographicChart>().FirstOrDefault();
+                        updateRequest.Charts.OfType<InfographicChart>().FirstOrDefault();
 
                     if (infographicChart != null &&
                         infographicChart.FileId != updatedInfographicChart?.FileId)
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             fileId: new Guid(infographicChart.FileId));
                     }
 
-                    _mapper.Map(dataBlockUpdate, dataBlockVersion.ContentBlock);
+                    _mapper.Map(updateRequest, dataBlockVersion.ContentBlock);
 
                     _context.DataBlocks.Update(dataBlockVersion.ContentBlock);
 

@@ -1,5 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query

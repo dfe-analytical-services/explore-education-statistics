@@ -33,6 +33,7 @@ import publicationService, {
 } from '@common/services/publicationService';
 import tableBuilderService, {
   FeaturedTable,
+  FullTableQuery,
   LocationOption,
   ReleaseTableDataQuery,
   Subject,
@@ -283,11 +284,13 @@ export default function TableToolWizard({
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler =
     async ({ locationIds }) => {
-      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-        releaseId: state.query.releaseId,
-        locationIds,
-        subjectId: state.query.subjectId,
-      });
+      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+        {
+          locationIds,
+          subjectId: state.query.subjectId,
+        },
+        state.query.releaseId,
+      );
 
       const { timePeriod } = state.query;
 
@@ -329,11 +332,13 @@ export default function TableToolWizard({
   const handleTimePeriodStepBack = async () => {
     const { releaseId, subjectId, locationIds } = state.query;
 
-    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+      {
+        subjectId,
+        locationIds,
+      },
       releaseId,
-      subjectId,
-      locationIds,
-    });
+    );
 
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
@@ -351,17 +356,19 @@ export default function TableToolWizard({
       const [startYear, startCode] = parseYearCodeTuple(values.start);
       const [endYear, endCode] = parseYearCodeTuple(values.end);
 
-      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-        releaseId,
-        subjectId,
-        locationIds,
-        timePeriod: {
-          startYear,
-          startCode,
-          endYear,
-          endCode,
+      const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+        {
+          subjectId,
+          locationIds,
+          timePeriod: {
+            startYear,
+            startCode,
+            endYear,
+            endCode,
+          },
         },
-      });
+        releaseId,
+      );
 
       const indicatorValues = new Set(
         Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
@@ -402,12 +409,14 @@ export default function TableToolWizard({
   const handleFiltersStepBack = async () => {
     const { releaseId, subjectId, locationIds, timePeriod } = state.query;
 
-    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta(
+      {
+        subjectId,
+        locationIds,
+        timePeriod,
+      },
       releaseId,
-      subjectId,
-      locationIds,
-      timePeriod,
-    });
+    );
 
     updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
@@ -425,13 +434,22 @@ export default function TableToolWizard({
       draft.response = undefined;
     });
 
-    const query: ReleaseTableDataQuery = {
+    const updatedReleaseTableDataQuery: ReleaseTableDataQuery = {
       ...state.query,
-      indicators,
       filters: Object.values(filters).flat(),
+      indicators,
     };
 
-    const tableData = await tableBuilderService.getTableData(query);
+    const tableData = await tableBuilderService.getTableData(
+      {
+        subjectId: updatedReleaseTableDataQuery.subjectId,
+        locationIds: updatedReleaseTableDataQuery.locationIds,
+        timePeriod: updatedReleaseTableDataQuery.timePeriod,
+        filters: updatedReleaseTableDataQuery.filters,
+        indicators: updatedReleaseTableDataQuery.indicators,
+      } as FullTableQuery,
+      updatedReleaseTableDataQuery.releaseId,
+    );
 
     if (!tableData.results.length || !tableData.subjectMeta) {
       throw new SubmitError(
@@ -447,7 +465,7 @@ export default function TableToolWizard({
     }
 
     updateState(draft => {
-      draft.query = query;
+      draft.query = updatedReleaseTableDataQuery;
       draft.response = {
         table,
         tableHeaders,

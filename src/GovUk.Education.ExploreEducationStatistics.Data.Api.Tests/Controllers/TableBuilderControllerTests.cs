@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -54,28 +53,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .DefaultDataBlockVersion()
                 .WithReleaseVersion(ReleaseVersion)
                 .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(new ObservationQueryContext
+                .WithQuery(new FullTableQuery
                 {
                     SubjectId = Guid.NewGuid(),
-                    Filters = new List<Guid>(),
-                    Indicators = new List<Guid>(),
-                    LocationIds = new List<Guid>(),
+                    LocationIds = [ Guid.NewGuid(), ],
                     TimePeriod = new TimePeriodQuery
                     {
                         StartYear = 2021,
                         StartCode = CalendarYear,
                         EndYear = 2022,
                         EndCode = CalendarYear
-                    }
+                    },
+                    Filters = new List<Guid>(),
+                    Indicators = new List<Guid> // use collection expression -> test failures
+                    {
+                        Guid.NewGuid(),
+                    },
                 })
                 .WithTable(new TableBuilderConfiguration
                 {
                     TableHeaders = new TableHeaders
                     {
-                        Rows = new List<TableHeader>
-                        {
-                            new("table header 1", TableHeaderType.Filter)
-                        }
+                        Rows = new List<TableHeader> { new("table header 1", TableHeaderType.Filter) }
                     }
                 })
                 .WithCharts(ListOf<IChart>(new LineChart
@@ -103,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private static readonly Guid DataBlockParentId = DataBlockParent.Id;
 
-        private static readonly ObservationQueryContext ObservationQueryContext =
+        private static readonly FullTableQuery FullTableQuery =
             DataBlockParent.LatestPublishedVersion!.Query;
 
         private static readonly TableBuilderConfiguration TableConfiguration =
@@ -121,14 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             },
             Results = new List<ObservationViewModel>
             {
-                new()
-                {
-                    TimePeriod = "2020_AY"
-                },
-                new()
-                {
-                    TimePeriod = "2021_AY"
-                }
+                new() { TimePeriod = "2020_AY" },
+                new() { TimePeriod = "2021_AY" }
             },
         };
 
@@ -140,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             tableBuilderService
                 .Setup(
                     s => s.Query(
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -149,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
             var response = await client
-                .PostAsync("/api/tablebuilder", new JsonNetContent(ObservationQueryContext));
+                .PostAsync("/api/tablebuilder", new JsonNetContent(FullTableQuery));
 
             VerifyAllMocks(tableBuilderService);
 
@@ -164,13 +157,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             tableBuilderService
                 .Setup(
                     s => s.QueryToCsvStream(
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<Stream>(),
                         It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
-                .Callback<ObservationQueryContext, Stream, CancellationToken>(
+                .Callback<FullTableQuery, Stream, CancellationToken>(
                     (_, stream, _) => { stream.WriteText("Test csv"); }
                 );
 
@@ -178,11 +171,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync("/api/tablebuilder",
-                    content: new JsonNetContent(ObservationQueryContext),
-                    headers: new Dictionary<string, string>
-                    {
-                        { HeaderNames.Accept, ContentTypes.Csv }
-                    }
+                    content: new JsonNetContent(FullTableQuery), // binds to FullTableQueryRequest
+                    headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
             VerifyAllMocks(tableBuilderService);
@@ -202,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(
                     s => s.Query(
                         ReleaseVersionId,
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -213,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync($"/api/tablebuilder/release/{ReleaseVersionId}",
-                    new JsonNetContent(ObservationQueryContext));
+                    new JsonNetContent(FullTableQuery));
 
             VerifyAllMocks(tableBuilderService);
 
@@ -232,13 +222,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(
                     s => s.QueryToCsvStream(
                         ReleaseVersionId,
-                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<Stream>(),
                         It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, ObservationQueryContext, Stream, CancellationToken>(
+                .Callback<Guid, FullTableQuery, Stream, CancellationToken>(
                     (_, _, stream, _) => { stream.WriteText("Test csv"); }
                 );
 
@@ -247,11 +237,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response = await client
                 .PostAsync($"/api/tablebuilder/release/{ReleaseVersionId}",
-                    content: new JsonNetContent(ObservationQueryContext),
-                    headers: new Dictionary<string, string>
-                    {
-                        { HeaderNames.Accept, ContentTypes.Csv }
-                    }
+                    content: new JsonNetContent(FullTableQuery),
+                    headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
 
             VerifyAllMocks(tableBuilderService);
@@ -329,14 +316,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
                 new Dictionary<string, string>
                 {
-                    {
-                        HeaderNames.IfModifiedSince,
-                        ifModifiedSinceDate.ToUniversalTime().ToString("R")
-                    },
-                    {
-                        HeaderNames.IfNoneMatch,
-                        $"W/\"{TableBuilderController.ApiVersion}\""
-                    }
+                    { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" }
                 }
             );
 
@@ -386,14 +367,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
                 new Dictionary<string, string>
                 {
-                    {
-                        HeaderNames.IfModifiedSince,
-                        ifModifiedSinceDate.ToUniversalTime().ToString("R")
-                    },
-                    {
-                        HeaderNames.IfNoneMatch,
-                        "\"not the same etag\""
-                    }
+                    { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, "\"not the same etag\"" }
                 }
             );
 
@@ -441,14 +416,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
                 new Dictionary<string, string>
                 {
-                    {
-                        HeaderNames.IfModifiedSince,
-                        yearBeforePublishedDate.ToUniversalTime().ToString("R")
-                    },
-                    {
-                        HeaderNames.IfNoneMatch,
-                        $"W/\"{TableBuilderController.ApiVersion}\""
-                    }
+                    { HeaderNames.IfModifiedSince, yearBeforePublishedDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" }
                 }
             );
 
@@ -518,11 +487,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var queryViewModel = viewModel.Query;
             Assert.NotNull(queryViewModel);
             Assert.Equal(PublicationId, queryViewModel.PublicationId);
-            Assert.Equal(ObservationQueryContext.SubjectId, viewModel.Query.SubjectId);
-            Assert.Equal(ObservationQueryContext.TimePeriod, viewModel.Query.TimePeriod);
-            Assert.Equal(ObservationQueryContext.Filters, viewModel.Query.Filters);
-            Assert.Equal(ObservationQueryContext.Indicators, viewModel.Query.Indicators);
-            Assert.Equal(ObservationQueryContext.LocationIds, viewModel.Query.LocationIds);
+            Assert.Equal(FullTableQuery.SubjectId, viewModel.Query.SubjectId);
+            Assert.Equal(FullTableQuery.TimePeriod, viewModel.Query.TimePeriod);
+            Assert.Equal(FullTableQuery.Filters, viewModel.Query.Filters);
+            Assert.Equal(FullTableQuery.Indicators, viewModel.Query.Indicators);
+            Assert.Equal(FullTableQuery.LocationIds, viewModel.Query.LocationIds);
         }
 
         [Fact]
@@ -610,7 +579,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                         services.ReplaceService(BlobCacheService);
 
                         services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
-                        services.AddTransient(_ => releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
+                        services.AddTransient(_ =>
+                            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
                         services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
                     }
                 );

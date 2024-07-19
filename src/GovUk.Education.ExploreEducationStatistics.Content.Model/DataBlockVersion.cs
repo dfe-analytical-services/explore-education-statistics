@@ -113,7 +113,7 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     }
 
     [NotMapped]
-    public ObservationQueryContext Query
+    public FullTableQuery Query
     {
         get => ContentBlock.Query;
         set => ContentBlock.Query = value;

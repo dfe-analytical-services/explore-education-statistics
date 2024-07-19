@@ -1105,6 +1105,8 @@
     "ees-notifier-templateid-release-published-superseded-subscribers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-published-superseded-subscribers')]",
     "ees-notifier-templateid-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-confirmation')]",
     "ees-notifier-templateid-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-verification')]",
+    "ees-notifier-templateid-api-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-confirmation')]",
+    "ees-notifier-templateid-api-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-verification')]",
 
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",

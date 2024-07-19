@@ -39,6 +39,24 @@ public static class HttpResponseMessageTestExtensions
         return message.AssertBodyEqualTo(expectedBody, useSystemJson);
     }
 
+    public static (T body, string createdEntityId) AssertCreated<T>(
+        this HttpResponseMessage message,
+        string expectedLocationPrefix,
+        bool useSystemJson = false)
+    {
+        Assert.Equal(Created, message.StatusCode);
+        Assert.NotNull(message.Headers.Location);
+
+        var locationHeader = message.Headers.Location.ToString();
+        Assert.StartsWith(expectedLocationPrefix, locationHeader);
+        var createdEntityId = locationHeader[expectedLocationPrefix.Length..];
+
+        var body = Deserialize<T>(message, useSystemJson);
+        var bodyAsType = Assert.IsType<T>(body);
+
+        return (bodyAsType, createdEntityId);
+    }
+
     public static T AssertCreated<T>(
         this HttpResponseMessage message,
         T expectedBody,

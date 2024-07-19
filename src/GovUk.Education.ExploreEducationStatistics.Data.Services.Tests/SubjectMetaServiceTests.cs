@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -393,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var query = new ObservationQueryContext
+                var request = new LocationsOrTimePeriodsQueryRequest
                 {
                     SubjectId = releaseSubject.SubjectId,
                     LocationIds = ListOf(Guid.NewGuid())
@@ -405,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result =
-                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -462,10 +462,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var query = new ObservationQueryContext
+                var request = new LocationsOrTimePeriodsQueryRequest
                 {
                     SubjectId = releaseSubject.SubjectId,
-                    LocationIds = ListOf(Guid.NewGuid())
+                    LocationIds = ListOf(Guid.NewGuid()),
                 };
 
                 var service = BuildSubjectMetaService(
@@ -474,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = (await service.FilterSubjectMeta(null, query, cancellationToken))
+                var result = (await service.FilterSubjectMeta(null, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -532,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 LocalAuthority = _sunderland
             };
 
-            var query = new ObservationQueryContext
+            var request = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = subject.Id,
                 LocationIds = ListOf(location1.Id, location2.Id, location3.Id)
@@ -621,7 +621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object);
 
                 var result =
-                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -665,7 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
             };
 
-            var query = new ObservationQueryContext
+            var request = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = releaseSubject.SubjectId,
                 LocationIds = ListOf(Guid.NewGuid()),
@@ -704,7 +704,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var observationService = new Mock<IObservationService>(MockBehavior.Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(query, cancellationToken))
+                    .Setup(s => s.GetMatchedObservations(
+                        It.Is<FullTableQuery>(ctx => ctx
+                                .Equals(request.AsFullTableQuery())),
+                        cancellationToken))
                     .ReturnsAsync(statisticsDbContext.MatchedObservations);
 
                 var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
@@ -783,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result =
-                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(
@@ -891,47 +894,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     }
                 });
-            }
-        }
-
-        [Fact]
-        public async Task FilterSubjectMeta_InvalidCombination_NoTimePeriodsOrLocations()
-        {
-            var statisticsReleaseVersion = new ReleaseVersion();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersion = statisticsReleaseVersion,
-                Subject = subject
-            };
-
-            var query = new ObservationQueryContext
-            {
-                SubjectId = subject.Id,
-                LocationIds = new List<Guid>(),
-                TimePeriod = null
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildSubjectMetaService(statisticsDbContext);
-
-                var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                    () => service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, default));
-
-                Assert.Equal("Unable to determine which SubjectMeta information has requested " +
-                             "(Parameter 'subjectMetaStep')", exception.Message);
             }
         }
 
