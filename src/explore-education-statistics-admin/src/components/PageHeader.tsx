@@ -117,6 +117,13 @@ interface LoggedInLinksProps {
 
 const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
   <>
+    {user.permissions.canAccessAnalystPages && (
+      <li className="govuk-header__navigation-item">
+        <a className="govuk-header__link" href="/publishers-guide">
+          Publisher's guide
+        </a>
+      </li>
+    )}
     {user.permissions.isBauUser && (
       <li className="govuk-header__navigation-item">
         <a className="govuk-header__link" href="/administration">
