@@ -78,9 +78,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(PreviewTokenStatus.Active, viewModel.Status),
                 () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
-                () => Assert.Equal(DateTimeOffset.UtcNow.AddDays(1),
-                    viewModel.Expiry,
-                    precision: TimeSpan.FromSeconds(2)),
+                () => viewModel.Expiry.AssertEqual(DateTimeOffset.UtcNow.AddDays(1)),
                 () => Assert.Null(viewModel.Updated)
             );
 
@@ -94,9 +92,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(dataSetVersion.Id, actualPreviewToken.DataSetVersionId),
                 () => Assert.Equal(CreatedByBauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => viewModel.Created.AssertUtcNow(),
-                () => Assert.Equal(DateTimeOffset.UtcNow.AddDays(1),
-                    viewModel.Expiry,
-                    precision: TimeSpan.FromSeconds(2)),
+                () => viewModel.Expiry.AssertEqual(DateTimeOffset.UtcNow.AddDays(1)),
                 () => Assert.Null(actualPreviewToken.Updated)
             );
         }
@@ -540,6 +536,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .WithPreviewTokens(() => DataFixture.DefaultPreviewToken()
+                    .WithCreatedByUserId(CreatedByBauUser.Id)
                     .Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
@@ -549,9 +546,23 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id);
+            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
 
-            response.AssertNoContent();
+            var previewToken = dataSetVersion.PreviewTokens[0];
+
+            var response = await RevokePreviewToken(previewToken.Id);
+
+            var viewModel = response.AssertOk<PreviewTokenViewModel>();
+
+            Assert.Multiple(
+                () => Assert.Equal(previewToken.Id, viewModel.Id),
+                () => Assert.Equal(previewToken.Label, viewModel.Label),
+                () => Assert.Equal(PreviewTokenStatus.Expired, viewModel.Status),
+                () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
+                () => Assert.Equal(previewToken.Created.TruncateNanoseconds(), viewModel.Created),
+                () => viewModel.Expiry.AssertUtcNow(),
+                () => viewModel.Updated.AssertUtcNow()
+            );
 
             await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
 

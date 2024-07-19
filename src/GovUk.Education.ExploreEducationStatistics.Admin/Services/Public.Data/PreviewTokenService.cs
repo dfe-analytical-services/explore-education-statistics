@@ -71,7 +71,7 @@ public class PreviewTokenService(
             .OnSuccess(async () => await DoList(dataSetVersionId, cancellationToken));
     }
 
-    public async Task<Either<ActionResult, Unit>> RevokePreviewToken(
+    public async Task<Either<ActionResult, PreviewTokenViewModel>> RevokePreviewToken(
         Guid previewTokenId,
         CancellationToken cancellationToken = default)
     {
@@ -79,10 +79,11 @@ public class PreviewTokenService(
             .OnSuccess(async () => await publicDataDbContext.PreviewTokens
                 .SingleOrNotFoundAsync(pt => pt.Id == previewTokenId, cancellationToken: cancellationToken))
             .OnSuccessDo(ValidatePreviewToken)
-            .OnSuccessVoid(async previewToken =>
+            .OnSuccess(async previewToken =>
             {
                 previewToken.Expiry = DateTimeOffset.UtcNow;
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
+                return await MapPreviewToken(previewToken);
             });
     }
 

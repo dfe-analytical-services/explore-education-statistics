@@ -24,7 +24,7 @@ public interface IPreviewTokenService
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, Unit>> RevokePreviewToken(
+    Task<Either<ActionResult, PreviewTokenViewModel>> RevokePreviewToken(
         Guid previewTokenId,
         CancellationToken cancellationToken = default);
 }

@@ -842,7 +842,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Either<ActionResult, Unit>> RevokePreviewToken(
+        public Task<Either<ActionResult, PreviewTokenViewModel>> RevokePreviewToken(
             Guid previewTokenId,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
