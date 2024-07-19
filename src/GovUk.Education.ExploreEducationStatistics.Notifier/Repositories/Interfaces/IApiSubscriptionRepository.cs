@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
@@ -26,5 +30,16 @@ public interface IApiSubscriptionRepository
     Task DeleteSubscription(
         Guid dataSetId, 
         string email,
+        CancellationToken cancellationToken = default);
+
+    Task<AsyncPageable<ApiSubscription>> QuerySubscriptions(
+        Expression<Func<ApiSubscription, bool>>? filter = null,
+        int? maxPerPage = 1000,
+        IEnumerable<string>? select = null,
+        CancellationToken cancellationToken = default);
+
+    Task BatchManipulateSubscriptions(
+        IEnumerable<ApiSubscription> subscriptions,
+        TableTransactionActionType tableTransactionActionType,
         CancellationToken cancellationToken = default);
 }

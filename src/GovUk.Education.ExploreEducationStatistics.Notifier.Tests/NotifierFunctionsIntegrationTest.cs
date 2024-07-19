@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -60,6 +64,16 @@ public abstract class NotifierFunctionsIntegrationTest
         await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
     }
 
+    public async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)
+    {
+        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
+
+        await dataTableStorageService.BatchManipulateEntities(
+            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            entities: subscriptions,
+            tableTransactionActionType: TableTransactionActionType.Add);
+    }
+
     public async Task CreateApiSubscription(ApiSubscription subscription)
     {
         var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
@@ -81,6 +95,29 @@ public abstract class NotifierFunctionsIntegrationTest
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             select: select);
+    }
+
+    public async Task<IReadOnlyList<ApiSubscription>> QueryApiSubscriptions(
+        Expression<Func<ApiSubscription, bool>>? filter = null,
+        int? maxPerPage = null,
+        IEnumerable<string>? select = null)
+    {
+        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
+
+        var pagedSubscriptions = await dataTableStorageService.QueryEntities(
+            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            filter: filter,
+            maxPerPage: maxPerPage,
+            select: select,
+            cancellationToken: CancellationToken.None);
+
+        var allSubscriptions = new List<ApiSubscription>();
+
+        await pagedSubscriptions
+            .AsPages()
+            .ForEachAsync(page => allSubscriptions.AddRange(page.Values));
+
+        return allSubscriptions;
     }
 }
 

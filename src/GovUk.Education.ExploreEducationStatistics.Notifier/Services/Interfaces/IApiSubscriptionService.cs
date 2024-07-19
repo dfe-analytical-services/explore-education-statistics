@@ -13,10 +13,12 @@ public interface IApiSubscriptionService
         Guid dataSetId,
         string dataSetTitle,
         string email,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, ApiSubscriptionViewModel>> VerifySubscription(
         Guid dataSetId,
         string token,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
+
+    Task RemoveExpiredApiSubscriptions(CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,7 @@
 using Azure;
 using Azure.Data.Tables;
 using System;
+using System.Runtime.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
@@ -28,5 +29,6 @@ public class ApiSubscription : ITableEntity
     public DateTimeOffset? Timestamp { get; set; }
     public ETag ETag { get; set; }
 
+    [IgnoreDataMember]
     public bool HasExpired => Expiry <= DateTimeOffset.UtcNow;
 }
