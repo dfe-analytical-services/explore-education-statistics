@@ -28,8 +28,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0"/>
-    <PackageReference Include="Testcontainers" Version="3.9.0"/>
-    <PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0"/>
+    <PackageReference Include="Testcontainers" Version="3.8.0"/>
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0"/>
   </ItemGroup>
 
   <ItemGroup>
