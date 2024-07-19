@@ -22,7 +22,7 @@ public class DataBlockViewModel : IContentBlockViewModel
 
     public string Source { get; set; }
 
-    public ObservationQueryContext Query { get; set; }
+    public FullTableQuery Query { get; set; }
 
     private List<IChart> ChartsInternal;
 

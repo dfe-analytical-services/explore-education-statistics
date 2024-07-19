@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -88,14 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(
             Guid? releaseVersionId,
-            ObservationQueryContext query,
+            LocationsOrTimePeriodsQueryRequest request,
             CancellationToken cancellationToken)
         {
-            return await releaseSubjectService.Find(subjectId: query.SubjectId,
+            return await releaseSubjectService.Find(subjectId: request.SubjectId,
                     releaseVersionId: releaseVersionId)
                 .OnSuccess(userService.CheckCanViewSubjectData)
                 .OnSuccess(releaseSubject =>
-                    GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
+                    GetSubjectMetaViewModelFromRequest(request, releaseSubject, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateSubjectFilters(
@@ -157,20 +157,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(
-            ObservationQueryContext query,
+        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromRequest(
+            LocationsOrTimePeriodsQueryRequest request,
             ReleaseSubject releaseSubject,
             CancellationToken cancellationToken)
         {
-            SubjectMetaQueryStep? subjectMetaStep = null;
-            if (!query.LocationIds.IsNullOrEmpty() && query.TimePeriod == null)
-            {
-                subjectMetaStep = SubjectMetaQueryStep.GetTimePeriods;
-            }
-            else if (query.TimePeriod != null && query.Filters.IsNullOrEmpty())
-            {
-                subjectMetaStep = SubjectMetaQueryStep.GetFilterItems;
-            }
+            // we already know query.Locations is not empty due to LocationsOrTimePeriodsQueryContext validator
+            var subjectMetaStep = request.TimePeriod == null
+                ? SubjectMetaQueryStep.GetTimePeriods
+                : SubjectMetaQueryStep.GetFilterItems;
 
             // Only data relevant to the step being executed in the table tool needs to be returned, so only the
             // minimum requisite DB calls for the task are performed.
@@ -184,8 +179,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .Observation
                         .AsNoTracking()
                         .Where(o =>
-                            o.SubjectId == query.SubjectId &&
-                            EF.Constant(query.LocationIds).Contains(o.LocationId));
+                            o.SubjectId == request.SubjectId &&
+                            EF.Constant(request.LocationIds).Contains(o.LocationId));
 
                     var timePeriods = await GetTimePeriods(observations);
 
@@ -208,12 +203,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .SingleAsync(cancellationToken: cancellationToken);
 
                     var observations =
-                        await observationService.GetMatchedObservations(query, cancellationToken);
+                        await observationService.GetMatchedObservations(
+                            request.AsFullTableQuery(),
+                            cancellationToken);
                     logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var filterItems = await
-                        filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
+                        filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations);
                     var filters =
                         FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                             filterItems, releaseFile.FilterSequence);

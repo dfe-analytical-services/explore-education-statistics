@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
@@ -74,20 +74,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpPost("meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
-            [FromBody] ObservationQueryContext query,
+            [FromBody] LocationsOrTimePeriodsQueryRequest request,
             CancellationToken cancellationToken)
         {
-            return _subjectMetaService.FilterSubjectMeta(releaseVersionId: null, query, cancellationToken)
+            return _subjectMetaService.FilterSubjectMeta(releaseVersionId: null, request, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseVersionId:guid}/meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
             Guid releaseVersionId,
-            [FromBody] ObservationQueryContext query,
+            [FromBody] LocationsOrTimePeriodsQueryRequest request,
             CancellationToken cancellationToken)
         {
-            return _subjectMetaService.FilterSubjectMeta(releaseVersionId, query, cancellationToken)
+            return _subjectMetaService.FilterSubjectMeta(releaseVersionId, request, cancellationToken)
                 .HandleFailuresOrOk();
         }
     }

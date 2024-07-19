@@ -36,6 +36,10 @@ public static class CsvUtils
         return csvReader.HeaderRecord?.ToList() ?? new List<string>();
     }
 
+    public static Task<List<List<string>>> GetCsvRows(Stream stream,
+        int startingRowIndex = 0)
+        => GetCsvRows(() => Task.FromResult(stream), startingRowIndex);
+
     /// <summary>
     /// Gets the lines of the provided CSV as lists of cell values.
     /// </summary>

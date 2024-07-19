@@ -20,13 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             File? source = null,
             int order = 0);
 
-        public Task<File> CreateZip(
-            Guid releaseVersionId,
-            string filename,
-            long contentLength,
-            string contentType,
-            Guid createdById);
-
         public Task<IList<File>> ListDataFiles(Guid releaseVersionId);
 
         public Task<bool> HasAnyDataFiles(Guid releaseVersionId);

@@ -907,7 +907,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block 1",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = releaseSubject1.Subject.Id,
                 },
@@ -923,7 +923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock2 = new DataBlock
             {
                 Name = "Test data block 2",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = releaseSubject2.Subject.Id,
                 },
@@ -1025,7 +1025,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = releaseSubject1.Subject.Id,
                 }
@@ -1107,7 +1107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = releaseSubject1.Subject.Id,
                 }
@@ -1190,7 +1190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block",
-                Query = new ObservationQueryContext
+                Query = new FullTableQuery
                 {
                     SubjectId = Guid.NewGuid(),
                 }

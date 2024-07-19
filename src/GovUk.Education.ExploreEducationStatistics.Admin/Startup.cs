@@ -1,4 +1,5 @@
 #nullable enable
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -69,7 +70,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
@@ -120,6 +120,9 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
+using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -164,6 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddHttpContextAccessor();
 
             services.AddFluentValidation();
+            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
 
             services.AddMvc(options =>
             {
@@ -460,6 +464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetService, DataSetService>();
                 services.AddTransient<IDataSetVersionService, DataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
+                services.AddTransient<IPreviewTokenService, PreviewTokenService>();
             }
             else
             {
@@ -473,6 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
+                services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -814,6 +820,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
             BatchFilterOptionMappingUpdatesRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+    }
+
+    internal class NoOpPreviewTokenService : IPreviewTokenService
+    {
+        public Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
+            Guid dataSetVersionId,
+            string label,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(
+            Guid previewTokenId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
+            Guid dataSetVersionId,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
     }

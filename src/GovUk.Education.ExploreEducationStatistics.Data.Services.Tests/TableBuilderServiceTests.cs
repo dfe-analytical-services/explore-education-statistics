@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Indicators = new[] { indicator1Id, indicator2Id },
@@ -271,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
 
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     // Does not match the saved release subject
                     SubjectId = Guid.NewGuid(),
@@ -318,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
 
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                 };
@@ -352,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
 
                 // SubjectId exists, but no Content.Model.Release
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                 };
@@ -395,7 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
@@ -563,7 +563,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Indicators = new[] { indicator1Id, indicator2Id, },
@@ -669,7 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildTableBuilderService(statisticsDbContext);
 
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId
                 };
@@ -714,7 +714,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildTableBuilderService(statisticsDbContext);
 
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     // Does not match saved release subject
                     SubjectId = Guid.NewGuid(),
@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
@@ -920,7 +920,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.Subject.Id,
                     Indicators = indicators.Select(i => i.Id).ToList(),
@@ -1032,7 +1032,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 // SubjectId exists, but no Content.Model.Release
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                 };
@@ -1080,7 +1080,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
                 // SubjectId does not exist
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = Guid.NewGuid(),
                 };
@@ -1125,7 +1125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
@@ -1280,7 +1280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.Subject.Id,
                     Indicators = indicators.Select(i => i.Id).ToList(),
@@ -1424,7 +1424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.Subject.Id,
                     Indicators = indicators.Select(i => i.Id).ToList(),
@@ -1534,7 +1534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                 };
@@ -1583,7 +1583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
                 // SubjectId does not exist
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = Guid.NewGuid(),
                 };
@@ -1627,7 +1627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var query = new ObservationQueryContext
+                var query = new FullTableQuery
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },

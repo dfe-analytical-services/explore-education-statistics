@@ -90,14 +90,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, 
                 import.File.Path());
-                    
+
             var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles,
                 import.MetaFile.Path());
 
             return await
-                ValidateCsvFileType(import.MetaFile, metaFileStreamProvider, true)
-                    .OnSuccess(() => ValidateCsvFileType(import.File, dataFileStreamProvider, false))
-                    .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
+                ValidateCsvFileType(metaFileStreamProvider, isMetaFile: true)
+                    .OnSuccess(() => ValidateCsvFileType(dataFileStreamProvider, isMetaFile: false))
+                    .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider))
                     .OnSuccess(async _ =>
                     {
                         var dataFileColumnHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
@@ -111,17 +111,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                 dataFileTotalRows,
                                 dataFileStreamProvider
                             )
-                            .OnSuccessDo(async () =>
+                            .OnSuccessDo(() =>
                                 _logger.LogInformation("Validating: {FileName} complete", import.File.Filename)));
                     });
         }
 
         private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFileType(
-            File file,
             Func<Task<Stream>> fileStreamProvider,
             bool isMetaFile)
         {
-            if (!await _fileTypeService.IsValidCsvFile(fileStreamProvider, file.Filename))
+            await using var stream = await fileStreamProvider.Invoke();
+
+            if (!await _fileTypeService.IsValidCsvFile(stream))
             {
                 return ListOf(isMetaFile
                     ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())
@@ -130,12 +131,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return Unit.Instance;
         }
-        
+
         private async Task<Either<List<DataImportError>, (List<string> columnHeaders, int totalRows)>>
             ValidateMetadataFile(
                 File file,
-                Func<Task<Stream>> fileStreamProvider,
-                bool isMetaFile)
+                Func<Task<Stream>> fileStreamProvider)
         {
             _logger.LogDebug("Determining if CSV file {FileName} is correct shape", file.Filename);
 
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 if (cells.Count != csvHeaders.Count)
                 {
-                    var errorCode = isMetaFile ? MetaFileHasInvalidNumberOfColumns : DataFileHasInvalidNumberOfColumns;
+                    var errorCode = MetaFileHasInvalidNumberOfColumns;
                     errors.Add(new DataImportError($"Error at data row {index + 1}: {errorCode.GetEnumLabel()}"));
                 }
                 

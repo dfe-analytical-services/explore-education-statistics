@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Source { get; set; }
 
-        public ObservationQueryContext Query { get; set; }
+        public FullTableQuery Query { get; set; }
 
         [JsonIgnore]
         public List<IChart> Charts

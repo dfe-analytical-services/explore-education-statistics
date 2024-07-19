@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("releases/{releaseVersionId:guid}/images")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<ImageFileViewModel>> Upload(Guid releaseVersionId, IFormFile file)
         {

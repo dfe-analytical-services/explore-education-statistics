@@ -1,4 +1,5 @@
 #nullable enable
+using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -23,15 +24,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var path = import.ZipFile!.Path();
 
-            await using var zipBlobFileStream = await _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, path);
+            await using var zipBlobFileStream = await _privateBlobStorageService
+                .StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
-            var file1 = archive.Entries[0];
-            var file2 = archive.Entries[1];
-            var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
-            var metadataFile = file1.Name.Contains(".meta.") ? file1 : file2;
+            var dataFile = archive.GetEntry(import.File.Filename) ??
+                           throw new FileNotFoundException($"Data file {import.File.Filename} not found in archive");
+            var metaFile = archive.GetEntry(import.MetaFile.Filename) ??
+                           throw new FileNotFoundException($"Meta file {import.MetaFile.Filename} not found in archive");
 
-            await using (var stream = dataFile.Open())
+            await using (var stream = dataFile.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
@@ -40,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     contentType: ContentTypes.Csv);
             }
 
-            await using (var stream = metadataFile.Open())
+            await using (var stream = metaFile.Open()) // we should have validated file's existence previously
             {
                 await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,

@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         public async Task<IQueryable<MatchedObservation>> GetMatchedObservations(
-            ObservationQueryContext query,
+            FullTableQuery query,
             CancellationToken cancellationToken = default)
         {
             var sw = Stopwatch.StartNew();

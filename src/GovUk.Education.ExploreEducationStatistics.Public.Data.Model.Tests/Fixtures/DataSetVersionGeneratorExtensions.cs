@@ -175,6 +175,11 @@ public static class DataSetVersionGeneratorExtensions
         IEnumerable<ChangeSetTimePeriods> timePeriodChanges)
         => generator.ForInstance(s => s.SetTimePeriodChanges(timePeriodChanges));
 
+    public static Generator<DataSetVersion> WithPreviewTokens(
+        this Generator<DataSetVersion> generator,
+        Func<IEnumerable<PreviewToken>> previewTokens)
+        => generator.ForInstance(s => s.SetPreviewTokens(previewTokens));
+
     public static InstanceSetters<DataSetVersion> SetDefaults(this InstanceSetters<DataSetVersion> setters)
         => setters
             .SetDefault(dsv => dsv.Id)
@@ -481,5 +486,21 @@ public static class DataSetVersionGeneratorExtensions
                     }
                 )
                 .ToList()
+        );
+
+    public static InstanceSetters<DataSetVersion> SetPreviewTokens(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<IEnumerable<PreviewToken>> previewTokens)
+        => instanceSetter.Set(
+            (_, dsv) =>
+            {
+                dsv.PreviewTokens = previewTokens().ToList();
+
+                foreach (var previewToken in dsv.PreviewTokens)
+                {
+                    previewToken.DataSetVersion = dsv;
+                    previewToken.DataSetVersionId = dsv.Id;
+                }
+            }
         );
 }

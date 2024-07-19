@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -27,7 +29,21 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
     [Fact]
     public async Task CreatePermalink()
     {
-        var createRequest = new PermalinkCreateRequest();
+        var createRequest = new PermalinkCreateRequest
+        {
+            Query = new FullTableQueryRequest
+            {
+                LocationIds = new List<Guid> { Guid.NewGuid(), },
+                TimePeriod = new TimePeriodQuery
+                {
+                    StartYear = 2000,
+                    StartCode = TimeIdentifier.AcademicYear,
+                    EndYear = 2001,
+                    EndCode = TimeIdentifier.AcademicYear,
+                },
+                Indicators = new List<Guid> { Guid.NewGuid(), },
+            }
+        };
         var expectedResult = new PermalinkViewModel
         {
             Id = Guid.NewGuid()

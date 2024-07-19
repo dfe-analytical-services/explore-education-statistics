@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -77,9 +76,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
         public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseDataFileService
@@ -88,9 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/data")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
         public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
         {
             return await _releaseDataFileService
@@ -99,9 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("release/{releaseVersionId:guid}/data/order")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
         public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseVersionId,
             List<Guid> fileIds)
         {
@@ -111,14 +101,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseVersionId:guid}/data")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> AddDataFilesAsync(Guid releaseVersionId,
+        public async Task<ActionResult<DataFileInfo>> UploadDataSet(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "title")] string subjectName,
+            [FromQuery(Name = "title")] string title,
             IFormFile file,
             IFormFile metaFile)
         {
@@ -127,26 +114,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     dataFormFile: file,
                     metaFormFile: metaFile,
                     replacingFileId: replacingFileId,
-                    subjectName: subjectName)
+                    dataSetTitle: title)
                 .HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseVersionId:guid}/zip-data")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> AddDataZipFileAsync(Guid releaseVersionId,
+        public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZip(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "title")] string subjectName,
+            [FromQuery(Name = "title")] string title,
             IFormFile zipFile)
         {
             return await _releaseDataFileService
                 .UploadAsZip(releaseVersionId: releaseVersionId,
                     zipFormFile: zipFile,
-                    replacingFileId: replacingFileId,
-                    subjectName: subjectName)
+                    dataSetTitle: title,
+                    replacingFileId: replacingFileId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseVersionId:guid}/bulk-zip-data")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<List<DataFileInfo>>> UploadDataSetsAsBulkZip(
+            Guid releaseVersionId,
+            IFormFile zipFile)
+        {
+            return await _releaseDataFileService
+                .UploadAsBulkZip(releaseVersionId: releaseVersionId, bulkZipFormFile: zipFile)
                 .HandleFailuresOrOk();
         }
 
