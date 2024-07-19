@@ -47,4 +47,14 @@ public class PreviewTokenController(IPreviewTokenService previewTokenService) : 
             .ListPreviewTokens(dataSetVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
+
+    [HttpPost("{previewTokenId:guid}/revoke")]
+    public async Task<ActionResult<PreviewTokenViewModel>> RevokePreviewToken(
+        Guid previewTokenId,
+        CancellationToken cancellationToken)
+    {
+        return await previewTokenService
+            .RevokePreviewToken(previewTokenId, cancellationToken)
+            .HandleFailuresOrOk();
+    }
 }

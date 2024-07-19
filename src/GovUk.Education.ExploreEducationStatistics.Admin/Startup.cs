@@ -841,5 +841,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid dataSetVersionId,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
+
+        public Task<Either<ActionResult, PreviewTokenViewModel>> RevokePreviewToken(
+            Guid previewTokenId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }

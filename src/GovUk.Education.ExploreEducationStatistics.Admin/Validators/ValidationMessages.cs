@@ -114,6 +114,7 @@ public static class ValidationMessages
             Message = string.Format(DatasetNamesCsvReaderException.Message, exception),
         };
     }
+
     public static readonly LocalizableMessage DatasetNamesCsvIncorrectHeaders = new(
         Code: nameof(DatasetNamesCsvIncorrectHeaders),
         Message: "dataset_names.csv has incorrect headers. It should have 'file_name' and 'dataset_name' only."
@@ -277,7 +278,7 @@ public static class ValidationMessages
             Message = string.Format(FileSizeMustNotBeZero.Message, filename),
         };
     }
-    
+
     public static readonly LocalizableMessage DataSetTitleCannotBeEmpty = new(
         Code: nameof(DataSetTitleCannotBeEmpty),
         Message: "Data set title cannot be empty"
@@ -296,5 +297,9 @@ public static class ValidationMessages
             Message = string.Format(DataSetTitleShouldNotContainSpecialCharacters.Message, filename),
         };
     }
-    
+
+    public static readonly LocalizableMessage PreviewTokenExpired = new(
+        Code: nameof(PreviewTokenExpired),
+        Message: "The preview token is expired."
+    );
 }
