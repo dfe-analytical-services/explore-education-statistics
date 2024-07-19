@@ -28,4 +28,10 @@
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Notifier\GovUk.Education.ExploreEducationStatistics.Notifier.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="appsettings.IntegrationTest.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

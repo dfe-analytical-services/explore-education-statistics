@@ -2,9 +2,9 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using Microsoft.Azure.Cosmos.Table;
 
-namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 
-public interface IStorageTableService
+public interface IPublicationSubscriptionRepository
 {
     Task UpdateSubscriber(CloudTable table, SubscriptionEntity subscription);
 
