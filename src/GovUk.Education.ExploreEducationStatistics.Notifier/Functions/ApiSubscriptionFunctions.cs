@@ -21,9 +21,8 @@ public class ApiSubscriptionFunctions(
 {
     [Function("RequestPendingApiSubscription")]
     public async Task<IActionResult> RequestPendingApiSubscription(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/request-pending-subscription/")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/request-pending-subscription")]
         [FromBody] PendingApiSubscriptionCreateRequest request,
-        FunctionContext context,
         CancellationToken cancellationToken)
     {
         try
@@ -46,7 +45,6 @@ public class ApiSubscriptionFunctions(
     [Function("VerifyApiSubscription")]
     public async Task<IActionResult> VerifyApiSubscription(
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "public-api/{dataSetId:guid}/verify-subscription/{token}")]
-        FunctionContext context,
         Guid dataSetId,
         string token,
         CancellationToken cancellationToken)
@@ -69,7 +67,7 @@ public class ApiSubscriptionFunctions(
     [Function("ApiUnsubscribe")]
     public async Task<IActionResult> ApiUnsubscribe(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe/{token}")]
-        FunctionContext context,
+        HttpRequest request,
         Guid dataSetId,
         string token,
         CancellationToken cancellationToken)
@@ -84,7 +82,7 @@ public class ApiSubscriptionFunctions(
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(VerifyApiSubscription));
+            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(ApiUnsubscribe));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
@@ -92,7 +90,6 @@ public class ApiSubscriptionFunctions(
     [Function("RemoveExpiredApiSubscriptions")]
     public async Task RemoveExpiredApiSubscriptions(
         [TimerTrigger("0 * * * * *")] TimerInfo timerInfo,
-        FunctionContext context,
         CancellationToken cancellationToken)
     {
         await apiSubscriptionService.RemoveExpiredApiSubscriptions(cancellationToken);
