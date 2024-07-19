@@ -11,11 +11,7 @@ Force Tags          GeneralPublic    Prod
 *** Test Cases ***
 Verify that absolute paths with trailing slashes are redirected without them
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/
-    user waits until page contains    Browse our open data
-    user checks url equals    %{PUBLIC_URL}/data-catalogue
-
-    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
-    user waits until page contains    Browse our open data
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue
 
     user navigates to public frontend    %{PUBLIC_URL}/glossary/?someRandomUrlParameter=123
@@ -26,7 +22,7 @@ Verify that redirects do not affect browser history
     user navigates to    about:blank
 
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/
-    user waits until page contains    Browse our open data
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue
 
     user goes back
@@ -47,24 +43,24 @@ Verify that routes with www are redirected without them
     user checks url equals    %{PUBLIC_URL}/
 
     user navigates to public frontend with www    %{PUBLIC_URL}/data-catalogue/
-    user waits until page contains    Browse our open data
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue
 
 Verify that routes with /1000 are redirected without them
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/1000
-    user waits until page contains    Browse our open data
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue
 
 Verify that routes with search parameters retain them
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue?foo=bar&baz=zod
-    user waits until page contains    Browse our open data
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue?foo=bar&baz=zod
 
 Verify that multiple rules work together
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/1000?foo=bar&baz=zod
-    user waits until page contains    Browse our open data
+    user waits until page contains   Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue?foo=bar&baz=zod
 
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/1000/?foo=bar
-    user waits until page contains    Browse our open data
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue?foo=bar
