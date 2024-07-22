@@ -16,16 +16,15 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     GRANT CREATE ON SCHEMA public TO app_public_data_api;
 
     /*
-     * Grant the other application user roles privileges to look up objects on the public schema.
-     */
-    GRANT USAGE ON SCHEMA public TO app_public_data_processor;
-    GRANT USAGE ON SCHEMA public TO app_admin;
-    GRANT USAGE ON SCHEMA public TO app_publisher;
-
-    /*
      * Create a public_data_read_write group role which can be granted to user roles requiring read and write privileges on public schema objects.
      */
     CREATE ROLE public_data_read_write WITH NOLOGIN;
+
+    /*
+     * Allow the public_data_read_write group role to access objects in the public schema.
+     * This does not include the permissions to read (i.e. `SELECT`) or modify (i.e. `INSERT`, `UPDATE`, `DELETE`) the content of those objects.
+     */
+    GRANT USAGE ON SCHEMA public TO public_data_read_write;
 
     /*
      * Grant privileges to the public_data_read_write group role for all tables and sequences in the public schema subsequently created by app_public_data_api.
