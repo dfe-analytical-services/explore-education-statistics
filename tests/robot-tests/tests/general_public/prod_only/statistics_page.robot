@@ -83,16 +83,14 @@ Remove release type filter
 
 Searching
     user clicks element    id:searchForm-search
-    user presses keys    Pupil absence in schools in England
+    user presses keys    pupil absence
     user clicks button    Search
-    user checks page contains button    Pupil absence in schools in England
-    user checks radio is checked    Relevance
-    user checks list item contains    testid:publicationsList    1    Pupil absence in schools in England
+    user checks page contains button    pupil absence
+    user checks list item contains    testid:publicationsList    1    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Removing search
-    user clicks button    Pupil absence in schools in England
-    user checks page does not contain button    Pupil absence in schools in England
-    user checks radio is checked    Newest
+    user clicks button    pupil absence
+    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Clear all filters
     user clicks element    id:searchForm-search

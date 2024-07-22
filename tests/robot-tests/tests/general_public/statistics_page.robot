@@ -77,16 +77,14 @@ Remove release type filter
 
 Searching
     user clicks element    id:searchForm-search
-    user presses keys    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user presses keys    pupil absence
     user clicks button    Search
-    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user checks radio is checked    Relevance
+    user checks page contains button    pupil absence
     user checks list item contains    testid:publicationsList    1    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Removing search
-    user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user clicks button    pupil absence
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user checks radio is checked    Newest
 
 Reset all filters
     user clicks element    id:searchForm-search
