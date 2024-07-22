@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +50,31 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
     {
         var context = GetDbContext<TDbContext>();
         await context.ClearTestData();
+    }
+
+    // The following code was taken from this article which explains a fast way to clear all rows from Azure Table Storage
+    // https://medium.com/medialesson/deleting-all-rows-from-azure-table-storage-as-fast-as-possible-79e03937c331
+    protected async Task ClearAzureDataTableTestData(string connectionString)
+    {
+        var dataTableStorageService = new DataTableStorageService(connectionString);
+
+        var tables = await dataTableStorageService.GetTables().ToListAsync();
+
+        foreach (var table in tables)
+        {
+            var entities = await dataTableStorageService.QueryEntities<TableEntity>(
+                tableName: table.Name,
+                select: new List<string>() { nameof(TableEntity.PartitionKey), nameof(TableEntity.RowKey) });
+
+            await entities.AsPages().ForEachAwaitAsync(async page => {
+                // Since we don't know how many rows the table has and the results are ordered by PartitonKey+RowKey
+                // we'll delete each page immediately and not cache the whole table in memory
+                await dataTableStorageService.BatchManipulateEntities(
+                    tableName: table.Name, 
+                    entities: page.Values, 
+                    tableTransactionActionType: TableTransactionActionType.Delete);
+            });
+        }
     }
 
     protected void ResetDbContext<TDbContext>() where TDbContext : DbContext

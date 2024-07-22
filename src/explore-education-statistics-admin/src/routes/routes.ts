@@ -25,6 +25,7 @@ import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import { RouteProps } from 'react-router';
 import ExpiredInvitePage from '@admin/pages/sign-in/ExpiredInvitePage';
 import NoInvitationPage from '@admin/pages/sign-in/NoInvitationPage';
+import PublishersGuide from '@admin/pages/publishers-guide/PublishersGuide';
 
 interface PublicRouteProps extends RouteProps {
   path: string;
@@ -71,6 +72,13 @@ export const noInvitationRoute: PublicRouteProps = {
 export const homeRoute: ProtectedRouteProps = {
   path: '/',
   component: AdminDashboardPage,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
+  exact: true,
+};
+
+export const publishersGuideRoute: ProtectedRouteProps = {
+  path: '/publishers-guide',
+  component: PublishersGuide,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
@@ -186,6 +194,7 @@ const routes = {
   ...administrationRoutes,
   ...documentationRoutes,
   homeRoute,
+  publishersGuideRoute,
   dashboardRoute,
   contactUsRoute,
   themesRoute,
