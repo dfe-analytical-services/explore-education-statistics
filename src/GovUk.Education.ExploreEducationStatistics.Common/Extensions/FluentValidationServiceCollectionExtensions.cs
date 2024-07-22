@@ -1,6 +1,7 @@
 #nullable enable
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -21,8 +22,7 @@ public static class FluentValidationServiceCollectionExtensions
     {
         ValidatorOptions.Global.LanguageManager = new FluentValidationLanguageManager();
 
-        ValidatorOptions.Global.PropertyNameResolver = (_, memberInfo, expression) =>
-            JsonNamingPolicy.CamelCase.ConvertName(ResolvePropertyName(memberInfo, expression));
+        ValidatorOptions.Global.UseCamelCasePropertyNames();
 
         services.AddValidatorsFromAssembly(assembly);
 
@@ -32,6 +32,12 @@ public static class FluentValidationServiceCollectionExtensions
         });
 
         return services;
+    }
+
+    public static void UseCamelCasePropertyNames(this ValidatorConfiguration globalConfig)
+    {
+        globalConfig.PropertyNameResolver = (_, memberInfo, expression) =>
+            JsonNamingPolicy.CamelCase.ConvertName(ResolvePropertyName(memberInfo, expression));
     }
 
     private static string ResolvePropertyName(MemberInfo? memberInfo, LambdaExpression? expression)
