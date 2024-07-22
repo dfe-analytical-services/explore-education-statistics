@@ -140,7 +140,10 @@ internal class DataSetService(
         var draftVersion = dataSet.LatestDraftVersion is null
             ? null
             : MapDraftVersion(
-                dataSet.LatestDraftVersion,
+                dataSetVersion: dataSet.LatestDraftVersion,
+                mappingStatus: await GetMappingStatus(
+                    nextDataSetVersionId: dataSet.LatestDraftVersion.Id,
+                    cancellationToken),
                 releaseFilesByVersion[dataSet.LatestDraftVersion]
             );
 
@@ -229,11 +232,12 @@ internal class DataSetService(
             );
     }
 
-    private static DataSetVersionViewModel MapDraftVersion(
+    private static DataSetDraftVersionViewModel MapDraftVersion(
         DataSetVersion dataSetVersion,
+        MappingStatusViewModel? mappingStatus,
         ReleaseFile releaseFile)
-    {
-        return new DataSetVersionViewModel
+    {   
+        return new DataSetDraftVersionViewModel
         {
             Id = dataSetVersion.Id,
             Version = dataSetVersion.Version,
@@ -250,7 +254,23 @@ internal class DataSetService(
                 : null,
             Filters = dataSetVersion.MetaSummary?.Filters ?? null,
             Indicators = dataSetVersion.MetaSummary?.Indicators ?? null,
+            MappingStatus = mappingStatus
         };
+    }
+
+    private async Task<MappingStatusViewModel?> GetMappingStatus(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        return await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .Select(mapping => new MappingStatusViewModel
+            {
+                LocationsComplete = mapping.LocationMappingsComplete,
+                FiltersComplete = mapping.FilterMappingsComplete
+            })
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     private static DataSetLiveVersionViewModel MapLiveVersion(

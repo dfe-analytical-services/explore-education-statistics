@@ -62,15 +62,15 @@ public abstract class DataSetsControllerTests(
                 .Distinct()
                 .ToList();
 
-            var oldPublishedReleaseVersion = publication.ReleaseVersions.First(rv => 
+            var oldPublishedReleaseVersion = publication.ReleaseVersions.First(rv =>
                 rv.Published is not null && rv.ReleaseId == releaseIds[0]);
 
-            var liveReleaseVersion = publication.ReleaseVersions.First(rv => 
+            var liveReleaseVersion = publication.ReleaseVersions.First(rv =>
                 rv.Published is not null && rv.ReleaseId == releaseIds[1]);
 
             var draftReleaseVersion = publication.ReleaseVersions.First(rv =>
                 rv.Published is null && rv.ReleaseId == releaseIds[2]);
-            
+
             ReleaseFile oldPublishedReleaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
@@ -113,7 +113,7 @@ public abstract class DataSetsControllerTests(
                 .WithReleaseFileId(liveReleaseFile.Id)
                 .WithVersionNumber(major: 2, minor: 0)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-            
+
             DataSetVersion draftDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(1, 1)
@@ -589,10 +589,21 @@ public abstract class DataSetsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
+            var mappings = new DataSetVersionMapping
+            {
+                SourceDataSetVersionId = liveDataSetVersion.Id,
+                TargetDataSetVersionId = draftDataSetVersion.Id,
+                LocationMappingPlan = new LocationMappingPlan(),
+                FilterMappingPlan = new FilterMappingPlan(),
+                LocationMappingsComplete = false,
+                FilterMappingsComplete = true
+            };
+
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
                 context.DataSetVersions.AddRange(liveDataSetVersion, draftDataSetVersion);
                 context.DataSets.Update(dataSet);
+                context.DataSetVersionMappings.Add(mappings);
             });
 
             var response = await GetDataSet(dataSet.Id);
@@ -654,6 +665,10 @@ public abstract class DataSetsControllerTests(
 
             Assert.Equal(new[] { draftReleaseVersion.ReleaseId, liveReleaseVersion.ReleaseId }.Order(),
                 viewModel.PreviousReleaseIds.Order());
+
+            Assert.NotNull(viewModel.DraftVersion.MappingStatus);
+            Assert.False(viewModel.DraftVersion.MappingStatus.LocationsComplete);
+            Assert.True(viewModel.DraftVersion.MappingStatus.FiltersComplete);
         }
 
         [Fact]
@@ -852,6 +867,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(dataSetVersion.VersionType, viewModel.DraftVersion.Type);
             Assert.Equal(releaseFile.File.DataSetFileId, viewModel.DraftVersion!.File.Id);
             Assert.Equal(releaseFile.Name, viewModel.DraftVersion!.File.Title);
+            Assert.Null(viewModel.DraftVersion.MappingStatus);
 
             Assert.Null(viewModel.LatestLiveVersion);
         }
