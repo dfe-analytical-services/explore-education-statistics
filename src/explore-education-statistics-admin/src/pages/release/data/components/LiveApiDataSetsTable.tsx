@@ -76,7 +76,7 @@ export default function LiveApiDataSetsTable({
                     releaseApiDataSetDetailsRoute.path,
                     {
                       publicationId,
-                      releaseId: releaseVersionId,
+                      releaseVersionId,
                       dataSetId: dataSet.id,
                     },
                   )}
@@ -107,7 +107,7 @@ export default function LiveApiDataSetsTable({
                             releaseApiDataSetDetailsRoute.path,
                             {
                               publicationId,
-                              releaseId: releaseVersionId,
+                              releaseVersionId,
                               dataSetId: dataSet.id,
                             },
                           ),
