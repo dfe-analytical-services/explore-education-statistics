@@ -22,7 +22,7 @@ const PublishersGuide = () => {
         Standards and details of using the Explore education statistics service
         are available on the{' '}
         <a
-          href="https://github.com/dfe-analytical-services/analysts-guide.git"
+          href="https://dfe-analytical-services.github.io/analysts-guide/"
           target="_blank"
           rel="noopener noreferrer"
         >
