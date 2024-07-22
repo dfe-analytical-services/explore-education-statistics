@@ -141,7 +141,7 @@ internal class DataSetService(
             ? null
             : MapDraftVersion(
                 dataSetVersion: dataSet.LatestDraftVersion,
-                mappings: await GetDataSetVersionMappings(
+                mappingStatus: await GetMappingStatus(
                     nextDataSetVersionId: dataSet.LatestDraftVersion.Id,
                     cancellationToken),
                 releaseFilesByVersion[dataSet.LatestDraftVersion]
@@ -234,7 +234,7 @@ internal class DataSetService(
 
     private static DataSetDraftVersionViewModel MapDraftVersion(
         DataSetVersion dataSetVersion,
-        MappingStatusViewModel? mappings,
+        MappingStatusViewModel? mappingStatus,
         ReleaseFile releaseFile)
     {   
         return new DataSetDraftVersionViewModel
@@ -254,27 +254,23 @@ internal class DataSetService(
                 : null,
             Filters = dataSetVersion.MetaSummary?.Filters ?? null,
             Indicators = dataSetVersion.MetaSummary?.Indicators ?? null,
-            MappingStatus = mappings
+            MappingStatus = mappingStatus
         };
     }
 
-    private async Task<MappingStatusViewModel?> GetDataSetVersionMappings(
+    private async Task<MappingStatusViewModel?> GetMappingStatus(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
     {
-        var statuses = await publicDataDbContext
+        return await publicDataDbContext
             .DataSetVersionMappings
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
-            .Select(mapping => new Tuple<bool, bool>(mapping.LocationMappingsComplete, mapping.FilterMappingsComplete))
-            .SingleOrDefaultAsync(cancellationToken);
-
-        return statuses is not null 
-            ? new MappingStatusViewModel
+            .Select(mapping => new MappingStatusViewModel
             {
-                LocationsComplete = statuses.Item1,
-                FiltersComplete = statuses.Item2
-            }
-            : null;
+                LocationsComplete = mapping.LocationMappingsComplete,
+                FiltersComplete = mapping.FilterMappingsComplete
+            })
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     private static DataSetLiveVersionViewModel MapLiveVersion(

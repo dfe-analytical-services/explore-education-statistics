@@ -59,7 +59,7 @@ export interface ApiDataSetDraftVersion extends ApiDataSetVersion {
   mappingStatus?: {
     locationsComplete: boolean;
     filtersComplete: boolean;
-  }
+  };
 }
 
 export interface ApiDataSetLiveVersion extends ApiDataSetVersion {
