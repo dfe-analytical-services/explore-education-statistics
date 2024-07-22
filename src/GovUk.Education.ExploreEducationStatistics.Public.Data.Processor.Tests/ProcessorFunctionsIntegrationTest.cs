@@ -137,7 +137,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         .Build();
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.27.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.31.0")
         .Build();
 
     public async Task DisposeAsync()
