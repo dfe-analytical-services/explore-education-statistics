@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240628135434_EES5235_GrantSequencePrivileges")]
-    partial class EES5235_GrantSequencePrivileges
+    [Migration("20240718171717_EES5329_GrantPublicDataReadWriteRolePrivileges")]
+    partial class EES5329_GrantPublicDataReadWriteRolePrivileges
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,6 +27,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.HasSequence<int>("FilterOptionMetaLink_seq");
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonBool", b =>
+                {
+                    b.Property<bool>("BoolValue")
+                        .HasColumnType("boolean");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonFragment", b =>
+                {
+                    b.Property<string>("JsonValue")
+                        .HasColumnType("text");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilterOptions", b =>
                 {
@@ -587,6 +607,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasIndex("OptionId");
 
                     b.ToTable("LocationOptionMetaLinks");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.PreviewToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Expiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("PreviewTokens");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", b =>
@@ -1402,6 +1455,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("Option");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.PreviewToken", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("PreviewTokens")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DataSetVersion");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
@@ -1437,6 +1501,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("LocationChanges");
 
                     b.Navigation("LocationMetas");
+
+                    b.Navigation("PreviewTokens");
 
                     b.Navigation("TimePeriodChanges");
 

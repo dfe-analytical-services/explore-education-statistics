@@ -7,7 +7,7 @@
   },
   "ConnectionStrings": {
     "ContentDb": "Server=db;Database=content;User=public_data_processor;Password=Your_Password123;TrustServerCertificate=True;",
-    "PublicDataDb": "Host=db;Username=postgres;Password=password;Database=public_data"
+    "PublicDataDb": "Host=db;Username=app_public_data_processor;Password=password;Database=public_data"
   },
   "Host": {
     "LocalHttpPort": 7074,

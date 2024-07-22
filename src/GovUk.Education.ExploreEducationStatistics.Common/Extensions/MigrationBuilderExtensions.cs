@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -7,7 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class MigrationBuilderExtensions
     {
-        public static void SqlFromFile(this MigrationBuilder migrationBuilder,
+        public static bool IsEnvironment(
+            this MigrationBuilder _,
+            string environmentName) =>
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == environmentName;
+
+        public static void SqlFromFile(
+            this MigrationBuilder migrationBuilder,
             string migrationsPath,
             string filename,
             bool suppressTransaction = false)
@@ -19,7 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             migrationBuilder.Sql(File.ReadAllText(file), suppressTransaction);
         }
 
-        public static void SqlFromFileByLine(this MigrationBuilder migrationBuilder,
+        public static void SqlFromFileByLine(
+            this MigrationBuilder migrationBuilder,
             string migrationsPath,
             string filename)
         {

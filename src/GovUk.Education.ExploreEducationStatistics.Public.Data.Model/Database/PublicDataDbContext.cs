@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 
 public class PublicDataDbContext : DbContext
 {
+    public const string PublicDataReadWriteRole = "public_data_read_write";
     public const string FilterOptionMetaLinkSequence = "FilterOptionMetaLink_seq";
     public const string LocationOptionMetasIdSequence = "LocationOptionMetas_Id_seq";
 
