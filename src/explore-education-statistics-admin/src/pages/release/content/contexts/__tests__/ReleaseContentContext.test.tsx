@@ -328,7 +328,6 @@ describe('ReleaseContentContext', () => {
             '99f5bbc3-de9a-4831-fdf8-08d7bec1dd71',
           ],
           locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
-          includeGeoJson: true,
         },
         charts: [],
         table: emptyTable,

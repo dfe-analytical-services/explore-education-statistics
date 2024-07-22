@@ -18,6 +18,10 @@ public record FullTableQueryRequest
 
     public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
+    // BoundaryLevel is used by DataBlockUpdateRequest, and TableBuilderController#Query with Map Charts
+    // Also see EES-3328 and EES-3319
+    public long? BoundaryLevel { get; set; }
+
     public FullTableQuery AsFullTableQuery()
     {
         return new FullTableQuery
@@ -27,7 +31,7 @@ public record FullTableQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = this.Filters,
             Indicators = this.Indicators,
-            BoundaryLevel = null,
+            BoundaryLevel = this.BoundaryLevel,
         };
     }
 

@@ -36,7 +36,6 @@ describe('DataBlockPageTabs', () => {
     highlightName: '',
     highlightDescription: '',
     query: {
-      includeGeoJson: false,
       subjectId: 'subject-1',
       locationIds: ['barnet'],
       timePeriod: {
