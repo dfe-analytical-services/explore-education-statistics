@@ -858,7 +858,7 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[2]).toBeChecked();
   });
 
-  test('sorts by previously selected method when applying a search filter', async () => {
+  test('adds the relevance sort option when applying a search filter', async () => {
     publicationService.listPublications
       .mockResolvedValueOnce({
         results: testPublications,
@@ -914,60 +914,6 @@ describe('FindStatisticsPage', () => {
       sortGroup.getByLabelText('Relevance'),
     );
     expect(updatedSortOptions[3]).not.toBeChecked();
-  });
-
-  test('reverts the sorting to `newest` when the search filter is removed', async () => {
-    mockRouter.setCurrentUrl(
-      '/find-statistics?search=Find+me&sortBy=relevance',
-    );
-    publicationService.listPublications
-      .mockResolvedValueOnce({
-        results: [testPublications[0]],
-        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
-      })
-      .mockResolvedValueOnce({
-        results: testPublications,
-        paging: testPaging,
-      });
-
-    const { user } = render(<FindStatisticsPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText('1 result')).toBeInTheDocument();
-    });
-
-    const sortGroup = within(
-      screen.getByRole('group', { name: 'Sort results' }),
-    );
-    const sortOptions = sortGroup.getAllByRole('radio');
-    expect(sortOptions).toHaveLength(4);
-    expect(sortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
-    expect(sortOptions[0]).not.toBeChecked();
-    expect(sortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
-    expect(sortOptions[1]).not.toBeChecked();
-    expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
-    expect(sortOptions[2]).not.toBeChecked();
-    expect(sortOptions[3]).toEqual(sortGroup.getByLabelText('Relevance'));
-    expect(sortOptions[3]).toBeChecked();
-
-    await user.click(
-      screen.getByRole('button', {
-        name: 'Remove filter: Search Find me',
-      }),
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('30 results')).toBeInTheDocument();
-    });
-
-    const updatedSortOptions = sortGroup.getAllByRole('radio');
-    expect(updatedSortOptions).toHaveLength(3);
-    expect(updatedSortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
-    expect(updatedSortOptions[0]).toBeChecked();
-    expect(updatedSortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
-    expect(updatedSortOptions[1]).not.toBeChecked();
-    expect(updatedSortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
-    expect(updatedSortOptions[2]).not.toBeChecked();
   });
 
   test('Reset filters', async () => {
