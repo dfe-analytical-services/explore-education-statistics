@@ -6,8 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Reque
 
 public abstract class DataSetGetQueryFiltersValidatorTests
 {
-    private readonly DataSetGetQueryFilters.Validator _validator = new();
-
     public static readonly TheoryData<string?> ValidFiltersSingle =
         DataSetQueryCriteriaFiltersValidatorTests.ValidFiltersSingle;
 
@@ -22,7 +20,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { Eq = filter };
 
-            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
+            new DataSetGetQueryFilters.Validator().TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
@@ -30,7 +28,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { Eq = "" };
 
-            _validator.TestValidate(query)
+            new DataSetGetQueryFilters.Validator().TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Eq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -41,7 +39,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { Eq = "12345678901" };
 
-            _validator.TestValidate(query)
+            new DataSetGetQueryFilters.Validator().TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Eq)
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator)
                 .Only();
@@ -56,7 +54,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { NotEq = filter };
 
-            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
+            new DataSetGetQueryFilters.Validator().TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
@@ -64,7 +62,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { NotEq = "" };
 
-            _validator.TestValidate(query)
+            new DataSetGetQueryFilters.Validator().TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.NotEq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -75,7 +73,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { NotEq = "12345678901" };
 
-            _validator.TestValidate(query)
+            new DataSetGetQueryFilters.Validator().TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.NotEq)
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator)
                 .Only();
@@ -90,7 +88,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { In = filters };
 
-            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
+            new DataSetGetQueryFilters.Validator().TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
@@ -98,7 +96,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { In = null };
 
-            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
+            new DataSetGetQueryFilters.Validator().TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
@@ -106,7 +104,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { In = [] };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             result.ShouldHaveValidationErrorFor(q => q.In)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
@@ -120,7 +118,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
                 In = ["", " ", null!]
             };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             Assert.Equal(query.In.Count, result.Errors.Count);
 
@@ -140,7 +138,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
                 In = ["12345678901", "999999999999999"]
             };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             Assert.Equal(query.In.Count, result.Errors.Count);
 
@@ -159,7 +157,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { NotIn = filters };
 
-            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
+            new DataSetGetQueryFilters.Validator().TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
@@ -167,7 +165,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { NotIn = null };
 
-            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
+            new DataSetGetQueryFilters.Validator().TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
@@ -175,7 +173,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         {
             var query = new DataSetGetQueryFilters { NotIn = [] };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             result.ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
@@ -189,7 +187,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
                 NotIn = ["", " ", null!]
             };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             Assert.Equal(query.NotIn.Count, result.Errors.Count);
 
@@ -209,7 +207,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
                 NotIn = ["12345678901", "999999999999999"]
             };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             Assert.Equal(query.NotIn.Count, result.Errors.Count);
 
@@ -233,7 +231,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
                 NotIn = []
             };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             Assert.Equal(4, result.Errors.Count);
 
@@ -258,7 +256,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
                 NotIn = []
             };
 
-            var result = _validator.TestValidate(query);
+            var result = new DataSetGetQueryFilters.Validator().TestValidate(query);
 
             Assert.Equal(2, result.Errors.Count);
 
