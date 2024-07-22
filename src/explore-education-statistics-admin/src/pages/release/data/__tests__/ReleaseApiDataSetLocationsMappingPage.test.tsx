@@ -67,6 +67,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         end: '2023',
       },
     },
+    previousReleaseIds: [],
   };
 
   test('renders the mappings tables correctly', async () => {
