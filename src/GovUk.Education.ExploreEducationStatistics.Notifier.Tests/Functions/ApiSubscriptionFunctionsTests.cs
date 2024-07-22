@@ -378,6 +378,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var apiSubscriptionManager = GetRequiredService<ApiSubscriptionFunctions>();
 
             return await apiSubscriptionManager.VerifyApiSubscription(
+                request: null!,
                 dataSetId: dataSetId,
                 token: token,
                 cancellationToken: CancellationToken.None);

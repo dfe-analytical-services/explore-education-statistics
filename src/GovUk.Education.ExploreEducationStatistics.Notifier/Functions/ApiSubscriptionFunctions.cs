@@ -44,7 +44,8 @@ public class ApiSubscriptionFunctions(
 
     [Function("VerifyApiSubscription")]
     public async Task<IActionResult> VerifyApiSubscription(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "public-api/{dataSetId:guid}/verify-subscription/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/{dataSetId:guid}/verify-subscription/{token}")]
+        HttpRequest request,
         Guid dataSetId,
         string token,
         CancellationToken cancellationToken)
