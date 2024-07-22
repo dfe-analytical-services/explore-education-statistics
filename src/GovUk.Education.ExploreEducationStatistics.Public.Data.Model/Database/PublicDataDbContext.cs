@@ -36,6 +36,7 @@ public class PublicDataDbContext : DbContext
         // They are mapped here to inform EF that they are not entities.
         modelBuilder.Entity<JsonFragment>().HasNoKey().ToView(null);
         modelBuilder.Entity<JsonBool>().HasNoKey().ToView(null);
+        modelBuilder.Entity<JsonInt>().HasNoKey().ToView(null);
     }
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
@@ -73,8 +74,7 @@ public class PublicDataDbContext : DbContext
     public DbSet<LocationOptionMetaChange> LocationOptionMetaChanges { get; init; } = null!;
     public DbSet<TimePeriodMetaChange> TimePeriodMetaChanges { get; init; } = null!;
     public DbSet<PreviewToken> PreviewTokens { get; init; } = null!;
-
     public DbSet<JsonFragment> JsonFragments { get; init; } = null!;
-    
-    public DbSet<JsonBool> JsonBool { get; init; } = null!;
+    public DbSet<JsonBool> JsonBools { get; init; } = null!;
+    public DbSet<JsonInt> JsonInts { get; init; } = null!;
 }

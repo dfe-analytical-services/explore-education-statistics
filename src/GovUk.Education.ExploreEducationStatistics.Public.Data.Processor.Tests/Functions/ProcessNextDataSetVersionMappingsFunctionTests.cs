@@ -1049,8 +1049,97 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             Assert.True(updatedMappings.FilterMappingsComplete);
         }
-    }
+        
+        // As there is currently no way in the UI for a user to resolve unmapped filters, filters
+        // and their child filter options with mapping type of AutoNone should not count towards
+        // the calculation of the FilterMappingsComplete flag.
+        [Fact]
+        public async Task Complete_SomeFiltersAutoNone()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
+            // Create a mapping plan based on 2 data set versions with the same filters
+            // and filter options, but additional options exist in the new version.
+            // Each source filter and filter option can be auto-mapped exactly to one in
+            // the target version, leaving some candidates unused but essentially the mapping
+            // is complete unless the user manually intervenes at this point.
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithNoMapping()
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterMapping("filter-2-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithNoMapping()
+                        .AddOptionMapping("filter-2-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())));
+
+            await AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersionMappings.Add(mappings));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+
+            Dictionary<string, FilterMapping> expectedFilterMappings = new()
+            {
+                {
+                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with
+                    {
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "filter-1-key",
+                        OptionMappings = new Dictionary<string, FilterOptionMapping>
+                        {
+                            {
+                                "filter-1-option-1-key",
+                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                {
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "filter-1-option-1-key"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with
+                    {
+                        Type = MappingType.AutoNone,
+                        OptionMappings = new Dictionary<string, FilterOptionMapping>
+                        {
+                            {
+                                "filter-2-option-1-key",
+                                mappings.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
+                                {
+                                    Type = MappingType.AutoNone
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                expectedFilterMappings,
+                ignoreCollectionOrders: true);
+
+            Assert.True(updatedMappings.FilterMappingsComplete);
+        }
+    }
+    
     public class CompleteNextDataSetVersionMappingsMappingProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessNextDataSetVersionMappingsFunctionTests(fixture)

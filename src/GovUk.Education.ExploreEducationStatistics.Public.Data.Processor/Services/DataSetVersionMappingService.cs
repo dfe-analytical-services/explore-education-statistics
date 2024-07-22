@@ -94,15 +94,14 @@ internal class DataSetVersionMappingService(
                 .Any(optionMapping =>
                     IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
 
+        // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
+        // omit checking the status of filters that have a mapping of AutoNone.
         mappings.FilterMappingsComplete = !mappings
             .FilterMappingPlan
             .Mappings
-            .Any(filterMapping =>
-                IncompleteMappingTypes.Contains(filterMapping.Value.Type)
-                || filterMapping
-                    .Value
-                    .OptionMappings
-                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
+            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
         publicDataDbContext.Update(mappings);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);

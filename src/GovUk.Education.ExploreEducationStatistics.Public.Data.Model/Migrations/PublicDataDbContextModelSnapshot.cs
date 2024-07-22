@@ -45,6 +45,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToView(null, (string)null);
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonInt", b =>
+                {
+                    b.Property<int>("IntValue")
+                        .HasColumnType("integer");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
                     b.Property<Guid>("Id")

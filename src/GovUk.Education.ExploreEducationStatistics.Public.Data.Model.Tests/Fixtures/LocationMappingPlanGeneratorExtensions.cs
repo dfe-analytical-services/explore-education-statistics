@@ -226,7 +226,7 @@ public static class LocationMappingPlanGeneratorExtensions
 
     public static Generator<LocationOptionMapping> WithCandidateKey(
         this Generator<LocationOptionMapping> generator,
-        string candidateKey)
+        string? candidateKey)
         => generator.ForInstance(s => s.SetCandidateKey(candidateKey));
 
     public static InstanceSetters<LocationOptionMapping> SetDefaults(

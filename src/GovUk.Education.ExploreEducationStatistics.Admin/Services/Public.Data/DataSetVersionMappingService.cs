@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
@@ -49,6 +50,7 @@ public class DataSetVersionMappingService(
             validateCandidatesFn: () =>
                 ValidateLocationOptionCandidates(nextDataSetVersionId, request, cancellationToken),
             applyUpdatesFn: () => UpdateLocationOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
+            updateMappingsCompleteFn: () => UpdateLocationMappingsComplete(nextDataSetVersionId, cancellationToken),
             createViewModelFn: updates => new BatchLocationMappingUpdatesResponseViewModel { Updates = updates },
             cancellationToken: cancellationToken);
     }
@@ -74,6 +76,7 @@ public class DataSetVersionMappingService(
             validateCandidatesFn: () =>
                 ValidateFilterOptionCandidates(nextDataSetVersionId, request, cancellationToken),
             applyUpdatesFn: () => UpdateFilterOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
+            updateMappingsCompleteFn: () => UpdateFilterMappingsComplete(nextDataSetVersionId, cancellationToken),
             createViewModelFn: updates => new BatchFilterOptionMappingUpdatesResponseViewModel { Updates = updates },
             cancellationToken: cancellationToken);
     }
@@ -83,6 +86,7 @@ public class DataSetVersionMappingService(
             Guid nextDataSetVersionId,
             Func<Task<List<Either<ErrorViewModel, TMappingCandidate>>>> validateCandidatesFn,
             Func<Task<List<Either<ErrorViewModel, TMappingUpdateResponse>>>> applyUpdatesFn,
+            Func<Task> updateMappingsCompleteFn,
             Func<List<TMappingUpdateResponse>, TBatchMappingUpdatesResponseViewModel> createViewModelFn,
             CancellationToken cancellationToken = default)
     {
@@ -110,10 +114,113 @@ public class DataSetVersionMappingService(
                     var aggregatedResult = updateSuccessesAndFailures.AggregateSuccessesAndFailures();
 
                     return aggregatedResult
-                        .OnSuccess(createViewModelFn)
                         .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors));
-                }));
+                })
+                .OnSuccessDo(updateMappingsCompleteFn)
+                .OnSuccess(createViewModelFn));
     }
+
+    private async Task UpdateLocationMappingsComplete(Guid nextDataSetVersionId, CancellationToken cancellationToken)
+    {
+        var mapping = await publicDataDbContext
+            .DataSetVersionMappings
+            .SingleAsync(
+                mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
+                cancellationToken);
+
+        mapping.LocationMappingsComplete = await LocationMappingsComplete(nextDataSetVersionId, cancellationToken);
+
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+#pragma warning disable EF1002
+    private async Task<bool> LocationMappingsComplete(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
+
+        // Query to find any mappings under any levels that have a mapping type of "None" or "AutoNone".
+        // This query iterates through each top-level LocationLevelMappings in the LocationMappingPlan and
+        // for each of the Level's LocationOptionMappings, checks to see if any exist with mapping type
+        // "None" or "AutoNone".
+        //
+        // If any exist, mappings are not yet complete.
+        var unmappedLocationOptionsExist = await publicDataDbContext
+            .Set<JsonInt>()
+            .FromSqlRaw(sql:
+                $"""
+                 SELECT 1 "{nameof(JsonInt.IntValue)}" FROM (
+                     SELECT OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.LocationMappingPlan)}" -> '{nameof(LocationMappingPlan.Levels)}') Level,
+                     jsonb_each(Level.value -> '{nameof(LocationLevelMappings.Mappings)}') OptionMapping,
+                     jsonb_extract_path_text(OptionMapping.value, '{nameof(LocationOptionMapping.Type)}') OptionMappingType
+                     WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
+                 ) 
+                 WHERE OptionMappingType IN ('{nameof(MappingType.None)}','{nameof(MappingType.AutoNone)}')
+                 LIMIT 1
+                 """,
+                parameters: [targetDataSetVersionIdParam])
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return unmappedLocationOptionsExist is null;
+    }
+#pragma warning restore EF1002
+
+    private async Task UpdateFilterMappingsComplete(Guid nextDataSetVersionId, CancellationToken cancellationToken)
+    {
+        var mapping = await GetDataSetVersionMapping(nextDataSetVersionId, cancellationToken);
+
+        mapping.FilterMappingsComplete = await FilterMappingsComplete(nextDataSetVersionId, cancellationToken);
+
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<DataSetVersionMapping> GetDataSetVersionMapping(Guid nextDataSetVersionId, CancellationToken cancellationToken) =>
+        await publicDataDbContext
+            .DataSetVersionMappings
+            .SingleAsync(
+                mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
+                cancellationToken);
+
+#pragma warning disable EF1002
+    private async Task<bool> FilterMappingsComplete(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
+
+        // Query to find any filter options under any filters that have a mapping type of "None" or "AutoNone".
+        // The query iterates through each top-level FilterMapping in the FilterMappingPlan, then iterates through
+        // each one's set of FilterOptionMappings, and checks to see if any exist with mapping type "None" or
+        // "AutoNone".
+        //
+        // If any exist, mappings are not yet complete.
+        //
+        // Notably we omit checking filters that have a mapping of AutoNone, as currently there is no way 
+        // within the UI for the users to handle the resolving of these unmapped filters.
+        var unmappedFilterOptionsExist = await publicDataDbContext
+            .Set<JsonInt>()
+            .FromSqlRaw(sql:
+                $"""
+                 SELECT 1 "{nameof(JsonInt.IntValue)}" FROM (
+                     SELECT FilterMappingType, OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" -> 'Mappings') FilterMapping,
+                     jsonb_each(FilterMapping.value -> '{nameof(FilterMapping.OptionMappings)}') OptionMapping,
+                     jsonb_extract_path_text(FilterMapping.value, '{nameof(FilterMapping.Type)}') FilterMappingType,
+                     jsonb_extract_path_text(OptionMapping.value, '{nameof(FilterOptionMapping.Type)}') OptionMappingType
+                     WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
+                 ) 
+                 WHERE FilterMappingType != '{nameof(MappingType.AutoNone)}' 
+                 AND OptionMappingType IN ('{nameof(MappingType.None)}','{nameof(MappingType.AutoNone)}')
+                 LIMIT 1
+                 """,
+                parameters: [targetDataSetVersionIdParam])
+            .SingleOrDefaultAsync(cancellationToken);
+        
+        return unmappedFilterOptionsExist is null;
+    }
+#pragma warning restore EF1002
 
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will validate that the chosen mapping candidates
