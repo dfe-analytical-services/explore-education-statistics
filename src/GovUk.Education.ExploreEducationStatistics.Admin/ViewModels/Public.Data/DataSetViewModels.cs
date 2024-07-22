@@ -20,7 +20,7 @@ public record DataSetViewModel
 
     public Guid? SupersedingDataSetId { get; init; }
 
-    public required DataSetVersionViewModel? DraftVersion { get; init; }
+    public required DataSetDraftVersionViewModel? DraftVersion { get; init; }
 
     public required DataSetLiveVersionViewModel? LatestLiveVersion { get; init; }
 
