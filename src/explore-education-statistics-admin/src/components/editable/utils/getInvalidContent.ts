@@ -10,16 +10,13 @@ export interface InvalidContentError {
     | 'skippedHeadingLevel'
     | 'missingTableHeaders'
     | 'boldAsHeading'
-    | 'emptyHeading'
-    | 'internalLinkOpensInSameTab'
-    | 'externalOpensLinkInNewTab';
+    | 'emptyHeading';
   message?: string;
   details?: string;
 }
 
 export default function getInvalidContent(
   elements: JsonElement[],
-  publicAppUrl: string,
 ): InvalidContentError[] {
   const errors: InvalidContentError[] = [];
 
@@ -140,28 +137,6 @@ export default function getInvalidContent(
         type: 'repeatedLinkText',
         message: link.data,
         details: `${link.attributes?.linkHref}, ${matchingUrls}`,
-      });
-      return;
-    }
-
-    if (
-      link.attributes?.linkHref?.startsWith(publicAppUrl) &&
-      link.attributes?.linkOpenInNewTab
-    ) {
-      errors.push({
-        type: 'internalLinkOpensInSameTab',
-        message: link.data,
-      });
-      return;
-    }
-
-    if (
-      !link.attributes?.linkHref?.startsWith(publicAppUrl) &&
-      !link.attributes?.linkOpenInNewTab
-    ) {
-      errors.push({
-        type: 'externalOpensLinkInNewTab',
-        message: link.data,
       });
     }
   });
