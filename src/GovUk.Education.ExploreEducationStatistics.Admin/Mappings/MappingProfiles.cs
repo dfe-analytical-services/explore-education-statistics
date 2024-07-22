@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<ReleaseVersion, ReleaseViewModel>()
                 .ForMember(
-                    dest => dest.ReleaseSeriesId,
+                    dest => dest.ReleaseId,
                     m => m.MapFrom(rv => rv.ReleaseId))
                 .ForMember(
                     dest => dest.LatestRelease,

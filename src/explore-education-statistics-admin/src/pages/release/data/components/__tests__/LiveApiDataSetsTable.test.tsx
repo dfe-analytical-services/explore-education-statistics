@@ -80,13 +80,13 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
+        releaseVersionId="release-version-1"
         releaseId="release-1"
-        releaseSeriesId="release-id"
       />,
     );
 
     const baseDataSetUrl =
-      '/publication/publication-1/release/release-1/api-data-sets';
+      '/publication/publication-1/release/release-version-1/api-data-sets';
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
 
@@ -156,8 +156,8 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease={false}
         dataSets={testDataSets}
         publicationId="publication-1"
-        releaseId="release-1"
-        releaseSeriesId="release-id"
+        releaseVersionId="release-1"
+        releaseId="release-id"
       />,
     );
 
@@ -172,8 +172,8 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
-        releaseId="release-1"
-        releaseSeriesId="previous-release-id"
+        releaseVersionId="release-1"
+        releaseId="previous-release-id"
       />,
     );
 
@@ -187,8 +187,8 @@ describe('LiveApiDataSetsTable', () => {
       <LiveApiDataSetsTable
         dataSets={[]}
         publicationId="publication-1"
-        releaseId="release-1"
-        releaseSeriesId="release-id"
+        releaseVersionId="release-1"
+        releaseId="release-id"
       />,
     );
 
@@ -204,8 +204,8 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
-        releaseId="release-1"
-        releaseSeriesId="release-id"
+        releaseVersionId="release-1"
+        releaseId="release-id"
       />,
     );
 
@@ -251,8 +251,8 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
+        releaseVersionId="release-version-1"
         releaseId="release-1"
-        releaseSeriesId="release-id"
       />,
       { history },
     );
@@ -291,7 +291,7 @@ describe('LiveApiDataSetsTable', () => {
     });
 
     expect(history.location.pathname).toBe(
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+      '/publication/publication-1/release/release-version-1/api-data-sets/data-set-1',
     );
   });
 

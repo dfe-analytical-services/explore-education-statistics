@@ -43,19 +43,38 @@ public abstract class DataSetsControllerTests(
         [Fact]
         public async Task PublicationHasSingleDataSet_Success_CorrectViewModel()
         {
+            // Generate 4 Releases - one to contain the currently live data set version, one for the
+            // current draft version, one for a published but not latest version, and one with no
+            // data set versions at all. We use the Releases unconnected to the current live and
+            // current draft data set versions to ensure that there are no unexpected side effects
+            // of having extra ReleaseVersions present on the Publication.
             Publication publication = DataFixture
                 .DefaultPublication()
                 .WithReleases(
                     DataFixture
                         .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                        .Generate(3)
+                        .Generate(4)
                 );
 
-            var liveReleaseVersion = publication.ReleaseVersions.First(rv => rv.Published is not null);
+            var releaseIds = publication
+                .ReleaseVersions
+                .Select(rv => rv.ReleaseId)
+                .Distinct()
+                .ToList();
+
+            var oldPublishedReleaseVersion = publication.ReleaseVersions.First(rv => 
+                rv.Published is not null && rv.ReleaseId == releaseIds[0]);
+
+            var liveReleaseVersion = publication.ReleaseVersions.First(rv => 
+                rv.Published is not null && rv.ReleaseId == releaseIds[1]);
 
             var draftReleaseVersion = publication.ReleaseVersions.First(rv =>
-                rv.Published is null
-                && rv.ReleaseId != liveReleaseVersion.ReleaseId);
+                rv.Published is null && rv.ReleaseId == releaseIds[2]);
+            
+            ReleaseFile oldPublishedReleaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(oldPublishedReleaseVersion);
 
             ReleaseFile liveReleaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -70,7 +89,7 @@ public abstract class DataSetsControllerTests(
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
                 context.Publications.Add(publication);
-                context.ReleaseFiles.AddRange(liveReleaseFile, draftReleaseFile);
+                context.ReleaseFiles.AddRange(oldPublishedReleaseFile, liveReleaseFile, draftReleaseFile);
             });
 
             DataSet dataSet = DataFixture
@@ -80,24 +99,34 @@ public abstract class DataSetsControllerTests(
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            DataSetVersion draftDataSetVersion = DataFixture
+            DataSetVersion oldPublishedDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 1)
-                .WithStatusDraft()
+                .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .WithReleaseFileId(draftReleaseFile.Id)
-                .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithReleaseFileId(oldPublishedReleaseFile.Id);
 
             DataSetVersion liveDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
                 .WithReleaseFileId(liveReleaseFile.Id)
+                .WithVersionNumber(major: 2, minor: 0)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+            
+            DataSetVersion draftDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithReleaseFileId(draftReleaseFile.Id)
+                .WithVersionNumber(major: 2, minor: 1)
+                .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
-                context.DataSetVersions.AddRange(draftDataSetVersion, liveDataSetVersion);
+                context.DataSetVersions.AddRange(
+                    oldPublishedDataSetVersion, draftDataSetVersion, liveDataSetVersion);
                 context.DataSets.Update(dataSet);
             });
 
@@ -128,7 +157,12 @@ public abstract class DataSetsControllerTests(
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
                 () => Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(),
                     dataSetViewModel.LatestLiveVersion?.Published),
-                () => Assert.Equal(new[] { liveReleaseVersion.ReleaseId, draftReleaseVersion.ReleaseId }.Order(),
+                () => Assert.Equal(new[]
+                    {
+                        oldPublishedReleaseVersion.ReleaseId, 
+                        liveReleaseVersion.ReleaseId, 
+                        draftReleaseVersion.ReleaseId
+                    }.Order(),
                     dataSetViewModel.PreviousReleaseIds.Order())
             );
         }

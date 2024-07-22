@@ -108,7 +108,7 @@ const ChartBuilderTabSection = ({
         query: nextQuery,
       });
     },
-    [onTableUpdate, query],
+    [onTableUpdate, query, releaseId],
   );
 
   return (

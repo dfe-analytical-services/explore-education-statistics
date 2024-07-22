@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public Guid Id { get; set; }
 
-        public Guid ReleaseSeriesId { get; set; }
+        public Guid ReleaseId { get; set; }
         
         public string Title { get; set; } = string.Empty;
 

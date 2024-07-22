@@ -27,16 +27,16 @@ interface Props {
   canUpdateRelease?: boolean;
   dataSets: LiveApiDataSetSummary[];
   publicationId: string;
+  releaseVersionId: string;
   releaseId: string;
-  releaseSeriesId: string;
 }
 
 export default function LiveApiDataSetsTable({
   canUpdateRelease,
   dataSets,
   publicationId,
+  releaseVersionId,
   releaseId,
-  releaseSeriesId,
 }: Props) {
   const history = useHistory();
 
@@ -76,7 +76,7 @@ export default function LiveApiDataSetsTable({
                     releaseApiDataSetDetailsRoute.path,
                     {
                       publicationId,
-                      releaseId,
+                      releaseId: releaseVersionId,
                       dataSetId: dataSet.id,
                     },
                   )}
@@ -85,7 +85,7 @@ export default function LiveApiDataSetsTable({
                   <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
                 </Link>
                 {canUpdateRelease &&
-                  !dataSet.previousReleaseIds.includes(releaseSeriesId) && (
+                  !dataSet.previousReleaseIds.includes(releaseId) && (
                     <ApiDataSetCreateModal
                       buttonText={
                         <>
@@ -94,7 +94,7 @@ export default function LiveApiDataSetsTable({
                         </>
                       }
                       publicationId={publicationId}
-                      releaseId={releaseId}
+                      releaseId={releaseVersionId}
                       submitText="Confirm new data set version"
                       title="Create a new API data set version"
                       onSubmit={async ({ releaseFileId }) => {
@@ -107,7 +107,7 @@ export default function LiveApiDataSetsTable({
                             releaseApiDataSetDetailsRoute.path,
                             {
                               publicationId,
-                              releaseId,
+                              releaseId: releaseVersionId,
                               dataSetId: dataSet.id,
                             },
                           ),

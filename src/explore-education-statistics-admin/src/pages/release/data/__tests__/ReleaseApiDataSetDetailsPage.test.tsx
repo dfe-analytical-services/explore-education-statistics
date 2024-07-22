@@ -381,7 +381,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     renderPage({
       release: {
         ...testRelease,
-        releaseSeriesId: testDataSet.previousReleaseIds[0],
+        releaseId: testDataSet.previousReleaseIds[0],
       },
     });
 

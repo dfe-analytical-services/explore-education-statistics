@@ -187,7 +187,6 @@ internal class DataSetService(
     {
         return await contentDbContext
             .ReleaseFiles
-            .Include(releaseFile => releaseFile.ReleaseVersion)
             .Where(releaseFile => releaseFileIds.Contains(releaseFile.Id))
             .Select(releaseFile => releaseFile.ReleaseVersion.ReleaseId)
             .ToListAsync(cancellationToken);

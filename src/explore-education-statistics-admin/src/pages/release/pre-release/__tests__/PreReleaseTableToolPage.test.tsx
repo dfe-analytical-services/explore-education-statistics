@@ -190,7 +190,7 @@ describe('PreReleaseTableToolPage', () => {
 
   const testRelease: Release = {
     id: '123',
-    releaseSeriesId: '456',
+    releaseId: '456',
     slug: '123',
     approvalStatus: 'Draft',
     updatePublishedDate: false,

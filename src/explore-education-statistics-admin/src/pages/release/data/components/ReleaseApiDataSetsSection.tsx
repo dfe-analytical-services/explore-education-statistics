@@ -129,8 +129,8 @@ export default function ReleaseApiDataSetsSection() {
                   canUpdateRelease={canUpdateRelease}
                   dataSets={liveDataSets}
                   publicationId={release.publicationId}
-                  releaseId={release.id}
-                  releaseSeriesId={release.releaseSeriesId}
+                  releaseVersionId={release.id}
+                  releaseId={release.releaseId}
                 />
               </>
             )}

@@ -248,7 +248,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             </div>
             {canUpdateRelease &&
               !dataSet.draftVersion &&
-              !dataSet.previousReleaseIds.includes(release.releaseSeriesId) && (
+              !dataSet.previousReleaseIds.includes(release.releaseId) && (
                 <ApiDataSetCreateModal
                   buttonText="Create a new version of this data set"
                   publicationId={release.publicationId}
