@@ -2,8 +2,6 @@ import getInvalidContent from '@admin/components/editable/utils/getInvalidConten
 import { JsonElement } from '@admin/types/ckeditor';
 
 describe('getInvalidContent', () => {
-  const testPublicAppUrl = 'test-public-app-url';
-
   test('returns errors for paragraphs which are entirely bold', () => {
     const testContent: JsonElement[] = [
       {
@@ -44,7 +42,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
     expect(result).toEqual([
       {
         type: 'boldAsHeading',
@@ -68,7 +66,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
     expect(result).toEqual([
       {
         type: 'emptyHeading',
@@ -199,7 +197,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
     expect(result).toEqual([
       {
         type: 'missingTableHeaders',
@@ -251,7 +249,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
     expect(result).toEqual([
       {
         type: 'skippedHeadingLevel',
@@ -272,7 +270,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
     expect(result).toEqual([
       {
         type: 'skippedHeadingLevel',
@@ -321,7 +319,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
 
     expect(result).toEqual([
       {
@@ -377,7 +375,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
 
     expect(result).toEqual([
       {
@@ -427,7 +425,7 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
 
     expect(result).toEqual([
       {
@@ -476,110 +474,12 @@ describe('getInvalidContent', () => {
       },
     ];
 
-    const result = getInvalidContent(testContent, testPublicAppUrl);
+    const result = getInvalidContent(testContent);
 
     expect(result).toEqual([
       {
         type: 'urlLinkText',
         message: 'https://bbc.co.uk',
-      },
-    ]);
-  });
-
-  test('returns an error when an internal link opens in a new tab', () => {
-    const testContent: JsonElement[] = [
-      {
-        name: 'paragraph',
-        children: [
-          {
-            data: 'words ',
-          },
-          {
-            attributes: {
-              linkHref: `${testPublicAppUrl}/something`,
-              linkOpenInNewTab: true,
-            },
-            data: 'an internal link 1',
-          },
-          {
-            data: ' words',
-          },
-        ],
-      },
-      {
-        name: 'paragraph',
-        children: [
-          {
-            data: 'words ',
-          },
-          {
-            attributes: {
-              linkHref: `${testPublicAppUrl}/something`,
-            },
-            data: 'an internal link 2',
-          },
-          {
-            data: ' words',
-          },
-        ],
-      },
-    ];
-
-    const result = getInvalidContent(testContent, testPublicAppUrl);
-
-    expect(result).toEqual([
-      {
-        type: 'internalLinkOpensInSameTab',
-        message: 'an internal link 1',
-      },
-    ]);
-  });
-
-  test('returns an error when an external link does not open in a new tab', () => {
-    const testContent: JsonElement[] = [
-      {
-        name: 'paragraph',
-        children: [
-          {
-            data: 'words ',
-          },
-          {
-            attributes: {
-              linkHref: 'https://gov.uk',
-              linkOpenInNewTab: true,
-            },
-            data: 'an external link 1',
-          },
-          {
-            data: ' words',
-          },
-        ],
-      },
-      {
-        name: 'paragraph',
-        children: [
-          {
-            data: 'words ',
-          },
-          {
-            attributes: {
-              linkHref: 'https://bbc.co.uk',
-            },
-            data: 'an external link 2',
-          },
-          {
-            data: ' words',
-          },
-        ],
-      },
-    ];
-
-    const result = getInvalidContent(testContent, testPublicAppUrl);
-
-    expect(result).toEqual([
-      {
-        type: 'externalOpensLinkInNewTab',
-        message: 'an external link 2',
       },
     ]);
   });

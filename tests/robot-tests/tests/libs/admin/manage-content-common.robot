@@ -567,9 +567,6 @@ user adds link to accordion section text block
     user clicks element    ${button}
     user enters text into element    label:Link URL    ${url}
     
-    # Select Open in a new tab
-    user presses keys    TAB 
-    user presses keys    ENTER
     # Save
     user presses keys    TAB
     user presses keys    ENTER

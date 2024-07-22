@@ -76,40 +76,6 @@ describe('InvalidContentDetails', () => {
     );
   });
 
-  test('renders internalLinkOpensInSameTab errors', () => {
-    const testErrors: InvalidContentError[] = [
-      {
-        type: 'internalLinkOpensInSameTab',
-        message: 'Internal link text',
-      },
-    ];
-    render(<InvalidContentDetails errors={testErrors} />);
-
-    expect(
-      screen.getByRole('button', {
-        name: /1 internal link does not open in the same tab/,
-      }),
-    );
-    expect(screen.getByText('Internal link text'));
-  });
-
-  test('renders externalOpensLinkInNewTab errors', () => {
-    const testErrors: InvalidContentError[] = [
-      {
-        type: 'externalOpensLinkInNewTab',
-        message: 'External link text',
-      },
-    ];
-    render(<InvalidContentDetails errors={testErrors} />);
-
-    expect(
-      screen.getByRole('button', {
-        name: /1 external link does not open in a new tab/,
-      }),
-    );
-    expect(screen.getByText('External link text'));
-  });
-
   test('renders skippedHeadingLevel errors', () => {
     const testErrors: InvalidContentError[] = [
       {

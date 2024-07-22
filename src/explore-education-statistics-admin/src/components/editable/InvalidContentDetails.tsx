@@ -38,12 +38,6 @@ export default function InvalidContentDetails({
   const emptyHeadingErrors = errors.filter(
     error => error.type === 'emptyHeading',
   );
-  const internalLinkOpensInSameTabErrors = errors.filter(
-    error => error.type === 'internalLinkOpensInSameTab',
-  );
-  const externalOpensLinkInNewTabErrors = errors.filter(
-    error => error.type === 'externalOpensLinkInNewTab',
-  );
 
   return (
     <>
@@ -157,50 +151,6 @@ export default function InvalidContentDetails({
             text={`${urlLinkTextErrors.length} ${
               urlLinkTextErrors.length === 1 ? 'link' : 'links'
             } with a URL as link text`}
-          />
-        )}
-
-        {!!internalLinkOpensInSameTabErrors.length && (
-          <ErrorItem
-            detailsList={internalLinkOpensInSameTabErrors.map(
-              (error, index) => (
-                <li key={`error-${index.toString()}`}>{error.message}</li>
-              ),
-            )}
-            modalContent={
-              <p>
-                Internal links should open in the same tab so that users can
-                navigate consistently around the site using the browser back and
-                next buttons.
-              </p>
-            }
-            modalTitle="Internal links should open in the same tab"
-            text={`${internalLinkOpensInSameTabErrors.length} internal ${
-              internalLinkOpensInSameTabErrors.length === 1
-                ? 'link does'
-                : 'links do'
-            } not open in the same tab`}
-          />
-        )}
-
-        {!!externalOpensLinkInNewTabErrors.length && (
-          <ErrorItem
-            detailsList={externalOpensLinkInNewTabErrors.map((error, index) => (
-              <li key={`error-${index.toString()}`}>{error.message}</li>
-            ))}
-            modalContent={
-              <p>
-                External links should open in a new tab so that users are not
-                taken away from the current website and can easily switch
-                between websites.
-              </p>
-            }
-            modalTitle="External links should open in a new tab"
-            text={`${externalOpensLinkInNewTabErrors.length} external ${
-              externalOpensLinkInNewTabErrors.length === 1
-                ? 'link does'
-                : 'links do'
-            } not open in a new tab`}
           />
         )}
 

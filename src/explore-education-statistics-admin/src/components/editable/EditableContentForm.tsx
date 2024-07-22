@@ -1,5 +1,4 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
-import { useConfig } from '@admin/contexts/ConfigContext';
 import InvalidContentDetails from '@admin/components/editable/InvalidContentDetails';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
@@ -85,7 +84,6 @@ const EditableContentForm = ({
   onSubmit,
 }: Props) => {
   const { clearPendingDeletions } = useCommentsContext();
-  const { publicAppUrl } = useConfig();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
   const [elements, setElements] = useState<Element[] | undefined>();
@@ -219,7 +217,6 @@ const EditableContentForm = ({
                 );
                 const invalidContent = getInvalidContent(
                   elementsJson as JsonElement[],
-                  publicAppUrl,
                 );
 
                 if (
