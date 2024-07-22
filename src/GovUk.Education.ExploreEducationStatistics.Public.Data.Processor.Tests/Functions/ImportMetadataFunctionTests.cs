@@ -203,7 +203,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 CandidateKey = MappingKeyFunctions.LocationOptionMetaRowKeyGenerator(mappedOption2.ToRow())
             };
 
-            var random = new Random();
+            var i = 0;
 
             var mappings = new DataSetVersionMapping
             {
@@ -227,7 +227,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                                             : option == mappedOption2 ? option2Mapping
                                             : new LocationOptionMapping
                                             {
-                                                Type = random.Next(1) == 0
+                                                Type = i++ % 2 == 0 
                                                     ? MappingType.AutoNone
                                                     : MappingType.ManualNone
                                             })
@@ -420,7 +420,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 CandidateKey = MappingKeyFunctions.FilterOptionKeyGenerator(mappedOption2)
             };
 
-            var random = new Random();
+            var i = 0;
 
             var mappings = new DataSetVersionMapping
             {
@@ -444,7 +444,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                                             : option == mappedOption2 ? option2Mapping
                                             : new FilterOptionMapping
                                             {
-                                                Type = random.Next(1) == 0
+                                                Type = i++ % 2 == 0 
                                                     ? MappingType.AutoNone
                                                     : MappingType.ManualNone
                                             })
