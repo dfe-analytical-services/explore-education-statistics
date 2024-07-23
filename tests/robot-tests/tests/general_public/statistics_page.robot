@@ -76,6 +76,10 @@ Remove release type filter
     user checks selected option label     id:filters-form-release-type    All release types
 
 Searching
+    # filter by theme first to make sure we get the seed publication on dev.
+    user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    
     user clicks element    id:searchForm-search
     user presses keys    pupil absence
     user clicks button    Search
