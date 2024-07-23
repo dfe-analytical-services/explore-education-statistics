@@ -121,8 +121,8 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admi
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -452,15 +452,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
             services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
 
-            services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
-            {
-                var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
-                httpClient.BaseAddress = new Uri(options.Value.Url);
-                httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
-            });
-
             if (publicDataDbExists)
             {
+                services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
+                    httpClient.BaseAddress = new Uri(options.Value.Url);
+                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
+                });
+
                 services.AddTransient<IDataSetService, DataSetService>();
                 services.AddTransient<IDataSetVersionService, DataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
@@ -468,6 +468,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             }
             else
             {
+                services.AddTransient<IProcessorClient, NoOpProcessorClient>();
+
                 // TODO EES-5073 Remove this once PublicDataDbContext is configured in ALL Azure environments.
                 // This is allowing for the PublicDataDbContext to be null.
                 services.AddTransient<IDataSetService, DataSetService>(provider =>
@@ -768,6 +770,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 migration.Apply();
             }
+        }
+    }
+
+    internal class NoOpProcessorClient : IProcessorClient
+    {
+        public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateDataSet(
+            Guid releaseFileId,
+            CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersion(
+            Guid dataSetId,
+            Guid releaseFileId,
+            CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult,Unit>(Unit.Instance));
+        }
+
+        public Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
+            Guid dataSetVersionId,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult,Unit>(Unit.Instance));
         }
     }
 
