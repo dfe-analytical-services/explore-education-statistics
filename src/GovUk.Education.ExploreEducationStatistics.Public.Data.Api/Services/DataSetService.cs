@@ -373,7 +373,6 @@ internal class DataSetService(
         return new GeographicLevelOptionViewModel
         {
             Level = level,
-            Label = level.GetEnumLabel(),
         };
     }
 
@@ -424,7 +423,6 @@ internal class DataSetService(
         return new LocationGroupOptionsViewModel
         {
             Level = locationMeta.Level,
-            Label = locationMeta.Level.GetEnumLabel(),
             Options = options,
         };
     }

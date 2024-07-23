@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
@@ -19,4 +21,14 @@ public record FilterOptionViewModel
     /// Whether the filter option is an aggregate (i.e. ‘all’ or a ‘total’) of the other filter options.
     /// </summary>
     public bool? IsAggregate { get; init; }
+
+    public static FilterOptionViewModel Create(FilterOptionMetaChange.State changeState)
+    {
+        return new FilterOptionViewModel
+        {
+            Id = changeState.PublicId,
+            Label = changeState.Option.Label,
+            IsAggregate = changeState.Option.IsAggregate
+        };
+    }
 }

@@ -13,7 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 [ApiController]
 [Route("api/v{version:apiVersion}/data-sets/{dataSetId:guid}/versions")]
 public class DataSetVersionsController(
-    IDataSetService dataSetService)
+    IDataSetService dataSetService,
+    IDataSetVersionChangeService dataSetVersionChangeService)
     : ControllerBase
 {
     /// <summary>
@@ -59,6 +60,30 @@ public class DataSetVersionsController(
     {
         return await dataSetService
             .GetVersion(
+                dataSetId: dataSetId,
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// Get a data set version's changes
+    /// </summary>
+    /// <remarks>
+    /// Lists the changes made by a data set version relative to the version prior to it.
+    /// </remarks>
+    [HttpGet("{dataSetVersion}/changes")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The changes for this data set version", type: typeof(DataSetVersionChangesViewModel))]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
+    public async Task<ActionResult<DataSetVersionChangesViewModel>> GetDataSetVersionChanges(
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetVersionChangeService
+            .GetChanges(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)

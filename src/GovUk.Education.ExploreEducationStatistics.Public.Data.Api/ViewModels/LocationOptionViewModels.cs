@@ -63,6 +63,11 @@ public abstract record LocationOptionViewModel
             _ => throw new NotImplementedException()
         };
     }
+
+    /// <summary>
+    /// Check if the option has a major change when compared to another option.
+    /// </summary>
+    public abstract bool HasMajorChange(LocationOptionViewModel otherOption);
 }
 
 /// <summary>
@@ -74,6 +79,11 @@ public record LocationCodedOptionViewModel : LocationOptionViewModel
     /// The code of the location.
     /// </summary>
     public required string Code { get; init; }
+
+    public override bool HasMajorChange(LocationOptionViewModel otherOption)
+        => otherOption is not LocationCodedOptionViewModel codedOption
+           || Id != codedOption.Id
+           || Code != codedOption.Code;
 }
 
 /// <summary>
@@ -90,6 +100,12 @@ public record LocationLocalAuthorityOptionViewModel : LocationOptionViewModel
     /// The old code (previously the LEA code) of the local authority.
     /// </summary>
     public required string OldCode { get; init; }
+
+    public override bool HasMajorChange(LocationOptionViewModel otherOption)
+        => otherOption is not LocationLocalAuthorityOptionViewModel localAuthorityOption
+           || Id != localAuthorityOption.Id
+           || Code != localAuthorityOption.Code
+           || OldCode != localAuthorityOption.OldCode;
 }
 
 /// <summary>
@@ -101,12 +117,22 @@ public record LocationProviderOptionViewModel : LocationOptionViewModel
     /// The UKPRN (UK provider reference number) of the provider.
     /// </summary>
     public required string Ukprn { get; init; }
+
+    public override bool HasMajorChange(LocationOptionViewModel otherOption)
+        => otherOption is not LocationProviderOptionViewModel providerOption
+           || Id != providerOption.Id
+           || Ukprn != providerOption.Ukprn;
 }
 
 /// <summary>
 /// A location option for an RSC region that can be used to filter a data set.
 /// </summary>
-public record LocationRscRegionOptionViewModel : LocationOptionViewModel;
+public record LocationRscRegionOptionViewModel : LocationOptionViewModel
+{
+    public override bool HasMajorChange(LocationOptionViewModel otherOption)
+        => otherOption is not LocationRscRegionOptionViewModel rscOption
+           || Id != rscOption.Id;
+}
 
 /// <summary>
 /// A location option for a school that can be used to filter a data set.
@@ -122,4 +148,10 @@ public record LocationSchoolOptionViewModel : LocationOptionViewModel
     /// The LAESTAB (local authority establishment number) of the school.
     /// </summary>
     public required string LaEstab { get; init; }
+
+    public override bool HasMajorChange(LocationOptionViewModel otherOption)
+        => otherOption is not LocationSchoolOptionViewModel schoolOption
+           || Id != schoolOption.Id
+           || Urn != schoolOption.Urn
+           || LaEstab != schoolOption.LaEstab;
 }
