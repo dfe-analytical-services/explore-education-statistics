@@ -109,6 +109,7 @@ internal class ApiSubscriptionService(
 
     public async Task NotifyApiSubscribers(
         Guid dataSetId,
+        Guid dataSetFileId,
         string version,
         CancellationToken cancellationToken = default)
     {
@@ -131,6 +132,7 @@ internal class ApiSubscriptionService(
             .ForEachAsync(
                 page => BatchNotifySubscribers(
                     subscribers: page,
+                    dataSetFileId: dataSetFileId,
                     version: version),
                 cancellationToken);
     }
@@ -336,20 +338,22 @@ internal class ApiSubscriptionService(
 
     private void BatchNotifySubscribers(
         Page<ApiSubscription> subscribers,
+        Guid dataSetFileId,
         string version)
     {
         foreach (var subscriber in subscribers.Values)
         {
-            SendNotificationEmail(subscriber, version);
+            SendNotificationEmail(subscriber, dataSetFileId, version);
         }
     }
 
     private void SendNotificationEmail(
         ApiSubscription subscription,
+        Guid dataSetFileId,
         string version)
     {
         var token = tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
-        var dataSetUrl = $"{_publicAppUrl}/???/{subscription.PartitionKey}/{version}";
+        var dataSetUrl = $"{_publicAppUrl}/data-catalogue/data-set/{dataSetFileId}";
         var unsubscribeUrl =
             $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{token}";
         var personalisation = new Dictionary<string, dynamic>

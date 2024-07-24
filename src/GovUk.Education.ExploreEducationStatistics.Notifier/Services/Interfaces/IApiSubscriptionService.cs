@@ -27,6 +27,7 @@ public interface IApiSubscriptionService
 
     Task NotifyApiSubscribers(
         Guid dataSetId,
+        Guid dataSetFileId,
         string version,
         CancellationToken cancellationToken = default);
 

@@ -72,14 +72,28 @@ public class DataSetPublishingService(
     /// </summary>
     private async Task NotifyApiSubscribers(IReadOnlyList<DataSetVersion> publishedDataSetVersions)
     {
-        var messages = publishedDataSetVersions
-            .Select(CreateApiNotificationMessage)
-            .ToList();
-
-        if (messages.Count == 0)
+        if (publishedDataSetVersions.Count == 0)
         {
             return;
         }
+
+        var releaseFileIds = publishedDataSetVersions
+            .Select(version => version.ReleaseFileId)
+            .ToList();
+
+        var dataSetFileIds = await contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .Where(rf => releaseFileIds.Contains(rf.Id))
+            .ToDictionaryAsync(rf => rf.Id, rf => rf.File.DataSetFileId!.Value);
+
+        var messages = publishedDataSetVersions
+            .Select(version => new ApiNotificationMessage
+            {
+                DataSetId = version.DataSetId,
+                DataSetFileId = dataSetFileIds[version.ReleaseFileId],
+                Version = version.Version
+            })
+            .ToList();
 
         await notifierClient.NotifyApiSubscribers(messages);
     }
@@ -132,15 +146,6 @@ public class DataSetPublishingService(
         }
 
         await publicDataDbContext.SaveChangesAsync();
-    }
-
-    private static ApiNotificationMessage CreateApiNotificationMessage(DataSetVersion version)
-    {
-        return new ApiNotificationMessage
-        {
-            DataSetId = version.DataSetId,
-            Version = version.Version
-        };
     }
 
     private async Task<List<ReleaseFile>> GetReleaseFiles(IEnumerable<Guid> releaseVersionIds)

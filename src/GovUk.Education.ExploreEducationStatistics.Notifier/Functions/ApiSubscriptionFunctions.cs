@@ -106,6 +106,7 @@ public class ApiSubscriptionFunctions(
         await apiNotificationMessageValidator.ValidateAndThrowAsync(message, cancellationToken);
         await apiSubscriptionService.NotifyApiSubscribers(
             dataSetId: message.DataSetId,
+            dataSetFileId: message.DataSetFileId,
             version: message.Version,
             cancellationToken: cancellationToken);
     }
