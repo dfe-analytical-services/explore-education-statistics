@@ -338,11 +338,11 @@ internal class ApiSubscriptionService(
     {
         foreach (var subscriber in subscribers.Values)
         {
-            SendNotification(subscriber, version);
+            SendNotificationEmail(subscriber, version);
         }
     }
 
-    private void SendNotification(ApiSubscription subscription, string version)
+    private void SendNotificationEmail(ApiSubscription subscription, string version)
     {
         var expiryDateTime = DateTime.UtcNow.AddYears(1);
         var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, expiryDateTime);
@@ -351,7 +351,7 @@ internal class ApiSubscriptionService(
         {
             { "api_dataset", subscription.DataSetTitle },
             {
-                "changelog-link",
+                "changelog_link",
                 $"{appSettingsOptions.Value.PublicAppUrl}/???/{subscription.PartitionKey}/{version}"
             },
             {
