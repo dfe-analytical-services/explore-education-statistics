@@ -112,11 +112,12 @@ internal class ApiSubscriptionService(
     {
         var dataSetSubscribers = await apiSubscriptionRepository.QuerySubscriptions(
             filter: s => s.PartitionKey == dataSetId.ToString(),
-            select: new List<string>
-            {
+            select:
+            [
                 nameof(ApiSubscription.PartitionKey),
-                nameof(ApiSubscription.RowKey)
-            },
+                nameof(ApiSubscription.RowKey),
+                nameof(ApiSubscription.DataSetTitle)
+            ],
             cancellationToken: cancellationToken);
 
         await dataSetSubscribers
@@ -374,11 +375,11 @@ internal class ApiSubscriptionService(
 
         return await apiSubscriptionRepository.QuerySubscriptions(
             filter: filter,
-            select: new List<string>
-            {
+            select:
+            [
                 nameof(ApiSubscription.PartitionKey),
                 nameof(ApiSubscription.RowKey)
-            },
+            ],
             cancellationToken: cancellationToken);
     }
 
