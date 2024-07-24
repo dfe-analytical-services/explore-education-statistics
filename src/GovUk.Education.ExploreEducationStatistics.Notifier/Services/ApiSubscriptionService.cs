@@ -110,8 +110,12 @@ internal class ApiSubscriptionService(
         string version,
         CancellationToken cancellationToken = default)
     {
+        Expression<Func<ApiSubscription, bool>> filter = s =>
+            s.PartitionKey == dataSetId.ToString()
+            && s.Status.Equals(ApiSubscriptionStatus.Subscribed.ToString());
+
         var dataSetSubscribers = await apiSubscriptionRepository.QuerySubscriptions(
-            filter: s => s.PartitionKey == dataSetId.ToString(),
+            filter: filter,
             select:
             [
                 nameof(ApiSubscription.PartitionKey),
