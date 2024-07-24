@@ -76,7 +76,7 @@ public class DataSetPublishingService(
             .Select(CreateApiNotificationMessage)
             .ToList();
 
-        if (!messages.Any())
+        if (messages.Count == 0)
         {
             return;
         }
@@ -134,12 +134,12 @@ public class DataSetPublishingService(
         await publicDataDbContext.SaveChangesAsync();
     }
 
-    private ApiNotificationMessage CreateApiNotificationMessage(DataSetVersion version)
+    private static ApiNotificationMessage CreateApiNotificationMessage(DataSetVersion version)
     {
         return new ApiNotificationMessage
         {
             DataSetId = version.DataSetId,
-            Version = version.FullSemanticVersion()
+            Version = version.Version
         };
     }
 

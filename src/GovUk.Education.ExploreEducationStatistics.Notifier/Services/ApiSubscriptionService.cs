@@ -20,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ErrorDetail
 using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Semver;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
@@ -108,7 +107,7 @@ internal class ApiSubscriptionService(
 
     public async Task NotifyApiSubscribers(
         Guid dataSetId,
-        SemVersion version,
+        string version,
         CancellationToken cancellationToken = default)
     {
         var dataSetSubscribers = await apiSubscriptionRepository.QuerySubscriptions(
@@ -335,7 +334,7 @@ internal class ApiSubscriptionService(
 
     private void BatchNotifySubscribers(
         Page<ApiSubscription> subscribers,
-        SemVersion version)
+        string version)
     {
         foreach (var subscriber in subscribers.Values)
         {
@@ -343,7 +342,7 @@ internal class ApiSubscriptionService(
         }
     }
 
-    private void SendNotification(ApiSubscription subscription, SemVersion version)
+    private void SendNotification(ApiSubscription subscription, string version)
     {
         var expiryDateTime = DateTime.UtcNow.AddYears(1);
         var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, expiryDateTime);
