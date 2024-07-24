@@ -641,6 +641,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.HasIndex("PublicId");
 
+                    b.HasIndex("MetaId", "PublicId")
+                        .IsUnique();
+
                     b.ToTable("LocationOptionMetaLinks");
                 });
 

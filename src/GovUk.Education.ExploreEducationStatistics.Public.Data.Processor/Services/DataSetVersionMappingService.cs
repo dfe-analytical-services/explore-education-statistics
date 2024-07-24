@@ -5,11 +5,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
+using ValidationMessages =
+    GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
@@ -115,7 +117,7 @@ internal class DataSetVersionMappingService(
             .OnSuccessCombineWith(nextDataSetVersion =>
                 GetImportInManualMappingStage(request, nextDataSetVersion));
     }
-    
+
     private static Either<ActionResult, DataSetVersionImport> GetImportInManualMappingStage(
         NextDataSetVersionCompleteImportRequest request,
         DataSetVersion nextDataSetVersion)
@@ -148,7 +150,7 @@ internal class DataSetVersionMappingService(
         if (nextVersion is null)
         {
             return ValidationUtils.NotFoundResult<DataSetVersion, Guid>(
-                request.DataSetVersionId, 
+                request.DataSetVersionId,
                 nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst());
         }
 
@@ -308,14 +310,14 @@ internal class DataSetVersionMappingService(
                             .Options
                             .Select(option => option.ToRow())
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
+                                keySelector: MappingKeyGenerators.LocationOptionMetaRow,
                                 elementSelector: option => new LocationOptionMapping
                                 {
                                     Source = CreateLocationOptionFromMetaRow(option)
                                 }),
                         Candidates = candidatesForLevel
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
+                                keySelector: MappingKeyGenerators.LocationOptionMetaRow,
                                 elementSelector: CreateLocationOptionFromMetaRow)
                     };
                 });
@@ -337,7 +339,7 @@ internal class DataSetVersionMappingService(
                     Candidates = meta
                         .optionsMeta
                         .ToDictionary(
-                            keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
+                            keySelector: MappingKeyGenerators.LocationOptionMetaRow,
                             elementSelector: CreateLocationOptionFromMetaRow)
                 });
 
@@ -357,7 +359,7 @@ internal class DataSetVersionMappingService(
     {
         var filterMappings = sourceFilterMeta
             .ToDictionary(
-                keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                keySelector: MappingKeyGenerators.Filter,
                 elementSelector: filter =>
                     new FilterMapping
                     {
@@ -365,7 +367,7 @@ internal class DataSetVersionMappingService(
                         OptionMappings = filter
                             .Options
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
+                                keySelector: MappingKeyGenerators.FilterOption,
                                 elementSelector: option =>
                                     new FilterOptionMapping { Source = CreateFilterOptionFromMetaRow(option) })
                     });
@@ -375,14 +377,14 @@ internal class DataSetVersionMappingService(
                 filterMeta: meta.Key,
                 optionsMeta: meta.Value))
             .ToDictionary(
-                keySelector: meta => MappingKeyFunctions.FilterKeyGenerator(meta.filterMeta),
+                keySelector: meta => MappingKeyGenerators.Filter(meta.filterMeta),
                 elementSelector: meta =>
                     new FilterMappingCandidate
                     {
                         Label = meta.filterMeta.Label,
                         Options = meta.optionsMeta
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
+                                keySelector: MappingKeyGenerators.FilterOption,
                                 elementSelector: CreateFilterOptionFromMetaRow)
                     });
 

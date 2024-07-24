@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -262,7 +263,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         Mappings = levelMeta
                             .Options
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionMetaKeyGenerator,
+                                keySelector: MappingKeyGenerators.LocationOptionMeta,
                                 elementSelector: option => new LocationOptionMapping
                                 {
                                     CandidateKey = null,
@@ -332,7 +333,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             Candidates = levelMeta
                                 .options
                                 .ToDictionary(
-                                    keySelector: MappingKeyFunctions.LocationOptionMetaKeyGenerator,
+                                    keySelector: MappingKeyGenerators.LocationOptionMeta,
                                     elementSelector: option => new MappableLocationOption
                                     {
                                         Label = option.Label,
@@ -381,7 +382,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             var expectedFilterMappings = initialFilterMeta
                 .ToDictionary(
-                    keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                    keySelector: MappingKeyGenerators.Filter,
                     elementSelector: filter =>
                         new FilterMapping
                         {
@@ -391,7 +392,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             OptionMappings = filter
                                 .Options
                                 .ToDictionary(
-                                    keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
+                                    keySelector: MappingKeyGenerators.FilterOption,
                                     elementSelector: option =>
                                         new FilterOptionMapping
                                         {
@@ -423,7 +424,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .AbsenceSchool
                 .ExpectedFilters
                 .ToDictionary(
-                    keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                    keySelector: MappingKeyGenerators.Filter,
                     elementSelector: filter =>
                         new FilterMappingCandidate
                         {
@@ -431,7 +432,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             Options = filter
                                 .Options
                                 .ToDictionary(
-                                    keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
+                                    keySelector: MappingKeyGenerators.FilterOption,
                                     elementSelector: optionMeta =>
                                         new MappableFilterOption { Label = optionMeta.Label })
                         });

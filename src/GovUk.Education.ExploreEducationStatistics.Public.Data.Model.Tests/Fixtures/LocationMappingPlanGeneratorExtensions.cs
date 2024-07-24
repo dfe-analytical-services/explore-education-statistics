@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 
@@ -35,7 +36,7 @@ public static class LocationMappingPlanGeneratorExtensions
             sourceLocationsForLevel?.Options.ForEach(option =>
             {
                 levelGenerator.AddMapping(
-                    sourceKey: MappingKeyFunctions.LocationOptionMetaKeyGenerator(option),
+                    sourceKey: MappingKeyGenerators.LocationOptionMeta(option),
                     mapping: fixture
                         .DefaultLocationOptionMapping()
                         .WithSource(fixture.DefaultMappableLocationOption()
@@ -49,7 +50,7 @@ public static class LocationMappingPlanGeneratorExtensions
             targetLocationsForLevel?.Options.ForEach(option =>
             {
                 levelGenerator.AddCandidate(
-                    targetKey: MappingKeyFunctions.LocationOptionMetaKeyGenerator(option),
+                    targetKey: MappingKeyGenerators.LocationOptionMeta(option),
                     candidate: fixture
                         .DefaultMappableLocationOption()
                         .WithLabel(option.Label)

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -57,7 +58,7 @@ public class LocationMetaRepository(
         publicDataDbContext.LocationMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+        var publicIdMappings = await GetPublicIdMappings(dataSetVersion, cancellationToken);
 
         foreach (var meta in metas)
         {
@@ -137,7 +138,7 @@ public class LocationMetaRepository(
                     .Where(hasBatchRowKey)
                     .Select((option, index) => new LocationOptionMetaLink
                     {
-                        PublicId = CreatePublicIdForLocationOptionMetaLink(publicIdMappings, meta, option),
+                        PublicId = GetLocationOptionMetaLinkPublicId(publicIdMappings, meta, option),
                         MetaId = meta.Id,
                         OptionId = option.Id
                     })
@@ -162,7 +163,7 @@ public class LocationMetaRepository(
         }
     }
 
-    private static string CreatePublicIdForLocationOptionMetaLink(
+    private static string GetLocationOptionMetaLinkPublicId(
         PublicIdMappings publicIdMappings,
         GeographicLevel level,
         LocationOptionMetaRow option)
@@ -170,7 +171,7 @@ public class LocationMetaRepository(
         return publicIdMappings
                    .GetPublicIdForCandidate(
                        level: level,
-                       candidateKey: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator(option))
+                       candidateKey: MappingKeyGenerators.LocationOptionMetaRow(option))
                ?? SqidEncoder.Encode(option.Id);
     }
 
@@ -263,23 +264,22 @@ public class LocationMetaRepository(
         };
     }
 
-    private async Task<PublicIdMappings> CreatePublicIdMappings(
+    private async Task<PublicIdMappings> GetPublicIdMappings(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
-        var mappings = await EntityFrameworkQueryableExtensions
-            .SingleOrDefaultAsync(publicDataDbContext
-                    .DataSetVersionMappings,
-                mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id,
-                cancellationToken);
+        var locationMappingPlan = await publicDataDbContext
+                .DataSetVersionMappings
+                .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
+                .Select(mapping => mapping.LocationMappingPlan)
+                .SingleOrDefaultAsync(cancellationToken: cancellationToken);
 
-        if (mappings is null)
+        if (locationMappingPlan is null)
         {
             return new PublicIdMappings();
         }
 
-        var mappingsByLevel = mappings
-            .LocationMappingPlan
+        var mappingsByLevel = locationMappingPlan
             .Levels
             .ToDictionary(
                 keySelector: level => level.Key,
@@ -301,12 +301,8 @@ public class LocationMetaRepository(
 
         public string? GetPublicIdForCandidate(GeographicLevel level, string candidateKey)
         {
-            if (!Levels.TryGetValue(level, out var mappingLevel))
-            {
-                return null;
-            }
-
-            return mappingLevel.GetValueOrDefault(candidateKey);
+            return Levels.GetValueOrDefault(level)
+                ?.GetValueOrDefault(candidateKey);
         }
     }
 }

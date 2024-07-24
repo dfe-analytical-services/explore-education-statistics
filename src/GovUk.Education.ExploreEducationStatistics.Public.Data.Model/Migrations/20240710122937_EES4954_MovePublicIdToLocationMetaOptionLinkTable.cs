@@ -8,8 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
     /// <inheritdoc />
     public partial class EES4954_MovePublicIdToLocationMetaOptionLinkTable : Migration
     {
-        private const string MigrationId = "20240710122937";
-
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -22,10 +20,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             migrationBuilder.CreateIndex(
                 name: "IX_LocationOptionMetaLinks_PublicId",
                 table: "LocationOptionMetaLinks",
-                column: "PublicId");
+                column: "PublicId");            
+            
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetaLinks_MetaId_PublicId",
+                table: "LocationOptionMetaLinks",
+                columns: new[] { "MetaId", "PublicId" },
+                unique: true);
 
-            migrationBuilder.SqlFromFile("Migrations", 
-                $"{MigrationId}_{nameof(EES4954_MovePublicIdToLocationMetaOptionLinkTable)}.sql");
+            migrationBuilder.Sql(
+                """
+                UPDATE "LocationOptionMetaLinks"
+                SET "PublicId" = (
+                  SELECT "PublicId" 
+                  FROM "LocationOptionMetas" 
+                  WHERE "LocationOptionMetas"."Id" = "LocationOptionMetaLinks"."OptionId"
+                )
+                """);
             
             migrationBuilder.AlterColumn<Guid>(
                 name: "PublicId",
@@ -50,6 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
             migrationBuilder.DropColumn(
                 name: "PublicId",
+                table: "LocationOptionMetaLinks");            
+            
+            migrationBuilder.DropIndex(
+                name: "IX_LocationOptionMetaLinks_MetaId_PublicId",
                 table: "LocationOptionMetaLinks");
 
             migrationBuilder.AddColumn<string>(

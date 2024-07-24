@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
@@ -61,7 +62,7 @@ public class FilterMetaRepository(
         publicDataDbContext.FilterMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+        var publicIdMappings = await GetPublicIdMappings(dataSetVersion, cancellationToken);
 
         foreach (var meta in metas)
         {
@@ -135,7 +136,7 @@ public class FilterMetaRepository(
                             publicIdMappings: publicIdMappings,
                             filter: meta,
                             option: option,
-                            defaultPublicIdFn: () => 
+                            defaultPublicIdFn: () =>
                                 SqidEncoder.Encode(startIndex + publicIdsGeneratedFromSequence++)),
                         MetaId = meta.Id,
                         OptionId = option.Id
@@ -219,23 +220,22 @@ public class FilterMetaRepository(
             .ToList();
     }
 
-    private async Task<PublicIdMappings> CreatePublicIdMappings(
+    private async Task<PublicIdMappings> GetPublicIdMappings(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
-        var mappings = await EntityFrameworkQueryableExtensions
-            .SingleOrDefaultAsync(publicDataDbContext
-                    .DataSetVersionMappings,
-                mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id,
-                cancellationToken);
+        var filterMappingPlan = await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
+            .Select(mapping => mapping.FilterMappingPlan)
+            .SingleOrDefaultAsync(cancellationToken: cancellationToken);
 
-        if (mappings is null)
+        if (filterMappingPlan is null)
         {
             return new PublicIdMappings();
         }
 
-        var mappingsByFilter = mappings
-            .FilterMappingPlan
+        var mappingsByFilter = filterMappingPlan
             .Mappings
             .ToDictionary(
                 keySelector: filter => filter.Key,
@@ -259,8 +259,8 @@ public class FilterMetaRepository(
     {
         return publicIdMappings
                    .GetPublicIdForFilterOptionCandidate(
-                       filterKey: MappingKeyFunctions.FilterKeyGenerator(filter),
-                       MappingKeyFunctions.FilterOptionKeyGenerator(option))
+                       filterKey: MappingKeyGenerators.Filter(filter),
+                       filterOptionCandidateKey: MappingKeyGenerators.FilterOption(option))
                ?? defaultPublicIdFn.Invoke();
     }
 
@@ -270,12 +270,9 @@ public class FilterMetaRepository(
 
         public string? GetPublicIdForFilterOptionCandidate(string filterKey, string filterOptionCandidateKey)
         {
-            if (!Filters.TryGetValue(filterKey, out var filterOptionMappings))
-            {
-                return null;
-            }
-
-            return filterOptionMappings.GetValueOrDefault(filterOptionCandidateKey);
+            return Filters
+                .GetValueOrDefault(filterKey)
+                ?.GetValueOrDefault(filterOptionCandidateKey);
         }
     }
 }
