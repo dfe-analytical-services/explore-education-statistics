@@ -18,7 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 public class ApiSubscriptionFunctions(
     ILogger<ApiSubscriptionFunctions> logger,
     IApiSubscriptionService apiSubscriptionService,
-    IValidator<PendingApiSubscriptionCreateRequest> newPendingApiSubscriptionRequestValidator)
+    IValidator<PendingApiSubscriptionCreateRequest> newPendingApiSubscriptionRequestValidator,
+    IValidator<ApiNotificationMessage> apiNotificationMessageValidator)
 {
     [Function("RequestPendingApiSubscription")]
     public async Task<IActionResult> RequestPendingApiSubscription(
@@ -99,12 +100,13 @@ public class ApiSubscriptionFunctions(
 
     [Function("NotifyApiSubscribers")]
     public async Task NotifyApiSubscribers(
-        [QueueTrigger(NotifierQueueStorage.ApiNotificationQueue)] ApiNotificationMessage msg,
+        [QueueTrigger(NotifierQueueStorage.ApiNotificationQueue)] ApiNotificationMessage message,
         CancellationToken cancellationToken)
     {
+        await apiNotificationMessageValidator.ValidateAndThrowAsync(message, cancellationToken);
         await apiSubscriptionService.NotifyApiSubscribers(
-            dataSetId: msg.DataSetId,
-            version: msg.Version,
+            dataSetId: message.DataSetId,
+            version: message.Version,
             cancellationToken: cancellationToken);
     }
 }

@@ -15,7 +15,7 @@ public record ApiNotificationMessage
             RuleFor(request => request.DataSetId)
                 .NotEmpty();
             RuleFor(request => request.Version)
-                .NotNull();
+                .NotEmpty();
         }
     }
 }
