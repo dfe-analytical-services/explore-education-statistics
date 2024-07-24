@@ -67,7 +67,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             Assert.Equal(_dataSetId, response.DataSetId);
             Assert.Equal(DataSetTitle, response.DataSetTitle);
             Assert.Equal(Email, response.Email);
-            Assert.Equal(ApiSubscriptionStatus.SubscriptionPending, response.Status);
+            Assert.Equal(ApiSubscriptionStatus.Pending, response.Status);
 
             // Assert that the verification link contains a valid token
             var extractedEmail = ExtractEmailFromSubscriptionLinkToken(verificationLink);
@@ -81,7 +81,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             Assert.Equal(Email, subscription.RowKey);
             Assert.Equal(_dataSetId.ToString(), subscription.PartitionKey);
             Assert.Equal(DataSetTitle, subscription.DataSetTitle);
-            Assert.Equal(ApiSubscriptionStatus.SubscriptionPending, subscription.Status);
+            Assert.Equal(ApiSubscriptionStatus.Pending, subscription.Status);
             subscription.Expiry.AssertEqual(DateTimeOffset.UtcNow.AddHours(1));
             subscription.Timestamp.AssertUtcNow();
         }
@@ -94,7 +94,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 PartitionKey = _dataSetId.ToString(),
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
-                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Status = ApiSubscriptionStatus.Pending,
                 Expiry = DateTimeOffset.UtcNow.AddHours(1),
             };
 
@@ -232,7 +232,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 PartitionKey = _dataSetId.ToString(),
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
-                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Status = ApiSubscriptionStatus.Pending,
                 Expiry = DateTime.UtcNow.AddHours(1),
             };
 
@@ -343,7 +343,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 PartitionKey = _dataSetId.ToString(),
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
-                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Status = ApiSubscriptionStatus.Pending,
                 Expiry = DateTimeOffset.UtcNow.AddHours(-1)
             };
 
@@ -446,7 +446,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 PartitionKey = _dataSetId.ToString(),
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
-                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Status = ApiSubscriptionStatus.Pending,
                 Expiry = DateTimeOffset.UtcNow,
             };
 
@@ -523,7 +523,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 PartitionKey = Email,
                 RowKey = Guid.NewGuid().ToString(),
                 DataSetTitle = DataSetTitle,
-                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Status = ApiSubscriptionStatus.Pending,
                 Expiry = DateTime.UtcNow.AddHours(-1),
             };
 
@@ -532,7 +532,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 PartitionKey = Email,
                 RowKey = Guid.NewGuid().ToString(),
                 DataSetTitle = DataSetTitle,
-                Status = ApiSubscriptionStatus.SubscriptionPending,
+                Status = ApiSubscriptionStatus.Pending,
                 Expiry = DateTime.UtcNow.AddHours(1),
             };
 

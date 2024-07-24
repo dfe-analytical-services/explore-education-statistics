@@ -154,7 +154,7 @@ internal class ApiSubscriptionService(
             ? subscription.Left is NotFoundResult
                 ? Unit.Instance
                 : subscription.Left
-            : subscription.Right.Status is ApiSubscriptionStatus.SubscriptionPending
+            : subscription.Right.Status is ApiSubscriptionStatus.Pending
                 ? ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.ApiPendingSubscriptionAlreadyExists.Code,
@@ -370,7 +370,7 @@ internal class ApiSubscriptionService(
     private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)
     {
         Expression<Func<ApiSubscription, bool>> filter = s =>
-            s.Status.Equals(ApiSubscriptionStatus.SubscriptionPending.ToString())
+            s.Status.Equals(ApiSubscriptionStatus.Pending.ToString())
             && s.Expiry <= DateTimeOffset.UtcNow;
 
         return await apiSubscriptionRepository.QuerySubscriptions(

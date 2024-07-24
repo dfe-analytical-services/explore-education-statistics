@@ -40,7 +40,7 @@ internal class ApiSubscriptionRepository(
             PartitionKey = dataSetId.ToString(),
             RowKey = email,
             DataSetTitle = dataSetTitle,
-            Status = ApiSubscriptionStatus.SubscriptionPending,
+            Status = ApiSubscriptionStatus.Pending,
             Expiry = expiry
         };
 
