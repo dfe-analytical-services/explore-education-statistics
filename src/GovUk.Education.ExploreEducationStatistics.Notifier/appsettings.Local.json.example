@@ -9,6 +9,7 @@
       "SubscriptionConfirmationId": "change-me",
       "SubscriptionVerificationId": "change-me",
       "ApiSubscriptionConfirmationId": "change-me",
+      "ApiSubscriptionNotificationId": "change-me",
       "ApiSubscriptionVerificationId": "change-me"
     }
   }
