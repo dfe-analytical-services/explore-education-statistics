@@ -26,8 +26,7 @@ public interface IDataSetFileService
         int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
-        Guid dataSetId);
+    Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId);
 
     Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems(
         CancellationToken cancellationToken = default);
