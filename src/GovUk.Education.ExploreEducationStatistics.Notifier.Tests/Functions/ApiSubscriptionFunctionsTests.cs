@@ -37,12 +37,11 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 .Setup(mock => mock.SendEmail(
                     Email,
                     GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionVerificationId,
-                    It.Is<Dictionary<string, dynamic>>(values =>
+                    It.Is<Dictionary<string, dynamic>>(personalisation =>
                         AssertEmailTemplateValues(
-                            values,
+                            personalisation,
                             DataSetTitle,
-                            $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription/",
-                            null)
+                            $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription/")
                     ),
                     null,
                     null,
@@ -51,11 +50,11 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 .Callback((
                         string email,
                         string templateId,
-                        Dictionary<string, dynamic> values,
+                        Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
-                        string oneClickUnsubscribeURL)
-                    => verificationLink = values["verification_link"]);
+                        string oneClickUnsubscribeUrl)
+                    => verificationLink = personalisation[NotifierEmailTemplateFields.VerificationUrl]);
 
             var result = await RequestPendingApiSubscription(
                 dataSetId: _dataSetId,
@@ -219,6 +218,16 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 request: request,
                 cancellationToken: CancellationToken.None);
         }
+
+        private static bool AssertEmailTemplateValues(
+            Dictionary<string, dynamic> personalisation,
+            string dataSetTitle,
+            string verificationLinkPrefix)
+        {
+            Assert.Equal(dataSetTitle, personalisation[NotifierEmailTemplateFields.DataSetTitle]);
+            Assert.StartsWith(verificationLinkPrefix, personalisation[NotifierEmailTemplateFields.VerificationUrl]);
+            return true;
+        }
     }
 
     public class VerifyApiSubscriptionTests(NotifierFunctionsIntegrationTestFixture fixture)
@@ -243,11 +252,10 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 .Setup(mock => mock.SendEmail(
                     Email,
                     GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionConfirmationId,
-                    It.Is<Dictionary<string, dynamic>>(values =>
+                    It.Is<Dictionary<string, dynamic>>(personalisation =>
                         AssertEmailTemplateValues(
-                            values,
+                            personalisation,
                             DataSetTitle,
-                            null,
                             $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
                     ),
                     null,
@@ -257,11 +265,11 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 .Callback((
                         string email,
                         string templateId,
-                        Dictionary<string, dynamic> values,
+                        Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
-                        string oneClickUnsubscribeURL)
-                    => unsubscribeLink = values["unsubscribe_link"]);
+                        string oneClickUnsubscribeUrl)
+                    => unsubscribeLink = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
 
             var tokenService = GetRequiredService<ITokenService>();
             var subscribeToken = tokenService.GenerateToken(pendingSubscription.RowKey,
@@ -388,6 +396,16 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 dataSetId: dataSetId,
                 token: token,
                 cancellationToken: CancellationToken.None);
+        }
+
+        private static bool AssertEmailTemplateValues(
+            Dictionary<string, dynamic> personalisation,
+            string dataSetTitle,
+            string unsubscribeLinkPrefix)
+        {
+            Assert.Equal(dataSetTitle, personalisation[NotifierEmailTemplateFields.DataSetTitle]);
+            Assert.StartsWith(unsubscribeLinkPrefix, personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
+            return true;
         }
     }
 
@@ -577,25 +595,4 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
     }
 
     private static string ExtractToken(string subscriptionLink) => subscriptionLink.Split("/").Last();
-
-    private static bool AssertEmailTemplateValues(
-        Dictionary<string, dynamic> values,
-        string dataSetTitle,
-        string? verificationLinkPrefix,
-        string? unsubscribeLinkPrefix)
-    {
-        Assert.Equal(dataSetTitle, values["api_dataset"]);
-
-        if (verificationLinkPrefix != null)
-        {
-            Assert.Contains(verificationLinkPrefix, values["verification_link"]);
-        }
-
-        if (unsubscribeLinkPrefix != null)
-        {
-            Assert.Contains(unsubscribeLinkPrefix, values["unsubscribe_link"]);
-        }
-
-        return true;
-    }
 }

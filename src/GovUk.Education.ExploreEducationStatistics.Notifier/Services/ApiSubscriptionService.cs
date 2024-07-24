@@ -31,6 +31,8 @@ internal class ApiSubscriptionService(
     IEmailService emailService,
     IApiSubscriptionRepository apiSubscriptionRepository) : IApiSubscriptionService
 {
+    private readonly string _publicAppUrl = appSettingsOptions.Value.PublicAppUrl;
+
     public async Task<Either<ActionResult, ApiSubscriptionViewModel>> RequestPendingSubscription(
         Guid dataSetId,
         string dataSetTitle,
@@ -258,41 +260,36 @@ internal class ApiSubscriptionService(
 
     private void SendVerificationEmail(ApiSubscription subscription)
     {
-        var activationCode = tokenService.GenerateToken(subscription.RowKey, subscription.Expiry!.Value.UtcDateTime);
-
-        var emailTemplateVariables = new Dictionary<string, dynamic>
+        var token = tokenService.GenerateToken(subscription.RowKey, subscription.Expiry!.Value.UtcDateTime);
+        var verificationUrl =
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-subscription/{token}";
+        var personalisation = new Dictionary<string, dynamic>
         {
-            { "api_dataset", subscription.DataSetTitle },
-            {
-                "verification_link",
-                $"{appSettingsOptions.Value.PublicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-subscription/{activationCode}"
-            }
+            { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
+            { NotifierEmailTemplateFields.VerificationUrl, verificationUrl }
         };
 
         emailService.SendEmail(
             email: subscription.RowKey,
             templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionVerificationId,
-            values: emailTemplateVariables);
+            values: personalisation);
     }
 
     private void SendConfirmationEmail(ApiSubscription subscription)
     {
-        var expiryDateTime = DateTime.UtcNow.AddYears(1);
-        var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, expiryDateTime);
-
-        var emailTemplateVariables = new Dictionary<string, dynamic>
+        var token = tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
+        var unsubscribeUrl =
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{token}";
+        var personalisation = new Dictionary<string, dynamic>
         {
-            { "api_dataset", subscription.DataSetTitle },
-            {
-                "unsubscribe_link",
-                $"{appSettingsOptions.Value.PublicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{unsubscribeToken}"
-            }
+            { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
+            { NotifierEmailTemplateFields.UnsubscribeUrl, unsubscribeUrl }
         };
 
         emailService.SendEmail(
             email: subscription.RowKey,
             templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionConfirmationId,
-            values: emailTemplateVariables);
+            values: personalisation);
     }
 
     private static ApiSubscriptionViewModel MapSubscription(ApiSubscription subscription)
@@ -347,28 +344,26 @@ internal class ApiSubscriptionService(
         }
     }
 
-    private void SendNotificationEmail(ApiSubscription subscription, string version)
+    private void SendNotificationEmail(
+        ApiSubscription subscription,
+        string version)
     {
-        var expiryDateTime = DateTime.UtcNow.AddYears(1);
-        var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, expiryDateTime);
-
-        var emailTemplateVariables = new Dictionary<string, dynamic>
+        var token = tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
+        var dataSetUrl = $"{_publicAppUrl}/???/{subscription.PartitionKey}/{version}";
+        var unsubscribeUrl =
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{token}";
+        var personalisation = new Dictionary<string, dynamic>
         {
-            { "api_dataset", subscription.DataSetTitle },
-            {
-                "changelog_link",
-                $"{appSettingsOptions.Value.PublicAppUrl}/???/{subscription.PartitionKey}/{version}"
-            },
-            {
-                "unsubscribe_link",
-                $"{appSettingsOptions.Value.PublicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{unsubscribeToken}"
-            }
+            { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
+            { NotifierEmailTemplateFields.DataSetUrl, dataSetUrl },
+            { NotifierEmailTemplateFields.DataSetVersion, version },
+            { NotifierEmailTemplateFields.UnsubscribeUrl, unsubscribeUrl }
         };
 
         emailService.SendEmail(
             email: subscription.RowKey,
             templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionNotificationId,
-            values: emailTemplateVariables);
+            values: personalisation);
     }
 
     private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)
