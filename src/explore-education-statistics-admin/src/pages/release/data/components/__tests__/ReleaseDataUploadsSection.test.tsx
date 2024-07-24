@@ -461,6 +461,49 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       ).toBeInTheDocument();
     });
+
+    test('does not allow deleting files when linked to an API data set', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], isLinkedToApiDataSet: true },
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+
+      const { user } = render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
+      });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      await user.click(
+        within(sections[0]).getByRole('button', {
+          name: 'Delete files',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Cannot delete files')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText(
+          'This data file has an API data set linked to it. Please remove the API data set before deleting.',
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('replace data file', () => {
@@ -535,6 +578,47 @@ describe('ReleaseDataUploadsSection', () => {
         'href',
         '/publication/publication-1/release/release-1/data/data-2/replace',
       );
+    });
+
+    test('does not allow replacing data when linked to an API data set', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], isLinkedToApiDataSet: true },
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+
+      const { user } = render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
+      });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      await user.click(
+        within(sections[0]).getByRole('button', { name: 'Replace data' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Cannot replace data')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText(
+          'This data file has an API data set linked to it. Please remove the API data set before replacing the data.',
+        ),
+      ).toBeInTheDocument();
     });
   });
 

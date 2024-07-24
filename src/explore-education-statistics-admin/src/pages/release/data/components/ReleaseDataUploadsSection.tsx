@@ -22,6 +22,7 @@ import releaseDataFileService, {
 import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import Modal from '@common/components/Modal';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import logger from '@common/services/logger';
@@ -244,36 +245,68 @@ const ReleaseDataUploadsSection = ({
                               >
                                 Edit title
                               </Link>
-                              <Link
-                                className="govuk-!-margin-right-4"
-                                to={generatePath<ReleaseDataFileReplaceRouteParams>(
-                                  releaseDataFileReplaceRoute.path,
-                                  {
-                                    publicationId,
-                                    releaseId,
-                                    fileId: dataFile.id,
-                                  },
-                                )}
-                              >
-                                Replace data
-                              </Link>
+                              {dataFile.isLinkedToApiDataSet ? (
+                                <Modal
+                                  showClose
+                                  title="Cannot replace data"
+                                  triggerButton={
+                                    <ButtonText>Replace data</ButtonText>
+                                  }
+                                >
+                                  <p>
+                                    This data file has an API data set linked to
+                                    it. Please remove the API data set before
+                                    replacing the data.
+                                  </p>
+                                </Modal>
+                              ) : (
+                                <Link
+                                  className="govuk-!-margin-right-4"
+                                  to={generatePath<ReleaseDataFileReplaceRouteParams>(
+                                    releaseDataFileReplaceRoute.path,
+                                    {
+                                      publicationId,
+                                      releaseId,
+                                      fileId: dataFile.id,
+                                    },
+                                  )}
+                                >
+                                  Replace data
+                                </Link>
+                              )}
                             </>
                           )}
-
-                          <ButtonText
-                            onClick={() =>
-                              releaseDataFileService
-                                .getDeleteDataFilePlan(releaseId, dataFile)
-                                .then(plan => {
-                                  setDeleteDataFile({
-                                    plan,
-                                    file: dataFile,
-                                  });
-                                })
-                            }
-                          >
-                            Delete files
-                          </ButtonText>
+                          {dataFile.isLinkedToApiDataSet ? (
+                            <Modal
+                              showClose
+                              title="Cannot delete files"
+                              triggerButton={
+                                <ButtonText className="govuk-!-margin-left-3">
+                                  Delete files
+                                </ButtonText>
+                              }
+                            >
+                              <p>
+                                This data file has an API data set linked to it.
+                                Please remove the API data set before deleting.
+                              </p>
+                            </Modal>
+                          ) : (
+                            <ButtonText
+                              onClick={() =>
+                                releaseDataFileService
+                                  .getDeleteDataFilePlan(releaseId, dataFile)
+                                  .then(plan => {
+                                    setDeleteDataFile({
+                                      plan,
+                                      file: dataFile,
+                                    });
+                                  })
+                              }
+                            >
+                              Delete files
+                            </ButtonText>
+                          )}
                         </>
                       )}
                     {dataFile.permissions.canCancelImport && (
