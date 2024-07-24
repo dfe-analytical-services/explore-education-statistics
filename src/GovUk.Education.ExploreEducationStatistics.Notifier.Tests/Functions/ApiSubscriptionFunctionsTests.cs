@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
@@ -10,11 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Moq;
 using Notify.Models.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
@@ -48,13 +48,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     null,
                     null))
                 .Returns(It.IsAny<EmailNotificationResponse>())
-                .Callback((string email,
-                           string templateId,
-                           Dictionary<string, dynamic> values,
-                           string clientReference,
-                           string emailReplyToId,
-                           string oneClickUnsubscribeURL)
-                    => verificationLink = values["verification_link"]); ;
+                .Callback((
+                        string email,
+                        string templateId,
+                        Dictionary<string, dynamic> values,
+                        string clientReference,
+                        string emailReplyToId,
+                        string oneClickUnsubscribeURL)
+                    => verificationLink = values["verification_link"]);
 
             var result = await RequestPendingApiSubscription(
                 dataSetId: _dataSetId,
@@ -148,7 +149,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            validationProblem.AssertHasNotEmptyError(expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst());
         }
 
         [Theory]
@@ -165,7 +167,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            validationProblem.AssertHasEmailError(expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst());
+            validationProblem.AssertHasEmailError(
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst());
         }
 
         [Fact]
@@ -178,7 +181,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            validationProblem.AssertHasNotEmptyError(expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst());
         }
 
         [Theory]
@@ -193,7 +197,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            validationProblem.AssertHasNotEmptyError(expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetTitle).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetTitle).ToLowerFirst());
         }
 
         private async Task<IActionResult> RequestPendingApiSubscription(
@@ -249,12 +254,13 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     null,
                     null))
                 .Returns(It.IsAny<EmailNotificationResponse>())
-                .Callback((string email,
-                           string templateId,
-                           Dictionary<string, dynamic> values,
-                           string clientReference,
-                           string emailReplyToId,
-                           string oneClickUnsubscribeURL)
+                .Callback((
+                        string email,
+                        string templateId,
+                        Dictionary<string, dynamic> values,
+                        string clientReference,
+                        string emailReplyToId,
+                        string oneClickUnsubscribeURL)
                     => unsubscribeLink = values["unsubscribe_link"]);
 
             var tokenService = GetRequiredService<ITokenService>();

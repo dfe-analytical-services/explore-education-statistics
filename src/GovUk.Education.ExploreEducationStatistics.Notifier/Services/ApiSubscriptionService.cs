@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -15,12 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Semver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
@@ -106,7 +106,6 @@ internal class ApiSubscriptionService(
                 DeleteSubscription(subscription: subscription, cancellationToken: cancellationToken));
     }
 
-
     public async Task NotifyApiSubscribers(
         Guid dataSetId,
         SemVersion version,
@@ -114,7 +113,11 @@ internal class ApiSubscriptionService(
     {
         var dataSetSubscribers = await apiSubscriptionRepository.QuerySubscriptions(
             filter: s => s.PartitionKey == dataSetId.ToString(),
-            select: new List<string>() { nameof(ApiSubscription.PartitionKey), nameof(ApiSubscription.RowKey) },
+            select: new List<string>
+            {
+                nameof(ApiSubscription.PartitionKey),
+                nameof(ApiSubscription.RowKey)
+            },
             cancellationToken: cancellationToken);
 
         await dataSetSubscribers

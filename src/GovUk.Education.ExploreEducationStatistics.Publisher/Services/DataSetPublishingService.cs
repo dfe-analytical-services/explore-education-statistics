@@ -17,7 +17,7 @@ public class DataSetPublishingService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     INotifierClient notifierClient
-    ) : IDataSetPublishingService
+) : IDataSetPublishingService
 {
     public async Task PublishDataSets(Guid[] releaseVersionIds)
     {

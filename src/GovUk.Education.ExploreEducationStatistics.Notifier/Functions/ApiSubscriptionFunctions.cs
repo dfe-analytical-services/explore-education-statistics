@@ -1,17 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
-using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
-using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
@@ -54,9 +54,9 @@ public class ApiSubscriptionFunctions(
         try
         {
             return await apiSubscriptionService.VerifySubscription(
-                dataSetId: dataSetId,
-                token: token,
-                cancellationToken: cancellationToken)
+                    dataSetId: dataSetId,
+                    token: token,
+                    cancellationToken: cancellationToken)
                 .HandleFailuresOr(subscription => new OkObjectResult(subscription));
         }
         catch (Exception ex)
@@ -77,9 +77,9 @@ public class ApiSubscriptionFunctions(
         try
         {
             return await apiSubscriptionService.Unsubscribe(
-                dataSetId: dataSetId,
-                token: token,
-                cancellationToken: cancellationToken)
+                    dataSetId: dataSetId,
+                    token: token,
+                    cancellationToken: cancellationToken)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
         catch (Exception ex)
@@ -100,7 +100,6 @@ public class ApiSubscriptionFunctions(
     [Function("NotifyApiSubscribers")]
     public async Task NotifyApiSubscribers(
         [QueueTrigger(NotifierQueueStorage.ApiNotificationQueue)] ApiNotificationMessage msg,
-        FunctionContext context,
         CancellationToken cancellationToken)
     {
         await apiSubscriptionService.NotifyApiSubscribers(

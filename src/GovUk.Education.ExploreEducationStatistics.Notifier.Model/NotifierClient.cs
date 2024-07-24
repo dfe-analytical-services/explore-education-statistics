@@ -10,7 +10,7 @@ public class NotifierClient(string connectionString) : INotifierClient
     private readonly QueueServiceClient _queueServiceClient = new(connectionString);
 
     public async Task NotifyPublicationSubscribers(
-        IReadOnlyList<ReleaseNotificationMessage> messages, 
+        IReadOnlyList<ReleaseNotificationMessage> messages,
         CancellationToken cancellationToken = default)
     {
         await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ReleaseNotificationQueue,
@@ -19,7 +19,7 @@ public class NotifierClient(string connectionString) : INotifierClient
     }
 
     public async Task NotifyApiSubscribers(
-        IReadOnlyList<ApiNotificationMessage> messages, 
+        IReadOnlyList<ApiNotificationMessage> messages,
         CancellationToken cancellationToken = default)
     {
         await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ApiNotificationQueue,
