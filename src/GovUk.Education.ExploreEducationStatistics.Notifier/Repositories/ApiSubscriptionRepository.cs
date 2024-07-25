@@ -17,7 +17,7 @@ internal class ApiSubscriptionRepository(
     IOptions<AppSettingsOptions> appSettingsOptions,
     IApiSubscriptionTableStorageService apiSubscriptionTableStorage) : IApiSubscriptionRepository
 {
-    private const string _apiSubscriptionsTableName = Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName;
+    private const string _apiSubscriptionsTableName = NotifierTableStorageTableNames.ApiSubscriptionsTableName;
 
     public async Task<ApiSubscription?> GetSubscription(
         Guid dataSetId,

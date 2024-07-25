@@ -69,7 +69,7 @@ public abstract class NotifierFunctionsIntegrationTest
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         await dataTableStorageService.BatchManipulateEntities(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             entities: subscriptions,
             tableTransactionActionType: TableTransactionActionType.Add);
     }
@@ -79,7 +79,7 @@ public abstract class NotifierFunctionsIntegrationTest
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         await dataTableStorageService.CreateEntity(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             entity: subscription);
     }
 
@@ -91,7 +91,7 @@ public abstract class NotifierFunctionsIntegrationTest
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         return await dataTableStorageService.GetEntityIfExists<ApiSubscription>(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             select: select);
@@ -105,7 +105,7 @@ public abstract class NotifierFunctionsIntegrationTest
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         var pagedSubscriptions = await dataTableStorageService.QueryEntities(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorageTableNames.ApiSubscriptionsTableName,
             filter: filter,
             maxPerPage: maxPerPage,
             select: select,

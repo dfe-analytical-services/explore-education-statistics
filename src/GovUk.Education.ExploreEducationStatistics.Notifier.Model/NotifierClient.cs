@@ -13,7 +13,7 @@ public class NotifierClient(string connectionString) : INotifierClient
         IReadOnlyList<ReleaseNotificationMessage> messages, 
         CancellationToken cancellationToken = default)
     {
-        await _queueServiceClient.SendMessagesAsJson(Constants.NotifierQueueStorage.ReleaseNotificationQueue,
+        await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ReleaseNotificationQueue,
             messages,
             cancellationToken);
     }
@@ -22,7 +22,7 @@ public class NotifierClient(string connectionString) : INotifierClient
         IReadOnlyList<ApiNotificationMessage> messages, 
         CancellationToken cancellationToken = default)
     {
-        await _queueServiceClient.SendMessagesAsJson(Constants.NotifierQueueStorage.ApiNotificationQueue,
+        await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ApiNotificationQueue,
             messages,
             cancellationToken);
     }

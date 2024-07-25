@@ -41,12 +41,12 @@ public class ReleaseNotifier
 
     [Function("ReleaseNotifier")]
     public async Task ReleaseNotifierFunc(
-        [QueueTrigger(Constants.NotifierQueueStorage.ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
+        [QueueTrigger(NotifierQueueStorage.ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
         FunctionContext context)
     {
         _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var subscribersTable = await _publicationSubscriptionRepository.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName);
+        var subscribersTable = await _publicationSubscriptionRepository.GetTable(NotifierTableStorageTableNames.PublicationSubscriptionsTableName);
 
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
