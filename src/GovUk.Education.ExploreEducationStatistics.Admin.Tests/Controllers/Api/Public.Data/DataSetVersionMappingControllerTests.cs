@@ -1332,12 +1332,10 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Theory]
-        [InlineData(MappingType.ManualMapped, MappingType.None, false)]
         [InlineData(MappingType.ManualMapped, MappingType.AutoNone, false)]
         [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, true)]
         [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, true)]
         [InlineData(MappingType.ManualMapped, MappingType.ManualNone, true)]
-        [InlineData(MappingType.ManualNone, MappingType.None, false)]
         [InlineData(MappingType.ManualNone, MappingType.AutoNone, false)]
         [InlineData(MappingType.ManualNone, MappingType.AutoMapped, true)]
         [InlineData(MappingType.ManualNone, MappingType.ManualMapped, true)]

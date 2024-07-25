@@ -22,7 +22,6 @@ internal class DataSetVersionMappingService(
 {
     private static readonly MappingType[] IncompleteMappingTypes =
     [
-        MappingType.None,
         MappingType.AutoNone
     ];
 

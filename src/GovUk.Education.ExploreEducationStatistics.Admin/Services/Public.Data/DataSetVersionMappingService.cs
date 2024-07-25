@@ -34,7 +34,6 @@ public class DataSetVersionMappingService(
 {
     private static readonly MappingType[] IncompleteMappingTypes =
     [
-        MappingType.None,
         MappingType.AutoNone
     ];
 
@@ -158,14 +157,14 @@ public class DataSetVersionMappingService(
     private async Task UpdateVersionNumber(
         Guid nextDataSetVersionId,
         List<MappingType> locationMappingTypes,
-        List<(MappingType filterType, MappingType optionType)> filterAndOptionMappingTypes,
+        List<FilterAndOptionMappingTypeDto> filterAndOptionMappingTypes,
         CancellationToken cancellationToken)
     {
         // Consider the current mappings to produce a major version change if any options from the
         // original data set version are currently not mapped to options in the new version.
         var majorVersionUpdate = locationMappingTypes
             .Concat(filterAndOptionMappingTypes
-                .Select(mappings => mappings.optionType))
+                .Select(mappings => mappings.OptionMappingType))
             .Any(type => NoMappingTypes.Contains(type));
 
         var currentVersionNumber = await publicDataDbContext
@@ -201,7 +200,7 @@ public class DataSetVersionMappingService(
     private async Task UpdateMappingCompleteFlags(
         Guid nextDataSetVersionId,
         List<MappingType> locationMappingTypes,
-        List<(MappingType filterType, MappingType optionType)> filterAndOptionMappingTypes,
+        List<FilterAndOptionMappingTypeDto> filterAndOptionMappingTypes,
         CancellationToken cancellationToken)
     {
         // Find any location options that have a mapping type that indicates the user
@@ -217,8 +216,8 @@ public class DataSetVersionMappingService(
         // the resolution of these unmapped filters, and so without ignoring these, the user
         // would never be able to complete the mappings.
         var filterMappingsComplete = !filterAndOptionMappingTypes
-            .Where(types => types.filterType != MappingType.AutoNone)
-            .Any(types => IncompleteMappingTypes.Contains(types.optionType));
+            .Where(types => types.FilterMappingType != MappingType.AutoNone)
+            .Any(types => IncompleteMappingTypes.Contains(types.OptionMappingType));
 
         // Update the mapping complete flags.
         await publicDataDbContext
@@ -261,7 +260,7 @@ public class DataSetVersionMappingService(
 #pragma warning restore EF1002
 
 #pragma warning disable EF1002
-    private async Task<List<(MappingType filterType, MappingType optionType)>> GetDistinctFilterAndOptionMappingTypes(
+    private async Task<List<FilterAndOptionMappingTypeDto>> GetDistinctFilterAndOptionMappingTypes(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
     {
@@ -270,12 +269,12 @@ public class DataSetVersionMappingService(
         // Find all the distinct combinations of parent filters' mapping types against the distinct
         // mapping types of their children.
         var typeCombinations = await publicDataDbContext
-            .Set<FilterAndOptionMappingTypeTuple>()
+            .Set<FilterAndOptionMappingTypeDto>()
             .FromSqlRaw(sql:
                 $"""
                  SELECT DISTINCT 
-                     FilterMappingType "{nameof(FilterAndOptionMappingTypeTuple.FilterMappingType)}",
-                     OptionMappingType "{nameof(FilterAndOptionMappingTypeTuple.OptionMappingType)}" 
+                     FilterMappingType "{nameof(FilterAndOptionMappingTypeDto.FilterMappingType)}",
+                     OptionMappingType "{nameof(FilterAndOptionMappingTypeDto.OptionMappingType)}" 
                  FROM (
                      SELECT FilterMappingType, OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
                      jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" -> 'Mappings') FilterMapping,
@@ -288,12 +287,7 @@ public class DataSetVersionMappingService(
                 parameters: [targetDataSetVersionIdParam])
             .ToListAsync(cancellationToken);
 
-        return typeCombinations
-            .Select(types => (
-                filterType: EnumUtil.GetFromEnumValue<MappingType>(types.FilterMappingType),
-                optionType: EnumUtil.GetFromEnumValue<MappingType>(types.OptionMappingType)
-            ))
-            .ToList();
+        return typeCombinations;
     }
 #pragma warning restore EF1002
 

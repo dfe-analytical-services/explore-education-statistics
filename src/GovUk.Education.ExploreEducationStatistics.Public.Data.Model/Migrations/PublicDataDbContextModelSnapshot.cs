@@ -246,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToTable("DataSetVersionMappings");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos.FilterAndOptionMappingTypeTuple", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos.FilterAndOptionMappingTypeDto", b =>
                 {
                     b.Property<string>("FilterMappingType")
                         .IsRequired()

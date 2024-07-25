@@ -38,7 +38,7 @@ public class PublicDataDbContext : DbContext
         modelBuilder.Entity<JsonFragment>().HasNoKey().ToView(null);
         modelBuilder.Entity<JsonBool>().HasNoKey().ToView(null);
         modelBuilder.Entity<JsonString>().HasNoKey().ToView(null);
-        modelBuilder.Entity<FilterAndOptionMappingTypeTuple>().HasNoKey().ToView(null);
+        modelBuilder.Entity<FilterAndOptionMappingTypeDto>().HasNoKey().ToView(null);
     }
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
@@ -76,8 +76,4 @@ public class PublicDataDbContext : DbContext
     public DbSet<LocationOptionMetaChange> LocationOptionMetaChanges { get; init; } = null!;
     public DbSet<TimePeriodMetaChange> TimePeriodMetaChanges { get; init; } = null!;
     public DbSet<PreviewToken> PreviewTokens { get; init; } = null!;
-    public DbSet<JsonFragment> JsonFragments { get; init; } = null!;
-    public DbSet<JsonBool> JsonBools { get; init; } = null!;
-    public DbSet<JsonString> JsonStrings { get; init; } = null!;
-    public DbSet<FilterAndOptionMappingTypeTuple> FilterAndOptionMappingTypes { get; init; } = null!;
 }
