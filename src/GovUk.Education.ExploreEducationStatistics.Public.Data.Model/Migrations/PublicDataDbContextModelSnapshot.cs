@@ -45,10 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToView(null, (string)null);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonInt", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonString", b =>
                 {
-                    b.Property<int>("IntValue")
-                        .HasColumnType("integer");
+                    b.Property<string>("StringValue")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.ToTable((string)null);
 
@@ -243,6 +244,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId");
 
                     b.ToTable("DataSetVersionMappings");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos.FilterAndOptionMappingTypeTuple", b =>
+                {
+                    b.Property<string>("FilterMappingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OptionMappingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>

@@ -488,8 +488,8 @@ public abstract class DataSetVersionMappingControllerTests(
                 .DataSetVersionMappings
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            // Assert that the batch save calculates the location mappings as expected given the combination
-            // of the requested mapping update and the existing mapping that is untouched. 
+            // Assert that the batch save calculates the LocationMappingsComplete flag as expected given
+            // the combination of the requested mapping update and the existing mapping that is untouched. 
             Assert.Equal(expectedMappingsComplete, updatedMappings.LocationMappingsComplete);
         }
 
@@ -608,7 +608,7 @@ public abstract class DataSetVersionMappingControllerTests(
             // Assert that the batch save calculates the next data set version correctly. 
             Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.Version);
         }
-        
+
         [Fact]
         public async Task SourceKeyDoesNotExist_Returns400_AndRollsBackTransaction()
         {
@@ -1447,8 +1447,8 @@ public abstract class DataSetVersionMappingControllerTests(
                 .DataSetVersionMappings
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            // Assert that the batch save calculates the location mappings as expected given the combination
-            // of the requested mapping update and the existing mapping that is untouched. 
+            // Assert that the batch save calculates the LocationMappingsComplete flag as expected given the
+            // combination of the requested mapping update and the existing mapping that is untouched. 
             Assert.Equal(expectedMappingsComplete, updatedMappings.FilterMappingsComplete);
         }
 
@@ -1658,7 +1658,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .Include(m => m.TargetDataSetVersion)
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            // Assert that the batch save calculates the filter mappings always as major,
+            // Assert that the batch save calculates the next version number as a major change,
             // as filter options that were in the source data set version no longer appear in the
             // next version. 
             Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);

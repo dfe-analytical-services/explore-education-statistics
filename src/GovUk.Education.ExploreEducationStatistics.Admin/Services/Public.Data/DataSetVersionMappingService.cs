@@ -134,7 +134,7 @@ public class DataSetVersionMappingService(
 
     private async Task UpdateMappingsCompleteAndVersion(Guid nextDataSetVersionId, CancellationToken cancellationToken)
     {
-        var locationMappingTypes = await GetLocationOptionMappingTypes(
+        var locationMappingTypes = await GetDistinctLocationOptionMappingTypes(
             nextDataSetVersionId: nextDataSetVersionId,
             cancellationToken: cancellationToken);
 
@@ -142,7 +142,7 @@ public class DataSetVersionMappingService(
             nextDataSetVersionId: nextDataSetVersionId,
             cancellationToken: cancellationToken);
 
-        await UpdateMappingsComplete(
+        await UpdateMappingCompleteFlags(
             nextDataSetVersionId: nextDataSetVersionId,
             locationMappingTypes: locationMappingTypes,
             filterAndOptionMappingTypes: filterAndOptionMappingTypes,
@@ -168,7 +168,7 @@ public class DataSetVersionMappingService(
                 .Select(mappings => mappings.optionType))
             .Any(type => NoMappingTypes.Contains(type));
 
-        var currentVersion = await publicDataDbContext
+        var currentVersionNumber = await publicDataDbContext
             .DataSetVersionMappings
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.SourceDataSetVersion)
@@ -179,26 +179,26 @@ public class DataSetVersionMappingService(
             })
             .SingleAsync(cancellationToken);
 
-        var nextVersion = majorVersionUpdate
+        var nextVersionNumber = majorVersionUpdate
             ? new
             {
-                major = currentVersion.major + 1,
+                major = currentVersionNumber.major + 1,
                 minor = 0
             }
-            : currentVersion with { minor = currentVersion.minor + 1 };
+            : currentVersionNumber with { minor = currentVersionNumber.minor + 1 };
 
         await publicDataDbContext
             .DataSetVersions
             .Where(dataSetVersion => dataSetVersion.Id == nextDataSetVersionId)
             .ExecuteUpdateAsync(
                 setPropertyCalls: s => s
-                    .SetProperty(dataSetVersion => dataSetVersion.VersionMajor, nextVersion.major)
-                    .SetProperty(dataSetVersion => dataSetVersion.VersionMinor, nextVersion.minor)
+                    .SetProperty(dataSetVersion => dataSetVersion.VersionMajor, nextVersionNumber.major)
+                    .SetProperty(dataSetVersion => dataSetVersion.VersionMinor, nextVersionNumber.minor)
                     .SetProperty(dataSetVersion => dataSetVersion.VersionPatch, 0),
                 cancellationToken: cancellationToken);
     }
 
-    private async Task UpdateMappingsComplete(
+    private async Task UpdateMappingCompleteFlags(
         Guid nextDataSetVersionId,
         List<MappingType> locationMappingTypes,
         List<(MappingType filterType, MappingType optionType)> filterAndOptionMappingTypes,
@@ -232,18 +232,13 @@ public class DataSetVersionMappingService(
     }
 
 #pragma warning disable EF1002
-    private async Task<List<MappingType>> GetLocationOptionMappingTypes(
+    private async Task<List<MappingType>> GetDistinctLocationOptionMappingTypes(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
     {
         var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
 
-        // Query to find any mappings under any levels that have a mapping type of "None" or "AutoNone".
-        // This query iterates through each top-level LocationLevelMappings in the LocationMappingPlan and
-        // for each of the Level's LocationOptionMappings, checks to see if any exist with mapping type
-        // "None" or "AutoNone".
-        //
-        // If any exist, mappings are not yet complete.
+        // Find the distinct mapping types across all location options across all levels.
         var types = await publicDataDbContext
             .Set<JsonString>()
             .FromSqlRaw(sql:
@@ -272,7 +267,7 @@ public class DataSetVersionMappingService(
     {
         var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
 
-        // Query to find all distinct combinations of parent filters' mapping types versus the distinct
+        // Find all the distinct combinations of parent filters' mapping types against the distinct
         // mapping types of their children.
         var typeCombinations = await publicDataDbContext
             .Set<FilterAndOptionMappingTypeTuple>()
