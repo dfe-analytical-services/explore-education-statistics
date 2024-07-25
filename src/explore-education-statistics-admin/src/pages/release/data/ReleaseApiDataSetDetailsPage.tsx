@@ -7,6 +7,7 @@ import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext'
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetLocationsMappingRoute,
+  releaseApiDataSetPreviewRoute,
   releaseApiDataSetsRoute,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
@@ -64,22 +65,45 @@ export default function ReleaseApiDataSetDetailsPage() {
       publicationId={release.publicationId}
       collapsibleButtonHiddenText="for draft version"
       actions={
-        canUpdateRelease && dataSet.draftVersion.status !== 'Processing' ? (
-          <DeleteDraftVersionButton
-            dataSet={dataSet}
-            dataSetVersion={dataSet.draftVersion}
-            onDeleted={() =>
-              history.push(
-                generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
-                }),
-              )
-            }
-          >
-            Remove draft version
-          </DeleteDraftVersionButton>
-        ) : undefined
+        <ul className="govuk-list">
+          {dataSet.draftVersion.status === 'Draft' && (
+            <li>
+              <Link
+                to={generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetPreviewRoute.path,
+                  {
+                    publicationId: release.publicationId,
+                    releaseId: release.id,
+                    dataSetId,
+                  },
+                )}
+              >
+                Preview API data set
+              </Link>
+            </li>
+          )}
+          {canUpdateRelease && dataSet.draftVersion.status !== 'Processing' && (
+            <li>
+              <DeleteDraftVersionButton
+                dataSet={dataSet}
+                dataSetVersion={dataSet.draftVersion}
+                onDeleted={() =>
+                  history.push(
+                    generatePath<ReleaseRouteParams>(
+                      releaseApiDataSetsRoute.path,
+                      {
+                        publicationId: release.publicationId,
+                        releaseId: release.id,
+                      },
+                    ),
+                  )
+                }
+              >
+                Remove draft version
+              </DeleteDraftVersionButton>
+            </li>
+          )}
+        </ul>
       }
     />
   ) : null;
