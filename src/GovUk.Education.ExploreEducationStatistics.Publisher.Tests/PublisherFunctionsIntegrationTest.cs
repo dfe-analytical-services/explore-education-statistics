@@ -5,18 +5,20 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Testcontainers.Azurite;
 using Testcontainers.PostgreSql;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests;
 
 public abstract class PublisherFunctionsIntegrationTest(
-    FunctionsIntegrationTestFixture fixture)
+    PublisherFunctionsIntegrationTestFixture fixture)
     : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
 {
     public async Task InitializeAsync()
@@ -27,7 +29,12 @@ public abstract class PublisherFunctionsIntegrationTest(
 
     public Task DisposeAsync()
     {
-        return Task.CompletedTask;
+        return ClearAzureDataTableTestData(StorageConnectionString());
+    }
+
+    protected string StorageConnectionString()
+    {
+        return fixture.StorageConnectionString();
     }
 }
 
@@ -38,14 +45,26 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         .WithImage("postgres:16.1-alpine")
         .Build();
 
+    private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.31.0")
+        .WithInMemoryPersistence()
+        .Build();
+
     public async Task DisposeAsync()
     {
+        await _azuriteContainer.DisposeAsync();
         await _postgreSqlContainer.DisposeAsync();
     }
 
     public async Task InitializeAsync()
     {
+        await _azuriteContainer.StartAsync();
         await _postgreSqlContainer.StartAsync();
+    }
+
+    public string StorageConnectionString()
+    {
+        return _azuriteContainer.GetConnectionString();
     }
 
     public override IHostBuilder ConfigureTestHostBuilder()
@@ -53,9 +72,30 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         return base
             .ConfigureTestHostBuilder()
             .ConfigurePublisherHostBuilder()
-            .ConfigureAppConfiguration((hostBuilderContext, configBuilder) =>
-                configBuilder
-                    .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false))
+            .ConfigureAppConfiguration(builder =>
+            {
+                builder
+                    .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false)
+                    .AddInMemoryCollection(new Dictionary<string, string?>
+                    {
+                        {
+                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PrivateStorageConnectionString)}",
+                            _azuriteContainer.GetConnectionString()
+                        },
+                        {
+                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PublicStorageConnectionString)}",
+                            _azuriteContainer.GetConnectionString()
+                        },
+                        {
+                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.NotifierStorageConnectionString)}",
+                            _azuriteContainer.GetConnectionString()
+                        },
+                        {
+                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PublisherStorageConnectionString)}",
+                            _azuriteContainer.GetConnectionString()
+                        }
+                    });
+            })
             .ConfigureServices(services =>
             {
                 services.UseInMemoryDbContext<ContentDbContext>();

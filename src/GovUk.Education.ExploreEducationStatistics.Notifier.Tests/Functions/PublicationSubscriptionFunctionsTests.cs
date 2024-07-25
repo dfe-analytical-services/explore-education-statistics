@@ -40,7 +40,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -104,7 +104,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -170,7 +170,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -228,7 +228,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -273,7 +273,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -318,7 +318,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -363,7 +363,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -418,7 +418,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -479,7 +479,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);

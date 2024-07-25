@@ -38,8 +38,8 @@ public static class NotifierHostBuilder
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
                     .AddFluentValidation()
-                    .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.AppSettings))
-                    .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.GovUkNotify))
+                    .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.Section))
+                    .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.Section))
                     .AddTransient<INotificationClient>(serviceProvider =>
                     {
                         var govUkNotifyOptions = serviceProvider.GetRequiredService<IOptions<GovUkNotifyOptions>>();

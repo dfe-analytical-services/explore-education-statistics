@@ -57,7 +57,6 @@ public class TestStartup : Startup
             .UseInMemoryDbContext<UsersAndRolesDbContext>()
             .MockService<IDataProcessorClient>()
             .MockService<IPublisherClient>()
-            .MockService<ICoreTableStorageService>()
             .MockService<IPublisherTableStorageService>()
             .MockService<IPrivateBlobStorageService>()
             .MockService<IPublicBlobStorageService>()

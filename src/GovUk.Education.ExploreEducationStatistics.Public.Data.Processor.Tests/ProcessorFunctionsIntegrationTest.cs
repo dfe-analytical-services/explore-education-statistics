@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -167,7 +168,10 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             {
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    { "CoreStorage", _azuriteContainer.GetConnectionString() }
+                    {
+                        $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PrivateStorageConnectionString)}",
+                        _azuriteContainer.GetConnectionString()
+                    }
                 });
             })
             .ConfigureServices(services =>
