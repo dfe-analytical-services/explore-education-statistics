@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 /// <summary>
 /// Used as a DTO by <see cref="PostgreSqlRepository" /> to extract arbitrary JSON fragments from JSONB columns.
-/// In order to use this in a DbContext, to must be registered as a DTO by adding the following configuration to
+/// In order to use this in a DbContext, it must be registered as a DTO by adding the following configuration to
 /// the OnModelBuilding() method of the DbContext:
 /// <code>
 /// modelBuilder.Entity&lt;JsonFragment&gt;().HasNoKey().ToView(null);
@@ -15,7 +15,7 @@ public record JsonFragment(string? JsonValue);
 
 /// <summary>
 /// Used as a DTO by <see cref="PostgreSqlRepository" /> to extract boolean results from JSONB queries.
-/// In order to use this in a DbContext, to must be registered as a DTO by adding the following configuration to
+/// In order to use this in a DbContext, it must be registered as a DTO by adding the following configuration to
 /// the OnModelBuilding() method of the DbContext:
 /// <code>
 /// modelBuilder.Entity&lt;JsonBool&gt;().HasNoKey().ToView(null);
@@ -24,11 +24,21 @@ public record JsonFragment(string? JsonValue);
 public record JsonBool(bool BoolValue);
 
 /// <summary>
-/// Used as a DTO by <see cref="PostgreSqlRepository" /> to extract boolean results from JSONB queries.
-/// In order to use this in a DbContext, to must be registered as a DTO by adding the following configuration to
+/// Used as a DTO by <see cref="PostgreSqlRepository" /> to extract int results from JSONB queries.
+/// In order to use this in a DbContext, it must be registered as a DTO by adding the following configuration to
 /// the OnModelBuilding() method of the DbContext:
 /// <code>
-/// modelBuilder.Entity&lt;JsonBool&gt;().HasNoKey().ToView(null);
+/// modelBuilder.Entity&lt;JsonInt&gt;().HasNoKey().ToView(null);
 /// </code>
 /// </summary>
 public record JsonInt(int IntValue);
+
+/// <summary>
+/// Used as a DTO by <see cref="PostgreSqlRepository" /> to extract string results from JSONB queries.
+/// In order to use this in a DbContext, it must be registered as a DTO by adding the following configuration to
+/// the OnModelBuilding() method of the DbContext:
+/// <code>
+/// modelBuilder.Entity&lt;JsonString&gt;().HasNoKey().ToView(null);
+/// </code>
+/// </summary>
+public record JsonString(string StringValue);
