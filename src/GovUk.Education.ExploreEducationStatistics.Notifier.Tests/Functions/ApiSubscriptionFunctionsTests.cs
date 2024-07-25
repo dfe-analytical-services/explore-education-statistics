@@ -26,7 +26,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
     private const string DataSetTitle = "data set title";
     private const string Email = "test@test.com";
 
-    public class RequestPendingApiSubscriptionTests(NotifierFunctionsIntegrationTestFixture fixture)
+    public class RequestPendingSubscriptionTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
         [Fact]
@@ -56,7 +56,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                         string oneClickUnsubscribeUrl)
                     => verificationLink = personalisation[NotifierEmailTemplateFields.VerificationUrl]);
 
-            var result = await RequestPendingApiSubscription(
+            var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
                 email: Email);
@@ -99,7 +99,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             await CreateApiSubscription(subscription);
 
-            var result = await RequestPendingApiSubscription(
+            var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
                 email: Email);
@@ -124,7 +124,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             await CreateApiSubscription(subscription);
 
-            var result = await RequestPendingApiSubscription(
+            var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
                 email: Email);
@@ -141,7 +141,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [InlineData("")]
         public async Task EmailEmpty_400(string? email)
         {
-            var result = await RequestPendingApiSubscription(
+            var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
                 email: email!);
@@ -159,7 +159,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [InlineData("@test")]
         public async Task EmailNotValid_400(string email)
         {
-            var result = await RequestPendingApiSubscription(
+            var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
                 email: email);
@@ -173,7 +173,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [Fact]
         public async Task DataSetIdEmpty_400()
         {
-            var result = await RequestPendingApiSubscription(
+            var result = await RequestPendingSubscription(
                 dataSetId: Guid.Empty,
                 dataSetTitle: DataSetTitle,
                 email: Email);
@@ -189,7 +189,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [InlineData("")]
         public async Task DataSetTitleEmpty_400(string? dataSetTitle)
         {
-            var result = await RequestPendingApiSubscription(
+            var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: dataSetTitle!,
                 email: Email);
@@ -200,7 +200,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetTitle).ToLowerFirst());
         }
 
-        private async Task<IActionResult> RequestPendingApiSubscription(
+        private async Task<IActionResult> RequestPendingSubscription(
             Guid dataSetId,
             string dataSetTitle,
             string email)
@@ -212,9 +212,9 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 Email = email
             };
 
-            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionFunctions>();
+            var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
-            return await apiSubscriptionManager.RequestPendingApiSubscription(
+            return await functions.RequestPendingSubscription(
                 request: request,
                 cancellationToken: CancellationToken.None);
         }
@@ -230,7 +230,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         }
     }
 
-    public class VerifyApiSubscriptionTests(NotifierFunctionsIntegrationTestFixture fixture)
+    public class VerifySubscriptionTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
         [Fact]
@@ -275,7 +275,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var subscribeToken = tokenService.GenerateToken(pendingSubscription.RowKey,
                 pendingSubscription.Expiry.Value.UtcDateTime);
 
-            var result = await VerifyApiSubscription(
+            var result = await VerifySubscription(
                 dataSetId: _dataSetId,
                 token: subscribeToken);
 
@@ -309,7 +309,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var subscribeToken = tokenService.GenerateToken(Email, DateTime.UtcNow);
 
-            var result = await VerifyApiSubscription(
+            var result = await VerifySubscription(
                 dataSetId: _dataSetId,
                 token: subscribeToken);
 
@@ -332,7 +332,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var subscribeToken = tokenService.GenerateToken(verifiedSubscription.RowKey, DateTime.UtcNow);
 
-            var result = await VerifyApiSubscription(
+            var result = await VerifySubscription(
                 dataSetId: _dataSetId,
                 token: subscribeToken);
 
@@ -360,7 +360,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var subscribeToken = tokenService.GenerateToken(verifiedSubscription.RowKey, DateTime.UtcNow);
 
-            var result = await VerifyApiSubscription(
+            var result = await VerifySubscription(
                 dataSetId: _dataSetId,
                 token: subscribeToken);
 
@@ -374,7 +374,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [Fact]
         public async Task SubscribeTokenInvalid_400()
         {
-            var result = await VerifyApiSubscription(
+            var result = await VerifySubscription(
                 dataSetId: _dataSetId,
                 token: "");
 
@@ -385,13 +385,13 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code);
         }
 
-        private async Task<IActionResult> VerifyApiSubscription(
+        private async Task<IActionResult> VerifySubscription(
             Guid dataSetId,
             string token)
         {
-            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionFunctions>();
+            var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
-            return await apiSubscriptionManager.VerifyApiSubscription(
+            return await functions.VerifySubscription(
                 request: null!,
                 dataSetId: dataSetId,
                 token: token,
@@ -409,7 +409,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         }
     }
 
-    public class ApiUnsubscribeTests(NotifierFunctionsIntegrationTestFixture fixture)
+    public class UnsubscribeTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
         [Fact]
@@ -520,9 +520,9 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             Guid dataSetId,
             string token)
         {
-            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionFunctions>();
+            var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
-            return await apiSubscriptionManager.ApiUnsubscribe(
+            return await functions.Unsubscribe(
                 request: null!,
                 dataSetId: dataSetId,
                 token: token,
@@ -530,7 +530,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         }
     }
 
-    public class RemoveExpiredApiSubscriptionsTests(NotifierFunctionsIntegrationTestFixture fixture)
+    public class RemoveExpiredSubscriptionsTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
         [Fact]
@@ -565,7 +565,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             await CreateApiSubscriptions(pendingAndExpiredSubscription, pendingSubscription, subscribedSubscription);
 
-            await RemoveExpiredApiSubscriptions();
+            await RemoveExpiredSubscriptions();
 
             var subscriptions = await QueryApiSubscriptions();
 
@@ -575,11 +575,11 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             Assert.Single(subscriptions, s => s.RowKey == subscribedSubscription.RowKey);
         }
 
-        private async Task RemoveExpiredApiSubscriptions(TimerInfo? timerInfo = null)
+        private async Task RemoveExpiredSubscriptions(TimerInfo? timerInfo = null)
         {
-            var apiSubscriptionManager = GetRequiredService<ApiSubscriptionFunctions>();
+            var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
-            await apiSubscriptionManager.RemoveExpiredApiSubscriptions(
+            await functions.RemoveExpiredSubscriptions(
                 timerInfo: timerInfo ?? new TimerInfo(),
                 cancellationToken: CancellationToken.None);
         }

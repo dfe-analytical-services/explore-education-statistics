@@ -21,8 +21,18 @@ public class ApiSubscriptionFunctions(
     IValidator<PendingApiSubscriptionCreateRequest> newPendingApiSubscriptionRequestValidator,
     IValidator<ApiNotificationMessage> apiNotificationMessageValidator)
 {
-    [Function("RequestPendingApiSubscription")]
-    public async Task<IActionResult> RequestPendingApiSubscription(
+    private static class FunctionNames
+    {
+        private const string Base = "PublicApiSubscriptions_";
+        public const string NotifySubscribers = $"{Base}{nameof(NotifySubscribers)}";
+        public const string RequestPendingSubscription = $"{Base}{nameof(RequestPendingSubscription)}";
+        public const string RemoveExpiredSubscriptions = $"{Base}{nameof(RemoveExpiredSubscriptions)}";
+        public const string Unsubscribe = $"{Base}{nameof(Unsubscribe)}";
+        public const string VerifySubscription = $"{Base}{nameof(VerifySubscription)}";
+    }
+
+    [Function(FunctionNames.RequestPendingSubscription)]
+    public async Task<IActionResult> RequestPendingSubscription(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/request-pending-subscription")]
         [FromBody] PendingApiSubscriptionCreateRequest request,
         CancellationToken cancellationToken)
@@ -39,13 +49,13 @@ public class ApiSubscriptionFunctions(
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(RequestPendingApiSubscription));
+            logger.LogError(ex, "Exception occured while executing '{FunctionName}'", nameof(RequestPendingSubscription));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
-    [Function("VerifyApiSubscription")]
-    public async Task<IActionResult> VerifyApiSubscription(
+    [Function(FunctionNames.VerifySubscription)]
+    public async Task<IActionResult> VerifySubscription(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/{dataSetId:guid}/verify-subscription/{token}")]
         HttpRequest request,
         Guid dataSetId,
@@ -62,13 +72,13 @@ public class ApiSubscriptionFunctions(
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(VerifyApiSubscription));
+            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(VerifySubscription));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
-    [Function("ApiUnsubscribe")]
-    public async Task<IActionResult> ApiUnsubscribe(
+    [Function(FunctionNames.Unsubscribe)]
+    public async Task<IActionResult> Unsubscribe(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe/{token}")]
         HttpRequest request,
         Guid dataSetId,
@@ -85,21 +95,21 @@ public class ApiSubscriptionFunctions(
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(ApiUnsubscribe));
+            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(Unsubscribe));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
-    [Function("RemoveExpiredApiSubscriptions")]
-    public async Task RemoveExpiredApiSubscriptions(
+    [Function(FunctionNames.RemoveExpiredSubscriptions)]
+    public async Task RemoveExpiredSubscriptions(
         [TimerTrigger("0 * * * * *")] TimerInfo timerInfo,
         CancellationToken cancellationToken)
     {
         await apiSubscriptionService.RemoveExpiredApiSubscriptions(cancellationToken);
     }
 
-    [Function("NotifyApiSubscribers")]
-    public async Task NotifyApiSubscribers(
+    [Function(FunctionNames.NotifySubscribers)]
+    public async Task NotifySubscribers(
         [QueueTrigger(NotifierQueueStorage.ApiNotificationQueue)] ApiNotificationMessage message,
         CancellationToken cancellationToken)
     {

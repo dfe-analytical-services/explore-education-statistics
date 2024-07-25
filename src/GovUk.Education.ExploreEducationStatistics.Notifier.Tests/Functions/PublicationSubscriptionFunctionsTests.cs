@@ -70,7 +70,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -134,7 +134,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -200,7 +200,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -258,7 +258,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -303,7 +303,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -348,7 +348,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -393,7 +393,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -444,7 +444,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.VerifySubscriptionFunc(new TestFunctionContext(),
+            await notifierFunction.VerifySubscription(new TestFunctionContext(),
                 "test-id-4",
                 "verification-code-4");
 
@@ -496,7 +496,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.PublicationUnsubscribeFunc(new TestFunctionContext(),
+            await notifierFunction.Unsubscribe(new TestFunctionContext(),
                 "test-id-5",
                 "unsubscription-code-5");
 
