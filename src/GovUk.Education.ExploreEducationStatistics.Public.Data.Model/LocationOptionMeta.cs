@@ -8,8 +8,6 @@ public abstract class LocationOptionMeta
 {
     public int Id { get; set; }
 
-    public required string PublicId { get; set; }
-
     public required string Label { get; set; }
 
     protected abstract string Type { get; set; }
@@ -32,7 +30,6 @@ public abstract class LocationOptionMeta
     {
         Id = Id,
         Type = Type,
-        PublicId = PublicId,
         Label = Label,
         Code = Code,
         OldCode = OldCode,
@@ -52,10 +49,6 @@ public abstract class LocationOptionMeta
                 .HasValue<LocationProviderOptionMeta>(LocationProviderOptionMeta.TypeValue)
                 .HasValue<LocationRscRegionOptionMeta>(LocationRscRegionOptionMeta.TypeValue)
                 .HasValue<LocationSchoolOptionMeta>(LocationSchoolOptionMeta.TypeValue);
-
-            builder
-                .HasIndex(o => o.PublicId)
-                .IsUnique();
 
             builder
                 .Property(o => o.Type)

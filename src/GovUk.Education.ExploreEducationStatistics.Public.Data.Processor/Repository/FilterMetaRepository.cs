@@ -20,7 +20,7 @@ public class FilterMetaRepository(
     IDataSetVersionPathResolver dataSetVersionPathResolver) : IFilterMetaRepository
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
-    
+
     public async Task<IDictionary<FilterMeta, List<FilterOptionMeta>>> ReadFilterMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
@@ -61,6 +61,8 @@ public class FilterMetaRepository(
         publicDataDbContext.FilterMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
+        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+
         foreach (var meta in metas)
         {
             var options = await GetFilterOptionMeta(
@@ -97,9 +99,17 @@ public class FilterMetaRepository(
 
             var current = 0;
 
+            // Keep a count of filter option links that have used the sequence to generate their PublicIds,
+            // as opposed to inheriting their PublicIds from the previous data set version's filter options 
+            // via the mappings.
+            //
+            // This allows us to use the sequence to generate PublicIds for filter options that have no
+            // mapping associated with them, without generating big holes in the sequence where lots of 
+            // filter options have been successfully mapped from the previous data set version.
+            var publicIdsGeneratedFromSequence = 0;
+
             while (current < options.Count)
             {
-                var batchStartIndex = startIndex + current;
                 var batch = options
                     .Skip(current)
                     .Take(_appSettingsOptions.MetaInsertBatchSize)
@@ -112,17 +122,25 @@ public class FilterMetaRepository(
                     .Select(o => o.Label + ',' + (o.IsAggregate == true ? "True" : ""))
                     .ToHashSet();
 
-                var links = await optionTable
+                var filterOptionMeta = await optionTable
                     .Where(o =>
                         batchRowKeys.Contains(o.Label + ',' + (o.IsAggregate == true ? "True" : "")))
                     .OrderBy(o => o.Label)
-                    .Select((option, index) => new FilterOptionMetaLink
+                    .ToListAsync(token: cancellationToken);
+
+                var links = filterOptionMeta
+                    .Select(option => new FilterOptionMetaLink
                     {
-                        PublicId = SqidEncoder.Encode(batchStartIndex + index),
+                        PublicId = CreatePublicIdForFilterOptionMetaLink(
+                            publicIdMappings: publicIdMappings,
+                            filter: meta,
+                            option: option,
+                            defaultPublicIdFn: () => 
+                                SqidEncoder.Encode(startIndex + publicIdsGeneratedFromSequence++)),
                         MetaId = meta.Id,
                         OptionId = option.Id
                     })
-                    .ToListAsync(token: cancellationToken);
+                    .ToList();
 
                 publicDataDbContext.FilterOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -141,9 +159,10 @@ public class FilterMetaRepository(
                     $"Inserted: {insertedLinks}, expected: {options.Count}");
             }
 
+            // Increase the sequence only by the amount that we used to generate new PublicIds. 
             await publicDataDbContext.SetSequenceValue(
                 PublicDataDbContext.FilterOptionMetaLinkSequence,
-                startIndex + insertedLinks - 1,
+                startIndex + publicIdsGeneratedFromSequence - 1,
                 cancellationToken);
         }
     }
@@ -198,5 +217,65 @@ public class FilterMetaRepository(
                 }
             )
             .ToList();
+    }
+
+    private async Task<PublicIdMappings> CreatePublicIdMappings(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        var mappings = await EntityFrameworkQueryableExtensions
+            .SingleOrDefaultAsync(publicDataDbContext
+                    .DataSetVersionMappings,
+                mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id,
+                cancellationToken);
+
+        if (mappings is null)
+        {
+            return new PublicIdMappings();
+        }
+
+        var mappingsByFilter = mappings
+            .FilterMappingPlan
+            .Mappings
+            .ToDictionary(
+                keySelector: filter => filter.Key,
+                elementSelector: filter => filter
+                    .Value
+                    .OptionMappings
+                    .Values
+                    .Where(mapping => mapping.Type is MappingType.AutoMapped or MappingType.ManualMapped)
+                    .ToDictionary(
+                        keySelector: mapping => mapping.CandidateKey!,
+                        elementSelector: mapping => mapping.PublicId));
+
+        return new PublicIdMappings { Filters = mappingsByFilter };
+    }
+
+    private static string CreatePublicIdForFilterOptionMetaLink(
+        PublicIdMappings publicIdMappings,
+        FilterMeta filter,
+        FilterOptionMeta option,
+        Func<string> defaultPublicIdFn)
+    {
+        return publicIdMappings
+                   .GetPublicIdForFilterOptionCandidate(
+                       filterKey: MappingKeyFunctions.FilterKeyGenerator(filter),
+                       MappingKeyFunctions.FilterOptionKeyGenerator(option))
+               ?? defaultPublicIdFn.Invoke();
+    }
+
+    private record PublicIdMappings
+    {
+        public Dictionary<string, Dictionary<string, string>> Filters { get; init; } = [];
+
+        public string? GetPublicIdForFilterOptionCandidate(string filterKey, string filterOptionCandidateKey)
+        {
+            if (!Filters.TryGetValue(filterKey, out var filterOptionMappings))
+            {
+                return null;
+            }
+
+            return filterOptionMappings.GetValueOrDefault(filterOptionCandidateKey);
+        }
     }
 }

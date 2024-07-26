@@ -54,7 +54,7 @@ public class LocationsDuckDbRepository(PublicDataDbContext publicDataDbContext) 
                 insertRow.AppendValue(id++);
                 insertRow.AppendValue(option.Label);
                 insertRow.AppendValue(location.Level.GetEnumValue());
-                insertRow.AppendValue(option.PublicId);
+                insertRow.AppendValue(link.PublicId);
 
                 switch (option)
                 {

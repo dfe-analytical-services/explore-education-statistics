@@ -45,6 +45,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             string[] expectedActivitySequence =
             [
+                ActivityNames.ImportMetadata,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
                 ActivityNames.CompleteNextDataSetVersionImportProcessing
@@ -75,7 +76,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.ImportData,
+                    context.CallActivityAsync(ActivityNames.ImportMetadata,
                         mockOrchestrationContext.Object.InstanceId,
                         null))
                 .Throws<Exception>();

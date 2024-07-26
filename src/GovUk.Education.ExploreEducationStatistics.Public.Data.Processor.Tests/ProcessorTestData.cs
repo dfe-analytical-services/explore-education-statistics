@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 
@@ -80,7 +79,6 @@ public record ProcessorTestData
                     new LocationLocalAuthorityOptionMeta
                     {
                         Id = 1,
-                        PublicId = SqidEncoder.Encode(1),
                         OldCode = "302",
                         Code = "E09000003",
                         Label = "Barnet",
@@ -88,7 +86,6 @@ public record ProcessorTestData
                     new LocationLocalAuthorityOptionMeta
                     {
                         Id = 2,
-                        PublicId = SqidEncoder.Encode(2),
                         OldCode = "314",
                         Code = "E09000021 / E09000027",
                         Label = "Kingston upon Thames / Richmond upon Thames",
@@ -96,7 +93,6 @@ public record ProcessorTestData
                     new LocationLocalAuthorityOptionMeta
                     {
                         Id = 3,
-                        PublicId = SqidEncoder.Encode(3),
                         OldCode = "370",
                         Code = "E08000016",
                         Label = "Barnsley",
@@ -104,7 +100,6 @@ public record ProcessorTestData
                     new LocationLocalAuthorityOptionMeta
                     {
                         Id = 4,
-                        PublicId = SqidEncoder.Encode(4),
                         OldCode = "373",
                         Code = "E08000019",
                         Label = "Sheffield",
@@ -120,7 +115,6 @@ public record ProcessorTestData
                     new LocationCodedOptionMeta
                     {
                         Id = 5,
-                        PublicId = SqidEncoder.Encode(5),
                         Code = "E92000001",
                         Label = "England",
                     },
@@ -135,14 +129,12 @@ public record ProcessorTestData
                     new LocationCodedOptionMeta
                     {
                         Id = 6,
-                        PublicId = SqidEncoder.Encode(6),
                         Code = "E12000003",
                         Label = "Yorkshire and The Humber",
                     },
                     new LocationCodedOptionMeta
                     {
                         Id = 7,
-                        PublicId = SqidEncoder.Encode(7),
                         Code = "E13000002",
                         Label = "Outer London",
                     },
@@ -157,7 +149,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 8,
-                        PublicId = SqidEncoder.Encode(8),
                         Urn = "101269",
                         LaEstab = "3022014",
                         Label = "Colindale Primary School",
@@ -165,7 +156,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 9,
-                        PublicId = SqidEncoder.Encode(9),
                         Urn = "102579",
                         LaEstab = "3142032",
                         Label = "King Athelstan Primary School",
@@ -173,7 +163,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 10,
-                        PublicId = SqidEncoder.Encode(10),
                         Urn = "106653",
                         LaEstab = "3704027",
                         Label = "Penistone Grammar School",
@@ -181,7 +170,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 11,
-                        PublicId = SqidEncoder.Encode(11),
                         Urn = "135507",
                         LaEstab = "3026906",
                         Label = "Wren Academy Finchley",
@@ -189,7 +177,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 12,
-                        PublicId = SqidEncoder.Encode(12),
                         Urn = "140821",
                         LaEstab = "3734008",
                         Label = "Newfield Secondary School",
@@ -197,7 +184,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 13,
-                        PublicId = SqidEncoder.Encode(13),
                         Urn = "141862",
                         LaEstab = "3144001",
                         Label = "The Kingston Academy",
@@ -205,7 +191,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 14,
-                        PublicId = SqidEncoder.Encode(14),
                         Urn = "141973",
                         LaEstab = "3702039",
                         Label = "Hoyland Springwood Primary School",
@@ -213,7 +198,6 @@ public record ProcessorTestData
                     new LocationSchoolOptionMeta
                     {
                         Id = 15,
-                        PublicId = SqidEncoder.Encode(15),
                         Urn = "145374",
                         LaEstab = "3732341",
                         Label = "Greenhill Primary School",

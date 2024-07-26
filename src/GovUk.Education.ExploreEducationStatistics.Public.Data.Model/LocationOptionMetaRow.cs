@@ -13,9 +13,6 @@ public class LocationOptionMetaRow
     public int Id { get; set; }
 
     [Column(CanBeNull = false)]
-    public required string PublicId { get; set; }
-
-    [Column(CanBeNull = false)]
     public required string Type { get; set; }
 
     [Column(CanBeNull = false)]
@@ -39,4 +36,18 @@ public class LocationOptionMetaRow
         (Urn ?? "null") + ',' +
         (LaEstab ?? "null") + ',' +
         (Ukprn ?? "null");
+
+    public string GetRowKeyPretty()
+    {
+        var rowKey = 
+            $"{nameof(Type)}:{Type}," +
+            $"{nameof(Label)}:{Label}," +
+            (Code is not null ? $"{nameof(Code)}:{Code}," : "") +
+            (OldCode is not null ? $"{nameof(OldCode)}:{OldCode}," : "") +
+            (Urn is not null ? $"{nameof(Urn)}:{Urn}," : "") +
+            (LaEstab is not null ? $"{nameof(LaEstab)}:{LaEstab}," : "") +
+            (Ukprn is not null ? $"{nameof(Ukprn)}:{Ukprn}," : "");
+
+        return rowKey[..^1];
+    }
 }

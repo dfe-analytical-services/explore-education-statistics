@@ -13,7 +13,6 @@ public abstract class LocationOptionMetaTests
             var option = new LocationCodedOptionMeta
             {
                 Id = 1,
-                PublicId = nameof(LocationCodedOptionMeta.PublicId),
                 Label = nameof(LocationCodedOptionMeta.Label),
                 Code = nameof(LocationCodedOptionMeta.Code),
             };
