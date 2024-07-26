@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
@@ -226,7 +227,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 mapping: DataFixture
                                     .DefaultLocationOptionMapping()
                                     .WithSource(DataFixture.DefaultMappableLocationOption())
-                                    .WithNoMapping())
+                                    .WithAutoNone())
                             .AddMapping(
                                 sourceKey: "source-location-3-key",
                                 mapping: DataFixture
@@ -370,6 +371,242 @@ public abstract class DataSetVersionMappingControllerTests(
             updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedFullMappings,
                 ignoreCollectionOrders: true);
+
+            // Assert that the batch saves still show the location mappings as incomplete, as there
+            // are still mappings with type "None" and "AutoNone" in the plan.
+            Assert.False(updatedMappings.LocationMappingsComplete);
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, false)]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, true)]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, true)]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, true)]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, false)]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, true)]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, true)]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, true)]
+        public async Task Success_MappingsComplete(
+            MappingType updatedMappingType,
+            MappingType unchangedMappingType,
+            bool expectedMappingsComplete)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "source-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "target-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption()))
+                    .AddLevel(
+                        level: GeographicLevel.Country,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "source-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithType(unchangedMappingType)
+                                    .WithCandidateKey(unchangedMappingType switch
+                                    {
+                                        MappingType.ManualMapped or MappingType.AutoMapped => "target-location-1-key",
+                                        _ => null
+                                    }))
+                            .AddCandidate(
+                                targetKey: "target-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())));
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "target-location-1-key"
+                : null;
+
+            List<LocationMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchLocationMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                client);
+
+            response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
+
+            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Assert that the batch save calculates the LocationMappingsComplete flag as expected given
+            // the combination of the requested mapping update and the existing mapping that is untouched. 
+            Assert.Equal(expectedMappingsComplete, updatedMappings.LocationMappingsComplete);
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0")]
+        public async Task Success_VersionUpdate(
+            MappingType updatedMappingType,
+            MappingType unchangedMappingType,
+            string expectedVersion)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "source-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "target-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption()))
+                    .AddLevel(
+                        level: GeographicLevel.Country,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "source-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithType(unchangedMappingType)
+                                    .WithCandidateKey(unchangedMappingType switch
+                                    {
+                                        MappingType.ManualMapped or MappingType.AutoMapped => "target-location-1-key",
+                                        _ => null
+                                    }))
+                            .AddCandidate(
+                                targetKey: "target-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())));
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "target-location-1-key"
+                : null;
+
+            List<LocationMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchLocationMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                client);
+
+            response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
+
+            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Assert that the batch save calculates the next data set version correctly. 
+            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.Version);
         }
 
         [Fact]
@@ -933,7 +1170,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
                 context.DataSets.Update(dataSet);
             });
-            
+
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(currentDataSetVersion.Id)
@@ -1004,24 +1241,24 @@ public abstract class DataSetVersionMappingControllerTests(
                         FilterKey = "filter-1-key",
                         SourceKey = "filter-1-option-1-key",
                         Mapping = mappings.GetFilterOptionMapping(
-                                filterKey: "filter-1-key", 
+                                filterKey: "filter-1-key",
                                 filterOptionKey: "filter-1-option-1-key") with
-                        {
-                            Type = MappingType.ManualMapped,
-                            CandidateKey = "filter-1-option-1-key"
-                        }
+                            {
+                                Type = MappingType.ManualMapped,
+                                CandidateKey = "filter-1-option-1-key"
+                            }
                     },
                     new FilterOptionMappingUpdateResponseViewModel
                     {
                         FilterKey = "filter-2-key",
                         SourceKey = "filter-2-option-1-key",
                         Mapping = mappings.GetFilterOptionMapping(
-                            filterKey: "filter-2-key", 
-                            filterOptionKey: "filter-2-option-1-key") with
-                        {
-                            Type = MappingType.ManualNone,
-                            CandidateKey = null
-                        }
+                                filterKey: "filter-2-key",
+                                filterOptionKey: "filter-2-option-1-key") with
+                            {
+                                Type = MappingType.ManualNone,
+                                CandidateKey = null
+                            }
                     },
                 ]
             };
@@ -1032,12 +1269,14 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
+                .Include(mapping => mapping.TargetDataSetVersion)
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             var expectedFullMappings = new Dictionary<string, FilterMapping>
             {
                 {
-                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with 
+                    "filter-1-key",
+                    mappings.GetFilterMapping("filter-1-key") with
                     {
                         OptionMappings = new Dictionary<string, FilterOptionMapping>
                         {
@@ -1057,7 +1296,8 @@ public abstract class DataSetVersionMappingControllerTests(
                     }
                 },
                 {
-                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with 
+                    "filter-2-key",
+                    mappings.GetFilterMapping("filter-2-key") with
                     {
                         OptionMappings = new Dictionary<string, FilterOptionMapping>
                         {
@@ -1079,6 +1319,347 @@ public abstract class DataSetVersionMappingControllerTests(
             updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFullMappings,
                 ignoreCollectionOrders: true);
+
+            // Assert that the batch saves show the filter mappings as complete, as there
+            // are no remaining mappings with type "None" or "AutoNone" in the plan.
+            Assert.True(updatedMappings.FilterMappingsComplete);
+
+            // Assert that this update constitutes a major version update, as some filter options
+            // belonging to mapped filters have a mapping type of "ManualNone", indicating that 
+            // some of the source filter options are no longer available in the target data set
+            // version, thus creating a breaking change. 
+            Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, false)]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, true)]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, true)]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, true)]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, false)]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, true)]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, true)]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, true)]
+        public async Task Success_MappingsComplete(
+            MappingType updatedMappingType,
+            MappingType unchangedMappingType,
+            bool expectedMappingsComplete)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterMapping("filter-2-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-2-key")
+                        .AddOptionMapping("filter-2-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithType(unchangedMappingType)
+                            .WithCandidateKey(unchangedMappingType switch
+                            {
+                                MappingType.ManualMapped or MappingType.AutoMapped => "filter-2-option-1-key",
+                                _ => null
+                            })))
+                    // Add an unmappable filter and filter options. Because we don't currently allow the 
+                    // users to update mappings for filters, this should not count against the calculation
+                    // of the FilterMappingsComplete flag.
+                    .AddFilterMapping("filter-3-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoNone()
+                        .AddOptionMapping("filter-3-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoNone()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())));
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "filter-1-option-1-key"
+                : null;
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                client);
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Assert that the batch save calculates the LocationMappingsComplete flag as expected given the
+            // combination of the requested mapping update and the existing mapping that is untouched. 
+            Assert.Equal(expectedMappingsComplete, updatedMappings.FilterMappingsComplete);
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0")]
+        public async Task Success_VersionUpdate(
+            MappingType updatedMappingType,
+            MappingType unchangedMappingType,
+            string expectedVersion)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterMapping("filter-2-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-2-key")
+                        .AddOptionMapping("filter-2-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithType(unchangedMappingType)
+                            .WithCandidateKey(unchangedMappingType switch
+                            {
+                                MappingType.ManualMapped or MappingType.AutoMapped => "filter-2-option-1-key",
+                                _ => null
+                            })))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())));
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "filter-1-option-1-key"
+                : null;
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                client);
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Assert that the batch save calculates the next version number as expected. 
+            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.Version);
+        }
+
+        [Theory]
+        [InlineData(MappingType.ManualMapped)]
+        [InlineData(MappingType.ManualNone)]
+        public async Task Success_VersionUpdates_UnmappableFilter(MappingType updatedMappingType)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    // Add an unmappable filter and filter options. Unlike the calculation of the
+                    // "FilterMappingsComplete" flag, this counts towards the version number having
+                    // to be a major update, as a filter from the source data set version no longer
+                    // appears in the next version.
+                    .AddFilterMapping("filter-3-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoNone()
+                        .AddOptionMapping("filter-3-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithAutoNone()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption()))
+                    .AddFilterCandidate("filter-2-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-2-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())));
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
+                ? "filter-1-option-1-key"
+                : null;
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = updatedMappingType,
+                    CandidateKey = mappingCandidateKey
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates,
+                client);
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Assert that the batch save calculates the next version number as a major change,
+            // as filter options that were in the source data set version no longer appear in the
+            // next version. 
+            Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);
         }
 
         [Fact]
@@ -1109,7 +1690,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
                 context.DataSets.Update(dataSet);
             });
-            
+
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(currentDataSetVersion.Id)
@@ -1347,7 +1928,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
                 context.DataSets.Update(dataSet);
             });
-            
+
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(currentDataSetVersion.Id)

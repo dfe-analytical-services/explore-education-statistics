@@ -333,7 +333,7 @@ public static class FilterMappingPlanGeneratorExtensions
 
     public static Generator<FilterOptionMapping> WithCandidateKey(
         this Generator<FilterOptionMapping> generator,
-        string candidateKey)
+        string? candidateKey)
         => generator.ForInstance(s => s.SetCandidateKey(candidateKey));
 
     public static InstanceSetters<FilterOptionMapping> SetDefaults(
