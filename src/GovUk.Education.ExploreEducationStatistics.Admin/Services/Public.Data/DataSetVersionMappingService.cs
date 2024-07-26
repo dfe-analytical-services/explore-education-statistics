@@ -14,10 +14,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewModels.ErrorViewModel;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
@@ -29,6 +32,17 @@ public class DataSetVersionMappingService(
     PublicDataDbContext publicDataDbContext)
     : IDataSetVersionMappingService
 {
+    private static readonly MappingType[] IncompleteMappingTypes =
+    [
+        MappingType.AutoNone
+    ];
+
+    private static readonly MappingType[] NoMappingTypes =
+    [
+        MappingType.ManualNone,
+        MappingType.AutoNone
+    ];
+
     public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -49,7 +63,8 @@ public class DataSetVersionMappingService(
             validateCandidatesFn: () =>
                 ValidateLocationOptionCandidates(nextDataSetVersionId, request, cancellationToken),
             applyUpdatesFn: () => UpdateLocationOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
-            createViewModelFn: updates => new BatchLocationMappingUpdatesResponseViewModel { Updates = updates },
+            createViewModelFn: updates =>
+                new BatchLocationMappingUpdatesResponseViewModel { Updates = updates },
             cancellationToken: cancellationToken);
     }
 
@@ -84,7 +99,7 @@ public class DataSetVersionMappingService(
             Func<Task<List<Either<ErrorViewModel, TMappingCandidate>>>> validateCandidatesFn,
             Func<Task<List<Either<ErrorViewModel, TMappingUpdateResponse>>>> applyUpdatesFn,
             Func<List<TMappingUpdateResponse>, TBatchMappingUpdatesResponseViewModel> createViewModelFn,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
     {
         return await publicDataDbContext.RequireTransaction(async () =>
             await userService
@@ -110,10 +125,171 @@ public class DataSetVersionMappingService(
                     var aggregatedResult = updateSuccessesAndFailures.AggregateSuccessesAndFailures();
 
                     return aggregatedResult
-                        .OnSuccess(createViewModelFn)
                         .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors));
-                }));
+                })
+                .OnSuccessDo(() => UpdateMappingsCompleteAndVersion(nextDataSetVersionId, cancellationToken))
+                .OnSuccess(createViewModelFn));
     }
+
+    private async Task UpdateMappingsCompleteAndVersion(Guid nextDataSetVersionId, CancellationToken cancellationToken)
+    {
+        var locationMappingTypes = await GetDistinctLocationOptionMappingTypes(
+            nextDataSetVersionId: nextDataSetVersionId,
+            cancellationToken: cancellationToken);
+
+        var filterAndOptionMappingTypes = await GetDistinctFilterAndOptionMappingTypes(
+            nextDataSetVersionId: nextDataSetVersionId,
+            cancellationToken: cancellationToken);
+
+        await UpdateMappingCompleteFlags(
+            nextDataSetVersionId: nextDataSetVersionId,
+            locationMappingTypes: locationMappingTypes,
+            filterAndOptionMappingTypes: filterAndOptionMappingTypes,
+            cancellationToken: cancellationToken);
+
+        await UpdateVersionNumber(
+            nextDataSetVersionId: nextDataSetVersionId,
+            locationMappingTypes: locationMappingTypes,
+            filterAndOptionMappingTypes: filterAndOptionMappingTypes,
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task UpdateVersionNumber(
+        Guid nextDataSetVersionId,
+        List<MappingType> locationMappingTypes,
+        List<FilterAndOptionMappingTypeDto> filterAndOptionMappingTypes,
+        CancellationToken cancellationToken)
+    {
+        // Consider the current mappings to produce a major version change if any options from the
+        // original data set version are currently not mapped to options in the new version.
+        var majorVersionUpdate = locationMappingTypes
+            .Concat(filterAndOptionMappingTypes
+                .Select(mappings => mappings.OptionMappingType))
+            .Any(type => NoMappingTypes.Contains(type));
+
+        var currentVersionNumber = await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .Select(nextVersion => nextVersion.SourceDataSetVersion)
+            .Select(sourceVersion => new
+            {
+                major = sourceVersion.VersionMajor,
+                minor = sourceVersion.VersionMinor
+            })
+            .SingleAsync(cancellationToken);
+
+        var nextVersionNumber = majorVersionUpdate
+            ? new
+            {
+                major = currentVersionNumber.major + 1,
+                minor = 0
+            }
+            : currentVersionNumber with { minor = currentVersionNumber.minor + 1 };
+
+        await publicDataDbContext
+            .DataSetVersions
+            .Where(dataSetVersion => dataSetVersion.Id == nextDataSetVersionId)
+            .ExecuteUpdateAsync(
+                setPropertyCalls: s => s
+                    .SetProperty(dataSetVersion => dataSetVersion.VersionMajor, nextVersionNumber.major)
+                    .SetProperty(dataSetVersion => dataSetVersion.VersionMinor, nextVersionNumber.minor)
+                    .SetProperty(dataSetVersion => dataSetVersion.VersionPatch, 0),
+                cancellationToken: cancellationToken);
+    }
+
+    private async Task UpdateMappingCompleteFlags(
+        Guid nextDataSetVersionId,
+        List<MappingType> locationMappingTypes,
+        List<FilterAndOptionMappingTypeDto> filterAndOptionMappingTypes,
+        CancellationToken cancellationToken)
+    {
+        // Find any location options that have a mapping type that indicates the user
+        // still needs to take action in order to resolve the mapping.
+        var locationMappingsComplete = !locationMappingTypes
+            .Any(type => IncompleteMappingTypes.Contains(type));
+
+        // Find any filter options that that indicates the user still needs to take action
+        // in order to resolve the mapping. If any exist, mappings are not yet complete.
+        //
+        // We do however omit checking the filter options of filters that have a mapping of
+        // "AutoNone", as currently there is no way within the UI for the users to handle
+        // the resolution of these unmapped filters, and so without ignoring these, the user
+        // would never be able to complete the mappings.
+        var filterMappingsComplete = !filterAndOptionMappingTypes
+            .Where(types => types.FilterMappingType != MappingType.AutoNone)
+            .Any(types => IncompleteMappingTypes.Contains(types.OptionMappingType));
+
+        // Update the mapping complete flags.
+        await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .ExecuteUpdateAsync(
+                setPropertyCalls: s => s
+                    .SetProperty(mapping => mapping.LocationMappingsComplete, locationMappingsComplete)
+                    .SetProperty(mapping => mapping.FilterMappingsComplete, filterMappingsComplete),
+                cancellationToken: cancellationToken);
+    }
+
+#pragma warning disable EF1002
+    private async Task<List<MappingType>> GetDistinctLocationOptionMappingTypes(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
+
+        // Find the distinct mapping types across all location options across all levels.
+        var types = await publicDataDbContext
+            .Set<JsonString>()
+            .FromSqlRaw(sql:
+                $"""
+                 SELECT DISTINCT OptionMappingType "{nameof(JsonString.StringValue)}" FROM (
+                     SELECT OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.LocationMappingPlan)}" -> '{nameof(LocationMappingPlan.Levels)}') Level,
+                     jsonb_each(Level.value -> '{nameof(LocationLevelMappings.Mappings)}') OptionMapping,
+                     jsonb_extract_path_text(OptionMapping.value, '{nameof(LocationOptionMapping.Type)}') OptionMappingType
+                     WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
+                 )
+                 """,
+                parameters: [targetDataSetVersionIdParam])
+            .ToListAsync(cancellationToken);
+
+        return types
+            .Select(jsonString => EnumUtil.GetFromEnumValue<MappingType>(jsonString.StringValue))
+            .ToList();
+    }
+#pragma warning restore EF1002
+
+#pragma warning disable EF1002
+    private async Task<List<FilterAndOptionMappingTypeDto>> GetDistinctFilterAndOptionMappingTypes(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
+
+        // Find all the distinct combinations of parent filters' mapping types against the distinct
+        // mapping types of their children.
+        var typeCombinations = await publicDataDbContext
+            .Set<FilterAndOptionMappingTypeDto>()
+            .FromSqlRaw(sql:
+                $"""
+                 SELECT DISTINCT 
+                     FilterMappingType "{nameof(FilterAndOptionMappingTypeDto.FilterMappingType)}",
+                     OptionMappingType "{nameof(FilterAndOptionMappingTypeDto.OptionMappingType)}" 
+                 FROM (
+                     SELECT FilterMappingType, OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" -> 'Mappings') FilterMapping,
+                     jsonb_each(FilterMapping.value -> '{nameof(FilterMapping.OptionMappings)}') OptionMapping,
+                     jsonb_extract_path_text(FilterMapping.value, '{nameof(FilterMapping.Type)}') FilterMappingType,
+                     jsonb_extract_path_text(OptionMapping.value, '{nameof(FilterOptionMapping.Type)}') OptionMappingType
+                     WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
+                 )
+                 """,
+                parameters: [targetDataSetVersionIdParam])
+            .ToListAsync(cancellationToken);
+
+        return typeCombinations;
+    }
+#pragma warning restore EF1002
 
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will validate that the chosen mapping candidates
@@ -322,7 +498,7 @@ public class DataSetVersionMappingService(
             string jsonbColumnName,
             string[] jsonPathSegments,
             string candidateKey,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
     {
         var jsonRequest = new JsonbPathRequest<Guid>
         {
@@ -363,7 +539,7 @@ public class DataSetVersionMappingService(
             string jsonbColumnName,
             string[] jsonPathSegments,
             Func<TMapping, TMappingUpdateResponse> createSuccessfulResponseFn,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         where TMapping : Mapping<TMappableElement>
         where TMappableElement : MappableElement
         where TMappingUpdateRequest : MappingUpdateRequest
