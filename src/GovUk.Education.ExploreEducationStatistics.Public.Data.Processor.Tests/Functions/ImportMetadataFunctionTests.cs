@@ -1,5 +1,6 @@
 using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -9,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
@@ -184,57 +186,43 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             // In this test, we will create mappings for all the original location options.
             // 2 of these mappings will have candidates, and the rest will have no candidates
             // mapped.
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
+                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .LocationMappingPlanFromLocationMeta(sourceLocations: testData.ExpectedLocations));
+            
+            var random = new Random();
+
+            mappings.LocationMappingPlan.Levels.ForEach(level => 
+                level.Value.Mappings.ForEach(mapping => 
+                    mapping.Value.Type = random.Next(1) == 0 
+                        ? MappingType.AutoNone 
+                        : MappingType.ManualNone));
 
             // Amend a couple of arbitrary mappings to identify some candidates.
-            var mappedOption1 = testData.ExpectedLocations.First().Options.First();
-            var mappedOption2 = testData.ExpectedLocations.Last().Options.Last();
+            var firstLevel = testData.ExpectedLocations.First();
+            var lastLevel = testData.ExpectedLocations.Last();
+            var mappedOption1Key = MappingKeyFunctions.LocationOptionMetaKeyGenerator(firstLevel.Options.First());
+            var mappedOption2Key = MappingKeyFunctions.LocationOptionMetaKeyGenerator(lastLevel.Options.Last());
+            var mappedOption1 = mappings.GetLocationOptionMapping(firstLevel.Level, mappedOption1Key);
+            var mappedOption2 = mappings.GetLocationOptionMapping(lastLevel.Level, mappedOption2Key);
 
-            var option1Mapping = new LocationOptionMapping
+            mappings.LocationMappingPlan.Levels[firstLevel.Level].Mappings[mappedOption1Key] = mappedOption1 with
             {
                 PublicId = "option-1-public-id",
                 Type = MappingType.AutoMapped,
-                CandidateKey = MappingKeyFunctions.LocationOptionMetaRowKeyGenerator(mappedOption1.ToRow())
+                CandidateKey = mappedOption1Key
             };
 
-            var option2Mapping = new LocationOptionMapping
+            mappings.LocationMappingPlan.Levels[lastLevel.Level].Mappings[mappedOption2Key] = mappedOption2 with
             {
                 PublicId = "option-2-public-id",
                 Type = MappingType.ManualMapped,
-                CandidateKey = MappingKeyFunctions.LocationOptionMetaRowKeyGenerator(mappedOption2.ToRow())
+                CandidateKey = mappedOption2Key
             };
-
-            var i = 0;
-
-            var mappings = new DataSetVersionMapping
-            {
-                SourceDataSetVersionId = sourceDataSetVersion.Id,
-                TargetDataSetVersionId = targetDataSetVersion.Id,
-                FilterMappingPlan = new FilterMappingPlan(),
-                LocationMappingPlan = new LocationMappingPlan
-                {
-                    Levels = testData
-                        .ExpectedLocations
-                        .ToDictionary(
-                            keySelector: level => level.Level,
-                            elementSelector: level => new LocationLevelMappings
-                            {
-                                Mappings = level
-                                    .Options
-                                    .ToDictionary(
-                                        keySelector: MappingKeyFunctions.LocationOptionMetaKeyGenerator,
-                                        elementSelector: option =>
-                                            option == mappedOption1 ? option1Mapping
-                                            : option == mappedOption2 ? option2Mapping
-                                            : new LocationOptionMapping
-                                            {
-                                                Type = i++ % 2 == 0 
-                                                    ? MappingType.AutoNone
-                                                    : MappingType.ManualNone
-                                            })
-                            })
-                }
-            };
-
+            
             await AddTestData<PublicDataDbContext>(context =>
             {
                 context.DataSetVersionMappings.Add(mappings);
@@ -287,10 +275,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             // Public Ids should be SQIDs based on the option's id unless otherwise directed by the
             // mappings.
-            var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Label);
+            var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Source.Label);
             Assert.Equal("option-1-public-id", actualMappedOption1Link.PublicId);
 
-            var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Label);
+            var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Source.Label);
             Assert.Equal("option-2-public-id", actualMappedOption2Link.PublicId);
 
             var otherLinks = actualLocations

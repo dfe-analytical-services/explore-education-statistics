@@ -31,6 +31,26 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     public DateTimeOffset Created { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
+    
+    public LocationLevelMappings GetLocationLevelMappings(GeographicLevel level)
+    {
+        return LocationMappingPlan.Levels[level];
+    }
+    
+    public LocationOptionMapping GetLocationOptionMapping(GeographicLevel level, string locationOptionKey)
+    {
+        return GetLocationLevelMappings(level).Mappings[locationOptionKey];
+    }
+
+    public FilterMapping GetFilterMapping(string filterKey)
+    {
+        return FilterMappingPlan.Mappings[filterKey];
+    }
+    
+    public FilterOptionMapping GetFilterOptionMapping(string filterKey, string filterOptionKey)
+    {
+        return GetFilterMapping(filterKey).OptionMappings[filterOptionKey];
+    }
 
     internal class Config : IEntityTypeConfiguration<DataSetVersionMapping>
     {
@@ -103,10 +123,13 @@ public enum MappingType
 /// <summary>
 /// This base class represents an element from the DataSetVersions that can be mapped.
 /// </summary>
-public abstract record MappableElement(string Label);
+public abstract record MappableElement
+{
+    public string Label { get; init; }
+};
 
-public abstract record MappableElementWithOptions<TMappableOption>(string Label)
-    : MappableElement(Label)
+public abstract record MappableElementWithOptions<TMappableOption>
+    : MappableElement
     where TMappableOption : MappableElement
 {
     public Dictionary<string, TMappableOption> Options { get; init; } = [];
@@ -149,7 +172,7 @@ public abstract record ParentMapping<TMappableElement, TOption, TOptionMapping>
 /// This represents a location option that is potentially mappable to another location option
 /// from the same geographic level. 
 /// </summary>
-public record MappableLocationOption(string Label) : MappableElement(Label)
+public record MappableLocationOption : MappableElement
 {
     public string? Code { get; init; }
 
@@ -191,20 +214,19 @@ public class LocationMappingPlan
 /// <summary>
 /// This represents a filter option that is potentially mappable to another filter option. 
 /// </summary>
-public record MappableFilterOption(string Label) : MappableElement(Label);
+public record MappableFilterOption : MappableElement;
 
 /// <summary>
 /// This represents a filter that is potentially mappable to another filter.
 /// </summary>
-public record MappableFilter(string Label) : MappableElement(Label);
+public record MappableFilter : MappableElement;
 
 /// <summary>
 /// This represents a candidate filter and all of its candidate filter options from
 /// the target data set version that could be mapped to from filters and filter options
 /// from the source version.
 /// </summary>
-public record FilterMappingCandidate(string Label)
-    : MappableElementWithOptions<MappableFilterOption>(Label);
+public record FilterMappingCandidate : MappableElementWithOptions<MappableFilterOption>;
 
 /// <summary>
 /// This represents a potential mapping of a filter option from the source data set version
@@ -234,7 +256,7 @@ public static class MappingKeyFunctions
 {
     public static Func<LocationOptionMetaRow, string> LocationOptionMetaRowKeyGenerator =>
         option => $"{option.Label} :: {option.GetRowKeyPretty()}";
-    
+
     public static Func<LocationOptionMeta, string> LocationOptionMetaKeyGenerator =>
         option => LocationOptionMetaRowKeyGenerator(option.ToRow());
 

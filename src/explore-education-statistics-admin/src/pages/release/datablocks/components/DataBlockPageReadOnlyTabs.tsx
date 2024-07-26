@@ -11,9 +11,7 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import tableBuilderService, {
-  ReleaseTableDataQuery,
-} from '@common/services/tableBuilderService';
+import tableBuilderService from '@common/services/tableBuilderService';
 import React from 'react';
 
 interface Model {

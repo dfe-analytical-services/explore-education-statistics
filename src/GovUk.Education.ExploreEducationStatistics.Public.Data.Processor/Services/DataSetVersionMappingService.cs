@@ -361,7 +361,7 @@ internal class DataSetVersionMappingService(
                 elementSelector: filter =>
                     new FilterMapping
                     {
-                        Source = new MappableFilter(filter.Label),
+                        Source = new MappableFilter { Label = filter.Label },
                         OptionMappings = filter
                             .Options
                             .ToDictionary(
@@ -377,8 +377,9 @@ internal class DataSetVersionMappingService(
             .ToDictionary(
                 keySelector: meta => MappingKeyFunctions.FilterKeyGenerator(meta.filterMeta),
                 elementSelector: meta =>
-                    new FilterMappingCandidate(meta.filterMeta.Label)
+                    new FilterMappingCandidate
                     {
+                        Label = meta.filterMeta.Label,
                         Options = meta.optionsMeta
                             .ToDictionary(
                                 keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
@@ -396,8 +397,9 @@ internal class DataSetVersionMappingService(
 
     private static MappableLocationOption CreateLocationOptionFromMetaRow(LocationOptionMetaRow option)
     {
-        return new MappableLocationOption(option.Label)
+        return new MappableLocationOption
         {
+            Label = option.Label,
             Code = option.Code,
             OldCode = option.OldCode,
             Ukprn = option.Ukprn,
@@ -408,7 +410,7 @@ internal class DataSetVersionMappingService(
 
     private static MappableFilterOption CreateFilterOptionFromMetaRow(FilterOptionMeta option)
     {
-        return new MappableFilterOption(option.Label);
+        return new MappableFilterOption { Label = option.Label };
     }
 
     private async Task<List<LocationMeta>> GetLocationMeta(
