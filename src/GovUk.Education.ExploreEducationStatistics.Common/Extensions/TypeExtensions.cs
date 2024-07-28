@@ -87,6 +87,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         }
 
         /// <summary>
+        /// Get the subclasses of a type.
+        /// </summary>
+        public static IEnumerable<Type> GetSubclasses(this Type type)
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var t in assembly.GetLoadableTypes())
+                {
+                    if (t.IsSubclassOf(type))
+                    {
+                        yield return t;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns true if the type is considered 'simple' i.e. it can be
         /// represented as a single value e.g. a string, number, date, etc.
         /// </summary>
