@@ -1,11 +1,30 @@
 variables:
   SPN_NAME: s101d-datahub-spn-ees-dfe-gov-uk
 schedules:
-- cron: 0 6 * * 1,2,3,4,5
+- cron: 0 6 * * 1,2,3,4
   branches:
     include:
     - dev
   always: true
+
+- cron: 0 6,14,18,23 * * 5
+  branches:
+    include:
+    - dev
+  always: true
+
+- cron: 0 6,14,18,23 * * 6
+  branches:
+    include:
+    - dev
+  always: true
+
+- cron: 0 6,14,18,23 * * 0
+  branches:
+    include:
+    - dev
+  always: true
+
 pr: none
 
 name: $(date:yyyyMMdd)$(rev:.r)
