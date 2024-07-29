@@ -1,10 +1,10 @@
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
-public static class NotifierTableStorageTableNames
+public static class NotifierTableStorage
 {
-    public const string PublicationPendingSubscriptionsTableName = "PendingSubscriptions";
-    public const string PublicationSubscriptionsTableName = "Subscriptions";
-    public const string ApiSubscriptionsTableName = "ApiSubscriptions";
+    public const string PublicationPendingSubscriptionsTable = "PendingSubscriptions";
+    public const string PublicationSubscriptionsTable = "Subscriptions";
+    public const string ApiSubscriptionsTable = "ApiSubscriptions";
 }
 
 public static class NotifierQueueStorage

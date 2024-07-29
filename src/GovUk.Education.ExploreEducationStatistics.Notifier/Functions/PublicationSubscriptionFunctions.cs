@@ -59,7 +59,7 @@ public class PublicationSubscriptionFunctions(
 
         var subscription = await publicationSubscriptionRepository.GetSubscription(req.Id, req.Email);
         var pendingSubscriptionTable =
-            await publicationSubscriptionRepository.GetTable(NotifierTableStorageTableNames.PublicationPendingSubscriptionsTableName);
+            await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
 
         try
         {
@@ -162,7 +162,7 @@ public class PublicationSubscriptionFunctions(
             return new BadRequestObjectResult("Unable to unsubscribe. A valid email address could not be parsed from the given token.");
         }
 
-        var table = await publicationSubscriptionRepository.GetTable(NotifierTableStorageTableNames.PublicationSubscriptionsTableName);
+        var table = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
         var sub = await publicationSubscriptionRepository.RetrieveSubscriber(table, new SubscriptionEntity(id, email));
         if (sub is null)
         {
@@ -192,9 +192,9 @@ public class PublicationSubscriptionFunctions(
 
         if (email != null)
         {
-            var subscriptionsTbl = await publicationSubscriptionRepository.GetTable(NotifierTableStorageTableNames.PublicationSubscriptionsTableName);
+            var subscriptionsTbl = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
             var pendingSubscriptionsTbl =
-                await publicationSubscriptionRepository.GetTable(NotifierTableStorageTableNames.PublicationPendingSubscriptionsTableName);
+                await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
 
             var sub = publicationSubscriptionRepository
                 .RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
@@ -245,7 +245,7 @@ public class PublicationSubscriptionFunctions(
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var pendingSubscriptionsTbl = await publicationSubscriptionRepository.GetTable(NotifierTableStorageTableNames.PublicationPendingSubscriptionsTableName);
+        var pendingSubscriptionsTbl = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
 
         // Remove any pending subscriptions where the token has expired i.e. more than 1 hour old
         var query = new TableQuery<SubscriptionEntity>()

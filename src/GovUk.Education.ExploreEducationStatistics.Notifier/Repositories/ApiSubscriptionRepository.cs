@@ -14,15 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 internal class ApiSubscriptionRepository(
     IApiSubscriptionTableStorageService apiSubscriptionTableStorage) : IApiSubscriptionRepository
 {
-    private const string ApiSubscriptionsTableName = NotifierTableStorageTableNames.ApiSubscriptionsTableName;
-
     public async Task<ApiSubscription?> GetSubscription(
         Guid dataSetId,
         string email,
         CancellationToken cancellationToken = default)
     {
         return await apiSubscriptionTableStorage.GetEntityIfExists<ApiSubscription>(
-            tableName: ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             cancellationToken: cancellationToken);
@@ -45,7 +43,7 @@ internal class ApiSubscriptionRepository(
         };
 
         await apiSubscriptionTableStorage.CreateEntity(
-            tableName: ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entity: subscription,
             cancellationToken: cancellationToken);
     }
@@ -55,7 +53,7 @@ internal class ApiSubscriptionRepository(
         CancellationToken cancellationToken = default)
     {
         await apiSubscriptionTableStorage.UpdateEntity(
-            tableName: ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entity: subscription,
             cancellationToken: cancellationToken);
     }
@@ -66,7 +64,7 @@ internal class ApiSubscriptionRepository(
         CancellationToken cancellationToken = default)
     {
         await apiSubscriptionTableStorage.DeleteEntity(
-            tableName: ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             cancellationToken: cancellationToken);
@@ -81,7 +79,7 @@ internal class ApiSubscriptionRepository(
         filter ??= subscription => true;
 
         return await apiSubscriptionTableStorage.QueryEntities(
-            tableName: ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             filter: filter,
             maxPerPage: maxPerPage,
             select: select,
@@ -94,7 +92,7 @@ internal class ApiSubscriptionRepository(
         CancellationToken cancellationToken = default)
     {
         await apiSubscriptionTableStorage.BatchManipulateEntities(
-            tableName: ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entities: subscriptions,
             tableTransactionActionType: tableTransactionActionType,
             cancellationToken: cancellationToken);
