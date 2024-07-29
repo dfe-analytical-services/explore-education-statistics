@@ -1,4 +1,4 @@
-export interface TableQuery {
+export interface FullTableQuery {
   subjectId: string;
   filters: string[];
   indicators: string[];

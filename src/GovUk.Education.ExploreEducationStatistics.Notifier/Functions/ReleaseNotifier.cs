@@ -8,11 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
-using Notify.Client;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
@@ -23,8 +23,7 @@ public class ReleaseNotifier
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions;
     private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
-    private readonly IStorageTableService _storageTableService;
-    private readonly INotificationClientProvider _notificationClientProvider;
+    private readonly IPublicationSubscriptionRepository _publicationSubscriptionRepository;
 
     public ReleaseNotifier(
         ILogger<ReleaseNotifier> logger,
@@ -32,17 +31,14 @@ public class ReleaseNotifier
         IOptions<GovUkNotifyOptions> govUkNotifyOptions,
         ITokenService tokenService,
         IEmailService emailService,
-        IStorageTableService storageTableService,
-        INotificationClientProvider notificationClientProvider)
+        IPublicationSubscriptionRepository publicationSubscriptionRepository)
     {
         _logger = logger;
         _appSettingsOptions = appSettingsOptions.Value;
         _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-        _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
-        _notificationClientProvider = notificationClientProvider
-                                      ?? throw new ArgumentNullException(nameof(notificationClientProvider));
+        _publicationSubscriptionRepository = publicationSubscriptionRepository ?? throw new ArgumentNullException(nameof(publicationSubscriptionRepository));
     }
 
     [Function("ReleaseNotifier")]
@@ -52,9 +48,7 @@ public class ReleaseNotifier
     {
         _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var notificationClient = _notificationClientProvider.Get();
-
-        var subscribersTable = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
+        var subscribersTable = await _publicationSubscriptionRepository.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName);
 
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -67,7 +61,7 @@ public class ReleaseNotifier
 
         foreach (var email in releaseSubscriberEmails)
         {
-            SendSubscriberEmail(email, msg, notificationClient);
+            SendSubscriberEmail(email, msg);
             sentEmails.Add(email);
         }
 
@@ -96,8 +90,7 @@ public class ReleaseNotifier
 
                 SendSupersededSubscriberEmail(email,
                     supersededPublication,
-                    msg,
-                    notificationClient);
+                    msg);
                 sentEmails.Add(email);
                 numSupersededSubscriberEmailsSent++;
             }
@@ -135,8 +128,7 @@ public class ReleaseNotifier
 
     private void SendSubscriberEmail(
         string email,
-        ReleaseNotificationMessage msg,
-        NotificationClient notificationClient)
+        ReleaseNotificationMessage msg)
     {
         var unsubscribeToken =
             _tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
@@ -164,7 +156,7 @@ public class ReleaseNotifier
             ? _emailTemplateOptions.ReleaseAmendmentPublishedId
             : _emailTemplateOptions.ReleasePublishedId;
 
-        _emailService.SendEmail(notificationClient,
+        _emailService.SendEmail(
             email: email,
             templateId: releaseTemplateId,
             values);
@@ -173,8 +165,7 @@ public class ReleaseNotifier
     private void SendSupersededSubscriberEmail(
         string email,
         IdTitleViewModel supersededPublication,
-        ReleaseNotificationMessage msg,
-        NotificationClient notificationClient)
+        ReleaseNotificationMessage msg)
     {
         var unsubscribeToken = _tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
 
@@ -202,7 +193,7 @@ public class ReleaseNotifier
             ? _emailTemplateOptions.ReleaseAmendmentPublishedSupersededSubscribersId
             : _emailTemplateOptions.ReleasePublishedSupersededSubscribersId;
 
-        _emailService.SendEmail(notificationClient,
+        _emailService.SendEmail(
             email: email,
             templateId: releaseSupersededSubscribersEmailTemplateId,
             values);

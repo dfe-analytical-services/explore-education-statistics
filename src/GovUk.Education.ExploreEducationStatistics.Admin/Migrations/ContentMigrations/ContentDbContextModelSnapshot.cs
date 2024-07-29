@@ -301,9 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("MetaFileId")
                         .IsUnique();
 
-                    b.HasIndex("ZipFileId")
-                        .IsUnique()
-                        .HasFilter("[ZipFileId] IS NOT NULL");
+                    b.HasIndex("ZipFileId");
 
                     b.ToTable("DataImports");
                 });
@@ -1550,8 +1548,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ZipFile")
-                        .WithOne()
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", "ZipFileId")
+                        .WithMany()
+                        .HasForeignKey("ZipFileId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("File");

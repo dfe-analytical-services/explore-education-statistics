@@ -47,15 +47,19 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public List<TimePeriodMeta> TimePeriodMetas { get; set; } = [];
 
-    public List<ChangeSetFilters> FilterChanges { get; set; } = [];
+    public List<FilterMetaChange> FilterMetaChanges { get; set; } = [];
 
-    public List<ChangeSetFilterOptions> FilterOptionChanges { get; set; } = [];
+    public List<FilterOptionMetaChange> FilterOptionMetaChanges { get; set; } = [];
 
-    public List<ChangeSetIndicators> IndicatorChanges { get; set; } = [];
+    public GeographicLevelMetaChange? GeographicLevelMetaChange { get; set; }
 
-    public List<ChangeSetLocations> LocationChanges { get; set; } = [];
+    public List<IndicatorMetaChange> IndicatorMetaChanges { get; set; } = [];
 
-    public List<ChangeSetTimePeriods> TimePeriodChanges { get; set; } = [];
+    public List<LocationMetaChange> LocationMetaChanges { get; set; } = [];
+
+    public List<LocationOptionMetaChange> LocationOptionMetaChanges { get; set; } = [];
+
+    public List<TimePeriodMetaChange> TimePeriodMetaChanges { get; set; } = [];
 
     public List<DataSetVersionImport> Imports { get; set; } = [];
 

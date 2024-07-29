@@ -24,10 +24,6 @@ Verify that absolute paths with trailing slashes are redirected without them
     user waits until page contains    Data catalogue
     user checks url without auth equals   ${PUBLIC_URL_WITHOUT_AUTH}/data-catalogue
 
-    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
-    user waits until page contains    Data catalogue
-    user checks url without auth equals   ${PUBLIC_URL_WITHOUT_AUTH}/data-catalogue
-
     user navigates to public frontend    %{PUBLIC_URL}/glossary/?someRandomUrlParameter=123
     user waits until page contains    Glossary
     user checks url without auth equals    ${PUBLIC_URL_WITHOUT_AUTH}/glossary?someRandomUrlParameter=123
@@ -71,4 +67,3 @@ Verify that multiple rules work together
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/1000/?foo=bar
     user waits until page contains    Data catalogue
     user checks url without auth equals    ${PUBLIC_URL_WITHOUT_AUTH}/data-catalogue
-

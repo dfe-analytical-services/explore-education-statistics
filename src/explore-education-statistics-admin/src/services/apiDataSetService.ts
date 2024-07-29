@@ -10,6 +10,7 @@ export interface ApiDataSetSummary {
   supersedingDataSetId?: string;
   draftVersion?: ApiDataSetDraftVersionSummary;
   latestLiveVersion?: ApiDataSetLiveVersionSummary;
+  previousReleaseIds: string[];
 }
 
 export interface ApiDataSetVersionSummary {
@@ -36,6 +37,7 @@ export interface ApiDataSet {
   supersedingDataSetId?: string;
   draftVersion?: ApiDataSetDraftVersion;
   latestLiveVersion?: ApiDataSetLiveVersion;
+  previousReleaseIds: string[];
 }
 
 export interface ApiDataSetVersion {
@@ -54,6 +56,10 @@ export interface ApiDataSetDraftVersion extends ApiDataSetVersion {
   geographicLevels?: string[];
   filters?: string[];
   indicators?: string[];
+  mappingStatus?: {
+    locationsComplete: boolean;
+    filtersComplete: boolean;
+  };
 }
 
 export interface ApiDataSetLiveVersion extends ApiDataSetVersion {

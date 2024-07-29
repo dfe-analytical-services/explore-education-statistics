@@ -14,7 +14,7 @@ public interface ISubjectCsvMetaService
 {
     Task<Either<ActionResult, SubjectCsvMetaViewModel>> GetSubjectCsvMeta(
         ReleaseSubject releaseSubject,
-        ObservationQueryContext query,
+        FullTableQuery query,
         IList<Observation> observations,
         CancellationToken cancellationToken = default);
 }

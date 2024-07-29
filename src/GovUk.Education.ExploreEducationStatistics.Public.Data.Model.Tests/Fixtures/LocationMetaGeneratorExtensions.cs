@@ -82,7 +82,7 @@ public static class LocationMetaGeneratorExtensions
     public static InstanceSetters<LocationMeta> SetOptions(
         this InstanceSetters<LocationMeta> setters,
         IEnumerable<LocationOptionMeta> options)
-        => setters.Set(m => m.Options, () => options);
+        => setters.SetOptions(() => options);
 
     public static InstanceSetters<LocationMeta> SetOptions(
         this InstanceSetters<LocationMeta> setters,

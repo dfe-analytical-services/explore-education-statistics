@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -19,9 +20,11 @@ public record DataSetViewModel
 
     public Guid? SupersedingDataSetId { get; init; }
 
-    public required DataSetVersionViewModel? DraftVersion { get; init; }
+    public required DataSetDraftVersionViewModel? DraftVersion { get; init; }
 
     public required DataSetLiveVersionViewModel? LatestLiveVersion { get; init; }
+
+    public required List<Guid> PreviousReleaseIds { get; init; }
 }
 
 public record DataSetSummaryViewModel
@@ -40,4 +43,6 @@ public record DataSetSummaryViewModel
     public required DataSetVersionSummaryViewModel? DraftVersion { get; init; }
 
     public required DataSetLiveVersionSummaryViewModel? LatestLiveVersion { get; init; }
+
+    public required List<Guid> PreviousReleaseIds { get; init; }
 }

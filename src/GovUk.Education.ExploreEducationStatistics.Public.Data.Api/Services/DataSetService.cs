@@ -429,7 +429,7 @@ internal class DataSetService(
 
     private static LocationLevelMetaViewModel MapLocationMeta(LocationMeta locationMeta)
     {
-        var options = locationMeta.Options
+        var options = locationMeta.OptionLinks
             .Select(MapLocationOptionMeta)
             .OrderBy(lom => lom.Label)
             .ToList();
@@ -442,37 +442,39 @@ internal class DataSetService(
         };
     }
 
-    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationOptionMeta locationOptionMeta)
+    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationOptionMetaLink locationOptionMetaLink)
     {
+        var locationOptionMeta = locationOptionMetaLink.Option;
+        
         return locationOptionMeta switch
         {
             LocationCodedOptionMeta codedOption => new LocationCodedOptionMetaViewModel
             {
-                Id = codedOption.PublicId,
+                Id = locationOptionMetaLink.PublicId,
                 Label = codedOption.Label,
                 Code = codedOption.Code,
             },
             LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionMetaViewModel
             {
-                Id = localAuthorityOption.PublicId,
+                Id = locationOptionMetaLink.PublicId,
                 Label = localAuthorityOption.Label,
                 Code = localAuthorityOption.Code,
                 OldCode = localAuthorityOption.OldCode,
             },
             LocationProviderOptionMeta providerOption => new LocationProviderOptionMetaViewModel
             {
-                Id = providerOption.PublicId,
+                Id = locationOptionMetaLink.PublicId,
                 Label = providerOption.Label,
                 Ukprn = providerOption.Ukprn,
             },
             LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionMetaViewModel
             {
-                Id = rscRegionOption.PublicId,
+                Id = locationOptionMetaLink.PublicId,
                 Label = rscRegionOption.Label,
             },
             LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionMetaViewModel
             {
-                Id = schoolOption.PublicId,
+                Id = locationOptionMetaLink.PublicId,
                 Label = schoolOption.Label,
                 Urn = schoolOption.Urn,
                 LaEstab = schoolOption.LaEstab,

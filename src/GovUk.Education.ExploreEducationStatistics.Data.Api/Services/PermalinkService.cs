@@ -11,6 +11,8 @@ using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -89,7 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await (request.ReleaseId ?? await FindLatestPublishedReleaseVersionId(request.Query.SubjectId))
                 .OnSuccess(releaseVersionId =>
                 {
-                    return _tableBuilderService.Query(releaseVersionId, request.Query, cancellationToken)
+                    return _tableBuilderService.Query(releaseVersionId,
+                            request.Query.AsFullTableQuery(),
+                            cancellationToken)
                         .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                         {
                             var frontendTableTask = _frontendService.CreateTable(

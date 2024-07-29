@@ -21,5 +21,9 @@ public class GovUkNotifyOptions
         public string SubscriptionConfirmationId { get; init; } = null!;
 
         public string SubscriptionVerificationId { get; init; } = null!;
+
+        public string ApiSubscriptionConfirmationId { get; init; } = null!;
+
+        public string ApiSubscriptionVerificationId { get; init; } = null!;
     }
 }

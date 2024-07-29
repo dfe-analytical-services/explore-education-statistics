@@ -250,18 +250,8 @@ const ChartBuilder = ({
   const handleChartDefinitionChange = useCallback(
     async (chartDefinition: ChartDefinition) => {
       actions.updateChartDefinition(chartDefinition);
-
-      if (chartDefinition.type === 'map') {
-        setDataLoading(true);
-
-        await onTableQueryUpdate({
-          includeGeoJson: true,
-        });
-
-        setDataLoading(false);
-      }
     },
-    [actions, onTableQueryUpdate],
+    [actions],
   );
 
   const [handleChartConfigurationChange] = useDebouncedCallback(

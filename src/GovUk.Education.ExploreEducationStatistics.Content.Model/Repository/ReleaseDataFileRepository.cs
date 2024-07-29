@@ -84,27 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return created.File;
         }
 
-        public async Task<File> CreateZip(Guid releaseVersionId,
-            string filename,
-            long contentLength,
-            string contentType,
-            Guid createdById)
-        {
-            var file = (await _contentDbContext.Files.AddAsync(new File
-            {
-                CreatedById = createdById,
-                RootPath = releaseVersionId,
-                Filename = filename,
-                ContentLength = contentLength,
-                ContentType = contentType,
-                Type = DataZip
-            })).Entity;
-
-            await _contentDbContext.SaveChangesAsync();
-
-            return file;
-        }
-
         public async Task<IList<File>> ListDataFiles(Guid releaseVersionId)
         {
             return await ListDataFilesQuery(releaseVersionId).ToListAsync();

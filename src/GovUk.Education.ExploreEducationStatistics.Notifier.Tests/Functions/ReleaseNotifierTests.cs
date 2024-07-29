@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
@@ -15,7 +15,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.TableStorageTestUtils;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Utils.NotifierTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
@@ -41,13 +40,6 @@ public class ReleaseNotifierTests
     public async Task ReleaseNotifierFunc()
     {
         var publication1Id = Guid.NewGuid();
-
-        // generate NotificationClient and use it in test
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
 
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
@@ -77,9 +69,9 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -92,15 +84,14 @@ public class ReleaseNotifierTests
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "release-published-id",
+            mock.SendEmail("test@test.com", "release-published-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "superseded@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
-            notificationClientProvider: notificationClientProvider.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -128,7 +119,7 @@ public class ReleaseNotifierTests
             new TestFunctionContext());
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "release-published-id",
+            mock.SendEmail("test@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         publication1Id.ToString(), "Publication 1", "publication-1",
@@ -136,7 +127,7 @@ public class ReleaseNotifierTests
                 )), Times.Once);
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "superseded@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
@@ -149,13 +140,6 @@ public class ReleaseNotifierTests
     public async Task ReleaseNotifierFunc_MultipleSubs()
     {
         var publication1Id = Guid.NewGuid();
-
-        // generate NotificationClient and use it in test
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
 
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
@@ -175,9 +159,9 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -193,18 +177,17 @@ public class ReleaseNotifierTests
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test1@test.com", "release-published-id",
+            mock.SendEmail("test1@test.com", "release-published-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test2@test.com", "release-published-id",
+            mock.SendEmail("test2@test.com", "release-published-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test3@test.com", "release-published-id",
+            mock.SendEmail("test3@test.com", "release-published-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
-            notificationClientProvider: notificationClientProvider.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -225,21 +208,21 @@ public class ReleaseNotifierTests
             new TestFunctionContext());
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test1@test.com", "release-published-id",
+            mock.SendEmail("test1@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         publication1Id.ToString(), "Publication 1", "publication-1",
                         "2000", "2000", null, null)
                 )), Times.Once);
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test2@test.com", "release-published-id",
+            mock.SendEmail("test2@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         publication1Id.ToString(), "Publication 1", "publication-1",
                         "2000", "2000", null, null)
                 )), Times.Once);
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test3@test.com", "release-published-id",
+            mock.SendEmail("test3@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-3",
                         publication1Id.ToString(), "Publication 1", "publication-1",
@@ -251,13 +234,6 @@ public class ReleaseNotifierTests
     public async Task ReleaseNotifierFunc_MultipleSupersededPublicationSubs()
     {
         var publication1Id = Guid.NewGuid();
-
-        // generate NotificationClient and use it in test
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
 
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
@@ -288,9 +264,9 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -306,18 +282,17 @@ public class ReleaseNotifierTests
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "superseded1@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "superseded2@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "superseded3@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded3@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
-            notificationClientProvider: notificationClientProvider.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -345,7 +320,7 @@ public class ReleaseNotifierTests
             new TestFunctionContext());
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "superseded1@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
@@ -353,7 +328,7 @@ public class ReleaseNotifierTests
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "superseded2@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
@@ -361,7 +336,7 @@ public class ReleaseNotifierTests
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "superseded3@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded3@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-3",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
@@ -374,13 +349,6 @@ public class ReleaseNotifierTests
     public async Task ReleaseNotifierFunc_MultipleSupersededPublications()
     {
         var publication1Id = Guid.NewGuid();
-
-        // generate NotificationClient and use it in test
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
 
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
@@ -419,9 +387,9 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPub2Subs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -434,15 +402,14 @@ public class ReleaseNotifierTests
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "superseded1@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "superseded2@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
-            notificationClientProvider: notificationClientProvider.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -475,7 +442,7 @@ public class ReleaseNotifierTests
             new TestFunctionContext());
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "superseded1@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         supersededPub1Id.ToString(), "Publication 1", "publication-1",
@@ -483,7 +450,7 @@ public class ReleaseNotifierTests
                         "Superseded 1 publication")
                 )), Times.Once);
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "superseded2@test.com", "release-published-superseded-subscribers-id",
+            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         supersededPub2Id.ToString(), "Publication 1", "publication-1",
@@ -496,13 +463,6 @@ public class ReleaseNotifierTests
     public async Task ReleaseNotifierFunc_Amendment()
     {
         var publication1Id = Guid.NewGuid();
-
-        // generate NotificationClient and use it in test
-        var notificationClient = MockNotificationClient(HttpStatusCode.OK, "response content");
-        var notificationClientProvider = new Mock<INotificationClientProvider>(MockBehavior.Strict);
-        notificationClientProvider.Setup(mock =>
-                mock.Get())
-            .Returns(notificationClient);
 
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
@@ -532,9 +492,9 @@ public class ReleaseNotifierTests
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
 
         // other mocks
-        var storageTableService = new Mock<IStorageTableService>(MockBehavior.Strict);
-        storageTableService.Setup(mock =>
-                mock.GetTable(NotifierSubscriptionsTableName))
+        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
+        publicationSubscriptionRepository.Setup(mock =>
+                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -547,16 +507,15 @@ public class ReleaseNotifierTests
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "release-amendment-published-id",
+            mock.SendEmail("test@test.com", "release-amendment-published-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
         emailService.Setup(mock =>
-            mock.SendEmail(notificationClient, "superseded@test.com",
+            mock.SendEmail("superseded@test.com",
                 "release-amendment-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            storageTableService: storageTableService.Object,
-            notificationClientProvider: notificationClientProvider.Object,
+            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -584,7 +543,7 @@ public class ReleaseNotifierTests
             new TestFunctionContext());
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "test@test.com", "release-amendment-published-id",
+            mock.SendEmail("test@test.com", "release-amendment-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         publication1Id.ToString(), "Publication 1", "publication-1",
@@ -592,7 +551,7 @@ public class ReleaseNotifierTests
                 )), Times.Once);
 
         emailService.Verify(mock =>
-            mock.SendEmail(notificationClient, "superseded@test.com",
+            mock.SendEmail("superseded@test.com",
                 "release-amendment-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
@@ -638,8 +597,7 @@ public class ReleaseNotifierTests
     private static ReleaseNotifier BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IStorageTableService? storageTableService = null,
-        INotificationClientProvider? notificationClientProvider = null)
+        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null)
     {
         return new ReleaseNotifier(
             Mock.Of<ILogger<ReleaseNotifier>>(),
@@ -651,7 +609,6 @@ public class ReleaseNotifierTests
             }),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            storageTableService ?? Mock.Of<IStorageTableService>(MockBehavior.Strict),
-            notificationClientProvider ?? Mock.Of<INotificationClientProvider>(MockBehavior.Strict));
+            publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict));
     }
 }

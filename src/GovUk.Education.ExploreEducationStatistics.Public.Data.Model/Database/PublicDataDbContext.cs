@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 
 public class PublicDataDbContext : DbContext
 {
+    public const string PublicDataReadWriteRole = "public_data_read_write";
     public const string FilterOptionMetaLinkSequence = "FilterOptionMetaLink_seq";
     public const string LocationOptionMetasIdSequence = "LocationOptionMetas_Id_seq";
 
@@ -64,11 +65,13 @@ public class PublicDataDbContext : DbContext
     public DbSet<FilterOptionMetaLink> FilterOptionMetaLinks { get; init; } = null!;
     public DbSet<IndicatorMeta> IndicatorMetas { get; init; } = null!;
     public DbSet<TimePeriodMeta> TimePeriodMetas { get; init; } = null!;
-    public DbSet<ChangeSetFilters> ChangeSetFilters { get; init; } = null!;
-    public DbSet<ChangeSetFilterOptions> ChangeSetFilterOptions { get; init; } = null!;
-    public DbSet<ChangeSetIndicators> ChangeSetIndicators { get; init; } = null!;
-    public DbSet<ChangeSetLocations> ChangeSetLocations { get; init; } = null!;
-    public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
+    public DbSet<FilterMetaChange> FilterMetaChanges { get; init; } = null!;
+    public DbSet<FilterOptionMetaChange> FilterOptionMetaChanges { get; init; } = null!;
+    public DbSet<GeographicLevelMetaChange> GeographicLevelMetaChanges { get; init; } = null!;
+    public DbSet<IndicatorMetaChange> IndicatorMetaChanges { get; init; } = null!;
+    public DbSet<LocationMetaChange> LocationMetaChanges { get; init; } = null!;
+    public DbSet<LocationOptionMetaChange> LocationOptionMetaChanges { get; init; } = null!;
+    public DbSet<TimePeriodMetaChange> TimePeriodMetaChanges { get; init; } = null!;
     public DbSet<PreviewToken> PreviewTokens { get; init; } = null!;
 
     public DbSet<JsonFragment> JsonFragments { get; init; } = null!;

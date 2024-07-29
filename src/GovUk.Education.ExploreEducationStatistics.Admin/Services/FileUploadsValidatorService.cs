@@ -18,6 +18,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -26,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
 
-        private const int MaxFilenameSize = 150;
+        public const int MaxFilenameSize = 150;
         private const int MaxFileSize = int.MaxValue; // 2GB
 
         public FileUploadsValidatorService(IFileTypeService fileTypeService,
@@ -36,31 +38,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        public async Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(
+        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
+            string dataSetTitle,
+            string dataFileName,
+            long dataFileLength,
+            Stream dataFileStream,
+            string metaFileName,
+            long metaFileLength,
+            Stream metaFileStream,
+            File? replacingFile = null)
+        {
+            List<ErrorViewModel> errors = [];
+
+            errors.AddRange(ValidateDataSetTitle(
+                releaseVersionId,
+                dataSetTitle,
+                isReplacement: replacingFile != null));
+
+            errors.AddRange(ValidateDataFileNames(
+                releaseVersionId,
+                dataFileName: dataFileName,
+                metaFileName: metaFileName,
+                replacingFile));
+
+            errors.AddRange(ValidateDataFileSizes(
+                dataFileLength,
+                dataFileName,
+                metaFileLength,
+                metaFileName));
+
+            errors.AddRange(await ValidateDataFileTypes(
+                dataFileName,
+                dataFileStream,
+                metaFileName,
+                metaFileStream));
+
+            return errors;
+        }
+
+        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
+            Guid releaseVersionId,
+            string dataSetTitle,
             IFormFile dataFile,
             IFormFile metaFile,
             File? replacingFile = null)
         {
-            return await ValidateDataFileNames(releaseVersionId,
-                    dataFileName: dataFile.FileName,
-                    metaFileName: metaFile.FileName,
-                    replacingFile)
-                .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
-                .OnSuccess(async _ => await ValidateDataFileTypes(dataFile, metaFile));
+            await using var dataFileStream = dataFile.OpenReadStream();
+            await using var metaFileStream = metaFile.OpenReadStream();
+
+            return await ValidateDataSetFilesForUpload(
+                releaseVersionId: releaseVersionId,
+                dataSetTitle: dataSetTitle,
+                dataFileName:dataFile.FileName,
+                dataFileLength:dataFile.Length,
+                dataFileStream: dataFileStream,
+                metaFileName:metaFile.FileName,
+                metaFileLength:metaFile.Length,
+                metaFileStream: metaFileStream,
+                replacingFile: replacingFile);
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(
+        public async Task<List<ErrorViewModel>> ValidateDataSetFilesForUpload(
             Guid releaseVersionId,
-            IDataArchiveFile archiveFile,
+            ArchiveDataSetFile archiveDataSet,
+            Stream dataFileStream,
+            Stream metaFileStream,
             File? replacingFile = null)
         {
-            return await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize)
-                .OnSuccess(async _ => await ValidateDataFileNames(releaseVersionId,
-                    dataFileName: archiveFile.DataFileName,
-                    metaFileName: archiveFile.MetaFileName,
-                    replacingFile));
+            return await ValidateDataSetFilesForUpload(
+                releaseVersionId: releaseVersionId,
+                dataSetTitle: archiveDataSet.Title,
+                dataFileName: archiveDataSet.DataFilename,
+                dataFileLength: archiveDataSet.DataFileSize,
+                dataFileStream: dataFileStream,
+                metaFileName: archiveDataSet.MetaFilename,
+                metaFileLength: archiveDataSet.MetaFileSize,
+                metaFileStream: metaFileStream,
+                replacingFile: replacingFile);
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
@@ -89,40 +144,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseVersionId,
-            string name)
+        private List<ErrorViewModel> ValidateDataSetTitle(
+            Guid releaseVersionId,
+            string title,
+            bool isReplacement)
         {
-            if (!name.Any())
+            List<ErrorViewModel> errors = [];
+
+            if (!title.Any())
             {
-                return ValidationActionResult(SubjectTitleCannotBeEmpty);
+                errors.Add(new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetTitleCannotBeEmpty.Code,
+                    Message = ValidationMessages.DataSetTitleCannotBeEmpty.Message,
+                });
             }
 
-            if (FileContainsSpecialChars(name))
+            if (ContainsSpecialChars(title))
             {
-                return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
+                errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(title));
             }
 
-            var subjectNameExists = _context.ReleaseFiles
-                .Include(rf => rf.File)
-                .Any(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.Type == FileType.Data
-                    && rf.Name == name);
-            if (subjectNameExists)
+            if (!isReplacement) // if a replacement, we get the title from the replacement which is already validated as unique
             {
-                return ValidationActionResult(SubjectTitleMustBeUnique);
+                var dataSetNameExists = _context.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Any(rf =>
+                        rf.ReleaseVersionId == releaseVersionId
+                        && rf.File.Type == FileType.Data
+                        && rf.Name == title);
+
+                if (dataSetNameExists)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(title));
+                }
             }
 
-            return await Task.FromResult(Unit.Instance);
+            return errors;
         }
 
-        private static bool FileContainsSpacesOrSpecialChars(string filename)
+        private static bool ContainsSpacesOrSpecialChars(string filename)
         {
             return filename.IndexOf(" ", Ordinal) > -1 ||
-                   FileContainsSpecialChars(filename);
+                   ContainsSpecialChars(filename);
         }
 
-        private static bool FileContainsSpecialChars(string filename)
+        private static bool ContainsSpecialChars(string filename)
         {
             return filename.IndexOf("&", Ordinal) > -1 ||
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
@@ -130,129 +197,124 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private bool IsFileExisting(Guid releaseVersionId,
             FileType type,
-            string name)
+            string filename)
         {
             return _context
                 .ReleaseFiles
                 .Include(rf => rf.File)
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId
+                             && rf.File.Type == type)
                 .ToList()
-                .Any(rf => String.Equals(rf.File.Filename, name, CurrentCultureIgnoreCase)
-                           && rf.File.Type == type);
+                .Any(rf => string.Equals(rf.File.Filename, filename, CurrentCultureIgnoreCase));
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(
+        private List<ErrorViewModel> ValidateDataFileNames(
             Guid releaseVersionId,
             string dataFileName,
             string metaFileName,
-            File? replacingFile)
+            File? replacingFile = null)
         {
+            List<ErrorViewModel> errors = [];
+
             if (string.Equals(dataFileName.ToLower(), metaFileName.ToLower(), OrdinalIgnoreCase))
             {
-                return ValidationActionResult(DataAndMetadataFilesCannotHaveTheSameName);
+                errors.Add(new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Code,
+                    Message = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Message,
+                });
             }
 
-            if (FileContainsSpacesOrSpecialChars(dataFileName))
+            if (ContainsSpacesOrSpecialChars(dataFileName))
             {
-                return ValidationActionResult(DataFilenameCannotContainSpacesOrSpecialCharacters);
+                errors.Add(ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters(
+                    dataFileName));
             }
 
-            if (FileContainsSpacesOrSpecialChars(metaFileName))
+            if (ContainsSpacesOrSpecialChars(metaFileName))
             {
-                return ValidationActionResult(MetaFilenameCannotContainSpacesOrSpecialCharacters);
+                errors.Add(ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters(
+                    metaFileName));
             }
 
-            if (!metaFileName.ToLower().Contains(".meta."))
+            if (!dataFileName.EndsWith(".csv"))
             {
-                return ValidationActionResult(MetaFileIsIncorrectlyNamed);
+                errors.Add(ValidationMessages.GenerateErrorFilenameMustEndDotCsv(dataFileName));
             }
 
-            if (!ValidateFileExtension(dataFileName, ".csv"))
+            if (!metaFileName.EndsWith(".meta.csv"))
             {
-                return ValidationActionResult(DataFileMustBeCsvFile);
+                errors.Add(ValidationMessages.GenerateErrorMetaFilenameMustEndDotMetaDotCsv(metaFileName));
             }
 
-            if (!ValidateFileExtension(metaFileName, ".csv"))
+            if (dataFileName.Length > MaxFilenameSize)
             {
-                return ValidationActionResult(MetaFileMustBeCsvFile);
+                errors.Add(ValidationMessages.GenerateErrorFilenameTooLong(
+                    dataFileName, MaxFilenameSize));
             }
 
-            var filenamesValid = ValidateFilenameLengths(
-                dataFileName.Length,
-                metaFileName.Length);
-
-            if (filenamesValid.IsLeft)
+            if (metaFileName.Length > MaxFilenameSize)
             {
-                return filenamesValid.Left;
+                errors.Add(ValidationMessages.GenerateErrorFilenameTooLong(
+                    metaFileName, MaxFilenameSize));
             }
 
+            // - Original uploads' data filename is not unique if a ReleaseFile exists with the same filename.
+            // - With replacement uploads, we can ignore a preexisting ReleaseFile if it is the file being replaced -
+            // we only care if the preexisting duplicate ReleaseFile name isn't the file being replaced.
             if (IsFileExisting(releaseVersionId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
-                return ValidationActionResult(DataFilenameNotUnique);
+                errors.Add(ValidationMessages.GenerateErrorFilenameNotUnique(dataFileName, FileType.Data));
             }
 
-            return Unit.Instance;
+            // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
+            // zips, so meta files won't be included in the same directory by filename and thereby cannot clash
+
+            return errors;
         }
 
-        private static async Task<Either<ActionResult, Unit>> ValidateDataFileSizes(long dataFileLength,
-            long metaFileLength)
+        private static List<ErrorViewModel> ValidateDataFileSizes(
+            long dataFileSize,
+            string dataFileName,
+            long metaFileSize,
+            string metaFileName)
+
         {
-            if (dataFileLength == 0)
+            List<ErrorViewModel> errors = [];
+
+            if (dataFileSize == 0)
             {
-                return ValidationActionResult(DataFileCannotBeEmpty);
+                errors.Add(ValidationMessages.GenerateErrorFileSizeMustNotBeZero(dataFileName));
             }
 
-            if (metaFileLength == 0)
+            if (metaFileSize == 0)
             {
-                return ValidationActionResult(MetadataFileCannotBeEmpty);
+                errors.Add(ValidationMessages.GenerateErrorFileSizeMustNotBeZero(metaFileName));
             }
 
-            return Unit.Instance;
+            return errors;
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateDataFileTypes(IFormFile dataFile, IFormFile metaFile)
+        private async Task<List<ErrorViewModel>> ValidateDataFileTypes(
+            string dataFileName,
+            Stream dataFileStream,
+            string metaFileName,
+            Stream metaFileStream)
         {
-            if (!await _fileTypeService.IsValidCsvFile(dataFile))
+            List<ErrorViewModel> errors = [];
+
+            if (!await _fileTypeService.IsValidCsvFile(dataFileStream))
             {
-                return ValidationActionResult(DataFileMustBeCsvFile);
+                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(dataFileName));
             }
 
-            if (!await _fileTypeService.IsValidCsvFile(metaFile))
+            if (!await _fileTypeService.IsValidCsvFile(metaFileStream))
             {
-                return ValidationActionResult(MetaFileMustBeCsvFile);
+                errors.Add(ValidationMessages.GenerateErrorMustBeCsvFile(metaFileName));
             }
 
-            return Unit.Instance;
-        }
-
-        private static bool ValidateFileExtension(string fileName, string requiredExtension)
-        {
-            return fileName.EndsWith(requiredExtension);
-        }
-
-        private static Either<ActionResult, Unit> ValidateFilenameLengths(
-            int dataFilenameLength,
-            int metaFilenameLength)
-        {
-            var errorMessages = new List<ValidationErrorMessages>();
-
-            if (dataFilenameLength > MaxFilenameSize)
-            {
-                errorMessages.Add(DataFilenameTooLong);
-            }
-
-            if (metaFilenameLength > MaxFilenameSize)
-            {
-                errorMessages.Add(MetaFilenameTooLong);
-            }
-
-            if (errorMessages.Any())
-            {
-                return ValidationActionResult(errorMessages);
-            }
-
-            return Unit.Instance;
+            return errors;
         }
     }
 }

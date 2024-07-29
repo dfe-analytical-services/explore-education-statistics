@@ -3,34 +3,47 @@ import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
+import { GlobalPermissions } from '@admin/services/authService';
 
 describe('ReleaseStatusChecklist', () => {
   test('renders correctly with errors', () => {
+    const bauUser: User = {
+      id: 'user-id',
+      name: 'BAU',
+      permissions: {
+        isBauUser: true,
+      } as GlobalPermissions,
+    };
+
     render(
-      <MemoryRouter>
-        <ReleaseStatusChecklist
-          checklist={{
-            valid: false,
-            warnings: [],
-            errors: [
-              { code: 'DataFileImportsMustBeCompleted' },
-              { code: 'DataFileReplacementsMustBeCompleted' },
-              { code: 'PublicDataGuidanceRequired' },
-              { code: 'ReleaseNoteRequired' },
-              { code: 'SummarySectionContainsEmptyHtmlBlock' },
-              { code: 'EmptyContentSectionExists' },
-              { code: 'GenericSectionsContainEmptyHtmlBlock' },
-              { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
-              { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
-              { code: 'PublicApiDataSetImportsMustBeCompleted' },
-              { code: 'PublicApiDataSetCancellationsMustBeResolved' },
-              { code: 'PublicApiDataSetFailuresMustBeResolved' },
-              { code: 'PublicApiDataSetMappingsMustBeCompleted' },
-            ],
-          }}
-          release={testRelease}
-        />
-      </MemoryRouter>,
+      <AuthContextTestProvider user={bauUser}>
+        <MemoryRouter>
+          <ReleaseStatusChecklist
+            checklist={{
+              valid: false,
+              warnings: [],
+              errors: [
+                { code: 'DataFileImportsMustBeCompleted' },
+                { code: 'DataFileReplacementsMustBeCompleted' },
+                { code: 'PublicDataGuidanceRequired' },
+                { code: 'ReleaseNoteRequired' },
+                { code: 'SummarySectionContainsEmptyHtmlBlock' },
+                { code: 'EmptyContentSectionExists' },
+                { code: 'GenericSectionsContainEmptyHtmlBlock' },
+                { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
+                { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
+                { code: 'PublicApiDataSetImportsMustBeCompleted' },
+                { code: 'PublicApiDataSetCancellationsMustBeResolved' },
+                { code: 'PublicApiDataSetFailuresMustBeResolved' },
+                { code: 'PublicApiDataSetMappingsMustBeCompleted' },
+              ],
+            }}
+            release={testRelease}
+          />
+        </MemoryRouter>
+        ,
+      </AuthContextTestProvider>,
     );
 
     expect(
@@ -126,39 +139,123 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'All Public API data set imports must be completed',
+        name: 'All public API data set processing must be completed',
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data#data-uploads',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
     );
 
     expect(
       screen.getByRole('link', {
-        name: 'All cancelled Public API data set imports must be removed or completed',
+        name: 'All cancelled public API data sets must be removed or completed',
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data#data-uploads',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
     );
 
     expect(
       screen.getByRole('link', {
-        name: 'All failed Public API data set imports must be retried or removed',
+        name: 'All failed public API data sets must be retried or removed',
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data#data-uploads',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
     );
 
     expect(
       screen.getByRole('link', {
-        name: 'All Public API data set mappings must be completed',
+        name: 'All public API data set mappings must be completed',
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data#data-uploads',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
     );
+  });
+
+  test('does not render api data set links for non-BAU users', () => {
+    const nonBauUser: User = {
+      id: 'user-id',
+      name: 'BAU',
+      permissions: {
+        isBauUser: false,
+      } as GlobalPermissions,
+    };
+
+    render(
+      <AuthContextTestProvider user={nonBauUser}>
+        <MemoryRouter>
+          <ReleaseStatusChecklist
+            checklist={{
+              valid: false,
+              warnings: [],
+              errors: [
+                { code: 'DataFileImportsMustBeCompleted' },
+                { code: 'DataFileReplacementsMustBeCompleted' },
+                { code: 'PublicDataGuidanceRequired' },
+                { code: 'ReleaseNoteRequired' },
+                { code: 'SummarySectionContainsEmptyHtmlBlock' },
+                { code: 'EmptyContentSectionExists' },
+                { code: 'GenericSectionsContainEmptyHtmlBlock' },
+                { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
+                { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
+                { code: 'PublicApiDataSetImportsMustBeCompleted' },
+                { code: 'PublicApiDataSetCancellationsMustBeResolved' },
+                { code: 'PublicApiDataSetFailuresMustBeResolved' },
+                { code: 'PublicApiDataSetMappingsMustBeCompleted' },
+              ],
+            }}
+            release={testRelease}
+          />
+        </MemoryRouter>
+        ,
+      </AuthContextTestProvider>,
+    );
+
+    expect(
+      screen.getByText('All public API data set processing must be completed'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', {
+        name: 'All public API data set processing must be completed',
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'All cancelled public API data sets must be removed or completed',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', {
+        name: 'All cancelled public API data sets must be removed or completed',
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'All failed public API data sets must be retried or removed',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', {
+        name: 'All failed public API data sets must be retried or removed',
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText('All public API data set mappings must be completed'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', {
+        name: 'All public API data set mappings must be completed',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders correctly with warnings', () => {

@@ -66,17 +66,23 @@ public abstract class ProcessorFunctionsIntegrationTest(
 
         await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-        return await CreateDataSetVersionAndImport(dataSet, importStage, status, releaseFileId);
+        return await CreateDataSetVersionAndImport(dataSet.Id, importStage, status, releaseFileId);
     }
 
     protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersionAndImport(
-        DataSet dataSet,
+        Guid dataSetId,
         DataSetVersionImportStage importStage,
         DataSetVersionStatus? status = null,
         Guid? releaseFileId = null,
         int versionMajor = 1,
         int versionMinor = 0)
     {
+        await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+        var dataSet = await publicDataDbContext
+            .DataSets
+            .SingleAsync(ds => ds.Id == dataSetId);
+        
         DataSetVersionImport dataSetVersionImport = DataFixture
             .DefaultDataSetVersionImport()
             .WithStage(importStage);
@@ -137,7 +143,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         .Build();
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.27.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.31.0")
         .Build();
 
     public async Task DisposeAsync()

@@ -28,6 +28,7 @@ public class ProcessCompletionOfNextDataSetVersionFunction(
 
         try
         {
+            await context.CallActivity(ActivityNames.ImportMetadata, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.WriteDataFiles, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CompleteNextDataSetVersionImportProcessing, logger,

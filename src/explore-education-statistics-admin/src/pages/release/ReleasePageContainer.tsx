@@ -29,6 +29,7 @@ import {
   releaseTableToolRoute,
   releaseApiDataSetsRoute,
   releaseApiDataSetDetailsRoute,
+  releaseApiDataSetLocationsMappingRoute,
 } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
@@ -57,6 +58,7 @@ const routes = [
   releaseDataFileReplacementCompleteRoute,
   releaseApiDataSetsRoute,
   releaseApiDataSetDetailsRoute,
+  releaseApiDataSetLocationsMappingRoute,
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
@@ -155,22 +157,6 @@ const ReleasePageContainer = ({
                 } for ${release.title}`}
               />
             </div>
-
-            {/* EES-2464
-            <div className="govuk-grid-column-one-third">
-              <RelatedInformation heading="Help and guidance">
-                <ul className="govuk-list">
-                  <li>
-                    <Link
-                      to="/documentation/create-new-release"
-                      target="_blank"
-                    >
-                      Creating a new release
-                    </Link>
-                  </li>
-                </ul>
-              </RelatedInformation>
-            </div> */}
           </div>
 
           <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>

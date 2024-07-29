@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseVersionId:guid}/ancillary")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UploadAncillary(
             Guid releaseVersionId,
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("release/{releaseVersionId:guid}/ancillary/{fileId:guid}")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UpdateAncillary(
             Guid releaseVersionId,
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("release/{releaseVersionId:guid}/chart/{fileId:guid}")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UpdateChartFile(Guid releaseVersionId,
             Guid fileId,
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseVersionId:guid}/chart")]
-        [RequestSizeLimit(int.MaxValue)]
+        [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UploadChart(Guid releaseVersionId, IFormFile file)
         {

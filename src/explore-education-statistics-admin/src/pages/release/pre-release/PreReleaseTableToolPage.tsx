@@ -50,10 +50,12 @@ const PreReleaseTableToolPage = ({
 
         const [subjectMeta, tableData] = await Promise.all([
           tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
-          tableBuilderService.getTableData({
+          tableBuilderService.getTableData(
+            {
+              ...query,
+            },
             releaseId,
-            ...query,
-          }),
+          ),
         ]);
 
         const fullTable = mapFullTable(tableData);

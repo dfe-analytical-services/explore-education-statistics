@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Command
 [Command("seed:data", Description = "Generate seed data for the public API")]
 public class SeedDataCommand : ICommand
 {
-    private const string DbConnectionString = "Host=db;Username=postgres;Password=password;Database=public_data";
+    private const string DbConnectionString = "Host=db;Username=app_public_data_api;Password=password;Database=public_data";
 
     [CommandOption("dump-sql", Description = "Dump seed data SQL to the `data/public-api-db` directory")]
     public bool DumpSql { get; init; }
@@ -40,7 +40,7 @@ public class SeedDataCommand : ICommand
     {
         var cancellationToken = console.RegisterCancellationHandler();
 
-        await using var dbContext = await SetUpPublicDataDbContext(cancellationToken);
+        await using var dbContext = await SetUpPublicDataDbContext(console, cancellationToken);
 
         // Set current directory to the assembly's directory to simplify pathing
         Directory.SetCurrentDirectory(Assembly.GetExecutingAssembly().GetDirectoryPath());
@@ -93,7 +93,8 @@ public class SeedDataCommand : ICommand
         }
     }
 
-    private static async Task<PublicDataDbContext> SetUpPublicDataDbContext(CancellationToken cancellationToken)
+    private static async Task<PublicDataDbContext> SetUpPublicDataDbContext(IConsole console,
+        CancellationToken cancellationToken)
     {
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionString);
 
@@ -104,6 +105,7 @@ public class SeedDataCommand : ICommand
         var dbContext = new PublicDataDbContext(options);
 
         dbContext.Database.SetCommandTimeout(300);
+        await console.Output.WriteLineAsync("Migrating database");
         await dbContext.Database.MigrateAsync(cancellationToken: cancellationToken);
 
         LinqToDBForEFTools.Initialize();
@@ -161,7 +163,9 @@ public class SeedDataCommand : ICommand
             Directory.CreateDirectory(outputDir);
         }
 
-        var sqlFilePath = Path.Combine(outputDir, "public_data.sql");
+        // The docker entrypoint executes initialisation scripts in name order.
+        // This file is prefixed '01-' to be run in sequence after '00-init.sh'
+        var sqlFilePath = Path.Combine(outputDir, "01-public_data.sql");
 
         await Cli.Wrap("pg_dump")
             .WithArguments([
@@ -616,7 +620,6 @@ public class SeedDataCommand : ICommand
                         foreach (var option in newOptions)
                         {
                             option.Id = startIndex++;
-                            option.PublicId = SqidEncoder.Encode(option.Id);
                         }
 
                         await optionTable.BulkCopyAsync(
@@ -635,6 +638,7 @@ public class SeedDataCommand : ICommand
                         .Where(hasBatchRowKey)
                         .Select((option, index) => new LocationOptionMetaLink
                         {
+                            PublicId = SqidEncoder.Encode(option.Id),
                             MetaId = meta.Id,
                             OptionId = option.Id
                         })
@@ -672,32 +676,27 @@ public class SeedDataCommand : ICommand
             {
                 GeographicLevel.LocalAuthority => new LocationLocalAuthorityOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Code = row[LocalAuthorityCsvColumns.NewCode],
                     OldCode = row[LocalAuthorityCsvColumns.OldCode]
                 },
                 GeographicLevel.School => new LocationSchoolOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Urn = row[SchoolCsvColumns.Urn],
                     LaEstab = row[SchoolCsvColumns.LaEstab]
                 },
                 GeographicLevel.Provider => new LocationProviderOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Ukprn = row[ProviderCsvColumns.Ukprn]
                 },
                 GeographicLevel.RscRegion => new LocationRscRegionOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label
                 },
                 _ => new LocationCodedOptionMeta
                 {
-                    PublicId = string.Empty,
                     Label = label,
                     Code = row[cols.Codes.First()]
                 }
@@ -958,7 +957,7 @@ public class SeedDataCommand : ICommand
                     insertRow.AppendValue(id++);
                     insertRow.AppendValue(option.Label);
                     insertRow.AppendValue(location.Level.GetEnumValue());
-                    insertRow.AppendValue(option.PublicId);
+                    insertRow.AppendValue(link.PublicId);
 
                     switch (option)
                     {

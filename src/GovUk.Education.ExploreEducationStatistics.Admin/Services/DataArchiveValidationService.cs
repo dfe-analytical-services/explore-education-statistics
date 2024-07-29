@@ -1,42 +1,39 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO.Compression;
-using System.Text.RegularExpressions;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class DataArchiveValidationService : IDataArchiveValidationService
+    public class DataArchiveValidationService(
+        IFileTypeService fileTypeService,
+        IFileUploadsValidatorService fileUploadsValidatorService)
+        : IDataArchiveValidationService
     {
-        private readonly IFileTypeService _fileTypeService;
+        public const int MaxFilenameSize = 150;
 
-        private const int MaxFilenameSize = 150;
-
-        private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
-            new()
-            {
-                {DataZip, AllowedArchiveMimeTypes}
-            };
-
-        public DataArchiveValidationService(IFileTypeService fileTypeService)
+        public async Task<Either<ActionResult, ArchiveDataSetFile>> ValidateDataArchiveFile(
+            Guid releaseVersionId,
+            string dataSetTitle,
+            IFormFile zipFile,
+            Content.Model.File? replacingFile = null)
         {
-            _fileTypeService = fileTypeService;
-        }
-
-        public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile)
-        {
-            if (!await IsZipFile(zipFile))
+            var errors = await IsValidZipFile(zipFile);
+            if (errors.Count > 0)
             {
-                return ValidationActionResult(DataZipMustBeZipFile);
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
             await using var stream = zipFile.OpenReadStream();
@@ -44,73 +41,234 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (archive.Entries.Count != 2)
             {
-                return ValidationActionResult(DataZipFileCanOnlyContainTwoFiles);
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataZipShouldContainTwoFiles.Code,
+                    Message = ValidationMessages.DataZipShouldContainTwoFiles.Message,
+                });
             }
 
             var file1 = archive.Entries[0];
             var file2 = archive.Entries[1];
 
-            if (!file1.FullName.EndsWith(".csv") || !file2.FullName.EndsWith(".csv"))
+            var dataFile = file1.Name.EndsWith(".meta.csv") ? file2 : file1;
+            var metaFile = file1.Name.EndsWith(".meta.csv") ? file1 : file2;
+
+            if (errors.Count > 0)
             {
-                return ValidationActionResult(DataZipFileDoesNotContainCsvFiles);
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
-            var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
-            var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
+            var archiveDataSet = new ArchiveDataSetFile(
+                dataSetTitle,
+                dataFile.FullName,
+                metaFile.FullName,
+                dataFile.Length,
+                metaFile.Length);
 
-            var filenamesValid = ValidateFilenameLengths(
-                zipFile.FileName.Length,
-                dataFile.Name.Length,
-                metaFile.Name.Length);
-
-            if (filenamesValid.IsLeft)
+            await using (var dataFileStream = dataFile.Open())
+            await using (var metaFileStream = metaFile.Open())
             {
-                return filenamesValid.Left;
+                errors.AddRange(await fileUploadsValidatorService
+                    .ValidateDataSetFilesForUpload(
+                        releaseVersionId,
+                        archiveDataSet,
+                        dataFileStream,
+                        metaFileStream,
+                        replacingFile));
             }
 
-            return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
+            if (errors.Count > 0)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
+            }
+
+            return archiveDataSet;
         }
 
-        private async Task<bool> IsZipFile(IFormFile file)
+        public async Task<Either<ActionResult, List<ArchiveDataSetFile>>> ValidateBulkDataArchiveFile(
+            Guid releaseVersionId,
+            IFormFile zipFile)
         {
-            if (!file.FileName.ToLower().EndsWith(".zip"))
+            var errors = await IsValidZipFile(zipFile);
+            if (errors.Count > 0)
             {
-                return false;
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
             }
 
-            return await _fileTypeService.HasMatchingMimeType(
-                       file,
-                       AllowedMimeTypesByFileType[DataZip]
-                   )
-                   && _fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes);
+            await using var stream = zipFile.OpenReadStream();
+            using var archive = new ZipArchive(stream);
+
+            var unprocessedArchiveFiles = archive.Entries.ToList();
+
+            var dataSetNamesFile = archive.GetEntry("dataset_names.csv");
+
+            if (dataSetNamesFile == null)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Code,
+                        Message = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Message,
+                    });
+            }
+
+            unprocessedArchiveFiles.Remove(dataSetNamesFile);
+
+            List<string> headers;
+            await using (var dataSetNamesStream = dataSetNamesFile.Open()) {
+                headers = await CsvUtils.GetCsvHeaders(dataSetNamesStream);
+            }
+
+            if (headers is not ["file_name", "dataset_name"])
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                    {
+                        Code = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Code,
+                        Message = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Message,
+                    });
+            }
+
+            var fileNameIndex = headers[0] == "file_name" ? 0 : 1;
+            var datasetNameIndex = headers[0] == "dataset_name" ? 0 : 1;
+
+            List<List<string>> rows;
+            await using (var dataSetNamesStream = dataSetNamesFile.Open())
+            {
+                rows = await CsvUtils.GetCsvRows(dataSetNamesStream);
+            }
+
+            var dataSetNamesCsvEntries = new List<(string BaseFilename, string Title)>();
+            foreach (var row in rows)
+            {
+                var filename = row[fileNameIndex];
+                var datasetName = row[datasetNameIndex].Trim();
+
+                dataSetNamesCsvEntries.Add((BaseFilename: filename, Title: datasetName));
+            }
+
+            dataSetNamesCsvEntries
+                .Select(entry => entry.BaseFilename)
+                .Where(baseFilename => baseFilename.EndsWith(".csv"))
+                .ToList()
+                .ForEach(baseFilename =>
+                {
+                    errors.Add(ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(baseFilename));
+                });
+
+            // Check for duplicate data set titles - because the bulk zip itself main contain duplicates!
+            dataSetNamesCsvEntries
+                .GroupBy(entry => entry.Title)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToList()
+                .ForEach(duplicateTitle =>
+                {
+                    errors.Add(ValidationMessages
+                        .GenerateErrorDataSetTitleShouldBeUnique(duplicateTitle));
+                });
+
+            // Check for duplicate data set filenames - because the bulk zip itself main contain duplicates!
+            dataSetNamesCsvEntries
+                .GroupBy(entry  => entry.BaseFilename)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToList()
+                .ForEach(duplicateFilename =>
+                {
+                    errors.Add(ValidationMessages
+                        .GenerateErrorDatasetNamesCsvFilenamesShouldBeUnique(duplicateFilename));
+                });
+
+            if (errors.Count > 0)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
+            }
+
+            var dataSetFiles = new List<ArchiveDataSetFile>();
+            foreach(var entry in dataSetNamesCsvEntries)
+            {
+                var dataFile = archive.GetEntry($"{entry.BaseFilename}.csv");
+                var metaFile = archive.GetEntry($"{entry.BaseFilename}.meta.csv");
+
+                if (dataFile == null)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorFileNotFoundInZip($"{entry.BaseFilename}.csv", FileType.Data));
+                }
+                else
+                {
+                    unprocessedArchiveFiles.Remove(dataFile);
+                }
+
+                if (metaFile == null)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorFileNotFoundInZip($"{entry.BaseFilename}.meta.csv", Metadata));
+                }
+                else
+                {
+                    unprocessedArchiveFiles.Remove(metaFile);
+                }
+
+                if (dataFile != null && metaFile != null)
+                {
+                    var dataArchiveFile = new ArchiveDataSetFile(
+                        entry.Title,
+                        dataFile.FullName,
+                        metaFile.FullName,
+                        dataFile.Length,
+                        metaFile.Length);
+
+                    await using (var dataFileStream = dataFile.Open())
+                    await using (var metaFileStream = metaFile.Open())
+                    {
+                        errors.AddRange(await fileUploadsValidatorService.ValidateDataSetFilesForUpload(
+                            releaseVersionId,
+                            dataArchiveFile,
+                            dataFileStream: dataFileStream,
+                            metaFileStream: metaFileStream));
+                    }
+
+                    dataSetFiles.Add(dataArchiveFile);
+                }
+            }
+
+            // Check for unused files in ZIP
+            if (unprocessedArchiveFiles.Count > 0)
+            {
+                errors.Add(ValidationMessages.GenerateErrorZipContainsUnusedFiles(
+                    unprocessedArchiveFiles
+                        .Select(file => file.FullName)
+                        .ToList()));
+            }
+
+            if (errors.Count > 0)
+            {
+                return Common.Validators.ValidationUtils.ValidationResult(errors);
+            }
+
+            return dataSetFiles;
         }
 
-        private static Either<ActionResult, Unit> ValidateFilenameLengths(
-            int zipFilenameLength,
-            int dataFilenameLength,
-            int metaFilenameLength)
+        private async Task<List<ErrorViewModel>> IsValidZipFile(IFormFile zipFile)
         {
-            if (zipFilenameLength > MaxFilenameSize)
+            List<ErrorViewModel> errors = [];
+
+            if (zipFile.FileName.Length > MaxFilenameSize)
             {
-                return ValidationActionResult(DataZipFilenameTooLong);
+                errors.Add(ValidationMessages.GenerateErrorFilenameTooLong(
+                        zipFile.FileName, MaxFilenameSize));
             }
 
-            if (dataFilenameLength > MaxFilenameSize && metaFilenameLength > MaxFilenameSize)
+            if (!zipFile.FileName.ToLower().EndsWith(".zip"))
             {
-                return ValidationActionResult(DataZipContentFilenamesTooLong);
+                errors.Add(ValidationMessages.GenerateErrorZipFilenameMustEndDotZip(zipFile.FileName));
             }
 
-            if (dataFilenameLength > MaxFilenameSize)
+            if (!await fileTypeService.IsValidZipFile(zipFile))
             {
-                return ValidationActionResult(DataFilenameTooLong);
+                errors.Add(ValidationMessages.GenerateErrorMustBeZipFile(zipFile.FileName));
             }
 
-            if (metaFilenameLength > MaxFilenameSize)
-            {
-                return ValidationActionResult(MetaFilenameTooLong);
-            }
-
-            return Unit.Instance;
+            return errors;
         }
     }
 }

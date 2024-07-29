@@ -19,6 +19,7 @@ describe('DraftApiDataSetsTable', () => {
         status: 'Draft',
         type: 'Major',
       },
+      previousReleaseIds: [],
     },
     {
       id: 'data-set-3',
@@ -31,6 +32,7 @@ describe('DraftApiDataSetsTable', () => {
         status: 'Processing',
         type: 'Major',
       },
+      previousReleaseIds: [],
     },
     {
       id: 'data-set-2',
@@ -50,6 +52,7 @@ describe('DraftApiDataSetsTable', () => {
         status: 'Published',
         type: 'Major',
       },
+      previousReleaseIds: [],
     },
     {
       id: 'data-set-1',
@@ -69,6 +72,7 @@ describe('DraftApiDataSetsTable', () => {
         status: 'Published',
         type: 'Major',
       },
+      previousReleaseIds: [],
     },
     {
       id: 'data-set-6',
@@ -81,6 +85,7 @@ describe('DraftApiDataSetsTable', () => {
         status: 'Cancelled',
         type: 'Major',
       },
+      previousReleaseIds: [],
     },
     {
       id: 'data-set-5',
@@ -93,6 +98,7 @@ describe('DraftApiDataSetsTable', () => {
         status: 'Failed',
         type: 'Major',
       },
+      previousReleaseIds: [],
     },
   ];
 

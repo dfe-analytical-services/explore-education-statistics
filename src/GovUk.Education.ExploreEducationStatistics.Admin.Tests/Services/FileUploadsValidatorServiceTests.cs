@@ -2,23 +2,23 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.ValidationProblemViewModelTestExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -27,6 +27,584 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class FileUploadsValidatorServiceTests
     {
         private readonly DataFixture _fixture = new();
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_Valid()
+        {
+            await using var context = InMemoryContentDbContext();
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("test.csv").Object;
+            var metaFile = CreateFormFileMock("test.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var result = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data set title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_Valid_Replacement()
+        {
+            var releaseVersionId = Guid.NewGuid();
+
+            var toBeReplacedReleaseFile = new ReleaseFile
+            {
+                ReleaseVersionId = releaseVersionId,
+                Name = "Data set title",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "test.csv",
+                },
+            };
+
+            var toBeReplacedReleaseMetaFile = new ReleaseFile
+            {
+                ReleaseVersionId = releaseVersionId,
+                File = new File
+                {
+                    Type = Metadata,
+                    Filename = "test.meta.csv",
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                context.ReleaseFiles.AddRange(toBeReplacedReleaseFile, toBeReplacedReleaseMetaFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                var (service, fileTypeService) = BuildService(context);
+
+                // NOTE: Not necessary, but in this test case new files have same name as the files they're replacing
+                var dataFile = CreateFormFileMock(toBeReplacedReleaseFile.File.Filename).Object;
+                var metaFile = CreateFormFileMock(toBeReplacedReleaseMetaFile.File.Filename).Object;
+
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+
+                var result = await service.ValidateDataSetFilesForUpload(
+                    Guid.NewGuid(),
+                    toBeReplacedReleaseFile.Name,
+                    dataFile.FileName,
+                    dataFile.Length,
+                    dataFile.OpenReadStream(),
+                    metaFile.FileName,
+                    metaFile.Length,
+                    metaFile.OpenReadStream(),
+                    toBeReplacedReleaseFile.File);
+
+                VerifyAllMocks(fileTypeService);
+
+                Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataSetTitleCannotBeEmpty()
+        {
+            await using var context = InMemoryContentDbContext();
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("test.csv").Object;
+            var metaFile = CreateFormFileMock("test.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetTitleCannotBeEmpty.Code,
+                    Message = ValidationMessages.DataSetTitleCannotBeEmpty.Message,
+                },
+            ]);
+        }
+
+        [Theory]
+        [InlineData("test/")]
+        [InlineData("test&")]
+        [InlineData($"test\0")]
+        public async Task ValidateDataFilesForUpload_DataSetTitleCannotContainSpecialCharacters(string dataSetTitle)
+        {
+            await using var context = InMemoryContentDbContext();
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("test.csv").Object;
+            var metaFile = CreateFormFileMock("test.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                dataSetTitle,
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                ValidationMessages.GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(dataSetTitle),
+            ]);
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataSetTitleShouldBeUnique()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                Name = "Used data set title",
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                File = new File { Type = FileType.Data, },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                context.ReleaseFiles.Add(releaseFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                var (service, fileTypeService) = BuildService(context);
+
+                var dataFile = CreateFormFileMock("test.csv").Object;
+                var metaFile = CreateFormFileMock("test.meta.csv").Object;
+
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+
+                var errors = await service.ValidateDataSetFilesForUpload(
+                    releaseFile.ReleaseVersionId,
+                    "Used data set title",
+                    dataFile.FileName,
+                    dataFile.Length,
+                    dataFile.OpenReadStream(),
+                    metaFile.FileName,
+                    metaFile.Length,
+                    metaFile.OpenReadStream());
+                VerifyAllMocks(fileTypeService);
+
+                AssertHasErrors(errors, [
+                    ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique("Used data set title"),
+                ]);
+            }
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataAndMetaFilesCannotHaveSameName()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var context = InMemoryContentDbContext(contentDbContextId);
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("samefilename.meta.csv").Object;
+            var metaFile = CreateFormFileMock("samefilename.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data file title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Code,
+                    Message = ValidationMessages.DataAndMetaFilesCannotHaveSameName.Message,
+                },
+            ]);
+        }
+
+        [Theory]
+        [InlineData("test ")]
+        [InlineData("test/")]
+        [InlineData("test&")]
+        [InlineData($"test\0")]
+        public async Task ValidateDataFilesForUpload_DataFileNamesCannotContainSpacesOrSpecialCharacters(string dataFileName)
+        {
+            await using var context = InMemoryContentDbContext();
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock($"{dataFileName}.csv").Object;
+            var metaFile = CreateFormFileMock($"{dataFileName}.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters($"{dataFileName}.csv"),
+                ValidationMessages.GenerateErrorFilenameCannotContainSpacesOrSpecialCharacters($"{dataFileName}.meta.csv"),
+            ]);
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataFilesHaveCorrectSuffix()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var context = InMemoryContentDbContext(contentDbContextId);
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("test.csvv").Object;
+            var metaFile = CreateFormFileMock("test.metaa.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data set title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                ValidationMessages.GenerateErrorFilenameMustEndDotCsv("test.csvv"),
+                ValidationMessages.GenerateErrorMetaFilenameMustEndDotMetaDotCsv("test.metaa.csv"),
+            ]);
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataFilesNamesTooLong()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var context = InMemoryContentDbContext(contentDbContextId);
+            var (service, fileTypeService) = BuildService(context);
+
+            var filename = "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongfilename";
+
+            var dataFile = CreateFormFileMock($"{filename}.csv").Object;
+            var metaFile = CreateFormFileMock($"{filename}.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data set title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                ValidationMessages.GenerateErrorFilenameTooLong($"{filename}.csv",
+                    FileUploadsValidatorService.MaxFilenameSize),
+                ValidationMessages.GenerateErrorFilenameTooLong($"{filename}.meta.csv",
+                    FileUploadsValidatorService.MaxFilenameSize),
+            ]);
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataFileNamesNotUnique()
+        {
+            var releaseVersion = _fixture.DefaultReleaseVersion()
+                .Generate();
+
+            var releaseFile =_fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(_fixture.DefaultFile()
+                    .WithType(FileType.Data)
+                    .WithFilename("test.csv"))
+                .Generate();
+
+            var releaseFileMeta =_fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(_fixture.DefaultFile()
+                    .WithType(Metadata)
+                    .WithFilename("test.meta.csv"))
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                context.ReleaseFiles.AddRange(releaseFile, releaseFileMeta);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                var (service, fileTypeService) = BuildService(context);
+
+                var dataFile = CreateFormFileMock("test.csv").Object;
+                var metaFile = CreateFormFileMock("test.meta.csv").Object;
+
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+
+                var errors = await service.ValidateDataSetFilesForUpload(
+                    releaseVersion.Id,
+                    "Data set title",
+                    dataFile.FileName,
+                    dataFile.Length,
+                    dataFile.OpenReadStream(),
+                    metaFile.FileName,
+                    metaFile.Length,
+                    metaFile.OpenReadStream());
+                VerifyAllMocks(fileTypeService);
+
+                AssertHasErrors(errors, [
+                    ValidationMessages.GenerateErrorFilenameNotUnique(
+                        releaseFile.File.Filename, releaseFile.File.Type),
+                    // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
+                    // zips, so meta files won't be included in the same directory by name and thereby cannot clash.
+                ]);
+            }
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataAndMetaFilesShouldNotBeSizeZero()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var context = InMemoryContentDbContext(contentDbContextId);
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("test.csv", 0).Object;
+            var metaFile = CreateFormFileMock("test.meta.csv", 0).Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(true);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(true);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data set title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                ValidationMessages.GenerateErrorFileSizeMustNotBeZero(dataFile.FileName),
+                ValidationMessages.GenerateErrorFileSizeMustNotBeZero(metaFile.FileName),
+            ]);
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataAndMetaFilesShouldBeValidCsvFiles()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var context = InMemoryContentDbContext(contentDbContextId);
+            var (service, fileTypeService) = BuildService(context);
+
+            var dataFile = CreateFormFileMock("test.csv").Object;
+            var metaFile = CreateFormFileMock("test.meta.csv").Object;
+
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                .ReturnsAsync(false);
+            fileTypeService
+                .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                .ReturnsAsync(false);
+
+            var errors = await service.ValidateDataSetFilesForUpload(
+                Guid.NewGuid(),
+                "Data set title",
+                dataFile.FileName,
+                dataFile.Length,
+                dataFile.OpenReadStream(),
+                metaFile.FileName,
+                metaFile.Length,
+                metaFile.OpenReadStream());
+            VerifyAllMocks(fileTypeService);
+
+            AssertHasErrors(errors, [
+                ValidationMessages.GenerateErrorMustBeCsvFile(dataFile.FileName),
+                ValidationMessages.GenerateErrorMustBeCsvFile(metaFile.FileName),
+            ]);
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_Replacement_FilesNamesNotUnique()
+        {
+            var releaseVersion = _fixture.DefaultReleaseVersion()
+                .Generate();
+
+            var otherSubjectId = Guid.NewGuid();
+
+            var otherReleaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(_fixture.DefaultFile()
+                    .WithType(FileType.Data)
+                    .WithFilename("usedfilename.csv")
+                    .WithSubjectId(otherSubjectId))
+                .Generate();
+
+            var otherMetaReleaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(_fixture.DefaultFile()
+                    .WithType(Metadata)
+                    .WithFilename("usedfilename.meta.csv")
+                    .WithSubjectId(otherSubjectId))
+                .Generate();
+
+            var toBeReplacedSubjectId = Guid.NewGuid();
+
+            var toBeReplacedReleaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithName("Data set title")
+                .WithFile(_fixture.DefaultFile()
+                    .WithType(FileType.Data)
+                    .WithFilename("test.csv")
+                    .WithSubjectId(toBeReplacedSubjectId))
+                .Generate();
+
+            var toBeReplacedMetaReleaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(_fixture.DefaultFile()
+                    .WithType(Metadata)
+                    .WithFilename("test.meta.csv")
+                    .WithSubjectId(toBeReplacedSubjectId))
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                context.ReleaseFiles.AddRange(
+                    otherReleaseFile, otherMetaReleaseFile,
+                    toBeReplacedReleaseFile, toBeReplacedMetaReleaseFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+
+                var (service, fileTypeService) = BuildService(context);
+
+                // New files have different filenames to files being replaced, but same name as a different existing subject
+                var dataFile = CreateFormFileMock("usedfilename.csv").Object;
+                var metaFile = CreateFormFileMock("usedfilename.meta.csv").Object;
+
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(dataFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+                fileTypeService
+                    .Setup(s => s.IsValidCsvFile(metaFile.OpenReadStream()))
+                    .ReturnsAsync(true);
+
+                var errors = await service.ValidateDataSetFilesForUpload(
+                    releaseVersion.Id,
+                    toBeReplacedReleaseFile.Name!,
+                    "usedfilename.csv",
+                    dataFile.Length,
+                    dataFile.OpenReadStream(),
+                    "usedfilename.meta.csv",
+                    metaFile.Length,
+                    metaFile.OpenReadStream(),
+                    toBeReplacedReleaseFile.File);
+
+                VerifyAllMocks(fileTypeService);
+
+                AssertHasErrors(errors, [
+                    ValidationMessages.GenerateErrorFilenameNotUnique("usedfilename.csv", FileType.Data),
+                    // NOTE: We allow duplicate meta file names - meta files aren't included in publicly downloadable
+                    // zips, so meta files won't be included in the same directory by name and thereby cannot clash.
+                ]);
+            }
+        }
 
         [Fact]
         public async Task ValidateFileForUpload_FileCannotBeEmpty()
@@ -79,549 +657,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             VerifyAllMocks(fileTypeService);
 
             result.AssertBadRequest(FileTypeInvalid);
-        }
-
-        [Fact]
-        public async Task ValidateSubjectName_SubjectNameContainsSpecialCharacters()
-        {
-            var (service, _) = BuildService();
-
-            var result = await service.ValidateSubjectName(Guid.NewGuid(), "Subject & Title");
-
-            result.AssertBadRequest(SubjectTitleCannotContainSpecialCharacters);
-        }
-
-        [Fact]
-        public async Task ValidateSubjectName_SubjectNameNotUnique()
-        {
-            var releaseVersion = new ReleaseVersion();
-            var dataReleaseFile = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                Name = "Subject Title",
-                File = new File
-                {
-                    Type = FileType.Data,
-                }
-            };
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.Add(dataReleaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var (service, _) = BuildService(contentDbContext);
-
-                var result = await service.ValidateSubjectName(releaseVersion.Id, "Subject Title");
-
-                result.AssertBadRequest(SubjectTitleMustBeUnique);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_Valid()
-        {
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var (service, fileTypeService) = BuildService(context);
-
-                var dataFile = CreateFormFileMock("test.csv").Object;
-                var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile))
-                    .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile))
-                    .ReturnsAsync(() => true);
-
-                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
-                VerifyAllMocks(fileTypeService);
-
-                Assert.True(result.IsRight);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_DataFileIsEmpty()
-        {
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var (service, _) = BuildService(context);
-
-                var dataFile = CreateFormFileMock("test.csv", 0);
-                var metaFile = CreateFormFileMock("test.meta.csv");
-
-                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile.Object, metaFile.Object);
-
-                result.AssertBadRequest(DataFileCannotBeEmpty);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_MetadataFileIsEmpty()
-        {
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var (service, _) = BuildService(context);
-
-                var dataFile = CreateFormFileMock("test.csv");
-                var metaFile = CreateFormFileMock("test.meta.csv", 0);
-
-                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile.Object, metaFile.Object);
-
-                result.AssertBadRequest(MetadataFileCannotBeEmpty);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_DataFileNotCsv()
-        {
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var (service, fileTypeService) = BuildService(context);
-
-                var dataFile = CreateFormFileMock("test.csv").Object;
-                var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile))
-                    .ReturnsAsync(() => false);
-
-                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
-                VerifyAllMocks(fileTypeService);
-
-                result.AssertBadRequest(DataFileMustBeCsvFile);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_MetadataFileNotCsv()
-        {
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var (service, fileTypeService) = BuildService(context);
-
-                var dataFile = CreateFormFileMock("test.csv").Object;
-                var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile))
-                    .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile))
-                    .ReturnsAsync(() => false);
-
-                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
-                VerifyAllMocks(fileTypeService);
-
-                result.AssertBadRequest(MetaFileMustBeCsvFile);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_DuplicateDataFile()
-        {
-            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
-
-            var releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithFilename("test.csv"));
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseFiles.Add(releaseFile);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var (service, _) = BuildService(context);
-
-                var dataFile = CreateFormFileMock("test.csv").Object;
-                var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-                var result = await service.ValidateDataFilesForUpload(releaseVersion.Id, dataFile, metaFile);
-
-                result.AssertBadRequest(DataFilenameNotUnique);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfSameName()
-        {
-            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
-
-            // The file being replaced here has the same name as the one being uploaded, but that's ok.
-            var fileBeingReplaced = _fixture.DefaultFile(FileType.Data)
-                .WithFilename("test.csv");
-
-            var releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(fileBeingReplaced);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseFiles.Add(releaseFile);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var (service, fileTypeService) = BuildService(context);
-
-                // The replacement file here has the same name as the one it is replacing, so this should be ok.
-                var dataFile = CreateFormFileMock("test.csv").Object;
-                var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile))
-                    .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile))
-                    .ReturnsAsync(() => true);
-
-                var result = await service.ValidateDataFilesForUpload(
-                    releaseVersion.Id, dataFile, metaFile, fileBeingReplaced);
-                VerifyAllMocks(fileTypeService);
-
-                result.AssertRight();
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfDifferentNameButClashesWithAnother()
-        {
-            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
-
-            // Create two release files, one of which is the file being replaced, and the other has the same filename
-            // as the file being uploaded.
-            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile(FileType.Data)
-                .ForIndex(0, s => s.SetFilename("test.csv"))
-                .ForIndex(1, s => s.SetFilename("another.csv"))
-                .Generate(2)
-                .ToTuple2();
-
-            var releaseFiles = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFiles(ListOf(fileBeingReplaced, otherFile))
-                .Generate(2);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseFiles.AddRange(releaseFiles);
-
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var (service, _) = BuildService(context);
-
-                // The replacement file here has the same name as another unrelated data file i.e. one that's not being
-                // replaced here, which should be a problem as it would otherwise result in duplicate data file names
-                // in this Release after the replacement is complete.
-                var dataFile = CreateFormFileMock("another.csv").Object;
-                var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-                var result = await service.ValidateDataFilesForUpload(
-                    releaseVersion.Id, dataFile, metaFile, fileBeingReplaced);
-
-                result.AssertBadRequest(DataFilenameNotUnique);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateFileForUpload_MetadataFileNamesCanBeDuplicated()
-        {
-            var releaseVersionId = Guid.NewGuid();
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseFiles.AddRange(new ReleaseFile
-                {
-                    ReleaseVersionId = releaseVersionId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "test.csv"
-                    }
-                }, new ReleaseFile
-                {
-                    ReleaseVersionId = releaseVersionId,
-                    File = new File
-                    {
-                        Type = Metadata,
-                        Filename = "test.meta.csv"
-                    }
-                });
-
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var (service, fileTypeService) = BuildService(context);
-
-                var dataFile = CreateFormFileMock("another.csv").Object;
-
-                // This metafile has the same name as an existing metafile, but it shouldn't matter for metadata files
-                // as they don't appear anywhere where the filenames have to be unique.
-                var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(dataFile))
-                    .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.IsValidCsvFile(metaFile))
-                    .ReturnsAsync(() => true);
-
-                var result = await service.ValidateDataFilesForUpload(releaseVersionId, dataFile, metaFile);
-                VerifyAllMocks(fileTypeService);
-
-                result.AssertRight();
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_Valid()
-        {
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var (service, _) = BuildService(context);
-
-                var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
-
-                var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                    archiveFile);
-
-                result.AssertRight();
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_DataFileNotCsv()
-        {
-            var (service, _) = BuildService();
-
-            var archiveFile = CreateDataArchiveFileMock("test.txt", "test.meta.csv").Object;
-
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                archiveFile);
-
-            result.AssertBadRequest(DataFileMustBeCsvFile);
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_MetadataFileNotCsv()
-        {
-            var (service, _) = BuildService();
-
-            var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.txt").Object;
-
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                archiveFile);
-
-            result.AssertBadRequest(MetaFileMustBeCsvFile);
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_MetadataFileIncorrectlyNamed()
-        {
-            var (service, _) = BuildService();
-
-            var archiveFile = CreateDataArchiveFileMock("test.csv", "meta.csv").Object;
-
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                archiveFile);
-
-            result.AssertBadRequest(MetaFileIsIncorrectlyNamed);
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_DataFilenameTooLong()
-        {
-            var (service, _) = BuildService();
-
-            var archiveFile =
-                CreateDataArchiveFileMock(
-                    "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.csv",
-                    "test.meta.csv").Object;
-
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                archiveFile);
-
-            result.AssertBadRequest(DataFilenameTooLong);
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_MetaFilenameTooLong()
-        {
-            var (service, _) = BuildService();
-
-            var archiveFile = CreateDataArchiveFileMock("test.csv",
-                    "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.meta.csv")
-                .Object;
-
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                archiveFile);
-
-            result.AssertBadRequest(MetaFilenameTooLong);
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_DataFileIsEmpty()
-        {
-            var (service, _) = BuildService();
-
-            var archiveFile = CreateDataArchiveFileMock("test.csv",
-                "test.meta.csv",
-                dataFileSize: 0,
-                metaFileSize: 1024).Object;
-
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                archiveFile);
-
-            result.AssertBadRequest(DataFileCannotBeEmpty);
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_MetadataFileIsEmpty()
-        {
-            var (service, _) = BuildService();
-
-            var archiveFile = CreateDataArchiveFileMock("test.csv",
-                "test.meta.csv",
-                dataFileSize: 1024,
-                metaFileSize: 0).Object;
-
-            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                archiveFile);
-
-            result.AssertBadRequest(MetadataFileCannotBeEmpty);
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_DuplicateDataFile()
-        {
-            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
-
-            var releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithFilename("test.csv"));
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseFiles.Add(releaseFile);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var (service, _) = BuildService(context);
-
-                var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
-
-                var result = await service.ValidateDataArchiveEntriesForUpload(releaseVersion.Id, archiveFile);
-
-                result.AssertBadRequest(DataFilenameNotUnique);
-            }
-        }
-
-        [Fact]
-        public async Task ValidateDataArchiveEntriesForUpload_ReplacingDataFileWithFileOfSameName()
-        {
-            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
-
-            // The file being replaced here has the same name as the one being uploaded, but that's ok.
-            var fileBeingReplaced = _fixture.DefaultFile(FileType.Data)
-                .WithFilename("test.csv");
-
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(fileBeingReplaced);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseFiles.Add(releaseFile);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var (service, _) = BuildService(context);
-
-                // The replacement file here has the same name as the one it is replacing, so this should be ok.
-                var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
-
-                var result =
-                    await service.ValidateDataArchiveEntriesForUpload(releaseVersion.Id,
-                        archiveFile,
-                        fileBeingReplaced);
-
-                result.AssertRight();
-            }
-        }
-
-        [Fact]
-        public async Task
-            ValidateDataArchiveEntriesForUpload_ReplacingDataFileWithFileOfDifferentNameButClashesWithAnother()
-        {
-            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
-
-            // Create two release files, one of which is the file being replaced, and the other has the same filename
-            // as the file being uploaded.
-            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile(FileType.Data)
-                .ForIndex(0, s => s.SetFilename("test.csv"))
-                .ForIndex(1, s => s.SetFilename("another.csv"))
-                .Generate(2)
-                .ToTuple2();
-
-            var releaseFiles = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFiles(ListOf(fileBeingReplaced, otherFile))
-                .Generate(2);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseFiles.AddRange(releaseFiles);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var (service, _) = BuildService(context);
-
-                // The replacement file here has the same name as another unrelated data file i.e. one that's not being
-                // replaced here, which should be a problem as it would otherwise result in duplicate data file names
-                // in this Release after the replacement is complete.
-                var archiveFile = CreateDataArchiveFileMock("another.csv", "test.meta.csv").Object;
-
-                var result = await service.ValidateDataArchiveEntriesForUpload(
-                    releaseVersion.Id, archiveFile, fileBeingReplaced);
-
-                result.AssertBadRequest(DataFilenameNotUnique);
-            }
         }
 
         private static (

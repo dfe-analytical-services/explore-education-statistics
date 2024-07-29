@@ -6,6 +6,7 @@ import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataS
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
+  releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetsRoute,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
@@ -26,7 +27,6 @@ import { generatePath, useHistory, useParams } from 'react-router-dom';
 
 // TODO: Version mapping
 const showDraftVersionTasks = false;
-
 // TODO: EES-4367
 const showChangelog = false;
 // TODO: EES-4382
@@ -160,29 +160,39 @@ export default function ReleaseApiDataSetDetailsPage() {
               </SummaryListItem>
             </SummaryList>
 
-            {dataSet.draftVersion?.status === 'Mapping' &&
-              showDraftVersionTasks && (
-                <div className="govuk-grid-row">
-                  <div className={columnSizeClassName}>
-                    <h3>Draft version tasks</h3>
+            {dataSet.draftVersion?.status === 'Mapping' && (
+              <div className="govuk-grid-row">
+                <div className={columnSizeClassName}>
+                  <h3>Draft version tasks</h3>
 
-                    <p>
-                      To publish the draft version of the API data set, the
-                      following tasks need to be completed:
-                    </p>
+                  <p>
+                    To publish the draft version of the API data set, the
+                    following tasks need to be completed:
+                  </p>
 
-                    <TaskList className="govuk-!-margin-bottom-8">
-                      <TaskListItem
-                        id="map-locations-task"
-                        status={<Tag colour="red">Incomplete</Tag>}
-                        hint="Define the changes to locations in this version."
-                      >
-                        {props => (
-                          <Link {...props} to="/todo">
-                            Map locations
-                          </Link>
-                        )}
-                      </TaskListItem>
+                  <TaskList className="govuk-!-margin-bottom-8">
+                    <TaskListItem
+                      id="map-locations-task"
+                      status={<Tag colour="red">Incomplete</Tag>}
+                      hint="Define the changes to locations in this version."
+                    >
+                      {props => (
+                        <Link
+                          {...props}
+                          to={generatePath<ReleaseDataSetRouteParams>(
+                            releaseApiDataSetLocationsMappingRoute.path,
+                            {
+                              publicationId: release.publicationId,
+                              releaseId: release.id,
+                              dataSetId,
+                            },
+                          )}
+                        >
+                          Map locations
+                        </Link>
+                      )}
+                    </TaskListItem>
+                    {showDraftVersionTasks && (
                       <TaskListItem
                         id="map-filters-task"
                         status={<Tag colour="blue">Complete</Tag>}
@@ -194,10 +204,11 @@ export default function ReleaseApiDataSetDetailsPage() {
                           </Link>
                         )}
                       </TaskListItem>
-                    </TaskList>
-                  </div>
+                    )}
+                  </TaskList>
                 </div>
-              )}
+              </div>
+            )}
 
             <div className="govuk-grid-row">
               {draftVersionSummary && (
@@ -235,22 +246,24 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </div>
               )}
             </div>
-            {canUpdateRelease && !dataSet.draftVersion && (
-              <ApiDataSetCreateModal
-                buttonText="Create a new version of this data set"
-                publicationId={release.publicationId}
-                releaseId={release.id}
-                submitText="Confirm new data set version"
-                title="Create a new API data set version"
-                onSubmit={async ({ releaseFileId }) => {
-                  await apiDataSetVersionService.createVersion({
-                    dataSetId: dataSet.id,
-                    releaseFileId,
-                  });
-                  refetch();
-                }}
-              />
-            )}
+            {canUpdateRelease &&
+              !dataSet.draftVersion &&
+              !dataSet.previousReleaseIds.includes(release.releaseId) && (
+                <ApiDataSetCreateModal
+                  buttonText="Create a new version of this data set"
+                  publicationId={release.publicationId}
+                  releaseId={release.id}
+                  submitText="Confirm new data set version"
+                  title="Create a new API data set version"
+                  onSubmit={async ({ releaseFileId }) => {
+                    await apiDataSetVersionService.createVersion({
+                      dataSetId: dataSet.id,
+                      releaseFileId,
+                    });
+                    refetch();
+                  }}
+                />
+              )}
           </>
         )}
       </LoadingSpinner>

@@ -128,14 +128,15 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .GenerateList(3))
                     .GenerateList(3);
 
-                var allLocationOptionMetaTypesGeneratorByLevel = new Dictionary<GeographicLevel, Func<LocationOptionMeta>>
-                {
-                    { GeographicLevel.School, () => DataFixture.DefaultLocationSchoolOptionMeta() },
-                    { GeographicLevel.LocalAuthority, () => DataFixture.DefaultLocationLocalAuthorityOptionMeta() },
-                    { GeographicLevel.RscRegion, () => DataFixture.DefaultLocationRscRegionOptionMeta() },
-                    { GeographicLevel.Provider, () => DataFixture.DefaultLocationProviderOptionMeta() },
-                    { GeographicLevel.EnglishDevolvedArea, () => DataFixture.DefaultLocationCodedOptionMeta() },
-                };
+                var allLocationOptionMetaTypesGeneratorByLevel =
+                    new Dictionary<GeographicLevel, Func<LocationOptionMeta>>
+                    {
+                        { GeographicLevel.School, () => DataFixture.DefaultLocationSchoolOptionMeta() },
+                        { GeographicLevel.LocalAuthority, () => DataFixture.DefaultLocationLocalAuthorityOptionMeta() },
+                        { GeographicLevel.RscRegion, () => DataFixture.DefaultLocationRscRegionOptionMeta() },
+                        { GeographicLevel.Provider, () => DataFixture.DefaultLocationProviderOptionMeta() },
+                        { GeographicLevel.EnglishDevolvedArea, () => DataFixture.DefaultLocationCodedOptionMeta() },
+                    };
 
                 var locationMetas = allLocationOptionMetaTypesGeneratorByLevel
                     .Select(locationOptionMetaGenerator => DataFixture
@@ -159,13 +160,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .WithGeographicLevelMeta()
                     .WithIndicatorMetas(() =>
                         DataFixture
-                        .DefaultIndicatorMeta()
-                        .GenerateList(3)
+                            .DefaultIndicatorMeta()
+                            .GenerateList(3)
                     )
                     .WithTimePeriodMetas(() =>
                         DataFixture
-                        .DefaultTimePeriodMeta()
-                        .GenerateList(3)
+                            .DefaultTimePeriodMeta()
+                            .GenerateList(3)
                     )
                     .WithMetaSummary()
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -184,7 +185,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 foreach (var filterMetaViewModel in content.Filters)
                 {
-                    var filterMeta = Assert.Single(dataSetVersion.FilterMetas, fm => fm.PublicId == filterMetaViewModel.Id);
+                    var filterMeta = Assert.Single(dataSetVersion.FilterMetas,
+                        fm => fm.PublicId == filterMetaViewModel.Id);
                     Assert.Equal(filterMeta.Hint, filterMetaViewModel.Hint);
                     Assert.Equal(filterMeta.Label, filterMetaViewModel.Label);
 
@@ -217,9 +219,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                     foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
                     {
-                        var locationOptionMeta = Assert.Single(
-                            locationMeta.Options,
+                        var locationOptionMetaLink = Assert.Single(
+                            locationMeta.OptionLinks,
                             o => o.PublicId == locationOptionMetaViewModel.Id);
+
+                        var locationOptionMeta = locationOptionMetaLink.Option;
 
                         switch (locationOptionMeta)
                         {
@@ -231,7 +235,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                                 break;
                             case LocationLocalAuthorityOptionMeta localAuthorityMeta:
                                 var localAuthorityViewModel =
-                                    Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(locationOptionMetaViewModel);
+                                    Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(
+                                        locationOptionMetaViewModel);
                                 Assert.Equal(localAuthorityMeta.Label, localAuthorityViewModel.Label);
                                 Assert.Equal(localAuthorityMeta.Code, localAuthorityViewModel.Code);
                                 Assert.Equal(localAuthorityMeta.OldCode, localAuthorityViewModel.OldCode);
@@ -279,13 +284,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     var timePeriodMeta = Assert.Single(
                         dataSetVersion.TimePeriodMetas,
                         tp => tp.Code == timePeriod.Code
-                        && tp.Period == timePeriod.Period);
+                              && tp.Period == timePeriod.Period);
 
                     Assert.Equal(
                         TimePeriodFormatter.FormatLabel(timePeriodMeta.Period, timePeriodMeta.Code),
                         timePeriod.Label);
                 }
-            }                   
+            }
 
             [Theory]
             [InlineData(DataSetVersionStatus.Published)]
@@ -355,7 +360,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var response = await GetDataSetMeta(dataSet.Id);
 
                 response.AssertForbidden();
-            }           
+            }
 
             [Fact]
             public async Task DataSetDoesNotExist_Returns404()
@@ -390,8 +395,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 1")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 1")
                             ]
                         )
                     )
@@ -400,8 +405,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 2")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 2")
                             ]
                         )
                     )
@@ -410,8 +415,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 3")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 3")
                             ]
                         )
                     )
@@ -420,8 +425,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 4")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 4")
                             ]
                         )
                     )
@@ -460,8 +465,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 1")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 1")
                             ]
                         )
                     )
@@ -470,8 +475,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 2")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 2")
                             ]
                         )
                     )
@@ -480,8 +485,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 3")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 3")
                             ]
                         )
                     )
@@ -490,8 +495,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .SetFilterMetas(() =>
                             [
                                 DataFixture
-                            .DefaultFilterMeta()
-                            .WithLabel("filter 4")
+                                    .DefaultFilterMeta()
+                                    .WithLabel("filter 4")
                             ]
                         )
                     )
@@ -523,7 +528,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .DefaultDataSet()
                     .WithStatusPublished();
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet1, dataSet2));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.AddRange(dataSet1, dataSet2));
 
                 DataSetVersion dataSetVersion = DataFixture
                     .DefaultDataSetVersion(
@@ -664,7 +670,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             [Theory]
             [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations)]
             [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators)]
-            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators, DataSetMetaType.TimePeriods)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators,
+                DataSetMetaType.TimePeriods)]
             public async Task MultipleTypesSpecified_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
             {
                 DataSet dataSet = DataFixture
@@ -831,8 +838,10 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             [InlineData(DataSetMetaType.TimePeriods)]
             [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations)]
             [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators)]
-            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators, DataSetMetaType.TimePeriods)]
-            public async Task ArrayQueryParameterSyntax_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators,
+                DataSetMetaType.TimePeriods)]
+            public async Task ArrayQueryParameterSyntax_ReturnsOnlySpecifiedMetaTypes(
+                params DataSetMetaType[] metaTypes)
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
@@ -857,7 +866,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 });
 
                 var query = metaTypes
-                    .Select((mt, index) => new { mt, index })
+                    .Select((mt, index) => new
+                    {
+                        mt,
+                        index
+                    })
                     .ToDictionary(a => $"types[{a.index}]", a => a.mt.ToString());
 
                 var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSet.Id}/meta", query!);
@@ -973,7 +986,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             [Fact]
             public async Task MixedValidAndInvalidMetaTypes_AllowedValueError()
             {
-                var response = await GetDataSetMeta(Guid.NewGuid(), types: [DataSetMetaType.Filters.ToString(), "invalid"]);
+                var response = await GetDataSetMeta(Guid.NewGuid(),
+                    types: [DataSetMetaType.Filters.ToString(), "invalid"]);
 
                 var validationProblem = response.AssertValidationProblem();
 

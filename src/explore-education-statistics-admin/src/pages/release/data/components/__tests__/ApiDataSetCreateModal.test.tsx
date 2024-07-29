@@ -95,6 +95,7 @@ describe('ApiDataSetCreateModal', () => {
       title: 'Test title',
       summary: 'Test summary',
       status: 'Draft',
+      previousReleaseIds: [],
     });
 
     const history = createMemoryHistory();

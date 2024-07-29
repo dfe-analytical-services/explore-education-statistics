@@ -31,6 +31,7 @@ describe('LiveApiDataSetsTable', () => {
         status: 'Published',
         type: 'Major',
       },
+      previousReleaseIds: ['previous-release-id'],
     },
     {
       id: 'data-set-1',
@@ -44,6 +45,7 @@ describe('LiveApiDataSetsTable', () => {
         status: 'Published',
         type: 'Major',
       },
+      previousReleaseIds: ['previous-release-id'],
     },
     {
       id: 'data-set-3',
@@ -57,6 +59,7 @@ describe('LiveApiDataSetsTable', () => {
         status: 'Published',
         type: 'Minor',
       },
+      previousReleaseIds: ['previous-release-id'],
     },
   ];
 
@@ -77,12 +80,13 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
+        releaseVersionId="release-version-1"
         releaseId="release-1"
       />,
     );
 
     const baseDataSetUrl =
-      '/publication/publication-1/release/release-1/api-data-sets';
+      '/publication/publication-1/release/release-version-1/api-data-sets';
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
 
@@ -152,7 +156,24 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease={false}
         dataSets={testDataSets}
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
+        releaseId="release-id"
+      />,
+    );
+
+    expect(
+      screen.queryAllByRole('button', { name: /Create new version/ }),
+    ).toHaveLength(0);
+  });
+
+  test("does not render 'Create new version' buttons when release series contains previous version of this data set", () => {
+    render(
+      <LiveApiDataSetsTable
+        canUpdateRelease
+        dataSets={testDataSets}
+        publicationId="publication-1"
+        releaseVersionId="release-1"
+        releaseId="previous-release-id"
       />,
     );
 
@@ -166,7 +187,8 @@ describe('LiveApiDataSetsTable', () => {
       <LiveApiDataSetsTable
         dataSets={[]}
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
+        releaseId="release-id"
       />,
     );
 
@@ -182,7 +204,8 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
-        releaseId="release-1"
+        releaseVersionId="release-1"
+        releaseId="release-id"
       />,
     );
 
@@ -218,6 +241,7 @@ describe('LiveApiDataSetsTable', () => {
       title: 'Test title',
       summary: 'Test summary',
       status: 'Draft',
+      previousReleaseIds: [],
     });
 
     const history = createMemoryHistory();
@@ -227,6 +251,7 @@ describe('LiveApiDataSetsTable', () => {
         canUpdateRelease
         dataSets={testDataSets}
         publicationId="publication-1"
+        releaseVersionId="release-version-1"
         releaseId="release-1"
       />,
       { history },
@@ -266,7 +291,7 @@ describe('LiveApiDataSetsTable', () => {
     });
 
     expect(history.location.pathname).toBe(
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+      '/publication/publication-1/release/release-version-1/api-data-sets/data-set-1',
     );
   });
 

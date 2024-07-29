@@ -16,7 +16,6 @@ import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import GoToTopLink from '@common/components/GoToTopLink';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import NotificationBanner from '@common/components/NotificationBanner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import Tag from '@common/components/Tag';
@@ -286,19 +285,6 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
           key="canonical"
         />
       </Head>
-      <NotificationBanner title="This page has changed">
-        Following user feedback we've made some changes to this page to make our
-        data sets easier to find, if you have any comments on the new design
-        please let us know via the{' '}
-        <a
-          href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          feedback survey
-        </a>
-        .
-      </NotificationBanner>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">

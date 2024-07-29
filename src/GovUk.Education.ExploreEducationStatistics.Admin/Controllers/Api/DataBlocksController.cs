@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("releases/{releaseVersionId:guid}/data-blocks")]
         public async Task<ActionResult<DataBlockViewModel>> CreateDataBlock(
             Guid releaseVersionId,
-            DataBlockCreateViewModel dataBlock)
+            DataBlockCreateRequest dataBlock)
         {
             return await _dataBlockService
                 .Create(releaseVersionId, dataBlock)
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPut("data-blocks/{dataBlockVersionId:guid}")]
         public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid dataBlockVersionId,
-            DataBlockUpdateViewModel dataBlock)
+            DataBlockUpdateRequest dataBlock)
         {
             return await _dataBlockService
                 .Update(dataBlockVersionId, dataBlock)

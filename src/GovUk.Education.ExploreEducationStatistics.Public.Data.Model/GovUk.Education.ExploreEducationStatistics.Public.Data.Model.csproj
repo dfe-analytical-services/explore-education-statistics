@@ -35,4 +35,10 @@
         <Folder Include="Migrations\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="Migrations\*.sql">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

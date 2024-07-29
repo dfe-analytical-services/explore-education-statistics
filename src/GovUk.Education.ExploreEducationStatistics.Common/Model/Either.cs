@@ -406,6 +406,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
          */
         public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
             OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
+                this Either<TFailure, TSuccess1> task,
+                Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
+        {
+            return await task.OnSuccess(success =>
+            {
+                return func(success).OnSuccess(combinator => TupleOf(success, combinator));
+            });
+        }
+
+        /**
+         * Allows 2 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing both of
+         * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
+         * fails, the second OnSuccess(...) will not be called.
+         *
+         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
+         */
+        public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
+            OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
                 this Task<Either<TFailure, TSuccess1>> task,
                 Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
         {

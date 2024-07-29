@@ -1,7 +1,6 @@
-version: "3"
 services:
   data-storage:
-    image: mcr.microsoft.com/azure-storage/azurite:3.27.0
+    image: mcr.microsoft.com/azure-storage/azurite:3.31.0
     ports:
       - "10000:10000"
       - "10001:10001"

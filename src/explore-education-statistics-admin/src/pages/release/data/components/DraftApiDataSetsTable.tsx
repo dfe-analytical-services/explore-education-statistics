@@ -47,7 +47,10 @@ export default function DraftApiDataSetsTable({
   const orderedDataSets = orderBy(dataSets, dataSet => dataSet.title);
 
   return (
-    <table className={styles.table} data-testid="draft-api-data-sets">
+    <table
+      className={`${styles.table} hasRowHighlights`}
+      data-testid="draft-api-data-sets"
+    >
       <thead>
         <tr>
           <th
@@ -81,14 +84,10 @@ export default function DraftApiDataSetsTable({
               <tr
                 key={dataSet.id}
                 className={classNames({
-                  [styles.rowHighlight]: rowHighlight,
+                  'rowHighlight--alert': rowHighlight,
                 })}
               >
-                <td
-                  className={classNames({
-                    'govuk-!-padding-left-1': rowHighlight,
-                  })}
-                >
+                <td>
                   <Tag
                     colour={getDataSetVersionStatusTagColour(
                       draftVersion.status,

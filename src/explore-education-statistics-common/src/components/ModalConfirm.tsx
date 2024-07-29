@@ -33,7 +33,7 @@ export default function ModalConfirm({
   hiddenConfirmingText = 'Confirming',
   open: initialOpen = false,
   showCancel = true,
-  submitButtonVariant = 'secondary',
+  submitButtonVariant,
   title,
   triggerButton,
   underlayClass,
@@ -109,7 +109,11 @@ export default function ModalConfirm({
 
       <ButtonGroup className="govuk-!-margin-top-6">
         {showCancel && (
-          <Button disabled={isConfirming} onClick={handleCancel}>
+          <Button
+            disabled={isConfirming}
+            variant="secondary"
+            onClick={handleCancel}
+          >
             {cancelText}
           </Button>
         )}

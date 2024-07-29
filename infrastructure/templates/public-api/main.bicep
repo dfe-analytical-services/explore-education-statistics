@@ -309,27 +309,6 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         name: 'DataFiles__BasePath'
         value: dataFilesFileShareMountPath
       }
-      {
-        // This property informs the Container App of the name of the Admin's system-assigned identity.
-        // It uses this to grant permissions to the Admin user in order for it to be able to access
-        // tables in the "public_data" database successfully.
-        name: 'AdminAppServiceIdentityName'
-        value: adminAppServiceFullName
-      }
-      {
-        // This property informs the Container App of the name of the Data Processor's system-assigned identity.
-        // It uses this to grant permissions to the Data Processor user in order for it to be able to access
-        // tables in the "public_data" database successfully.
-        name: 'DataProcessorFunctionAppIdentityName'
-        value: dataProcessorFunctionAppManagedIdentity.name
-      }
-      {
-        // This property informs the Container App of the name of the Publisher's system-assigned identity.
-        // It uses this to grant permissions to the Publisher user in order for it to be able to access
-        // tables in the "public_data" database successfully.
-        name: 'PublisherFunctionAppIdentityName'
-        value: publisherFunctionAppFullName
-      }
     ]
     tagValues: tagValues
   }

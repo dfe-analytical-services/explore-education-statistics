@@ -117,3 +117,5 @@ const locationLevelsMap: Dictionary<{
 };
 
 export default locationLevelsMap;
+
+export type LocationLevelsType = keyof typeof locationLevelsMap;

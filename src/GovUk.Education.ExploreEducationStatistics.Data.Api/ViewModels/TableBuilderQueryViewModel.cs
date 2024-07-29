@@ -18,7 +18,7 @@ public record TableBuilderQueryViewModel
     {
     }
 
-    public TableBuilderQueryViewModel(Guid publicationId, ObservationQueryContext query)
+    public TableBuilderQueryViewModel(Guid publicationId, FullTableQuery query)
     {
         PublicationId = publicationId;
         SubjectId = query.SubjectId;

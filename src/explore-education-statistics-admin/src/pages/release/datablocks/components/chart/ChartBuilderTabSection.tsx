@@ -98,14 +98,17 @@ const ChartBuilderTabSection = ({
         return;
       }
 
-      const tableData = await tableBuilderService.getTableData(nextQuery);
+      const tableData = await tableBuilderService.getTableData(
+        nextQuery,
+        releaseId,
+      );
 
       onTableUpdate({
         table: mapFullTable(tableData),
         query: nextQuery,
       });
     },
-    [onTableUpdate, query],
+    [onTableUpdate, query, releaseId],
   );
 
   return (
