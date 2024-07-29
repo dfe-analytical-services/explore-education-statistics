@@ -1,8 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -24,6 +24,7 @@ public class DataSetVersionService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     IProcessorClient processorClient,
+    IPublicDataApiClient publicDataApiClient,
     IUserService userService)
     : IDataSetVersionService
 {
@@ -66,7 +67,7 @@ public class DataSetVersionService(
                     cancellationToken))
             .OnSuccess(MapDraftSummaryVersion);
     }
-    
+
     public async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
         Guid dataSetId,
         SemVersion version,
@@ -76,12 +77,13 @@ public class DataSetVersionService(
             .AsNoTracking()
             .Include(dsv => dsv.DataSet)
             .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == version!.Major)
-            .Where(dsv => dsv.VersionMinor == version!.Minor)
+            .Where(dsv => dsv.VersionMajor == version.Major)
+            .Where(dsv => dsv.VersionMinor == version.Minor)
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteVersion(Guid dataSetVersionId,
+    public async Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
@@ -99,6 +101,22 @@ public class DataSetVersionService(
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
         };
+    }
+
+    public async Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccess(() => publicDataDbContext.DataSetVersions
+                .AsNoTracking()
+                .Where(dsv => dsv.Id == dataSetVersionId)
+                .SingleOrNotFoundAsync(cancellationToken: cancellationToken))
+            .OnSuccess(dsv => publicDataApiClient.GetDataSetVersionChanges(
+                dataSetId: dsv.DataSetId,
+                dataSetVersion: dsv.Version,
+                cancellationToken: cancellationToken
+            ));
     }
 }
 

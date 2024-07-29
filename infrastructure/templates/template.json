@@ -1748,6 +1748,7 @@
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
+        "PublicDataApi:Url": "[concat('https://', parameters('publicApiUrl'))]",
         "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
       }
