@@ -130,7 +130,7 @@
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "text": "Reindexing complete or Data Factory timeout at 16hrs - stored procedure may still be running!",
+                "text": "Data Factory Success!",
                 "attachments": [{
                   "color": "good",
                   "fields": [{
@@ -180,7 +180,7 @@
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "text": "Data Factory Failure!",
+                "text": "Data Factory Failure! Stored procedure may still be running!",
                 "attachments": [
                   {
                     "color": "warning",

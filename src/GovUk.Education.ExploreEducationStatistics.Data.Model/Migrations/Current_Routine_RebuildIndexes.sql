@@ -9,7 +9,7 @@ BEGIN
         @CurrentTable NVARCHAR(MAX) = '',
         @LastTable NVARCHAR(MAX) = '',
         @Command NVARCHAR(MAX),
-        @StopTime DATETIME = DATEADD(MINUTE, @StopInMinutes, GETDATE());
+        @StopTime DATETIME = DATEADD(MINUTE, @StopInMinutes, GETUTCDATE());
 
     IF LEN(ISNULL(@Tables, '')) > 0
         BEGIN
@@ -63,7 +63,7 @@ BEGIN
 
             -- Rebuild or reorganise each index depending on the fragmentation percentage
             SET @StatsRowIndex = 1;
-            WHILE(@StatsRowIndex <= @StatsCount AND @StopTime > GETDATE())
+            WHILE(@StatsRowIndex <= @StatsCount AND @StopTime > GETUTCDATE())
                 BEGIN
                     SELECT @CurrentTable = ObjectName, @Command =
                            'ALTER INDEX ' + IndexName + ' ON ' + SchemaName + '.' + ObjectName +
@@ -85,7 +85,7 @@ BEGIN
 
                     SET @StatsRowIndex += 1;
                 END
-            IF(@StopTime > GETDATE())
+            IF(@StopTime > GETUTCDATE())
                 RAISERROR ('Completed optimising indexes for tables.', 0, 1, NULL) WITH NOWAIT;
 
             /*-----------------------------------------------------------------------*/
@@ -93,7 +93,7 @@ BEGIN
             SET @StatsRowIndex = 1;
             SET @LastTable = '';
             SELECT @StatsCount = COUNT(Id) FROM #Stats;
-            WHILE(@StatsRowIndex <= @StatsCount AND @StopTime > GETDATE())
+            WHILE(@StatsRowIndex <= @StatsCount AND @StopTime > GETUTCDATE())
                 BEGIN
                     SELECT @CurrentTable = ObjectName
                     FROM #Stats
@@ -112,9 +112,9 @@ BEGIN
 
                     SET @StatsRowIndex += 1;
                 END
-            IF(@StopTime > GETDATE())
+            IF(@StopTime > GETUTCDATE())
                 RAISERROR ('Completed updating statistics on tables.', 0, 1, NULL) WITH NOWAIT;
             ELSE
-                RAISERROR ('Optimising indexes and updating statistics on tables took longer than %d minutes. Stopping.', 0, 1, @StopInMinutes) WITH NOWAIT;
+                RAISERROR ('Reindexing did not complete in %d minutes. Remaining reindexing skipped.', 16, 1, @StopInMinutes) WITH NOWAIT;
         END
 END
