@@ -24,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
         public DataFilePermissions Permissions { get; set; } = new();
 
-        public bool IsLinkedToApiDataSet { get; set; }
+        public Guid? PublicApiDataSetId { get; set; }
+
+        public string? PublicApiDataSetVersion { get; set; }
     }
 }
