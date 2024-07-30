@@ -80,8 +80,8 @@ void LoadLocationCache()
 
 async Task ClearQueues()
 {
-    var config = host.Services.GetRequiredService<IConfiguration>();
-    var connectionString = config.GetValue<string>("CoreStorage");
+    var config = host.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+    var connectionString = config.PrivateStorageConnectionString;
 
     var importsPendingQueueClient = new QueueClient(connectionString, queueName: ImportsPendingQueue);
     await importsPendingQueueClient.CreateIfNotExistsAsync();
@@ -94,8 +94,8 @@ async Task ClearQueues()
 
 async Task RestartImports()
 {
-    var config = host.Services.GetRequiredService<IConfiguration>();
-    var connectionString = config.GetValue<string>("CoreStorage");
+    var config = host.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+    var connectionString = config.PrivateStorageConnectionString;
 
     QueueClientOptions queueOptions = 
         new() { MessageEncoding = QueueMessageEncoding.Base64 };
