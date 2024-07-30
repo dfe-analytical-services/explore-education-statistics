@@ -9,10 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Moq.Protected;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
@@ -112,24 +110,17 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                 new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
         }
 
-        private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(
-            Guid? instanceId = null,
-            bool isReplaying = false)
+        private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(Guid? instanceId = null)
         {
-            var mock = new Mock<TaskOrchestrationContext>(MockBehavior.Strict);
+            var mock = new Mock<TaskOrchestrationContext>();
 
-            mock
-                .Protected()
-                .Setup<ILoggerFactory>("LoggerFactory")
-                .Returns(NullLoggerFactory.Instance);
+            mock.Setup(context =>
+                    context.CreateReplaySafeLogger(
+                        nameof(ProcessInitialDataSetVersionFunction.ProcessInitialDataSetVersion)))
+                .Returns(NullLogger.Instance);
 
-            mock
-                .SetupGet(context => context.InstanceId)
+            mock.SetupGet(context => context.InstanceId)
                 .Returns(instanceId?.ToString() ?? Guid.NewGuid().ToString());
-
-            mock
-                .SetupGet(context => context.IsReplaying)
-                .Returns(isReplaying);
 
             return mock;
         }
