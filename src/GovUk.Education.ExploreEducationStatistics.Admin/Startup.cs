@@ -539,12 +539,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
-
-            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
-
-            services.AddTransient<ICoreTableStorageService, CoreTableStorageService>();
-            services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>();
+            services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
+                new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage"),
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
+                new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage"),
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+            services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
+                new PublisherTableStorageService(publisherStorageConnectionString));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);

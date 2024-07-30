@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -14,12 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ErrorDetail
 using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
@@ -31,6 +31,8 @@ internal class ApiSubscriptionService(
     IEmailService emailService,
     IApiSubscriptionRepository apiSubscriptionRepository) : IApiSubscriptionService
 {
+    private readonly string _publicAppUrl = appSettingsOptions.Value.PublicAppUrl;
+
     public async Task<Either<ActionResult, ApiSubscriptionViewModel>> RequestPendingSubscription(
         Guid dataSetId,
         string dataSetTitle,
@@ -105,6 +107,36 @@ internal class ApiSubscriptionService(
                 DeleteSubscription(subscription: subscription, cancellationToken: cancellationToken));
     }
 
+    public async Task NotifyApiSubscribers(
+        Guid dataSetId,
+        Guid dataSetFileId,
+        string version,
+        CancellationToken cancellationToken = default)
+    {
+        Expression<Func<ApiSubscription, bool>> filter = s =>
+            s.PartitionKey == dataSetId.ToString()
+            && s.Status.Equals(ApiSubscriptionStatus.Subscribed.ToString());
+
+        var dataSetSubscribers = await apiSubscriptionRepository.QuerySubscriptions(
+            filter: filter,
+            select:
+            [
+                nameof(ApiSubscription.PartitionKey),
+                nameof(ApiSubscription.RowKey),
+                nameof(ApiSubscription.DataSetTitle)
+            ],
+            cancellationToken: cancellationToken);
+
+        await dataSetSubscribers
+            .AsPages()
+            .ForEachAsync(
+                page => BatchNotifySubscribers(
+                    subscribers: page,
+                    dataSetFileId: dataSetFileId,
+                    version: version),
+                cancellationToken);
+    }
+
     public async Task RemoveExpiredApiSubscriptions(CancellationToken cancellationToken = default)
     {
         var expiredSubscriptions = await GetExpiredApiSubscriptions(cancellationToken);
@@ -130,7 +162,7 @@ internal class ApiSubscriptionService(
             ? subscription.Left is NotFoundResult
                 ? Unit.Instance
                 : subscription.Left
-            : subscription.Right.Status is ApiSubscriptionStatus.SubscriptionPending
+            : subscription.Right.Status is ApiSubscriptionStatus.Pending
                 ? ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.ApiPendingSubscriptionAlreadyExists.Code,
@@ -230,41 +262,36 @@ internal class ApiSubscriptionService(
 
     private void SendVerificationEmail(ApiSubscription subscription)
     {
-        var activationCode = tokenService.GenerateToken(subscription.RowKey, subscription.Expiry!.Value.UtcDateTime);
-
-        var emailTemplateVariables = new Dictionary<string, dynamic>
+        var token = tokenService.GenerateToken(subscription.RowKey, subscription.Expiry!.Value.UtcDateTime);
+        var verificationUrl =
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-subscription/{token}";
+        var personalisation = new Dictionary<string, dynamic>
         {
-            { "api_dataset", subscription.DataSetTitle },
-            {
-                "verification_link",
-                $"{appSettingsOptions.Value.PublicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-subscription/{activationCode}"
-            }
+            { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
+            { NotifierEmailTemplateFields.VerificationUrl, verificationUrl }
         };
 
         emailService.SendEmail(
             email: subscription.RowKey,
             templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionVerificationId,
-            values: emailTemplateVariables);
+            values: personalisation);
     }
 
     private void SendConfirmationEmail(ApiSubscription subscription)
     {
-        var expiryDateTime = DateTime.UtcNow.AddYears(1);
-        var unsubscribeToken = tokenService.GenerateToken(subscription.RowKey, expiryDateTime);
-
-        var emailTemplateVariables = new Dictionary<string, dynamic>
+        var token = tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
+        var unsubscribeUrl =
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{token}";
+        var personalisation = new Dictionary<string, dynamic>
         {
-            { "api_dataset", subscription.DataSetTitle },
-            {
-                "unsubscribe_link",
-                $"{appSettingsOptions.Value.PublicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{unsubscribeToken}"
-            }
+            { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
+            { NotifierEmailTemplateFields.UnsubscribeUrl, unsubscribeUrl }
         };
 
         emailService.SendEmail(
             email: subscription.RowKey,
             templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionConfirmationId,
-            values: emailTemplateVariables);
+            values: personalisation);
     }
 
     private static ApiSubscriptionViewModel MapSubscription(ApiSubscription subscription)
@@ -309,19 +336,53 @@ internal class ApiSubscriptionService(
         return Unit.Instance;
     }
 
+    private void BatchNotifySubscribers(
+        Page<ApiSubscription> subscribers,
+        Guid dataSetFileId,
+        string version)
+    {
+        foreach (var subscriber in subscribers.Values)
+        {
+            SendNotificationEmail(subscriber, dataSetFileId, version);
+        }
+    }
+
+    private void SendNotificationEmail(
+        ApiSubscription subscription,
+        Guid dataSetFileId,
+        string version)
+    {
+        var token = tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
+        var dataSetUrl = $"{_publicAppUrl}/data-catalogue/data-set/{dataSetFileId}";
+        var unsubscribeUrl =
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{token}";
+        var personalisation = new Dictionary<string, dynamic>
+        {
+            { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
+            { NotifierEmailTemplateFields.DataSetUrl, dataSetUrl },
+            { NotifierEmailTemplateFields.DataSetVersion, version },
+            { NotifierEmailTemplateFields.UnsubscribeUrl, unsubscribeUrl }
+        };
+
+        emailService.SendEmail(
+            email: subscription.RowKey,
+            templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionNotificationId,
+            values: personalisation);
+    }
+
     private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)
     {
         Expression<Func<ApiSubscription, bool>> filter = s =>
-            s.Status.Equals(ApiSubscriptionStatus.SubscriptionPending.ToString())
+            s.Status.Equals(ApiSubscriptionStatus.Pending.ToString())
             && s.Expiry <= DateTimeOffset.UtcNow;
 
         return await apiSubscriptionRepository.QuerySubscriptions(
             filter: filter,
-            select: new List<string>
-            {
+            select:
+            [
                 nameof(ApiSubscription.PartitionKey),
                 nameof(ApiSubscription.RowKey)
-            },
+            ],
             cancellationToken: cancellationToken);
     }
 

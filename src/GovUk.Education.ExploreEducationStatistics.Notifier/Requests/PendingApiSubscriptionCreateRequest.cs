@@ -1,5 +1,5 @@
-using FluentValidation;
 using System;
+using FluentValidation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 

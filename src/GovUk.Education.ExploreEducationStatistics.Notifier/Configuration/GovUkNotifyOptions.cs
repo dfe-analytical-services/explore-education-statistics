@@ -2,7 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 
 public class GovUkNotifyOptions
 {
-    public const string GovUkNotify = "GovUkNotify";
+    public const string Section = "GovUkNotify";
 
     public string ApiKey { get; init; } = null!;
 
@@ -23,6 +23,8 @@ public class GovUkNotifyOptions
         public string SubscriptionVerificationId { get; init; } = null!;
 
         public string ApiSubscriptionConfirmationId { get; init; } = null!;
+
+        public string ApiSubscriptionNotificationId { get; init; } = null!;
 
         public string ApiSubscriptionVerificationId { get; init; } = null!;
     }

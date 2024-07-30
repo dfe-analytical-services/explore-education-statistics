@@ -127,7 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
+                new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
                 provider.GetRequiredService<IPublicBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()));

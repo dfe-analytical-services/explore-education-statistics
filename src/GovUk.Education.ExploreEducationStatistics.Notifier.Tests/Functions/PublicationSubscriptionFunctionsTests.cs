@@ -14,10 +14,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
@@ -40,7 +40,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -70,7 +70,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -94,7 +94,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task DoesNotSendEmailAgainIfSubIsPending()
     {
         // Arrange (data)
-        await AddTestSubscription(Constants.NotifierTableStorageTableNames.PublicationPendingSubscriptionsTableName,
+        await AddTestSubscription(NotifierTableStorage.PublicationPendingSubscriptionsTable,
             new SubscriptionEntity("test-id-2",
                 "test2@test.com",
                 "Test Publication Title 2",
@@ -104,7 +104,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -134,7 +134,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -160,7 +160,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task SendsConfirmationEmailIfUserAlreadySubscribed()
     {
         // Arrange (data)
-        await AddTestSubscription(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName,
+        await AddTestSubscription(NotifierTableStorage.PublicationSubscriptionsTable,
             new SubscriptionEntity("test-id-3",
                 "test3@test.com",
                 "Test Publication Title 3",
@@ -170,7 +170,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -200,7 +200,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -228,7 +228,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -258,7 +258,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -273,7 +273,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -303,7 +303,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -318,7 +318,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -348,7 +348,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -363,7 +363,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -393,7 +393,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.RequestPendingSubscriptionFunc(request,
+            await notifierFunction.RequestPendingSubscription(request,
                 new TestFunctionContext(),
                 new CancellationToken());
 
@@ -407,7 +407,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task SendsSubscriptionConfirmationEmail()
     {
         // Arrange (data)
-        await AddTestSubscription(Constants.NotifierTableStorageTableNames.PublicationPendingSubscriptionsTableName,
+        await AddTestSubscription(NotifierTableStorage.PublicationPendingSubscriptionsTable,
             new SubscriptionEntity("test-id-4",
                 "test4@test.com",
                 "Test Publication Title 4",
@@ -418,7 +418,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -444,7 +444,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.VerifySubscriptionFunc(new TestFunctionContext(),
+            await notifierFunction.VerifySubscription(new TestFunctionContext(),
                 "test-id-4",
                 "verification-code-4");
 
@@ -468,7 +468,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task Unsubscribes()
     {
         // Arrange (data)
-        await AddTestSubscription(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName,
+        await AddTestSubscription(NotifierTableStorage.PublicationSubscriptionsTable,
             new SubscriptionEntity("test-id-5",
                 "test5@test.com",
                 "Test Publication Title 5",
@@ -479,7 +479,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         // Arrange (mocks)
         var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
         {
-            TableStorageConnectionString = TableStorageConnectionString()
+            NotifierStorageConnectionString = StorageConnectionString()
         }));
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -496,7 +496,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         // Act
         var result =
-            await notifierFunction.PublicationUnsubscribeFunc(new TestFunctionContext(),
+            await notifierFunction.Unsubscribe(new TestFunctionContext(),
                 "test-id-5",
                 "unsubscription-code-5");
 
