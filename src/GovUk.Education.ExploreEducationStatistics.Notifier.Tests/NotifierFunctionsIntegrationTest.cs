@@ -36,12 +36,12 @@ public abstract class NotifierFunctionsIntegrationTest
         MockUtils.VerifyAllMocks(fixture._notificationClient);
         fixture._notificationClient.Reset();
 
-        return ClearAzureDataTableTestData(TableStorageConnectionString());
+        return ClearAzureDataTableTestData(StorageConnectionString());
     }
 
-    public string TableStorageConnectionString()
+    protected string StorageConnectionString()
     {
-        return fixture.TableStorageConnectionString();
+        return fixture.StorageConnectionString();
     }
 
     public AppSettingsOptions GetAppSettingsOptions()
@@ -56,7 +56,7 @@ public abstract class NotifierFunctionsIntegrationTest
 
     public async Task AddTestSubscription(string tableName, SubscriptionEntity subscription)
     {
-        var storageAccount = CloudStorageAccount.Parse(TableStorageConnectionString());
+        var storageAccount = CloudStorageAccount.Parse(StorageConnectionString());
         var tableClient = storageAccount.CreateCloudTableClient();
         var table = tableClient.GetTableReference(tableName);
         await table.CreateIfNotExistsAsync();
@@ -66,7 +66,7 @@ public abstract class NotifierFunctionsIntegrationTest
 
     public async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)
     {
-        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
+        var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         await dataTableStorageService.BatchManipulateEntities(
             tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
@@ -76,7 +76,7 @@ public abstract class NotifierFunctionsIntegrationTest
 
     public async Task CreateApiSubscription(ApiSubscription subscription)
     {
-        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
+        var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         await dataTableStorageService.CreateEntity(
             tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
@@ -88,7 +88,7 @@ public abstract class NotifierFunctionsIntegrationTest
         string email,
         IEnumerable<string>? select = null)
     {
-        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
+        var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         return await dataTableStorageService.GetEntityIfExists<ApiSubscription>(
             tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
@@ -102,7 +102,7 @@ public abstract class NotifierFunctionsIntegrationTest
         int? maxPerPage = null,
         IEnumerable<string>? select = null)
     {
-        var dataTableStorageService = new DataTableStorageService(TableStorageConnectionString());
+        var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         var pagedSubscriptions = await dataTableStorageService.QueryEntities(
             tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
@@ -141,7 +141,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
         await _azuriteContainer.StartAsync();
     }
 
-    public string TableStorageConnectionString()
+    public string StorageConnectionString()
     {
         return _azuriteContainer.GetConnectionString();
     }
@@ -155,9 +155,12 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
             {
                 builder
                     .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false)
-                    .AddInMemoryCollection(new List<KeyValuePair<string, string?>>
+                    .AddInMemoryCollection(new Dictionary<string, string?>
                     {
-                        new($"{nameof(AppSettingsOptions.AppSettings)}:{nameof(AppSettingsOptions.TableStorageConnectionString)}", TableStorageConnectionString())
+                        {
+                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.NotifierStorageConnectionString)}",
+                            StorageConnectionString()
+                        }
                     });
             })
             .ConfigureServices((hostContext, services) =>

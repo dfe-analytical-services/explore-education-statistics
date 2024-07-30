@@ -40,7 +40,7 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
 
     public async Task<CloudTable> GetTable(string storageTableName)
     {
-        var storageAccount = CloudStorageAccount.Parse(_appSettingsOptions.TableStorageConnectionString);
+        var storageAccount = CloudStorageAccount.Parse(_appSettingsOptions.NotifierStorageConnectionString);
         var tableClient = storageAccount.CreateCloudTableClient();
         var table = tableClient.GetTableReference(storageTableName);
         await table.CreateIfNotExistsAsync();

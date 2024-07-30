@@ -2881,7 +2881,7 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
         "AppSettings:BaseUrl": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
         "AppSettings:PublicAppUrl": "[variables('publicAppUrl')]",
-        "AppSettings:TableStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "AppSettings:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "AppSettings:TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "GovUkNotify:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "GovUkNotify:EmailTemplates:ReleaseAmendmentPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published'), '2018-02-14').secretUriWithVersion, ')')]",
@@ -3044,7 +3044,7 @@
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2020-02-02').InstrumentationKey]",
         "AppSettings:RowsPerBatch": "3000",
-        "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
+        "AppSettings:PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
       }
     },
     {
@@ -3210,10 +3210,10 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
         "AppSettings:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "AppSettings:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
-        "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
-        "NotificationStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
-        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "AppSettings:PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
+        "AppSettings:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "AppSettings:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
+        "AppSettings:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },

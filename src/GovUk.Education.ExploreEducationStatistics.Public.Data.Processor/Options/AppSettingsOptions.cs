@@ -2,7 +2,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Optio
 
 public class AppSettingsOptions
 {
-    public static readonly string Section = "AppSettings";
+    public const string Section = "AppSettings";
+
+    public required string PrivateStorageConnectionString { get; set; }
 
     /// <summary>
     /// Batch size to use when inserting location option meta rows, location option meta link rows,
