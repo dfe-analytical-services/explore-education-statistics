@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.TableStorageTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
@@ -37,7 +36,7 @@ public class ReleaseNotifierTests
     };
 
     [Fact]
-    public async Task ReleaseNotifierFunc()
+    public async Task NotifySubscribers()
     {
         var publication1Id = Guid.NewGuid();
 
@@ -71,7 +70,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
+                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -114,7 +113,7 @@ public class ReleaseNotifierTests
             },
         };
 
-        await function.ReleaseNotifierFunc(
+        await function.NotifySubscribers(
             releaseNotificationMessage,
             new TestFunctionContext());
 
@@ -137,7 +136,7 @@ public class ReleaseNotifierTests
     }
 
     [Fact]
-    public async Task ReleaseNotifierFunc_MultipleSubs()
+    public async Task NotifySubscribers_MultipleSubs()
     {
         var publication1Id = Guid.NewGuid();
 
@@ -161,7 +160,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
+                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -203,7 +202,7 @@ public class ReleaseNotifierTests
             SupersededPublications = new List<IdTitleViewModel>(),
         };
 
-        await function.ReleaseNotifierFunc(
+        await function.NotifySubscribers(
             releaseNotificationMessage,
             new TestFunctionContext());
 
@@ -231,7 +230,7 @@ public class ReleaseNotifierTests
     }
 
     [Fact]
-    public async Task ReleaseNotifierFunc_MultipleSupersededPublicationSubs()
+    public async Task NotifySubscribers_MultipleSupersededPublicationSubs()
     {
         var publication1Id = Guid.NewGuid();
 
@@ -266,7 +265,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
+                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -315,7 +314,7 @@ public class ReleaseNotifierTests
             },
         };
 
-        await function.ReleaseNotifierFunc(
+        await function.NotifySubscribers(
             releaseNotificationMessage,
             new TestFunctionContext());
 
@@ -346,7 +345,7 @@ public class ReleaseNotifierTests
     }
 
     [Fact]
-    public async Task ReleaseNotifierFunc_MultipleSupersededPublications()
+    public async Task NotifySubscribers_MultipleSupersededPublications()
     {
         var publication1Id = Guid.NewGuid();
 
@@ -389,7 +388,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
+                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -437,7 +436,7 @@ public class ReleaseNotifierTests
             },
         };
 
-        await function.ReleaseNotifierFunc(
+        await function.NotifySubscribers(
             releaseNotificationMessage,
             new TestFunctionContext());
 
@@ -460,7 +459,7 @@ public class ReleaseNotifierTests
     }
 
     [Fact]
-    public async Task ReleaseNotifierFunc_Amendment()
+    public async Task NotifySubscribers_Amendment()
     {
         var publication1Id = Guid.NewGuid();
 
@@ -494,7 +493,7 @@ public class ReleaseNotifierTests
         // other mocks
         var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
         publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName))
+                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
             .ReturnsAsync(cloudTable.Object);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -538,7 +537,7 @@ public class ReleaseNotifierTests
             },
         };
 
-        await function.ReleaseNotifierFunc(
+        await function.NotifySubscribers(
             releaseNotificationMessage,
             new TestFunctionContext());
 

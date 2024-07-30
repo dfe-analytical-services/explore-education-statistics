@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 
@@ -50,7 +50,7 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
     public async Task<Subscription> GetSubscription(string id, string email)
     {
         var pendingSub =
-            await RetrieveSubscriber(await GetTable(Constants.NotifierTableStorageTableNames.PublicationPendingSubscriptionsTableName),
+            await RetrieveSubscriber(await GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable),
                 new SubscriptionEntity(id, email));
         if (pendingSub is not null)
         {
@@ -61,7 +61,7 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
             };
         }
 
-        var activeSubscriber = await RetrieveSubscriber(await GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName),
+        var activeSubscriber = await RetrieveSubscriber(await GetTable(NotifierTableStorage.PublicationSubscriptionsTable),
             new SubscriptionEntity(id, email));
         if (activeSubscriber is not null)
         {

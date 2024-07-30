@@ -33,8 +33,8 @@ public abstract class NotifierFunctionsIntegrationTest
 
     public Task DisposeAsync()
     {
-        MockUtils.VerifyAllMocks(fixture._notificationClient);
-        fixture._notificationClient.Reset();
+        MockUtils.VerifyAllMocks(fixture.NotificationClient);
+        fixture.NotificationClient.Reset();
 
         return ClearAzureDataTableTestData(StorageConnectionString());
     }
@@ -44,17 +44,17 @@ public abstract class NotifierFunctionsIntegrationTest
         return fixture.StorageConnectionString();
     }
 
-    public AppSettingsOptions GetAppSettingsOptions()
+    protected AppSettingsOptions GetAppSettingsOptions()
     {
         return GetRequiredService<IOptions<AppSettingsOptions>>().Value;
     }
 
-    public GovUkNotifyOptions GetGovUkNotifyOptions()
+    protected GovUkNotifyOptions GetGovUkNotifyOptions()
     {
         return GetRequiredService<IOptions<GovUkNotifyOptions>>().Value;
     }
 
-    public async Task AddTestSubscription(string tableName, SubscriptionEntity subscription)
+    protected async Task AddTestSubscription(string tableName, SubscriptionEntity subscription)
     {
         var storageAccount = CloudStorageAccount.Parse(StorageConnectionString());
         var tableClient = storageAccount.CreateCloudTableClient();
@@ -64,26 +64,26 @@ public abstract class NotifierFunctionsIntegrationTest
         await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
     }
 
-    public async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)
+    protected async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)
     {
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         await dataTableStorageService.BatchManipulateEntities(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entities: subscriptions,
             tableTransactionActionType: TableTransactionActionType.Add);
     }
 
-    public async Task CreateApiSubscription(ApiSubscription subscription)
+    protected async Task CreateApiSubscription(ApiSubscription subscription)
     {
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         await dataTableStorageService.CreateEntity(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entity: subscription);
     }
 
-    public async Task<ApiSubscription?> GetApiSubscriptionIfExists(
+    protected async Task<ApiSubscription?> GetApiSubscriptionIfExists(
         Guid dataSetId,
         string email,
         IEnumerable<string>? select = null)
@@ -91,13 +91,13 @@ public abstract class NotifierFunctionsIntegrationTest
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         return await dataTableStorageService.GetEntityIfExists<ApiSubscription>(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             select: select);
     }
 
-    public async Task<IReadOnlyList<ApiSubscription>> QueryApiSubscriptions(
+    protected async Task<IReadOnlyList<ApiSubscription>> QueryApiSubscriptions(
         Expression<Func<ApiSubscription, bool>>? filter = null,
         int? maxPerPage = null,
         IEnumerable<string>? select = null)
@@ -105,7 +105,7 @@ public abstract class NotifierFunctionsIntegrationTest
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
         var pagedSubscriptions = await dataTableStorageService.QueryEntities(
-            tableName: Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             filter: filter,
             maxPerPage: maxPerPage,
             select: select,
@@ -124,7 +124,7 @@ public abstract class NotifierFunctionsIntegrationTest
 // ReSharper disable once ClassNeverInstantiated.Global
 public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
 {
-    public readonly Mock<INotificationClient> _notificationClient = new(MockBehavior.Strict);
+    public readonly Mock<INotificationClient> NotificationClient = new(MockBehavior.Strict);
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
         .WithImage("mcr.microsoft.com/azure-storage/azurite:3.31.0")
@@ -166,7 +166,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
             .ConfigureServices((hostContext, services) =>
             {
                 services
-                    .ReplaceService(_notificationClient);
+                    .ReplaceService(NotificationClient);
             });
     }
 

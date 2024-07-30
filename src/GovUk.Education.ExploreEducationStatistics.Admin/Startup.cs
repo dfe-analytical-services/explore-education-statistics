@@ -539,10 +539,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
-            services.AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
+            services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
-            services.AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
+            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                 new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>

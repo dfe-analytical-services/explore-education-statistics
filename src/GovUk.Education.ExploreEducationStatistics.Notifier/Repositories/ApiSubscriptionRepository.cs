@@ -5,26 +5,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
-using Microsoft.Extensions.Options;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 
 internal class ApiSubscriptionRepository(
-    IOptions<AppSettingsOptions> appSettingsOptions,
     IApiSubscriptionTableStorageService apiSubscriptionTableStorage) : IApiSubscriptionRepository
 {
-    private const string _apiSubscriptionsTableName = Constants.NotifierTableStorageTableNames.ApiSubscriptionsTableName;
-
     public async Task<ApiSubscription?> GetSubscription(
         Guid dataSetId,
         string email,
         CancellationToken cancellationToken = default)
     {
         return await apiSubscriptionTableStorage.GetEntityIfExists<ApiSubscription>(
-            tableName: _apiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             cancellationToken: cancellationToken);
@@ -42,12 +38,12 @@ internal class ApiSubscriptionRepository(
             PartitionKey = dataSetId.ToString(),
             RowKey = email,
             DataSetTitle = dataSetTitle,
-            Status = ApiSubscriptionStatus.SubscriptionPending,
+            Status = ApiSubscriptionStatus.Pending,
             Expiry = expiry
         };
 
         await apiSubscriptionTableStorage.CreateEntity(
-            tableName: _apiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entity: subscription,
             cancellationToken: cancellationToken);
     }
@@ -57,7 +53,7 @@ internal class ApiSubscriptionRepository(
         CancellationToken cancellationToken = default)
     {
         await apiSubscriptionTableStorage.UpdateEntity(
-            tableName: _apiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entity: subscription,
             cancellationToken: cancellationToken);
     }
@@ -68,22 +64,22 @@ internal class ApiSubscriptionRepository(
         CancellationToken cancellationToken = default)
     {
         await apiSubscriptionTableStorage.DeleteEntity(
-            tableName: _apiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
             cancellationToken: cancellationToken);
     }
 
     public async Task<AsyncPageable<ApiSubscription>> QuerySubscriptions(
-        Expression<Func<ApiSubscription, bool>>? filter = null, 
-        int? maxPerPage = 1000, 
-        IEnumerable<string>? select = null, 
+        Expression<Func<ApiSubscription, bool>>? filter = null,
+        int? maxPerPage = 1000,
+        IEnumerable<string>? select = null,
         CancellationToken cancellationToken = default)
     {
         filter ??= subscription => true;
 
         return await apiSubscriptionTableStorage.QueryEntities(
-            tableName: _apiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             filter: filter,
             maxPerPage: maxPerPage,
             select: select,
@@ -92,11 +88,11 @@ internal class ApiSubscriptionRepository(
 
     public async Task BatchManipulateSubscriptions(
         IEnumerable<ApiSubscription> subscriptions,
-        TableTransactionActionType tableTransactionActionType, 
+        TableTransactionActionType tableTransactionActionType,
         CancellationToken cancellationToken = default)
     {
         await apiSubscriptionTableStorage.BatchManipulateEntities(
-            tableName: _apiSubscriptionsTableName,
+            tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entities: subscriptions,
             tableTransactionActionType: tableTransactionActionType,
             cancellationToken: cancellationToken);

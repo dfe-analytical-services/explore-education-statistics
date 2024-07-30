@@ -1,5 +1,7 @@
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
@@ -38,6 +40,8 @@ public static class NotifierHostBuilder
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
                     .AddFluentValidation()
+                    .AddValidatorsFromAssembly(
+                        typeof(ApiNotificationMessage.Validator).Assembly) // Adds *all* validators from Notifier.Model
                     .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.Section))
                     .Configure<GovUkNotifyOptions>(hostContext.Configuration.GetSection(GovUkNotifyOptions.Section))
                     .AddTransient<INotificationClient>(serviceProvider =>

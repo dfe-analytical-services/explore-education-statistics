@@ -8,47 +8,37 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
-public class ReleaseNotifier
+public class ReleaseNotifier(
+    ILogger<ReleaseNotifier> logger,
+    IOptions<AppSettingsOptions> appSettingsOptions,
+    IOptions<GovUkNotifyOptions> govUkNotifyOptions,
+    ITokenService tokenService,
+    IEmailService emailService,
+    IPublicationSubscriptionRepository publicationSubscriptionRepository)
 {
-    private readonly ILogger<ReleaseNotifier> _logger;
-    private readonly AppSettingsOptions _appSettingsOptions;
-    private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions;
-    private readonly ITokenService _tokenService;
-    private readonly IEmailService _emailService;
-    private readonly IPublicationSubscriptionRepository _publicationSubscriptionRepository;
+    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
 
-    public ReleaseNotifier(
-        ILogger<ReleaseNotifier> logger,
-        IOptions<AppSettingsOptions> appSettingsOptions,
-        IOptions<GovUkNotifyOptions> govUkNotifyOptions,
-        ITokenService tokenService,
-        IEmailService emailService,
-        IPublicationSubscriptionRepository publicationSubscriptionRepository)
+    private static class FunctionNames
     {
-        _logger = logger;
-        _appSettingsOptions = appSettingsOptions.Value;
-        _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
-        _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
-        _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-        _publicationSubscriptionRepository = publicationSubscriptionRepository ?? throw new ArgumentNullException(nameof(publicationSubscriptionRepository));
+        private const string Base = "PublicationSubscriptions_";
+        public const string NotifySubscribers = $"{Base}{nameof(ReleaseNotifier.NotifySubscribers)}";
     }
 
-    [Function("ReleaseNotifier")]
-    public async Task ReleaseNotifierFunc(
-        [QueueTrigger(ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
+    [Function(FunctionNames.NotifySubscribers)]
+    public async Task NotifySubscribers(
+        [QueueTrigger(NotifierQueueStorage.ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
         FunctionContext context)
     {
-        _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
+        logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var subscribersTable = await _publicationSubscriptionRepository.GetTable(Constants.NotifierTableStorageTableNames.PublicationSubscriptionsTableName);
+        var subscribersTable = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
 
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -65,7 +55,7 @@ public class ReleaseNotifier
             sentEmails.Add(email);
         }
 
-        _logger.LogInformation("Emailed {NumReleaseSubscriberEmailsSent} publication subscribers",
+        logger.LogInformation("Emailed {NumReleaseSubscriberEmailsSent} publication subscribers",
             sentEmails.Count);
 
         // Send emails to subscribers of any associated superseded publication
@@ -95,12 +85,12 @@ public class ReleaseNotifier
                 numSupersededSubscriberEmailsSent++;
             }
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Emailed {NumSupersededPublicationEmailsSent} subscribers from a superseded publication",
                 numSupersededSubscriberEmailsSent);
         }
 
-        _logger.LogInformation("Sent {TotalNumEmailsSent} emails in total to subscribers",
+        logger.LogInformation("Sent {TotalNumEmailsSent} emails in total to subscribers",
             sentEmails.Count);
     }
 
@@ -130,8 +120,7 @@ public class ReleaseNotifier
         string email,
         ReleaseNotificationMessage msg)
     {
-        var unsubscribeToken =
-            _tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
+        var unsubscribeToken = tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
 
         var values = new Dictionary<string, dynamic>
         {
@@ -156,7 +145,7 @@ public class ReleaseNotifier
             ? _emailTemplateOptions.ReleaseAmendmentPublishedId
             : _emailTemplateOptions.ReleasePublishedId;
 
-        _emailService.SendEmail(
+        emailService.SendEmail(
             email: email,
             templateId: releaseTemplateId,
             values);
@@ -167,7 +156,7 @@ public class ReleaseNotifier
         IdTitleViewModel supersededPublication,
         ReleaseNotificationMessage msg)
     {
-        var unsubscribeToken = _tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
+        var unsubscribeToken = tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
 
         var values = new Dictionary<string, dynamic>
         {
@@ -193,7 +182,7 @@ public class ReleaseNotifier
             ? _emailTemplateOptions.ReleaseAmendmentPublishedSupersededSubscribersId
             : _emailTemplateOptions.ReleasePublishedSupersededSubscribersId;
 
-        _emailService.SendEmail(
+        emailService.SendEmail(
             email: email,
             templateId: releaseSupersededSubscribersEmailTemplateId,
             values);
