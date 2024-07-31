@@ -464,7 +464,7 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('does not allow deleting files when linked to an API data set', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
-        { ...testDataFiles[0], isLinkedToApiDataSet: true },
+        { ...testDataFiles[0], publicApiDataSetId: 'test-data-set-id' },
       ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
@@ -503,6 +503,13 @@ describe('ReleaseDataUploadsSection', () => {
           'This data file has an API data set linked to it. Please remove the API data set before deleting.',
         ),
       ).toBeInTheDocument();
+
+      expect(
+        modal.getByRole('link', { name: 'Go to API data set' }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/api-data-sets/test-data-set-id',
+      );
     });
   });
 
@@ -582,7 +589,7 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('does not allow replacing data when linked to an API data set', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
-        { ...testDataFiles[0], isLinkedToApiDataSet: true },
+        { ...testDataFiles[0], publicApiDataSetId: 'test-data-set-id' },
       ]);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
@@ -619,6 +626,13 @@ describe('ReleaseDataUploadsSection', () => {
           'This data file has an API data set linked to it. Please remove the API data set before replacing the data.',
         ),
       ).toBeInTheDocument();
+
+      expect(
+        modal.getByRole('link', { name: 'Go to API data set' }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/api-data-sets/test-data-set-id',
+      );
     });
   });
 

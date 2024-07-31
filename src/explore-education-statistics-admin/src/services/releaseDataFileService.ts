@@ -38,8 +38,9 @@ export interface DataFile {
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
-  isLinkedToApiDataSet?: boolean;
   permissions: DataFilePermissions;
+  publicApiDataSetId?: string;
+  publicApiDataSetVersion?: string;
 }
 
 export type UploadDataFilesRequest =

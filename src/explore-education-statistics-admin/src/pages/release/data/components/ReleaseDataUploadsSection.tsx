@@ -8,10 +8,12 @@ import DataFileUploadForm, {
 import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import {
+  releaseApiDataSetDetailsRoute,
   releaseDataFileReplaceRoute,
   ReleaseDataFileReplaceRouteParams,
   releaseDataFileRoute,
   ReleaseDataFileRouteParams,
+  ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
@@ -245,7 +247,7 @@ const ReleaseDataUploadsSection = ({
                               >
                                 Edit title
                               </Link>
-                              {dataFile.isLinkedToApiDataSet ? (
+                              {dataFile.publicApiDataSetId ? (
                                 <Modal
                                   showClose
                                   title="Cannot replace data"
@@ -257,6 +259,21 @@ const ReleaseDataUploadsSection = ({
                                     This data file has an API data set linked to
                                     it. Please remove the API data set before
                                     replacing the data.
+                                  </p>
+                                  <p>
+                                    <Link
+                                      to={generatePath<ReleaseDataSetRouteParams>(
+                                        releaseApiDataSetDetailsRoute.path,
+                                        {
+                                          publicationId,
+                                          releaseId,
+                                          dataSetId:
+                                            dataFile.publicApiDataSetId,
+                                        },
+                                      )}
+                                    >
+                                      Go to API data set
+                                    </Link>
                                   </p>
                                 </Modal>
                               ) : (
@@ -276,7 +293,7 @@ const ReleaseDataUploadsSection = ({
                               )}
                             </>
                           )}
-                          {dataFile.isLinkedToApiDataSet ? (
+                          {dataFile.publicApiDataSetId ? (
                             <Modal
                               showClose
                               title="Cannot delete files"
@@ -290,10 +307,24 @@ const ReleaseDataUploadsSection = ({
                                 This data file has an API data set linked to it.
                                 Please remove the API data set before deleting.
                               </p>
+                              <p>
+                                <Link
+                                  to={generatePath<ReleaseDataSetRouteParams>(
+                                    releaseApiDataSetDetailsRoute.path,
+                                    {
+                                      publicationId,
+                                      releaseId,
+                                      dataSetId: dataFile.publicApiDataSetId,
+                                    },
+                                  )}
+                                >
+                                  Go to API data set
+                                </Link>
+                              </p>
                             </Modal>
                           ) : (
                             <ButtonText
-                              onClick={() =>
+                              onClick={async () =>
                                 releaseDataFileService
                                   .getDeleteDataFilePlan(releaseId, dataFile)
                                   .then(plan => {
