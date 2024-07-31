@@ -948,11 +948,11 @@ public class SeedDataCommand : ICommand
             {
                 using var appender = _duckDbConnection.CreateAppender(table: LocationOptionsTable.TableName);
 
-                var insertRow = appender.CreateRow();
-
                 foreach (var link in location.OptionLinks.OrderBy(l => l.Option.Label))
                 {
                     var option = link.Option;
+
+                    var insertRow = appender.CreateRow();
 
                     insertRow.AppendValue(id++);
                     insertRow.AppendValue(option.Label);
