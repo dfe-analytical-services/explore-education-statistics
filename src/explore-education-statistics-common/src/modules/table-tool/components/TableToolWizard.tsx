@@ -95,11 +95,13 @@ export interface TableToolWizardProps {
     nextStepNumber: number;
     nextStepTitle: string;
   }) => void;
+
   onSubjectFormSubmit?(params: {
     publication: SelectedPublication;
     release: SelectedPublication['selectedRelease'];
     subjectId: string;
   }): void;
+
   onSubjectStepBack?: (publication?: SelectedPublication) => void;
   onSubmit?: (table: FullTable) => void;
   onTableQueryError?: (

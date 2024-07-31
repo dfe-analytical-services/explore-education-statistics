@@ -27,7 +27,7 @@ interface Model {
 const PreReleaseMethodologiesPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+  const { publicationId, releaseVersionId } = match.params;
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, latestMethodologyVersions] = await Promise.all([
@@ -64,7 +64,7 @@ const PreReleaseMethodologiesPage = ({
                         preReleaseMethodologyRoute.path,
                         {
                           publicationId,
-                          releaseId,
+                          releaseVersionId,
                           methodologyId:
                             // If latest methodology version is unapproved, it will
                             // be an unpublished amendment. So we link to previous

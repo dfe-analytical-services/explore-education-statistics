@@ -26,7 +26,7 @@ interface Props {
   block: EditableBlock;
   editable?: boolean;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   visible?: boolean;
 }
 
@@ -36,16 +36,17 @@ const PrototypeReleaseEditableBlock = ({
   block,
   editable = true,
   publicationId,
-  releaseId,
+  releaseVersionId,
   visible,
 }: Props) => {
-  const getChartFile = useGetChartFile(releaseId);
+  const getChartFile = useGetChartFile(releaseVersionId);
 
   const { handleImageUpload, handleImageUploadCancel } =
-    useReleaseImageUpload(releaseId);
+    useReleaseImageUpload(releaseVersionId);
 
+  // TODO rename to releaseVersionId
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseId,
+    releaseId: releaseVersionId,
   });
 
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
@@ -70,15 +71,16 @@ const PrototypeReleaseEditableBlock = ({
                 releaseDataBlockEditRoute.path,
                 {
                   publicationId,
-                  releaseId,
+                  releaseVersionId,
                   dataBlockId: block.id,
                 },
               )}
               onDelete={noop}
             >
+              {/* TODO rename to releaseVersionId */}
               <Gate condition={!!visible}>
                 <DataBlockTabs
-                  releaseId={releaseId}
+                  releaseId={releaseVersionId}
                   id={blockId}
                   dataBlock={block}
                   getInfographic={getChartFile}

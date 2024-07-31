@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseVersionSummary } from '@admin/services/releaseService';
 import {
   MethodologyRouteParams,
   methodologyContentRoute,
@@ -18,7 +18,7 @@ import merge from 'lodash/merge';
 
 interface Props {
   methodologyApprovals: MethodologyVersion[];
-  releaseApprovals: DashboardReleaseSummary[];
+  releaseApprovals: DashboardReleaseVersionSummary[];
 }
 
 export default function ApprovalsTable({
@@ -26,10 +26,10 @@ export default function ApprovalsTable({
   releaseApprovals,
 }: Props) {
   const releasesByPublication: Dictionary<{
-    releases: DashboardReleaseSummary[];
+    releases: DashboardReleaseVersionSummary[];
   }> = useMemo(() => {
     return releaseApprovals.reduce<
-      Dictionary<{ releases: DashboardReleaseSummary[] }>
+      Dictionary<{ releases: DashboardReleaseVersionSummary[] }>
     >((acc, release) => {
       if (acc[release.publication.title]) {
         acc[release.publication.title].releases.push(release);
@@ -104,7 +104,7 @@ export default function ApprovalsTable({
 interface PublicationRowProps {
   publication: string;
   methodologies: MethodologyVersion[];
-  releases: DashboardReleaseSummary[];
+  releases: DashboardReleaseVersionSummary[];
 }
 
 function PublicationRow({
@@ -130,7 +130,7 @@ function PublicationRow({
             <Link
               to={generatePath<ReleaseRouteParams>(releaseContentRoute.path, {
                 publicationId: release.publication.id,
-                releaseId: release.id,
+                releaseVersionId: release.id,
               })}
             >
               Review this page

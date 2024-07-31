@@ -5,7 +5,7 @@ import { AxiosProgressEvent } from 'axios';
 
 const releaseImageService = {
   upload(
-    releaseId: string,
+    releaseVersionId: string,
     file: File,
     options: {
       signal?: AbortSignal;
@@ -15,7 +15,7 @@ const releaseImageService = {
     const data = new FormData();
     data.append('file', file);
 
-    return client.post(`/releases/${releaseId}/images`, data, {
+    return client.post(`/releases/${releaseVersionId}/images`, data, {
       signal: options.signal,
       onUploadProgress(event: AxiosProgressEvent) {
         options.onProgress?.(event.loaded, event.total ?? 0);

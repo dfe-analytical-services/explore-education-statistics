@@ -7,6 +7,7 @@ export type ImageAttributeTransformer = (
 ) => Dictionary<string>;
 
 export default function useReleaseImageAttributeTransformer(options: {
+  // TODO rename to releaseVersionId
   releaseId: string;
   rootUrl?: string;
 }): ImageAttributeTransformer {

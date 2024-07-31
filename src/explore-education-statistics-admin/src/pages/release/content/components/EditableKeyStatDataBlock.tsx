@@ -15,7 +15,7 @@ export interface EditableKeyStatDataBlockProps {
   isEditing?: boolean;
   isReordering?: boolean;
   keyStat: KeyStatisticDataBlock;
-  releaseId: string;
+  releaseVersionId: string;
   testId?: string;
   onRemove: () => void;
   onSubmit: (values: KeyStatDataBlockFormValues) => void;
@@ -25,7 +25,7 @@ export default function EditableKeyStatDataBlock({
   isEditing = false,
   isReordering = false,
   keyStat,
-  releaseId,
+  releaseVersionId,
   testId = 'keyStat',
   onRemove,
   onSubmit,
@@ -36,7 +36,7 @@ export default function EditableKeyStatDataBlock({
     value: dataBlockValues,
     isLoading,
     error,
-  } = useKeyStatQuery(releaseId, keyStat.dataBlockParentId);
+  } = useKeyStatQuery(releaseVersionId, keyStat.dataBlockParentId);
 
   const handleSubmit = useCallback(
     async (values: KeyStatDataBlockFormValues) => {

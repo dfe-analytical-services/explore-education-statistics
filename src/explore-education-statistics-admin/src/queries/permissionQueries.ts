@@ -2,10 +2,10 @@ import permissionService from '@admin/services/permissionService';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 const permissionQueries = createQueryKeys('releaseDataBlocks', {
-  canUpdateRelease(releaseId: string) {
+  canUpdateRelease(releaseVersionId: string) {
     return {
-      queryKey: [releaseId],
-      queryFn: () => permissionService.canUpdateRelease(releaseId),
+      queryKey: [releaseVersionId],
+      queryFn: () => permissionService.canUpdateRelease(releaseVersionId),
     };
   },
   canUpdateMethodology(methodologyId: string) {

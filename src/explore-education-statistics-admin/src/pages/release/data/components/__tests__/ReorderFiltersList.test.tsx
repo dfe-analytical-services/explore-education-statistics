@@ -112,7 +112,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -162,7 +162,7 @@ describe('ReorderFiltersList', () => {
     );
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -179,7 +179,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -209,7 +209,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -256,7 +256,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -286,7 +286,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -324,7 +324,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -376,7 +376,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -407,7 +407,7 @@ describe('ReorderFiltersList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderFiltersList
-        releaseId="release-1"
+        releaseVersionId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={handleSave}

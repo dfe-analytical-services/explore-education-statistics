@@ -1,6 +1,6 @@
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
 import _releaseService, {
-  DashboardReleaseSummary,
+  DashboardReleaseVersionSummary,
 } from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
@@ -13,7 +13,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('DraftReleasesTable', () => {
-  const testReleases: DashboardReleaseSummary[] = [
+  const testReleases: DashboardReleaseVersionSummary[] = [
     {
       id: 'release-1',
       latestRelease: true,

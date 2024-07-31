@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseService
     {
-        Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
+        Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
         Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId, 
@@ -22,12 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
+        Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId);
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>>
             GetReleasePublicationStatus(Guid releaseVersionId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(Guid releaseVersionId, ReleaseUpdateRequest request);
+        Task<Either<ActionResult, ReleaseVersionViewModel>> UpdateReleaseVersion(Guid releaseVersionId, ReleaseUpdateRequest request);
 
         Task<Either<ActionResult, Unit>> UpdateReleasePublished(Guid releaseVersionId,
             ReleasePublishedUpdateRequest request);

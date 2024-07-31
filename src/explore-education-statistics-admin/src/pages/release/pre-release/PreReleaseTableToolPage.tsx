@@ -26,21 +26,21 @@ import { useQuery } from '@tanstack/react-query';
 const PreReleaseTableToolPage = ({
   match,
 }: RouteComponentProps<PreReleaseTableToolRouteParams>) => {
-  const { publicationId, releaseId, dataBlockId } = match.params;
+  const { publicationId, releaseVersionId, dataBlockId } = match.params;
 
   const { data: publication, isLoading: isPublicationLoading } = useQuery(
     publicationQueries.get(publicationId),
   );
 
   const { data: release, isLoading: isReleaseLoading } = useQuery(
-    releaseQueries.get(releaseId),
+    releaseQueries.get(releaseVersionId),
   );
 
   const { value: tableToolState, isLoading: isTableToolStateLoading } =
     useAsyncHandledRetry<InitialTableToolState | undefined>(async () => {
       const [featuredTables, subjects] = await Promise.all([
-        tableBuilderService.listReleaseFeaturedTables(releaseId),
-        tableBuilderService.listReleaseSubjects(releaseId),
+        tableBuilderService.listReleaseFeaturedTables(releaseVersionId),
+        tableBuilderService.listReleaseSubjects(releaseVersionId),
       ]);
 
       if (dataBlockId) {
@@ -49,12 +49,13 @@ const PreReleaseTableToolPage = ({
         );
 
         const [subjectMeta, tableData] = await Promise.all([
-          tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
+          tableBuilderService.getSubjectMeta(query.subjectId, releaseVersionId),
           tableBuilderService.getTableData(
             {
               ...query,
             },
-            releaseId,
+            // TODO rename to releaseVersionId
+            releaseVersionId,
           ),
         ]);
 
@@ -71,7 +72,8 @@ const PreReleaseTableToolPage = ({
           query: {
             ...query,
             publicationId,
-            releaseId,
+            // TODO rename to releaseVersionId
+            releaseId: releaseVersionId,
           },
           subjectMeta,
           response: {
@@ -87,14 +89,15 @@ const PreReleaseTableToolPage = ({
         featuredTables,
         query: {
           publicationId,
-          releaseId,
+          // TODO rename to releaseVersionId
+          releaseId: releaseVersionId,
           subjectId: '',
           indicators: [],
           filters: [],
           locationIds: [],
         },
       };
-    }, [publicationId, releaseId, dataBlockId]);
+    }, [publicationId, releaseVersionId, dataBlockId]);
 
   const isLoading =
     isReleaseLoading || isTableToolStateLoading || isPublicationLoading;
@@ -126,7 +129,7 @@ const PreReleaseTableToolPage = ({
                   preReleaseTableToolRoute.path,
                   {
                     publicationId,
-                    releaseId,
+                    releaseVersionId,
                     dataBlockId: featuredTable.dataBlockId,
                   },
                 )}
@@ -146,7 +149,7 @@ const PreReleaseTableToolPage = ({
                       <PreReleaseTableToolFinalStep
                         publication={publication}
                         query={query}
-                        releaseId={releaseId}
+                        releaseVersionId={releaseVersionId}
                         releaseType={release.type}
                         table={table}
                         tableHeaders={tableHeaders}

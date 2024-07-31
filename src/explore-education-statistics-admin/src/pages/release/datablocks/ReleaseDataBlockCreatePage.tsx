@@ -19,12 +19,12 @@ const ReleaseDataBlockCreatePage = ({
   history,
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const {
-    params: { publicationId, releaseId },
+    params: { publicationId, releaseVersionId },
   } = match;
 
   const { value: canUpdateRelease, isLoading } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
-    [releaseId],
+    () => permissionService.canUpdateRelease(releaseVersionId),
+    [releaseVersionId],
   );
 
   const handleDataBlockSave = useCallback(
@@ -34,13 +34,13 @@ const ReleaseDataBlockCreatePage = ({
           releaseDataBlockEditRoute.path,
           {
             publicationId,
-            releaseId,
+            releaseVersionId,
             dataBlockId: dataBlock.id,
           },
         ),
       );
     },
-    [history, publicationId, releaseId],
+    [history, publicationId, releaseVersionId],
   );
 
   return (
@@ -50,7 +50,7 @@ const ReleaseDataBlockCreatePage = ({
         className="govuk-!-margin-bottom-6"
         to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         })}
       >
         Back
@@ -62,7 +62,7 @@ const ReleaseDataBlockCreatePage = ({
         <section>
           {canUpdateRelease ? (
             <DataBlockPageTabs
-              releaseId={releaseId}
+              releaseVersionId={releaseVersionId}
               onDataBlockSave={handleDataBlockSave}
             />
           ) : (

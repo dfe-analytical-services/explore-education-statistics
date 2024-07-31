@@ -5,6 +5,7 @@ export interface ImportStatus {
   subjectId: string;
   publicationId: string;
   publicationTitle: string;
+  // TODO rename to releaseVersionId
   releaseId: string;
   releaseTitle: string;
   dataFileName: string;

@@ -1,6 +1,6 @@
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import {
-  Release,
+  ReleaseVersion,
   ReleaseChecklistErrorCode,
 } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
@@ -83,7 +83,7 @@ const fallbackErrorMapping = mapFallbackFieldError<ReleaseStatusFormValues>({
 });
 
 interface Props {
-  release: Release;
+  release: ReleaseVersion;
   statusPermissions: ReleaseStatusPermissions;
   onCancel: () => void;
   onSubmit: (values: ReleaseStatusFormValues) => Promise<void> | void;

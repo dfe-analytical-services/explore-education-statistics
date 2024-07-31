@@ -18,12 +18,12 @@ const ReleaseContentHubContext = createContext<
 
 interface ReleaseContentHubContextProviderProps {
   children: ReactNode | ((value: HubState<ReleaseContentHub>) => ReactNode);
-  releaseId: string;
+  releaseVersionId: string;
 }
 
 export function ReleaseContentHubContextProvider({
   children,
-  releaseId,
+  releaseVersionId,
 }: ReleaseContentHubContextProviderProps) {
   const hubState = useHubState(releaseContentHub);
 
@@ -37,7 +37,7 @@ export function ReleaseContentHubContextProvider({
       joinStateRef.current = 'joining';
 
       hub
-        .joinReleaseGroup(releaseId)
+        .joinReleaseGroup(releaseVersionId)
         .then(() => {
           joinStateRef.current = 'joined';
         })
@@ -45,17 +45,17 @@ export function ReleaseContentHubContextProvider({
           joinStateRef.current = '';
         });
     }
-  }, [hub, hubState, isMountedRef, releaseId, status]);
+  }, [hub, hubState, isMountedRef, releaseVersionId, status]);
 
   useEffect(() => {
     return () => {
       if (hub.status() === 'Connected' && joinStateRef.current === 'joined') {
-        hub.leaveReleaseGroup(releaseId);
+        hub.leaveReleaseGroup(releaseVersionId);
       }
     };
     // We only want this to run when the component unmounts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [releaseId]);
+  }, [releaseVersionId]);
 
   if (!hubState) {
     return <LoadingSpinner />;

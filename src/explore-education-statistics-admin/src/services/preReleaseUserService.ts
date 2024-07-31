@@ -11,24 +11,27 @@ export interface PreReleaseInvitePlan {
 }
 
 const preReleaseUserService = {
-  getUsers(releaseId: string): Promise<PreReleaseUser[]> {
-    return client.get(`/release/${releaseId}/prerelease-users`);
+  getUsers(releaseVersionId: string): Promise<PreReleaseUser[]> {
+    return client.get(`/release/${releaseVersionId}/prerelease-users`);
   },
   getInvitePlan(
-    releaseId: string,
+    releaseVersionId: string,
     emails: string[],
   ): Promise<PreReleaseInvitePlan> {
-    return client.post(`/release/${releaseId}/prerelease-users-plan`, {
+    return client.post(`/release/${releaseVersionId}/prerelease-users-plan`, {
       emails,
     });
   },
-  inviteUsers(releaseId: string, emails: string[]): Promise<PreReleaseUser[]> {
-    return client.post(`/release/${releaseId}/prerelease-users`, {
+  inviteUsers(
+    releaseVersionId: string,
+    emails: string[],
+  ): Promise<PreReleaseUser[]> {
+    return client.post(`/release/${releaseVersionId}/prerelease-users`, {
       emails,
     });
   },
-  removeUser(releaseId: string, email: string): Promise<void> {
-    return client.delete(`/release/${releaseId}/prerelease-users`, {
+  removeUser(releaseVersionId: string, email: string): Promise<void> {
+    return client.delete(`/release/${releaseVersionId}/prerelease-users`, {
       data: {
         email,
       },

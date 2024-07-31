@@ -53,7 +53,7 @@ describe('PublicationReleaseContributorsForm', () => {
     render(
       <PublicationReleaseContributorsForm
         publicationId="publication-id"
-        releaseId="release-id"
+        releaseVersionId="release-id"
         publicationContributors={testPublicationContributors}
         releaseContributors={testReleaseContributors}
       />,

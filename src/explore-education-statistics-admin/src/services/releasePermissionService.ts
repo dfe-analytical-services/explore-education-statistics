@@ -13,11 +13,11 @@ export interface UserReleaseInvite {
 }
 
 const releasePermissionService = {
-  listRoles(releaseId: string): Promise<UserReleaseRole[]> {
-    return client.get(`/releases/${releaseId}/roles`);
+  listRoles(releaseVersionId: string): Promise<UserReleaseRole[]> {
+    return client.get(`/releases/${releaseVersionId}/roles`);
   },
-  listInvites(releaseId: string): Promise<UserReleaseInvite[]> {
-    return client.get(`/releases/${releaseId}/invites`);
+  listInvites(releaseVersionId: string): Promise<UserReleaseInvite[]> {
+    return client.get(`/releases/${releaseVersionId}/invites`);
   },
   listPublicationContributors(
     publicationId: string,
@@ -25,10 +25,12 @@ const releasePermissionService = {
     return client.get(`/publications/${publicationId}/contributors`);
   },
   updateReleaseContributors(
-    releaseId: string,
+    releaseVersionId: string,
     userIds: string[],
   ): Promise<void> {
-    return client.put(`/releases/${releaseId}/contributors`, { userIds });
+    return client.put(`/releases/${releaseVersionId}/contributors`, {
+      userIds,
+    });
   },
   removeAllUserContributorPermissionsForPublication(
     publicationId: string,

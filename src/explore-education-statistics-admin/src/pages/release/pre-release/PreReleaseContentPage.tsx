@@ -18,14 +18,14 @@ import { useQuery } from '@tanstack/react-query';
 const PreReleaseContentPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+  const { publicationId, releaseVersionId } = match.params;
 
   const { data: content, isLoading: isLoadingContent } = useQuery(
-    releaseContentQueries.get(releaseId),
+    releaseContentQueries.get(releaseVersionId),
   );
 
   const { data: featuredTables = [], isLoading: isLoadingFeaturedTables } =
-    useQuery(featuredTableQueries.list(releaseId));
+    useQuery(featuredTableQueries.list(releaseVersionId));
 
   const handleFeaturedTableLinks = (url: string, text: string) => {
     // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
@@ -41,7 +41,7 @@ const PreReleaseContentPage = ({
           preReleaseTableToolRoute.path,
           {
             publicationId,
-            releaseId,
+            releaseVersionId,
             dataBlockId: featuredTable?.dataBlockId,
           },
         )}

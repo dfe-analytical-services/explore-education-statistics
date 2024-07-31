@@ -11,7 +11,7 @@ interface UseImageUploadReturn {
 }
 
 export default function useReleaseImageUpload(
-  releaseId: string,
+  releaseVersionId: string,
 ): UseImageUploadReturn {
   const abortController = useRef<AbortController>();
 
@@ -19,12 +19,12 @@ export default function useReleaseImageUpload(
     async (file, onProgress) => {
       abortController.current = new AbortController();
 
-      return releaseImageService.upload(releaseId, file, {
+      return releaseImageService.upload(releaseVersionId, file, {
         signal: abortController.current.signal,
         onProgress,
       });
     },
-    [releaseId],
+    [releaseVersionId],
   );
 
   const handleImageUploadCancel: ImageUploadCancelHandler = useCallback(() => {

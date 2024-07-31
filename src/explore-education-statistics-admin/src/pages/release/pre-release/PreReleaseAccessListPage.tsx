@@ -18,11 +18,11 @@ const PreReleaseAccessListPage = ({
   match,
   location,
 }: RouteComponentProps<ReleaseRouteParams, StaticContext, LocationState>) => {
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
 
   const { value: release, isLoading } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [releaseId],
+    () => releaseService.getRelease(releaseVersionId),
+    [releaseVersionId],
   );
 
   return (

@@ -49,7 +49,9 @@ describe('EditableKeyStat', () => {
     };
 
     test('renders correctly', async () => {
-      render(<EditableKeyStat releaseId="release-1" keyStat={keyStatText} />);
+      render(
+        <EditableKeyStat releaseVersionId="release-1" keyStat={keyStatText} />,
+      );
 
       await waitFor(() => {
         expect(
@@ -158,7 +160,10 @@ describe('EditableKeyStat', () => {
       );
 
       render(
-        <EditableKeyStat releaseId="release-1" keyStat={keyStatDataBlock} />,
+        <EditableKeyStat
+          releaseVersionId="release-1"
+          keyStat={keyStatDataBlock}
+        />,
       );
 
       await waitFor(() => {
@@ -197,7 +202,7 @@ describe('EditableKeyStat', () => {
 
       render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={keyStatDataBlock}
           isEditing
         />,
@@ -250,7 +255,7 @@ describe('EditableKeyStat', () => {
 
       render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={keyStatDataBlock}
           isEditing
         />,
@@ -283,7 +288,7 @@ describe('EditableKeyStat', () => {
     test('invalid `keyStat` renders null', async () => {
       const { container } = render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={
             {
               id: 'KeyStat-1',

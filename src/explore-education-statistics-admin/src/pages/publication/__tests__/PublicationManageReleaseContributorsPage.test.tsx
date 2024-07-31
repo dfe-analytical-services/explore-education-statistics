@@ -5,7 +5,9 @@ import {
   publicationManageReleaseContributorsPageRoute,
   PublicationManageTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  ReleaseVersion,
+} from '@admin/services/releaseService';
 import _releasePermissionService, {
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
@@ -23,11 +25,11 @@ const releasePermissionService = _releasePermissionService as jest.Mocked<
   typeof _releasePermissionService
 >;
 
-const testRelease: Release = {
+const testRelease: ReleaseVersion = {
   amendment: false,
   approvalStatus: 'Draft',
-  id: 'release-1',
-  releaseId: 'release-series-1',
+  id: 'release-version-1',
+  releaseId: 'release-1',
   latestInternalReleaseNote: 'release1-release-note',
   latestRelease: true,
   live: false,
@@ -139,7 +141,7 @@ function renderPage() {
     publicationManageReleaseContributorsPageRoute.path,
     {
       publicationId: testPublication.id,
-      releaseId: testRelease.id,
+      releaseVersionId: testRelease.id,
     },
   );
 

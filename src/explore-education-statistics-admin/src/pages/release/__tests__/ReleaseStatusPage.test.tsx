@@ -1,10 +1,12 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { testReleaseVersion } from '@admin/pages/release/__data__/testReleaseVersion';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import _permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  ReleaseVersion,
+} from '@admin/services/releaseService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -65,7 +67,7 @@ describe('ReleaseStatusPage', () => {
     });
 
     renderPage({
-      ...testRelease,
+      ...testReleaseVersion,
       approvalStatus: 'Approved',
       publishScheduled: '2021-01-15',
       nextReleaseDate: {
@@ -132,13 +134,13 @@ describe('ReleaseStatusPage', () => {
     expect(screen.queryByText('Edit release status')).not.toBeInTheDocument();
   });
 
-  function renderPage(release: Release = testRelease) {
+  function renderPage(release: ReleaseVersion = testReleaseVersion) {
     return render(
       <MemoryRouter>
         <TestConfigContextProvider>
-          <ReleaseContextProvider release={release}>
+          <ReleaseVersionContextProvider releaseVersion={release}>
             <ReleaseStatusPage />
-          </ReleaseContextProvider>
+          </ReleaseVersionContextProvider>
         </TestConfigContextProvider>
       </MemoryRouter>,
     );

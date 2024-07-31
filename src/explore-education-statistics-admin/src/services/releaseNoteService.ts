@@ -3,24 +3,26 @@ import { ReleaseNote } from '@common/services/publicationService';
 
 const releaseNoteService = {
   create: (
-    releaseId: string,
-    releaseNote: Omit<ReleaseNote, 'id' | 'on' | 'releaseId'>,
+    releaseVersionId: string,
+    releaseNote: Omit<ReleaseNote, 'id' | 'on' | 'releaseVersionId'>,
   ): Promise<ReleaseNote[]> => {
     return client.post(
-      `/release/${releaseId}/content/release-note`,
+      `/release/${releaseVersionId}/content/release-note`,
       releaseNote,
     );
   },
-  delete: (id: string, releaseId: string): Promise<ReleaseNote[]> => {
-    return client.delete(`/release/${releaseId}/content/release-note/${id}`);
+  delete: (id: string, releaseVersionId: string): Promise<ReleaseNote[]> => {
+    return client.delete(
+      `/release/${releaseVersionId}/content/release-note/${id}`,
+    );
   },
   edit: (
     id: string,
-    releaseId: string,
-    releaseNote: Omit<ReleaseNote, 'id' | 'releaseId'>,
+    releaseVersionId: string,
+    releaseNote: Omit<ReleaseNote, 'id' | 'releaseVersionId'>,
   ): Promise<ReleaseNote[]> => {
     return client.put(
-      `/release/${releaseId}/content/release-note/${id}`,
+      `/release/${releaseVersionId}/content/release-note/${id}`,
       releaseNote,
     );
   },

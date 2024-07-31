@@ -102,21 +102,21 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
 }
 
 const releaseDataFileService = {
-  getDataFiles(releaseId: string): Promise<DataFile[]> {
+  getDataFiles(releaseVersionId: string): Promise<DataFile[]> {
     return client
-      .get<DataFileInfo[]>(`/release/${releaseId}/data`)
+      .get<DataFileInfo[]>(`/release/${releaseVersionId}/data`)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(mapFile);
       });
   },
-  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+  getDataFile(releaseVersionId: string, fileId: string): Promise<DataFile> {
     return client
-      .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
+      .get<DataFileInfo>(`/release/${releaseVersionId}/data/${fileId}`)
       .then(mapFile);
   },
   async uploadDataFiles(
-    releaseId: string,
+    releaseVersionId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
     const { dataFile, metadataFile, ...params } = request;
@@ -126,7 +126,7 @@ const releaseDataFileService = {
     data.append('metaFile', metadataFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/data`,
+      `/release/${releaseVersionId}/data`,
       data,
       {
         params,
@@ -136,7 +136,7 @@ const releaseDataFileService = {
     return mapFile(file);
   },
   async uploadZipDataFile(
-    releaseId: string,
+    releaseVersionId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
     const { zipFile, ...params } = request;
@@ -145,7 +145,7 @@ const releaseDataFileService = {
     data.append('zipFile', zipFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/zip-data`,
+      `/release/${releaseVersionId}/zip-data`,
       data,
       {
         params,
@@ -169,52 +169,58 @@ const releaseDataFileService = {
     return files.map(file => mapFile(file));
   },
   updateDataFilesOrder(
-    releaseId: string,
+    releaseVersionId: string,
     order: string[],
   ): Promise<DataFile[]> {
     return client
-      .put<DataFileInfo[]>(`/release/${releaseId}/data/order`, order)
+      .put<DataFileInfo[]>(`/release/${releaseVersionId}/data/order`, order)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(mapFile);
       });
   },
   getDataFileImportStatus(
-    releaseId: string,
+    releaseVersionId: string,
     dataFile: DataFile,
   ): Promise<DataFileImportStatus> {
     return client.get<DataFileImportStatus>(
-      `/release/${releaseId}/data/${dataFile.id}/import/status`,
+      `/release/${releaseVersionId}/data/${dataFile.id}/import/status`,
     );
   },
 
   getDeleteDataFilePlan(
-    releaseId: string,
+    releaseVersionId: string,
     dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.id}/delete-plan`,
+      `/release/${releaseVersionId}/data/${dataFile.id}/delete-plan`,
     );
   },
-  deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
+  deleteDataFiles(releaseVersionId: string, fileId: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseVersionId}/data/${fileId}`);
   },
-  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
+  downloadFile(
+    releaseVersionId: string,
+    id: string,
+    fileName: string,
+  ): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
+      .get<Blob>(`/release/${releaseVersionId}/file/${id}/download`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
   },
   updateFile(
-    releaseId: string,
+    releaseVersionId: string,
     fileId: string,
     data: DataFileUpdateRequest,
   ): Promise<void> {
-    return client.patch(`/release/${releaseId}/data/${fileId}`, data);
+    return client.patch(`/release/${releaseVersionId}/data/${fileId}`, data);
   },
-  cancelImport(releaseId: string, fileId: string): Promise<void> {
-    return client.post(`/release/${releaseId}/data/${fileId}/import/cancel`);
+  cancelImport(releaseVersionId: string, fileId: string): Promise<void> {
+    return client.post(
+      `/release/${releaseVersionId}/data/${fileId}/import/cancel`,
+    );
   },
 };
 

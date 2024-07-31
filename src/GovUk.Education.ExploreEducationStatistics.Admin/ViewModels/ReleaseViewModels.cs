@@ -9,7 +9,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public record ReleaseViewModel
+    public record ReleaseVersionViewModel
     {
         public Guid Id { get; set; }
 

@@ -81,7 +81,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={keyStatDataBlock}
         onRemove={noop}
         onSubmit={noop}
@@ -122,7 +122,7 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         isEditing
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={keyStatDataBlock}
         onRemove={noop}
         onSubmit={noop}
@@ -157,7 +157,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={{ ...keyStatDataBlock, trend: undefined }}
         onRemove={noop}
         onSubmit={noop}
@@ -176,7 +176,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={{ ...keyStatDataBlock, guidanceTitle: undefined }}
         onRemove={noop}
         onSubmit={noop}
@@ -202,7 +202,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={{ ...keyStatDataBlock, guidanceText: undefined }}
         onRemove={noop}
         onSubmit={noop}
@@ -231,7 +231,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={keyStatDataBlock}
         isEditing
         onRemove={onRemove}
@@ -260,7 +260,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={keyStatDataBlock}
         isEditing
         onRemove={noop}
@@ -294,7 +294,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={keyStatDataBlock}
         isEditing
         onRemove={noop}
@@ -335,7 +335,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={keyStatDataBlock}
         onRemove={onRemove}
         onSubmit={noop}

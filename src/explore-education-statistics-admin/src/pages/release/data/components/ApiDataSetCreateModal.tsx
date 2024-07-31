@@ -19,7 +19,7 @@ import { generatePath } from 'react-router-dom';
 interface Props {
   buttonText?: ReactNode | string;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   submitText?: string;
   title?: string;
   onSubmit: (values: ApiDataSetCreateFormValues) => void;
@@ -28,7 +28,7 @@ interface Props {
 export default function ApiDataSetCreateModal({
   buttonText = 'Create API data set',
   publicationId,
-  releaseId,
+  releaseVersionId,
   submitText,
   title = 'Create a new API data set',
   onSubmit,
@@ -36,7 +36,7 @@ export default function ApiDataSetCreateModal({
   const [isOpen, toggleOpen] = useToggle(false);
 
   const { data: dataSetCandidates = [], isLoading } = useQuery({
-    ...apiDataSetCandidateQueries.list(releaseId),
+    ...apiDataSetCandidateQueries.list(releaseVersionId),
     enabled: isOpen,
   });
 
@@ -67,7 +67,7 @@ export default function ApiDataSetCreateModal({
               <Link
                 to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
                   publicationId,
-                  releaseId,
+                  releaseVersionId,
                 })}
               >
                 Data and files

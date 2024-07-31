@@ -6,7 +6,7 @@ export const testReleaseSeries: ReleaseSeriesTableEntry[] = [
     id: 'ees-release-3',
     isLegacyLink: false,
     description: 'EES release 3',
-    releaseId: 'release-id',
+    releaseId: 'release-id', // TODO rename to releaseVersionId
     releaseSlug: '3',
     isLatest: false,
     isPublished: false,

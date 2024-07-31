@@ -1,5 +1,5 @@
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseVersionSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import {
@@ -85,7 +85,7 @@ export interface ReleaseSeriesLegacyLinkAddRequest {
 
 export interface ReleaseSeriesItemUpdateRequest {
   id: string;
-  releaseId?: string;
+  releaseVersionId?: string;
   legacyLinkDescription?: string;
   legacyLinkUrl?: string;
 }
@@ -174,7 +174,9 @@ const publicationService = {
     return client.put(`publication/${publicationId}/contact`, updatedContact);
   },
 
-  listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
+  listReleases<
+    TReleaseSummary extends ReleaseVersionSummary = ReleaseVersionSummary,
+  >(
     publicationId: string,
     params?: ListReleasesParams,
   ): Promise<PaginatedList<TReleaseSummary>> {

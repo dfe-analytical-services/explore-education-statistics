@@ -2,30 +2,34 @@ import client from '@admin/services/utils/service';
 import { BasicLink, Release } from '@common/services/publicationService';
 
 const releaseContentRelatedInformationService = {
-  getAll: (releaseId: string): Promise<Release['relatedInformation']> => {
-    return client.get(`/release/${releaseId}/content/related-information`);
+  getAll: (
+    releaseVersionId: string,
+  ): Promise<Release['relatedInformation']> => {
+    return client.get(
+      `/release/${releaseVersionId}/content/related-information`,
+    );
   },
   create: (
-    releaseId: string,
+    releaseVersionId: string,
     link: Omit<BasicLink, 'id'>,
   ): Promise<BasicLink[]> => {
     return client.post(
-      `/release/${releaseId}/content/related-information`,
+      `/release/${releaseVersionId}/content/related-information`,
       link,
     );
   },
   update: (
-    releaseId: string,
+    releaseVersionId: string,
     link: { id: string; description: string; url: string },
   ): Promise<BasicLink[]> => {
     return client.put(
-      `/release/${releaseId}/content/related-information/${link.id}`,
+      `/release/${releaseVersionId}/content/related-information/${link.id}`,
       link,
     );
   },
-  delete: (releaseId: string, linkId: string): Promise<BasicLink[]> => {
+  delete: (releaseVersionId: string, linkId: string): Promise<BasicLink[]> => {
     return client.delete(
-      `/release/${releaseId}/content/related-information/${linkId}`,
+      `/release/${releaseVersionId}/content/related-information/${linkId}`,
     );
   },
 };

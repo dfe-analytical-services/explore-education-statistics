@@ -4,7 +4,7 @@ import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseQueries from '@admin/queries/releaseQueries';
 import {
@@ -69,14 +69,14 @@ const routes = [
 
 interface MatchProps {
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
 }
 
 const ReleasePageContainer = ({
   match,
   location,
 }: RouteComponentProps<MatchProps>) => {
-  const { publicationId, releaseId } = match.params;
+  const { publicationId, releaseVersionId } = match.params;
 
   const { user } = useAuthContext();
 
@@ -84,7 +84,7 @@ const ReleasePageContainer = ({
     data: release,
     isLoading: loadingRelease,
     refetch,
-  } = useQuery(releaseQueries.get(releaseId));
+  } = useQuery(releaseQueries.get(releaseVersionId));
 
   const navRoutes = useMemo(() => {
     return allNavRoutes.filter(route => {
@@ -100,7 +100,7 @@ const ReleasePageContainer = ({
       route =>
         generatePath<ReleaseRouteParams>(route.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         }) === location.pathname,
     ) || 0;
 
@@ -117,7 +117,7 @@ const ReleasePageContainer = ({
         label: previousRoute.title,
         linkTo: generatePath<ReleaseRouteParams>(previousRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         }),
       }
     : undefined;
@@ -127,7 +127,7 @@ const ReleasePageContainer = ({
         label: nextRoute.title,
         linkTo: generatePath<ReleaseRouteParams>(nextRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         }),
       }
     : undefined;
@@ -170,19 +170,22 @@ const ReleasePageContainer = ({
               title: route.title,
               to: generatePath<ReleaseRouteParams>(route.path, {
                 publicationId,
-                releaseId,
+                releaseVersionId,
               }),
             }))}
             label="Release"
           />
 
-          <ReleaseContextProvider release={release} onReleaseChange={refetch}>
+          <ReleaseVersionContextProvider
+            releaseVersion={release}
+            onReleaseChange={refetch}
+          >
             <Switch>
               {routes.map(route => (
                 <ProtectedRoute exact key={route.path} {...route} />
               ))}
             </Switch>
-          </ReleaseContextProvider>
+          </ReleaseVersionContextProvider>
 
           {currentRouteIndex > -1 && (
             <PreviousNextLinks

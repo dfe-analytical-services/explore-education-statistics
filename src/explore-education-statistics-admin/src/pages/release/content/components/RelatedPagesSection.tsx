@@ -1,7 +1,7 @@
 import EditableLink from '@admin/components/editable/EditableLink';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -16,7 +16,7 @@ import React, { useState } from 'react';
 type FormValues = Omit<BasicLink, 'id'>;
 
 interface Props {
-  release: EditableRelease;
+  release: EditableReleaseVersion;
 }
 
 export default function RelatedPagesSection({ release }: Props) {

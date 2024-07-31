@@ -2,16 +2,16 @@ import { createQueryKeys } from '@lukemorales/query-key-factory';
 import releasePermissionService from '@admin/services/releasePermissionService';
 
 const releasePermissionQueries = createQueryKeys('releasePermission', {
-  listRoles(releaseId: string) {
+  listRoles(releaseVersionId: string) {
     return {
-      queryKey: [releaseId],
-      queryFn: () => releasePermissionService.listRoles(releaseId),
+      queryKey: [releaseVersionId],
+      queryFn: () => releasePermissionService.listRoles(releaseVersionId),
     };
   },
-  listInvites(releaseId: string) {
+  listInvites(releaseVersionId: string) {
     return {
-      queryKey: [releaseId],
-      queryFn: () => releasePermissionService.listInvites(releaseId),
+      queryKey: [releaseVersionId],
+      queryFn: () => releasePermissionService.listInvites(releaseVersionId),
     };
   },
 });

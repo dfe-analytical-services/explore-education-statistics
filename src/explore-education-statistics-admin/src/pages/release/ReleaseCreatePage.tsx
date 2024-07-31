@@ -68,7 +68,7 @@ const ReleaseCreatePage = ({
     history.push(
       generatePath(releaseSummaryRoute.path, {
         publicationId,
-        releaseId: createdRelease.id,
+        releaseVersionId: createdRelease.id,
       }),
     );
   };

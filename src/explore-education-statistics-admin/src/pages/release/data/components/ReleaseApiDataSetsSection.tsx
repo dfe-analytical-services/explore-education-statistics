@@ -1,5 +1,5 @@
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseContext';
 import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import DraftApiDataSetsTable, {
   DraftApiDataSetSummary,
@@ -22,11 +22,11 @@ import { generatePath, useHistory } from 'react-router-dom';
 
 export default function ReleaseApiDataSetsSection() {
   const history = useHistory();
-  const { release } = useReleaseContext();
+  const { releaseVersion } = useReleaseVersionContext();
   const { user } = useAuthContext();
 
   const { data: dataSets = [], isLoading: hasDataSetsLoading } = useQuery({
-    ...apiDataSetQueries.list(release.publicationId),
+    ...apiDataSetQueries.list(releaseVersion.publicationId),
     refetchInterval: 20_000,
   });
 
@@ -38,7 +38,7 @@ export default function ReleaseApiDataSetsSection() {
     dataSet => dataSet.latestLiveVersion && !dataSet.draftVersion,
   ) as LiveApiDataSetSummary[];
 
-  const canUpdateRelease = release.approvalStatus !== 'Approved';
+  const canUpdateRelease = releaseVersion.approvalStatus !== 'Approved';
 
   return (
     <>
@@ -65,7 +65,7 @@ export default function ReleaseApiDataSetsSection() {
           still download and explore your data by creating their own tables.
         </p>
 
-        {!release.published && (
+        {!releaseVersion.published && (
           <strong>
             Changes will not be made in the public API until this release has
             been published.
@@ -79,8 +79,8 @@ export default function ReleaseApiDataSetsSection() {
           <>
             {canUpdateRelease ? (
               <ApiDataSetCreateModal
-                publicationId={release.publicationId}
-                releaseId={release.id}
+                publicationId={releaseVersion.publicationId}
+                releaseVersionId={releaseVersion.id}
                 onSubmit={async ({ releaseFileId }) => {
                   const dataSet = await apiDataSetService.createDataSet({
                     releaseFileId,
@@ -89,8 +89,8 @@ export default function ReleaseApiDataSetsSection() {
                     generatePath<ReleaseDataSetRouteParams>(
                       releaseApiDataSetDetailsRoute.path,
                       {
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
+                        publicationId: releaseVersion.publicationId,
+                        releaseVersionId: releaseVersion.id,
                         dataSetId: dataSet.id,
                       },
                     ),
@@ -115,8 +115,8 @@ export default function ReleaseApiDataSetsSection() {
                 <DraftApiDataSetsTable
                   canUpdateRelease={canUpdateRelease}
                   dataSets={draftDataSets}
-                  publicationId={release.publicationId}
-                  releaseId={release.id}
+                  publicationId={releaseVersion.publicationId}
+                  releaseVersionId={releaseVersion.id}
                 />
               </>
             )}
@@ -128,9 +128,9 @@ export default function ReleaseApiDataSetsSection() {
                 <LiveApiDataSetsTable
                   canUpdateRelease={canUpdateRelease}
                   dataSets={liveDataSets}
-                  publicationId={release.publicationId}
-                  releaseVersionId={release.id}
-                  releaseId={release.releaseId}
+                  publicationId={releaseVersion.publicationId}
+                  releaseVersionId={releaseVersion.id}
+                  releaseId={releaseVersion.releaseId}
                 />
               </>
             )}

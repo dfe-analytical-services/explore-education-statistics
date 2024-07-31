@@ -1,6 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   ReleaseRouteParams,
   releaseSummaryEditRoute,
@@ -21,14 +21,15 @@ const ReleaseSummaryPage = () => {
   const location = useLocation();
   const lastLocation = useLastLocation();
 
-  const { release: contextRelease, releaseId } = useReleaseContext();
+  const { releaseVersion: contextRelease, releaseVersionId } =
+    useReleaseVersionContext();
 
   const { value: release, isLoading } = useAsyncRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseService.getRelease(releaseVersionId)
         : contextRelease,
-    [releaseId],
+    [releaseVersionId],
   );
 
   return (
@@ -53,13 +54,17 @@ const ReleaseSummaryPage = () => {
             </SummaryListItem>
           </SummaryList>
 
-          <Gate condition={() => permissionService.canUpdateRelease(releaseId)}>
+          <Gate
+            condition={() =>
+              permissionService.canUpdateRelease(releaseVersionId)
+            }
+          >
             <ButtonLink
               to={generatePath<ReleaseRouteParams>(
                 releaseSummaryEditRoute.path,
                 {
                   publicationId: release.publicationId,
-                  releaseId,
+                  releaseVersionId,
                 },
               )}
             >

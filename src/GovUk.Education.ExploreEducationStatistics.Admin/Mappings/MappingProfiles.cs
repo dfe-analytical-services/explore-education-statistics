@@ -27,7 +27,6 @@ using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.A
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.ReleaseNoteViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
-using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
 using TopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.TopicViewModel;
 
@@ -42,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             CreateMap<User, UserDetailsViewModel>();
 
-            CreateMap<ReleaseVersion, ReleaseViewModel>()
+            CreateMap<ReleaseVersion, ReleaseVersionViewModel>()
                 .ForMember(
                     dest => dest.ReleaseId,
                     m => m.MapFrom(rv => rv.ReleaseId))

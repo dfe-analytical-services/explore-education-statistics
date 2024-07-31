@@ -33,6 +33,7 @@ export interface UserPublicationRole {
 }
 
 export interface UserReleaseRoleSubmission {
+  // TODO rename to releaseVersionId
   releaseId: string;
   releaseRole: string;
 }
@@ -45,7 +46,11 @@ export interface UserPublicationRoleSubmission {
 export interface UserInvite {
   email: string;
   roleId: string;
-  userReleaseRoles: { releaseId: string; releaseRole: string }[];
+  userReleaseRoles: {
+    // TODO rename to releaseVersionId
+    releaseId: string;
+    releaseRole: string;
+  }[];
   userPublicationRoles: { publicationId: string; publicationRole: string }[];
 }
 
@@ -74,9 +79,13 @@ export interface ResourceRoles {
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
+
   getReleases(): Promise<IdTitlePair[]>;
+
   getResourceRoles(): Promise<ResourceRoles>;
+
   getUser(userId: string): Promise<User>;
+
   addUserReleaseRole: (
     userId: string,
     userReleaseRole: UserReleaseRoleSubmission,
@@ -93,12 +102,16 @@ export interface UsersService {
   ) => Promise<boolean>;
 
   getUsers(): Promise<UserStatus[]>;
+
   getPreReleaseUsers(): Promise<UserStatus[]>;
+
   getPendingInvites(): Promise<PendingInvite[]>;
+
   inviteUser: (invite: UserInvite) => Promise<boolean>;
   inviteContributor: (
     email: string,
     publicationId: string,
+    // TODO rename to releaseVersionId
     releaseIds: string[],
   ) => Promise<boolean>;
   removeContributorReleaseInvites: (
@@ -176,13 +189,14 @@ const userService: UsersService = {
   inviteContributor(
     email: string,
     publicationId: string,
-    releaseIds: string[],
+    releaseVersionIds: string[],
   ): Promise<boolean> {
     return client.post(
       `/user-management/publications/${publicationId}/invites/contributor`,
       {
         email,
-        releaseIds,
+        // TODO rename to releaseVersionId
+        releaseIds: releaseVersionIds,
       },
     );
   },

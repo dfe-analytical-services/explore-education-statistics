@@ -3,7 +3,7 @@ import PreReleaseContentPage from '@admin/pages/release/pre-release/PreReleaseCo
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import _releaseContentService, {
-  EditableRelease,
+  EditableReleaseVersion,
   ReleaseContent,
 } from '@admin/services/releaseContentService';
 import _featuredTableService, {
@@ -26,7 +26,7 @@ const featuredTableService = _featuredTableService as jest.Mocked<
 >;
 
 describe('PreReleaseContentPage', () => {
-  const testEditableRelease: EditableRelease = {
+  const testEditableRelease: EditableReleaseVersion = {
     approvalStatus: 'Approved',
     content: [
       {
@@ -254,7 +254,7 @@ describe('PreReleaseContentPage', () => {
     initialEntries: string[] = [
       generatePath<ReleaseRouteParams>(preReleaseContentRoute.path, {
         publicationId: 'publication-1',
-        releaseId: 'release-1',
+        releaseVersionId: 'release-1',
       }),
     ],
   ) => {

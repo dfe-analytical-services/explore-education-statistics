@@ -101,7 +101,7 @@ export type TableQueryUpdateHandler = (
 interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
-  releaseId: string;
+  releaseVersionId: string;
   initialChart?: Chart;
   tableTitle: string;
   onChartSave: (chart: Chart, file?: File) => Promise<void>;
@@ -112,7 +112,7 @@ interface Props {
 const ChartBuilder = ({
   data,
   meta,
-  releaseId,
+  releaseVersionId,
   initialChart,
   tableTitle,
   onChartSave,
@@ -133,7 +133,7 @@ const ChartBuilder = ({
 
   const { axes, map, definition, options, legend } = chartBuilderState;
 
-  const getChartFile = useGetChartFile(releaseId);
+  const getChartFile = useGetChartFile(releaseVersionId);
 
   const [submitError, setSubmitError] = useState<ValidationProblemDetails>();
 

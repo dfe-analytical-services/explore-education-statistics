@@ -279,7 +279,7 @@ function renderPage() {
   history.push(
     generatePath<ReleaseRouteParams>(releaseFootnotesRoute.path, {
       publicationId: 'publication-1',
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
     }),
   );
 

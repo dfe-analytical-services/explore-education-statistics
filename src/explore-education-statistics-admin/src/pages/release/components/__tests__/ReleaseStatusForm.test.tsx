@@ -1,4 +1,4 @@
-import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import { testReleaseVersion } from '@admin/pages/release/__data__/testReleaseVersion';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import { ReleaseChecklistErrorCode } from '@admin/services/releaseService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
@@ -21,7 +21,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with all status options enabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        release={testReleaseVersion}
         statusPermissions={testStatusPermissions}
         onCancel={noop}
         onSubmit={noop}
@@ -49,7 +49,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with Approved status option disabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        release={testReleaseVersion}
         statusPermissions={{
           ...testStatusPermissions,
           canMarkApproved: false,
@@ -80,7 +80,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with HigherLevelReview and Approved status options disabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        release={testReleaseVersion}
         statusPermissions={{
           ...testStatusPermissions,
           canMarkHigherLevelReview: false,
@@ -112,7 +112,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with all options disabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        release={testReleaseVersion}
         statusPermissions={{
           canMarkDraft: false,
           canMarkHigherLevelReview: false,
@@ -145,7 +145,7 @@ describe('ReleaseStatusForm', () => {
     render(
       <ReleaseStatusForm
         release={{
-          ...testRelease,
+          ...testReleaseVersion,
           approvalStatus: 'HigherLevelReview',
           nextReleaseDate: {
             month: 10,
@@ -193,7 +193,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={testRelease}
+          release={testReleaseVersion}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
           onSubmit={handleSubmit}
@@ -223,7 +223,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={testRelease}
+          release={testReleaseVersion}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
           onSubmit={handleSubmit}
@@ -271,7 +271,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'HigherLevelReview',
           }}
           statusPermissions={testStatusPermissions}
@@ -298,7 +298,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'HigherLevelReview',
           }}
           statusPermissions={testStatusPermissions}
@@ -326,7 +326,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'HigherLevelReview',
           }}
           statusPermissions={testStatusPermissions}
@@ -372,7 +372,7 @@ describe('ReleaseStatusForm', () => {
       render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -406,7 +406,7 @@ describe('ReleaseStatusForm', () => {
       render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
             publishScheduled: '2020-12-15',
           }}
@@ -447,7 +447,7 @@ describe('ReleaseStatusForm', () => {
       render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
             preReleaseUsersOrInvitesAdded: true,
           }}
@@ -474,7 +474,7 @@ describe('ReleaseStatusForm', () => {
       render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
             preReleaseUsersOrInvitesAdded: false,
           }}
@@ -501,7 +501,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -526,7 +526,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -551,7 +551,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -578,7 +578,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -614,7 +614,7 @@ describe('ReleaseStatusForm', () => {
 
         const { user } = render(
           <ReleaseStatusForm
-            release={testRelease}
+            release={testReleaseVersion}
             statusPermissions={testStatusPermissions}
             onCancel={noop}
             onSubmit={handleSubmit}
@@ -647,7 +647,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={testRelease}
+          release={testReleaseVersion}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
           onSubmit={handleSubmit}
@@ -676,7 +676,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             publishScheduled: format(new Date(), 'yyyy-MM-dd'),
             approvalStatus: 'Approved',
           }}
@@ -721,7 +721,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -765,7 +765,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -807,7 +807,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -868,7 +868,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -938,7 +938,7 @@ describe('ReleaseStatusForm', () => {
       const { user } = render(
         <ReleaseStatusForm
           release={{
-            ...testRelease,
+            ...testReleaseVersion,
             approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
@@ -987,7 +987,7 @@ describe('ReleaseStatusForm', () => {
         render(
           <ReleaseStatusForm
             release={{
-              ...testRelease,
+              ...testReleaseVersion,
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: true,
@@ -1014,7 +1014,7 @@ describe('ReleaseStatusForm', () => {
         const { user } = render(
           <ReleaseStatusForm
             release={{
-              ...testRelease,
+              ...testReleaseVersion,
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: false,
@@ -1064,7 +1064,7 @@ describe('ReleaseStatusForm', () => {
         const { user } = render(
           <ReleaseStatusForm
             release={{
-              ...testRelease,
+              ...testReleaseVersion,
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: false,
@@ -1107,7 +1107,7 @@ describe('ReleaseStatusForm', () => {
         const { user } = render(
           <ReleaseStatusForm
             release={{
-              ...testRelease,
+              ...testReleaseVersion,
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: true,

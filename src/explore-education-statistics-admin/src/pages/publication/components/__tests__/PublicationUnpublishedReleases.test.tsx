@@ -2,8 +2,8 @@ import baseRender from '@common-test/render';
 import PublicationUnpublishedReleases from '@admin/pages/publication/components/PublicationUnpublishedReleases';
 import _publicationService from '@admin/services/publicationService';
 import _releaseService, {
-  ReleasePermissions,
-  ReleaseSummaryWithPermissions,
+  ReleaseVersionPermissions,
+  ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -22,7 +22,7 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 describe('PublicationUnpublishedReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testPermissions: ReleasePermissions = {
+  const testPermissions: ReleaseVersionPermissions = {
     canAddPrereleaseUsers: false,
     canUpdateRelease: true,
     canDeleteRelease: true,
@@ -30,7 +30,7 @@ describe('PublicationUnpublishedReleases', () => {
     canViewRelease: true,
   };
 
-  const testRelease1: ReleaseSummaryWithPermissions = {
+  const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -49,7 +49,7 @@ describe('PublicationUnpublishedReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease2: ReleaseSummaryWithPermissions = {
+  const testRelease2: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
     id: 'release-2',
@@ -67,7 +67,7 @@ describe('PublicationUnpublishedReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease3: ReleaseSummaryWithPermissions = {
+  const testRelease3: ReleaseVersionSummaryWithPermissions = {
     amendment: true,
     approvalStatus: 'HigherLevelReview',
     id: 'release-3',
@@ -85,15 +85,16 @@ describe('PublicationUnpublishedReleases', () => {
     latestRelease: false,
   };
 
-  const testReleasesPage1: PaginatedList<ReleaseSummaryWithPermissions> = {
-    paging: {
-      page: 1,
-      pageSize: 20,
-      totalPages: 1,
-      totalResults: 3,
-    },
-    results: [testRelease1, testRelease2, testRelease3],
-  };
+  const testReleasesPage1: PaginatedList<ReleaseVersionSummaryWithPermissions> =
+    {
+      paging: {
+        page: 1,
+        pageSize: 20,
+        totalPages: 1,
+        totalResults: 3,
+      },
+      results: [testRelease1, testRelease2, testRelease3],
+    };
 
   beforeEach(() => {
     releaseService.getReleaseStatus.mockResolvedValue({

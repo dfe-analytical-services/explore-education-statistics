@@ -101,21 +101,21 @@ export interface DataReplacementPlan {
 
 const dataReplacementService = {
   getReplacementPlan(
-    releaseId: string,
+    releaseVersionId: string,
     fileId: string,
     replacementFileId: string,
   ): Promise<DataReplacementPlan> {
     return client.get(
-      `releases/${releaseId}/data/${fileId}/replacement-plan/${replacementFileId}`,
+      `releases/${releaseVersionId}/data/${fileId}/replacement-plan/${replacementFileId}`,
     );
   },
   replaceData(
-    releaseId: string,
+    releaseVersionId: string,
     fileId: string,
     replacementFileId: string,
   ): Promise<void> {
     return client.post(
-      `releases/${releaseId}/data/${fileId}/replacement/${replacementFileId}`,
+      `releases/${releaseVersionId}/data/${fileId}/replacement/${replacementFileId}`,
     );
   },
 };

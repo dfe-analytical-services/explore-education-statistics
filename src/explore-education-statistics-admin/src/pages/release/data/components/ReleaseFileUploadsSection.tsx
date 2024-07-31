@@ -18,13 +18,13 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 interface Props {
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   canUpdateRelease: boolean;
 }
 
 export default function ReleaseFileUploadsSection({
   publicationId,
-  releaseId,
+  releaseVersionId,
   canUpdateRelease,
 }: Props) {
   const [deleteFile, setDeleteFile] = useState<AncillaryFile>();
@@ -32,8 +32,8 @@ export default function ReleaseFileUploadsSection({
   const queryClient = useQueryClient();
 
   const listFilesQuery = useMemo(
-    () => releaseAncillaryFileQueries.list(releaseId),
-    [releaseId],
+    () => releaseAncillaryFileQueries.list(releaseVersionId),
+    [releaseVersionId],
   );
 
   const { data: files = [], isLoading } = useQuery(listFilesQuery);
@@ -54,16 +54,19 @@ export default function ReleaseFileUploadsSection({
 
   const handleSubmit = useCallback(
     async (values: AncillaryFileFormValues) => {
-      const newFile = await releaseAncillaryFileService.createFile(releaseId, {
-        title: values.title,
-        file: values.file as File,
-        summary: values.summary,
-      });
+      const newFile = await releaseAncillaryFileService.createFile(
+        releaseVersionId,
+        {
+          title: values.title,
+          file: values.file as File,
+          summary: values.summary,
+        },
+      );
 
       queryClient.setQueryData(listFilesQuery.queryKey, [...files, newFile]);
       await queryClient.invalidateQueries(listFilesQuery.queryKey);
     },
-    [files, listFilesQuery.queryKey, queryClient, releaseId],
+    [files, listFilesQuery.queryKey, queryClient, releaseVersionId],
   );
 
   return (
@@ -136,7 +139,7 @@ export default function ReleaseFileUploadsSection({
                     canUpdateRelease={canUpdateRelease}
                     file={file}
                     publicationId={publicationId}
-                    releaseId={releaseId}
+                    releaseVersionId={releaseVersionId}
                     onDelete={() => setDeleteFile(file)}
                   />
                 </div>
@@ -160,7 +163,7 @@ export default function ReleaseFileUploadsSection({
 
             try {
               await releaseAncillaryFileService.deleteFile(
-                releaseId,
+                releaseVersionId,
                 deleteFile.id,
               );
 

@@ -23,7 +23,7 @@ import { ReleaseType } from '@common/services/types/releaseType';
 interface TableToolFinalStepProps {
   publication?: Publication;
   query: ReleaseTableDataQuery;
-  releaseId: string;
+  releaseVersionId: string;
   releaseType: ReleaseType;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
@@ -33,7 +33,7 @@ interface TableToolFinalStepProps {
 const PreReleaseTableToolFinalStep = ({
   publication,
   query,
-  releaseId,
+  releaseVersionId,
   releaseType,
   table,
   tableHeaders,
@@ -95,7 +95,7 @@ const PreReleaseTableToolFinalStep = ({
                     preReleaseContentRoute.path,
                     {
                       publicationId: publication.id,
-                      releaseId,
+                      releaseVersionId,
                     },
                   )}
                 >

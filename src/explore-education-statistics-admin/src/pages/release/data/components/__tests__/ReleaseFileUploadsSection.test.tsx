@@ -46,7 +46,7 @@ describe('ReleaseFileUploadsSection', () => {
       <MemoryRouter>
         <ReleaseFileUploadsSection
           publicationId="publication-1"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           canUpdateRelease
         />
       </MemoryRouter>,

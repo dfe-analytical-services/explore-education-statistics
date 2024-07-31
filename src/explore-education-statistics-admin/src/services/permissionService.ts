@@ -43,16 +43,16 @@ const permissionService = {
   canAccessPrereleasePages(user?: User): Promise<boolean> {
     return Promise.resolve(!!user?.permissions.canAccessPrereleasePages);
   },
-  canUpdateRelease(releaseId: string): Promise<boolean> {
-    return client.get(`/permissions/release/${releaseId}/update`);
+  canUpdateRelease(releaseVersionId: string): Promise<boolean> {
+    return client.get(`/permissions/release/${releaseVersionId}/update`);
   },
   getReleaseStatusPermissions(
-    releaseId: string,
+    releaseVersionId: string,
   ): Promise<ReleaseStatusPermissions> {
-    return client.get(`/permissions/release/${releaseId}/status`);
+    return client.get(`/permissions/release/${releaseVersionId}/status`);
   },
-  canMakeAmendmentOfRelease(releaseId: string): Promise<boolean> {
-    return client.get(`/permissions/release/${releaseId}/amend`);
+  canMakeAmendmentOfRelease(releaseVersionId: string): Promise<boolean> {
+    return client.get(`/permissions/release/${releaseVersionId}/amend`);
   },
   canCreatePublicationForTopic(topicId: string): Promise<boolean> {
     return client.get(`/permissions/topic/${topicId}/publication/create`);
@@ -66,14 +66,14 @@ const permissionService = {
     return client.get(`/permissions/methodology/${methodologyId}/status`);
   },
   getPreReleaseWindowStatus(
-    releaseId: string,
+    releaseVersionId: string,
   ): Promise<PreReleaseWindowStatus> {
     return client
       .get<{
         access: PreReleaseAccess;
         start: string;
         scheduledPublishDate: string;
-      }>(`/permissions/release/${releaseId}/prerelease/status`)
+      }>(`/permissions/release/${releaseVersionId}/prerelease/status`)
       .then(status => ({
         access: status.access,
         start: parseISO(status.start),
@@ -81,11 +81,11 @@ const permissionService = {
       }));
   },
   getDataFilePermissions(
-    releaseId: string,
+    releaseVersionId: string,
     fileId: string,
   ): Promise<DataFilePermissions> {
     return client.get<DataFilePermissions>(
-      `/permissions/release/${releaseId}/data/${fileId}`,
+      `/permissions/release/${releaseVersionId}/data/${fileId}`,
     );
   },
 };

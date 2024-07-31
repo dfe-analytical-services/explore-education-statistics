@@ -1,5 +1,5 @@
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
-import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import { testReleaseVersion } from '@admin/pages/release/__data__/testReleaseVersion';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
@@ -39,7 +39,7 @@ describe('ReleaseStatusChecklist', () => {
                 { code: 'PublicApiDataSetMappingsMustBeCompleted' },
               ],
             }}
-            release={testRelease}
+            release={testReleaseVersion}
           />
         </MemoryRouter>
         ,
@@ -206,7 +206,7 @@ describe('ReleaseStatusChecklist', () => {
                 { code: 'PublicApiDataSetMappingsMustBeCompleted' },
               ],
             }}
-            release={testRelease}
+            release={testReleaseVersion}
           />
         </MemoryRouter>
         ,
@@ -282,7 +282,7 @@ describe('ReleaseStatusChecklist', () => {
             ],
             errors: [],
           }}
-          release={testRelease}
+          release={testReleaseVersion}
         />
       </MemoryRouter>,
     );
@@ -369,7 +369,7 @@ describe('ReleaseStatusChecklist', () => {
             warnings: [{ code: 'NoMethodology' }],
             errors: [{ code: 'PublicDataGuidanceRequired' }],
           }}
-          release={testRelease}
+          release={testReleaseVersion}
         />
       </MemoryRouter>,
     );
@@ -407,7 +407,7 @@ describe('ReleaseStatusChecklist', () => {
             warnings: [],
             errors: [],
           }}
-          release={testRelease}
+          release={testReleaseVersion}
         />
       </MemoryRouter>,
     );

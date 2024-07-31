@@ -1,43 +1,45 @@
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseService';
 import noop from 'lodash/noop';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 
-export interface ReleaseContextState {
-  release: Release;
-  releaseId: string;
+export interface ReleaseVersionContextState {
+  releaseVersion: ReleaseVersion;
+  releaseVersionId: string;
   onReleaseChange: () => void;
 }
 
-const ReleaseContext = createContext<ReleaseContextState | undefined>(
-  undefined,
-);
+const ReleaseVersionContext = createContext<
+  ReleaseVersionContextState | undefined
+>(undefined);
 
-interface ReleaseContextProviderProps {
+interface ReleaseVersionContextProviderProps {
   children: ReactNode;
-  release: Release;
+  releaseVersion: ReleaseVersion;
   onReleaseChange?: () => void;
 }
 
-export const ReleaseContextProvider = ({
+export const ReleaseVersionContextProvider = ({
   children,
-  release,
+  releaseVersion,
   onReleaseChange = noop,
-}: ReleaseContextProviderProps) => {
-  const value = useMemo<ReleaseContextState>(() => {
+}: ReleaseVersionContextProviderProps) => {
+  const value = useMemo<ReleaseVersionContextState>(() => {
     return {
-      release,
-      releaseId: release.id,
+      releaseVersion,
+      releaseVersionId: releaseVersion.id,
       onReleaseChange,
     };
-  }, [onReleaseChange, release]);
+  }, [onReleaseChange, releaseVersion]);
 
   return (
-    <ReleaseContext.Provider value={value}>{children}</ReleaseContext.Provider>
+    <ReleaseVersionContext.Provider value={value}>
+      {children}
+    </ReleaseVersionContext.Provider>
   );
 };
 
-export function useReleaseContext() {
-  const context = useContext(ReleaseContext);
+export function useReleaseVersionContext() {
+  const context = useContext(ReleaseVersionContext);
 
   if (!context) {
     throw new Error(

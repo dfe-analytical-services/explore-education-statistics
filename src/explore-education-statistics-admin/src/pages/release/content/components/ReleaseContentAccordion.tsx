@@ -1,6 +1,6 @@
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';
@@ -8,7 +8,7 @@ import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 interface ReleaseContentAccordionProps {
   id?: string;
-  release: EditableRelease;
+  release: EditableReleaseVersion;
   sectionName: string;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
   onSectionOpen: ({ id, title }: { id: string; title: string }) => void;
@@ -26,7 +26,7 @@ const ReleaseContentAccordion = ({
 
   const addAccordionSection = useCallback(async () => {
     await addContentSection({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       order: release.content.length,
     });
   }, [release.id, release.content.length, addContentSection]);
@@ -41,7 +41,7 @@ const ReleaseContentAccordion = ({
           return acc;
         }, {});
 
-      await updateContentSectionsOrder({ releaseId: release.id, order });
+      await updateContentSectionsOrder({ releaseVersionId: release.id, order });
     },
     [id, release.id, updateContentSectionsOrder],
   );

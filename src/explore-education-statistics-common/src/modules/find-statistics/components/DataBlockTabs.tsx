@@ -26,6 +26,7 @@ export interface DataBlockTabsProps {
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
   id?: string;
+  // TODO rename to releaseVersionId
   releaseId: string;
   onToggle?: (section: { id: string; title: string }) => void;
 }

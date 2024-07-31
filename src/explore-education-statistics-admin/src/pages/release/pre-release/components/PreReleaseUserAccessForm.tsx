@@ -35,7 +35,7 @@ const errorMappings = [
 ];
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   isReleaseApproved?: boolean;
   isReleaseLive?: boolean;
 }
@@ -44,7 +44,7 @@ const formId = 'preReleaseUserAccessForm';
 const inviteLimit = 50;
 
 export default function PreReleaseUserAccessForm({
-  releaseId,
+  releaseVersionId,
   isReleaseApproved = false,
   isReleaseLive = false,
 }: Props) {
@@ -56,8 +56,8 @@ export default function PreReleaseUserAccessForm({
     error,
     setState: setUsers,
   } = useAsyncRetry(
-    () => preReleaseUserService.getUsers(releaseId),
-    [releaseId],
+    () => preReleaseUserService.getUsers(releaseVersionId),
+    [releaseVersionId],
   );
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
@@ -71,7 +71,7 @@ export default function PreReleaseUserAccessForm({
   const handleSubmit = async (values: FormValues) => {
     setInvitePlan(
       await preReleaseUserService.getInvitePlan(
-        releaseId,
+        releaseVersionId,
         splitAndTrimLines(values.emails),
       ),
     );
@@ -79,7 +79,7 @@ export default function PreReleaseUserAccessForm({
 
   const handleModalSubmit = async (emails: string) => {
     const newUsers = await preReleaseUserService.inviteUsers(
-      releaseId,
+      releaseVersionId,
       splitAndTrimLines(emails),
     );
 
@@ -226,7 +226,7 @@ export default function PreReleaseUserAccessForm({
                           toggleRemoving.on();
 
                           await preReleaseUserService.removeUser(
-                            releaseId,
+                            releaseVersionId,
                             user.email,
                           );
 

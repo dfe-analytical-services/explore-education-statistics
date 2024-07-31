@@ -10,7 +10,9 @@ import _dataBlockService, {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  ReleaseVersion,
+} from '@admin/services/releaseService';
 import _tableBuilderService, {
   SubjectMeta,
   TableDataResponse,
@@ -188,7 +190,7 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
-  const testRelease: Release = {
+  const testRelease: ReleaseVersion = {
     id: '123',
     releaseId: '456',
     slug: '123',
@@ -323,7 +325,7 @@ describe('PreReleaseTableToolPage', () => {
 
     expect(step1.getByRole('link', { name: 'Test highlight' })).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/prerelease/table-tool/block-1',
+      '/publication/publication-1/release/release-version-1/prerelease/table-tool/block-1',
     );
   });
 
@@ -369,7 +371,7 @@ describe('PreReleaseTableToolPage', () => {
         preReleaseTableToolRoute.path,
         {
           publicationId: 'publication-1',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-version-1',
           dataBlockId: 'block-1',
         },
       ),
@@ -412,7 +414,7 @@ describe('PreReleaseTableToolPage', () => {
         preReleaseTableToolRoute.path,
         {
           publicationId: 'publication-1',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-version-1',
         },
       ),
     ],

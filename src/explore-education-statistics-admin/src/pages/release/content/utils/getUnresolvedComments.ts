@@ -1,4 +1,4 @@
-import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableReleaseVersion } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
 import { BlockCommentIds } from '@admin/contexts/EditingContext';
 
@@ -33,7 +33,9 @@ const getContentSectionComments = (
   }, {});
 };
 
-const getUnresolvedComments = (release: EditableRelease): BlockCommentIds => {
+const getUnresolvedComments = (
+  release: EditableReleaseVersion,
+): BlockCommentIds => {
   return {
     ...getContentSectionComments(release.summarySection.content),
     ...getContentSectionComments(release.headlinesSection.content),

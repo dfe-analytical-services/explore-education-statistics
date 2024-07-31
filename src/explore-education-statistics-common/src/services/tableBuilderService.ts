@@ -140,6 +140,7 @@ export interface TableDataQuery extends FullTableQuery {
 }
 
 export interface ReleaseTableDataQuery extends TableDataQuery {
+  // TODO rename to releaseVersionId
   releaseId?: string;
 }
 
@@ -243,6 +244,7 @@ const tableBuilderService = {
   },
   async getTableData(
     query: FullTableQuery,
+    // TODO rename to releaseVersionId
     releaseId?: string,
   ): Promise<TableDataResponse> {
     return releaseId

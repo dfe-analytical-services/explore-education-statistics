@@ -58,7 +58,7 @@ Invite a new user with release and publication roles
 
     user enters text into element    name:userEmail    ${EMAIL}
 
-    user chooses select option    name:releaseId    ${RELEASE1_NAME}
+    user chooses select option    name:releaseVersionId    ${RELEASE1_NAME}
     user chooses select option    name:releaseRole    Approver
     user clicks button    Add release role
 
@@ -66,7 +66,7 @@ Invite a new user with release and publication roles
     ${ROW}=    user gets table row    ${RELEASE1_NAME}    testid:release-role-table
     user checks element contains    ${ROW}    Approver
 
-    user chooses select option    name:releaseId    ${RELEASE2_NAME}
+    user chooses select option    name:releaseVersionId    ${RELEASE2_NAME}
     user chooses select option    name:releaseRole    Contributor
     user clicks button    Add release role
 
@@ -76,7 +76,7 @@ Invite a new user with release and publication roles
     ${ROW}=    user gets table row    ${RELEASE2_NAME}    testid:release-role-table
     user checks element contains    ${ROW}    Contributor
 
-    user chooses select option    name:releaseId    ${RELEASE3_NAME}
+    user chooses select option    name:releaseVersionId    ${RELEASE3_NAME}
     user chooses select option    name:releaseRole    PrereleaseViewer
     user clicks button    Add release role
 

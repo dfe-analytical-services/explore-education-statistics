@@ -7,12 +7,14 @@ import React from 'react';
 import TagGroup from '@common/components/TagGroup';
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
 }
 
-const DraftReleaseRowIssues = ({ releaseId }: Props) => {
+const DraftReleaseRowIssues = ({ releaseVersionId }: Props) => {
   const { value: checklist, isLoading: isLoadingChecklist } =
-    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
+    useAsyncHandledRetry(() =>
+      releaseService.getReleaseChecklist(releaseVersionId),
+    );
 
   const totalIssues = checklist
     ? checklist.errors.length + checklist.warnings.length
