@@ -8,6 +8,7 @@ import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
+  releaseApiDataSetPreviewTokenLogRoute,
   releaseApiDataSetsRoute,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
@@ -67,20 +68,36 @@ export default function ReleaseApiDataSetDetailsPage() {
       actions={
         <ul className="govuk-list">
           {dataSet.draftVersion.status === 'Draft' && (
-            <li>
-              <Link
-                to={generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetPreviewRoute.path,
-                  {
-                    publicationId: release.publicationId,
-                    releaseId: release.id,
-                    dataSetId,
-                  },
-                )}
-              >
-                Preview API data set
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link
+                  to={generatePath<ReleaseDataSetRouteParams>(
+                    releaseApiDataSetPreviewRoute.path,
+                    {
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                      dataSetId,
+                    },
+                  )}
+                >
+                  Preview API data set
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={generatePath<ReleaseDataSetRouteParams>(
+                    releaseApiDataSetPreviewTokenLogRoute.path,
+                    {
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                      dataSetId,
+                    },
+                  )}
+                >
+                  View API data set token log
+                </Link>
+              </li>
+            </>
           )}
           {canUpdateRelease && dataSet.draftVersion.status !== 'Processing' && (
             <li>
