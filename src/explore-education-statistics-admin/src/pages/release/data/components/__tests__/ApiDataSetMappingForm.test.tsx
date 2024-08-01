@@ -1,4 +1,4 @@
-import ApiDataSetLocationMappingForm from '@admin/pages/release/data/components/ApiDataSetLocationMappingForm';
+import ApiDataSetMappingForm from '@admin/pages/release/data/components/ApiDataSetMappingForm';
 import {
   LocationCandidateWithKey,
   LocationMappingWithKey,
@@ -6,7 +6,7 @@ import {
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 
-describe('ApiDataSetLocationMappingForm', () => {
+describe('ApiDataSetMappingForm', () => {
   const testMapping: LocationMappingWithKey = {
     publicId: 'location-1-public-id',
     sourceKey: 'Location1Key',
@@ -34,10 +34,11 @@ describe('ApiDataSetLocationMappingForm', () => {
 
   test('renders the form', () => {
     render(
-      <ApiDataSetLocationMappingForm
-        level="region"
+      <ApiDataSetMappingForm
+        groupKey="region"
+        label="location"
         mapping={testMapping}
-        newLocations={testNewLocations}
+        newItems={testNewLocations}
         onSubmit={Promise.resolve}
       />,
     );
@@ -64,18 +65,19 @@ describe('ApiDataSetLocationMappingForm', () => {
 
   test('renders the form correctly with a candidate previously selected', async () => {
     render(
-      <ApiDataSetLocationMappingForm
+      <ApiDataSetMappingForm
         candidate={{
           key: 'Location3Key',
           label: 'Location 3',
         }}
-        level="region"
+        groupKey="region"
+        label="location"
         mapping={{
           ...testMapping,
           type: 'ManualMapped',
           candidateKey: 'Location3Key',
         }}
-        newLocations={[testNewLocations[0], testNewLocations[2]]}
+        newItems={[testNewLocations[0], testNewLocations[2]]}
         onSubmit={Promise.resolve}
       />,
     );
@@ -100,10 +102,11 @@ describe('ApiDataSetLocationMappingForm', () => {
 
   test('renders the form correctly with no mapping available previously selected', async () => {
     render(
-      <ApiDataSetLocationMappingForm
-        level="region"
+      <ApiDataSetMappingForm
+        groupKey="region"
+        label="location"
         mapping={{ ...testMapping, type: 'ManualNone' }}
-        newLocations={testNewLocations}
+        newItems={testNewLocations}
         onSubmit={Promise.resolve}
       />,
     );
@@ -111,13 +114,14 @@ describe('ApiDataSetLocationMappingForm', () => {
     expect(screen.getByLabelText('No mapping available')).toBeChecked();
   });
 
-  test('submitting the form with a mapped location', async () => {
+  test('submitting the form with a mapping', async () => {
     const handleSubmit = jest.fn();
     const { user } = render(
-      <ApiDataSetLocationMappingForm
-        level="region"
+      <ApiDataSetMappingForm
+        groupKey="region"
+        label="location"
         mapping={testMapping}
-        newLocations={testNewLocations}
+        newItems={testNewLocations}
         onSubmit={handleSubmit}
       />,
     );
@@ -132,7 +136,7 @@ describe('ApiDataSetLocationMappingForm', () => {
     await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
     expect(handleSubmit).toHaveBeenCalledWith({
       candidateKey: 'Location2Key',
-      level: 'region',
+      groupKey: 'region',
       previousCandidate: undefined,
       previousMapping: {
         publicId: 'location-1-public-id',
@@ -151,10 +155,11 @@ describe('ApiDataSetLocationMappingForm', () => {
   test('submitting the form with no mapping available', async () => {
     const handleSubmit = jest.fn();
     const { user } = render(
-      <ApiDataSetLocationMappingForm
-        level="region"
+      <ApiDataSetMappingForm
+        groupKey="region"
+        label="location"
         mapping={testMapping}
-        newLocations={testNewLocations}
+        newItems={testNewLocations}
         onSubmit={handleSubmit}
       />,
     );
@@ -169,7 +174,7 @@ describe('ApiDataSetLocationMappingForm', () => {
     await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
     expect(handleSubmit).toHaveBeenCalledWith({
       candidateKey: undefined,
-      level: 'region',
+      groupKey: 'region',
       previousCandidate: undefined,
       previousMapping: {
         publicId: 'location-1-public-id',
@@ -187,10 +192,11 @@ describe('ApiDataSetLocationMappingForm', () => {
 
   test('shows validation error when submit with no selection', async () => {
     const { user } = render(
-      <ApiDataSetLocationMappingForm
-        level="region"
+      <ApiDataSetMappingForm
+        groupKey="region"
+        label="location"
         mapping={testMapping}
-        newLocations={testNewLocations}
+        newItems={testNewLocations}
         onSubmit={Promise.resolve}
       />,
     );
@@ -205,6 +211,6 @@ describe('ApiDataSetLocationMappingForm', () => {
 
     expect(
       screen.getByRole('link', { name: 'Select the next data set location' }),
-    ).toHaveAttribute('href', '#map-location-form-nextLocation');
+    ).toHaveAttribute('href', '#map-region-form-nextItem');
   });
 });

@@ -6,6 +6,7 @@ import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataS
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
+  releaseApiDataSetFiltersMappingRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
@@ -27,8 +28,6 @@ import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 
-// TODO: Version mapping
-const showDraftVersionTasks = false;
 // TODO: EES-4367
 const showChangelog = false;
 // TODO: EES-4382
@@ -246,19 +245,39 @@ export default function ReleaseApiDataSetDetailsPage() {
                         </Link>
                       )}
                     </TaskListItem>
-                    {showDraftVersionTasks && (
-                      <TaskListItem
-                        id="map-filters-task"
-                        status={<Tag colour="blue">Complete</Tag>}
-                        hint="Define the changes to filters in this version."
-                      >
-                        {props => (
-                          <Link {...props} to="/todo">
-                            Map filters
-                          </Link>
-                        )}
-                      </TaskListItem>
-                    )}
+                    <TaskListItem
+                      id="map-filters-task"
+                      status={
+                        <Tag
+                          colour={
+                            dataSet.draftVersion.mappingStatus?.filtersComplete
+                              ? 'blue'
+                              : 'red'
+                          }
+                        >
+                          {dataSet.draftVersion.mappingStatus?.filtersComplete
+                            ? 'Complete'
+                            : 'Incomplete'}
+                        </Tag>
+                      }
+                      hint="Define the changes to filters in this version."
+                    >
+                      {props => (
+                        <Link
+                          {...props}
+                          to={generatePath<ReleaseDataSetRouteParams>(
+                            releaseApiDataSetFiltersMappingRoute.path,
+                            {
+                              publicationId: release.publicationId,
+                              releaseId: release.id,
+                              dataSetId,
+                            },
+                          )}
+                        >
+                          Map filters
+                        </Link>
+                      )}
+                    </TaskListItem>
                   </TaskList>
                 </div>
               </div>
