@@ -1,13 +1,15 @@
 CREATE OR ALTER PROCEDURE RebuildIndexes @Tables NVARCHAR(MAX), -- comma separated list of user-defined table names
                                          @FragmentationThresholdReorganize INT = 5,
-                                         @FragmentationThresholdRebuild INT = 30
+                                         @FragmentationThresholdRebuild INT = 30,
+                                         @StopInMinutes INT = 600
 AS
 BEGIN
     DECLARE @StatsCount INT,
         @StatsRowIndex INT = 1,
         @CurrentTable NVARCHAR(MAX) = '',
         @LastTable NVARCHAR(MAX) = '',
-        @Command NVARCHAR(MAX);
+        @Command NVARCHAR(MAX),
+        @StopTime DATETIME = DATEADD(MINUTE, @StopInMinutes, GETUTCDATE());
 
     IF LEN(ISNULL(@Tables, '')) > 0
         BEGIN
@@ -61,7 +63,7 @@ BEGIN
 
             -- Rebuild or reorganise each index depending on the fragmentation percentage
             SET @StatsRowIndex = 1;
-            WHILE(@StatsRowIndex <= @StatsCount)
+            WHILE(@StatsRowIndex <= @StatsCount AND @StopTime > GETUTCDATE())
                 BEGIN
                     SELECT @CurrentTable = ObjectName, @Command =
                            'ALTER INDEX ' + IndexName + ' ON ' + SchemaName + '.' + ObjectName +
@@ -83,15 +85,15 @@ BEGIN
 
                     SET @StatsRowIndex += 1;
                 END
-
-            RAISERROR ('Completed optimising indexes for tables.', 0, 1, NULL) WITH NOWAIT;
+            IF(@StopTime > GETUTCDATE())
+                RAISERROR ('Completed optimising indexes for tables.', 0, 1, NULL) WITH NOWAIT;
 
             /*-----------------------------------------------------------------------*/
 
             SET @StatsRowIndex = 1;
             SET @LastTable = '';
             SELECT @StatsCount = COUNT(Id) FROM #Stats;
-            WHILE(@StatsRowIndex <= @StatsCount)
+            WHILE(@StatsRowIndex <= @StatsCount AND @StopTime > GETUTCDATE())
                 BEGIN
                     SELECT @CurrentTable = ObjectName
                     FROM #Stats
@@ -110,7 +112,9 @@ BEGIN
 
                     SET @StatsRowIndex += 1;
                 END
-
-            RAISERROR ('Completed updating statistics on tables.', 0, 1, NULL) WITH NOWAIT;
+            IF(@StopTime > GETUTCDATE())
+                RAISERROR ('Completed updating statistics on tables.', 0, 1, NULL) WITH NOWAIT;
+            ELSE
+                RAISERROR ('Reindexing did not complete in %d minutes. Remaining reindexing skipped.', 16, 1, @StopInMinutes) WITH NOWAIT;
         END
 END
