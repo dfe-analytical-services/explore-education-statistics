@@ -834,7 +834,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, Unit>> DeleteVersion(
-            Guid dataSetVersionId, CancellationToken cancellationToken = default)
+            Guid dataSetVersionId, 
+            CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
@@ -843,6 +844,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid dataSetVersionId,
             CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
+            DataSetVersionUpdateRequest updateRequest, 
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult, DataSetDraftVersionViewModel>(new NotFoundResult()));
+        }
     }
 
     internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService

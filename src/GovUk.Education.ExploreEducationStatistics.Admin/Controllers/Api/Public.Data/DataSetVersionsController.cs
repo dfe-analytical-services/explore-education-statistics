@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -63,5 +64,18 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
                 await response.Content.CopyToAsync(Response.BodyWriter.AsStream(), cancellationToken);
             })
             .HandleFailuresOrNoOp();
+    }
+
+    [HttpPatch()]
+    [Produces("application/json")]
+    public async Task<ActionResult<DataSetDraftVersionViewModel>> UpdateVersion(
+        [FromBody] DataSetVersionUpdateRequest dataSetVersionUpdateRequest,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetVersionService
+            .UpdateVersion(
+                updateRequest: dataSetVersionUpdateRequest,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
     }
 }

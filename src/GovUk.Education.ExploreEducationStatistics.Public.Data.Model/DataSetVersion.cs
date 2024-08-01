@@ -82,7 +82,7 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     public DataSetVersionType VersionType
         => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
 
-    public bool CanBeDeleted => Status is DataSetVersionStatus.Failed
+    public bool CanBeUpdated => Status is DataSetVersionStatus.Failed
         or DataSetVersionStatus.Mapping
         or DataSetVersionStatus.Draft
         or DataSetVersionStatus.Cancelled;
