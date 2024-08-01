@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,10 +5,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -23,15 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class PublishingServiceTests
     {
-        private const string? PublicStorageConnectionString = "public-storage-conn";
+        private const string PublicStorageConnectionString = "public-storage-conn";
 
         [Fact]
         public async Task PublishMethodologyFiles()
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid()
-            };
+            var methodologyVersion = new MethodologyVersion { Id = Guid.NewGuid() };
 
             var logger = new Mock<ILogger<PublishingService>>();
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
@@ -392,24 +389,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IPublicBlobStorageService? publicBlobStorageService = null,
             IMethodologyService? methodologyService = null,
             IReleaseService? releaseService = null,
-            ILogger<PublishingService>? logger = null,
-            IConfiguration? configuration = null)
+            IOptions<AppSettingsOptions>? appSettingsOptions = null,
+            ILogger<PublishingService>? logger = null)
         {
             return new PublishingService(
                 privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
                 publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
-                logger ?? Mock.Of<ILogger<PublishingService>>(),
-                configuration ?? DefaultConfigurationMock().Object
+                appSettingsOptions ?? DefaultAppSettingsOptions(),
+                logger ?? Mock.Of<ILogger<PublishingService>>()
             );
         }
 
-        private static Mock<IConfiguration> DefaultConfigurationMock()
+        private static IOptions<AppSettingsOptions> DefaultAppSettingsOptions()
         {
-            return MockUtils.CreateMockConfiguration(
-                TupleOf("PublicStorage", PublicStorageConnectionString));
+            return Options.Create(new AppSettingsOptions
+            {
+                PrivateStorageConnectionString = string.Empty,
+                PublicStorageConnectionString = PublicStorageConnectionString,
+                NotifierStorageConnectionString = string.Empty,
+                PublisherStorageConnectionString = string.Empty,
+                PublishReleaseContentCronSchedule = string.Empty,
+                PublishReleasesCronSchedule = string.Empty
+            });
         }
-
     }
 }
