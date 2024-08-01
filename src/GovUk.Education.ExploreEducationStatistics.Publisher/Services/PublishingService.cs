@@ -1,13 +1,13 @@
-#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -15,35 +15,21 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.CopyDire
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
-    public class PublishingService : IPublishingService
+    public class PublishingService(
+        IPrivateBlobStorageService privateBlobStorageService,
+        IPublicBlobStorageService publicBlobStorageService,
+        IMethodologyService methodologyService,
+        IReleaseService releaseService,
+        IOptions<AppSettingsOptions> appSettingsOptions,
+        ILogger<PublishingService> logger)
+        : IPublishingService
     {
-        private readonly string _publicStorageConnectionString;
-        private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IPublicBlobStorageService _publicBlobStorageService;
-        private readonly IMethodologyService _methodologyService;
-        private readonly IReleaseService _releaseService;
-        private readonly ILogger<PublishingService> _logger;
-
-        public PublishingService(
-            IPrivateBlobStorageService privateBlobStorageService,
-            IPublicBlobStorageService publicBlobStorageService,
-            IMethodologyService methodologyService,
-            IReleaseService releaseService,
-            ILogger<PublishingService> logger,
-            IConfiguration configuration)
-        {
-            _publicStorageConnectionString = configuration.GetValue<string>("PublicStorage");
-            _privateBlobStorageService = privateBlobStorageService;
-            _publicBlobStorageService = publicBlobStorageService;
-            _methodologyService = methodologyService;
-            _releaseService = releaseService;
-            _logger = logger;
-        }
+        private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
 
         public async Task PublishStagedReleaseContent()
         {
-            _logger.LogInformation("Moving staged release content");
-            await _publicBlobStorageService.MoveDirectory(
+            logger.LogInformation("Moving staged release content");
+            await publicBlobStorageService.MoveDirectory(
                 sourceContainerName: PublicContent,
                 sourceDirectoryPath: PublicContentStagingPath(),
                 destinationContainerName: PublicContent,
@@ -53,14 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishMethodologyFiles(Guid methodologyId)
         {
-            var methodology = await _methodologyService.Get(methodologyId);
+            var methodology = await methodologyService.Get(methodologyId);
             await PublishMethodologyFiles(methodology);
         }
 
         public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseVersionId)
         {
-            var releaseVersion = await _releaseService.Get(releaseVersionId);
-            var methodologyVersions = await _methodologyService.GetLatestVersionByRelease(releaseVersion);
+            var releaseVersion = await releaseService.Get(releaseVersionId);
+            var methodologyVersions = await methodologyService.GetLatestVersionByRelease(releaseVersion);
 
             if (!methodologyVersions.Any())
             {
@@ -69,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var methodologyVersion in methodologyVersions)
             {
-                if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
+                if (await methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
                 {
                     await PublishMethodologyFiles(methodologyVersion);
                 }
@@ -78,9 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishReleaseFiles(Guid releaseVersionId)
         {
-            var releaseVersion = await _releaseService.Get(releaseVersionId);
+            var releaseVersion = await releaseService.Get(releaseVersionId);
 
-            var files = await _releaseService.GetFiles(
+            var files = await releaseService.GetFiles(
                 releaseVersionId,
                 Ancillary,
                 Chart,
@@ -91,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var destinationDirectoryPath = $"{releaseVersion.Id}/";
 
             // Delete any existing blobs in public storage
-            await _publicBlobStorageService.DeleteBlobs(
+            await publicBlobStorageService.DeleteBlobs(
                 containerName: PublicReleaseFiles,
                 directoryPath: destinationDirectoryPath);
 
@@ -105,53 +91,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Copy the blobs of those directories in private storage to the destination directory in public storage
             foreach (var sourceDirectoryPath in sourceDirectoryPaths)
             {
-                await _privateBlobStorageService.CopyDirectory(
+                await privateBlobStorageService.CopyDirectory(
                     sourceContainerName: PrivateReleaseFiles,
                     sourceDirectoryPath: sourceDirectoryPath,
                     destinationContainerName: PublicReleaseFiles,
                     destinationDirectoryPath: destinationDirectoryPath,
                     new IBlobStorageService.CopyDirectoryOptions
                     {
-                        DestinationConnectionString = _publicStorageConnectionString,
+                        DestinationConnectionString = _appSettingsOptions.PublicStorageConnectionString,
                         ShouldTransferCallbackAsync = (source, _) =>
                             // Filter by blobs with matching file paths
                             TransferBlobIfFileExistsCallback(
                                 source: source,
                                 files: files,
                                 sourceContainerName: PrivateReleaseFiles,
-                                logger: _logger)
+                                logger: logger)
                     });
             }
         }
 
         private async Task PublishMethodologyFiles(MethodologyVersion methodologyVersion)
         {
-            var files = await _methodologyService.GetFiles(methodologyVersion.Id, Image);
+            var files = await methodologyService.GetFiles(methodologyVersion.Id, Image);
 
             var directoryPath = $"{methodologyVersion.Id}/";
 
             // Delete any existing blobs in public storage
-            await _publicBlobStorageService.DeleteBlobs(
+            await publicBlobStorageService.DeleteBlobs(
                 containerName: PublicMethodologyFiles,
                 directoryPath: directoryPath
             );
 
             // Copy the blobs from private to public storage
-            await _privateBlobStorageService.CopyDirectory(
+            await privateBlobStorageService.CopyDirectory(
                 sourceContainerName: PrivateMethodologyFiles,
                 sourceDirectoryPath: directoryPath,
                 destinationContainerName: PublicMethodologyFiles,
                 destinationDirectoryPath: directoryPath,
                 new IBlobStorageService.CopyDirectoryOptions
                 {
-                    DestinationConnectionString = _publicStorageConnectionString,
+                    DestinationConnectionString = _appSettingsOptions.PublicStorageConnectionString,
                     ShouldTransferCallbackAsync = (source, _) =>
                         // Filter by blobs with matching file paths
                         TransferBlobIfFileExistsCallback(
                             source: source,
                             files: files,
                             sourceContainerName: PrivateMethodologyFiles,
-                            logger: _logger)
+                            logger: logger)
                 });
         }
     }
