@@ -360,7 +360,7 @@ public class DataSetFileService : IDataSetFileService
 
     private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(ReleaseFile releaseFile)
     {
-        if (releaseFile.PublicApiDataSetId is null || releaseFile.PublicApiVersionString is null)
+        if (releaseFile.PublicApiDataSetId is null || releaseFile.PublicApiDataSetVersionString is null)
         {
             return null;
         }
@@ -368,7 +368,7 @@ public class DataSetFileService : IDataSetFileService
         return new DataSetFileApiViewModel
         {
             Id = releaseFile.PublicApiDataSetId.Value,
-            Version = releaseFile.PublicApiVersionString,
+            Version = releaseFile.PublicApiDataSetVersionString,
         };
     }
 }
