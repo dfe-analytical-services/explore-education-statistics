@@ -27,7 +27,7 @@ public class ReleaseFile
 
     public SemVersion? PublicApiDataSetVersion { get; set; }
 
-    public string? PublicApiVersionString => PublicApiDataSetVersion is not null
+    public string? PublicApiDataSetVersionString => PublicApiDataSetVersion is not null
         ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}"
         : null;
 
@@ -36,8 +36,6 @@ public class ReleaseFile
     public List<IndicatorGroupSequenceEntry>? IndicatorSequence { get; set; }
 
     public DateTime? Published { get; set; }
-
-    public bool IsLinkedToApiDataSet => PublicApiDataSetId is not null;
 }
 
 public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);
