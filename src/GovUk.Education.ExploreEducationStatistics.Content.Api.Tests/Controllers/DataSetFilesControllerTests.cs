@@ -1742,7 +1742,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             viewModel.IsSuperseded),
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
                     () => Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api?.Id),
-                    () => Assert.Equal(releaseFile.PublicApiVersionString, viewModel.Api?.Version)
+                    () => Assert.Equal(releaseFile.PublicApiDataSetVersionString, viewModel.Api?.Version)
                 );
             });
         }

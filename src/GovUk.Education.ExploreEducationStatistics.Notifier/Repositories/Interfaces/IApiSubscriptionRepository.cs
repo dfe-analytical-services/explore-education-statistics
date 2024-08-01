@@ -12,14 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Inter
 public interface IApiSubscriptionRepository
 {
     Task<ApiSubscription?> GetSubscription(
-        Guid dataSetId, 
-        string email, 
+        Guid dataSetId,
+        string email,
         CancellationToken cancellationToken = default);
 
     Task CreatePendingSubscription(
         Guid dataSetId,
         string dataSetTitle,
-        string email, 
+        string email,
         DateTimeOffset expiryDateTime,
         CancellationToken cancellationToken = default);
 
@@ -28,7 +28,7 @@ public interface IApiSubscriptionRepository
         CancellationToken cancellationToken = default);
 
     Task DeleteSubscription(
-        Guid dataSetId, 
+        Guid dataSetId,
         string email,
         CancellationToken cancellationToken = default);
 

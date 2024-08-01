@@ -24,6 +24,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor;
 
@@ -87,7 +88,11 @@ public static class ProcessorHostBuilder
                     .AddScoped<ILocationMetaRepository, LocationMetaRepository>()
                     .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
                     .AddScoped<IParquetService, ParquetService>()
-                    .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
+                    .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
+                        new PrivateBlobStorageService(
+                            provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value
+                                .PrivateStorageConnectionString,
+                            provider.GetRequiredService<ILogger<IBlobStorageService>>()))
                     .Configure<AppSettingsOptions>(
                         hostBuilderContext.Configuration.GetSection(AppSettingsOptions.Section))
                     .Configure<DataFilesOptions>(

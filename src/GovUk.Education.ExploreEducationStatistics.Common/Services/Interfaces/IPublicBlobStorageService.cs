@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
- public interface IPublicBlobStorageService : IBlobStorageService {}
+public interface IPublicBlobStorageService : IBlobStorageService;

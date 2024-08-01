@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 var host = new HostBuilder()
@@ -41,7 +42,11 @@ var host = new HostBuilder()
             .AddDbContext<ContentDbContext>(options =>
                 options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
                     providerOptions => providerOptions.EnableCustomRetryOnFailure()))
-            .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>()
+            .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
+                new PrivateBlobStorageService(
+                    provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.PrivateStorageConnectionString,
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>())
+            )
             .AddTransient<IFileImportService, FileImportService>()
             .AddTransient<IImporterService, ImporterService>()
             .AddTransient<ImporterLocationService>()
@@ -55,7 +60,7 @@ var host = new HostBuilder()
             .AddSingleton<IDatabaseHelper, DatabaseHelper>()
             .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
             .AddSingleton<IDbContextSupplier, DbContextSupplier>()
-            .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.AppSettings));
+            .Configure<AppSettingsOptions>(hostContext.Configuration.GetSection(AppSettingsOptions.Section));
     })
     .Build();
 
@@ -75,8 +80,8 @@ void LoadLocationCache()
 
 async Task ClearQueues()
 {
-    var config = host.Services.GetRequiredService<IConfiguration>();
-    var connectionString = config.GetValue<string>("CoreStorage");
+    var config = host.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+    var connectionString = config.PrivateStorageConnectionString;
 
     var importsPendingQueueClient = new QueueClient(connectionString, queueName: ImportsPendingQueue);
     await importsPendingQueueClient.CreateIfNotExistsAsync();
@@ -89,8 +94,8 @@ async Task ClearQueues()
 
 async Task RestartImports()
 {
-    var config = host.Services.GetRequiredService<IConfiguration>();
-    var connectionString = config.GetValue<string>("CoreStorage");
+    var config = host.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+    var connectionString = config.PrivateStorageConnectionString;
 
     QueueClientOptions queueOptions = 
         new() { MessageEncoding = QueueMessageEncoding.Base64 };

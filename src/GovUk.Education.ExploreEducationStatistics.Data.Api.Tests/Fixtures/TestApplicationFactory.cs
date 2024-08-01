@@ -80,8 +80,8 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                 {
                     services.ReplaceService<IPublicBlobStorageService>(sp =>
                         new PublicBlobStorageService(
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>(),
-                            sp.GetRequiredService<IConfiguration>()
+                            _azuriteContainer.GetConnectionString(),
+                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
                     );
                 });
