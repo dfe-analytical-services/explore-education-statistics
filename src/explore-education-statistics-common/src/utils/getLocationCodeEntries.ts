@@ -2,9 +2,16 @@ import typedKeys from '@common/utils/object/typedKeys';
 import pickBy from 'lodash/pickBy';
 import sortBy from 'lodash/sortBy';
 
-const codeKeys = ['id', 'code', 'oldCode', 'urn', 'laEstab', 'ukprn'] as const;
+export const locationCodeKeys = [
+  'id',
+  'code',
+  'oldCode',
+  'urn',
+  'laEstab',
+  'ukprn',
+] as const;
 
-export type LocationCodeKey = (typeof codeKeys)[number];
+export type LocationCodeKey = (typeof locationCodeKeys)[number];
 
 export type LocationCodeLabels = Record<LocationCodeKey, string>;
 
@@ -40,7 +47,7 @@ export default function getLocationCodeEntries(
     ),
   );
 
-  return sortBy(keys, key => codeKeys.indexOf(key)).map(key => {
+  return sortBy(keys, key => locationCodeKeys.indexOf(key)).map(key => {
     return {
       key,
       label: labels[key],

@@ -1,10 +1,11 @@
-import ApiDataSetAutoMappedLocationsTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedLocationsTable';
+import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
 import { AutoMappedLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
+import { AutoMappedFilter } from '../../utils/getApiDataSetFilterMappings';
 
-describe('ApiDataSetAutoMappedLocationsTable', () => {
+describe('ApiDataSetAutoMappedTable', () => {
   const testLocations: AutoMappedLocation[] = [
     {
       candidate: {
@@ -195,19 +196,189 @@ describe('ApiDataSetAutoMappedLocationsTable', () => {
     },
   ];
 
-  test('renders the first page of auto mapped locations', () => {
+  const testFilterOptions: AutoMappedFilter[] = [
+    {
+      candidate: {
+        label: 'Filter Option 1',
+        key: 'FilterOption1Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption1Key',
+        publicId: 'FilterOption-1-public-id',
+        source: {
+          label: 'Filter Option 1',
+        },
+        sourceKey: 'FilterOption1Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 2',
+        key: 'FilterOption2Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption2Key',
+        publicId: 'FilterOption-2-public-id',
+        source: {
+          label: 'Filter Option 2',
+        },
+        sourceKey: 'FilterOption2Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 3',
+        key: 'FilterOption3Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption3Key',
+        publicId: 'FilterOption-3-public-id',
+        source: {
+          label: 'Filter Option 3',
+        },
+        sourceKey: 'FilterOption3Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 4',
+        key: 'FilterOption4Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption4Key',
+        publicId: 'FilterOption-4-public-id',
+        source: {
+          label: 'Filter Option 4',
+        },
+        sourceKey: 'FilterOption4Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 5',
+        key: 'FilterOption5Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption5Key',
+        publicId: 'FilterOption-5-public-id',
+        source: {
+          label: 'Filter Option 5',
+        },
+        sourceKey: 'FilterOption5Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 6',
+        key: 'FilterOption6Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption6Key',
+        publicId: 'FilterOption-6-public-id',
+        source: {
+          label: 'Filter Option 6',
+        },
+        sourceKey: 'FilterOption6Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 7',
+        key: 'FilterOption7Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption7Key',
+        publicId: 'FilterOption-7-public-id',
+        source: {
+          label: 'Filter Option 7',
+        },
+        sourceKey: 'FilterOption7Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 8',
+        key: 'FilterOption8Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption8Key',
+        publicId: 'FilterOption-8-public-id',
+        source: {
+          label: 'Filter Option 8',
+        },
+        sourceKey: 'FilterOption8Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 9',
+        key: 'FilterOption9Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption9Key',
+        publicId: 'FilterOption-9-public-id',
+        source: {
+          label: 'Filter Option 9',
+        },
+        sourceKey: 'FilterOption9Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 10',
+        key: 'FilterOption10Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption10Key',
+        publicId: 'FilterOption-10-public-id',
+        source: {
+          label: 'Filter Option 10',
+        },
+        sourceKey: 'FilterOption10Key',
+        type: 'AutoMapped',
+      },
+    },
+    {
+      candidate: {
+        label: 'Filter Option 11',
+        key: 'FilterOption11Key',
+      },
+      mapping: {
+        candidateKey: 'FilterOption11Key',
+        publicId: 'FilterOption-11-public-id',
+        source: {
+          label: 'Filter Option 11',
+        },
+        sourceKey: 'FilterOption11Key',
+        type: 'AutoMapped',
+      },
+    },
+  ];
+
+  test('renders correctly with locations', () => {
     render(
-      <ApiDataSetAutoMappedLocationsTable
-        level="localAuthority"
-        locations={testLocations}
-        newLocations={[]}
+      <ApiDataSetAutoMappedTable
+        autoMappedItems={testLocations}
+        groupKey="localAuthority"
+        groupLabel="Local Authorities"
+        label="location"
+        newItems={[]}
         onUpdate={Promise.resolve}
       />,
     );
 
     // Search
     expect(
-      screen.getByLabelText('Search auto mapped locations'),
+      screen.getByLabelText('Search auto mapped Local Authorities'),
     ).toBeInTheDocument();
 
     // Table
@@ -360,12 +531,157 @@ describe('ApiDataSetAutoMappedLocationsTable', () => {
     ).toBeInTheDocument();
   });
 
-  test('searching locations', async () => {
+  test('renders correctly with filter options', () => {
+    render(
+      <ApiDataSetAutoMappedTable
+        autoMappedItems={testFilterOptions}
+        groupKey="Filter1"
+        groupLabel="Filter 1"
+        label="location"
+        newItems={[]}
+        onUpdate={Promise.resolve}
+      />,
+    );
+
+    // Search
+    expect(
+      screen.getByLabelText('Search auto mapped Filter 1'),
+    ).toBeInTheDocument();
+
+    // Table
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+    expect(rows).toHaveLength(11);
+
+    // Row 1
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('Filter Option 1');
+    expect(row1Cells[1]).toHaveTextContent('Filter Option 1');
+    expect(
+      within(row1Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 1',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 2
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('Filter Option 2');
+    expect(row2Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row2Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 2',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 3
+    const row3Cells = within(rows[3]).getAllByRole('cell');
+    expect(row3Cells[0]).toHaveTextContent('Filter Option 3');
+    expect(row3Cells[1]).toHaveTextContent('Filter Option 3');
+    expect(row3Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row3Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 3',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 4
+    const row4Cells = within(rows[4]).getAllByRole('cell');
+    expect(row4Cells[0]).toHaveTextContent('Filter Option 4');
+    expect(row4Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row4Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 4',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 5
+    const row5Cells = within(rows[5]).getAllByRole('cell');
+    expect(row5Cells[0]).toHaveTextContent('Filter Option 5');
+    expect(row5Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row5Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 5',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 6
+    const row6Cells = within(rows[6]).getAllByRole('cell');
+    expect(row6Cells[0]).toHaveTextContent('Filter Option 6');
+    expect(row6Cells[1]).toHaveTextContent('Filter Option 6');
+    expect(row6Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row6Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 6',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 7
+    const row7Cells = within(rows[7]).getAllByRole('cell');
+    expect(row7Cells[0]).toHaveTextContent('Filter Option 7');
+    expect(row7Cells[1]).toHaveTextContent('Filter Option 7');
+    expect(row7Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row7Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 7',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 8
+    const row8Cells = within(rows[8]).getAllByRole('cell');
+    expect(row8Cells[0]).toHaveTextContent('Filter Option 8');
+    expect(row8Cells[1]).toHaveTextContent('Filter Option 8');
+    expect(row8Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row8Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 8',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 9
+    const row9Cells = within(rows[9]).getAllByRole('cell');
+    expect(row9Cells[0]).toHaveTextContent('Filter Option 9');
+    expect(row9Cells[1]).toHaveTextContent('Filter Option 9');
+    expect(row9Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row9Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 9',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 10
+    const row10Cells = within(rows[10]).getAllByRole('cell');
+    expect(row10Cells[0]).toHaveTextContent('Filter Option 10');
+    expect(row10Cells[1]).toHaveTextContent('Filter Option 10');
+    expect(row10Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row10Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Filter Option 10',
+      }),
+    ).toBeInTheDocument();
+
+    // Pagination
+    const pagination = within(
+      screen.getByRole('navigation', { name: 'Pagination' }),
+    );
+    expect(
+      pagination.getByRole('button', { name: 'Page 1' }),
+    ).toBeInTheDocument();
+    expect(
+      pagination.getByRole('button', { name: 'Page 2' }),
+    ).toBeInTheDocument();
+
+    expect(
+      pagination.getByRole('button', { name: 'Next page' }),
+    ).toBeInTheDocument();
+  });
+
+  test('searching', async () => {
     const { user } = render(
-      <ApiDataSetAutoMappedLocationsTable
-        level="localAuthority"
-        locations={testLocations}
-        newLocations={[]}
+      <ApiDataSetAutoMappedTable
+        autoMappedItems={testLocations}
+        groupKey="localAuthority"
+        groupLabel="Local Authorities"
+        label="location"
+        newItems={[]}
         onUpdate={Promise.resolve}
       />,
     );
@@ -379,7 +695,7 @@ describe('ApiDataSetAutoMappedLocationsTable', () => {
     ).toBeInTheDocument();
 
     await user.type(
-      screen.getByLabelText('Search auto mapped locations'),
+      screen.getByLabelText('Search auto mapped Local Authorities'),
       'location 3',
     );
 
@@ -408,10 +724,12 @@ describe('ApiDataSetAutoMappedLocationsTable', () => {
 
   test('pagination', async () => {
     const { user } = render(
-      <ApiDataSetAutoMappedLocationsTable
-        level="localAuthority"
-        locations={testLocations}
-        newLocations={[]}
+      <ApiDataSetAutoMappedTable
+        autoMappedItems={testLocations}
+        groupKey="localAuthority"
+        groupLabel="Local Authorities"
+        label="location"
+        newItems={[]}
         onUpdate={Promise.resolve}
       />,
     );
@@ -454,14 +772,16 @@ describe('ApiDataSetAutoMappedLocationsTable', () => {
 
   test('hides the edit button if there is a pending update for the mapping', () => {
     render(
-      <ApiDataSetAutoMappedLocationsTable
-        level="localAuthority"
-        locations={testLocations}
-        newLocations={[]}
+      <ApiDataSetAutoMappedTable
+        autoMappedItems={testLocations}
+        groupKey="localAuthority"
+        groupLabel="Local Authorities"
+        label="location"
+        newItems={[]}
         pendingUpdates={[
           {
             previousMapping: testLocations[1].mapping,
-            level: 'localAuthority',
+            groupKey: 'localAuthority',
             sourceKey: 'Location2Key',
             type: 'ManualMapped',
           },

@@ -1,12 +1,13 @@
 import {
+  FilterCandidateWithKey,
+  FilterMappingWithKey,
+} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import styles from '@admin/pages/release/data/components/ApiDataSetMappingModal.module.scss';
+import { PendingMappingUpdate } from '@admin/services/apiDataSetVersionService';
+import {
   LocationCandidateWithKey,
   LocationMappingWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import {
-  PendingLocationMappingUpdate,
-  noMappingValue,
-} from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
-import styles from '@admin/pages/release/data/components/ApiDataSetLocationMappingModal.module.scss';
 import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -16,37 +17,40 @@ import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSea
 import FormProvider from '@common/components/form/FormProvider';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import Yup from '@common/validation/yup';
 import React from 'react';
 
+const noMappingValue = 'noMapping';
+
 interface FormValues {
-  nextLocation: string;
+  nextItem: string;
 }
 
 interface Props {
-  candidate?: LocationCandidateWithKey;
-  level: LocationLevelKey;
-  mapping: LocationMappingWithKey;
-  newLocations: LocationCandidateWithKey[];
+  candidate?: FilterCandidateWithKey | LocationCandidateWithKey;
+  groupKey: string;
+  label: string;
+  mapping: FilterMappingWithKey | LocationMappingWithKey;
+  newItems: FilterCandidateWithKey[] | LocationCandidateWithKey[];
   onCancel?: () => void;
-  onSubmit: (update: PendingLocationMappingUpdate) => Promise<void>;
+  onSubmit: (update: PendingMappingUpdate) => Promise<void>;
 }
 
-export default function ApiDataSetLocationMappingForm({
+export default function ApiDataSetMappingForm({
   candidate,
-  level,
+  groupKey,
+  label,
   mapping,
-  newLocations = [],
+  newItems = [],
   onCancel,
   onSubmit,
 }: Props) {
-  const handleSubmit = async ({ nextLocation }: FormValues) => {
+  const handleSubmit = async ({ nextItem }: FormValues) => {
     await onSubmit({
-      candidateKey: nextLocation !== noMappingValue ? nextLocation : undefined,
-      level,
+      candidateKey: nextItem !== noMappingValue ? nextItem : undefined,
+      groupKey,
       sourceKey: mapping.sourceKey,
-      type: nextLocation !== noMappingValue ? 'ManualMapped' : 'ManualNone',
+      type: nextItem !== noMappingValue ? 'ManualMapped' : 'ManualNone',
       previousCandidate: candidate,
       previousMapping: mapping,
     });
@@ -56,8 +60,7 @@ export default function ApiDataSetLocationMappingForm({
     {
       label: 'No mapping available',
       value: noMappingValue,
-      divider:
-        newLocations.length || candidate ? 'Select a location:' : undefined,
+      divider: `Select a ${label}:`,
     },
     ...(candidate
       ? [
@@ -68,11 +71,11 @@ export default function ApiDataSetLocationMappingForm({
           },
         ]
       : []),
-    ...newLocations.map(location => {
+    ...newItems.map(option => {
       return {
-        label: location.label,
-        value: location.key,
-        hint: getApiDataSetLocationCodes(location),
+        label: option.label,
+        value: option.key,
+        hint: getApiDataSetLocationCodes(option),
       };
     }),
   ];
@@ -81,27 +84,25 @@ export default function ApiDataSetLocationMappingForm({
     <FormProvider
       initialValues={getInitialValues({ candidate, mapping })}
       validationSchema={Yup.object({
-        nextLocation: Yup.string().required(
-          'Select the next data set location',
-        ),
+        nextItem: Yup.string().required(`Select the next data set ${label}`),
       })}
     >
       {({ formState }) => {
         return (
-          <Form id="map-location-form" onSubmit={handleSubmit}>
+          <Form id={`map-${groupKey}-form`} onSubmit={handleSubmit}>
             <FormFieldRadioSearchGroup<FormValues>
               alwaysShowOptions={[noMappingValue]}
-              hint="Choose a location that will be mapped to the current data set location (see above)."
-              legend="Next data set location"
-              name="nextLocation"
+              hint={`Choose a ${label} that will be mapped to the current data set ${label} (see above).`}
+              legend={`Next data set ${label}`}
+              name="nextItem"
               options={options}
               order={[]}
-              searchLabel="Search locations"
+              searchLabel={`Search ${label}s`}
               small
             />
             <ButtonGroup className={styles.buttons}>
               <Button disabled={formState.isSubmitting} type="submit">
-                Update location mapping
+                {`Update ${label} mapping`}
               </Button>
               <ButtonText disabled={formState.isSubmitting} onClick={onCancel}>
                 Cancel
@@ -113,7 +114,7 @@ export default function ApiDataSetLocationMappingForm({
                 inline
                 loading={formState.isSubmitting}
                 size="sm"
-                text="Updating location mapping"
+                text={`Updating ${label} mapping`}
               />
             </ButtonGroup>
           </Form>
@@ -127,14 +128,14 @@ function getInitialValues({
   candidate,
   mapping,
 }: {
-  candidate?: LocationCandidateWithKey;
-  mapping: LocationMappingWithKey;
+  candidate?: FilterCandidateWithKey | LocationCandidateWithKey;
+  mapping: FilterMappingWithKey | LocationMappingWithKey;
 }) {
   if (candidate) {
-    return { nextLocation: candidate.key };
+    return { nextItem: candidate.key };
   }
   if (mapping.type === 'ManualNone') {
-    return { nextLocation: noMappingValue };
+    return { nextItem: noMappingValue };
   }
   return undefined;
 }

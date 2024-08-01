@@ -1,27 +1,27 @@
-import styles from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage.module.scss';
 import { LocationCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
+import { FilterCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
 import Tag from '@common/components/Tag';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
+import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import React from 'react';
 
 interface Props {
-  level: LocationLevelKey;
-  locations: LocationCandidateWithKey[];
+  groupKey: LocationLevelKey | string;
+  groupLabel: string;
+  label: string;
+  newItems: FilterCandidateWithKey[] | LocationCandidateWithKey[];
 }
 
-export default function ApiDataSetNewLocationsTable({
-  level,
-  locations,
+export default function ApiDataSetNewItemsTable({
+  groupKey,
+  groupLabel,
+  label,
+  newItems,
 }: Props) {
   return (
-    <table data-testid={`new-locations-table-${level}`}>
+    <table data-testid={`new-items-table-${groupKey}`}>
       <caption className="govuk-visually-hidden">
-        {`Table showing new locations for ${
-          locationLevelsMap[level]?.plural ?? level
-        }`}
+        {`Table showing new ${label}s for ${groupLabel}`}
       </caption>
       <thead>
         <tr>
@@ -31,16 +31,13 @@ export default function ApiDataSetNewLocationsTable({
         </tr>
       </thead>
       <tbody>
-        {locations.map(candidate => {
+        {newItems.map(candidate => {
           return (
             <tr key={`candidate-${candidate.key}`}>
               <td>Not applicable</td>
               <td>
                 {candidate.label}
-                <br />
-                <span className={styles.code}>
-                  {getApiDataSetLocationCodes(candidate)}
-                </span>
+                <ApiDataSetLocationCode location={candidate} />
               </td>
               <td>
                 <Tag colour="grey">Minor</Tag>

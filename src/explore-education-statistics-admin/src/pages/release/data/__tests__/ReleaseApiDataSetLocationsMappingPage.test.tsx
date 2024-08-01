@@ -127,7 +127,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).toBeInTheDocument();
     expect(
       within(
-        newLocationsAccordion.getByTestId('new-locations-table-localAuthority'),
+        newLocationsAccordion.getByTestId('new-items-table-localAuthority'),
       ).getAllByRole('row'),
     ).toHaveLength(3);
 
@@ -139,7 +139,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).toBeInTheDocument();
     expect(
       within(
-        newLocationsAccordion.getByTestId('new-locations-table-region'),
+        newLocationsAccordion.getByTestId('new-items-table-region'),
       ).getAllByRole('row'),
     ).toHaveLength(3);
 
@@ -334,7 +334,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     expect(screen.queryByTestId('notificationBanner')).not.toBeInTheDocument();
   });
 
-  test('renders a message if there are no unmapped or manually mapped locations', async () => {
+  test('renders a message if there are no mappable locations', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getLocationsMapping.mockResolvedValue({
       levels: {
@@ -554,7 +554,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       ).toBeInTheDocument();
       const newLocationsTable = screen.getByTestId(
-        'new-locations-table-localAuthority',
+        'new-items-table-localAuthority',
       );
       const newLocationRows = within(newLocationsTable).getAllByRole('row');
       expect(newLocationRows).toHaveLength(3);
@@ -836,7 +836,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       ).toBeInTheDocument();
       const newLocationsTable = screen.getByTestId(
-        'new-locations-table-localAuthority',
+        'new-items-table-localAuthority',
       );
       expect(within(newLocationsTable).getAllByRole('row')).toHaveLength(3);
 
