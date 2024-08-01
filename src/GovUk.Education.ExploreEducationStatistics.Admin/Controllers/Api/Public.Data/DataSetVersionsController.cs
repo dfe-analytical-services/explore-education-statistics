@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 [Route("api/public-data/data-set-versions")]
 public class DataSetVersionsController(IDataSetVersionService dataSetVersionService) : ControllerBase
 {
+    [HttpGet("{dataSetId:guid}")]
+    [Produces("application/json")]
+    public async Task<ActionResult<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListLiveVersions(
+        [FromQuery] DataSetVersionListRequest request,
+        Guid dataSetId,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetVersionService
+            .ListLiveVersions(
+                dataSetId: dataSetId,
+                page: request.Page,
+                pageSize: request.PageSize,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPost]
     [Produces("application/json")]
     public async Task<ActionResult<DataSetVersionSummaryViewModel>> CreateNextVersion(
