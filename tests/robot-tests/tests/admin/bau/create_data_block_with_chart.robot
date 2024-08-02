@@ -206,6 +206,7 @@ Validate data block is in list
     user checks table column heading contains    1    4    Created date    testid:dataBlocks
     user checks table column heading contains    1    5    Actions    testid:dataBlocks
 
+    user reloads page
     user checks table body has x rows    1    testid:dataBlocks
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
     user checks table cell contains    1    3    No    testid:dataBlocks
@@ -262,6 +263,7 @@ Save data block again
 Validate data block is in list again
     user clicks link    Back
     user waits until h2 is visible    Data blocks
+    user reloads page
 
     user waits until table is visible
     user checks table column heading contains    1    1    Data block name    testid:featuredTables
