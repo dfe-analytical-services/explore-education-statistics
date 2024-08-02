@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
+[Collection("Set FluentValidation property name camel case configuration")]
 public class DataSetQueryCriteriaTimePeriodsValidatorTests
 {
     private readonly DataSetQueryCriteriaTimePeriods.Validator _validator = new();
@@ -103,7 +104,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("Eq", error.PropertyName));
+                Assert.StartsWith("eq", error.PropertyName));
         }
     }
 
@@ -129,7 +130,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("NotEq", error.PropertyName));
+                Assert.StartsWith("notEq", error.PropertyName));
         }
     }
 
@@ -155,7 +156,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("In", error.PropertyName));
+                Assert.StartsWith("in", error.PropertyName));
         }
 
         [Fact]
@@ -192,7 +193,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("NotIn", error.PropertyName));
+                Assert.StartsWith("notIn", error.PropertyName));
         }
 
         [Fact]
@@ -229,7 +230,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("Gt", error.PropertyName));
+                Assert.StartsWith("gt", error.PropertyName));
         }
     }
 
@@ -255,7 +256,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("Gte", error.PropertyName));
+                Assert.StartsWith("gte", error.PropertyName));
         }
     }
 
@@ -281,7 +282,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("Lt", error.PropertyName));
+                Assert.StartsWith("lt", error.PropertyName));
         }
     }
 
@@ -307,7 +308,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("Lte", error.PropertyName));
+                Assert.StartsWith("lte", error.PropertyName));
         }
     }
 

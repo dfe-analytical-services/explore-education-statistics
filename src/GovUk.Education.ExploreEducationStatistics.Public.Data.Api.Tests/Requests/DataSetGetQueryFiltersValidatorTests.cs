@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
+[Collection("Set FluentValidation property name camel case configuration")]
 public abstract class DataSetGetQueryFiltersValidatorTests
 {
     private readonly DataSetGetQueryFilters.Validator _validator = new();
@@ -16,6 +17,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
 
     public class EqTests : DataSetGetQueryFiltersValidatorTests
     {
+
         [Theory]
         [MemberData(nameof(ValidFiltersSingle))]
         public void Success(string? filter)
@@ -65,7 +67,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
             var query = new DataSetGetQueryFilters { NotEq = "" };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.NotEq)
+                .ShouldHaveValidationErrorFor("notEq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
         }
@@ -124,11 +126,11 @@ public abstract class DataSetGetQueryFiltersValidatorTests
 
             Assert.Equal(query.In.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("In[0]")
+            result.ShouldHaveValidationErrorFor("in[0]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor("In[1]")
+            result.ShouldHaveValidationErrorFor("in[1]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor("In[2]")
+            result.ShouldHaveValidationErrorFor("in[2]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
@@ -144,9 +146,9 @@ public abstract class DataSetGetQueryFiltersValidatorTests
 
             Assert.Equal(query.In.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("In[0]")
+            result.ShouldHaveValidationErrorFor("in[0]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
-            result.ShouldHaveValidationErrorFor("In[1]")
+            result.ShouldHaveValidationErrorFor("in[1]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
     }
@@ -193,11 +195,11 @@ public abstract class DataSetGetQueryFiltersValidatorTests
 
             Assert.Equal(query.NotIn.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("NotIn[0]")
+            result.ShouldHaveValidationErrorFor("notIn[0]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor("NotIn[1]")
+            result.ShouldHaveValidationErrorFor("notIn[1]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor("NotIn[2]")
+            result.ShouldHaveValidationErrorFor("notIn[2]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
@@ -213,9 +215,9 @@ public abstract class DataSetGetQueryFiltersValidatorTests
 
             Assert.Equal(query.NotIn.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("NotIn[0]")
+            result.ShouldHaveValidationErrorFor("notIn[0]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
-            result.ShouldHaveValidationErrorFor("NotIn[1]")
+            result.ShouldHaveValidationErrorFor("notIn[1]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
     }
