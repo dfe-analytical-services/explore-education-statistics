@@ -15,6 +15,6 @@ public static class HostEnvironmentExtensions
     public static IWebHostBuilder UseIntegrationTestEnvironment(
         this IWebHostBuilder hostBuilder)
     {
-        return hostBuilder.UseSetting(WebHostDefaults.EnvironmentKey, IntegrationTestEnvironment);
+        return hostBuilder.UseEnvironment(IntegrationTestEnvironment);
     }
 }
