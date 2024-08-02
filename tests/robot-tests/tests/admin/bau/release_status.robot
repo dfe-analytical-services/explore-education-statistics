@@ -115,8 +115,12 @@ Add text block with content to Test section two
     user adds text block to editable accordion section    Test section two    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section two    1
     ...    Test section two text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user reloads page
+    user scrolls to accordion section    View related dashboard(s)    id:data-accordion
 
 Add content to text block in Related dashboards section
+
+    user waits until page contains accordion section    View related dashboard(s)
     user opens accordion section    View related dashboard(s)    id:data-accordion
     user adds content to related dashboards text block    Related dashboards test text
 
