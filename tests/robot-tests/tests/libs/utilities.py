@@ -24,6 +24,7 @@ logger = get_logger(__name__)
 # of custom locators onto the framework's ElementFinder
 if not utilities_init.initialised:
 
+
     def _normalize_parent_locator(parent_locator: object) -> Union[str, WebElement]:
         if not isinstance(parent_locator, str) and not isinstance(parent_locator, WebElement):
             return "css:body"
@@ -162,12 +163,7 @@ def user_waits_until_parent_does_not_contain_element(
         )
         raise_assertion_error(err)
 
-
 def get_child_element(parent_locator: object, child_locator: str, retries: int = 5, delay: float = 1.0):
-    def log_and_raise(message: str):
-        logger.warning(message)
-        raise AssertionError(message)
-
     for attempt in range(retries):
         try:
             children = get_child_elements(parent_locator, child_locator)
@@ -177,7 +173,7 @@ def get_child_element(parent_locator: object, child_locator: str, retries: int =
                     time.sleep(delay)
                     continue
                 else:
-                    log_and_raise(
+                    raise_assertion_error(
                         f"No elements matching child locator '{child_locator}' under parent locator '{parent_locator}' after {retries} retries"
                     )
             if len(children) > 1:
@@ -193,11 +189,9 @@ def get_child_element(parent_locator: object, child_locator: str, retries: int =
                 time.sleep(delay)
                 continue
             else:
-                logger.warning(
+                raise_assertion_error(
                     f"Error in get_child_element() with parent '{parent_locator}' and child locator '{child_locator}': {err}"
                 )
-                raise AssertionError(err)
-
 
 def get_child_elements(parent_locator: object, child_locator: str):
     try:
