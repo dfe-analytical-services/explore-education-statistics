@@ -89,7 +89,7 @@ Searching
     user presses keys    pupil absence
     user clicks button    Search
     user checks page contains button    pupil absence
-    user checks radio is checked    Relevance
+    user checks radio is checked    Newest
     user checks list item contains    testid:publicationsList    1   Pupil absence in schools in England
 
 Removing search

@@ -588,7 +588,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Status = importStatus,
                 Created = dataReleaseFile.File.Created,
                 Permissions = permissions,
-                IsLinkedToApiDataSet = dataReleaseFile.IsLinkedToApiDataSet
+                PublicApiDataSetId = dataReleaseFile.PublicApiDataSetId,
+                PublicApiDataSetVersion = dataReleaseFile.PublicApiDataSetVersionString,
             };
         }
 
