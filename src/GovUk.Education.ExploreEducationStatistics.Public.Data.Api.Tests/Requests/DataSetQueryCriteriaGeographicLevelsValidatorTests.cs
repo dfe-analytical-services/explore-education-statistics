@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
+[Collection("Set FluentValidation property name camel case configuration")]
 public abstract class DataSetQueryCriteriaGeographicLevelsValidatorTests
 {
     private readonly DataSetQueryCriteriaGeographicLevels.Validator _validator = new();
@@ -135,7 +136,7 @@ public abstract class DataSetQueryCriteriaGeographicLevelsValidatorTests
 
             foreach (var (error, index) in result.Errors.WithIndex())
             {
-                result.ShouldHaveValidationErrorFor($"In[{index}]")
+                result.ShouldHaveValidationErrorFor($"in[{index}]")
                     .WithErrorCode(ValidationMessages.AllowedValue.Code)
                     .WithErrorMessage(ValidationMessages.AllowedValue.Message)
                     .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
@@ -178,7 +179,7 @@ public abstract class DataSetQueryCriteriaGeographicLevelsValidatorTests
 
             foreach (var (error, index) in result.Errors.WithIndex())
             {
-                result.ShouldHaveValidationErrorFor($"NotIn[{index}]")
+                result.ShouldHaveValidationErrorFor($"notIn[{index}]")
                     .WithErrorCode(ValidationMessages.AllowedValue.Code)
                     .WithErrorMessage(ValidationMessages.AllowedValue.Message)
                     .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
