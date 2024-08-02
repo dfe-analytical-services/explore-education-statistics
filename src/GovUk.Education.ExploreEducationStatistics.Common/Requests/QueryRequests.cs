@@ -1,8 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using System;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
@@ -31,7 +31,6 @@ public record FullTableQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = this.Filters,
             Indicators = this.Indicators,
-            BoundaryLevel = this.BoundaryLevel,
         };
     }
 
@@ -72,7 +71,6 @@ public class LocationsOrTimePeriodsQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = [],
             Indicators = [],
-            BoundaryLevel = null,
         };
     }
 

@@ -98,6 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var result = await service.GetSubjectMeta(
                 releaseVersionId: Guid.NewGuid(),
                 query,
+                null,
                 new List<Observation>());
 
             result.AssertNotFound();
@@ -199,6 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
+                    null,
                     observations);
 
                 VerifyAllMocks(
@@ -377,6 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
+                    null,
                     observations);
 
                 VerifyAllMocks(
@@ -600,6 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
+                    null,
                     observations);
 
                 VerifyAllMocks(
@@ -764,7 +768,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Setup a query requesting GeoJSON (by virtue of having a boundary level set)
             var query = new FullTableQuery
             {
-                BoundaryLevel = 123,
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
             };
@@ -809,7 +812,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(new List<Footnote>());
 
             boundaryDataRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
-                    query.BoundaryLevel.Value,
+                    It.IsAny<long>(),
                     new List<string>
                     {
                         _northEast.Code!, _northWest.Code!, _eastMidlands.Code!
@@ -859,6 +862,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
+                    123,
                     observations);
 
                 VerifyAllMocks(
