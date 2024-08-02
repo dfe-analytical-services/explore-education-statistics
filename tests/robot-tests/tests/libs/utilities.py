@@ -87,8 +87,20 @@ def raise_assertion_error(err_msg):
 
 
 def user_waits_until_parent_contains_element(
-    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None
+    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None, retries: int = 5, delay: float = 1.0
 ):
+    def _try_with_retries_child_element_found(func, *args, **kwargs):
+        last_exception = None
+        for attempt in range(retries):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                last_exception = e
+                logger.warn(f"Attempt {attempt + 1}/{retries} failed with error: {e}. Retrying in {delay} seconds...")
+                time.sleep(delay)
+        # Raise the last exception if all retries failed
+        raise last_exception
+
     try:
         child_locator = _normalise_child_locator(child_locator)
 
@@ -97,7 +109,8 @@ def user_waits_until_parent_contains_element(
             return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
-            return waiting()._wait_until(
+            return _try_with_retries_child_element_found(
+                waiting()._wait_until,
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
                 timeout,
@@ -110,7 +123,8 @@ def user_waits_until_parent_contains_element(
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
-        waiting()._wait_until(
+        _try_with_retries_child_element_found(
+            waiting()._wait_until,
             parent_contains_matching_elements,
             "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
             timeout,
@@ -122,6 +136,7 @@ def user_waits_until_parent_contains_element(
             f"with parent {parent_locator} and child locator {child_locator} - {err}"
         )
         raise_assertion_error(err)
+
 
 
 def user_waits_until_parent_does_not_contain_element(
