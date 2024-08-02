@@ -24,6 +24,7 @@ logger = get_logger(__name__)
 # of custom locators onto the framework's ElementFinder
 if not utilities_init.initialised:
 
+
     def _normalize_parent_locator(parent_locator: object) -> Union[str, WebElement]:
         if not isinstance(parent_locator, str) and not isinstance(parent_locator, WebElement):
             return "css:body"
@@ -162,33 +163,35 @@ def user_waits_until_parent_does_not_contain_element(
         )
         raise_assertion_error(err)
 
+def get_child_element(parent_locator: object, child_locator: str, retries: int = 5, delay: float = 1.0):
+    for attempt in range(retries):
+        try:
+            children = get_child_elements(parent_locator, child_locator)
+            if not children:
+                if attempt < retries - 1:
+                    logger.info(f"Retrying... ({attempt + 1}/{retries})")
+                    time.sleep(delay)
+                    continue
+                else:
+                    raise_assertion_error(
+                        f"No elements matching child locator '{child_locator}' under parent locator '{parent_locator}' after {retries} retries"
+                    )
+            if len(children) > 1:
+                logger.warning(
+                    f"Multiple ({len(children)}) elements found for child locator '{child_locator}' under parent locator '{parent_locator}'. "
+                    f"Returning the first element. Consider refining the parent selector."
+                )
+            return children[0]
 
-def get_child_element(parent_locator: object, child_locator: str):
-    try:
-        children = get_child_elements(parent_locator, child_locator)
-
-        if len(children) == 0:
-            raise_assertion_error(
-                f"Found no elements matching child locator {child_locator} under parent "
-                f"locator {parent_locator} in utilities.py#get_child_element()"
-            )
-
-        if len(children) > 1:
-            logger.warn(
-                f"Found {len(children)} child elements matching child locator {child_locator} "
-                f"under parent locator {parent_locator} in utilities.py#get_child_element() - "
-                f"was expecting only one. Consider making the parent selector more specific. "
-                f"Returning the first element found."
-            )
-
-        return children[0]
-    except Exception as err:
-        logger.warn(
-            f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
-            f"locator {child_locator} - {err}"
-        )
-        raise_assertion_error(err)
-
+        except Exception as err:
+            if attempt < retries - 1:
+                logger.info(f"Retrying due to error... ({attempt + 1}/{retries})")
+                time.sleep(delay)
+                continue
+            else:
+                raise_assertion_error(
+                    f"Error in get_child_element() with parent '{parent_locator}' and child locator '{child_locator}': {err}"
+                )
 
 def get_child_elements(parent_locator: object, child_locator: str):
     try:
