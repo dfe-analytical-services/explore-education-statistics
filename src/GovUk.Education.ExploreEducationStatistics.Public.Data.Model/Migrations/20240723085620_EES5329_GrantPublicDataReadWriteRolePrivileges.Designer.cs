@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240718171717_EES5329_GrantPublicDataReadWriteRolePrivileges")]
+    [Migration("20240723085620_EES5329_GrantPublicDataReadWriteRolePrivileges")]
     partial class EES5329_GrantPublicDataReadWriteRolePrivileges
     {
         /// <inheritdoc />
