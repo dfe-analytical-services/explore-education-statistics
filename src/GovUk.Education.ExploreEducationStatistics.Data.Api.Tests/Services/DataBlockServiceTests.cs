@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -13,6 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -70,6 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             s.Query(
                                 dataBlockVersion.ReleaseVersionId,
                                 It.Is<FullTableQuery>(q => q.SubjectId == subjectId),
+                                It.IsAny<long?>(),
                                 default
                             )
                     )
@@ -77,7 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 var result = (await service.GetDataBlockTableResult(
                     releaseVersionId: dataBlockVersion.ReleaseVersionId,
-                    dataBlockVersionId: dataBlockVersion.Id)).AssertRight();
+                    dataBlockVersionId: dataBlockVersion.Id,
+                    null)).AssertRight();
 
                 VerifyAllMocks(tableBuilderService);
 
@@ -106,7 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 var result = await service.GetDataBlockTableResult(
                     releaseVersionId: htmlBlock.ReleaseVersionId,
-                    dataBlockVersionId: htmlBlock.Id);
+                    dataBlockVersionId: htmlBlock.Id,
+                    null);
 
                 result.AssertNotFound();
             }

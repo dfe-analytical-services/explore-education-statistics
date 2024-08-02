@@ -1,17 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
@@ -28,6 +19,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.TableBuilderUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -76,12 +75,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken = default)
         {
             return await FindLatestPublishedReleaseVersionId(query.SubjectId)
-                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
+                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, null, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseVersionId,
             FullTableQuery query,
+            long? boundaryLevelId,
             CancellationToken cancellationToken = default)
         {
             return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return await _subjectResultMetaService
-                        .GetSubjectMeta(releaseVersionId, query, observations)
+                        .GetSubjectMeta(releaseVersionId, query, boundaryLevelId, observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel

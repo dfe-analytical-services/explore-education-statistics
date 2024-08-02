@@ -1,10 +1,10 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.ChartType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
@@ -84,8 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public override ChartType Type => ChartType.Map;
 
-        // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
-        public long? BoundaryLevel { get; set; }
+        public long BoundaryLevel { get; set; }
 
         // TODO EES-4271
         [Obsolete("Migrate to `DataSetConfigs` in EES-4271")]

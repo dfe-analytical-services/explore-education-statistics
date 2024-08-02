@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -10,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
@@ -38,7 +38,7 @@ public class DataBlockServicePermissionTests
                 {
                     var service = BuildService(
                         userService: userService.Object);
-                    return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id);
+                    return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id, null);
                 });
     }
 
