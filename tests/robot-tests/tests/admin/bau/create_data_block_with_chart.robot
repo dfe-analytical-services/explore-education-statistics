@@ -548,6 +548,7 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user checks table column heading contains    1    1    Name    testid:dataBlocks
     user checks table column heading contains    1    2    Has chart    testid:dataBlocks
 
+    user reloads page
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
     user checks table cell contains    1    2    Yes    testid:dataBlocks
