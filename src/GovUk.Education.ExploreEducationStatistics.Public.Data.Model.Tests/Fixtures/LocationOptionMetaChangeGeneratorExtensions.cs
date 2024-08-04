@@ -96,8 +96,8 @@ public static class LocationOptionMetaChangeGeneratorExtensions
                     new LocationOptionMetaChange.State
                     {
                         MetaId = current.MetaId,
-                        OptionId = current.OptionId
-
+                        OptionId = current.OptionId,
+                        PublicId = current.PublicId
                     }
                 )
             : setters;
@@ -130,7 +130,8 @@ public static class LocationOptionMetaChangeGeneratorExtensions
                     new LocationOptionMetaChange.State
                     {
                         MetaId = previous.MetaId,
-                        OptionId = previous.OptionId
+                        OptionId = previous.OptionId,
+                        PublicId = previous.PublicId
                     }
                 )
             : setters;

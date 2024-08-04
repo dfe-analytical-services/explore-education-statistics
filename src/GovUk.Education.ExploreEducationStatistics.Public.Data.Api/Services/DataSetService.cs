@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -71,9 +72,11 @@ internal class DataSetService(
         string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return await CheckVersionExists(
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .FindByVersion(
                 dataSetId: dataSetId,
-                dataSetVersion: dataSetVersion,
+                version: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(async dsv =>
@@ -196,24 +199,6 @@ internal class DataSetService(
         };
     }
 
-    private async Task<Either<ActionResult, DataSetVersion>> CheckVersionExists(
-        Guid dataSetId,
-        string dataSetVersion,
-        CancellationToken cancellationToken = default)
-    {
-        if (!VersionUtils.TryParse(dataSetVersion, out var version))
-        {
-            return new NotFoundResult();
-        }
-
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == version.Major)
-            .Where(dsv => dsv.VersionMinor == version.Minor)
-            .SingleOrNotFoundAsync(cancellationToken);
-    }
-
     private static DataSetLatestVersionViewModel MapLatestVersion(DataSetVersion latestVersion)
     {
         return new DataSetLatestVersionViewModel
@@ -291,10 +276,12 @@ internal class DataSetService(
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 
-        return await CheckVersionExists(
-            dataSetId: dataSetId,
-            dataSetVersion: dataSetVersion,
-            cancellationToken: cancellationToken);
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .FindByVersion(
+                dataSetId: dataSetId,
+                version: dataSetVersion,
+                cancellationToken: cancellationToken);
     }
 
     private async Task LoadMeta(
@@ -348,25 +335,25 @@ internal class DataSetService(
     private static DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)
     {
         var filters = dataSetVersion.FilterMetas
-            .Select(MapFilterMeta)
+            .Select(MapFilterOptions)
             .OrderBy(fm => fm.Label)
             .ToList();
 
         var indicators = dataSetVersion.IndicatorMetas
-            .Select(MapIndicatorMeta)
+            .Select(MapIndicator)
             .OrderBy(im => im.Label)
             .ToList();
 
         var geographicLevels = dataSetVersion.GeographicLevelMeta?.Levels
-            .Select(MapGeographicLevelMeta)
+            .Select(MapGeographicLevelOption)
             .ToList() ?? [];
 
         var locations = dataSetVersion.LocationMetas
-            .Select(MapLocationMeta)
+            .Select(MapLocationGroupOptions)
             .ToList();
 
         var timePeriods = dataSetVersion.TimePeriodMetas
-            .Select(MapTimePeriod)
+            .Select(MapTimePeriodOption)
             .OrderBy(tm => tm.Code.GetEnumValue())
             .ThenBy(tm => tm.Period)
             .ToList();
@@ -381,23 +368,22 @@ internal class DataSetService(
         };
     }
 
-    private static GeographicLevelMetaViewModel MapGeographicLevelMeta(GeographicLevel level)
+    private static GeographicLevelOptionViewModel MapGeographicLevelOption(GeographicLevel level)
     {
-        return new GeographicLevelMetaViewModel
+        return new GeographicLevelOptionViewModel
         {
             Level = level,
-            Label = level.GetEnumLabel(),
         };
     }
 
-    private static FilterMetaViewModel MapFilterMeta(FilterMeta filterMeta)
+    private static FilterOptionsViewModel MapFilterOptions(FilterMeta filterMeta)
     {
         var options = filterMeta.OptionLinks
-            .Select(MapFilterOptionMeta)
+            .Select(MapFilterOption)
             .OrderBy(fom => fom.Label)
             .ToList();
 
-        return new FilterMetaViewModel
+        return new FilterOptionsViewModel
         {
             Id = filterMeta.PublicId,
             Hint = filterMeta.Hint,
@@ -406,9 +392,9 @@ internal class DataSetService(
         };
     }
 
-    private static FilterOptionMetaViewModel MapFilterOptionMeta(FilterOptionMetaLink filterOptionMetaLink)
+    private static FilterOptionViewModel MapFilterOption(FilterOptionMetaLink filterOptionMetaLink)
     {
-        return new FilterOptionMetaViewModel
+        return new FilterOptionViewModel
         {
             Id = filterOptionMetaLink.PublicId,
             Label = filterOptionMetaLink.Option.Label,
@@ -416,9 +402,9 @@ internal class DataSetService(
         };
     }
 
-    private static IndicatorMetaViewModel MapIndicatorMeta(IndicatorMeta indicatorMeta)
+    private static IndicatorViewModel MapIndicator(IndicatorMeta indicatorMeta)
     {
-        return new IndicatorMetaViewModel
+        return new IndicatorViewModel
         {
             Id = indicatorMeta.PublicId,
             Label = indicatorMeta.Label,
@@ -427,65 +413,23 @@ internal class DataSetService(
         };
     }
 
-    private static LocationLevelMetaViewModel MapLocationMeta(LocationMeta locationMeta)
+    private static LocationGroupOptionsViewModel MapLocationGroupOptions(LocationMeta locationMeta)
     {
         var options = locationMeta.OptionLinks
-            .Select(MapLocationOptionMeta)
+            .Select(LocationOptionViewModel.Create)
             .OrderBy(lom => lom.Label)
             .ToList();
 
-        return new LocationLevelMetaViewModel
+        return new LocationGroupOptionsViewModel
         {
             Level = locationMeta.Level,
-            Label = locationMeta.Level.GetEnumLabel(),
             Options = options,
         };
     }
 
-    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationOptionMetaLink locationOptionMetaLink)
+    private static TimePeriodOptionViewModel MapTimePeriodOption(TimePeriodMeta timePeriodMeta)
     {
-        var locationOptionMeta = locationOptionMetaLink.Option;
-        
-        return locationOptionMeta switch
-        {
-            LocationCodedOptionMeta codedOption => new LocationCodedOptionMetaViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = codedOption.Label,
-                Code = codedOption.Code,
-            },
-            LocationLocalAuthorityOptionMeta localAuthorityOption => new LocationLocalAuthorityOptionMetaViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = localAuthorityOption.Label,
-                Code = localAuthorityOption.Code,
-                OldCode = localAuthorityOption.OldCode,
-            },
-            LocationProviderOptionMeta providerOption => new LocationProviderOptionMetaViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = providerOption.Label,
-                Ukprn = providerOption.Ukprn,
-            },
-            LocationRscRegionOptionMeta rscRegionOption => new LocationRscRegionOptionMetaViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = rscRegionOption.Label,
-            },
-            LocationSchoolOptionMeta schoolOption => new LocationSchoolOptionMetaViewModel
-            {
-                Id = locationOptionMetaLink.PublicId,
-                Label = schoolOption.Label,
-                Urn = schoolOption.Urn,
-                LaEstab = schoolOption.LaEstab,
-            },
-            _ => throw new NotImplementedException()
-        };
-    }
-
-    private static TimePeriodMetaViewModel MapTimePeriod(TimePeriodMeta timePeriodMeta)
-    {
-        return new TimePeriodMetaViewModel
+        return new TimePeriodOptionViewModel
         {
             Code = timePeriodMeta.Code,
             Period = timePeriodMeta.Period,
