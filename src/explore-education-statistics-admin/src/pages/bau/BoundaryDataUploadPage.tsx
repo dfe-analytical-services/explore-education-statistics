@@ -1,4 +1,5 @@
 import boundaryDataService from '@admin/services/boundaryDataService';
+import typedKeys from '@common/utils/object/typedKeys';
 import React, { useCallback, useMemo } from 'react';
 import Page from '@admin/components/Page';
 import FormProvider from '@common/components/form/FormProvider';
@@ -15,9 +16,7 @@ import {
 import { useHistory } from 'react-router-dom';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Link from '@admin/components/Link';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
+import locationLevelsMap from '@common/utils/locationLevelsMap';
 import Yup from '@common/validation/yup';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { ObjectSchema } from 'yup';
@@ -76,14 +75,13 @@ export default function BoundaryDataUploadPage() {
         {({ formState }) => {
           const options: SelectOption<string | number>[] = [
             { value: '', label: '' },
+            ...typedKeys(locationLevelsMap).map(key => {
+              return {
+                value: locationLevelsMap[key].label.replace(/\s/g, ''),
+                label: `${locationLevelsMap[key].code} - ${locationLevelsMap[key].label}`,
+              };
+            }),
           ];
-
-          (Object.keys(locationLevelsMap) as LocationLevelKey[]).map(key => {
-            return options.push({
-              value: locationLevelsMap[key].label.replace(/\s/g, ''),
-              label: `${locationLevelsMap[key].code} - ${locationLevelsMap[key].label}`,
-            });
-          });
 
           return (
             <Form id="addBoundaryDataForm" onSubmit={handleSubmit}>

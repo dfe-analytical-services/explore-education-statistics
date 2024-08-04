@@ -33,7 +33,6 @@ export default function getApiDataSetLocationMappings(
   >;
   mappableLocations: Partial<Record<LocationLevelKey, MappableLocation[]>>;
 } {
-  const levels = Object.keys(locationsMapping?.levels) as LocationLevelKey[];
   const mappableLocations: Partial<
     Record<LocationLevelKey, MappableLocation[]>
   > = {};
@@ -44,18 +43,11 @@ export default function getApiDataSetLocationMappings(
     Record<LocationLevelKey, AutoMappedLocation[]>
   > = {};
 
-  levels.forEach(level => {
-    const mappable: {
-      candidate?: LocationCandidateWithKey;
-      mapping: LocationMappingWithKey;
-    }[] = [];
-    const autoMapped: {
-      candidate: LocationCandidateWithKey;
-      mapping: LocationMappingWithKey;
-    }[] = [];
+  Object.keys(locationsMapping.levels).forEach(level => {
+    const mappable: MappableLocation[] = [];
+    const autoMapped: AutoMappedLocation[] = [];
 
     const levelMappings = locationsMapping.levels[level]?.mappings ?? {};
-
     const levelCandidates = locationsMapping.levels[level]?.candidates ?? {};
 
     const mappedCandidateKeys = new Set<string>();
@@ -102,6 +94,7 @@ export default function getApiDataSetLocationMappings(
       if (mapping.type === 'AutoNone' || mapping.type === 'ManualNone') {
         mappable.push({ mapping: { ...mapping, sourceKey: key } });
       }
+
       return mapping;
     });
 
@@ -119,17 +112,18 @@ export default function getApiDataSetLocationMappings(
       }));
 
     // TODO remove camelCase
-    const camelCaseLevel = camelCase(level) as LocationLevelKey;
+    const levelKey = camelCase(level) as LocationLevelKey;
+
     if (mappable.length) {
-      mappableLocations[camelCaseLevel] = mappable;
+      mappableLocations[levelKey] = mappable;
     }
 
     if (autoMapped.length) {
-      autoMappedLocations[camelCaseLevel] = autoMapped;
+      autoMappedLocations[levelKey] = autoMapped;
     }
 
     if (newLocations.length) {
-      newLocationCandidates[camelCaseLevel] = newLocations;
+      newLocationCandidates[levelKey] = newLocations;
     }
   });
 

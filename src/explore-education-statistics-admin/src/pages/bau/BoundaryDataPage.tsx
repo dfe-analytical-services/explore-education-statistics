@@ -1,5 +1,6 @@
 import Page from '@admin/components/Page';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import typedKeys from '@common/utils/object/typedKeys';
 import React, { Fragment } from 'react';
 import FormattedDate from '@common/components/FormattedDate';
 import Details from '@common/components/Details';
@@ -53,7 +54,7 @@ const BoundaryDataPage = () => {
               styles.boundaryLevels,
             )}
           >
-            {(Object.keys(locationLevelsMap) as LocationLevelKey[]).map(key => {
+            {typedKeys(locationLevelsMap).map(key => {
               return (
                 <Fragment key={key}>
                   <dt>{locationLevelsMap[key].code}</dt>
@@ -113,12 +114,7 @@ const BoundaryDataPage = () => {
             <tbody>
               {boundaryLevels.map(boundaryLevel => (
                 <tr key={boundaryLevel.id}>
-                  <td>
-                    {
-                      locationLevelsMap[boundaryLevel.level as LocationLevelKey]
-                        .code
-                    }
-                  </td>
+                  k<td>{locationLevelsMap[boundaryLevel.level].code}</td>
                   <td>{boundaryLevel.label}</td>
                   <td>
                     <FormattedDate format="d MMM yyyy">

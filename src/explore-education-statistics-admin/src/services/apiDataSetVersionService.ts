@@ -26,15 +26,10 @@ export interface LocationMapping {
 }
 
 export interface LocationsMapping {
-  levels: Partial<
-    Record<
-      LocationLevelKey,
-      {
-        candidates: Dictionary<LocationCandidate>;
-        mappings: Dictionary<LocationMapping>;
-      }
-    >
-  >;
+  levels: Dictionary<{
+    candidates: Dictionary<LocationCandidate>;
+    mappings: Dictionary<LocationMapping>;
+  }>;
 }
 
 export interface LocationMappingUpdate {
