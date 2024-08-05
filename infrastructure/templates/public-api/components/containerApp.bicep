@@ -168,7 +168,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   tags: tagValues
 }
 
-module authSettings 'authSettings.bicep' = if (entraIdAuthentication != null) {
+module authSettings 'azureAuthentication.bicep' = if (entraIdAuthentication != null) {
   name: '${containerAppName}AuthSettings'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
