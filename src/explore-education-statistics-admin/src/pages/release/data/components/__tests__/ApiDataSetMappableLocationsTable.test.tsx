@@ -35,14 +35,30 @@ describe('ApiDataSetMappableLocationsTable', () => {
       },
     },
     {
+      candidate: {
+        label: 'Location 3',
+        code: 'location-3-updated-code',
+        key: 'Location3CandidateKey',
+      },
       mapping: {
         publicId: 'location-3-public-id',
-
+        candidateKey: 'Location3CandidateKey',
         source: {
           label: 'Location 3',
           code: 'location-3-code',
         },
         sourceKey: 'Location3SourceKey',
+        type: 'ManualMapped',
+      },
+    },
+    {
+      mapping: {
+        publicId: 'location-4-public-id',
+        source: {
+          label: 'Location 4',
+          code: 'location-4-code',
+        },
+        sourceKey: 'Location4SourceKey',
         type: 'ManualNone',
       },
     },
@@ -59,7 +75,7 @@ describe('ApiDataSetMappableLocationsTable', () => {
     );
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
-    expect(rows).toHaveLength(4);
+    expect(rows).toHaveLength(5);
 
     // Row 1 - AutoNone
     const row1Cells = within(rows[1]).getAllByRole('cell');
@@ -78,7 +94,7 @@ describe('ApiDataSetMappableLocationsTable', () => {
       }),
     ).toBeInTheDocument();
 
-    // Row 2 - ManualMapped
+    // Row 2 - ManualMapped - Minor
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('Location 2');
     expect(row2Cells[0]).toHaveTextContent('location-2-code');
@@ -96,20 +112,38 @@ describe('ApiDataSetMappableLocationsTable', () => {
       }),
     ).toBeInTheDocument();
 
-    // Row 3 - ManualNone
+    // Row 3 - ManualMapped - Major
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('Location 3');
     expect(row3Cells[0]).toHaveTextContent('location-3-code');
-    expect(row3Cells[1]).toHaveTextContent('No mapping available');
+    expect(row3Cells[1]).toHaveTextContent('Location 3');
+    expect(row3Cells[1]).toHaveTextContent('location-3-updated-code');
     expect(row3Cells[2]).toHaveTextContent('Major');
     expect(
-      within(row3Cells[3]).queryByRole('button', {
-        name: 'No mapping for Location 2',
+      within(row3Cells[3]).getByRole('button', {
+        name: 'No mapping for Location 3',
       }),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(
       within(row3Cells[3]).getByRole('button', {
         name: 'Edit mapping for Location 3',
+      }),
+    ).toBeInTheDocument();
+
+    // Row 3 - ManualNone
+    const row4Cells = within(rows[4]).getAllByRole('cell');
+    expect(row4Cells[0]).toHaveTextContent('Location 4');
+    expect(row4Cells[0]).toHaveTextContent('location-4-code');
+    expect(row4Cells[1]).toHaveTextContent('No mapping available');
+    expect(row4Cells[2]).toHaveTextContent('Major');
+    expect(
+      within(row4Cells[3]).queryByRole('button', {
+        name: 'No mapping for Location 4',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(row4Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Location 4',
       }),
     ).toBeInTheDocument();
   });
@@ -126,7 +160,7 @@ describe('ApiDataSetMappableLocationsTable', () => {
 
     expect(
       screen.getByRole('table', {
-        name: 'Local Authorities 1 unmapped location 2 mapped locations',
+        name: 'Local Authorities 1 unmapped location 3 mapped locations',
       }),
     ).toBeInTheDocument();
   });
