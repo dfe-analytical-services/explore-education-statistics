@@ -461,14 +461,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
                 });
 
                 services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
                 });
 
                 services.AddTransient<IDataSetService, DataSetService>();

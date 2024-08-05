@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Authorization;
 
@@ -14,8 +15,9 @@ public class ViewDataSetVersionAuthorizationHandler(
         ViewDataSetVersionRequirement requirement,
         DataSetVersion dataSetVersion)
     {
-        // TODO: EES-5374 - Temporary workaround until authentication is added for admin API
-        if (httpContextAccessor.HttpContext?.Request.Headers.UserAgent.Contains("EES Admin") == true)
+        var user = httpContextAccessor.HttpContext?.User;
+        
+        if (user is not null && user.HasScope(SecurityScopes.AdminApiAccess))
         {
             context.Succeed(requirement);
             return Task.CompletedTask;

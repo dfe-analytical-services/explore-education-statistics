@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Settings;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -90,13 +91,13 @@ public class PublicDataApiClient(
         // If operating within Azure, obtain an access token for authenticating the Admin App Service with
         // the Public API using its managed identity.
         //
-        // We are requesting a special "AdminApp" Scope that represents a subset of endpoints that
-        // the Admin App is permitted to access.
+        // We are requesting a special Admin App Scope that represents a subset of operations that the
+        // Admin App is permitted to perform in the Public API.
         if (environment.IsProduction())
         {
             var accessTokenProvider = new DefaultAzureCredential();
             var tokenResponse = await accessTokenProvider.GetTokenAsync(
-                new TokenRequestContext([$"api://{options.Value.AppRegistrationClientId}/AdminApp"]),
+                new TokenRequestContext([$"api://{options.Value.AppRegistrationClientId}/AdminApiAccess"]),
                 cancellationToken);
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", tokenResponse.Token);
