@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
+[Collection("Set FluentValidation property name camel case configuration")]
 public abstract class DataSetGetQueryTimePeriodsValidatorTests
 {
     private readonly DataSetGetQueryTimePeriods.Validator _validator = new();
@@ -141,7 +142,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
-            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"In[{index}]"));
+            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"in[{index}]"));
         }
 
         [Theory]
@@ -157,7 +158,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
-            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"In[{index}]"));
+            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"in[{index}]"));
         }
     }
 
@@ -193,7 +194,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
-            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"NotIn[{index}]"));
+            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"notIn[{index}]"));
         }
         
         [Theory]
@@ -206,7 +207,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
-            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"NotIn[{index}]"));
+            timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"notIn[{index}]"));
         }
     }
 

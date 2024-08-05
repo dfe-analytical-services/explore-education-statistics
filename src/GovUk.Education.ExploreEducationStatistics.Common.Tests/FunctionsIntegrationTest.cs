@@ -100,9 +100,9 @@ public abstract class FunctionsIntegrationTestFixture
         return new HostBuilder()
             .ConfigureAppConfiguration((hostContext, config) =>
             {
-                hostContext.HostingEnvironment.EnvironmentName =
-                    HostEnvironmentExtensions.IntegrationTestEnvironment;
-                config.AddJsonFile("local.settings.json", optional: true, reloadOnChange: false);
+                config
+                    .AddJsonFile("local.settings.json", optional: true, reloadOnChange: false)
+                    .AddEnvironmentVariables();
             })
             .ConfigureWebHostDefaults(builder => builder.UseIntegrationTestEnvironment())
             .ConfigureServices(services =>

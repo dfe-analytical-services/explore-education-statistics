@@ -548,8 +548,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             var updatedMappings = GetDataSetVersionMapping(nextVersion);
 
-            Assert.False(updatedMappings.LocationMappingsComplete);
-
             var laMapping1 = mappings
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-1-key");
 
@@ -562,7 +560,8 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
-                    GeographicLevel.LocalAuthority, mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    GeographicLevel.LocalAuthority,
+                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -584,7 +583,8 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                     }
                 },
                 {
-                    GeographicLevel.RscRegion, mappings.GetLocationLevelMappings(GeographicLevel.RscRegion) with
+                    GeographicLevel.RscRegion,
+                    mappings.GetLocationLevelMappings(GeographicLevel.RscRegion) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -598,14 +598,18 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         }
                     }
                 },
-                {
-                    GeographicLevel.Country, mappings.GetLocationLevelMappings(GeographicLevel.Country)
-                }
+                { GeographicLevel.Country, mappings.GetLocationLevelMappings(GeographicLevel.Country) }
             };
 
             updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
+
+            Assert.False(updatedMappings.LocationMappingsComplete);
+
+            // Some source location options have no equivalent candidate to be mapped to, thus
+            // resulting in a major version update.
+            Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);
         }
 
         [Fact]
@@ -643,15 +647,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             var updatedMappings = GetDataSetVersionMapping(nextVersion);
 
-            Assert.True(updatedMappings.LocationMappingsComplete);
-
             var originalLocationMapping = mappings
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "location-1-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
-                    GeographicLevel.LocalAuthority, mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    GeographicLevel.LocalAuthority,
+                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -668,6 +671,12 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             };
 
             updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLevelMappings);
+
+            Assert.True(updatedMappings.LocationMappingsComplete);
+
+            // All source location options have equivalent candidates to be mapped to, thus
+            // resulting in a minor version update.
+            Assert.Equal("1.1", updatedMappings.TargetDataSetVersion.Version);
         }
 
         [Fact]
@@ -720,15 +729,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             var updatedMappings = GetDataSetVersionMapping(nextVersion);
 
-            Assert.True(updatedMappings.LocationMappingsComplete);
-
             var originalLaMapping = mappings
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-1-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
-                    GeographicLevel.LocalAuthority, mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    GeographicLevel.LocalAuthority,
+                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -742,14 +750,19 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         }
                     }
                 },
-                {
-                    GeographicLevel.RscRegion, mappings.GetLocationLevelMappings(GeographicLevel.RscRegion)
-                }
+                { GeographicLevel.RscRegion, mappings.GetLocationLevelMappings(GeographicLevel.RscRegion) }
             };
 
             updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
+
+            Assert.True(updatedMappings.LocationMappingsComplete);
+
+            // All source location options have equivalent candidates to be mapped to, thus
+            // resulting in a minor version update. The inclusion of new location options
+            // not present in the original version does not matter.
+            Assert.Equal("1.1", updatedMappings.TargetDataSetVersion.Version);
         }
     }
 
@@ -793,7 +806,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             .DefaultMappableFilterOption())
                         .AddOptionCandidate("filter-1-option-3-key", DataFixture
                             .DefaultMappableFilterOption())));
-            
+
             await AddTestData<PublicDataDbContext>(context =>
                 context.DataSetVersionMappings.Add(mappings));
 
@@ -804,7 +817,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             Dictionary<string, FilterMapping> expectedFilterMappings = new()
             {
                 {
-                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with 
+                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with
                     {
                         // The code managed to establish an automapping for this filter.
                         Type = MappingType.AutoMapped,
@@ -832,9 +845,9 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             }
                         }
                     }
-                }, 
+                },
                 {
-                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with 
+                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with
                     {
                         // The code managed to establish that no obvious automapping candidate exists for
                         // this filter.
@@ -862,6 +875,10 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 ignoreCollectionOrders: true);
 
             Assert.False(updatedMappings.FilterMappingsComplete);
+
+            // Some source filter options have no equivalent candidate to be mapped to, thus
+            // resulting in a major version update.
+            Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);
         }
 
         [Fact]
@@ -903,7 +920,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         .DefaultFilterMappingCandidate()
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
-            
+
             await AddTestData<PublicDataDbContext>(context =>
                 context.DataSetVersionMappings.Add(mappings));
 
@@ -967,6 +984,10 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
 
             Assert.True(updatedMappings.FilterMappingsComplete);
+
+            // All source filter options have equivalent candidates to be mapped to, thus
+            // resulting in a minor version update.
+            Assert.Equal("1.1", updatedMappings.TargetDataSetVersion.Version);
         }
 
         [Fact]
@@ -1037,6 +1058,104 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 ignoreCollectionOrders: true);
 
             Assert.True(updatedMappings.FilterMappingsComplete);
+
+            // All source filter options have equivalent candidates to be mapped to, thus
+            // resulting in a minor version update. The inclusion of new filter options
+            // not present in the original version does not matter.
+            Assert.Equal("1.1", updatedMappings.TargetDataSetVersion.Version);
+        }
+
+        // As there is currently no way in the UI for a user to resolve unmapped filters, filters
+        // and their child filter options with mapping type of AutoNone should not count towards
+        // the calculation of the FilterMappingsComplete flag.
+        [Fact]
+        public async Task Complete_SomeFiltersAutoNone()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            // Create a mapping plan based on 2 data set versions with the same filters
+            // and filter options, but additional options exist in the new version.
+            // Each source filter and filter option can be auto-mapped exactly to one in
+            // the target version, leaving some candidates unused but essentially the mapping
+            // is complete unless the user manually intervenes at this point.
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithNoMapping()
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterMapping("filter-2-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithNoMapping()
+                        .AddOptionMapping("filter-2-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())));
+
+            await AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersionMappings.Add(mappings));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+
+            Dictionary<string, FilterMapping> expectedFilterMappings = new()
+            {
+                {
+                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with
+                    {
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "filter-1-key",
+                        OptionMappings = new Dictionary<string, FilterOptionMapping>
+                        {
+                            {
+                                "filter-1-option-1-key",
+                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                {
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "filter-1-option-1-key"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with
+                    {
+                        Type = MappingType.AutoNone,
+                        OptionMappings = new Dictionary<string, FilterOptionMapping>
+                        {
+                            {
+                                "filter-2-option-1-key",
+                                mappings.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
+                                {
+                                    Type = MappingType.AutoNone
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+                expectedFilterMappings,
+                ignoreCollectionOrders: true);
+
+            Assert.True(updatedMappings.FilterMappingsComplete);
+
+            // Some source filter options have no equivalent candidate to be mapped to, thus
+            // resulting in a major version update.
+            Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);
         }
     }
 
@@ -1103,6 +1222,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
     {
         return GetDbContext<PublicDataDbContext>()
             .DataSetVersionMappings
+            .Include(mapping => mapping.TargetDataSetVersion)
             .Single(mapping => mapping.TargetDataSetVersionId == nextVersion.Id);
     }
 }

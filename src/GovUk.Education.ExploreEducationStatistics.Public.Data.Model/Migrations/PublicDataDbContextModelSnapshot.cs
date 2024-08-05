@@ -45,6 +45,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToView(null, (string)null);
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonString", b =>
+                {
+                    b.Property<string>("StringValue")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
                     b.Property<Guid>("Id")
@@ -233,6 +244,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId");
 
                     b.ToTable("DataSetVersionMappings");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos.FilterAndOptionMappingTypeDto", b =>
+                {
+                    b.Property<string>("FilterMappingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OptionMappingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
@@ -1204,6 +1230,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                             b1.Property<int>("OptionId")
                                 .HasColumnType("integer");
 
+                            b1.Property<string>("PublicId")
+                                .IsRequired()
+                                .HasColumnType("text");
+
                             b1.HasKey("LocationOptionMetaChangeId");
 
                             b1.HasIndex("MetaId");
@@ -1242,6 +1272,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                             b1.Property<int>("OptionId")
                                 .HasColumnType("integer");
+
+                            b1.Property<string>("PublicId")
+                                .IsRequired()
+                                .HasColumnType("text");
 
                             b1.HasKey("LocationOptionMetaChangeId");
 

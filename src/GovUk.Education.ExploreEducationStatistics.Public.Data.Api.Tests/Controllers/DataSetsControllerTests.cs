@@ -217,11 +217,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                     Assert.Equal(locationMeta.Level.GetEnumLabel(), locationMetaViewModel.Label);
 
-                    foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
+                    foreach (var locationOptionViewModel in locationMetaViewModel.Options)
                     {
                         var locationOptionMetaLink = Assert.Single(
                             locationMeta.OptionLinks,
-                            o => o.PublicId == locationOptionMetaViewModel.Id);
+                            o => o.PublicId == locationOptionViewModel.Id);
 
                         var locationOptionMeta = locationOptionMetaLink.Option;
 
@@ -229,32 +229,31 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         {
                             case LocationCodedOptionMeta codedMeta:
                                 var codedViewModel =
-                                    Assert.IsType<LocationCodedOptionMetaViewModel>(locationOptionMetaViewModel);
+                                    Assert.IsType<LocationCodedOptionViewModel>(locationOptionViewModel);
                                 Assert.Equal(codedMeta.Label, codedViewModel.Label);
                                 Assert.Equal(codedMeta.Code, codedViewModel.Code);
                                 break;
                             case LocationLocalAuthorityOptionMeta localAuthorityMeta:
                                 var localAuthorityViewModel =
-                                    Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(
-                                        locationOptionMetaViewModel);
+                                    Assert.IsType<LocationLocalAuthorityOptionViewModel>(locationOptionViewModel);
                                 Assert.Equal(localAuthorityMeta.Label, localAuthorityViewModel.Label);
                                 Assert.Equal(localAuthorityMeta.Code, localAuthorityViewModel.Code);
                                 Assert.Equal(localAuthorityMeta.OldCode, localAuthorityViewModel.OldCode);
                                 break;
                             case LocationProviderOptionMeta providerMeta:
                                 var providerViewModel =
-                                    Assert.IsType<LocationProviderOptionMetaViewModel>(locationOptionMetaViewModel);
+                                    Assert.IsType<LocationProviderOptionViewModel>(locationOptionViewModel);
                                 Assert.Equal(providerMeta.Label, providerViewModel.Label);
                                 Assert.Equal(providerMeta.Ukprn, providerViewModel.Ukprn);
                                 break;
                             case LocationRscRegionOptionMeta rscRegionMeta:
                                 var rscRegionViewModel =
-                                    Assert.IsType<LocationRscRegionOptionMetaViewModel>(locationOptionMetaViewModel);
+                                    Assert.IsType<LocationRscRegionOptionViewModel>(locationOptionViewModel);
                                 Assert.Equal(rscRegionMeta.Label, rscRegionViewModel.Label);
                                 break;
                             case LocationSchoolOptionMeta schoolMeta:
                                 var schoolViewModel =
-                                    Assert.IsType<LocationSchoolOptionMetaViewModel>(locationOptionMetaViewModel);
+                                    Assert.IsType<LocationSchoolOptionViewModel>(locationOptionViewModel);
                                 Assert.Equal(schoolMeta.Label, schoolViewModel.Label);
                                 Assert.Equal(schoolMeta.Urn, schoolViewModel.Urn);
                                 Assert.Equal(schoolMeta.LaEstab, schoolViewModel.LaEstab);
@@ -305,11 +304,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatus(dataSetVersionStatus)
                     .WithPublished(DateTimeOffset.UtcNow)
                     .WithDataSetId(dataSet.Id)
@@ -342,11 +337,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatus(dataSetVersionStatus)
                     .WithDataSetId(dataSet.Id)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -383,11 +374,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 var dataSetVersions = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
                     .ForIndex(0, dsv => dsv
@@ -453,11 +440,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 var dataSetVersions = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
                     .ForIndex(0, dsv => dsv
@@ -532,11 +515,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     context.DataSets.AddRange(dataSet1, dataSet2));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet1.Id);
 
@@ -574,11 +553,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 2)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -615,11 +590,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 2)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -681,11 +652,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 2)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -765,11 +732,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 2)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -850,11 +813,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 2)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
