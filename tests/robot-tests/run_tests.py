@@ -185,6 +185,7 @@ def run():
     install_chromedriver(args.chromedriver_version)
 
     test_run_index = -1
+    run_identifier_initial_value = create_run_identifier()
 
     logger.info(f"Running Robot tests with {args.rerun_attempts} rerun attempts for any failing suites")
 
@@ -208,7 +209,7 @@ def run():
                     os.makedirs(f"{results_foldername}/downloads")
 
                 # Create a unique run identifier so that this test run's data will be unique.
-                run_identifier = create_run_identifier()
+                run_identifier = f"{run_identifier_initial_value}-{test_run_index}"
                 os.environ["RUN_IDENTIFIER"] = run_identifier
 
                 # Create a Test Topic under which all of this test run's data will be created.

@@ -155,6 +155,8 @@ public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
         public LocationOptionMeta Option { get; set; } = null!;
 
         public required int OptionId { get; set; }
+
+        public required string PublicId { get; set; }
     }
 }
 

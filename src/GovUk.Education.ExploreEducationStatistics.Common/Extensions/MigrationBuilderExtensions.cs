@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Hosting;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -11,7 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         public static bool IsEnvironment(
             this MigrationBuilder _,
             string environmentName) =>
-            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == environmentName;
+            string.Equals(
+                GetEnvironment(),
+                environmentName,
+                StringComparison.OrdinalIgnoreCase);
 
         public static void SqlFromFile(
             this MigrationBuilder migrationBuilder,
@@ -41,5 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 migrationBuilder.Sql(line);
             }
         }
+
+        private static string GetEnvironment() =>
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ??
+            Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ??
+            Environments.Production;
     }
 }

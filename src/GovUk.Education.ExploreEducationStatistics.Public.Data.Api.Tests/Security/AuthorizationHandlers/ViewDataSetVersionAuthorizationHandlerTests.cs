@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Http;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Security.AuthorizationHandlers;
@@ -49,6 +50,12 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
     private static ViewDataSetVersionAuthorizationHandler BuildHandler()
     {
-        return new ViewDataSetVersionAuthorizationHandler();
+        // TODO: EES-5374 - Remove when authentication is added for admin API
+        var httpContextAccessor = new HttpContextAccessor
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        return new ViewDataSetVersionAuthorizationHandler(httpContextAccessor);
     }
 }

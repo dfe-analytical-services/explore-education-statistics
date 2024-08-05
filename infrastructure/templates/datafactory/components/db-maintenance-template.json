@@ -78,7 +78,7 @@
             "type": "SqlServerStoredProcedure",
             "dependsOn": [],
             "policy": {
-              "timeout": "0.12:00:00",
+              "timeout": "0.16:00:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -114,7 +114,7 @@
               }
             ],
             "policy": {
-              "timeout": "0.12:00:00",
+              "timeout": "0.00:10:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -164,7 +164,7 @@
               }
             ],
             "policy": {
-              "timeout": "0.12:00:00",
+              "timeout": "0.00:10:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -180,7 +180,7 @@
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "text": "Data Factory Failure!",
+                "text": "Data Factory Failure! Stored procedure may still be running!",
                 "attachments": [
                   {
                     "color": "warning",
@@ -286,7 +286,7 @@
               }
             ],
             "policy": {
-              "timeout": "0.12:00:00",
+              "timeout": "0.00:10:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -336,7 +336,7 @@
               }
             ],
             "policy": {
-              "timeout": "0.12:00:00",
+              "timeout": "0.00:10:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
