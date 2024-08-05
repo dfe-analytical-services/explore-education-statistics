@@ -1,6 +1,9 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +13,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -25,12 +30,12 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 public abstract class DataSetVersionsControllerTests(
-    TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+    TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
-    public class CreateNextVersionTests(
-        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class CreateNextVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -125,8 +130,7 @@ public abstract class DataSetVersionsControllerTests(
         }
     }
 
-    public class DeleteVersionTests(
-        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class DeleteVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -184,6 +188,7 @@ public abstract class DataSetVersionsControllerTests(
             });
 
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
+
             processorClient
                 .Setup(c => c.DeleteDataSetVersion(
                     dataSetVersion.Id,
@@ -223,6 +228,7 @@ public abstract class DataSetVersionsControllerTests(
             });
 
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
+
             processorClient
                 .Setup(c => c.DeleteDataSetVersion(
                     dataSetVersion.Id,
@@ -251,7 +257,7 @@ public abstract class DataSetVersionsControllerTests(
         }
 
         [Fact]
-        public async Task ProcessorFailureStatusCode_Returns500()
+        public async Task ProcessorClientThrows_Returns500()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -276,6 +282,7 @@ public abstract class DataSetVersionsControllerTests(
             });
 
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
+
             processorClient
                 .Setup(c => c.DeleteDataSetVersion(
                     dataSetVersion.Id,
@@ -284,9 +291,10 @@ public abstract class DataSetVersionsControllerTests(
 
             var client = BuildApp(processorClient.Object).CreateClient();
 
-            var exception =
-                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                    await DeleteVersion(dataSetVersion.Id, client));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => DeleteVersion(dataSetVersion.Id, client)
+            );
+
             Assert.IsType<HttpRequestException>(exception.InnerException);
         }
 
@@ -302,13 +310,186 @@ public abstract class DataSetVersionsControllerTests(
         }
     }
 
+    public class GetVersionChangesTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success_Returns200()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithVersionNumber(1, 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var mockedChanges = new MockedChanges
+            {
+                Changes = ["test"]
+            };
+
+            var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+
+            publicDataApiClient
+                .Setup(c => c.GetDataSetVersionChanges(
+                    dataSetVersion.DataSetId,
+                    dataSetVersion.Version,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                    new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = JsonContent.Create(mockedChanges),
+                    }
+                );
+
+            var client = BuildApp(publicDataApiClient: publicDataApiClient.Object)
+                .CreateClient();
+
+            var response = await GetVersionChanges(dataSetVersion.Id, client);
+
+            response.AssertOk(mockedChanges, useSystemJson: true);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await GetVersionChanges(Guid.NewGuid(), client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task VersionDoesNotExist_Returns404()
+        {
+            var response = await GetVersionChanges(Guid.NewGuid());
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task PublicDataApiReturns400_Returns400()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithVersionNumber(1, 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+
+            publicDataApiClient
+                .Setup(c => c.GetDataSetVersionChanges(
+                    dataSetVersion.DataSetId,
+                    dataSetVersion.Version,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ValidationUtils.ValidationResult());
+
+            var client = BuildApp(publicDataApiClient: publicDataApiClient.Object)
+                .CreateClient();
+
+            var response = await GetVersionChanges(dataSetVersion.Id, client);
+
+            MockUtils.VerifyAllMocks(publicDataApiClient);
+
+            response.AssertValidationProblem();
+        }
+
+        [Fact]
+        public async Task PublicDataApiClientThrows_Returns500()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+
+            publicDataApiClient
+                .Setup(c => c.GetDataSetVersionChanges(
+                    dataSetVersion.DataSetId,
+                    dataSetVersion.Version,
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new HttpRequestException());
+
+            var client = BuildApp(publicDataApiClient: publicDataApiClient.Object)
+                .CreateClient();
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => GetVersionChanges(dataSetVersion.Id, client)
+            );
+
+            Assert.IsType<HttpRequestException>(exception.InnerException);
+
+            MockUtils.VerifyAllMocks(publicDataApiClient);
+        }
+
+        private async Task<HttpResponseMessage> GetVersionChanges(
+            Guid dataSetVersionId,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var uri = new Uri($"{BaseUrl}/{dataSetVersionId}/changes", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+
+        private record MockedChanges
+        {
+            public List<string> Changes { get; init; } = [];
+        }
+    }
+
     private WebApplicationFactory<TestStartup> BuildApp(
         IProcessorClient? processorClient = null,
+        IPublicDataApiClient? publicDataApiClient = null,
         ClaimsPrincipal? user = null)
     {
-        return TestApp.ConfigureServices(
-                services => { services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>()); }
-            )
+        return TestApp.ConfigureServices(services =>
+            {
+                services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>());
+                services.ReplaceService(publicDataApiClient ?? Mock.Of<IPublicDataApiClient>());
+            })
             .SetUser(user ?? BauUser());
     }
 }

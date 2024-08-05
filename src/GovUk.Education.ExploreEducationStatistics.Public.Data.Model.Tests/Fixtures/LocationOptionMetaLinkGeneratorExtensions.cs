@@ -45,6 +45,7 @@ public static class LocationOptionMetaLinkGeneratorExtensions
         this InstanceSetters<LocationOptionMetaLink> setters)
         => setters
             .SetDefault(m => m.PublicId);
+
     public static InstanceSetters<LocationOptionMetaLink> SetPublicId(
         this InstanceSetters<LocationOptionMetaLink> setters,
         string publicId)

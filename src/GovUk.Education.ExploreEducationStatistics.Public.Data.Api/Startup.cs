@@ -157,6 +157,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IDataSetService, DataSetService>();
         services.AddScoped<IDataSetQueryService, DataSetQueryService>();
         services.AddScoped<IDataSetQueryParser, DataSetQueryParser>();
+        services.AddScoped<IDataSetVersionChangeService, DataSetVersionChangeService>();
 
         services.AddScoped<IParquetDataRepository, ParquetDataRepository>();
         services.AddScoped<IParquetFilterRepository, ParquetFilterRepository>();
