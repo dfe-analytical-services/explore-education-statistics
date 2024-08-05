@@ -35,6 +35,8 @@ export function useConfig(): Config {
 const defaultTestConfig: Config = {
   appInsightsKey: '',
   publicAppUrl: 'http://localhost',
+  publicApiBaseUrl: 'http://public-api',
+  publicApiDocsUrl: 'http://public-api-docs',
   permittedEmbedUrlDomains: ['https://department-for-education.shinyapps.io'],
   oidc: {
     clientId: '',
