@@ -207,13 +207,13 @@ public abstract class DataSetVersionMappingControllerTests(
                                 mapping: DataFixture
                                     .DefaultLocationOptionMapping()
                                     .WithSource(DataFixture.DefaultMappableLocationOption())
-                                    .WithNoMapping())
+                                    .WithAutoNone())
                             .AddMapping(
                                 sourceKey: "source-location-2-key",
                                 mapping: DataFixture
                                     .DefaultLocationOptionMapping()
                                     .WithSource(DataFixture.DefaultMappableLocationOption())
-                                    .WithNoMapping()
+                                    .WithAutoNone()
                             )
                             .AddCandidate(
                                 targetKey: "target-location-1-key",
@@ -373,7 +373,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 ignoreCollectionOrders: true);
 
             // Assert that the batch saves still show the location mappings as incomplete, as there
-            // are still mappings with type "None" and "AutoNone" in the plan.
+            // are still mappings with type "AutoNone" in the plan.
             Assert.False(updatedMappings.LocationMappingsComplete);
         }
 
