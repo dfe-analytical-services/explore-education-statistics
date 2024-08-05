@@ -60,4 +60,5 @@ stages:
                     deployContainerApp=true \
                     updatePsqlFlexibleServer=true \
                     dataProcessorFunctionAppExists=true \
-                    dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)'
+                    dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
+                    apiAppRegistrationClientId='$(apiAppRegistrationClientId)'

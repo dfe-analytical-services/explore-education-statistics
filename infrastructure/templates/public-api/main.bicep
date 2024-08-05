@@ -81,6 +81,9 @@ param dataProcessorFunctionAppExists bool = false
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string = ''
 
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
+param apiAppRegistrationClientId string = ''
+
 var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
@@ -310,6 +313,15 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         value: dataFilesFileShareMountPath
       }
     ]
+    entraIdAuthentication: {
+      appRegistrationClientId: apiAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+      ]
+      allowedPrincipalIds: [
+        adminAppPrincipalId
+      ]
+    }
     tagValues: tagValues
   }
   dependsOn: [
