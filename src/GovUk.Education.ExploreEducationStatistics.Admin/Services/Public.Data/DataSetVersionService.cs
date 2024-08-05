@@ -158,6 +158,7 @@ public class DataSetVersionService(
 
         var releasesByReleaseFileId = await contentDbContext
             .ReleaseFiles
+            .Include(rf => rf.ReleaseVersion)
             .Where(releaseFile => dataSetVersionsByReleaseFileId.Keys.Contains(releaseFile.Id))
             .ToDictionaryAsync(
                 rf => rf.Id,
