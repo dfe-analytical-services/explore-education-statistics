@@ -3,7 +3,6 @@ import {
   LocationMapping,
   LocationsMapping,
 } from '@admin/services/apiDataSetVersionService';
-import logger from '@common/services/logger';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import { camelCase } from 'lodash';
 
@@ -54,48 +53,70 @@ export default function getApiDataSetLocationMappings(
 
     Object.entries(levelMappings).forEach(([key, mapping]) => {
       if (mapping.type === 'AutoMapped') {
-        if (mapping.candidateKey) {
-          mappedCandidateKeys.add(mapping.candidateKey);
-          const candidate = levelCandidates[mapping.candidateKey];
-          if (candidate) {
-            autoMapped.push({
-              candidate: { ...candidate, key: mapping.candidateKey },
-              mapping: { ...mapping, sourceKey: key },
-            });
-          } else {
-            logger.error(
-              `Cannot find candidate for AutoMapped location, candidateKey: ${mapping.candidateKey}`,
-            );
-          }
+        if (!mapping.candidateKey) {
+          throw new Error(
+            `Candidate key missing for AutoMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
+        }
+
+        mappedCandidateKeys.add(mapping.candidateKey);
+
+        const candidate = levelCandidates[mapping.candidateKey];
+
+        if (candidate) {
+          autoMapped.push({
+            candidate: { ...candidate, key: mapping.candidateKey },
+            mapping: { ...mapping, sourceKey: key },
+          });
         } else {
-          logger.error('AutoMapped location must have a candidate key');
+          throw new Error(
+            `Cannot find candidate for AutoMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
         }
       }
 
       if (mapping.type === 'ManualMapped') {
-        if (mapping.candidateKey) {
-          mappedCandidateKeys.add(mapping.candidateKey);
-          const candidate = levelCandidates[mapping.candidateKey];
-          if (candidate) {
-            mappable.push({
-              candidate: { ...candidate, key: mapping.candidateKey },
-              mapping: { ...mapping, sourceKey: key },
-            });
-          } else {
-            logger.error(
-              `Cannot find candidate for ManualMapped location, candidateKey: ${mapping.candidateKey}`,
-            );
-          }
+        if (!mapping.candidateKey) {
+          throw new Error(
+            `Candidate key missing for ManualMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
+        }
+
+        mappedCandidateKeys.add(mapping.candidateKey);
+
+        const candidate = levelCandidates[mapping.candidateKey];
+
+        if (candidate) {
+          mappable.push({
+            candidate: { ...candidate, key: mapping.candidateKey },
+            mapping: { ...mapping, sourceKey: key },
+          });
         } else {
-          logger.error('ManualMapped location must have a candidate key');
+          throw new Error(
+            `Cannot find candidate for ManualMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
         }
       }
 
       if (mapping.type === 'AutoNone' || mapping.type === 'ManualNone') {
         mappable.push({ mapping: { ...mapping, sourceKey: key } });
       }
-
-      return mapping;
     });
 
     // New locations:
