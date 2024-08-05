@@ -1,5 +1,6 @@
 import Page from '@admin/components/Page';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import typedKeys from '@common/utils/object/typedKeys';
 import React, { Fragment } from 'react';
 import FormattedDate from '@common/components/FormattedDate';
 import Details from '@common/components/Details';
@@ -7,7 +8,9 @@ import Link from '@admin/components/Link';
 import { useQuery } from '@tanstack/react-query';
 import boundaryDataQueries from '@admin/queries/boundaryDataQueries';
 import boundaryTypesMap from '@common/utils/boundaryTypesMap';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import InsetText from '@common/components/InsetText';
 import classNames from 'classnames';
 import styles from './BoundaryDataPage.module.scss';
@@ -51,7 +54,7 @@ const BoundaryDataPage = () => {
               styles.boundaryLevels,
             )}
           >
-            {Object.keys(locationLevelsMap).map(key => {
+            {typedKeys(locationLevelsMap).map(key => {
               return (
                 <Fragment key={key}>
                   <dt>{locationLevelsMap[key].code}</dt>
@@ -111,7 +114,7 @@ const BoundaryDataPage = () => {
             <tbody>
               {boundaryLevels.map(boundaryLevel => (
                 <tr key={boundaryLevel.id}>
-                  <td>{locationLevelsMap[boundaryLevel.level].code}</td>
+                  k<td>{locationLevelsMap[boundaryLevel.level].code}</td>
                   <td>{boundaryLevel.label}</td>
                   <td>
                     <FormattedDate format="d MMM yyyy">

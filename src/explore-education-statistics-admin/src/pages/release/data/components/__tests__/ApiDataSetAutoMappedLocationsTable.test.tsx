@@ -1,136 +1,216 @@
 import ApiDataSetAutoMappedLocationsTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedLocationsTable';
 import { AutoMappedLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
 describe('ApiDataSetAutoMappedLocationsTable', () => {
   const testLocations: AutoMappedLocation[] = [
     {
-      candidate: { label: 'Location 1', code: 'location-1-code' },
+      candidate: {
+        label: 'Location 1',
+        code: 'location-1-code',
+        key: 'Location1Key',
+      },
       mapping: {
         candidateKey: 'Location1Key',
-        type: 'AutoMapped',
+        publicId: 'location-1-public-id',
         source: {
           label: 'Location 1',
           code: 'location-1-code',
         },
+        sourceKey: 'Location1Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 2', code: 'location-2-code' },
+      candidate: {
+        label: 'Location 2',
+        code: 'location-2-code',
+        key: 'Location2Key',
+      },
       mapping: {
         candidateKey: 'Location2Key',
-        type: 'AutoMapped',
+        publicId: 'location-2-public-id',
         source: {
           label: 'Location 2',
           code: 'location-2-code',
         },
+        sourceKey: 'Location2Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 3', code: 'location-3-code' },
+      candidate: {
+        label: 'Location 3',
+        code: 'location-3-code',
+        key: 'Location3Key',
+      },
       mapping: {
         candidateKey: 'Location3Key',
-        type: 'AutoMapped',
+        publicId: 'location-3-public-id',
         source: {
           label: 'Location 3',
           code: 'location-3-code',
         },
+        sourceKey: 'Location3Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 4', code: 'location-4-code' },
+      candidate: {
+        label: 'Location 4',
+        code: 'location-4-code',
+        key: 'Location4Key',
+      },
       mapping: {
         candidateKey: 'Location4Key',
-        type: 'AutoMapped',
+        publicId: 'location-4-public-id',
         source: {
           label: 'Location 4',
           code: 'location-4-code',
         },
+        sourceKey: 'Location4Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 5', code: 'location-5-code' },
+      candidate: {
+        label: 'Location 5',
+        code: 'location-5-code',
+        key: 'Location5Key',
+      },
       mapping: {
         candidateKey: 'Location5Key',
-        type: 'AutoMapped',
+        publicId: 'location-5-public-id',
         source: {
           label: 'Location 5',
           code: 'location-5-code',
         },
+        sourceKey: 'Location5Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 6', code: 'location-6-code' },
+      candidate: {
+        label: 'Location 6',
+        code: 'location-6-code',
+        key: 'Location6Key',
+      },
       mapping: {
         candidateKey: 'Location6Key',
-        type: 'AutoMapped',
+        publicId: 'location-6-public-id',
         source: {
           label: 'Location 6',
           code: 'location-6-code',
         },
+        sourceKey: 'Location6Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 7', code: 'location-7-code' },
+      candidate: {
+        label: 'Location 7',
+        code: 'location-7-code',
+        key: 'Location7Key',
+      },
       mapping: {
         candidateKey: 'Location7Key',
-        type: 'AutoMapped',
+        publicId: 'location-7-public-id',
         source: {
           label: 'Location 7',
           code: 'location-7-code',
         },
+        sourceKey: 'Location7Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 8', code: 'location-8-code' },
+      candidate: {
+        label: 'Location 8',
+        code: 'location-8-code',
+        key: 'Location8Key',
+      },
       mapping: {
         candidateKey: 'Location8Key',
-        type: 'AutoMapped',
+        publicId: 'location-8-public-id',
         source: {
           label: 'Location 8',
           code: 'location-8-code',
         },
+        sourceKey: 'Location8Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 9', code: 'location-9-code' },
+      candidate: {
+        label: 'Location 9',
+        code: 'location-9-code',
+        key: 'Location9Key',
+      },
       mapping: {
         candidateKey: 'Location9Key',
-        type: 'AutoMapped',
+        publicId: 'location-9-public-id',
         source: {
           label: 'Location 9',
           code: 'location-9-code',
         },
+        sourceKey: 'Location9Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 10', code: 'location-10-code' },
+      candidate: {
+        label: 'Location 10',
+        code: 'location-10-code',
+        key: 'Location10Key',
+      },
       mapping: {
         candidateKey: 'Location10Key',
-        type: 'AutoMapped',
+        publicId: 'location-10-public-id',
         source: {
           label: 'Location 10',
           code: 'location-10-code',
         },
+        sourceKey: 'Location10Key',
+        type: 'AutoMapped',
       },
     },
     {
-      candidate: { label: 'Location 11', code: 'location-11-code' },
+      candidate: {
+        label: 'Location 11',
+        code: 'location-11-code',
+        key: 'Location11Key',
+      },
       mapping: {
         candidateKey: 'Location11Key',
-        type: 'AutoMapped',
+        publicId: 'location-11-public-id',
         source: {
           label: 'Location 11',
           code: 'location-11-code',
         },
+        sourceKey: 'Location11Key',
+        type: 'AutoMapped',
       },
     },
   ];
 
-  test('renders the first 10 auto mapped locations', () => {
-    render(<ApiDataSetAutoMappedLocationsTable locations={testLocations} />);
+  test('renders the first page of auto mapped locations', () => {
+    render(
+      <ApiDataSetAutoMappedLocationsTable
+        level="localAuthority"
+        locations={testLocations}
+        newLocations={[]}
+        onUpdate={Promise.resolve}
+      />,
+    );
+
+    // Search
+    expect(
+      screen.getByLabelText('Search auto mapped locations'),
+    ).toBeInTheDocument();
+
+    // Table
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows).toHaveLength(11);
 
@@ -263,5 +343,139 @@ describe('ApiDataSetAutoMappedLocationsTable', () => {
         name: 'Edit mapping for Location 10',
       }),
     ).toBeInTheDocument();
+
+    // Pagination
+    const pagination = within(
+      screen.getByRole('navigation', { name: 'Pagination' }),
+    );
+    expect(
+      pagination.getByRole('button', { name: 'Page 1' }),
+    ).toBeInTheDocument();
+    expect(
+      pagination.getByRole('button', { name: 'Page 2' }),
+    ).toBeInTheDocument();
+
+    expect(
+      pagination.getByRole('button', { name: 'Next page' }),
+    ).toBeInTheDocument();
+  });
+
+  test('searching locations', async () => {
+    const { user } = render(
+      <ApiDataSetAutoMappedLocationsTable
+        level="localAuthority"
+        locations={testLocations}
+        newLocations={[]}
+        onUpdate={Promise.resolve}
+      />,
+    );
+
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
+      11,
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: 'Pagination' }),
+    ).toBeInTheDocument();
+
+    await user.type(
+      screen.getByLabelText('Search auto mapped locations'),
+      'location 3',
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByText('Location 1')).not.toBeInTheDocument(),
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+    expect(rows).toHaveLength(2);
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('Location 3');
+    expect(row1Cells[0]).toHaveTextContent('location-3-code');
+    expect(row1Cells[1]).toHaveTextContent('Location 3');
+    expect(row1Cells[1]).toHaveTextContent('location-3-code');
+    expect(row1Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row1Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Location 3',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('navigation', { name: 'Pagination' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('pagination', async () => {
+    const { user } = render(
+      <ApiDataSetAutoMappedLocationsTable
+        level="localAuthority"
+        locations={testLocations}
+        newLocations={[]}
+        onUpdate={Promise.resolve}
+      />,
+    );
+
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
+      11,
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: 'Pagination' }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Page 2' }));
+
+    await waitFor(() =>
+      expect(screen.queryByText('Location 1')).not.toBeInTheDocument(),
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+    expect(rows).toHaveLength(2);
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('Location 11');
+    expect(row1Cells[0]).toHaveTextContent('location-11-code');
+    expect(row1Cells[1]).toHaveTextContent('Location 11');
+    expect(row1Cells[1]).toHaveTextContent('location-11-code');
+    expect(row1Cells[2]).toHaveTextContent('Minor');
+    expect(
+      within(row1Cells[3]).getByRole('button', {
+        name: 'Edit mapping for Location 11',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Previous page' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Next page' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('hides the edit button if there is a pending update for the mapping', () => {
+    render(
+      <ApiDataSetAutoMappedLocationsTable
+        level="localAuthority"
+        locations={testLocations}
+        newLocations={[]}
+        pendingUpdates={[
+          {
+            previousMapping: testLocations[1].mapping,
+            level: 'localAuthority',
+            sourceKey: 'Location2Key',
+            type: 'ManualMapped',
+          },
+        ]}
+        onUpdate={Promise.resolve}
+      />,
+    );
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(
+      within(row2Cells[3]).queryByRole('button', {
+        name: 'Edit mapping for Location 2',
+      }),
+    ).not.toBeInTheDocument();
   });
 });

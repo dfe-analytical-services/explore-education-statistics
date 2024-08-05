@@ -171,7 +171,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             <h2>{dataSet.title}</h2>
 
             <SummaryList
-              className="govuk-!-width-two-thirds govuk-!-margin-bottom-8"
+              className="govuk-!-margin-bottom-8"
               testId="data-set-summary"
             >
               <SummaryListItem term="Status">
@@ -197,7 +197,20 @@ export default function ReleaseApiDataSetDetailsPage() {
                   <TaskList className="govuk-!-margin-bottom-8">
                     <TaskListItem
                       id="map-locations-task"
-                      status={<Tag colour="red">Incomplete</Tag>}
+                      status={
+                        <Tag
+                          colour={
+                            dataSet.draftVersion.mappingStatus
+                              ?.locationsComplete
+                              ? 'blue'
+                              : 'red'
+                          }
+                        >
+                          {dataSet.draftVersion.mappingStatus?.locationsComplete
+                            ? 'Complete'
+                            : 'Incomplete'}
+                        </Tag>
+                      }
                       hint="Define the changes to locations in this version."
                     >
                       {props => (
