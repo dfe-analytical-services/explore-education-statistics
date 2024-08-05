@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
@@ -494,11 +495,24 @@ public abstract class DataSetVersionsControllerTests(
     public class UpdateVersionTests(
         TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
+        private static readonly IReadOnlyList<DataSetVersionStatus> EligibleUpdateDataSetVersionStatuses =
+            new List<DataSetVersionStatus>(
+            [
+                DataSetVersionStatus.Draft,
+                DataSetVersionStatus.Mapping
+            ]
+        );
+
+        public static TheoryData<DataSetVersionStatus> EligibleUpdateDataSetVersionStatusesData = new(
+            EligibleUpdateDataSetVersionStatuses
+        );
+
+        public static TheoryData<DataSetVersionStatus> NonEligibleUpdateDataSetVersionStatusesData = new(
+            EnumUtil.GetEnums<DataSetVersionStatus>().Except(EligibleUpdateDataSetVersionStatuses)
+        );
+
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(EligibleUpdateDataSetVersionStatusesData))]
         public async Task Success(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -602,10 +616,7 @@ public abstract class DataSetVersionsControllerTests(
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
+        [MemberData(nameof(NonEligibleUpdateDataSetVersionStatusesData))]
         public async Task DataSetVersionCannotBeUpdated_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture

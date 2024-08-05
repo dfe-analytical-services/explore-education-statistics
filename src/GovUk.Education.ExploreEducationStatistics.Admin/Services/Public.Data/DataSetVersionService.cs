@@ -111,7 +111,7 @@ public class DataSetVersionService(
                 dataSetVersion: dataSetVersion,
                 updateRequest: updateRequest,
                 cancellationToken: cancellationToken))
-            .OnSuccess(MapVersion);
+            .OnSuccess(MapDraftVersion);
     }
 
     private static DataSetVersionSummaryViewModel MapDraftSummaryVersion(DataSetVersion dataSetVersion)
@@ -181,7 +181,7 @@ public class DataSetVersionService(
         return dataSetVersion;
     }
 
-    private async Task<DataSetDraftVersionViewModel> MapVersion(DataSetVersion dataSetVersion)
+    private async Task<DataSetDraftVersionViewModel> MapDraftVersion(DataSetVersion dataSetVersion)
     {
         var releaseFile = await GetReleaseFile(dataSetVersion);
 
