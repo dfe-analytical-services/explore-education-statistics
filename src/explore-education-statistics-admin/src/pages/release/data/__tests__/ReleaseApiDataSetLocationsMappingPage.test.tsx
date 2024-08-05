@@ -614,7 +614,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       // Update location in unmapped table
       expect(within(unmappedLocationCells[0]).getByText('Location 2'));
       expect(within(unmappedLocationCells[1]).getByText('Location 6'));
-      expect(within(unmappedLocationCells[2]).getByText('Minor'));
+      expect(within(unmappedLocationCells[2]).getByText('Major'));
 
       // Remove from new locations table
       expect(
@@ -1035,7 +1035,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       );
       expect(within(unmappedLocationCells[0]).getByText('Location 1'));
       expect(within(unmappedLocationCells[1]).getByText('Location 6'));
-      expect(within(unmappedLocationCells[2]).getByText('Minor'));
+      expect(within(unmappedLocationCells[2]).getByText('Major'));
     });
 
     test('batches updates made in quick succession', async () => {
