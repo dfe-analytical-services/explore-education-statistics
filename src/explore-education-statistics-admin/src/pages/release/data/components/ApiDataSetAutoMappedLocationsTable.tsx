@@ -40,31 +40,34 @@ export default function ApiDataSetAutoMappedLocationsTable({
   const [searchTerm, setSearchTerm] = useState<string>();
 
   const filteredLocations = useMemo(() => {
-    return searchTerm
-      ? locations.filter(location => {
-          const { candidate, mapping } = location;
-          const searchFields = compact([
-            candidate.label.toLowerCase(),
-            candidate.code?.toLowerCase(),
-            candidate.laEstab?.toLowerCase(),
-            candidate.oldCode?.toLowerCase(),
-            candidate.ukprn?.toLowerCase(),
-            candidate.urn?.toLowerCase(),
-            mapping.source.label.toLowerCase(),
-            mapping.source.code?.toLowerCase(),
-            mapping.source.laEstab?.toLowerCase(),
-            mapping.source.oldCode?.toLowerCase(),
-            mapping.source.ukprn?.toLowerCase(),
-            mapping.source.urn?.toLowerCase(),
-          ]);
+    if (searchTerm) {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-          const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      return locations.filter(location => {
+        const { candidate, mapping } = location;
 
-          return searchFields.some(field => {
-            return field.includes(lowerCaseSearchTerm);
-          });
-        })
-      : locations;
+        const searchFields = compact([
+          candidate.label,
+          candidate.code,
+          candidate.laEstab,
+          candidate.oldCode,
+          candidate.ukprn,
+          candidate.urn,
+          mapping.source.label,
+          mapping.source.code,
+          mapping.source.laEstab,
+          mapping.source.oldCode,
+          mapping.source.ukprn,
+          mapping.source.urn,
+        ]);
+
+        return searchFields.some(field => {
+          return field?.toLowerCase().includes(lowerCaseSearchTerm);
+        });
+      });
+    }
+
+    return locations;
   }, [locations, searchTerm]);
 
   const filteredLocationChunks = useMemo(

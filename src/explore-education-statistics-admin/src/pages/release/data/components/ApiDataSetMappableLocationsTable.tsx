@@ -6,7 +6,10 @@ import ApiDataSetLocationMappingModal from '@admin/pages/release/data/components
 import styles from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage.module.scss';
 import { PendingLocationMappingUpdate } from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
 import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
-import { MappingType } from '@admin/services/apiDataSetVersionService';
+import {
+  LocationCandidate,
+  MappingType,
+} from '@admin/services/apiDataSetVersionService';
 import Tag, { TagProps } from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import TagGroup from '@common/components/TagGroup';
@@ -15,8 +18,15 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import locationLevelsMap, {
   LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
+import omit from 'lodash/omit';
 import React from 'react';
 import classNames from 'classnames';
+
+// Fields to omit from location mapping diff.
+const omittedDiffingFields: (keyof LocationCandidateWithKey)[] = [
+  'key',
+  'label',
+];
 
 interface Props {
   level: LocationLevelKey;
@@ -76,6 +86,14 @@ export default function ApiDataSetMappableLocationsTable({
           const isPendingUpdate = pendingUpdates.some(
             update => update.sourceKey === mapping.sourceKey,
           );
+
+          const isMajorMapping = candidate
+            ? Object.entries(omit(mapping.source, omittedDiffingFields)).some(
+                ([key, value]) =>
+                  candidate[key as keyof LocationCandidate] !== value,
+              )
+            : true;
+
           return (
             <tr
               key={`mapping-${mapping.sourceKey}`}
@@ -110,8 +128,8 @@ export default function ApiDataSetMappableLocationsTable({
                 )}
               </td>
               <td>
-                <Tag colour={getUpdateTagColour(mapping.type)}>
-                  {getUpdateTagText(mapping.type)}
+                <Tag colour={getUpdateTagColour(mapping.type, isMajorMapping)}>
+                  {getUpdateTagText(mapping.type, isMajorMapping)}
                 </Tag>
               </td>
               <td className="govuk-!-text-align-right">
@@ -162,10 +180,10 @@ export default function ApiDataSetMappableLocationsTable({
   );
 }
 
-function getUpdateTagText(type: MappingType): string {
+function getUpdateTagText(type: MappingType, isMajorMapping: boolean): string {
   switch (type) {
     case 'ManualMapped':
-      return 'Minor';
+      return isMajorMapping ? 'Major' : 'Minor';
     case 'ManualNone':
       return 'Major';
     default:
@@ -173,10 +191,13 @@ function getUpdateTagText(type: MappingType): string {
   }
 }
 
-function getUpdateTagColour(type: MappingType): TagProps['colour'] {
+function getUpdateTagColour(
+  type: MappingType,
+  isMajorMapping: boolean,
+): TagProps['colour'] {
   switch (type) {
     case 'ManualMapped':
-      return 'grey';
+      return isMajorMapping ? 'blue' : 'grey';
     case 'ManualNone':
       return 'blue';
     default:

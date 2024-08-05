@@ -1,8 +1,9 @@
 import client from '@admin/services/utils/service';
+import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 
 export interface BoundaryLevel {
   id: string;
-  level: string;
+  level: LocationLevelKey;
   label: string;
   published: Date;
 }

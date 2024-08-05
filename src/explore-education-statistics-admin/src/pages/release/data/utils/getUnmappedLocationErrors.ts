@@ -3,16 +3,18 @@ import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 import locationLevelsMap, {
   LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
+import typedKeys from '@common/utils/object/typedKeys';
 
 export default function getUnmappedLocationErrors(
   mappableLocations: Partial<Record<LocationLevelKey, MappableLocation[]>>,
 ): ErrorSummaryMessage[] {
   const errors: ErrorSummaryMessage[] = [];
 
-  (Object.keys(mappableLocations) as LocationLevelKey[]).forEach(level => {
+  typedKeys(mappableLocations).forEach(level => {
     const total = mappableLocations[level]?.filter(
       map => map.mapping.type === 'AutoNone',
     ).length;
+
     if (total) {
       errors.push({
         id: `mappable-${level}`,

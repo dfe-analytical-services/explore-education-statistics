@@ -29,6 +29,7 @@ import locationLevelsMap, {
   LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import typedKeys from '@common/utils/object/typedKeys';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
@@ -277,26 +278,26 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               Locations not found in the new data set
             </h3>
 
-            {Object.keys(mappableLocations).length > 0 ? (
+            {typedKeys(mappableLocations).length > 0 ? (
               <>
-                {(Object.keys(mappableLocations) as LocationLevelKey[]).map(
-                  level => {
-                    const levelMappableLocations = mappableLocations[level];
-                    if (levelMappableLocations?.length) {
-                      return (
-                        <ApiDataSetMappableLocationsTable
-                          key={`unmapped-${level}`}
-                          level={level}
-                          locations={levelMappableLocations}
-                          newLocations={newLocationCandidates[level]}
-                          pendingUpdates={pendingUpdates}
-                          onUpdate={handleUpdateMapping}
-                        />
-                      );
-                    }
-                    return null;
-                  },
-                )}
+                {typedKeys(mappableLocations).map(level => {
+                  const levelMappableLocations = mappableLocations[level];
+
+                  if (levelMappableLocations?.length) {
+                    return (
+                      <ApiDataSetMappableLocationsTable
+                        key={`unmapped-${level}`}
+                        level={level}
+                        locations={levelMappableLocations}
+                        newLocations={newLocationCandidates[level]}
+                        pendingUpdates={pendingUpdates}
+                        onUpdate={handleUpdateMapping}
+                      />
+                    );
+                  }
+
+                  return null;
+                })}
               </>
             ) : (
               <p>No locations not found in the new data set.</p>
@@ -312,30 +313,30 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
             {totalNewLocationCandidates > 0 ? (
               <Accordion id="new-locations" testId="new-locations-accordion">
-                {(Object.keys(newLocationCandidates) as LocationLevelKey[]).map(
-                  level => {
-                    const levelNewLocations = newLocationCandidates[level];
-                    if (levelNewLocations?.length) {
-                      return (
-                        <AccordionSection
-                          goToTop={false}
-                          heading={`${
-                            locationLevelsMap[level]?.plural ?? level
-                          } (${levelNewLocations.length})`}
-                          headingTag="h4"
-                          id={`new-locations-${level}`}
-                          key={`new-locations-${level}`}
-                        >
-                          <ApiDataSetNewLocationsTable
-                            level={level}
-                            locations={levelNewLocations}
-                          />
-                        </AccordionSection>
-                      );
-                    }
-                    return null;
-                  },
-                )}
+                {typedKeys(newLocationCandidates).map(level => {
+                  const levelNewLocations = newLocationCandidates[level];
+
+                  if (levelNewLocations?.length) {
+                    return (
+                      <AccordionSection
+                        goToTop={false}
+                        heading={`${
+                          locationLevelsMap[level]?.plural ?? level
+                        } (${levelNewLocations.length})`}
+                        headingTag="h4"
+                        id={`new-locations-${level}`}
+                        key={`new-locations-${level}`}
+                      >
+                        <ApiDataSetNewLocationsTable
+                          level={level}
+                          locations={levelNewLocations}
+                        />
+                      </AccordionSection>
+                    );
+                  }
+
+                  return null;
+                })}
               </Accordion>
             ) : (
               <p>No new locations.</p>
@@ -354,33 +355,33 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                 showOpenAll={false}
                 testId="auto-mapped-accordion"
               >
-                {(Object.keys(autoMappedLocations) as LocationLevelKey[]).map(
-                  level => {
-                    const levelAutoMappedLocations = autoMappedLocations[level];
-                    if (levelAutoMappedLocations?.length) {
-                      return (
-                        <AccordionSection
-                          goToTop={false}
-                          heading={`${
-                            locationLevelsMap[level]?.plural ?? level
-                          } (${levelAutoMappedLocations?.length})`}
-                          headingTag="h4"
-                          id={`auto-mapped-${level}`}
-                          key={`auto-mapped-${level}`}
-                        >
-                          <ApiDataSetAutoMappedLocationsTable
-                            level={level}
-                            locations={levelAutoMappedLocations}
-                            newLocations={newLocationCandidates[level]}
-                            pendingUpdates={pendingUpdates}
-                            onUpdate={handleUpdateMapping}
-                          />
-                        </AccordionSection>
-                      );
-                    }
-                    return null;
-                  },
-                )}
+                {typedKeys(autoMappedLocations).map(level => {
+                  const levelAutoMappedLocations = autoMappedLocations[level];
+
+                  if (levelAutoMappedLocations?.length) {
+                    return (
+                      <AccordionSection
+                        goToTop={false}
+                        heading={`${
+                          locationLevelsMap[level]?.plural ?? level
+                        } (${levelAutoMappedLocations?.length})`}
+                        headingTag="h4"
+                        id={`auto-mapped-${level}`}
+                        key={`auto-mapped-${level}`}
+                      >
+                        <ApiDataSetAutoMappedLocationsTable
+                          level={level}
+                          locations={levelAutoMappedLocations}
+                          newLocations={newLocationCandidates[level]}
+                          pendingUpdates={pendingUpdates}
+                          onUpdate={handleUpdateMapping}
+                        />
+                      </AccordionSection>
+                    );
+                  }
+
+                  return null;
+                })}
               </Accordion>
             ) : (
               <p>No auto mapped locations.</p>
@@ -417,16 +418,14 @@ function getSubNavItems(
   >,
   key: string,
 ) {
-  return (Object.keys(locations) as LocationLevelKey[]).reduce<NavItem[]>(
-    (acc, level) => {
-      if (locations[level]?.length) {
-        acc.push({
-          id: `${key}-${level}`,
-          text: locationLevelsMap[level]?.plural ?? level,
-        });
-      }
-      return acc;
-    },
-    [],
-  );
+  return typedKeys(locations).reduce<NavItem[]>((acc, level) => {
+    if (locations[level]?.length) {
+      acc.push({
+        id: `${key}-${level}`,
+        text: locationLevelsMap[level]?.plural ?? level,
+      });
+    }
+
+    return acc;
+  }, []);
 }
