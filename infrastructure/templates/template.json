@@ -675,6 +675,12 @@
       "metadata": {
         "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
       }
+    },
+    "apiAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
+      }
     }
   },
   "variables": {
@@ -1749,6 +1755,7 @@
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
         "PublicDataApi:Url": "[concat('https://', parameters('publicApiUrl'))]",
+        "PublicDataApi:AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
       }
