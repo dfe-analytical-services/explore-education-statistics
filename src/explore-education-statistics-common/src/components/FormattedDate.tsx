@@ -1,10 +1,17 @@
-import { format as formatter, isValid, parse, toDate } from 'date-fns';
+import {
+  format as formatter,
+  formatRelative,
+  isValid,
+  parse,
+  toDate,
+} from 'date-fns';
 import React from 'react';
 
 interface Props {
   children: Date | number | string;
   className?: string;
   format?: string;
+  formatRelativeToNow?: boolean;
   testId?: string;
   parseFormat?: string;
 }
@@ -13,6 +20,7 @@ const FormattedDate = ({
   children,
   className,
   format = 'd MMMM yyyy',
+  formatRelativeToNow = false,
   testId,
   parseFormat,
 }: Props) => {
@@ -32,7 +40,9 @@ const FormattedDate = ({
 
   return (
     <time data-testid={testId} className={className}>
-      {formatter(parsedDate, format)}
+      {formatRelativeToNow
+        ? formatRelative(parsedDate, new Date())
+        : formatter(parsedDate, format)}
     </time>
   );
 };

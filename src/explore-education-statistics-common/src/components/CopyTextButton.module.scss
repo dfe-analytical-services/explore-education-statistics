@@ -5,7 +5,7 @@
   margin: govuk-spacing(2) 0;
 }
 
-.modal {
+.container {
   @include govuk-media-query($from: tablet) {
     width: 500px;
   }

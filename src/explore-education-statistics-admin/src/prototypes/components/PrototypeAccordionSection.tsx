@@ -1,4 +1,4 @@
-import CopyLinkButton from '@common/components/CopyLinkButton';
+import CopyLinkModal from '@common/components/CopyLinkModal';
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
@@ -77,8 +77,8 @@ const AccordionSection = ({
     >
       <div className="govuk-accordion__section-header">
         {anchorLinkUrl && (
-          <CopyLinkButton
-            className={styles.copyLinkButton}
+          <CopyLinkModal
+            buttonClassName={styles.copyLinkButton}
             url={anchorLinkUrl}
           />
         )}
