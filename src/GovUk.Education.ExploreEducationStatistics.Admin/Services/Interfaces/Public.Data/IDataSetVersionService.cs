@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
@@ -30,5 +31,9 @@ public interface IDataSetVersionService
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
+        Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 }

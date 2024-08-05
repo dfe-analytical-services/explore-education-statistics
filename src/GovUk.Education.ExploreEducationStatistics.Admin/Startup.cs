@@ -77,6 +77,7 @@ using Notify.Interfaces;
 using Semver;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Thinktecture;
@@ -352,6 +353,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<PublicDataProcessorOptions>(
                 configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
+            services.Configure<PublicDataApiOptions>(
+                configuration.GetRequiredSection(PublicDataApiOptions.Section));
             services.Configure<PreReleaseOptions>(configuration);
             services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
             services.Configure<ReleaseApprovalOptions>(
@@ -457,6 +460,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
+                    httpClient.BaseAddress = new Uri(options.Value.Url);
+                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
+                });
+
+                services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
                 });
@@ -828,6 +838,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
+
+        public Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
+            Guid dataSetVersionId,
+            CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
     }
 
     internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService
