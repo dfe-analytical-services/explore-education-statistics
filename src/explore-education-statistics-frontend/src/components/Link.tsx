@@ -1,4 +1,5 @@
 import { OmitStrict } from '@common/types';
+import getContentLinkProps from '@common/utils/url/getContentLinkProps';
 import classNames from 'classnames';
 import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
@@ -23,15 +24,23 @@ const Link = ({
   to,
   unvisited = false,
   testId,
+  rel: originalRel,
   ...props
 }: LinkProps) => {
+  const { target, rel } = getContentLinkProps({
+    url: to.toString(),
+    rel: originalRel,
+  });
+
   return (
     <RouterLink
       {...props}
       href={to}
+      target={target}
       prefetch={prefetch}
       scroll={scroll}
       shallow={shallow}
+      rel={rel}
       className={classNames(
         'govuk-link',
         {

@@ -339,19 +339,29 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                             description,
                             legacyLinkUrl,
                             releaseSlug,
-                          }) => (
-                            <li key={id} data-testid="other-release-item">
-                              {isLegacyLink ? (
-                                <a href={legacyLinkUrl}>{description}</a>
-                              ) : (
+                          }) => {
+                            if (isLegacyLink) {
+                              if (legacyLinkUrl === undefined) {
+                                return null;
+                              }
+
+                              return (
+                                <li key={id} data-testid="other-release-item">
+                                  <Link to={legacyLinkUrl}>{description}</Link>
+                                </li>
+                              );
+                            }
+
+                            return (
+                              <li key={id} data-testid="other-release-item">
                                 <Link
                                   to={`/find-statistics/${release.publication.slug}/${releaseSlug}`}
                                 >
                                   {description}
                                 </Link>
-                              )}
-                            </li>
-                          ),
+                              </li>
+                            );
+                          },
                         ),
                       ]}
                     </ul>
@@ -401,7 +411,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     {release.relatedInformation &&
                       release.relatedInformation.map(link => (
                         <li key={link.id}>
-                          <a href={link.url}>{link.description}</a>
+                          <Link to={link.url}>{link.description}</Link>
                         </li>
                       ))}
                   </ul>

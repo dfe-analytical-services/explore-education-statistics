@@ -1,6 +1,5 @@
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import styles from '@common/components/ContentHtml.module.scss';
-import formatContentLink from '@common/utils/url/formatContentLink';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -15,15 +14,19 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
+import getContentLinkProps from '@common/utils/url/getContentLinkProps';
 
-export interface ContentHtmlProps {
+export interface ContentHtmlProps extends ContentHtmlLinkProps {
   className?: string;
-  formatLinks?: boolean;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   html: string;
   sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
+}
+
+interface ContentHtmlLinkProps {
+  formatLinks?: boolean;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
@@ -69,29 +72,13 @@ export default function ContentHtml({
         ) : undefined;
       }
 
-      if (
-        transformFeaturedTableLinks &&
-        node.name === 'a' &&
-        typeof node.attribs['data-featured-table'] !== 'undefined'
-      ) {
-        const text = domToReact(node.children);
-        return isMounted && typeof text === 'string'
-          ? transformFeaturedTableLinks(node.attribs.href, text)
-          : undefined;
-      }
-
-      if (formatLinks && node.name === 'a') {
-        const url = formatContentLink(node.attribs.href);
-        const text = domToReact(node.children);
-
-        return !url?.includes('explore-education-statistics.service.gov.uk') &&
-          typeof node.attribs['data-featured-table'] === 'undefined' ? (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {text} (opens in a new tab)
-          </a>
-        ) : (
-          <a href={url}>{text}</a>
-        );
+      if (node.name === 'a') {
+        return renderLink({
+          node,
+          isMounted,
+          formatLinks,
+          transformFeaturedTableLinks,
+        });
       }
 
       if (node.name === 'figure' && node.attribs.class === 'table') {
@@ -106,6 +93,45 @@ export default function ContentHtml({
     <div className={classNames('dfe-content', className)} data-testid={testId}>
       {parsedContent}
     </div>
+  );
+}
+
+function renderLink(
+  params: ContentHtmlLinkProps & { node: Element; isMounted: boolean },
+): ReactElement | void | null {
+  const { node, isMounted, formatLinks, transformFeaturedTableLinks } = params;
+  const targetUrl = node.attribs.href;
+
+  if (
+    transformFeaturedTableLinks &&
+    typeof node.attribs['data-featured-table'] !== 'undefined'
+  ) {
+    const text = domToReact(node.children);
+    return isMounted && typeof text === 'string'
+      ? transformFeaturedTableLinks(targetUrl, text)
+      : null;
+  }
+
+  const text = domToReact(node.children);
+
+  if (!formatLinks) {
+    return <a href={node.attribs.href}>{text}</a>;
+  }
+
+  const { url, target, rel, origin } = getContentLinkProps({
+    url: targetUrl,
+  });
+
+  return origin !== 'public' &&
+    typeof node.attribs['data-featured-table'] === 'undefined' ? (
+    // eslint-disable-next-line react/jsx-no-target-blank
+    <a href={url} target={target} rel={rel}>
+      {text} (opens in a new tab)
+    </a>
+  ) : (
+    <a href={url} rel={rel}>
+      {text}
+    </a>
   );
 }
 

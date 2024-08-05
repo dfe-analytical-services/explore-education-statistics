@@ -1,4 +1,12 @@
 import formatContentLink from '@common/utils/url/formatContentLink';
+import * as hostUrl from '@common/utils/url/hostUrl';
+
+jest.mock('@common/utils/url/hostUrl');
+jest
+  .spyOn(hostUrl, 'getHostUrl')
+  .mockReturnValue(
+    new URL('https://explore-education-statistics.servce.gov.uk/'),
+  );
 
 describe('formatContentLink', () => {
   test('converts EES links to lowercase', () => {
@@ -8,6 +16,16 @@ describe('formatContentLink', () => {
       ),
     ).toEqual(
       'https://explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools',
+    );
+  });
+
+  test('converts Admin EES links to lowercase', () => {
+    expect(
+      formatContentLink(
+        'https://adMIN.exploRe-eduCation-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools',
+      ),
+    ).toEqual(
+      'https://admin.explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools',
     );
   });
 
@@ -55,6 +73,12 @@ describe('formatContentLink', () => {
     expect(formatContentLink('https://gov.uk/Something')).toEqual(
       'https://gov.uk/Something',
     );
+  });
+
+  test('converts host to lowercase but does not convert paths', () => {
+    expect(
+      formatContentLink('https://STACKoverFLOW.com/SOMETHING_UPPER_CASE'),
+    ).toEqual('https://stackoverflow.com/SOMETHING_UPPER_CASE');
   });
 
   test('trims external links', () => {

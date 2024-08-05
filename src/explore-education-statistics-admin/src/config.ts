@@ -1,3 +1,5 @@
+import { setHostUrl } from '@common/utils/url/hostUrl';
+
 export interface OidcConfig {
   readonly clientId: string;
   readonly authority: string;
@@ -17,6 +19,7 @@ export interface Config {
   readonly publicAppUrl: string;
   readonly permittedEmbedUrlDomains: string[];
   readonly oidc: OidcConfig;
+  readonly url: string;
 }
 
 let config: Config;
@@ -24,6 +27,8 @@ let config: Config;
 export async function getConfig(): Promise<Config> {
   if (!config) {
     config = await fetch('/api/config').then(r => r.json());
+
+    setHostUrl(config.url);
   }
   return config;
 }
