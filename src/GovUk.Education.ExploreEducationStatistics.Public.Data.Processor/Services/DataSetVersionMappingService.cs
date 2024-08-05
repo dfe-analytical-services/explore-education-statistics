@@ -20,7 +20,12 @@ internal class DataSetVersionMappingService(
 {
     private static readonly MappingType[] IncompleteMappingTypes =
     [
-        MappingType.None,
+        MappingType.AutoNone
+    ];
+
+    private static readonly MappingType[] NoMappingTypes =
+    [
+        MappingType.ManualNone,
         MappingType.AutoNone
     ];
 
@@ -76,6 +81,7 @@ internal class DataSetVersionMappingService(
     {
         var mappings = await publicDataDbContext
             .DataSetVersionMappings
+            .Include(mapping => mapping.TargetDataSetVersion)
             .SingleAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken);
@@ -92,17 +98,58 @@ internal class DataSetVersionMappingService(
                 .Any(optionMapping =>
                     IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
 
+        // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
+        // omit checking the status of filters that have a mapping of AutoNone.
         mappings.FilterMappingsComplete = !mappings
             .FilterMappingPlan
             .Mappings
-            .Any(filterMapping =>
-                IncompleteMappingTypes.Contains(filterMapping.Value.Type)
-                || filterMapping
-                    .Value
-                    .OptionMappings
-                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
+            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
-        publicDataDbContext.Update(mappings);
+        var currentVersionNumber = await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .Select(nextVersion => nextVersion.SourceDataSetVersion)
+            .Select(sourceVersion => new
+            {
+                major = sourceVersion.VersionMajor,
+                minor = sourceVersion.VersionMinor
+            })
+            .SingleAsync(cancellationToken);
+
+        // Consider the current mappings to produce a major version change if any options from the
+        // original data set version are currently not mapped to options in the new version.
+        var majorLocationVersionUpdate = mappings
+            .LocationMappingPlan
+            .Levels
+            .Any(level => level
+                .Value
+                .Mappings
+                .Any(optionMapping =>
+                    NoMappingTypes.Contains(optionMapping.Value.Type)));
+
+        var majorFilterVersionUpdate = mappings
+            .FilterMappingPlan
+            .Mappings
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
+
+        var majorVersionUpdate = majorLocationVersionUpdate || majorFilterVersionUpdate;
+
+        var nextVersionNumber = majorVersionUpdate
+            ? new
+            {
+                major = currentVersionNumber.major + 1,
+                minor = 0
+            }
+            : currentVersionNumber with { minor = currentVersionNumber.minor + 1 };
+
+        mappings.TargetDataSetVersion.VersionMajor = nextVersionNumber.major;
+        mappings.TargetDataSetVersion.VersionMinor = nextVersionNumber.minor;
+        mappings.TargetDataSetVersion.VersionPatch = 0;
+
+        publicDataDbContext.DataSetVersionMappings.Update(mappings);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
