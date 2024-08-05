@@ -7,6 +7,7 @@ import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext'
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetLocationsMappingRoute,
+  releaseApiDataSetPreviewRoute,
   releaseApiDataSetsRoute,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
@@ -64,22 +65,45 @@ export default function ReleaseApiDataSetDetailsPage() {
       publicationId={release.publicationId}
       collapsibleButtonHiddenText="for draft version"
       actions={
-        canUpdateRelease && dataSet.draftVersion.status !== 'Processing' ? (
-          <DeleteDraftVersionButton
-            dataSet={dataSet}
-            dataSetVersion={dataSet.draftVersion}
-            onDeleted={() =>
-              history.push(
-                generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
-                }),
-              )
-            }
-          >
-            Remove draft version
-          </DeleteDraftVersionButton>
-        ) : undefined
+        <ul className="govuk-list">
+          {dataSet.draftVersion.status === 'Draft' && (
+            <li>
+              <Link
+                to={generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetPreviewRoute.path,
+                  {
+                    publicationId: release.publicationId,
+                    releaseId: release.id,
+                    dataSetId,
+                  },
+                )}
+              >
+                Preview API data set
+              </Link>
+            </li>
+          )}
+          {canUpdateRelease && dataSet.draftVersion.status !== 'Processing' && (
+            <li>
+              <DeleteDraftVersionButton
+                dataSet={dataSet}
+                dataSetVersion={dataSet.draftVersion}
+                onDeleted={() =>
+                  history.push(
+                    generatePath<ReleaseRouteParams>(
+                      releaseApiDataSetsRoute.path,
+                      {
+                        publicationId: release.publicationId,
+                        releaseId: release.id,
+                      },
+                    ),
+                  )
+                }
+              >
+                Remove draft version
+              </DeleteDraftVersionButton>
+            </li>
+          )}
+        </ul>
       }
     />
   ) : null;
@@ -147,7 +171,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             <h2>{dataSet.title}</h2>
 
             <SummaryList
-              className="govuk-!-width-two-thirds govuk-!-margin-bottom-8"
+              className="govuk-!-margin-bottom-8"
               testId="data-set-summary"
             >
               <SummaryListItem term="Status">
@@ -173,7 +197,20 @@ export default function ReleaseApiDataSetDetailsPage() {
                   <TaskList className="govuk-!-margin-bottom-8">
                     <TaskListItem
                       id="map-locations-task"
-                      status={<Tag colour="red">Incomplete</Tag>}
+                      status={
+                        <Tag
+                          colour={
+                            dataSet.draftVersion.mappingStatus
+                              ?.locationsComplete
+                              ? 'blue'
+                              : 'red'
+                          }
+                        >
+                          {dataSet.draftVersion.mappingStatus?.locationsComplete
+                            ? 'Complete'
+                            : 'Incomplete'}
+                        </Tag>
+                      }
                       hint="Define the changes to locations in this version."
                     >
                       {props => (

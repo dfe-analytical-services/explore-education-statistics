@@ -2,7 +2,9 @@ import { FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { MapDataSetCategory } from '@common/modules/charts/components/utils/createMapDataSetCategories';
 import { Dictionary } from '@common/types';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import orderBy from 'lodash/orderBy';
 import uniq from 'lodash/uniq';
 import React, { useMemo } from 'react';
@@ -59,7 +61,7 @@ export default function MapControls({
           filter.level === 'localAuthority' ||
           filter.level === 'localAuthorityDistrict'
             ? (filter.group as string)
-            : locationLevelsMap[filter.level].label;
+            : locationLevelsMap[filter.level as LocationLevelKey].label;
 
         (acc[groupLabel] ??= []).push({
           label: filter.label,
@@ -75,10 +77,11 @@ export default function MapControls({
     const levels = uniq(
       dataSetCategories.map(category => category.filter.level),
     );
+    const levelKey = levels[0] as LocationLevelKey;
     return !levels.every(level => level === levels[0]) ||
-      !locationLevelsMap[levels[0]]
+      !locationLevelsMap[levelKey]
       ? { label: 'location', prefix: 'a' }
-      : locationLevelsMap[levels[0]];
+      : locationLevelsMap[levelKey];
   }, [dataSetCategories]);
 
   return (

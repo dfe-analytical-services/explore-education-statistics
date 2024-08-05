@@ -1,11 +1,15 @@
-import { NewLocationCandidate } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
+import styles from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage.module.scss';
+import { LocationCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
+import Tag from '@common/components/Tag';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import React from 'react';
-import camelCase from 'lodash/camelCase';
 
 interface Props {
-  level: string;
-  locations: NewLocationCandidate[];
+  level: LocationLevelKey;
+  locations: LocationCandidateWithKey[];
 }
 
 export default function ApiDataSetNewLocationsTable({
@@ -13,27 +17,33 @@ export default function ApiDataSetNewLocationsTable({
   locations,
 }: Props) {
   return (
-    <table data-testid={`new-${level}`}>
+    <table data-testid={`new-locations-table-${level}`}>
       <caption className="govuk-visually-hidden">
         {`Table showing new locations for ${
-          locationLevelsMap[camelCase(level)]?.plural ?? level
+          locationLevelsMap[level]?.plural ?? level
         }`}
       </caption>
       <thead>
         <tr>
           <th className="govuk-!-width-one-third">Current data set</th>
           <th className="govuk-!-width-one-third">New data set</th>
+          <th>Type</th>
         </tr>
       </thead>
       <tbody>
-        {locations.map(({ candidate }) => {
+        {locations.map(candidate => {
           return (
-            <tr key={`candidate-${candidate.code}`}>
-              <td>Not applicable to current data set</td>
+            <tr key={`candidate-${candidate.key}`}>
+              <td>Not applicable</td>
               <td>
                 {candidate.label}
                 <br />
-                {candidate.code}
+                <span className={styles.code}>
+                  {getApiDataSetLocationCodes(candidate)}
+                </span>
+              </td>
+              <td>
+                <Tag colour="grey">Minor</Tag>
               </td>
             </tr>
           );

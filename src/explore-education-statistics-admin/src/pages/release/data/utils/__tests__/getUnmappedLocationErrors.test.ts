@@ -1,12 +1,10 @@
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
-import { UnmappedAndManuallyMappedLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import { MappableLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import { Dictionary } from '@common/types';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 
 describe('getUnmappedLocationTotalsByLevel', () => {
-  const testUnmappedAndManuallyMappedLocations: Dictionary<
-    UnmappedAndManuallyMappedLocation[]
-  > = {
+  const testMappableLocations: Dictionary<MappableLocation[]> = {
     localAuthority: [
       {
         mapping: {
@@ -15,6 +13,8 @@ describe('getUnmappedLocationTotalsByLevel', () => {
             label: 'Location 1',
             code: 'location-1-code',
           },
+          sourceKey: 'Location1Key',
+          publicId: 'location-1-public-id',
         },
       },
       {
@@ -24,10 +24,13 @@ describe('getUnmappedLocationTotalsByLevel', () => {
             label: 'Location 2',
             code: 'location-2-code',
           },
+          sourceKey: 'Location2Key',
+          publicId: 'location-2-public-id',
         },
       },
       {
         candidate: {
+          key: 'Location3Key',
           label: 'Location 3',
           code: 'location-3-code',
         },
@@ -38,12 +41,18 @@ describe('getUnmappedLocationTotalsByLevel', () => {
             label: 'Location 3',
             code: 'location-3-code',
           },
+          sourceKey: 'Location3Key',
+          publicId: 'location-3-public-id',
         },
       },
     ],
     region: [
       {
-        candidate: { label: 'Location 4', code: 'location-4-code' },
+        candidate: {
+          key: 'Location4Key',
+          label: 'Location 4',
+          code: 'location-4-code',
+        },
         mapping: {
           candidateKey: 'Location4Key',
           type: 'AutoNone',
@@ -51,10 +60,16 @@ describe('getUnmappedLocationTotalsByLevel', () => {
             label: 'Location 4',
             code: 'location-4-code',
           },
+          sourceKey: 'Location4Key',
+          publicId: 'location-4-public-id',
         },
       },
       {
-        candidate: { label: 'Location 5 updated', code: 'location-5-code' },
+        candidate: {
+          key: 'Location5Key',
+          label: 'Location 5 updated',
+          code: 'location-5-code',
+        },
         mapping: {
           candidateKey: 'Location5Key',
           type: 'ManualMapped',
@@ -62,12 +77,18 @@ describe('getUnmappedLocationTotalsByLevel', () => {
             label: 'Location 5',
             code: 'location-5-code',
           },
+          sourceKey: 'Location5Key',
+          publicId: 'location-5-public-id',
         },
       },
     ],
     englishDevolvedArea: [
       {
-        candidate: { label: 'Location 6 updated', code: 'location-6-code' },
+        candidate: {
+          key: 'Location6Key',
+          label: 'Location 6 updated',
+          code: 'location-6-code',
+        },
         mapping: {
           candidateKey: 'Location6Key',
           type: 'ManualMapped',
@@ -75,6 +96,8 @@ describe('getUnmappedLocationTotalsByLevel', () => {
             label: 'Location 6',
             code: 'location-6-code',
           },
+          sourceKey: 'Location6Key',
+          publicId: 'location-6-public-id',
         },
       },
     ],
@@ -83,14 +106,12 @@ describe('getUnmappedLocationTotalsByLevel', () => {
   test('it returns the error messages', () => {
     const expected: ErrorSummaryMessage[] = [
       {
-        id: 'unmapped-localAuthority',
+        id: 'mappable-localAuthority',
         message: 'There are 2 unmapped local authorities',
       },
-      { id: 'unmapped-region', message: 'There is 1 unmapped region' },
+      { id: 'mappable-region', message: 'There is 1 unmapped region' },
     ];
 
-    expect(
-      getUnmappedLocationErrors(testUnmappedAndManuallyMappedLocations),
-    ).toEqual(expected);
+    expect(getUnmappedLocationErrors(testMappableLocations)).toEqual(expected);
   });
 });

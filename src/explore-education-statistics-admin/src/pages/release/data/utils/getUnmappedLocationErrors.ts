@@ -1,28 +1,27 @@
-import { UnmappedAndManuallyMappedLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import { MappableLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
-import { Dictionary } from '@common/types';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
-import camelCase from 'lodash/camelCase';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
+import typedKeys from '@common/utils/object/typedKeys';
 
 export default function getUnmappedLocationErrors(
-  unmappedAndManuallyMappedLocations: Dictionary<
-    UnmappedAndManuallyMappedLocation[]
-  >,
+  mappableLocations: Partial<Record<LocationLevelKey, MappableLocation[]>>,
 ): ErrorSummaryMessage[] {
   const errors: ErrorSummaryMessage[] = [];
 
-  Object.keys(unmappedAndManuallyMappedLocations).forEach(level => {
-    const total = unmappedAndManuallyMappedLocations[level].filter(
+  typedKeys(mappableLocations).forEach(level => {
+    const total = mappableLocations[level]?.filter(
       map => map.mapping.type === 'AutoNone',
     ).length;
+
     if (total) {
       errors.push({
-        id: `unmapped-${level}`,
+        id: `mappable-${level}`,
         message: `There ${total > 1 ? 'are' : 'is'} ${total} unmapped ${
           total > 1
-            ? // TODO remove camelCase when levels are camelCase in BE
-              locationLevelsMap[camelCase(level)]?.plural.toLowerCase() ?? level
-            : locationLevelsMap[camelCase(level)]?.label.toLowerCase() ?? level
+            ? locationLevelsMap[level]?.plural.toLowerCase() ?? level
+            : locationLevelsMap[level]?.label.toLowerCase() ?? level
         }`,
       });
     }

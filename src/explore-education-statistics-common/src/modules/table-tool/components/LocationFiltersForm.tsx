@@ -8,7 +8,9 @@ import {
   LocationOption,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import { Dictionary } from '@common/types/util';
 import Yup from '@common/validation/yup';
 import mapValues from 'lodash/mapValues';
@@ -62,7 +64,9 @@ const LocationFiltersForm = ({
     return opts.flatMap(group => {
       const level =
         group.level && group.label
-          ? `${locationLevelsMap[group.level].label}: ${group.label}`
+          ? `${locationLevelsMap[group.level as LocationLevelKey].label}: ${
+              group.label
+            }`
           : '';
       return (
         group.options?.map(opt => ({
