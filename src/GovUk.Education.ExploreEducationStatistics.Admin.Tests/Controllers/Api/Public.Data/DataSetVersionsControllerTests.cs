@@ -51,10 +51,25 @@ public abstract class DataSetVersionsControllerTests(
     public class ListLiveVersionsTests(
         TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
+        private static readonly IReadOnlyList<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatuses =
+            new List<DataSetVersionStatus>(
+            [
+                DataSetVersionStatus.Published,
+                DataSetVersionStatus.Withdrawn,
+                DataSetVersionStatus.Deprecated
+            ]
+        );
+
+        public static TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
+            PreviouslyPublishedDataSetVersionStatuses
+        );
+
+        public static TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
+            EnumUtil.GetEnums<DataSetVersionStatus>().Except(PreviouslyPublishedDataSetVersionStatuses)
+        );
+
         [Theory]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
+        [MemberData(nameof(PreviouslyPublishedDataSetVersionStatusesData))]
         public async Task OnlyPreviouslyPublishedVersionsReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -118,11 +133,7 @@ public abstract class DataSetVersionsControllerTests(
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DraftDataSetVersionStatusesData))]
         public async Task DraftVersionsNotReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
