@@ -53,10 +53,4 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj"/>
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Authentication.JwtBearer">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.authentication.jwtbearer\8.0.0\lib\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

@@ -322,6 +322,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       allowedPrincipalIds: [
         adminAppPrincipalId
       ]
+      requireAuthentication: false
     }
     tagValues: tagValues
   }
@@ -366,6 +367,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       allowedPrincipalIds: [
         adminAppPrincipalId
       ]
+      requireAuthentication: true
     }
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
