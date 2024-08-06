@@ -96,6 +96,7 @@ param entraIdAuthentication {
   appRegistrationClientId: string
   allowedClientIds: string[]
   allowedPrincipalIds: string[]
+  requireAuthentication: bool
 }?
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
@@ -168,13 +169,14 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   tags: tagValues
 }
 
-module authSettings 'authSettings.bicep' = if (entraIdAuthentication != null) {
-  name: '${containerAppName}AuthSettings'
+module azureAuthentication 'azureAuthentication.bicep' = if (entraIdAuthentication != null) {
+  name: '${containerAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
     siteName: fullApplicationName
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
+    requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
 }
 
