@@ -1,21 +1,24 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
-/// A set of changes made by a data set version.
+/// A set of changes made to a data set version.
 /// </summary>
 public record DataSetVersionChangesViewModel
 {
     /// <summary>
     /// Any major changes that were made to the data set.
     /// </summary>
-    public ChangeSetViewModel? MajorChanges { get; init; }
+    public required ChangeSetViewModel MajorChanges { get; init; }
 
     /// <summary>
     /// Any minor changes that were made to the data set.
     /// </summary>
-    public ChangeSetViewModel? MinorChanges { get; init; }
+    public required ChangeSetViewModel MinorChanges { get; init; }
 }
 
+/// <summary>
+/// A set of changes grouped by their type (major or minor).
+/// </summary>
 public record ChangeSetViewModel
 {
     /// <summary>
@@ -26,7 +29,7 @@ public record ChangeSetViewModel
     /// <summary>
     /// A list of any filter option changes made to the data set.
     /// </summary>
-    public IReadOnlyList<FilterOptionChangeViewModel>? FilterOptions { get; init; }
+    public IReadOnlyList<FilterOptionChangesViewModel>? FilterOptions { get; init; }
 
     /// <summary>
     /// A list of any geographic level changes made to the data set.
@@ -39,17 +42,50 @@ public record ChangeSetViewModel
     public IReadOnlyList<IndicatorChangeViewModel>? Indicators { get; init; }
 
     /// <summary>
-    /// A list of any location level changes made to the data set.
+    /// A list of any location group changes made to the data set.
     /// </summary>
     public IReadOnlyList<LocationGroupChangeViewModel>? LocationGroups { get; init; }
 
     /// <summary>
     /// A list of any location option changes made to the data set.
     /// </summary>
-    public IReadOnlyList<LocationOptionChangeViewModel>? LocationOptions { get; init; }
+    public IReadOnlyList<LocationOptionChangesViewModel>? LocationOptions { get; init; }
 
     /// <summary>
     /// A list of any time period changes made to the data set.
     /// </summary>
     public IReadOnlyList<TimePeriodOptionChangeViewModel>? TimePeriods { get; init; }
 }
+
+/// <summary>
+/// A set of filter option changes and details of the filter they belong to.
+/// </summary>
+public record FilterOptionChangesViewModel
+{
+    /// <summary>
+    /// The filter the option changes belong to.
+    /// </summary>
+    public required FilterViewModel Filter { get; init; }
+
+    /// <summary>
+    /// The list of filter option changes.
+    /// </summary>
+    public required IReadOnlyList<FilterOptionChangeViewModel> Options { get; init; }
+}
+
+/// <summary>
+/// A set of location option changes and details of the location group they belong to.
+/// </summary>
+public record LocationOptionChangesViewModel
+{
+    /// <summary>
+    /// The location group the option changes belong to.
+    /// </summary>
+    public required LocationGroupViewModel Group { get; init; }
+    
+    /// <summary>
+    /// The list of location option changes.
+    /// </summary>
+    public required IReadOnlyList<LocationOptionChangeViewModel> Options { get; init; }
+}
+
