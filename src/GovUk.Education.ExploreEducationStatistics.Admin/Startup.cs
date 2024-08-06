@@ -159,25 +159,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.AddControllers(options =>
-            {
-                options.AddCommaSeparatedQueryModelBinderProvider();
-                options.AddTrimStringBinderProvider();
-            })
+                {
+                    options.AddCommaSeparatedQueryModelBinderProvider();
+                    options.AddTrimStringBinderProvider();
+                })
                 .AddControllersAsServices();
 
             services.AddHttpContextAccessor();
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
+            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator)
+                .Assembly); // Adds *all* validators from Common
 
             services.AddMvc(options =>
-            {
-                options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
-                options.Filters.Add(new OperationCancelledExceptionFilter());
-                options.Filters.Add(new ProblemDetailsResultFilter());
-                options.EnableEndpointRouting = false;
-                options.AllowEmptyInputInBodyModelBinding = true;
-            })
+                {
+                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.Filters.Add(new ProblemDetailsResultFilter());
+                    options.EnableEndpointRouting = false;
+                    options.AllowEmptyInputInBodyModelBinding = true;
+                })
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -364,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<OpenIdConnectSpaClientOptions>(configuration.GetSection(
                 OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
 
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, configuration);
+            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
             /*
              * Services
@@ -461,14 +462,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
                 });
 
                 services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
                 });
 
                 services.AddTransient<IDataSetService, DataSetService>();
@@ -715,9 +714,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
-            }
+                {
+                    endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+                }
             );
 
             app.UseMvc();
@@ -800,14 +799,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid releaseVersionId,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new Either<ActionResult,Unit>(Unit.Instance));
+            return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
 
         public Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
             Guid dataSetVersionId,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new Either<ActionResult,Unit>(Unit.Instance));
+            return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
     }
 
@@ -860,10 +859,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
-            Guid nextDataSetVersionId,
-            BatchLocationMappingUpdatesRequest request,
-            CancellationToken cancellationToken = default)
+        public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>>
+            ApplyBatchLocationMappingUpdates(
+                Guid nextDataSetVersionId,
+                BatchLocationMappingUpdatesRequest request,
+                CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
@@ -871,9 +871,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
-            BatchFilterOptionMappingUpdatesRequest request,
-            CancellationToken cancellationToken = default) =>
+        public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>>
+            ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
+                BatchFilterOptionMappingUpdatesRequest request,
+                CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
     }
 

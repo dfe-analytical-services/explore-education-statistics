@@ -28,6 +28,5 @@ public static class StartupSecurityConfiguration
         services.AddScoped<IAuthorizationHandler, ViewDataSetAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, QueryDataSetVersionAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, ViewDataSetVersionAuthorizationHandler>();
-
     }
 }
