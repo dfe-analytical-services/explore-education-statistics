@@ -54,6 +54,16 @@ public static class ValidationMessages
         Message: "The file provided '{0}' should have a filename ending in '.zip'."
     );
 
+    public static readonly LocalizableMessage DataSetVersionCannotHaveChangelogNotes = new(
+        Code: nameof(DataSetVersionCannotHaveChangelogNotes),
+        Message: "The data set version is the first version of the series, and therefore cannot have any changelog notes."
+    );
+
+    public static readonly LocalizableMessage DataSetVersionCannotBeUpdated = new(
+        Code: nameof(DataSetVersionCannotBeUpdated),
+        Message: "The data set version cannot be updated."
+    );
+
     public static ErrorViewModel GenerateErrorZipFilenameMustEndDotZip(string fullFilename)
     {
         return new ErrorViewModel
