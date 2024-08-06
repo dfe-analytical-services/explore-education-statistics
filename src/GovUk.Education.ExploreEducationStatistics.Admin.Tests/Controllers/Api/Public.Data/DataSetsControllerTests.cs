@@ -151,10 +151,14 @@ public abstract class DataSetsControllerTests(
                 () => Assert.Equal(draftDataSetVersion.Version, dataSetViewModel.DraftVersion.Version),
                 () => Assert.Equal(draftDataSetVersion.Status, dataSetViewModel.DraftVersion.Status),
                 () => Assert.Equal(draftDataSetVersion.VersionType, dataSetViewModel.DraftVersion.Type),
+                () => Assert.Equal(draftReleaseVersion.Id, dataSetViewModel.DraftVersion.ReleaseVersion.Id),
+                () => Assert.Equal(draftReleaseVersion.Title, dataSetViewModel.DraftVersion.ReleaseVersion.Title),
                 () => Assert.Equal(liveDataSetVersion.Id, dataSetViewModel.LatestLiveVersion.Id),
                 () => Assert.Equal(liveDataSetVersion.Version, dataSetViewModel.LatestLiveVersion.Version),
                 () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
+                () => Assert.Equal(liveReleaseVersion.Id, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Id),
+                () => Assert.Equal(liveReleaseVersion.Title, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Title),
                 () => Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(),
                     dataSetViewModel.LatestLiveVersion?.Published),
                 () => Assert.Equal(new[]
@@ -178,20 +182,32 @@ public abstract class DataSetsControllerTests(
         {
             Publication publication = DataFixture.DefaultPublication();
 
+            var releaseFiles = DataFixture.DefaultReleaseFile()
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => 
+                    DataFixture.DefaultReleaseVersion()
+                        .WithPublication(publication)))
+                .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
+                .GenerateList(numberOfAvailableDataSets);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.AddRange(releaseFiles);
+            });
+
             var dataSets = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished()
                 .WithPublicationId(publication.Id)
                 .GenerateList(numberOfAvailableDataSets);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
 
             var dataSetVersions = dataSets
-                .Select(ds => DataFixture
+                .Select((ds, index) => DataFixture
                     .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSet(ds)
+                    .WithReleaseFileId(releaseFiles[index].Id)
                     .FinishWith(dsv => ds.LatestLiveVersion = dsv)
                     .Generate())
                 .ToList();
@@ -209,7 +225,10 @@ public abstract class DataSetsControllerTests(
                 .Take(pageSize)
                 .ToList();
 
-            var response = await ListPublicationDataSets(publication.Id, page: page, pageSize: pageSize);
+            var response = await ListPublicationDataSets(
+                publicationId: publication.Id, 
+                page: page, 
+                pageSize: pageSize);
 
             var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
 
@@ -224,6 +243,16 @@ public abstract class DataSetsControllerTests(
         [Fact]
         public async Task PublicationHasMultipleDataSets_Success_CorrectOrdering()
         {
+            var releaseFiles = DataFixture.DefaultReleaseFile()
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => DataFixture.DefaultReleaseVersion()))
+                .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
+                .GenerateList(7);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.AddRange(releaseFiles);
+            });
+
             Publication publication = DataFixture.DefaultPublication();
 
             var dataSets = DataFixture
@@ -245,6 +274,7 @@ public abstract class DataSetsControllerTests(
                     s.SetDataSet(dataSets[0]);
                     s.SetStatus(DataSetVersionStatus.Deprecated);
                     s.SetPublished(DateTimeOffset.UtcNow.AddDays(-3));
+                    s.SetReleaseFileId(releaseFiles[0].Id);
                 })
                 .ForIndex(1, s =>
                 {
@@ -252,12 +282,14 @@ public abstract class DataSetsControllerTests(
                     s.SetDataSet(dataSets[1]);
                     s.SetStatus(DataSetVersionStatus.Published);
                     s.SetPublished(DateTimeOffset.UtcNow.AddDays(-4));
+                    s.SetReleaseFileId(releaseFiles[1].Id);
                 })
                 .ForIndex(2, s =>
                 {
                     // Also associate data set 1 with a draft version that should have no bearing on the ordering
                     s.SetDataSet(dataSets[1]);
                     s.SetStatusDraft();
+                    s.SetReleaseFileId(releaseFiles[2].Id);
                 })
                 .ForIndex(3, s =>
                 {
@@ -265,12 +297,14 @@ public abstract class DataSetsControllerTests(
                     s.SetDataSet(dataSets[2]);
                     s.SetStatus(DataSetVersionStatus.Deprecated);
                     s.SetPublished(DateTimeOffset.UtcNow.AddDays(-1));
+                    s.SetReleaseFileId(releaseFiles[3].Id);
                 })
                 .ForIndex(4, s =>
                 {
                     // Associate dataset 3 with a draft version that should have no bearing on the ordering
                     s.SetDataSet(dataSets[3]);
                     s.SetStatusDraft();
+                    s.SetReleaseFileId(releaseFiles[4].Id);
                 })
                 .ForIndex(5, s =>
                 {
@@ -278,12 +312,14 @@ public abstract class DataSetsControllerTests(
                     s.SetDataSet(dataSets[4]);
                     s.SetStatus(DataSetVersionStatus.Published);
                     s.SetPublished(DateTimeOffset.UtcNow.AddDays(-2));
+                    s.SetReleaseFileId(releaseFiles[5].Id);
                 })
                 .ForIndex(6, s =>
                 {
                     // Associate dataset 5 with a draft version that should have no bearing on the ordering
                     s.SetDataSet(dataSets[5]);
                     s.SetStatusDraft();
+                    s.SetReleaseFileId(releaseFiles[6].Id);
                 })
                 .FinishWith(dsv =>
                 {
@@ -332,20 +368,28 @@ public abstract class DataSetsControllerTests(
         public async Task PublicationHasSingleDataSetWithoutLiveVersion_LatestLiveVersionIsEmpty(
             DataSetVersionStatus dataSetVersionStatus)
         {
-            Publication publication = DataFixture.DefaultPublication();
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithPublication(DataFixture.DefaultPublication()))
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusDraft()
-                .WithPublicationId(publication.Id);
+                .WithPublicationId(releaseFile.ReleaseVersion.PublicationId);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet)
+                .WithReleaseFileId(releaseFile.Id)
                 .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -354,7 +398,7 @@ public abstract class DataSetsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var response = await ListPublicationDataSets(publication.Id);
+            var response = await ListPublicationDataSets(releaseFile.ReleaseVersion.PublicationId);
 
             var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
 
@@ -371,14 +415,21 @@ public abstract class DataSetsControllerTests(
         public async Task PublicationHasSingleDataSetWithoutDraftVersion_DraftVersionIsEmpty(
             DataSetVersionStatus dataSetVersionStatus)
         {
-            Publication publication = DataFixture.DefaultPublication();
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithPublication(DataFixture.DefaultPublication()))
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+                .WithPublicationId(releaseFile.ReleaseVersion.PublicationId);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
@@ -386,6 +437,7 @@ public abstract class DataSetsControllerTests(
                 .WithPublished(DateTimeOffset.UtcNow)
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet)
+                .WithReleaseFileId(releaseFile.Id)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -394,7 +446,7 @@ public abstract class DataSetsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var response = await ListPublicationDataSets(publication.Id);
+            var response = await ListPublicationDataSets(releaseFile.ReleaseVersion.PublicationId);
 
             var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
 
