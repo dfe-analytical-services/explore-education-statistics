@@ -13,10 +13,13 @@ param allowedClientIds string[] = []
 @description('Specifies an optional set of Principal Ids of Managed Identities that are allowed to access this resource')
 param allowedPrincipalIds string[] = []
 
+@description('Specifies whether all calls to this resource should be authenticated or not.  Defaults to true')
+param requireAuthentication bool = true
+
 var properties = {
   globalValidation: {
-    requireAuthentication: true
-    unauthenticatedClientAction: 'Return401'
+    requireAuthentication: requireAuthentication
+    unauthenticatedClientAction: requireAuthentication ? 'Return401' : null
   }
   httpSettings: {
     requireHttps: true

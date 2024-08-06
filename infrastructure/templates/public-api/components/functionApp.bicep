@@ -54,6 +54,7 @@ param entraIdAuthentication {
   appRegistrationClientId: string
   allowedClientIds: string[]
   allowedPrincipalIds: string[]
+  requireAuthentication: bool
 }?
 
 @description('Specifies the SKU for the Function App hosting plan')
@@ -238,14 +239,15 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
   tags: tagValues
 }
 
-module authSettings 'authSettings.bicep' = if (entraIdAuthentication != null) {
-  name: '${functionAppName}AuthSettings'
+module azureAuthentication 'azureAuthentication.bicep' = if (entraIdAuthentication != null) {
+  name: '${functionAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
     siteName: fullFunctionAppName
     stagingSlotName: stagingSlot.name
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
+    requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
 }
 
