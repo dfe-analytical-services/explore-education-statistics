@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
@@ -133,6 +134,22 @@ public class DataSetVersionService(
                 cancellationToken: cancellationToken));
     }
 
+    public async Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccess(() => publicDataDbContext.DataSetVersions
+                .AsNoTracking()
+                .Where(dsv => dsv.Id == dataSetVersionId)
+                .SingleOrNotFoundAsync(cancellationToken: cancellationToken))
+            .OnSuccess(dsv => publicDataApiClient.GetDataSetVersionChanges(
+                dataSetId: dsv.DataSetId,
+                dataSetVersion: dsv.Version,
+                cancellationToken: cancellationToken
+            ));
+    }
+
     public async Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
         DataSetVersionUpdateRequest updateRequest,
         CancellationToken cancellationToken = default)
@@ -199,7 +216,7 @@ public class DataSetVersionService(
             Version = dataSetVersion.Version,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
-            Release = MapReleaseVersion(releaseFile.ReleaseVersion)
+            ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion)
         };
     }
 
@@ -314,22 +331,6 @@ public class DataSetVersionService(
             Id = releaseVersion.Id,
             Title = releaseVersion.Title,
         };
-    }
-
-    public async Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
-        Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
-    {
-        return await userService.CheckIsBauUser()
-            .OnSuccess(() => publicDataDbContext.DataSetVersions
-                .AsNoTracking()
-                .Where(dsv => dsv.Id == dataSetVersionId)
-                .SingleOrNotFoundAsync(cancellationToken: cancellationToken))
-            .OnSuccess(dsv => publicDataApiClient.GetDataSetVersionChanges(
-                dataSetId: dsv.DataSetId,
-                dataSetVersion: dsv.Version,
-                cancellationToken: cancellationToken
-            ));
     }
 }
 

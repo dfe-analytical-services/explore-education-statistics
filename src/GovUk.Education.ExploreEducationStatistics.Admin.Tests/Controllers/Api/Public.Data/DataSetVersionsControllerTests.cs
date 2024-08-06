@@ -1,12 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -33,7 +25,9 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -127,8 +121,8 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(currentDataSetVersion.Version, liveVersion.Version);
             Assert.Equal(currentDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(currentDataSetVersion.VersionType, liveVersion.Type);
-            Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.Release.Id);
-            Assert.Equal(releaseFile.ReleaseVersion.Title, liveVersion.Release.Title);
+            Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
+            Assert.Equal(releaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
             liveVersion.Published.AssertEqual(currentDataSetVersion.Published!.Value);
         }
 
@@ -184,8 +178,8 @@ public abstract class DataSetVersionsControllerTests(
             int numberOfPublishedDataSetVersions)
         {
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, DataFixture.DefaultReleaseVersion()))
-                .ForInstance(s => s.Set(rf => rf.File, DataFixture.DefaultFile(FileType.Data)))
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => DataFixture.DefaultReleaseVersion()))
+                .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
                 .GenerateList(numberOfPublishedDataSetVersions);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -308,8 +302,8 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(targetDataSetVersion.Version, liveVersion.Version);
             Assert.Equal(targetDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(targetDataSetVersion.VersionType, liveVersion.Type);
-            Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.Release.Id);
-            Assert.Equal(targetReleaseFile.ReleaseVersion.Title, liveVersion.Release.Title);
+            Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
+            Assert.Equal(targetReleaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
             liveVersion.Published.AssertEqual(targetDataSetVersion.Published!.Value);
         }
 
@@ -353,7 +347,14 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task Success()
         {
-            var nextReleaseFileId = Guid.NewGuid();
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -380,7 +381,7 @@ public abstract class DataSetVersionsControllerTests(
 
             processorClient
                 .Setup(c => c.CreateNextDataSetVersion(dataSet.Id,
-                    nextReleaseFileId, It.IsAny<CancellationToken>()))
+                    releaseFile.Id, It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
                     var savedDataSet = await TestApp.GetDbContext<PublicDataDbContext>()
@@ -391,7 +392,7 @@ public abstract class DataSetVersionsControllerTests(
                         .DefaultDataSetVersion()
                         .WithStatusMapping()
                         .WithVersionNumber(major: 1, minor: 1)
-                        .WithReleaseFileId(nextReleaseFileId)
+                        .WithReleaseFileId(releaseFile.Id)
                         .WithDataSet(savedDataSet)
                         .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
@@ -413,7 +414,7 @@ public abstract class DataSetVersionsControllerTests(
 
             var response = await CreateNextVersion(
                 dataSetId: dataSet.Id,
-                releaseFileId: nextReleaseFileId,
+                releaseFileId: releaseFile.Id,
                 client);
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
