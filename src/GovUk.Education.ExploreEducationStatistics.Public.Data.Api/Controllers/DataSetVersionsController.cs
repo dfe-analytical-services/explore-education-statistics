@@ -25,12 +25,14 @@ public class DataSetVersionsController(
     /// </remarks>
     [HttpGet]
     [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
+    [SwaggerResponse(200, "The paginated list of data set versions",
+        type: typeof(DataSetVersionPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
         [FromQuery] DataSetVersionListRequest request,
-        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        [SwaggerParameter("The ID of the data set.")]
+        Guid dataSetId,
         CancellationToken cancellationToken)
     {
         return await dataSetService
@@ -54,8 +56,10 @@ public class DataSetVersionsController(
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
-        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion,
+        [SwaggerParameter("The ID of the data set.")]
+        Guid dataSetId,
+        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")]
+        string dataSetVersion,
         CancellationToken cancellationToken)
     {
         return await dataSetService
@@ -78,8 +82,10 @@ public class DataSetVersionsController(
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionChangesViewModel>> GetDataSetVersionChanges(
-        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion,
+        [SwaggerParameter("The ID of the data set.")]
+        Guid dataSetId,
+        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")]
+        string dataSetVersion,
         CancellationToken cancellationToken)
     {
         return await dataSetVersionChangeService

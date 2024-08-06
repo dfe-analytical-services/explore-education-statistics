@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
@@ -35,6 +36,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 {
     private readonly IConfiguration _miniProfilerConfig =
         configuration.GetRequiredSection(MiniProfilerOptions.Section);
+    private readonly IConfiguration _openIdConnectConfig =
+        configuration.GetRequiredSection(OpenIdConnectOptions.Section);
     private readonly IConfiguration _requestTimeoutConfig =
         configuration.GetSection(RequestTimeoutOptions.Section);
 
@@ -62,6 +65,23 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                     options.ShouldProfile = request => request.Path.StartsWithSegments("/api");
                 })
                 .AddEntityFramework();
+        }
+
+        // Authentication
+
+        // Look for JWT Bearer tokens, and validate that they are issued from the correct tenant and are
+        // issued for the Public API.
+        if (!hostEnvironment.IsIntegrationTest())
+        {
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var tenantId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.TenantId));
+                    var clientId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.ClientId));
+                    options.Authority = $"https://login.microsoftonline.com/{tenantId}";
+                    options.Audience = clientId.ToString();
+                });
         }
 
         // MVC
@@ -221,11 +241,22 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         app.UseRouting();
 
+        // Authentication and authorization
+        
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseRequestTimeouts();
 
         app.UseEndpoints(builder =>
         {
-            builder.MapControllers();
+            builder
+                .MapControllers()
+                // Enable anonymous and authenticated users to call any Controller
+                // methods in the same way, but allow users to be identified if they have
+                // passed a JWT in the call.
+                .RequireAuthorization()
+                .AllowAnonymous();
         });
 
         app.UseHealthChecks("/api/health");
