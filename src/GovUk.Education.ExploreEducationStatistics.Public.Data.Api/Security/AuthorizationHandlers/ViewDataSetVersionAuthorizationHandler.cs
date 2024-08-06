@@ -19,8 +19,9 @@ public class ViewDataSetVersionAuthorizationHandler(
         ViewDataSetVersionRequirement requirement,
         DataSetVersion dataSetVersion)
     {
-        // TODO: EES-5374 - Temporary workaround until authentication is added for admin API
-        if (httpContextAccessor.HttpContext?.Request.Headers.UserAgent.Contains("EES Admin") == true)
+        var user = httpContextAccessor.HttpContext?.User;
+
+        if (user is not null && user.IsInRole(SecurityConstants.UnpublishedDataReaderAppRole))
         {
             context.Succeed(requirement);
             return;
