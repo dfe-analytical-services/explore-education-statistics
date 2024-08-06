@@ -44,7 +44,7 @@ public record FilterOptionsViewModel : FilterViewModel
 }
 
 /// <summary>
-/// The location options available at a geographic level in the data set.
+/// The options available for a location group in the data set.
 /// </summary>
 public record LocationGroupOptionsViewModel : LocationGroupViewModel
 {
