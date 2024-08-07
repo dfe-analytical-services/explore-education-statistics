@@ -200,3 +200,10 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --slot staging \
                   --target-slot production
+
+          - template: assign-app-role-to-service-principal-template.yml
+            parameters:
+              serviceConnection: ${{parameters.serviceConnection}}
+              appRoleName: UnpublishedData.Read
+              protectedResourceAppRegName: $subscription-ees-papi-ca-api-appreg
+              servicePrincipalName: $subscription-as-ees-admin
