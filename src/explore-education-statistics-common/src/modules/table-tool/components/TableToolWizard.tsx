@@ -1,6 +1,8 @@
 import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
+import locationLevelsMap, {
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
@@ -628,7 +630,7 @@ function getLocationsStepTitle(
     options: LocationOption[];
   }>,
 ) {
-  const levelKeys = Object.keys(locations);
+  const levelKeys = Object.keys(locations) as LocationLevelKey[];
   return levelKeys.length === 1 && locationLevelsMap[levelKeys[0]]
     ? `Choose ${locationLevelsMap[levelKeys[0]].plural}`
     : defaultLocationStepTitle;

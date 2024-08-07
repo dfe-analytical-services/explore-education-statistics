@@ -190,6 +190,11 @@ public static class DataSetVersionGeneratorExtensions
         Func<IEnumerable<PreviewToken>> previewTokens)
         => generator.ForInstance(s => s.SetPreviewTokens(previewTokens));
 
+    public static Generator<DataSetVersion> WithNotes(
+        this Generator<DataSetVersion> generator,
+        string notes)
+        => generator.ForInstance(s => s.SetNotes(notes));
+
     public static InstanceSetters<DataSetVersion> SetDefaults(this InstanceSetters<DataSetVersion> setters)
         => setters
             .SetDefault(dsv => dsv.Id)
@@ -542,4 +547,9 @@ public static class DataSetVersionGeneratorExtensions
                 }
             }
         );
+
+    public static InstanceSetters<DataSetVersion> SetNotes(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        string notes)
+        => instanceSetter.Set(dsv => dsv.Notes, notes);
 }

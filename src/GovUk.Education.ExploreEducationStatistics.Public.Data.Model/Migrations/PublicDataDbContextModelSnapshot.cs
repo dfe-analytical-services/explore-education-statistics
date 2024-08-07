@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -38,6 +38,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonFragment", b =>
                 {
                     b.Property<string>("JsonValue")
+                        .HasColumnType("text");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.JsonString", b =>
+                {
+                    b.Property<string>("StringValue")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.ToTable((string)null);
@@ -233,6 +244,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId");
 
                     b.ToTable("DataSetVersionMappings");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos.FilterAndOptionMappingTypeDto", b =>
+                {
+                    b.Property<string>("FilterMappingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OptionMappingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable((string)null);
+
+                    b.ToView(null, (string)null);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>

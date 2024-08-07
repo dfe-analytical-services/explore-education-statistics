@@ -1,11 +1,6 @@
 import { Dictionary } from '@common/types';
 
-const locationLevelsMap: Dictionary<{
-  label: string;
-  plural: string;
-  prefix: string;
-  code: string;
-}> = {
+const locationLevelsMap = {
   country: {
     label: 'Country',
     plural: 'Countries',
@@ -114,8 +109,13 @@ const locationLevelsMap: Dictionary<{
     prefix: 'a',
     code: 'PA',
   },
-};
+} as const satisfies Dictionary<{
+  label: string;
+  plural: string;
+  prefix: string;
+  code: string;
+}>;
 
 export default locationLevelsMap;
 
-export type LocationLevelsType = keyof typeof locationLevelsMap;
+export type LocationLevelKey = keyof typeof locationLevelsMap;

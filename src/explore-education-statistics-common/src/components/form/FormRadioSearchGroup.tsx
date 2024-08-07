@@ -9,6 +9,7 @@ import FormRadioGroup, {
 import React, { useState } from 'react';
 
 export interface FormRadioSearchGroupProps extends FormRadioGroupProps {
+  alwaysShowOptions?: string[];
   searchLabel?: string;
 }
 
@@ -22,6 +23,7 @@ const FormRadioSearchGroup = ({
   const [selectedOption, setSelectedOption] = useState('');
 
   const {
+    alwaysShowOptions = [],
     id,
     hint,
     legend,
@@ -65,14 +67,22 @@ const FormRadioSearchGroup = ({
     filteredOptions = options.filter(option => {
       return (
         option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        selectedOption.indexOf(option.value) > -1
+        selectedOption.indexOf(option.value) > -1 ||
+        alwaysShowOptions.includes(option.value)
       );
     });
   }
+  const noResults = alwaysShowOptions.length
+    ? filteredOptions.length === alwaysShowOptions.length
+    : !filteredOptions.length;
+
+  const showSearch = alwaysShowOptions.length
+    ? options.length > 1 + alwaysShowOptions.length
+    : options.length > 1;
 
   return (
     <FormFieldset {...fieldsetProps} useFormId={false}>
-      {options.length > 1 && (
+      {showSearch && (
         <FormTextSearchInput
           id={`${id}-search`}
           className="govuk-!-margin-bottom-4"
@@ -89,7 +99,7 @@ const FormRadioSearchGroup = ({
       )}
 
       <div aria-live="assertive">
-        {filteredOptions.length > 0 ? (
+        {(alwaysShowOptions.length > 0 || !noResults) && (
           <BaseFormRadioGroup
             {...groupProps}
             name={name}
@@ -100,9 +110,9 @@ const FormRadioSearchGroup = ({
               onChange?.(event, option);
             }}
           />
-        ) : (
-          <p>No results found</p>
         )}
+
+        {noResults && <p>No results found</p>}
       </div>
     </FormFieldset>
   );

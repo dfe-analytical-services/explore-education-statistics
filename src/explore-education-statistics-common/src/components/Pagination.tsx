@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight } from '@common/components/ArrowIcons';
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
+import styles from '@common/components/Pagination.module.scss';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import appendQuery from '@common/utils/url/appendQuery';
 import classNames from 'classnames';
@@ -17,7 +18,7 @@ interface LinkRenderProps {
   className: string;
   rel?: 'next' | 'prev';
   to: string;
-  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  onClick?: (event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
 }
 
 export interface PaginationProps {
@@ -54,7 +55,11 @@ const Pagination = ({
   }
 
   return (
-    <nav className="govuk-pagination" role="navigation" aria-label={label}>
+    <nav
+      className={`govuk-pagination ${styles.pagination}`}
+      role="navigation"
+      aria-label={label}
+    >
       {currentPage !== 1 && (
         <div className="govuk-pagination__prev">
           {renderLink({

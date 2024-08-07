@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -35,5 +36,9 @@ public interface IDataSetVersionService
 
     Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
         Guid dataSetVersionId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
+        DataSetVersionUpdateRequest updateRequest,
         CancellationToken cancellationToken = default);
 }

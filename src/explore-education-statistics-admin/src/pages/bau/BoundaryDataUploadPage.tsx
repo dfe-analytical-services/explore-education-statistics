@@ -1,4 +1,5 @@
 import boundaryDataService from '@admin/services/boundaryDataService';
+import typedKeys from '@common/utils/object/typedKeys';
 import React, { useCallback, useMemo } from 'react';
 import Page from '@admin/components/Page';
 import FormProvider from '@common/components/form/FormProvider';
@@ -74,14 +75,13 @@ export default function BoundaryDataUploadPage() {
         {({ formState }) => {
           const options: SelectOption<string | number>[] = [
             { value: '', label: '' },
+            ...typedKeys(locationLevelsMap).map(key => {
+              return {
+                value: locationLevelsMap[key].label.replace(/\s/g, ''),
+                label: `${locationLevelsMap[key].code} - ${locationLevelsMap[key].label}`,
+              };
+            }),
           ];
-
-          Object.keys(locationLevelsMap).map(key => {
-            return options.push({
-              value: locationLevelsMap[key].label.replace(/\s/g, ''),
-              label: `${locationLevelsMap[key].code} - ${locationLevelsMap[key].label}`,
-            });
-          });
 
           return (
             <Form id="addBoundaryDataForm" onSubmit={handleSubmit}>

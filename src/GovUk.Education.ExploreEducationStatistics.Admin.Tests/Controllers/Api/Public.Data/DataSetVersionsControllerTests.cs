@@ -11,12 +11,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -25,7 +29,15 @@ using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -477,6 +489,220 @@ public abstract class DataSetVersionsControllerTests(
         private record MockedChanges
         {
             public List<string> Changes { get; init; } = [];
+        }
+    }
+
+    public class UpdateVersionTests(
+        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    {
+        private static readonly IReadOnlyList<DataSetVersionStatus> EligibleUpdateDataSetVersionStatuses =
+            new List<DataSetVersionStatus>(
+            [
+                DataSetVersionStatus.Draft,
+                DataSetVersionStatus.Mapping
+            ]
+        );
+
+        public static TheoryData<DataSetVersionStatus> EligibleUpdateDataSetVersionStatusesData = new(
+            EligibleUpdateDataSetVersionStatuses
+        );
+
+        public static TheoryData<DataSetVersionStatus> NonEligibleUpdateDataSetVersionStatusesData = new(
+            EnumUtil.GetEnums<DataSetVersionStatus>().Except(EligibleUpdateDataSetVersionStatuses)
+        );
+
+        [Theory]
+        [MemberData(nameof(EligibleUpdateDataSetVersionStatusesData))]
+        public async Task Success(DataSetVersionStatus dataSetVersionStatus)
+        {
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .WithReleaseFileId(releaseFile.Id)
+                .WithNotes("initial notes.")
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var updateRequest = new DataSetVersionUpdateRequest
+            {
+                DataSetVersionId = nextDataSetVersion.Id,
+                Notes = "updated notes."
+            };
+
+            var response = await UpdateVersion(updateRequest);
+
+            var viewModel = response.AssertOk<DataSetDraftVersionViewModel>();
+
+            Assert.NotNull(viewModel);
+            Assert.Equal(nextDataSetVersion.Id, viewModel.Id);
+            Assert.Equal(nextDataSetVersion.Version, viewModel.Version);
+            Assert.Equal(nextDataSetVersion.Status, viewModel.Status);
+            Assert.Equal(nextDataSetVersion.VersionType, viewModel.Type);
+            Assert.Equal(releaseFile.File.DataSetFileId!.Value, viewModel.File.Id);
+            Assert.Equal(releaseFile.Name, viewModel.File.Title);
+            Assert.Equal(releaseFile.ReleaseVersion.Id, viewModel.ReleaseVersion.Id);
+            Assert.Equal(releaseFile.ReleaseVersion.Title, viewModel.ReleaseVersion.Title);
+            Assert.Equal(nextDataSetVersion.TotalResults, viewModel.TotalResults);
+            Assert.Equal("updated notes.", viewModel.Notes);
+            Assert.Equal(
+                nextDataSetVersion.MetaSummary!.GeographicLevels.Select(l => l.GetEnumLabel()),
+                viewModel.GeographicLevels);
+            Assert.Equal(
+                TimePeriodRangeViewModel.Create(nextDataSetVersion.MetaSummary!.TimePeriodRange),
+                viewModel.TimePeriods);
+            Assert.Equal(
+                nextDataSetVersion.MetaSummary!.Filters,
+                viewModel.Filters);
+            Assert.Equal(
+                nextDataSetVersion.MetaSummary!.Indicators,
+                viewModel.Indicators);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var updateRequest = new DataSetVersionUpdateRequest
+            {
+                DataSetVersionId = Guid.NewGuid()
+            };
+
+            var response = await UpdateVersion(updateRequest, client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetVersionDoesNotExist_Returns404()
+        {
+            var updateRequest = new DataSetVersionUpdateRequest
+            {
+                DataSetVersionId = Guid.NewGuid()
+            };
+
+            var response = await UpdateVersion(updateRequest);
+
+            response.AssertNotFound();
+        }
+
+        [Theory]
+        [MemberData(nameof(NonEligibleUpdateDataSetVersionStatusesData))]
+        public async Task DataSetVersionCannotBeUpdated_Returns400(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var updateRequest = new DataSetVersionUpdateRequest
+            {
+                DataSetVersionId = nextDataSetVersion.Id
+            };
+
+            var response = await UpdateVersion(updateRequest);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "dataSetVersionId",
+                expectedCode: ValidationMessages.DataSetVersionCannotBeUpdated.Code);
+        }
+
+        [Fact]
+        public async Task DataSetVersionIsFirstVersion_UpdatingNotes_Returns400()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var updateRequest = new DataSetVersionUpdateRequest
+            {
+                DataSetVersionId = dataSetVersion.Id,
+                Notes = "updated notes."
+            };
+
+            var response = await UpdateVersion(updateRequest);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "notes",
+                expectedCode: ValidationMessages.DataSetVersionCannotHaveChangelogNotes.Code);
+        }
+
+        private async Task<HttpResponseMessage> UpdateVersion(
+            DataSetVersionUpdateRequest updateRequest,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            return await client.PatchAsync(BaseUrl, new JsonNetContent(updateRequest));
         }
     }
 

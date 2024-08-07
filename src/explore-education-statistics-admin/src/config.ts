@@ -17,6 +17,8 @@ export interface Config {
   readonly publicAppUrl: string;
   readonly permittedEmbedUrlDomains: string[];
   readonly oidc: OidcConfig;
+  readonly publicApiBaseUrl: string;
+  readonly publicApiDocsUrl: string;
 }
 
 let config: Config;

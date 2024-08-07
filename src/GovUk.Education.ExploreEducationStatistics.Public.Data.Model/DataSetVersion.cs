@@ -87,6 +87,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
         or DataSetVersionStatus.Draft
         or DataSetVersionStatus.Cancelled;
 
+    public bool CanBeUpdated => Status is DataSetVersionStatus.Mapping
+        or DataSetVersionStatus.Draft;
+
     internal class Config : IEntityTypeConfiguration<DataSetVersion>
     {
         public void Configure(EntityTypeBuilder<DataSetVersion> builder)
