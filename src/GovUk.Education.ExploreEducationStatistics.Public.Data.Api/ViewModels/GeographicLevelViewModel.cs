@@ -6,24 +6,23 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
-/// A geographic level option (e.g. national, regional) that can be used to
-/// filter a data set.
+/// A geographic level (e.g. national, regional) covered by a data set.
 /// </summary>
-public record GeographicLevelOptionViewModel
+public record GeographicLevelViewModel
 {
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
-    public required GeographicLevel Level { get; init; }
+    public required GeographicLevel Code { get; init; }
 
     /// <summary>
     /// The human-readable label for the geographic level.
     /// </summary>
-    public string Label => Level.GetEnumLabel();
+    public string Label => Code.GetEnumLabel();
 
-    public static GeographicLevelOptionViewModel Create(GeographicLevel level)
+    public static GeographicLevelViewModel Create(GeographicLevel level)
     {
-        return new GeographicLevelOptionViewModel
+        return new GeographicLevelViewModel
         {
-            Level = level,
+            Code = level,
         };
     }
 }

@@ -345,7 +345,7 @@ internal class DataSetService(
             .ToList();
 
         var geographicLevels = dataSetVersion.GeographicLevelMeta?.Levels
-            .Select(MapGeographicLevelOption)
+            .Select(GeographicLevelViewModel.Create)
             .ToList() ?? [];
 
         var locations = dataSetVersion.LocationMetas
@@ -365,14 +365,6 @@ internal class DataSetService(
             GeographicLevels = geographicLevels,
             Locations = locations,
             TimePeriods = timePeriods,
-        };
-    }
-
-    private static GeographicLevelOptionViewModel MapGeographicLevelOption(GeographicLevel level)
-    {
-        return new GeographicLevelOptionViewModel
-        {
-            Level = level,
         };
     }
 
@@ -422,7 +414,7 @@ internal class DataSetService(
 
         return new LocationGroupOptionsViewModel
         {
-            Level = locationMeta.Level,
+            Level = GeographicLevelViewModel.Create(locationMeta.Level),
             Options = options,
         };
     }

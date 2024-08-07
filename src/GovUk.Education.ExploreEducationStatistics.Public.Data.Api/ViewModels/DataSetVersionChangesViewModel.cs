@@ -74,14 +74,14 @@ public record FilterOptionChangesViewModel
 }
 
 /// <summary>
-/// A set of location option changes and details of the location group they belong to.
+/// A set of location option changes and details of the geographic level they belong to.
 /// </summary>
 public record LocationOptionChangesViewModel
 {
     /// <summary>
-    /// The location group the option changes belong to.
+    /// The geographic level the changes belong to.
     /// </summary>
-    public required LocationGroupViewModel Group { get; init; }
+    public required GeographicLevelViewModel Level { get; init; }
     
     /// <summary>
     /// The list of location option changes.

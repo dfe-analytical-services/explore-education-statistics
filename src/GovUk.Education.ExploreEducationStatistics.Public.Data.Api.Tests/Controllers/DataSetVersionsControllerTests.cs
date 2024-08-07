@@ -1248,7 +1248,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Deletion
             Assert.Null(majorChanges[0].CurrentState);
             Assert.NotNull(majorChanges[0].PreviousState);
-            Assert.Equal(GeographicLevel.LocalAuthorityDistrict, majorChanges[0].PreviousState!.Level);
+            Assert.Equal(GeographicLevel.LocalAuthorityDistrict, majorChanges[0].PreviousState!.Code);
 
             var minorChanges = viewModel.MinorChanges.GeographicLevels;
 
@@ -1258,12 +1258,12 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Addition
             Assert.Null(minorChanges[0].PreviousState);
             Assert.NotNull(minorChanges[0].CurrentState);
-            Assert.Equal(GeographicLevel.Region, minorChanges[0].CurrentState!.Level);
+            Assert.Equal(GeographicLevel.Region, minorChanges[0].CurrentState!.Code);
 
             // Addition
             Assert.Null(minorChanges[1].PreviousState);
             Assert.NotNull(minorChanges[1].CurrentState);
-            Assert.Equal(GeographicLevel.LocalAuthority, minorChanges[1].CurrentState!.Level);
+            Assert.Equal(GeographicLevel.LocalAuthority, minorChanges[1].CurrentState!.Code);
         }
 
         [Fact]
@@ -1329,14 +1329,14 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Deletion
             Assert.Null(majorChanges[0].CurrentState);
             Assert.NotNull(majorChanges[0].PreviousState);
-            Assert.Equal(oldDataSetVersion.LocationMetas[0].Level, majorChanges[0].PreviousState!.Level);
+            Assert.Equal(oldDataSetVersion.LocationMetas[0].Level, majorChanges[0].PreviousState!.Level.Code);
 
             // Updated level
             Assert.NotNull(majorChanges[1].PreviousState);
-            Assert.Equal(oldDataSetVersion.LocationMetas[1].Level, majorChanges[1].PreviousState!.Level);
+            Assert.Equal(oldDataSetVersion.LocationMetas[1].Level, majorChanges[1].PreviousState!.Level.Code);
 
             Assert.NotNull(majorChanges[1].CurrentState);
-            Assert.Equal(dataSetVersion.LocationMetas[1].Level, majorChanges[1].CurrentState!.Level);
+            Assert.Equal(dataSetVersion.LocationMetas[1].Level, majorChanges[1].CurrentState!.Level.Code);
 
             var minorChanges = viewModel.MinorChanges.LocationGroups;
 
@@ -1346,7 +1346,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Addition
             Assert.Null(minorChanges[0].PreviousState);
             Assert.NotNull(minorChanges[0].CurrentState);
-            Assert.Equal(dataSetVersion.LocationMetas[0].Level, minorChanges[0].CurrentState!.Level);
+            Assert.Equal(dataSetVersion.LocationMetas[0].Level, minorChanges[0].CurrentState!.Level.Code);
         }
 
         [Fact]
@@ -1434,8 +1434,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.NotNull(majorChanges);
             Assert.Single(majorChanges);
 
-            Assert.Equal(dataSetVersion.LocationMetas[0].Level, majorChanges[0].Group.Level);
-            Assert.Equal(dataSetVersion.LocationMetas[0].Level.GetEnumLabel(), majorChanges[0].Group.Label);
+            Assert.Equal(dataSetVersion.LocationMetas[0].Level, majorChanges[0].Level.Code);
 
             var majorChangeOptions = majorChanges[0].Options;
 
@@ -1467,8 +1466,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.NotNull(minorChanges);
             Assert.Single(minorChanges);
 
-            Assert.Equal(dataSetVersion.LocationMetas[0].Level, minorChanges[0].Group.Level);
-            Assert.Equal(dataSetVersion.LocationMetas[0].Level.GetEnumLabel(), minorChanges[0].Group.Label);
+            Assert.Equal(dataSetVersion.LocationMetas[0].Level, minorChanges[0].Level.Code);
 
             var minorChangeOptions = minorChanges[0].Options;
 

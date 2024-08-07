@@ -195,13 +195,13 @@ public class DataSetVersionChangeService(
                 .Where(level => !previousLevels.Contains(level))
                 .Select(level => new GeographicLevelOptionChangeViewModel
                 {
-                    CurrentState = GeographicLevelOptionViewModel.Create(level),
+                    CurrentState = GeographicLevelViewModel.Create(level),
                 }),
             ..previousLevels
                 .Where(level => !currentLevels.Contains(level))
                 .Select(level => new GeographicLevelOptionChangeViewModel
                 {
-                    PreviousState = GeographicLevelOptionViewModel.Create(level),
+                    PreviousState = GeographicLevelViewModel.Create(level),
                 }),
         ];
 
@@ -253,10 +253,7 @@ public class DataSetVersionChangeService(
                         .GroupBy(t => t.Meta.Level, t => t.Option)
                         .Select(metaGroup => new LocationOptionChangesViewModel
                         {
-                            Group = new LocationGroupViewModel
-                            {
-                                Level = metaGroup.Key,
-                            },
+                            Level = GeographicLevelViewModel.Create(metaGroup.Key),
                             Options = metaGroup.ToList()
                         })
                         .ToList()
