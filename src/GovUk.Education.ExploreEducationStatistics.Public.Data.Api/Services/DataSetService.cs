@@ -340,7 +340,7 @@ internal class DataSetService(
             .ToList();
 
         var indicators = dataSetVersion.IndicatorMetas
-            .Select(MapIndicator)
+            .Select(IndicatorViewModel.Create)
             .OrderBy(im => im.Label)
             .ToList();
 
@@ -353,7 +353,7 @@ internal class DataSetService(
             .ToList();
 
         var timePeriods = dataSetVersion.TimePeriodMetas
-            .Select(MapTimePeriodOption)
+            .Select(TimePeriodOptionViewModel.Create)
             .OrderBy(tm => tm.Code.GetEnumValue())
             .ThenBy(tm => tm.Period)
             .ToList();
@@ -394,17 +394,6 @@ internal class DataSetService(
         };
     }
 
-    private static IndicatorViewModel MapIndicator(IndicatorMeta indicatorMeta)
-    {
-        return new IndicatorViewModel
-        {
-            Id = indicatorMeta.PublicId,
-            Label = indicatorMeta.Label,
-            Unit = indicatorMeta.Unit,
-            DecimalPlaces = indicatorMeta.DecimalPlaces,
-        };
-    }
-
     private static LocationGroupOptionsViewModel MapLocationGroupOptions(LocationMeta locationMeta)
     {
         var options = locationMeta.OptionLinks
@@ -416,16 +405,6 @@ internal class DataSetService(
         {
             Level = GeographicLevelViewModel.Create(locationMeta.Level),
             Options = options,
-        };
-    }
-
-    private static TimePeriodOptionViewModel MapTimePeriodOption(TimePeriodMeta timePeriodMeta)
-    {
-        return new TimePeriodOptionViewModel
-        {
-            Code = timePeriodMeta.Code,
-            Period = timePeriodMeta.Period,
-            Label = TimePeriodFormatter.FormatLabel(timePeriodMeta.Period, timePeriodMeta.Code),
         };
     }
 }
