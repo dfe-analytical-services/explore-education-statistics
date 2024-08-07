@@ -26,19 +26,23 @@ class SlackService:
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:
             contents = report.read()
 
-        soup = BeautifulSoup(contents, features="xml")
+        try:
+            soup = BeautifulSoup(contents, features="xml")
+            tests = soup.find("total").find("stat")
+            failed_tests = int(tests["fail"])
+            passed_tests = int(tests["pass"])
 
-        tests = soup.find("total").find("stat")
+        except AttributeError as e:
+            raise Exception("Error parsing the XML report") from e
 
-        failed_tests = int(tests["fail"])
-        passed_tests = int(tests["pass"])
+        total_tests_count = passed_tests + failed_tests
 
         blocks = [
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"{':warning:' if suites_failed else ':white_check_mark:'} All results",
+                    "text": f"{':warning:' if failed_tests > 0 else ':white_check_mark:'} All results",
                 },
             },
             {
@@ -47,7 +51,7 @@ class SlackService:
                     {"type": "mrkdwn", "text": f"*Environment*\n{env}"},
                     {"type": "mrkdwn", "text": f"*Suite*\n{suites_ran.replace('tests/', '')}"},
                     {"type": "mrkdwn", "text": f"*Total runs*\n{run_index + 1}"},
-                    {"type": "mrkdwn", "text": f"*Total test cases*\n{passed_tests + failed_tests}"},
+                    {"type": "mrkdwn", "text": f"*Total test cases*\n{total_tests_count}"},
                     {"type": "mrkdwn", "text": f"*Passed test cases*\n{passed_tests}"},
                     {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests}"},
                 ],
@@ -55,8 +59,7 @@ class SlackService:
         ]
 
         if suites_failed:
-            failed_test_suites_list_items = []
-
+            failed_test_suites_list_items = [ ]
             for suite in suites_failed:
                 failed_test_suites_list_items.append(
                     {"type": "rich_text_section", "elements": [{"type": "text", "text": suite}]}
