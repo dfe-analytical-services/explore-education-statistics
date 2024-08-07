@@ -313,6 +313,14 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         name: 'DataFiles__BasePath'
         value: dataFilesFileShareMountPath
       }
+      {
+        name: 'OpenIdConnect__TenantId'
+        value: tenant().tenantId
+      }
+      {
+        name: 'OpenIdConnect__ClientId'
+        value: apiAppRegistrationClientId
+      }
     ]
     entraIdAuthentication: {
       appRegistrationClientId: apiAppRegistrationClientId

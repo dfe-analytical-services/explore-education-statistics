@@ -1,13 +1,17 @@
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Constants;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -182,19 +186,49 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
     private static ViewDataSetVersionAuthorizationHandler BuildHandler(
         IList<KeyValuePair<string, StringValues>>? requestHeaders = null,
-        PublicDataDbContext? publicDataDbContext = null)
+        PublicDataDbContext? publicDataDbContext = null,
+        string? environmentName = null,
+        string? userAgentValue = null,
+        ClaimsPrincipal? claimsPrincipal = null)
     {
-        publicDataDbContext ??= Mock.Of<PublicDataDbContext>();
-
+        var httpContextAccessor = new HttpContextAccessor
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                HttpContext =
+                {
+                    User = claimsPrincipal!,
+                    Request =
+                    {
+                        Headers =
+                        {
+                            UserAgent = userAgentValue
+                        }
+                    }
+                }
+            }
+        };
+        
         var httpContext = new DefaultHttpContext();
 
         var requestFeature = new HttpRequestFeature { Headers = new HeaderDictionary(requestHeaders?.ToDictionary()) };
         httpContext.Features.Set<IHttpRequestFeature>(requestFeature);
 
+        var environment = new Mock<IWebHostEnvironment>(MockBehavior.Strict);
+        
+        environment
+            .SetupGet(s => s.EnvironmentName)
+            .Returns(environmentName ?? Environments.Production);
+
+        var authorizationService = new AuthorizationService(
+            httpContextAccessor: httpContextAccessor, 
+            environment: environment.Object);
+
         var previewTokenService = new PreviewTokenService(publicDataDbContext);
 
         return new ViewDataSetVersionAuthorizationHandler(
-            new HttpContextAccessor { HttpContext = httpContext },
+            authorizationService,
+            httpContextAccessor,
             previewTokenService);
     }
 }
