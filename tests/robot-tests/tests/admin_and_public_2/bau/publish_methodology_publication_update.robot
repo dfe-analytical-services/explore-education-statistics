@@ -133,7 +133,7 @@ Update methodology details
     user enters text into element    id:updateMethodologyForm-title    ${PUBLICATION_NAME}-methodology update
     user waits until button is clickable    Update methodology
     user clicks button    Update methodology
-    user reloads page
+    user waits until page finishes loading
 
 Navigate to sign-off page and approve the methodology immediately
     user clicks link    Sign off
