@@ -1,12 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Authorization;
+using IAuthorizationService =
+    GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security.IAuthorizationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 
 public class ViewDataSetVersionRequirement : IAuthorizationRequirement;
 
 public class ViewDataSetVersionAuthorizationHandler(
-    IHttpContextAccessor httpContextAccessor)
+    IAuthorizationService authorizationService)
     : AuthorizationHandler<ViewDataSetVersionRequirement, DataSetVersion>
 {
     protected override Task HandleRequirementAsync(
@@ -14,9 +16,7 @@ public class ViewDataSetVersionAuthorizationHandler(
         ViewDataSetVersionRequirement requirement,
         DataSetVersion dataSetVersion)
     {
-        var user = httpContextAccessor.HttpContext?.User;
-
-        if (user is not null && user.IsInRole(SecurityConstants.UnpublishedDataReaderAppRole))
+        if (authorizationService.CanAccessUnpublishedData())
         {
             context.Succeed(requirement);
             return Task.CompletedTask;
