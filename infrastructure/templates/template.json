@@ -3628,175 +3628,186 @@
         "enabledForDiskEncryption": true,
         "enabledForTemplateDeployment": true,
         "enableSoftDelete": true,
-        "accessPolicies": [
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-          {
-            "tenantId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').principalId]",
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2019-08-01', 'Full').identity.principalId]",
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2019-08-01', 'Full').identity.principalId]",
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('importerAppName')), '2019-08-01', 'Full').identity.principalId]",
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('contentAppName')), '2019-08-01', 'Full').identity.principalId]",
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataAppName')), '2019-08-01', 'Full').identity.principalId]",
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[parameters('devopsSPN')]", // Devops SPN
-            "permissions": {
-              "keys": [],
-              "secrets": ["Get", "List"],
-              "certificates": []
-            }
-          },
-
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "a2d80c7b-fa56-4145-9a11-8aa3f9a4a8fe", // EES Admin Group ID
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "secrets": [
-                "Get",
-                "List",
-                "Set",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          },
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "976855ee-57b9-438c-bace-b4dfe141bb7e", // EDAP Team
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "Decrypt",
-                "Encrypt",
-                "UnwrapKey",
-                "WrapKey",
-                "Verify",
-                "Sign"
-              ],
-              "secrets": [
-                "Get",
-                "List",
-                "Set",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          }
-        ]
+        "accessPolicies": []
       },
       "resources": [
+        {
+          "type": "accessPolicies",
+          "apiVersion": "2016-10-01",
+          "name": "addKeyVaultAccessPolicies",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[variables('keyVaultName')]"
+          ],
+          "properties": {
+            "accessPolicies": [
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').tenantId]",
+                "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2019-08-01', 'Full').identity.principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2019-08-01', 'Full').identity.principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "[reference(concat('Microsoft.Web/sites/', variables('importerAppName')), '2019-08-01', 'Full').identity.principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "[reference(concat('Microsoft.Web/sites/', variables('contentAppName')), '2019-08-01', 'Full').identity.principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataAppName')), '2019-08-01', 'Full').identity.principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "[parameters('devopsSPN')]", // Devops SPN
+                "permissions": {
+                  "keys": [],
+                  "secrets": ["Get", "List"],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "a2d80c7b-fa56-4145-9a11-8aa3f9a4a8fe", // EES Admin Group ID
+                "permissions": {
+                  "keys": [
+                    "Get",
+                    "List",
+                    "Update",
+                    "Create",
+                    "Import",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore"
+                  ],
+                  "secrets": [
+                    "Get",
+                    "List",
+                    "Set",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore"
+                  ],
+                  "certificates": [
+                    "Get",
+                    "List",
+                    "Update",
+                    "Create",
+                    "Import",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore",
+                    "ManageContacts",
+                    "ManageIssuers",
+                    "GetIssuers",
+                    "ListIssuers",
+                    "SetIssuers",
+                    "DeleteIssuers"
+                  ]
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantId]",
+                "objectId": "976855ee-57b9-438c-bace-b4dfe141bb7e", // EDAP Team
+                "permissions": {
+                  "keys": [
+                    "Get",
+                    "List",
+                    "Update",
+                    "Create",
+                    "Import",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore",
+                    "Decrypt",
+                    "Encrypt",
+                    "UnwrapKey",
+                    "WrapKey",
+                    "Verify",
+                    "Sign"
+                  ],
+                  "secrets": [
+                    "Get",
+                    "List",
+                    "Set",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore"
+                  ],
+                  "certificates": [
+                    "Get",
+                    "List",
+                    "Update",
+                    "Create",
+                    "Import",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore",
+                    "ManageContacts",
+                    "ManageIssuers",
+                    "GetIssuers",
+                    "ListIssuers",
+                    "SetIssuers",
+                    "DeleteIssuers"
+                  ]
+                }
+              }
+            ]
+          }
+        },
         {
           "type": "secrets",
           "name": "ees-storage-core",
