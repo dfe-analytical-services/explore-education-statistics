@@ -12,6 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Inte
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
@@ -70,8 +72,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Authentication
 
         // Look for JWT Bearer tokens, and validate that they are issued from the correct tenant and are
-        // issued for the Public API.
-        if (!hostEnvironment.IsIntegrationTest())
+        // issued for the Public API.  It is only necessary to enable this support in Azure environments
+        // as it is using Azure Authentication to handle the access tokens.
+        if (hostEnvironment.IsProduction())
         {
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -185,6 +188,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         });
 
         services.AddSecurity();
+        
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
 
         services.AddScoped<IPreviewTokenService, PreviewTokenService>();
 
@@ -242,7 +247,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseRouting();
 
         // Authentication and authorization
-        
+
         app.UseAuthentication();
         app.UseAuthorization();
 
