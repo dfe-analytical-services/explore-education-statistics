@@ -119,6 +119,7 @@ describe('ReleaseDataBlockEditPage', () => {
             dataSets: [],
           },
         },
+        boundaryLevel: undefined,
         legend: {
           position: 'top',
           items: [],

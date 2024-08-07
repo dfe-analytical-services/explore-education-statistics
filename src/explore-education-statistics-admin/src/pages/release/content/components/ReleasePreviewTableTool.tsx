@@ -48,6 +48,7 @@ const ReleasePreviewTableTool = ({
             ...query,
           },
           releaseId,
+          query.boundaryLevel,
         ),
       ]);
 
