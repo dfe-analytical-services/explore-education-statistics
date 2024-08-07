@@ -3,12 +3,14 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import {
   releaseApiDataSetDetailsRoute,
   releaseApiDataSetPreviewRoute,
+  releaseApiDataSetPreviewTokenLogRoute,
   ReleaseDataSetPreviewTokenRouteParams,
   ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import previewTokenQueries from '@admin/queries/previewTokenQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import previewTokenService from '@admin/services/previewTokenService';
+import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Button from '@common/components/Button';
 import CopyTextButton from '@common/components/CopyTextButton';
@@ -21,6 +23,8 @@ import React from 'react';
 
 export default function ReleaseApiDataSetPreviewTokenPage() {
   const history = useHistory();
+  const lastLocation = useLastLocation();
+
   const { publicApiBaseUrl, publicApiDocsUrl } = useConfig();
 
   const { dataSetId, previewTokenId, releaseId, publicationId } =
@@ -34,18 +38,40 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     ...previewTokenQueries.get(previewTokenId),
   });
 
+  const previewPagePath = generatePath<ReleaseDataSetRouteParams>(
+    releaseApiDataSetPreviewRoute.path,
+    {
+      publicationId,
+      releaseId,
+      dataSetId,
+    },
+  );
+
+  const detailsPagePath = generatePath<ReleaseDataSetRouteParams>(
+    releaseApiDataSetDetailsRoute.path,
+    {
+      publicationId,
+      releaseId,
+      dataSetId,
+    },
+  );
+
+  const tokenLogPagePath = generatePath<ReleaseDataSetRouteParams>(
+    releaseApiDataSetPreviewTokenLogRoute.path,
+    {
+      publicationId,
+      releaseId,
+      dataSetId,
+    },
+  );
+
   const handleRevoke = async (id: string) => {
     await previewTokenService.revokePreviewToken(id);
 
     history.push(
-      generatePath<ReleaseDataSetRouteParams>(
-        releaseApiDataSetPreviewRoute.path,
-        {
-          publicationId,
-          releaseId,
-          dataSetId,
-        },
-      ),
+      lastLocation?.pathname === tokenLogPagePath
+        ? tokenLogPagePath
+        : previewPagePath,
     );
   };
 
@@ -54,16 +80,15 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseId,
-            dataSetId,
-          },
-        )}
+        to={
+          lastLocation?.pathname === tokenLogPagePath
+            ? tokenLogPagePath
+            : detailsPagePath
+        }
       >
-        Back to API data set details
+        {lastLocation?.pathname === tokenLogPagePath
+          ? 'Back to API preview token log'
+          : ' Back to API data set details'}
       </Link>
       <LoadingSpinner loading={isLoadingDataSet || isLoadingPreviewTokenId}>
         <div className="govuk-grid-row">
@@ -109,7 +134,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   <p>Are you sure you want to revoke this token?</p>
                 </ModalConfirm>
                 <p>
-                  <Link to="todo">View API data set token log</Link>
+                  <Link to={tokenLogPagePath}>View API data set token log</Link>
                 </p>
                 <h3>API data set endpoints quick start</h3>
                 {dataSet?.draftVersion && (

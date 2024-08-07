@@ -5,18 +5,24 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Semver;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -92,6 +98,22 @@ public class DataSetVersionService(
                 cancellationToken: cancellationToken));
     }
 
+    public async Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
+        DataSetVersionUpdateRequest updateRequest,
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccess(async () => await GetDataSetVersion(
+                dataSetVersionId: updateRequest.DataSetVersionId,
+                cancellationToken: cancellationToken))
+            .OnSuccessDo(dataSetVersion => CheckCanUpdateVersion(dataSetVersion, updateRequest))
+            .OnSuccess(async dataSetVersion => await UpdateVersion(
+                dataSetVersion: dataSetVersion,
+                updateRequest: updateRequest,
+                cancellationToken: cancellationToken))
+            .OnSuccess(MapDraftVersion);
+    }
+
     private static DataSetVersionSummaryViewModel MapDraftSummaryVersion(DataSetVersion dataSetVersion)
     {
         return new DataSetVersionSummaryViewModel
@@ -100,6 +122,115 @@ public class DataSetVersionService(
             Version = dataSetVersion.Version,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
+        };
+    }
+
+    private async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Where(dsv => dsv.Id == dataSetVersionId)
+            .SingleOrNotFoundAsync(cancellationToken);
+    }
+
+    private static Either<ActionResult, Unit> CheckCanUpdateVersion(
+        DataSetVersion dataSetVersion,
+        DataSetVersionUpdateRequest updateRequest)
+    {
+        if (!dataSetVersion.CanBeUpdated)
+        {
+            return ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Code = ValidationMessages.DataSetVersionCannotBeUpdated.Code,
+                Message = ValidationMessages.DataSetVersionCannotBeUpdated.Message,
+                Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+                Path = nameof(DataSetVersionUpdateRequest.DataSetVersionId).ToLowerFirst()
+            });
+        }
+
+        if (updateRequest.Notes is not null && dataSetVersion.IsFirstVersion)
+        {
+            return ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Code = ValidationMessages.DataSetVersionCannotHaveChangelogNotes.Code,
+                Message = ValidationMessages.DataSetVersionCannotHaveChangelogNotes.Message,
+                Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+                Path = nameof(DataSetVersionUpdateRequest.Notes).ToLowerFirst()
+            });
+        }
+
+        return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, DataSetVersion>> UpdateVersion(
+        DataSetVersion dataSetVersion,
+        DataSetVersionUpdateRequest updateRequest,
+        CancellationToken cancellationToken)
+    {
+        if (updateRequest.Notes is not null)
+        {
+            dataSetVersion.Notes = updateRequest.Notes;
+        }
+
+        publicDataDbContext.DataSetVersions.Update(dataSetVersion);
+
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        return dataSetVersion;
+    }
+
+    private async Task<DataSetDraftVersionViewModel> MapDraftVersion(DataSetVersion dataSetVersion)
+    {
+        var releaseFile = await GetReleaseFile(dataSetVersion);
+
+        return new DataSetDraftVersionViewModel
+        {
+            Id = dataSetVersion.Id,
+            Version = dataSetVersion.Version,
+            Status = dataSetVersion.Status,
+            Type = dataSetVersion.VersionType,
+            File = MapVersionFile(releaseFile),
+            ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
+            TotalResults = dataSetVersion.TotalResults,
+            Notes = dataSetVersion.Notes,
+            GeographicLevels = dataSetVersion.MetaSummary?.GeographicLevels
+                .Select(l => l.GetEnumLabel())
+                .ToList() ?? null,
+            TimePeriods = dataSetVersion.MetaSummary?.TimePeriodRange is not null
+                ? TimePeriodRangeViewModel.Create(dataSetVersion.MetaSummary.TimePeriodRange)
+                : null,
+            Filters = dataSetVersion.MetaSummary?.Filters ?? null,
+            Indicators = dataSetVersion.MetaSummary?.Indicators ?? null
+        };
+    }
+
+    private async Task<ReleaseFile> GetReleaseFile(DataSetVersion dataSetVersion)
+    {
+        return await contentDbContext.ReleaseFiles
+            .AsNoTracking()
+            .Where(rf => rf.Id == dataSetVersion.ReleaseFileId)
+            .Include(rf => rf.ReleaseVersion)
+            .Include(rf => rf.File)
+            .SingleAsync();
+    }
+
+    private static IdTitleViewModel MapVersionFile(ReleaseFile releaseFile)
+    {
+        return new IdTitleViewModel
+        {
+            Id = releaseFile.File.DataSetFileId!.Value,
+            Title = releaseFile.Name ?? string.Empty,
+        };
+    }
+
+    private static IdTitleViewModel MapReleaseVersion(ReleaseVersion releaseVersion)
+    {
+        return new IdTitleViewModel
+        {
+            Id = releaseVersion.Id,
+            Title = releaseVersion.Title,
         };
     }
 

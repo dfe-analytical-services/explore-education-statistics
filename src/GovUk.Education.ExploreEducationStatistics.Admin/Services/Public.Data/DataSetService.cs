@@ -246,6 +246,7 @@ internal class DataSetService(
             File = MapVersionFile(releaseFile),
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             TotalResults = dataSetVersion.TotalResults,
+            Notes = dataSetVersion.Notes,
             GeographicLevels = dataSetVersion.MetaSummary?.GeographicLevels
                 .Select(l => l.GetEnumLabel())
                 .ToList() ?? null,
@@ -286,6 +287,7 @@ internal class DataSetService(
             File = MapVersionFile(releaseFile),
             Published = dataSetVersion.Published!.Value,
             TotalResults = dataSetVersion.TotalResults,
+            Notes = dataSetVersion.Notes,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             GeographicLevels = dataSetVersion.MetaSummary!.GeographicLevels
                 .Select(l => l.GetEnumLabel())

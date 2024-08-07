@@ -198,6 +198,7 @@ Save data block
 Validate data block is in list
     user clicks link    Back
     user waits until h2 is visible    Data blocks
+    user waits until page finishes loading
 
     user waits until table is visible
     user checks table column heading contains    1    1    Name    testid:dataBlocks
@@ -205,6 +206,7 @@ Validate data block is in list
     user checks table column heading contains    1    3    In content    testid:dataBlocks
     user checks table column heading contains    1    4    Created date    testid:dataBlocks
     user checks table column heading contains    1    5    Actions    testid:dataBlocks
+
 
     user checks table body has x rows    1    testid:dataBlocks
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
@@ -262,6 +264,7 @@ Save data block again
 Validate data block is in list again
     user clicks link    Back
     user waits until h2 is visible    Data blocks
+    user waits until page finishes loading
 
     user waits until table is visible
     user checks table column heading contains    1    1    Data block name    testid:featuredTables
@@ -543,10 +546,12 @@ Save chart and validate marked as 'Has chart' in data blocks list
 
     user clicks link    Back
     user waits until h2 is visible    Data blocks
+    user waits until page finishes loading
 
     user waits until table is visible
     user checks table column heading contains    1    1    Name    testid:dataBlocks
     user checks table column heading contains    1    2    Has chart    testid:dataBlocks
+
 
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks

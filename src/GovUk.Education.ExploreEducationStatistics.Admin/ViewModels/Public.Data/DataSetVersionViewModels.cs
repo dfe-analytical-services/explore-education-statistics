@@ -26,6 +26,8 @@ public abstract record DataSetVersionViewModel
 
     public long TotalResults { get; init; }
 
+    public required string Notes { get; init; }
+
     public TimePeriodRangeViewModel? TimePeriods { get; init; }
 
     public IReadOnlyList<string>? GeographicLevels { get; init; }
