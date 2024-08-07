@@ -6,11 +6,13 @@ import tableBuilderService from '@common/services/tableBuilderService';
 export default function useTableQuery(
   releaseId: string,
   dataBlockParentId: string,
+  boundaryLevelId?: number | undefined,
 ): AsyncRetryState<FullTable> {
   return useAsyncRetry(async () => {
     const response = await tableBuilderService.getDataBlockTableData(
       releaseId,
       dataBlockParentId,
+      boundaryLevelId,
     );
 
     return mapFullTable(response);

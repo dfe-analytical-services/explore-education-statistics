@@ -244,8 +244,16 @@ const tableBuilderService = {
   async getTableData(
     query: FullTableQuery,
     releaseId?: string,
+    boundaryLevelId?: number | undefined,
   ): Promise<TableDataResponse> {
-    return releaseId
+    if (releaseId && boundaryLevelId) {
+      return dataApi.post(
+        `/tablebuilder/release/${releaseId}/${boundaryLevelId}`,
+        query,
+      );
+    }
+
+    return releaseId && !boundaryLevelId
       ? dataApi.post(`/tablebuilder/release/${releaseId}`, query)
       : dataApi.post('/tablebuilder', query);
   },
@@ -267,10 +275,15 @@ const tableBuilderService = {
   async getDataBlockTableData(
     releaseId: string,
     dataBlockParentId: string,
+    boundaryLevelId?: number | undefined,
   ): Promise<TableDataResponse> {
-    return dataApi.get(
-      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
-    );
+    return boundaryLevelId
+      ? dataApi.get(
+          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}/${boundaryLevelId}`,
+        )
+      : dataApi.get(
+          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
+        );
   },
   getFastTrackTableAndReleaseMeta(
     dataBlockParentId: string,
