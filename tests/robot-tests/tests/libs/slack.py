@@ -59,11 +59,10 @@ class SlackService:
         ]
 
         if suites_failed:
-            failed_test_suites_list_items = [ ]
-            for suite in suites_failed:
-                failed_test_suites_list_items.append(
-                    {"type": "rich_text_section", "elements": [{"type": "text", "text": suite}]}
-                )
+            failed_test_suites_list_items = [
+                {"type": "rich_text_section", "elements": [{"type": "text", "text": suite}]}
+                for suite in suites_failed
+            ]
 
             blocks += [
                 {"type": "divider"},
