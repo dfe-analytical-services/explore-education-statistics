@@ -100,10 +100,10 @@ param entraIdAuthentication {
 }?
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
-var fullApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
+var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 
 resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
-  name: fullApplicationName
+  name: containerApplicationName
   location: location
   identity: {
     type: 'UserAssigned'
@@ -179,5 +179,6 @@ module azureAuthentication 'containerAppAzureAuthentication.bicep' = if (entraId
   }
 }
 
-output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
+output containerAppFqdn string = containerApp.properties.configuration.ingress.fqdn
 output containerImage string = containerImageName
+output containerAppName string = containerApp.name

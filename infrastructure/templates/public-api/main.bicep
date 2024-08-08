@@ -72,7 +72,8 @@ param updatePsqlFlexibleServer bool = false
 @description('Public URLs of other components in the service.')
 param publicUrls {
   contentApi: string
-  publicApp: string
+  publicSite: string
+  publicApi: string
 }
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
@@ -268,7 +269,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     corsPolicy: {
       allowedOrigins: [
-        publicUrls.publicApp
+        publicUrls.publicSite
         'http://localhost:3000'
         'http://127.0.0.1'
       ]
@@ -410,26 +411,25 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   }
 }
 
-// TODO EES-5407 - incorporate this change with the automating of the app gateway creation.
-resource appGatewayManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: appGatewayManagedIdentityName
-}
-
-// TODO EES-5382 - remove when the switch over the Key Vault RBAC is enabled.
-module appGatewayKeyVaultAccessPolicy 'components/keyVaultAccessPolicy.bicep' = {
-  name: 'appGatewayKeyVaultAccessPolicy'
+// Create an Application Gateway to serve public traffic for the Public API Container App.
+module appGateway 'components/appGateway.bicep' = {
+  name: 'appGatewayDeploy'
   params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    instanceName: '01'
     keyVaultName: keyVaultName
-    principalIds: [appGatewayManagedIdentity.properties.principalId]
-  }
-}
-
-module appGatewayKeyVaultRoleAssignments 'components/keyVaultRoleAssignment.bicep' = {
-  name: 'appGatewayKeyVaultRoleAssignment'
-  params: {
-    keyVaultName: keyVaultName
-    principalIds: [appGatewayManagedIdentity.properties.principalId]
-    role: 'Secrets User'
+    subnetId: vNetModule.outputs.appGatewaySubnetRef
+    sites: [
+      {
+        resourceName: apiContainerAppModule.outputs.containerAppName
+        backendFqdn: apiContainerAppModule.outputs.containerAppFqdn
+        publicHostName: publicUrls.publicApi
+        certificateKeyVaultSecretName: '${apiContainerAppModule.outputs.containerAppName}-certificate'
+        healthProbeRelativeUrl: '/docs'
+      }
+    ]
+    tagValues: tagValues
   }
 }
 
