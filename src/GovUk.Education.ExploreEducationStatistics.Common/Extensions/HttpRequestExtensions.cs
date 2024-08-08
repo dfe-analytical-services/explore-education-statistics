@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -79,5 +80,21 @@ public static class HttpRequestExtensions
 
         return JsonConvert.DeserializeObject<TJsonType>(requestBody) ??
                throw new ArgumentException($"Could not deserialize request body to type {typeof(TJsonType)}");
+    }
+
+    public static bool TryGetHeader(
+        this HttpRequest httpRequest,
+        string headerName,
+        [MaybeNullWhen(false)] out string headerValue)
+    {
+        headerValue = null;
+
+        if (!httpRequest.Headers.TryGetValue(headerName, out var values))
+        {
+            return false;
+        }
+
+        headerValue = values.FirstOrDefault();
+        return headerValue != null;
     }
 }
