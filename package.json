@@ -43,7 +43,7 @@
     "stylelint-prettier": "^4.0.2",
     "tree-kill": "^1.2.2",
     "tsx": "^4.12.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.0"
   },
   "scripts": {
     "prepare": "husky install",
