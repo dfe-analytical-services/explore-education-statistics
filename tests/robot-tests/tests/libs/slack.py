@@ -94,35 +94,30 @@ class SlackService:
             {"type": "divider"},
             {"type": "section", "text": {"type": "mrkdwn", "text": f"*Error details*\n{ex_stripped}"}},
         ]
-
+    
     def send_test_report(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
         attachments = self._build_test_results_attachments(env, suites_ran, suites_failed, run_index)
 
-        if attachments:
+        response = self.client.chat_postMessage(channel=self.slack_channel, text="All results", blocks=attachments)
+
+        if suites_failed:
+            date = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+
+            report_name = f"UI-test-report-{suites_ran.replace('tests/', '')}-{env}-{date}.zip"
+
+            shutil.make_archive(report_name.replace(".zip", ""), "zip", PATH)
             try:
-                response = self.client.chat_postMessage(channel=self.slack_channel, text="All results",
-                                                        blocks=attachments)
-                assert response.status_code == 200, f"Response wasn't 200, it was {response.status_code}"
-                logger.info("Sent UI test statistics to #build")
-
-                if suites_failed:
-                    date = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
-                    report_name = f"UI-test-report-{suites_ran.replace('tests/', '')}-{env}-{date}.zip"
-
-                    shutil.make_archive(report_name.replace(".zip", ""), "zip", self.path)
-                    try:
-                        self.client.files_upload_v2(
-                            channel=self.slack_channel, file=report_name, title=report_name,
-                            thread_ts=response.data["ts"]
-                        )
-                        logger.info("Sent UI test report to #build")
-                    except SlackApiError as e:
-                        logger.error(f"Error uploading test report: {e}")
-                    finally:
-                        os.remove(report_name)
-
+                self.client.files_upload_v2(
+                    channel=self.slack_channel, file=report_name, title=report_name, thread_ts=response.data["ts"]
+                )
             except SlackApiError as e:
-                logger.error(f"Error sending message to Slack: {e}")
+                logger.error(f"Error uploading test report: {e}")
+            os.remove(report_name)
+            logger.info("Sent UI test report to #build")
+
+        assert response.status_code == 200, logger.warn(f"Response wasn't 200, it was {response}")
+
+        logger.info("Sent UI test statistics to #build")
 
     def send_exception_details(self, env: str, suites_ran: str, run_index: int, ex: Exception):
         attachments = self._build_exception_details_attachments(env, suites_ran, run_index, ex)
