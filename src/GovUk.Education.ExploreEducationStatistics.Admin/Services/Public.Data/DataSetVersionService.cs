@@ -55,11 +55,11 @@ public class DataSetVersionService(
                     .Paginate(page: page, pageSize: pageSize)
                     .ToListAsync(cancellationToken);
 
-                var releasesByDataSetVersion =
-                    await GetReleasesByDataSetVersion(dataSetVersions, cancellationToken);
+                var releasesVersionsByDataSetVersionId =
+                    await GetReleasesVersionsByDataSetVersionId(dataSetVersions, cancellationToken);
 
                 var results = dataSetVersions
-                    .Select(dsv => MapLiveSummaryVersion(dsv, releasesByDataSetVersion[dsv.Id]))
+                    .Select(dsv => MapLiveVersionSummary(dsv, releasesVersionsByDataSetVersionId[dsv.Id]))
                     .ToList();
 
                 return new PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>(
@@ -107,7 +107,7 @@ public class DataSetVersionService(
                 .SingleAsync(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
-            .OnSuccess(async dataSetVersion => await MapDraftSummaryVersion(dataSetVersion, cancellationToken));
+            .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
     }
 
     public async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
@@ -166,14 +166,14 @@ public class DataSetVersionService(
             .OnSuccess(async dataSetVersion => await MapDraftVersion(dataSetVersion, cancellationToken));
     }
 
-    private async Task<IReadOnlyDictionary<Guid, ReleaseVersion>> GetReleasesByDataSetVersion(
+    private async Task<IReadOnlyDictionary<Guid, ReleaseVersion>> GetReleasesVersionsByDataSetVersionId(
         IReadOnlyList<DataSetVersion> dataSetVersions,
         CancellationToken cancellationToken)
     {
         var dataSetVersionsByReleaseFileId = dataSetVersions
             .ToDictionary(dsv => dsv.ReleaseFileId);
 
-        var releasesByReleaseFileId = await contentDbContext
+        var releaseVersionsByReleaseFileId = await contentDbContext
             .ReleaseFiles
             .Include(rf => rf.ReleaseVersion)
             .Where(releaseFile => dataSetVersionsByReleaseFileId.Keys.Contains(releaseFile.Id))
@@ -182,14 +182,14 @@ public class DataSetVersionService(
                 rf => rf.ReleaseVersion,
                 cancellationToken);
 
-        return releasesByReleaseFileId
+        return releaseVersionsByReleaseFileId
             .ToDictionary(
                 d => dataSetVersionsByReleaseFileId[d.Key].Id,
                 d => d.Value
             );
     }
 
-    private static DataSetLiveVersionSummaryViewModel MapLiveSummaryVersion(
+    private static DataSetLiveVersionSummaryViewModel MapLiveVersionSummary(
         DataSetVersion dataSetVersion,
         ReleaseVersion releaseVersion)
     {
@@ -204,7 +204,7 @@ public class DataSetVersionService(
         };
     }
 
-    private async Task<DataSetVersionSummaryViewModel> MapDraftSummaryVersion(
+    private async Task<DataSetVersionSummaryViewModel> MapDraftVersionSummary(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
