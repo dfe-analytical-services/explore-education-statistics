@@ -59,10 +59,12 @@ class SlackService:
         ]
 
         if suites_failed:
-            failed_test_suites_list_items = [
-                {"type": "rich_text_section", "elements": [{"type": "text", "text": suite}]}
-                for suite in suites_failed
-            ]
+            failed_test_suites_list_items = []
+
+            for suite in suites_failed:
+                failed_test_suites_list_items.append(
+                    {"type": "rich_text_section", "elements": [{"type": "text", "text": suite}]}
+                )
 
             blocks += [
                 {"type": "divider"},
@@ -94,7 +96,7 @@ class SlackService:
             {"type": "divider"},
             {"type": "section", "text": {"type": "mrkdwn", "text": f"*Error details*\n{ex_stripped}"}},
         ]
-    
+
     def send_test_report(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
         attachments = self._build_test_results_attachments(env, suites_ran, suites_failed, run_index)
 
