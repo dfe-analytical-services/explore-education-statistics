@@ -5,7 +5,8 @@ param environmentName = 'Pre-Production'
 
 param publicUrls = {
   contentApi: 'https://s101p02-as-ees-content.azurewebsites.net'
-  publicApp: 'https://pre-production.explore-education-statistics.service.gov.uk'
+  publicSite: 'https://pre-production.explore-education-statistics.service.gov.uk'
+  publicApi: 'https://pre-production.statistics.api.education.gov.uk'
 }
 
 // PostgreSQL Database Params

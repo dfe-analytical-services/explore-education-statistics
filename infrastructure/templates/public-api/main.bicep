@@ -72,7 +72,8 @@ param updatePsqlFlexibleServer bool = false
 @description('Public URLs of other components in the service.')
 param publicUrls {
   contentApi: string
-  publicApp: string
+  publicSite: string
+  publicApi: string
 }
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
@@ -264,7 +265,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     corsPolicy: {
       allowedOrigins: [
-        publicUrls.publicApp
+        publicUrls.publicSite
         'http://localhost:3000'
         'http://127.0.0.1'
       ]
@@ -383,6 +384,28 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       mountPath: dataFilesFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
+    tagValues: tagValues
+  }
+}
+
+// Create an Application Gateway to serve public traffic for the Public API Container App.
+module appGateway 'components/appGateway.bicep' = {
+  name: 'appGatewayDeploy'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    instanceName: '01'
+    keyVaultName: keyVaultName
+    subnetId: vNetModule.outputs.appGatewaySubnetRef
+    sites: [
+      {
+        resourceName: apiContainerAppModule.outputs.containerAppName
+        backendFqdn: apiContainerAppModule.outputs.containerAppFqdn
+        publicHostName: publicUrls.publicApi
+        certificateKeyVaultSecretName: '${apiContainerAppModule.outputs.containerAppName}-certificate'
+        healthProbeRelativeUrl: '/docs'
+      }
+    ]
     tagValues: tagValues
   }
 }
