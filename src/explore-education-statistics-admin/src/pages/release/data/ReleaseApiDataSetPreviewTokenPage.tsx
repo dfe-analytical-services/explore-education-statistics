@@ -141,7 +141,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   <ApiDataSetQuickStart
                     publicApiBaseUrl={publicApiBaseUrl ?? ''}
                     publicApiDocsUrl={publicApiDocsUrl ?? ''}
-                    dataSetId={dataSet.draftVersion?.id}
+                    dataSetId={dataSet.id}
                     dataSetName={dataSet.title}
                     dataSetVersion={dataSet.draftVersion?.version}
                     headingsTag="h4"
