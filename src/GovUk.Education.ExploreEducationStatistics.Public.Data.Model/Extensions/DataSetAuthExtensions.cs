@@ -1,6 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 
 public static class DataSetAuthExtensions
 {

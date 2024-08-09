@@ -1,12 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -28,11 +20,14 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModel
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,12 +42,319 @@ public abstract class DataSetVersionsControllerTests(
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
-    public class CreateNextVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class ListLiveVersionsTests(
+        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    {
+        private static readonly IReadOnlyList<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatuses =
+            new List<DataSetVersionStatus>(
+            [
+                DataSetVersionStatus.Published,
+                DataSetVersionStatus.Withdrawn,
+                DataSetVersionStatus.Deprecated
+            ]
+        );
+
+        public static TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
+            PreviouslyPublishedDataSetVersionStatuses
+        );
+
+        public static TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
+            EnumUtil.GetEnums<DataSetVersionStatus>().Except(PreviouslyPublishedDataSetVersionStatuses)
+        );
+
+        [Theory]
+        [MemberData(nameof(PreviouslyPublishedDataSetVersionStatusesData))]
+        public async Task OnlyPreviouslyPublishedVersionsReturned(DataSetVersionStatus dataSetVersionStatus)
+        {
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatus(dataSetVersionStatus)
+                .WithPublished(DateTimeOffset.UtcNow)
+                .WithDataSet(dataSet)
+                .WithReleaseFileId(releaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await ListLiveVersions(
+                dataSetId: dataSet.Id,
+                page: 1,
+                pageSize: 10);
+
+            var viewModel = response.AssertOk<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>();
+
+            Assert.NotNull(viewModel);
+            Assert.Equal(1, viewModel.Paging.Page);
+            Assert.Equal(10, viewModel.Paging.PageSize);
+            Assert.Equal(1, viewModel.Paging.TotalPages);
+            Assert.Equal(1, viewModel.Paging.TotalResults);
+
+            var liveVersion = Assert.Single(viewModel.Results);
+            Assert.Equal(currentDataSetVersion.Id, liveVersion.Id);
+            Assert.Equal(currentDataSetVersion.Version, liveVersion.Version);
+            Assert.Equal(currentDataSetVersion.Status, liveVersion.Status);
+            Assert.Equal(currentDataSetVersion.VersionType, liveVersion.Type);
+            Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
+            Assert.Equal(releaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+            liveVersion.Published.AssertEqual(currentDataSetVersion.Published!.Value);
+        }
+
+        [Theory]
+        [MemberData(nameof(DraftDataSetVersionStatusesData))]
+        public async Task DraftVersionsNotReturned(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await ListLiveVersions(
+                dataSetId: dataSet.Id,
+                page: 1,
+                pageSize: 10);
+
+            var viewModel = response.AssertOk<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>();
+
+            Assert.NotNull(viewModel);
+            Assert.Equal(1, viewModel.Paging.Page);
+            Assert.Equal(10, viewModel.Paging.PageSize);
+            Assert.Equal(1, viewModel.Paging.TotalPages);
+            Assert.Equal(0, viewModel.Paging.TotalResults);
+
+            Assert.Empty(viewModel.Results);
+        }
+
+        [Theory]
+        [InlineData(1, 1, 0)]
+        [InlineData(1, 2, 1)]
+        [InlineData(1, 2, 2)]
+        [InlineData(1, 2, 9)]
+        [InlineData(2, 2, 9)]
+        [InlineData(2, 2, 2)]
+        public async Task ResultsArePaginatedCorrectly(
+            int page, 
+            int pageSize,
+            int numberOfPublishedDataSetVersions)
+        {
+            var releaseFiles = DataFixture.DefaultReleaseFile()
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => DataFixture.DefaultReleaseVersion()))
+                .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
+                .GenerateList(numberOfPublishedDataSetVersions);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.AddRange(releaseFiles);
+            });
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var now = DateTimeOffset.UtcNow.AddDays(-numberOfPublishedDataSetVersions);
+            var dataSetVersions = releaseFiles
+                .Select(
+                    (rf, index) => DataFixture
+                        .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                        .WithVersionNumber(major: 1, minor: index, patch: 1)
+                        .WithStatusPublished()
+                        .WithPublished(now.AddDays(index))
+                        .WithDataSet(dataSet)
+                        .WithReleaseFileId(rf.Id)
+                        .Generate()
+                )
+                .ToList();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersions);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await ListLiveVersions(
+                dataSetId: dataSet.Id,
+                page: page,
+                pageSize: pageSize);
+
+            var viewModel = response.AssertOk<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>();
+
+            var pagedDataSetVersionIds = dataSetVersions
+                .OrderByDescending(dsv => dsv.Published)
+                .Select(dsv => dsv.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            Assert.NotNull(viewModel);
+            Assert.Equal(page, viewModel.Paging.Page);
+            Assert.Equal(pageSize, viewModel.Paging.PageSize);
+            Assert.Equal(numberOfPublishedDataSetVersions, viewModel.Paging.TotalResults);
+            Assert.Equal(pagedDataSetVersionIds.Count, viewModel.Results.Count);
+            Assert.All(viewModel.Results, dsv => Assert.Contains(dsv.Id, pagedDataSetVersionIds));
+        }
+
+        [Fact]
+        public async Task VersionsForDifferentDataSetNotReturned()
+        {
+            ReleaseFile targetReleaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            ReleaseFile otherReleaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.AddRange(targetReleaseFile, otherReleaseFile);
+            });
+
+            DataSet targetDataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            DataSet otherDataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => 
+                context.DataSets.AddRange(targetDataSet, otherDataSet));
+
+            DataSetVersion targetDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(targetDataSet)
+                .WithReleaseFileId(targetReleaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion otherDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(otherDataSet)
+                .WithReleaseFileId(otherReleaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(targetDataSetVersion, otherDataSetVersion);
+                context.DataSets.UpdateRange(targetDataSet, otherDataSet);
+            });
+
+            var response = await ListLiveVersions(
+                dataSetId: targetDataSet.Id,
+                page: 1,
+                pageSize: 10);
+
+            var viewModel = response.AssertOk<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>();
+
+            Assert.NotNull(viewModel);
+            Assert.Equal(1, viewModel.Paging.Page);
+            Assert.Equal(10, viewModel.Paging.PageSize);
+            Assert.Equal(1, viewModel.Paging.TotalPages);
+            Assert.Equal(1, viewModel.Paging.TotalResults);
+
+            var liveVersion = Assert.Single(viewModel.Results);
+            Assert.Equal(targetDataSetVersion.Id, liveVersion.Id);
+            Assert.Equal(targetDataSetVersion.Version, liveVersion.Version);
+            Assert.Equal(targetDataSetVersion.Status, liveVersion.Status);
+            Assert.Equal(targetDataSetVersion.VersionType, liveVersion.Type);
+            Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
+            Assert.Equal(targetReleaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+            liveVersion.Published.AssertEqual(targetDataSetVersion.Published!.Value);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await ListLiveVersions(
+                dataSetId: Guid.NewGuid(),
+                page: 1,
+                pageSize: 1,
+                client: client);
+
+            response.AssertForbidden();
+        }
+
+        private async Task<HttpResponseMessage> ListLiveVersions(
+            Guid dataSetId,
+            int? page = null,
+            int? pageSize = null,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var queryParams = new Dictionary<string, string?>
+            {
+                { "page", page?.ToString() },
+                { "pageSize", pageSize?.ToString() }
+            };
+
+            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}", queryParams);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    public class CreateNextVersionTests(
+        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
         {
-            var nextReleaseFileId = Guid.NewGuid();
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -79,7 +381,7 @@ public abstract class DataSetVersionsControllerTests(
 
             processorClient
                 .Setup(c => c.CreateNextDataSetVersion(dataSet.Id,
-                    nextReleaseFileId, It.IsAny<CancellationToken>()))
+                    releaseFile.Id, It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
                     var savedDataSet = await TestApp.GetDbContext<PublicDataDbContext>()
@@ -90,7 +392,7 @@ public abstract class DataSetVersionsControllerTests(
                         .DefaultDataSetVersion()
                         .WithStatusMapping()
                         .WithVersionNumber(major: 1, minor: 1)
-                        .WithReleaseFileId(nextReleaseFileId)
+                        .WithReleaseFileId(releaseFile.Id)
                         .WithDataSet(savedDataSet)
                         .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
@@ -112,7 +414,7 @@ public abstract class DataSetVersionsControllerTests(
 
             var response = await CreateNextVersion(
                 dataSetId: dataSet.Id,
-                releaseFileId: nextReleaseFileId,
+                releaseFileId: releaseFile.Id,
                 client);
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
@@ -526,7 +828,7 @@ public abstract class DataSetVersionsControllerTests(
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatusDraft();
+                .WithStatusPublished();
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -621,7 +923,7 @@ public abstract class DataSetVersionsControllerTests(
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatusDraft();
+                .WithStatusPublished();
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 

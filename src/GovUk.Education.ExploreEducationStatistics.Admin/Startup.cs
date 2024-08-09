@@ -124,6 +124,7 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -813,6 +814,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
     internal class NoOpDataSetVersionService : IDataSetVersionService
     {
+        public Task<Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListLiveVersions(
+            Guid dataSetId, 
+            int page, 
+            int pageSize, 
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10));
+        }
+
         public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
             Guid releaseVersionId,
             CancellationToken cancellationToken = default)
