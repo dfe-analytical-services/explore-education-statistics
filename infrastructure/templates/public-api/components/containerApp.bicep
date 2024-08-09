@@ -162,5 +162,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   tags: tagValues
 }
 
-output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
+output containerAppFqdn string = containerApp.properties.configuration.ingress.fqdn
 output containerImage string = containerImageName
+output containerAppName string = containerApp.name

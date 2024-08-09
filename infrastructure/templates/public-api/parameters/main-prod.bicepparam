@@ -5,7 +5,8 @@ param environmentName = 'Production'
 
 param publicUrls = {
   contentApi: 'https://content.explore-education-statistics.service.gov.uk'
-  publicApp: 'https://explore-education-statistics.service.gov.uk'
+  publicSite: 'https://explore-education-statistics.service.gov.uk'
+  publicApi: 'https://statistics.api.education.gov.uk'
 }
 
 // PostgreSQL Database Params
