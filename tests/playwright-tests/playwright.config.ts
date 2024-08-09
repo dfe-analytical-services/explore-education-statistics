@@ -17,7 +17,7 @@ function appendBasicAuthCredentialsToPublic() {
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 15 * 60 * 1000,
+  timeout: process.env.CI ? 60 * 15 * 1000 : 15 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -51,16 +51,22 @@ export default defineConfig({
     {
       name: 'admin',
       testDir: './tests/admin',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
     },
     {
       name: 'adminandpublic',
       testDir: './tests/admin-and-public',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
     },
     {
       name: 'public',
       testDir: './tests/public',
-    },
-    {
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
