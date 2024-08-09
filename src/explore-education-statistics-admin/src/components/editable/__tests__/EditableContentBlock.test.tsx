@@ -1,11 +1,12 @@
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { getDescribedBy } from '@common-test/queries';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render as baseRender, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 describe('EditableContentBlock', () => {
   const testMarkdown = `
@@ -359,4 +360,10 @@ Test paragraph
       expect(handleEditing).toHaveBeenCalledTimes(1);
     });
   });
+
+  function render(element: ReactElement) {
+    baseRender(
+      <TestConfigContextProvider>{element}</TestConfigContextProvider>,
+    );
+  }
 });

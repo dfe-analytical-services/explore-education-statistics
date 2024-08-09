@@ -78,7 +78,7 @@ Verify that validation prevents adding an image without alt text
     user adds image without alt text to accordion section text block    Methodology content section 1    1
     ...    test-infographic.png    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}    Save
 
-    user checks page contains    All images must have alternative text
+    user checks page contains    1 image does not have alternative text.
 
     user clicks element    xpath://img
     user clicks button    Change image text alternative
@@ -90,14 +90,14 @@ Verify that validation prevents adding an image without alt text
 
     user clicks button    Save
 
-    user checks page does not contain    All images must have alternative text
+    user checks page does not contain    1 image does not have alternative text.
 
 Verify that validation prevents adding an invalid link
     user adds link to accordion section text block    Methodology content section 1    1    https://gov
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user checks page contains    1 link has an invalid URL.
 
-    user clicks element    xpath://a[text()='https://gov']
+    user clicks element    xpath://a[text()='Link text']
     user clicks button    Edit link
     user enters text into element    label:Link URL    gov.uk
     user presses keys    ENTER

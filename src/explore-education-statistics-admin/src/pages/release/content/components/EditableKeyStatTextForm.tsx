@@ -14,12 +14,13 @@ export interface KeyStatTextFormValues {
   title: string;
   statistic: string;
   trend: string;
-  guidanceTitle: string;
-  guidanceText: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
 }
 
 interface EditableKeyStatTextFormProps {
   keyStat?: KeyStatisticText;
+  keyStatisticGuidanceTitles?: (string | undefined)[];
   isReordering?: boolean;
   onSubmit: (values: KeyStatTextFormValues) => void;
   onCancel: () => void;
@@ -28,6 +29,7 @@ interface EditableKeyStatTextFormProps {
 
 export default function EditableKeyStatTextForm({
   keyStat,
+  keyStatisticGuidanceTitles,
   isReordering = false,
   onSubmit,
   onCancel,
@@ -45,17 +47,32 @@ export default function EditableKeyStatTextForm({
     <div data-testid={testId}>
       <FormProvider
         initialValues={{
-          title: keyStat?.title ?? '',
-          statistic: keyStat?.statistic ?? '',
-          trend: keyStat?.trend ?? '',
-          guidanceTitle: keyStat?.guidanceTitle ?? 'Help',
+          title: keyStat?.title,
+          statistic: keyStat?.statistic,
+          trend: keyStat?.trend,
+          guidanceTitle: keyStat?.guidanceTitle,
           guidanceText: keyStat?.guidanceText,
         }}
         validationSchema={Yup.object<KeyStatTextFormValues>({
           title: Yup.string().required('Enter a title').max(60),
           statistic: Yup.string().required('Enter a statistic').max(12),
           trend: Yup.string().max(230),
-          guidanceTitle: Yup.string().max(65),
+          guidanceTitle: Yup.string()
+            .max(65)
+            .when('guidanceText', {
+              is: (val: string) => val !== '',
+              then: s => s.required('Enter a guidance title'),
+            })
+            .test({
+              name: 'duplicateGuidanceTitles',
+              message: 'Guidance titles must be unique',
+              test: (value?: string) =>
+                !(
+                  value !== undefined &&
+                  value !== '' &&
+                  keyStatisticGuidanceTitles?.includes(value?.toLowerCase())
+                ),
+            }),
           guidanceText: Yup.string(),
         })}
       >
