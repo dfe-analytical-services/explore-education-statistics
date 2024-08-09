@@ -2,7 +2,7 @@ import { LocationCandidate } from '@admin/services/apiDataSetVersionService';
 import pickBy from 'lodash/pickBy';
 import sortBy from 'lodash/sortBy';
 
-const fields = [
+export const locationFields = [
   'code',
   'oldCode',
   'urn',
@@ -10,7 +10,7 @@ const fields = [
   'ukprn',
 ] as const satisfies readonly (keyof LocationCandidate)[];
 
-type Field = (typeof fields)[number];
+export type LocationField = (typeof locationFields)[number];
 
 export default function getApiDataSetLocationCodes(
   candidate: LocationCandidate,
@@ -18,15 +18,17 @@ export default function getApiDataSetLocationCodes(
   const entries = Object.entries(
     pickBy(
       candidate,
-      (_, key) => fields.includes(key as Field) && candidate[key as Field],
+      (_, key) =>
+        locationFields.includes(key as LocationField) &&
+        candidate[key as LocationField],
     ),
-  ) as [Field, string][];
+  ) as [LocationField, string][];
 
   if (entries.length === 1 && entries[0][0] === 'code') {
     return entries[0][1];
   }
 
-  return sortBy(entries, ([key]) => fields.indexOf(key))
+  return sortBy(entries, ([key]) => locationFields.indexOf(key))
     .map(([key, value]) => {
       switch (key) {
         case 'code':

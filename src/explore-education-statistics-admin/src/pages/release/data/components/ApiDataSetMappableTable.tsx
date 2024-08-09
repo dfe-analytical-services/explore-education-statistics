@@ -1,77 +1,90 @@
 import {
-  MappableLocation,
-  LocationCandidateWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import ApiDataSetLocationMappingModal from '@admin/pages/release/data/components/ApiDataSetLocationMappingModal';
-import styles from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage.module.scss';
-import { PendingLocationMappingUpdate } from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
-import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
-import {
   LocationCandidate,
   MappingType,
+  PendingMappingUpdate,
 } from '@admin/services/apiDataSetVersionService';
+import {
+  FilterCandidateWithKey,
+  MappableFilter,
+} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
+import {
+  LocationCandidateWithKey,
+  MappableLocation,
+} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
 import Tag, { TagProps } from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
-import omit from 'lodash/omit';
 import React from 'react';
 import classNames from 'classnames';
+import omit from 'lodash/omit';
 
-// Fields to omit from location mapping diff.
+// Fields to omit from mapping diff.
 const omittedDiffingFields: (keyof LocationCandidateWithKey)[] = [
   'key',
   'label',
 ];
 
 interface Props {
-  level: LocationLevelKey;
-  locations: MappableLocation[];
-  newLocations?: LocationCandidateWithKey[];
-  pendingUpdates?: PendingLocationMappingUpdate[];
-  onUpdate: (update: PendingLocationMappingUpdate) => Promise<void>;
+  groupKey: string;
+  groupLabel: string;
+  label: string;
+  mappableItems: MappableFilter[] | MappableLocation[];
+  newItems?: FilterCandidateWithKey[] | LocationCandidateWithKey[];
+  pendingUpdates?: PendingMappingUpdate[];
+  showColumnName?: boolean;
+  onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
-export default function ApiDataSetMappableLocationsTable({
-  level,
-  locations,
-  newLocations = [],
+export default function ApiDataSetMappableTable({
+  groupKey,
+  groupLabel,
+  label,
+  mappableItems,
+  newItems = [],
   pendingUpdates = [],
+  showColumnName = false,
   onUpdate,
 }: Props) {
-  const totalUnmapped = locations.filter(
-    location => location.mapping.type === 'AutoNone',
+  const totalUnmapped = mappableItems.filter(
+    option => option.mapping.type === 'AutoNone',
   ).length;
-  const totalManuallyMapped = locations.length - totalUnmapped;
+  const totalManuallyMapped = mappableItems.length - totalUnmapped;
 
   return (
     <table
-      className={`${styles.table} hasRowHighlights`}
-      id={`mappable-${level}`}
-      data-testid={`mappable-table-${level}`}
+      className="dfe-table-vertical-align-middle dfe-has-row-highlights"
+      id={`mappable-${groupKey}`}
+      data-testid={`mappable-table-${groupKey}`}
     >
       <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
-        {locationLevelsMap[level]?.plural ?? level}{' '}
+        {groupLabel}{' '}
         <TagGroup className="govuk-!-margin-left-2">
           {totalUnmapped > 0 && (
             <Tag colour="red">
-              {`${totalUnmapped} unmapped location${
+              {`${totalUnmapped} unmapped ${label}${
                 totalUnmapped > 1 ? 's' : ''
               } `}
             </Tag>
           )}
           {totalManuallyMapped > 0 && (
             <Tag colour="blue">
-              {`${totalManuallyMapped} mapped location${
+              {`${totalManuallyMapped} mapped ${label}${
                 totalManuallyMapped > 1 ? 's' : ''
               } `}
             </Tag>
           )}
         </TagGroup>
+        <br />
+        {showColumnName && (
+          <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
+            Column:{' '}
+            <span className="govuk-!-font-weight-regular">{groupKey}</span>
+          </div>
+        )}
       </caption>
       <thead>
         <tr>
@@ -82,7 +95,7 @@ export default function ApiDataSetMappableLocationsTable({
         </tr>
       </thead>
       <tbody>
-        {Object.values(locations).map(({ candidate, mapping }) => {
+        {Object.values(mappableItems).map(({ candidate, mapping }) => {
           const isPendingUpdate = pendingUpdates.some(
             update => update.sourceKey === mapping.sourceKey,
           );
@@ -103,10 +116,7 @@ export default function ApiDataSetMappableLocationsTable({
             >
               <td>
                 {mapping.source.label}
-                <br />
-                <span className={styles.code}>
-                  {getApiDataSetLocationCodes(mapping.source)}
-                </span>
+                <ApiDataSetLocationCode location={mapping.source} />
               </td>
               <td>
                 {!candidate ? (
@@ -120,10 +130,7 @@ export default function ApiDataSetMappableLocationsTable({
                 ) : (
                   <>
                     {candidate.label}
-                    <br />
-                    <span className={styles.code}>
-                      {getApiDataSetLocationCodes(candidate)}
-                    </span>
+                    <ApiDataSetLocationCode location={candidate} />
                   </>
                 )}
               </td>
@@ -139,7 +146,7 @@ export default function ApiDataSetMappableLocationsTable({
                     hideText
                     inline
                     size="sm"
-                    text="Updating location mapping"
+                    text={`Updating ${label} mapping`}
                   />
                 ) : (
                   <>
@@ -147,7 +154,7 @@ export default function ApiDataSetMappableLocationsTable({
                       <ButtonText
                         onClick={async () => {
                           await onUpdate({
-                            level,
+                            groupKey,
                             previousCandidate: candidate,
                             previousMapping: mapping,
                             sourceKey: mapping.sourceKey,
@@ -162,11 +169,13 @@ export default function ApiDataSetMappableLocationsTable({
                         </VisuallyHidden>
                       </ButtonText>
                     )}
-                    <ApiDataSetLocationMappingModal
+
+                    <ApiDataSetMappingModal
                       candidate={candidate}
-                      level={level}
+                      groupKey={groupKey}
+                      label={label}
                       mapping={mapping}
-                      newLocations={newLocations}
+                      newItems={newItems}
                       onSubmit={onUpdate}
                     />
                   </>
@@ -190,7 +199,6 @@ function getUpdateTagText(type: MappingType, isMajorMapping: boolean): string {
       return 'N/A';
   }
 }
-
 function getUpdateTagColour(
   type: MappingType,
   isMajorMapping: boolean,

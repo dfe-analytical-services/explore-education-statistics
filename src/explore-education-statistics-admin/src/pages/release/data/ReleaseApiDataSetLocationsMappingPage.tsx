@@ -1,14 +1,13 @@
 import Link from '@admin/components/Link';
 import ButtonLink from '@admin/components/ButtonLink';
-import ApiDataSetMappableLocationsTable from '@admin/pages/release/data/components/ApiDataSetMappableLocationsTable';
-import ApiDataSetNewLocationsTable from '@admin/pages/release/data/components/ApiDataSetNewLocationsTable';
-import ApiDataSetAutoMappedLocationsTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedLocationsTable';
 import getApiDataSetLocationMappings, {
   AutoMappedLocation,
   LocationCandidateWithKey,
-  LocationMappingWithKey,
   MappableLocation,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
+import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
+import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
 import {
   releaseApiDataSetDetailsRoute,
@@ -17,7 +16,7 @@ import {
 import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionService, {
-  LocationMappingUpdate,
+  PendingMappingUpdate,
 } from '@admin/services/apiDataSetVersionService';
 import Tag from '@common/components/Tag';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -36,13 +35,6 @@ import { generatePath, useParams } from 'react-router-dom';
 import omit from 'lodash/omit';
 import { useImmer } from 'use-immer';
 
-export const noMappingValue = 'noMapping';
-
-export interface PendingLocationMappingUpdate extends LocationMappingUpdate {
-  previousCandidate?: LocationCandidateWithKey;
-  previousMapping: LocationMappingWithKey;
-}
-
 export default function ReleaseApiDataSetLocationsMappingPage() {
   const [autoMappedLocations, updateAutoMappedLocations] = useImmer<
     Partial<Record<LocationLevelKey, AutoMappedLocation[]>>
@@ -53,9 +45,9 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
   const [mappableLocations, updateMappableLocations] = useImmer<
     Partial<Record<LocationLevelKey, MappableLocation[]>>
   >({});
-  const [pendingUpdates, setPendingUpdates] = useState<
-    PendingLocationMappingUpdate[]
-  >([]);
+  const [pendingUpdates, setPendingUpdates] = useState<PendingMappingUpdate[]>(
+    [],
+  );
 
   const { dataSetId, releaseId, publicationId } =
     useParams<ReleaseDataSetRouteParams>();
@@ -118,11 +110,12 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
   ];
 
   const updateMappingState = useCallback(
-    (updates: PendingLocationMappingUpdate[]) => {
+    (updates: PendingMappingUpdate[]) => {
       // MappableLocations - Add or update mapping
       updateMappableLocations(draft => {
         updates.forEach(
-          ({ candidateKey, level, previousMapping, sourceKey, type }) => {
+          ({ candidateKey, groupKey, previousMapping, sourceKey, type }) => {
+            const level = groupKey as LocationLevelKey;
             const candidate = candidateKey
               ? newLocationCandidates[level]?.find(
                   location => location.key === candidateKey,
@@ -158,7 +151,8 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
       // NewLocations - remove mapped candidates, add unmapped candidates
       updateNewLocationCandidates(draft => {
-        updates.forEach(({ candidateKey, level, previousCandidate }) => {
+        updates.forEach(({ candidateKey, groupKey, previousCandidate }) => {
+          const level = groupKey as LocationLevelKey;
           if (candidateKey) {
             // Remove candidates that have been mapped
             draft[level]?.forEach((location, index) => {
@@ -176,7 +170,8 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
       // AutoMapped - remove previously AutoMapped ones
       updateAutoMappedLocations(draft => {
-        updates.forEach(({ level, sourceKey, previousMapping }) => {
+        updates.forEach(({ groupKey, sourceKey, previousMapping }) => {
+          const level = groupKey as LocationLevelKey;
           if (previousMapping.type !== 'AutoMapped') {
             return;
           }
@@ -212,7 +207,12 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
       dataSet.draftVersion?.id,
       {
         updates: pendingUpdates.map(update =>
-          omit(update, 'previousCandidate', 'previousMapping'),
+          omit(
+            { ...update, level: update.groupKey as LocationLevelKey },
+            'previousCandidate',
+            'previousMapping',
+            'groupKey',
+          ),
         ),
       },
     );
@@ -221,8 +221,11 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
   }, 1000);
 
   const handleUpdateMapping = useCallback(
-    async (update: PendingLocationMappingUpdate) => {
-      setPendingUpdates(current => [...current, update]);
+    async (update: PendingMappingUpdate) => {
+      setPendingUpdates(current => [
+        ...current,
+        { ...update, level: update.groupKey },
+      ]);
       handleUpdate();
     },
     [handleUpdate],
@@ -282,14 +285,17 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               <>
                 {typedKeys(mappableLocations).map(level => {
                   const levelMappableLocations = mappableLocations[level];
+                  const groupLabel = locationLevelsMap[level]?.plural ?? level;
 
                   if (levelMappableLocations?.length) {
                     return (
-                      <ApiDataSetMappableLocationsTable
+                      <ApiDataSetMappableTable
                         key={`unmapped-${level}`}
-                        level={level}
-                        locations={levelMappableLocations}
-                        newLocations={newLocationCandidates[level]}
+                        groupKey={level}
+                        groupLabel={groupLabel}
+                        label="location"
+                        mappableItems={levelMappableLocations}
+                        newItems={newLocationCandidates[level]}
                         pendingUpdates={pendingUpdates}
                         onUpdate={handleUpdateMapping}
                       />
@@ -315,21 +321,22 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               <Accordion id="new-locations" testId="new-locations-accordion">
                 {typedKeys(newLocationCandidates).map(level => {
                   const levelNewLocations = newLocationCandidates[level];
+                  const groupLabel = locationLevelsMap[level]?.plural ?? level;
 
                   if (levelNewLocations?.length) {
                     return (
                       <AccordionSection
                         goToTop={false}
-                        heading={`${
-                          locationLevelsMap[level]?.plural ?? level
-                        } (${levelNewLocations.length})`}
+                        heading={`${groupLabel} (${levelNewLocations.length})`}
                         headingTag="h4"
                         id={`new-locations-${level}`}
                         key={`new-locations-${level}`}
                       >
-                        <ApiDataSetNewLocationsTable
-                          level={level}
-                          locations={levelNewLocations}
+                        <ApiDataSetNewItemsTable
+                          groupKey={level}
+                          groupLabel={groupLabel}
+                          label="location"
+                          newItems={levelNewLocations}
                         />
                       </AccordionSection>
                     );
@@ -357,22 +364,23 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               >
                 {typedKeys(autoMappedLocations).map(level => {
                   const levelAutoMappedLocations = autoMappedLocations[level];
+                  const groupLabel = locationLevelsMap[level]?.plural ?? level;
 
                   if (levelAutoMappedLocations?.length) {
                     return (
                       <AccordionSection
                         goToTop={false}
-                        heading={`${
-                          locationLevelsMap[level]?.plural ?? level
-                        } (${levelAutoMappedLocations?.length})`}
+                        heading={`${groupLabel} (${levelAutoMappedLocations?.length})`}
                         headingTag="h4"
                         id={`auto-mapped-${level}`}
                         key={`auto-mapped-${level}`}
                       >
-                        <ApiDataSetAutoMappedLocationsTable
-                          level={level}
-                          locations={levelAutoMappedLocations}
-                          newLocations={newLocationCandidates[level]}
+                        <ApiDataSetAutoMappedTable
+                          groupKey={level}
+                          groupLabel={groupLabel}
+                          label="location"
+                          autoMappedItems={levelAutoMappedLocations}
+                          newItems={newLocationCandidates[level]}
                           pendingUpdates={pendingUpdates}
                           onUpdate={handleUpdateMapping}
                         />

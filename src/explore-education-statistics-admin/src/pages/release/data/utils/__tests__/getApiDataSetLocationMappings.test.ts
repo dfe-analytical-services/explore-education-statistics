@@ -6,7 +6,7 @@ import getApiDataSetLocationMappings, {
 import testLocationsMapping from '@admin/pages/release/data/__data__/testLocationsMapping';
 
 describe('getApiDataSetLocationMappings', () => {
-  test('returns the correct unmapped and manually mapped locations grouped by level', () => {
+  test('returns the correct mappable locations grouped by level', () => {
     const { mappableLocations } =
       getApiDataSetLocationMappings(testLocationsMapping);
 

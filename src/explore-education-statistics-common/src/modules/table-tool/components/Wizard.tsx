@@ -67,7 +67,9 @@ const Wizard = ({
 
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
-  ) as FunctionComponentElement<WizardStepProps & InjectedWizardProps>[];
+  ) as unknown as FunctionComponentElement<
+    WizardStepProps & InjectedWizardProps
+  >[];
 
   const lastStep = filteredChildren.length;
 
