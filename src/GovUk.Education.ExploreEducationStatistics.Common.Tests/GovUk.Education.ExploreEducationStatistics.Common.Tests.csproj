@@ -17,7 +17,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7" PrivateAssets="all"/>
     <PackageReference Include="CompareNETObjects" Version="4.83.0"/>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.7"/>
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0"/>
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.23.0"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
     <PackageReference Include="Moq" Version="4.20.70"/>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>

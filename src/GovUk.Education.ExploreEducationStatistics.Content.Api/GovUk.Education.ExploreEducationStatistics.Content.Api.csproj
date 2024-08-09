@@ -20,7 +20,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
         <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
     </ItemGroup>
 
     <ItemGroup>
