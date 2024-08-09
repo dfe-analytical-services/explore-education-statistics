@@ -3,9 +3,24 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ContentHtml from '@common/components/ContentHtml';
 import { GlossaryEntry } from '@common/services/types/glossary';
+import _redirectService from '@common/services/redirectService';
 import { within } from '@testing-library/dom';
 
+jest.mock('@common/services/redirectService');
+const redirectService = _redirectService as jest.Mocked<
+  typeof _redirectService
+>;
+
 describe('ContentHtml', () => {
+  beforeEach(() => {
+    redirectService.list.mockImplementation(async () => {
+      return Promise.resolve({
+        methodologies: [],
+        publications: [],
+      });
+    });
+  });
+
   test('renders correctly with required props', () => {
     render(<ContentHtml html="<p>Test text</p>" />);
 
@@ -98,12 +113,17 @@ describe('ContentHtml', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not transform featured table links when `transformFeaturedTableLinks` is not provided', () => {
+  test('does not transform featured table links when `transformFeaturedTableLinks` is not provided', async () => {
     render(
       <ContentHtml html="<a href='/data-table/fast-track/124356575?featuredTable=true' data-featured-table>Featured table</a>" />,
     );
 
     expect(screen.queryByText('I am transformed')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Featured table')).toBeInTheDocument();
+    });
+
     expect(
       screen.getByRole('link', { name: 'Featured table' }),
     ).toBeInTheDocument();
@@ -198,10 +218,16 @@ describe('ContentHtml', () => {
   });
 
   describe('formatting links', () => {
-    test('encodes special characters in urls', () => {
+    test('encodes special characters in urls', async () => {
       render(
         <ContentHtml html='<a href="https://gov.uk/TEST something">External link</a>' />,
       );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('External link (opens in a new tab)'),
+        ).toBeInTheDocument();
+      });
 
       expect(
         screen.getByRole('link', {
@@ -210,10 +236,16 @@ describe('ContentHtml', () => {
       ).toHaveAttribute('href', 'https://gov.uk/TEST%20something');
     });
 
-    test('trims whitespace in urls', () => {
+    test('trims whitespace in urls', async () => {
       render(
         <ContentHtml html='<a href="   https://gov.uk/TEST  ">External link</a>">External link</a>' />,
       );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('External link (opens in a new tab)'),
+        ).toBeInTheDocument();
+      });
 
       expect(
         screen.getByRole('link', {
@@ -222,10 +254,14 @@ describe('ContentHtml', () => {
       ).toHaveAttribute('href', 'https://gov.uk/TEST');
     });
 
-    test('lower cases internal urls, excluding query params', () => {
+    test('lower cases internal urls, excluding query params', async () => {
       render(
         <ContentHtml html='<a href="https://explore-education-statistics.service.gov.uk/Find-Statistics?testParam=Something">Internal link</a>' />,
       );
+
+      await waitFor(() => {
+        expect(screen.getByText('Internal link')).toBeInTheDocument();
+      });
 
       expect(
         screen.getByRole('link', {
@@ -237,10 +273,17 @@ describe('ContentHtml', () => {
       );
     });
 
-    test('does not lower case external urls', () => {
+    test('does not lower case external urls', async () => {
       render(
         <ContentHtml html='<a href="https://gov.uk/TEST">External link</a>' />,
       );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('External link (opens in a new tab)'),
+        ).toBeInTheDocument();
+      });
+
       expect(
         screen.getByRole('link', {
           name: 'External link (opens in a new tab)',
@@ -248,10 +291,17 @@ describe('ContentHtml', () => {
       ).toHaveAttribute('href', 'https://gov.uk/TEST');
     });
 
-    test('opens external links in a new tab', () => {
+    test('opens external links in a new tab', async () => {
       render(
         <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
       );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('External link (opens in a new tab)'),
+        ).toBeInTheDocument();
+      });
+
       const link = screen.getByRole('link', {
         name: 'External link (opens in a new tab)',
       });
@@ -260,10 +310,15 @@ describe('ContentHtml', () => {
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
 
-    test('opens internal links in the same tab', () => {
+    test('opens internal links in the same tab', async () => {
       render(
         <ContentHtml html='<a href="https://explore-education-statistics.service.gov.uk/">Internal link</a>' />,
       );
+
+      await waitFor(() => {
+        expect(screen.getByText('Internal link')).toBeInTheDocument();
+      });
+
       const link = screen.getByRole('link', {
         name: 'Internal link',
       });
@@ -275,7 +330,7 @@ describe('ContentHtml', () => {
       expect(link).not.toHaveAttribute('rel', 'noopener noreferrer');
     });
 
-    test('does not format links when `formatLinks` is false', () => {
+    test('does not format links when `formatLinks` is false', async () => {
       render(
         <ContentHtml
           formatLinks={false}
@@ -285,6 +340,10 @@ describe('ContentHtml', () => {
           <a href="  https://gov.uk/TEST something  ">External link</a>`}
         />,
       );
+
+      await waitFor(() => {
+        expect(screen.getByText('External link')).toBeInTheDocument();
+      });
 
       expect(
         screen.getByRole('link', {
