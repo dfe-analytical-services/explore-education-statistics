@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -28,6 +23,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Options;
 using Moq;
 using Snapshooter.Xunit;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -187,6 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         s => s.GetSubjectMeta(
                             releaseVersion.Id,
                             query,
+                            It.IsAny<long?>(),
                             It.IsAny<IList<Observation>>()
                         )
                     )
@@ -590,6 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         s => s.GetSubjectMeta(
                             releaseSubject.ReleaseVersionId,
                             query,
+                            It.IsAny<long?>(),
                             It.IsAny<IList<Observation>>()
                         )
                     )
@@ -601,7 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subjectResultMetaService: subjectResultMetaService.Object
                 );
 
-                var result = await service.Query(releaseSubject.ReleaseVersionId, query);
+                var result = await service.Query(releaseSubject.ReleaseVersionId, query, null);
 
                 VerifyAllMocks(observationService, subjectResultMetaService);
 
@@ -675,7 +677,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 };
 
                 // Query using a non-existent release id
-                var result = await service.Query(Guid.NewGuid(), query);
+                var result = await service.Query(Guid.NewGuid(), query, null);
 
                 result.AssertNotFound();
             }
@@ -720,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     SubjectId = Guid.NewGuid(),
                 };
 
-                var result = await service.Query(releaseVersion.Id, query);
+                var result = await service.Query(releaseVersion.Id, query, null);
 
                 result.AssertNotFound();
             }
@@ -800,7 +802,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = await service.Query(releaseSubject.ReleaseVersionId, query);
+                var result = await service.Query(releaseSubject.ReleaseVersionId, query, null);
 
                 VerifyAllMocks(filterItemRepository);
 

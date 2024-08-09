@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -14,6 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 
@@ -37,13 +37,14 @@ public class DataBlockService : IDataBlockService
 
     public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
         Guid releaseVersionId,
-        Guid dataBlockVersionId)
+        Guid dataBlockVersionId,
+        long? boundaryLevelId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(() => CheckDataBlockVersionExists(releaseVersionId: releaseVersionId,
                 dataBlockVersionId: dataBlockVersionId))
-            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query));
+            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query, boundaryLevelId));
     }
 
     private async Task<Either<ActionResult, DataBlockVersion>> CheckDataBlockVersionExists(

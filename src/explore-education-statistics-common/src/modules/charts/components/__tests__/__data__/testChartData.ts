@@ -87,6 +87,7 @@ export const testChartConfiguration: Chart = {
       tickConfig: 'default',
     },
   },
+  boundaryLevel: undefined,
   type: 'line',
   title: 'Aggregated results chart',
   alt: 'Some alt text',
