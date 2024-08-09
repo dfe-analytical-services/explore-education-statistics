@@ -1,4 +1,32 @@
 import { Dictionary } from '@common/types';
+import { mapKeys } from 'lodash';
+
+export type GeographicLevelCode =
+  | 'EDA'
+  | 'INST'
+  | 'LA'
+  | 'LAD'
+  | 'LEP'
+  | 'LSIP'
+  | 'MAT'
+  | 'MCA'
+  | 'NAT'
+  | 'OA'
+  | 'PCON'
+  | 'PROV'
+  | 'REG'
+  | 'RSC'
+  | 'SCH'
+  | 'SPON'
+  | 'PA'
+  | 'WARD';
+
+export interface LocationLevelDetails {
+  label: string;
+  plural: string;
+  prefix: string;
+  code: GeographicLevelCode;
+}
 
 const locationLevelsMap = {
   country: {
@@ -67,6 +95,12 @@ const locationLevelsMap = {
     prefix: 'a',
     code: 'PCON',
   },
+  planningArea: {
+    label: 'Planning Area',
+    plural: 'Planning Areas',
+    prefix: 'a',
+    code: 'PA',
+  },
   provider: {
     label: 'Provider',
     plural: 'Providers',
@@ -103,19 +137,13 @@ const locationLevelsMap = {
     prefix: 'a',
     code: 'WARD',
   },
-  planningArea: {
-    label: 'Planning Area',
-    plural: 'Planning Areas',
-    prefix: 'a',
-    code: 'PA',
-  },
-} as const satisfies Dictionary<{
-  label: string;
-  plural: string;
-  prefix: string;
-  code: string;
-}>;
+} as const satisfies Dictionary<LocationLevelDetails>;
 
 export default locationLevelsMap;
 
 export type LocationLevelKey = keyof typeof locationLevelsMap;
+
+export const geographicLevelCodesMap = mapKeys(
+  locationLevelsMap,
+  level => level.code,
+) as Record<GeographicLevelCode, LocationLevelDetails>;
