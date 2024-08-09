@@ -91,12 +91,19 @@ param volumeMounts {
   volumeName: string
 }[] = []
 
+@description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
+param entraIdAuthentication {
+  appRegistrationClientId: string
+  allowedClientIds: string[]
+  allowedPrincipalIds: string[]
+  requireAuthentication: bool
+}?
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
-var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
+var fullApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 
 resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
-  name: containerApplicationName
+  name: fullApplicationName
   location: location
   identity: {
     type: 'UserAssigned'
@@ -160,6 +167,17 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
     workloadProfileName: 'Consumption'
   }
   tags: tagValues
+}
+
+module azureAuthentication 'azureAuthentication.bicep' = if (entraIdAuthentication != null) {
+  name: '${containerAppName}AzureAuthentication'
+  params: {
+    clientId: entraIdAuthentication!.appRegistrationClientId
+    siteName: fullApplicationName
+    allowedClientIds: entraIdAuthentication!.allowedClientIds
+    allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
+    requireAuthentication: entraIdAuthentication!.requireAuthentication
+  }
 }
 
 output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn

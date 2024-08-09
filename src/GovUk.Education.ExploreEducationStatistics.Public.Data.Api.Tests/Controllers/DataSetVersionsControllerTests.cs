@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -6,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -13,10 +15,13 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Content.ViewModels.PublicationSummaryViewModel;
+using PublicationSummaryViewModel =
+    GovUk.Education.ExploreEducationStatistics.Content.ViewModels.PublicationSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -33,9 +38,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [InlineData(1, 3, 2)]
         [InlineData(2, 2, 9)]
         public async Task MultipleAvailableVersionsForRequestedDataSet_Returns200_PaginatedCorrectly(
-           int page,
-           int pageSize,
-           int numberOfAvailableDataSetVersions)
+            int page,
+            int pageSize,
+            int numberOfAvailableDataSetVersions)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -140,7 +145,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                         req.Ids.All(id => releaseFileIds.Contains(id))),
                     It.IsAny<CancellationToken>()
                 ))
-                .ReturnsAsync( releaseFiles[..3]);
+                .ReturnsAsync(releaseFiles[..3]);
 
             var page1Response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
@@ -181,7 +186,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Withdrawn)]
         [InlineData(DataSetVersionStatus.Deprecated)]
-        public async Task DataSetVersionIsAvailable_Returns200_CorrectViewModel(DataSetVersionStatus dataSetVersionStatus)
+        public async Task DataSetVersionIsAvailable_Returns200_CorrectViewModel(
+            DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -248,6 +254,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     result.Withdrawn
                 );
             }
+
             Assert.Equal(dataSetVersion.Notes, result.Notes);
             Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
 
@@ -482,7 +489,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSetId(dataSet.Id)
                 .GenerateList(numberOfDataSetVersions);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.AddRange(dataSetVersions));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.AddRange(dataSetVersions));
 
             var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
@@ -650,6 +658,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     viewModel.Withdrawn
                 );
             }
+
             Assert.Equal(dataSetVersion.Notes, viewModel.Notes);
             Assert.Equal(dataSetVersion.TotalResults, viewModel.TotalResults);
 
@@ -1571,6 +1580,80 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertForbidden();
         }
 
+        [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        public async Task VersionNotAvailable_UserMissingUnpublishedDataReadRole_Returns403(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            await TestApp
+                .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var userWithIncorrectRole = new ClaimsPrincipal(
+                new ClaimsIdentity(
+                    claims: new Claim[] { new(ClaimTypes.Role, "IncorrectRole") },
+                    authenticationType: JwtBearerDefaults.AuthenticationScheme,
+                    nameType: ClaimTypes.Name,
+                    roleType: ClaimTypes.Role));
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.Version,
+                user: userWithIncorrectRole);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        public async Task VersionNotAvailable_UserHasUnpublishedDataReadRole_Returns200(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            var userWithCorrectRole = new ClaimsPrincipal(
+                new ClaimsIdentity(
+                    claims: new Claim[] { new(ClaimTypes.Role, SecurityConstants.UnpublishedDataReaderAppRole) },
+                    authenticationType: JwtBearerDefaults.AuthenticationScheme,
+                    nameType: ClaimTypes.Name,
+                    roleType: ClaimTypes.Role));
+
+            await TestApp
+                .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.Version,
+                user: userWithCorrectRole);
+
+            response.AssertOk();
+        }
+
         [Fact]
         public async Task VersionExistsForOtherDataSet_Returns404()
         {
@@ -1634,9 +1717,11 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         private async Task<HttpResponseMessage> GetDataSetVersionChanges(
             Guid dataSetId,
             string dataSetVersion,
-            IContentApiClient? contentApiClient = null)
+            IContentApiClient? contentApiClient = null,
+            ClaimsPrincipal? user = null)
         {
-            var client = BuildApp(contentApiClient).CreateClient();
+            var client = BuildApp(contentApiClient: contentApiClient, user: user)
+                .CreateClient();
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes", UriKind.Relative);
 
@@ -1644,12 +1729,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
+    private WebApplicationFactory<Startup> BuildApp(
+        IContentApiClient? contentApiClient = null,
+        ClaimsPrincipal? user = null)
     {
-        return TestApp.ConfigureServices(services =>
-        {
-            services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>());
-        });
+        return TestApp
+            .SetUser(user)
+            .ConfigureServices(services =>
+            {
+                services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>());
+            });
     }
 
     private Generator<ReleaseFileViewModel> DefaultReleaseFileViewModel() =>

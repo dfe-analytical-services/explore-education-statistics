@@ -16,12 +16,15 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Inte
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +37,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 {
     private readonly IConfiguration _miniProfilerConfig =
         configuration.GetRequiredSection(MiniProfilerOptions.Section);
+
+    private readonly IConfiguration _openIdConnectConfig =
+        configuration.GetRequiredSection(OpenIdConnectOptions.Section);
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -59,6 +65,24 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                     options.ShouldProfile = request => request.Path.StartsWithSegments("/api");
                 })
                 .AddEntityFramework();
+        }
+
+        // Authentication
+
+        // Look for JWT Bearer tokens, and validate that they are issued from the correct tenant and are
+        // issued for the Public API.  It is only necessary to enable this support in Azure environments
+        // as it is using Azure Authentication to handle the access tokens.
+        if (hostEnvironment.IsProduction())
+        {
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var tenantId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.TenantId));
+                    var clientId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.ClientId));
+                    options.Authority = $"https://login.microsoftonline.com/{tenantId}";
+                    options.Audience = clientId.ToString();
+                });
         }
 
         // MVC
@@ -140,7 +164,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Services
 
         services.AddFluentValidation();
-        services.AddValidatorsFromAssembly(typeof(DataSetGetQueryLocations.Validator).Assembly); // Adds *all* validators from Public.Data.Requests
+        services.AddValidatorsFromAssembly(typeof(DataSetGetQueryLocations.Validator)
+            .Assembly); // Adds *all* validators from Public.Data.Requests
         services.AddFluentValidationRulesToSwagger();
 
         services.AddHttpClient<IContentApiClient, ContentApiClient>((provider, httpClient) =>
@@ -151,6 +176,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         });
 
         services.AddSecurity();
+        
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
 
         services.AddSingleton<IDataSetVersionPathResolver, DataSetVersionPathResolver>();
         services.AddScoped<IPublicationService, PublicationService>();
@@ -183,7 +210,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Rewrites
 
-        app.UseRewriter(new RewriteOptions {Rules = {new LowercasePathRule()}});
+        app.UseRewriter(new RewriteOptions { Rules = { new LowercasePathRule() } });
 
         // Caching and compression
 
@@ -204,9 +231,24 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Routing / endpoints
 
         app.UseRouting();
+
+        // Authentication and authorization
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseEndpoints(builder =>
         {
-            builder.MapControllers();
+            builder
+                .MapControllers()
+                // Enable authentication and authorization across any and all Controllers,
+                // allowing both anonymous and authenticated users to call any Controller
+                // methods in the same way, but allow users to be identified if they have
+                // passed a JWT in the call. This is done globally, rather than supplying
+                // [Authorize] and [AllowAnonymous] attributes to each individual
+                // Controller.
+                .RequireAuthorization()
+                .AllowAnonymous();
         });
 
         app.UseHealthChecks("/api/health");
