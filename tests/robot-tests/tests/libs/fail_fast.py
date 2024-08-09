@@ -6,6 +6,8 @@ should continue to run or if they should fail immediately and therefore fail the
 """
 
 import os.path
+import os
+import atomicwrites
 
 from robot.libraries.BuiltIn import BuiltIn
 from tests.libs.logger import get_logger
@@ -52,12 +54,15 @@ def get_failing_test_suites() -> []:
         #
         # We therefore explicitly remove any duplicates from the list here.
 
-        with open(failing_suites_filename, "r") as file:
-            failing_suites = file.readlines()
-            stripped_suite_names = [failing_suite.strip() for failing_suite in failing_suites]
-            filtered_suite_names = filter(None, stripped_suite_names)
-            return list(dict.fromkeys(filtered_suite_names))
-    return []
+        if os.path.isfile(failing_suites_filename):
+            with atomicwrites.atomic_write(failing_suites_filename, mode='r') as file:
+                # atomicwrite reduces the risk of race conditions or partial writes that could lead to incorrect test
+                # suite results.
+                failing_suites = file.readlines()
+                stripped_suite_names = [failing_suite.strip() for failing_suite in failing_suites]
+                filtered_suite_names = filter(None, stripped_suite_names)
+                return list(dict.fromkeys(filtered_suite_names))
+        return []
 
 
 def _raise_assertion_error(err_msg):
