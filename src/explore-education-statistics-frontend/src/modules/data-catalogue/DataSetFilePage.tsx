@@ -9,6 +9,7 @@ import downloadService from '@common/services/downloadService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import DataSetFileApiChangelog from '@frontend/modules/data-catalogue/components/DataSetFileApiChangelog';
 import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileApiQuickStart';
 import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
 import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
@@ -42,8 +43,9 @@ export const pageBaseSections = {
 } as const;
 
 export const pageApiSections = {
-  apiVersionHistory: 'API data set version history',
   apiQuickStart: 'API data set quick start',
+  apiVersionHistory: 'API data set version history',
+  apiChangelog: 'API data set changelog',
 } as const;
 
 export const pageSections = {
@@ -216,14 +218,18 @@ export default function DataSetFilePage({
 
               {apiDataSet && apiDataSetVersion && (
                 <>
+                  <DataSetFileApiQuickStart
+                    id={apiDataSet.id}
+                    name={apiDataSet.title}
+                    version={apiDataSetVersion.version}
+                  />
+
                   <DataSetFileApiVersionHistory
                     apiDataSetId={apiDataSet?.id}
                     currentVersion={apiDataSetVersion.version}
                   />
 
-                  <DataSetFileApiQuickStart
-                    id={apiDataSet.id}
-                    name={apiDataSet.title}
+                  <DataSetFileApiChangelog
                     version={apiDataSetVersion.version}
                   />
                 </>
