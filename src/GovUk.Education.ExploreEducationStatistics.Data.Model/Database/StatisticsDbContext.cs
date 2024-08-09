@@ -55,11 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
     {
         public StatisticsDbContext()
         {
-            // We intentionally don't run `Configure` here as Moq would call this constructor
-            // and we'd immediately get a MockException from interacting with its fields
-            // e.g. from adding events listeners to `ChangeTracker`.
-            // We can just rely on the variants which take options instead as these
-            // are what get used in real application scenarios.
+            // We intentionally don't run `Configure` here as Moq would call this constructor, and we'd immediately get
+            // a MockException from interacting with its fields e.g. from adding events listeners to `ChangeTracker`.
+            // We can just rely on the variant which takes options instead as this is what gets used in real application
+            // scenarios.
         }
 
         public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, timeout: 300)
