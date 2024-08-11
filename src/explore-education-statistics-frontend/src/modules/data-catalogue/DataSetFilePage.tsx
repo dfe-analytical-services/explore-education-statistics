@@ -1,6 +1,7 @@
 import Button from '@common/components/Button';
 import ContentHtml from '@common/components/ContentHtml';
 import FormattedDate from '@common/components/FormattedDate';
+import PageNav, { NavItem } from '@common/components/PageNav';
 import SectionBreak from '@common/components/SectionBreak';
 import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
@@ -14,7 +15,6 @@ import DataSetFileApiChangelog from '@frontend/modules/data-catalogue/components
 import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileApiQuickStart';
 import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
 import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
-import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
 import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
 import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
 import DataSetFileVariables from '@frontend/modules/data-catalogue/components/DataSetFileVariables';
@@ -120,7 +120,7 @@ export default function DataSetFilePage({
     };
   }, [handleScroll]);
 
-  const navSections = useMemo(() => {
+  const navItems = useMemo<NavItem[]>(() => {
     let sections: Partial<Record<PageSectionId, string>> = apiDataSet
       ? pageSections
       : pageBaseSections;
@@ -137,7 +137,12 @@ export default function DataSetFilePage({
       sections = omit(sections, 'apiChangelog');
     }
 
-    return sections;
+    return Object.entries(sections).map<NavItem>(([id, text]) => {
+      return {
+        id,
+        text,
+      };
+    });
   }, [apiDataSet, apiDataSetVersionChanges, dataSetFile.footnotes.length]);
 
   if (!dataSetFile) {
@@ -204,10 +209,12 @@ export default function DataSetFilePage({
           <SectionBreak size="l" />
 
           <div className="govuk-grid-row">
-            <DataSetFilePageNav
+            <PageNav
               activeSection={activeSection}
-              sections={navSections}
-              onClickItem={setActiveSection}
+              items={navItems}
+              onClickItem={sectionId => {
+                setActiveSection(sectionId as PageSectionId);
+              }}
             />
 
             <div className="govuk-grid-column-two-thirds">
