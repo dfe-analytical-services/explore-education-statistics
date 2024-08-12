@@ -60,7 +60,7 @@ def get_failing_test_suites() -> []:
         #
         # We therefore explicitly remove any duplicates from the list here.
 
-        if os.path.isfile(failing_suites_filename):
+        with file_lock:
             try:
                 with open(failing_suites_filename, "r") as file:
                     failing_suites = file.readlines()
