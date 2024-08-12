@@ -189,7 +189,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddSecurity();
         
-        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IAuthorizationHandlerService, AuthorizationHandlerService>();
 
         services.AddScoped<IPreviewTokenService, PreviewTokenService>();
 
@@ -257,9 +257,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             builder
                 .MapControllers()
-                // Enable anonymous and authenticated users to call any Controller
-                // methods in the same way, but allow users to be identified if they have
-                // passed a JWT in the call.
+                // Enable both anonymous public users and authenticated Admin user to securely access controllers.
                 .RequireAuthorization()
                 .AllowAnonymous();
         });

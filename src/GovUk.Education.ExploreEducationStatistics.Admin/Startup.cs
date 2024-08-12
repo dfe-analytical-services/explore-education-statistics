@@ -28,11 +28,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -51,7 +49,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -92,7 +89,6 @@ using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
-using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using IContentMethodologyService =
     GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
@@ -125,6 +121,11 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
+using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Security;
+using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -464,14 +465,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
+                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 
                 services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
+                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 
                 services.AddTransient<IDataSetService, DataSetService>();

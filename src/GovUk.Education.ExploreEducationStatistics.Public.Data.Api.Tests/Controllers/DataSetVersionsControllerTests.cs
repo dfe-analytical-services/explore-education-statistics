@@ -1659,10 +1659,72 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertForbidden();
         }
 
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task VersionNotAvailable_UserMissingAdminAccessReadRole_Returns403(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            await TestApp
+                .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var userWithIncorrectRole = ClaimsPrincipalUtils.UnknownRoleUser();
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.Version,
+                user: userWithIncorrectRole);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task VersionNotAvailable_UserHasAdminAccessReadRole_Returns200(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            var userWithCorrectRole = ClaimsPrincipalUtils.AdminAccessUser();
+
+            await TestApp
+                .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.Version,
+                user: userWithCorrectRole);
+
+            response.AssertOk();
+        }
+
+
         private async Task<HttpResponseMessage> GetDataSetVersionChanges(
             Guid dataSetId,
             string dataSetVersion,
             Guid? previewTokenId = null,
+            ClaimsPrincipal? user = null,
             IContentApiClient? contentApiClient = null)
         {
             var client = BuildApp(contentApiClient).CreateClient();
