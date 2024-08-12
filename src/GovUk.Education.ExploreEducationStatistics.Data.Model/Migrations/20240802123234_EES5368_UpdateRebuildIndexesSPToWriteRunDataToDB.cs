@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
     [ExcludeFromCodeCoverage]
     public partial class EES5368_UpdateRebuildIndexesSPToWriteRunDataToDB : Migration
     {
-        private const string PreviousRebuildIndexesMigrationId = "20240726153723";
+        private const string PreviousRebuildIndexesMigrationId = EES5205_UpdateRebuildIndexesStoredProc.MigrationId;
         internal const string MigrationId = "20240802123234";
 
         /// <inheritdoc />
