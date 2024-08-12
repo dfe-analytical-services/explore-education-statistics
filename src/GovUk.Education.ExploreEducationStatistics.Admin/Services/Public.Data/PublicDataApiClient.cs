@@ -91,7 +91,7 @@ public class PublicDataApiClient(
         // If operating within Azure, obtain an access token for authenticating the Admin App Service with
         // the Public API using its managed identity.
         //
-        // By virtue of the Admin App's managed identity being granted the "UnpublishedData.Read" App Role
+        // By virtue of the Admin App's managed identity being granted the "Admin.Access" App Role
         // on the Public API, the access token retrieved here will have the App Role present in its list
         // of Role claims.
         if (environment.IsProduction())

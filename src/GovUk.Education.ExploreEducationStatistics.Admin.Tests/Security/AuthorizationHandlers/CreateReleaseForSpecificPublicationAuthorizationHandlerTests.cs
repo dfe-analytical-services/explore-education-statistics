@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static Moq.MockBehavior;
+using ClaimsPrincipalUtils = GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
