@@ -15,7 +15,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 
-public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixture fixture) 
+public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixture fixture)
     : PublisherFunctionsIntegrationTest(fixture)
 {
     public class PublishDataSetsTests(PublisherFunctionsIntegrationTestFixture fixture)
@@ -39,7 +39,8 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithReleaseFileId(releaseDataFile.Id);
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(releaseDataFile.Id));
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
             await AddTestData<PublicDataDbContext>(context =>
@@ -96,12 +97,11 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             var dataSetVersions = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .ForIndex(0, s => s
-                    .SetReleaseFileId(Guid.NewGuid())
-                    .SetStatusPublished())
-                .ForIndex(1, s => s
-                    .SetReleaseFileId(releaseDataFile.Id)
-                    .SetStatusDraft())
+                .ForIndex(0, s => s.SetStatusPublished())
+                .ForIndex(1,
+                    s => s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
+                            .WithReleaseFileId(releaseDataFile.Id))
+                        .SetStatusDraft())
                 .GenerateList(2);
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
@@ -132,20 +132,20 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             // Assert that the already-set Published date on the overarching DataSet is retained so that it indicates
             // the first date at which its first DataSetVersion was published.
             Assert.Equal(dataSet.Published.TruncateNanoseconds(), publishedDataSet.Published);
-            
+
             Assert.Equal(DataSetStatus.Published, publishedDataSet.Status);
             Assert.Equal(dataSet.LatestDraftVersionId, publishedDataSet.LatestLiveVersionId);
             Assert.Null(publishedDataSet.LatestDraftVersion);
-            
+
             Assert.NotNull(publishedDataSet.LatestLiveVersion);
             Assert.Equal(DataSetVersionStatus.Published, publishedDataSet.LatestLiveVersion.Status);
             publishedDataSet.LatestLiveVersion.Published.AssertUtcNow();
-            
+
             Assert.Equal(2, publishedDataSet.Versions.Count);
-            publishedDataSet.Versions.ForEach(version => 
+            publishedDataSet.Versions.ForEach(version =>
                 Assert.Equal(DataSetVersionStatus.Published, version.Status));
         }
-        
+
         [Fact]
         public async Task NoDraftDataSetVersionsToPublish()
         {
@@ -166,7 +166,8 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
                 .WithStatusPublished()
-                .WithReleaseFileId(releaseDataFile.Id);
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(releaseDataFile.Id));
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
             await AddTestData<PublicDataDbContext>(context =>
@@ -195,7 +196,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             // Assert that no publishing details have changed on the overarching DataSet.
             Assert.Equal(dataSet.Published, retrievedDataSet.Published);
             Assert.Equal(DataSetStatus.Published, retrievedDataSet.Status);
-            
+
             // Assert that the LatestLiveVersion has not been changed.
             Assert.Equal(dataSet.LatestLiveVersionId, retrievedDataSet.LatestLiveVersionId);
             Assert.Null(retrievedDataSet.LatestDraftVersion);
@@ -214,7 +215,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             ReleaseVersion amendmentReleaseVersion = DataFixture
                 .DefaultReleaseVersion()
                 .WithPreviousVersionId(originalReleaseVersion.Id);
-            
+
             File dataFile = DataFixture
                 .DefaultFile(FileType.Data);
 
@@ -233,7 +234,8 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithReleaseFileId(originalReleaseDataFile.Id)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(originalReleaseDataFile.Id))
                 .WithStatusPublished();
 
             await AddTestData<ContentDbContext>(context =>
@@ -271,11 +273,11 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 dataSetVersion.Published.TruncateNanoseconds(),
                 publishedDataSet.LatestLiveVersion.Published
             );
-            
+
             // The version should have be updated to reference the amendment's ReleaseFile
-            Assert.Equal(amendmentReleaseDataFile.Id, publishedDataSet.LatestLiveVersion.ReleaseFileId);
+            Assert.Equal(amendmentReleaseDataFile.Id, publishedDataSet.LatestLiveVersion.Release.ReleaseFileId);
         }
-        
+
         [Fact]
         public async Task ReleaseAmendmentPublishedWithNewDataSetVersion_CorrectReleaseFileIds()
         {
@@ -285,7 +287,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             ReleaseVersion amendmentReleaseVersion = DataFixture
                 .DefaultReleaseVersion()
                 .WithPreviousVersionId(originalReleaseVersion.Id);
-            
+
             var (dataFile, newDataFile) = DataFixture
                 .DefaultFile(FileType.Data)
                 .Generate(2)
@@ -298,7 +300,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .ForIndex(1, s => s.SetReleaseVersion(amendmentReleaseVersion))
                 .Generate(2)
                 .ToTuple2();
-            
+
             ReleaseFile newReleaseDataFile = DataFixture
                 .DefaultReleaseFile()
                 .WithFile(newDataFile)
@@ -311,13 +313,15 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             DataSetVersion dataSetVersion1 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithReleaseFileId(originalReleaseDataFile.Id)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(originalReleaseDataFile.Id))
                 .WithStatusPublished();
 
             DataSetVersion dataSetVersion2 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithReleaseFileId(newReleaseDataFile.Id)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(newReleaseDataFile.Id))
                 .WithVersionNumber(major: 2, minor: 0)
                 .WithStatusDraft();
 
@@ -362,7 +366,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             Assert.Equal(DataSetVersionStatus.Published, savedDataSetVersion2.Status);
             savedDataSetVersion2.Published.AssertUtcNow();
 
-            Assert.Equal(newReleaseDataFile.Id, savedDataSetVersion2.ReleaseFileId);
+            Assert.Equal(newReleaseDataFile.Id, savedDataSetVersion2.Release.ReleaseFileId);
 
             var savedDataSetVersion1 = publishedDataSet.Versions[1];
 
@@ -371,7 +375,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             Assert.Equal(dataSetVersion1.Published.TruncateNanoseconds(), savedDataSetVersion1.Published);
 
             // The ReleaseFileId should be updated to reference the amendment's ReleaseFile
-            Assert.Equal(amendmentReleaseDataFile.Id, savedDataSetVersion1.ReleaseFileId);
+            Assert.Equal(amendmentReleaseDataFile.Id, savedDataSetVersion1.Release.ReleaseFileId);
         }
     }
 }

@@ -870,6 +870,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             return Task.FromResult(new Either<ActionResult, DataSetDraftVersionViewModel>(new NotFoundResult()));
         }
+
+        public Task UpdateVersionsForReleaseVersion(
+            Guid releaseVersionId,
+            string slug,
+            string title,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService

@@ -31,11 +31,13 @@ public class CopyCsvFilesFunction(
         await UpdateImportStage(dataSetVersionImport, CopyingCsvFiles, cancellationToken);
 
         var csvDataFile = await contentDbContext.ReleaseFiles
-            .Where(rf => rf.Id == dataSetVersion.ReleaseFileId)
+            .AsNoTracking()
+            .Where(rf => rf.Id == dataSetVersion.Release.ReleaseFileId)
             .Select(rf => rf.File)
             .SingleAsync(cancellationToken);
 
         var csvMetaFile = await contentDbContext.Files
+            .AsNoTracking()
             .SingleAsync(f => f.SubjectId == csvDataFile.SubjectId && f.Type == FileType.Metadata,
                 cancellationToken: cancellationToken);
 

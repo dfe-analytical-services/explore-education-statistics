@@ -872,9 +872,20 @@ public abstract class ReleaseServiceTests
                 await context.SaveChangesAsync();
             }
 
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+
+            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
+                    releaseVersion.Id,
+                    "2035-march",
+                    "March 2035",
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(
+                    contentDbContext: context,
+                    dataSetVersionService: dataSetVersionService.Object);
 
                 var result = await releaseService
                     .UpdateReleaseVersion(
@@ -887,6 +898,8 @@ public abstract class ReleaseServiceTests
                             PreReleaseAccessList = "New access list",
                         }
                     );
+
+                VerifyAllMocks(dataSetVersionService);
 
                 var viewModel = result.AssertRight();
 
@@ -1216,10 +1229,7 @@ public abstract class ReleaseServiceTests
                 TimePeriodCoverage = TimeIdentifier.CalendarYear
             };
 
-            var publication = new Publication
-            {
-                ReleaseVersions = [releaseVersion]
-            };
+            var publication = new Publication { ReleaseVersions = [releaseVersion] };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))

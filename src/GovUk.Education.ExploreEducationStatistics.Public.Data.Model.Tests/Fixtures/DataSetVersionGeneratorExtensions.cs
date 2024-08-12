@@ -42,10 +42,15 @@ public static class DataSetVersionGeneratorExtensions
         Guid dataSetId)
         => generator.ForInstance(s => s.SetDataSetId(dataSetId));
 
-    public static Generator<DataSetVersion> WithReleaseFileId(
+    public static Generator<DataSetVersion> WithRelease(
         this Generator<DataSetVersion> generator,
-        Guid releaseFileId)
-        => generator.ForInstance(s => s.SetReleaseFileId(releaseFileId));
+        Release release)
+        => generator.ForInstance(s => s.SetRelease(release));
+
+    public static Generator<DataSetVersion> WithRelease(
+        this Generator<DataSetVersion> generator,
+        Func<Release> release)
+        => generator.ForInstance(s => s.SetRelease(release));
 
     public static Generator<DataSetVersion> WithVersionNumber(
         this Generator<DataSetVersion> generator,
@@ -179,7 +184,7 @@ public static class DataSetVersionGeneratorExtensions
         this Generator<DataSetVersion> generator,
         IEnumerable<LocationOptionMetaChange> metaChanges)
         => generator.ForInstance(s => s.SetLocationOptionMetaChanges(metaChanges));
-    
+
     public static Generator<DataSetVersion> WithTimePeriodMetaChanges(
         this Generator<DataSetVersion> generator,
         IEnumerable<TimePeriodMetaChange> metaChanges)
@@ -199,7 +204,7 @@ public static class DataSetVersionGeneratorExtensions
         => setters
             .SetDefault(dsv => dsv.Id)
             .SetDefault(dsv => dsv.DataSetId)
-            .SetDefault(dsv => dsv.ReleaseFileId)
+            .Set(dsv => dsv.Release, (_, _, context) => context.Fixture.Generator<Release>().WithDefaults().Generate())
             .SetDefault(dsv => dsv.Notes)
             .Set(dsv => dsv.VersionMajor, 1)
             .Set(dsv => dsv.VersionMinor, (_, _, context) => context.Index)
@@ -219,10 +224,15 @@ public static class DataSetVersionGeneratorExtensions
         Guid dataSetId)
         => instanceSetter.Set(dsv => dsv.DataSetId, dataSetId);
 
-    public static InstanceSetters<DataSetVersion> SetReleaseFileId(
+    public static InstanceSetters<DataSetVersion> SetRelease(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        Guid releaseFileId)
-        => instanceSetter.Set(dsv => dsv.ReleaseFileId, releaseFileId);
+        Release release)
+        => instanceSetter.Set(dsv => dsv.Release, release);
+
+    public static InstanceSetters<DataSetVersion> SetRelease(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<Release> release)
+        => instanceSetter.Set(dsv => dsv.Release, release);
 
     public static InstanceSetters<DataSetVersion> SetVersionNumber(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -454,7 +464,7 @@ public static class DataSetVersionGeneratorExtensions
                 )
                 .ToList()
         );
-    
+
     public static InstanceSetters<DataSetVersion> SetGeographicLevelMetaChange(
         this InstanceSetters<DataSetVersion> instanceSetter,
         GeographicLevelMetaChange change)
