@@ -7,7 +7,7 @@ should continue to run or if they should fail immediately and therefore fail the
 
 import os.path
 import os
-import atomicwrites
+import threading
 
 from robot.libraries.BuiltIn import BuiltIn
 from tests.libs.logger import get_logger
@@ -28,14 +28,20 @@ def current_test_suite_failing_fast() -> bool:
     return f"{test_suite}" in failing_suites
 
 
+file_lock = threading.Lock()
+
+
 def record_failing_test_suite():
     test_suite = _get_current_test_suite()
     logger.warn(
         f"Recording test suite '{test_suite}' as failing - subsequent tests will automatically fail in this suite"
     )
-    file_write = open(failing_suites_filename, "a")
-    file_write.write(f"{test_suite}{os.linesep}")
-    file_write.close()
+    with file_lock:
+        try:
+            with open(failing_suites_filename, "a") as file_write:
+                file_write.write(f"{test_suite}{os.linesep}")
+        except IOError as e:
+            logger.error(f"Failed to write failing test suite to file: {e}")
 
 
 def fail_test_fast_if_required():
@@ -55,13 +61,15 @@ def get_failing_test_suites() -> []:
         # We therefore explicitly remove any duplicates from the list here.
 
         if os.path.isfile(failing_suites_filename):
-            with atomicwrites.atomic_write(failing_suites_filename, mode='r') as file:
-                # atomicwrite reduces the risk of race conditions or partial writes that could lead to incorrect test
-                # suite results.
-                failing_suites = file.readlines()
-                stripped_suite_names = [failing_suite.strip() for failing_suite in failing_suites]
-                filtered_suite_names = filter(None, stripped_suite_names)
-                return list(dict.fromkeys(filtered_suite_names))
+            try:
+                with open(failing_suites_filename, "r") as file:
+                    failing_suites = file.readlines()
+                    stripped_suite_names = [failing_suite.strip() for failing_suite in failing_suites]
+                    filtered_suite_names = filter(None, stripped_suite_names)
+                    return list(dict.fromkeys(filtered_suite_names))
+            except IOError as e:
+                logger.error(f"Failed to read failing test suites from file: {e}")
+                return []
         return []
 
 
