@@ -148,7 +148,6 @@ export default function DataSetFilePage({
   if (!dataSetFile) {
     return <NotFoundPage />;
   }
-
   const { file, release, summary, title } = dataSetFile;
 
   return (
@@ -218,7 +217,10 @@ export default function DataSetFilePage({
             />
 
             <div className="govuk-grid-column-two-thirds">
-              <DataSetFileDetails dataSetFile={dataSetFile} />
+              <DataSetFileDetails
+                dataSetFile={dataSetFile}
+                hasApiDataSet={!!apiDataSet}
+              />
 
               <DataSetFilePreview
                 dataCsvPreview={dataSetFile.file.dataCsvPreview}

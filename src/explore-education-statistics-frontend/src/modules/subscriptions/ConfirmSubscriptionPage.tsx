@@ -8,9 +8,10 @@ import notificationService, {
   Subscription,
 } from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
-import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
 import VerificationErrorMessage from '@frontend/modules/subscriptions/components/VerificationErrorMessage';
 import Head from 'next/head';
+import Panel from '@common/components/Panel';
+import Link from '@frontend/components/Link';
 
 interface Props {
   publicationSlug: string;
@@ -65,11 +66,14 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
         <meta name="robots" content="noindex,nofollow" />
       </Head>
       {confirmedSubscription ? (
-        <SubscriptionStatusMessage
-          title={publicationTitle}
-          message="You have successfully subscribed to these updates."
-          slug={confirmedSubscription.slug}
-        />
+        <Panel headingTag="h2" title="Subscribed">
+          <p>You have successfully subscribed to these updates.</p>
+          <p>
+            <Link to={`/find-statistics/${confirmedSubscription.slug}`}>
+              View {publicationTitle}
+            </Link>
+          </p>
+        </Panel>
       ) : (
         <>
           <p>

@@ -8,8 +8,9 @@ import notificationService, {
   Subscription,
 } from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
-import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
 import Head from 'next/head';
+import Link from '@frontend/components/Link';
+import Panel from '@common/components/Panel';
 
 interface Props {
   publicationSlug: string;
@@ -56,11 +57,14 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
         <meta name="robots" content="noindex,nofollow" />
       </Head>
       {unsubscribedSubscription ? (
-        <SubscriptionStatusMessage
-          title={publicationTitle}
-          message="You have successfully unsubscribed from these updates."
-          slug={unsubscribedSubscription.slug}
-        />
+        <Panel headingTag="h2" title="Unsubscribed">
+          <p>You have successfully unsubscribed from these updates.</p>
+          <p>
+            <Link to={`/find-statistics/${unsubscribedSubscription.slug}`}>
+              View {publicationTitle}
+            </Link>
+          </p>
+        </Panel>
       ) : (
         <>
           <p>

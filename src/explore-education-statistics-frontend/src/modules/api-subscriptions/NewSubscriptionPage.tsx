@@ -4,58 +4,61 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Form from '@common/components/form/Form';
 import FormProvider from '@common/components/form/FormProvider';
 import Panel from '@common/components/Panel';
-import useMounted from '@common/hooks/useMounted';
-import publicationService from '@common/services/publicationService';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
+import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
-import notificationService from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
+import { DataSetFile } from '@frontend/services/dataSetFileService';
+import apiNotificationService from '@frontend/services/apiNotificationService';
 import React from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
+import { QueryClient } from '@tanstack/react-query';
 
 interface FormValues {
+  dataSetId: string;
   email: string;
 }
 
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'dataSetId',
+    messages: {
+      ApiPendingSubscriptionAlreadyExists:
+        'The user is already subscribed to the API data set.',
+      ApiVerifiedSubscriptionAlreadyExists:
+        'The user already has a pending subscription for the API data set. They must verify their subscription.',
+    },
+  }),
+];
+
 interface Props {
-  publicationSlug: string;
-  publicationTitle: string;
-  publicationId: string;
+  dataSetFile: DataSetFile;
 }
 
-const SubscriptionPage: NextPage<Props> = ({
-  publicationSlug,
-  publicationTitle,
-  publicationId,
-}) => {
-  const { isMounted } = useMounted();
-
-  if (!isMounted) {
-    return null;
-  }
+const NewSubscriptionPage: NextPage<Props> = ({ dataSetFile }) => {
+  const { id, title } = dataSetFile;
 
   const handleFormSubmit = async ({ email }: FormValues) => {
-    if (email !== '') {
-      await notificationService.requestPendingSubscription({
-        email,
-        id: publicationId,
-        slug: publicationSlug,
-        title: publicationTitle,
-      });
-    }
+    await apiNotificationService.requestPendingSubscription({
+      email,
+      dataSetId: id,
+      dataSetTitle: title,
+    });
   };
 
   return (
     <Page
-      title={publicationTitle}
+      title={dataSetFile.title}
       caption="Notify me"
       breadcrumbLabel="Notify me"
       breadcrumbs={[
-        { name: 'Find statistics and data', link: '/find-statistics' },
+        { name: 'Data catalogue', link: '/data-catalogue' },
         {
-          name: publicationTitle,
-          link: `/find-statistics/${publicationSlug}`,
+          name: title,
+          link: `/data-catalogue/data-set/${id}`,
         },
       ]}
     >
@@ -65,10 +68,13 @@ const SubscriptionPage: NextPage<Props> = ({
       </Head>
       <FormProvider
         enableReinitialize
+        errorMappings={errorMappings}
         initialValues={{
+          dataSetId: dataSetFile.id,
           email: '',
         }}
         validationSchema={Yup.object({
+          dataSetId: Yup.string().required(),
           email: Yup.string()
             .required('Email is required')
             .email('Enter a valid email'),
@@ -80,11 +86,10 @@ const SubscriptionPage: NextPage<Props> = ({
           >
             {!formState.isSubmitSuccessful ? (
               <>
-                <p>Subscribe to receive updates when:</p>
-                <ul className="govuk-list govuk-list--bullet">
-                  <li>new statistics and data are released</li>
-                  <li>existing statistics and data are changed or corrected</li>
-                </ul>
+                <p>
+                  Subscribe to receive updates when new versions of this data
+                  set are published.
+                </p>
 
                 <Form id="subscriptionForm" onSubmit={handleFormSubmit}>
                   <FormFieldTextInput<FormValues>
@@ -115,20 +120,20 @@ const SubscriptionPage: NextPage<Props> = ({
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
-    const { publicationSlug } = query;
+    const { dataSetId } = query as Dictionary<string>;
 
-    const publication = await publicationService.getPublicationTitle(
-      publicationSlug as string,
+    const queryClient = new QueryClient();
+
+    const dataSetFile = await queryClient.fetchQuery(
+      dataSetFileQueries.get(dataSetId),
     );
 
     return {
       props: {
-        publicationSlug: publicationSlug as string,
-        publicationId: publication.id,
-        publicationTitle: publication.title,
+        dataSetFile,
       },
     };
   },
 );
 
-export default SubscriptionPage;
+export default NewSubscriptionPage;
