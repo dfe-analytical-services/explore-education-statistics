@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
@@ -21,9 +22,7 @@ public class ViewDataSetVersionAuthorizationHandler(
             return Task.CompletedTask;
         }
 
-        if (dataSetVersion.Status is DataSetVersionStatus.Published
-            or DataSetVersionStatus.Deprecated
-            or DataSetVersionStatus.Withdrawn)
+        if (dataSetVersion.IsPublicStatus())
         {
             context.Succeed(requirement);
         }
