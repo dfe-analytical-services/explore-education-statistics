@@ -604,7 +604,6 @@ describe('chartBuilderReducer', () => {
             },
           },
         },
-        boundaryLevel: undefined,
         type: 'line',
         height: 300,
         title: 'Table title',

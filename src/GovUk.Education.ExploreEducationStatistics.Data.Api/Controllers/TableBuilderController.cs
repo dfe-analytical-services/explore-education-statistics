@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, request.AsFullTableQuery(), request.BoundaryLevel, cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), boundaryLevelId: null, cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
@@ -102,10 +102,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         // both in order to support legacy URLs in bookmarks and in content, but also to remain consistent with the equivalent
         // endpoint in the Admin API, which does require the Release Id in order to differentiate between different 
         // DataBlockVersions rather than simply picking the latest published one.
-        [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}/{boundaryLevelId:long?}")]
+        [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
             Guid dataBlockParentId,
-            long? boundaryLevelId)
+            [FromQuery] long? boundaryLevelId)
         {
             var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessDo(dataBlockVersion => this

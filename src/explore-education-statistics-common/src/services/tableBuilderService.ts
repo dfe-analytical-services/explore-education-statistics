@@ -244,11 +244,11 @@ const tableBuilderService = {
   async getTableData(
     query: FullTableQuery,
     releaseId?: string,
-    boundaryLevelId?: number | undefined,
+    boundaryLevelId?: number,
   ): Promise<TableDataResponse> {
     if (releaseId && boundaryLevelId) {
       return dataApi.post(
-        `/tablebuilder/release/${releaseId}/${boundaryLevelId}`,
+        `/tablebuilder/release/${releaseId}?boundaryLevelId=${boundaryLevelId}`,
         query,
       );
     }
@@ -279,7 +279,7 @@ const tableBuilderService = {
   ): Promise<TableDataResponse> {
     return boundaryLevelId
       ? dataApi.get(
-          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}/${boundaryLevelId}`,
+          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}?boundaryLevelId=${boundaryLevelId}`,
         )
       : dataApi.get(
           `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,

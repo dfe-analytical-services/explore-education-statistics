@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             {
                                 SubjectId = _subject.Id
                             },
-                            null
+                            boundaryLevelId: null
                         );
                     }
                 );

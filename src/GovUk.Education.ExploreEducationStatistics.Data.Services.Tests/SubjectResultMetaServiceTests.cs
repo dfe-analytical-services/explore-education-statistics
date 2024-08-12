@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var result = await service.GetSubjectMeta(
                 releaseVersionId: Guid.NewGuid(),
                 query,
-                null,
+                boundaryLevelId: null,
                 new List<Observation>());
 
             result.AssertNotFound();
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    null,
+                    boundaryLevelId: null,
                     observations);
 
                 VerifyAllMocks(
@@ -379,7 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    null,
+                    boundaryLevelId: null,
                     observations);
 
                 VerifyAllMocks(
@@ -603,7 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    null,
+                    boundaryLevelId: null,
                     observations);
 
                 VerifyAllMocks(
@@ -862,7 +862,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(
                     releaseVersion.Id,
                     query,
-                    123,
+                    boundaryLevelId: 123,
                     observations);
 
                 VerifyAllMocks(

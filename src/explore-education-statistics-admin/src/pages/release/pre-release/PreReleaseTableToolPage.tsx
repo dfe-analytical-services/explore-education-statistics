@@ -55,7 +55,6 @@ const PreReleaseTableToolPage = ({
               ...query,
             },
             releaseId,
-            query.boundaryLevel,
           ),
         ]);
 

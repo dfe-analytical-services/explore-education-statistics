@@ -25,7 +25,7 @@ type ChartAxesConfiguration = {
  */
 export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta' | 'axes'> & {
   axes: ChartAxesConfiguration;
-  boundaryLevel: number | undefined;
+  boundaryLevel?: number;
 };
 
 export interface Table {
