@@ -44,7 +44,11 @@ const DataBlockTabs = ({
     value: fullTable,
     isLoading,
     error,
-  } = useTableQuery(releaseId, dataBlock.dataBlockParentId);
+  } = useTableQuery(
+    releaseId,
+    dataBlock.dataBlockParentId,
+    dataBlock.charts[0]?.boundaryLevel,
+  );
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 

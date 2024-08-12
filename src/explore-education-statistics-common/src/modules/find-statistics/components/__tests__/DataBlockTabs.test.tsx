@@ -161,6 +161,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+        undefined,
       );
 
       expect(screen.getAllByText('Could not load content')).toHaveLength(2);
@@ -194,6 +195,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+        undefined,
       );
 
       expect(
@@ -225,6 +227,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -260,6 +263,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -294,6 +298,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -334,6 +339,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+        undefined,
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
@@ -362,6 +368,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+        1,
       );
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();

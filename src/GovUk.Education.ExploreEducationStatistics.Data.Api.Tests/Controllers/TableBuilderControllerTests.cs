@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -28,6 +23,11 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .WithQuery(new FullTableQuery
                 {
                     SubjectId = Guid.NewGuid(),
-                    LocationIds = [ Guid.NewGuid(), ],
+                    LocationIds = [Guid.NewGuid(),],
                     TimePeriod = new TimePeriodQuery
                     {
                         StartYear = 2021,
@@ -193,6 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     s => s.Query(
                         ReleaseVersionId,
                         ItIs.DeepEqualTo(FullTableQuery),
+                        It.IsAny<long?>(),
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -268,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>();
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -347,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -398,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -455,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
@@ -539,7 +540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);

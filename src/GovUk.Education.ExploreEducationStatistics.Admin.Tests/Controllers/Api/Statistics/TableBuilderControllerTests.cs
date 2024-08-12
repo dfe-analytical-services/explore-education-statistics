@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -16,6 +12,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -99,6 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             It.Is<FullTableQuery>(
                                 q => q.SubjectId == FullTableQueryRequest.SubjectId
                             ),
+                            It.IsAny<long?>(),
                             cancellationToken
                         )
                 )
@@ -112,6 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var result = await controller.QueryForDataBlock(releaseVersionId: ReleaseVersionId,
                 dataBlockVersion.Id,
+                null,
                 cancellationToken);
             VerifyAllMocks(dataBlockService, tableBuilderService);
 
@@ -129,8 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(dataBlockService: dataBlockService.Object);
 
-            var result = await controller.QueryForDataBlock(releaseVersionId: ReleaseVersionId,
-                dataBlockParentId: DataBlockId);
+            var result = await controller.QueryForDataBlock(
+                releaseVersionId: ReleaseVersionId,
+                dataBlockParentId: DataBlockId,
+                null);
             VerifyAllMocks(dataBlockService);
 
             result.AssertNotFoundResult();
