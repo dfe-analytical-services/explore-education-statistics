@@ -8,9 +8,7 @@ import Link from '@admin/components/Link';
 import { useQuery } from '@tanstack/react-query';
 import boundaryDataQueries from '@admin/queries/boundaryDataQueries';
 import boundaryTypesMap from '@common/utils/boundaryTypesMap';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
+import locationLevelsMap from '@common/utils/locationLevelsMap';
 import InsetText from '@common/components/InsetText';
 import classNames from 'classnames';
 import styles from './BoundaryDataPage.module.scss';

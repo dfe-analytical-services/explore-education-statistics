@@ -1,17 +1,9 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -37,6 +29,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Snapshooter;
 using Snapshooter.Xunit;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -84,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
-                .ReturnsAsync((ReleaseVersion?) null);
+                .ReturnsAsync((ReleaseVersion?)null);
 
             subjectRepository
                 .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
@@ -368,6 +367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Query(releaseVersion.Id,
                     It.Is<FullTableQuery>(ctx =>
                         ctx.Equals(request.Query.AsFullTableQuery())),
+                    null,
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
@@ -691,6 +691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Query(releaseVersion.Id,
                     It.Is<FullTableQuery>(ctx =>
                         ctx.Equals(request.Query.AsFullTableQuery())),
+                    It.IsAny<long?>(),
                     CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
