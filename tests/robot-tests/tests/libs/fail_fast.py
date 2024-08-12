@@ -70,7 +70,7 @@ def get_failing_test_suites() -> []:
             except IOError as e:
                 logger.error(f"Failed to read failing test suites from file: {e}")
                 return []
-        return []
+    return []
 
 
 def _raise_assertion_error(err_msg):
