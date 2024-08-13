@@ -30,7 +30,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
 {
     private const string BaseUrl = "api/public-data/preview-tokens";
 
-    private static readonly ClaimsPrincipal BauUser = BauUser();
+    private static readonly ClaimsPrincipal BauUser = new DataFixture().BauUser();
 
     private static readonly User CreatedByBauUser = new()
     {
@@ -183,7 +183,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await CreatePreviewToken(dataSetVersion.Id, "Label", client);
 
@@ -309,7 +309,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await GetPreviewToken(dataSetVersion.PreviewTokens[0].Id, client);
 
@@ -497,7 +497,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await ListPreviewTokens(dataSetVersion.Id, client);
 
@@ -641,7 +641,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id, client);
 

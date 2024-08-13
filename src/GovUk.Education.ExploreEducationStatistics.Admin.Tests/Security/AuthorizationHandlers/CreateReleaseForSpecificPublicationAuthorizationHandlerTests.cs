@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -16,7 +17,6 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static Moq.MockBehavior;
-using ClaimsPrincipalUtils = GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -25,16 +25,15 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
 {
     private static readonly Guid UserId = Guid.NewGuid();
 
-    private static readonly Publication Publication = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
 
     private static readonly Publication PublicationArchived = new()
     {
         Id = Guid.NewGuid(),
         SupersededById = Guid.NewGuid()
     };
+
+    private static readonly DataFixture DataFixture = new();
 
     public class ClaimsTests
     {
@@ -46,7 +45,10 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
                 var (handler,
                     userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId, claim);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
                 var authContext = CreateAuthContext(user, Publication);
 
                 var expectedToPassByClaimAlone = claim == SecurityClaimTypes.CreateAnyRelease;
@@ -73,7 +75,10 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
             {
                 var (handler, _) = CreateHandlerAndDependencies();
 
-                var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId, claim);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
                 var authContext = CreateAuthContext(user, PublicationArchived);
 
                 await handler.HandleAsync(authContext);
@@ -93,7 +98,8 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
             {
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                 var authContext = CreateAuthContext(user, Publication);
 
                 userPublicationRoleRepository
@@ -114,7 +120,8 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         {
             var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-            var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId);
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
+
             var authContext = CreateAuthContext(user, PublicationArchived);
 
             await handler.HandleAsync(authContext);

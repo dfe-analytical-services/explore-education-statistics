@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
@@ -14,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 {
     public static class ReleaseAuthorizationHandlersTestUtil
     {
+        private static readonly DataFixture DataFixture = new();
+
         /**
          * Assert that the given handler succeeds when a user has any of the "rolesExpectedToSucceed" on the supplied
          * Release, and fails otherwise
@@ -57,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var userId = Guid.NewGuid();
 
-            var user = CreateClaimsPrincipal(userId);
+            var user = DataFixture.AuthenticatedUser(userId: userId);
 
             var rolesList = new List<UserReleaseRole>();
 
@@ -104,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var userId = Guid.NewGuid();
 
-                var user = CreateClaimsPrincipal(userId);
+                var user = DataFixture.AuthenticatedUser(userId: userId);
 
                 // add a new UserReleaseRole for the current User and ReleaseRole under test
                 var rolesList = new List<UserReleaseRole>
@@ -159,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var userId = Guid.NewGuid();
 
-            var user = CreateClaimsPrincipal(userId);
+            var user = DataFixture.AuthenticatedUser(userId: userId);
 
             var rolesList = new List<UserPublicationRole>();
 
@@ -206,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var userId = Guid.NewGuid();
 
-                var user = CreateClaimsPrincipal(userId);
+                var user = DataFixture.AuthenticatedUser(userId: userId);
 
                 // add a new UserPublicationRole for the current User and PublicationRole under test
                 var rolesList = new List<UserPublicationRole>
@@ -314,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        var user = CreateClaimsPrincipal(userId);
+                        var user = DataFixture.AuthenticatedUser(userId: userId);
                         var authContext = new AuthorizationHandlerContext(
                             new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
                             user, handleRequirementArgument);
@@ -341,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             await using (var contentDbContext = InMemoryApplicationDbContext("no-release-role"))
             {
-                var user = CreateClaimsPrincipal(userId);
+                var user = DataFixture.AuthenticatedUser(userId: userId);
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
                     user, handleRequirementArgument);

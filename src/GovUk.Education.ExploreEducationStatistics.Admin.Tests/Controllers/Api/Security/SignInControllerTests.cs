@@ -8,9 +8,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
@@ -19,18 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
 public class SignInControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
+    private static readonly DataFixture DataFixture = new();
+
     public class RegistrationTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
         [Theory]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 2", null, null)]
         [InlineData(null, "VALID-USER@education.gov.uk", "FirstName", "LastName", null, "Role 1", null, null)]
         [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName LastName", "Role 1", null, null)]
-        [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName MiddleName LastName", "Role 1", null, null)]
+        [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName MiddleName LastName", "Role 1", null,
+            null)]
         [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName", "Role 1", null, null)]
-        [InlineData("VALID-USER@education.gov.uk", "VALID-USER@education.gov.uk", "FirstName", "LastName", "FirstName LastName", "Role 1", null, null)]
+        [InlineData("VALID-USER@education.gov.uk", "VALID-USER@education.gov.uk", "FirstName", "LastName",
+            "FirstName LastName", "Role 1", null, null)]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Approver", null)]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Approver")]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Contributor", "Approver")]
+        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Contributor",
+            "Approver")]
         public async Task Success(
             string? emailClaimValue,
             string? nameClaimValue,
@@ -47,7 +52,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var firstName = "";
             var lastName = "";
 
-            var claimsPrincipal = ClaimsPrincipalUtils.VerifiedByIdentityProviderUser();
+            var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
 
             // One possibility is that the Identity Provider sends the user's email in the "emailaddress" Claim.
@@ -114,10 +119,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
-                    Publication = new Publication
-                    {
-                        Id = publicationId
-                    }
+                    Publication = new Publication { Id = publicationId }
                 };
 
                 context.ReleaseVersions.Add(releaseVersion);
@@ -176,10 +178,10 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var (loginResult, userProfile) = response.AssertOk<SignInResponseViewModel>();
 
             // Assert registration and role assignments went successfully.
-            Assert.Equal(LoginResult.RegistrationSuccess , loginResult);
+            Assert.Equal(LoginResult.RegistrationSuccess, loginResult);
             Assert.NotNull(userProfile);
-            Assert.NotEqual(Guid.Empty , userProfile.Id);
-            Assert.Equal(firstName , userProfile.FirstName);
+            Assert.NotEqual(Guid.Empty, userProfile.Id);
+            Assert.Equal(firstName, userProfile.FirstName);
 
             await using (var context = TestApp.GetDbContext<UsersAndRolesDbContext>())
             {
@@ -243,7 +245,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         {
             const string email = "user@education.gov.uk";
 
-            var claimsPrincipal = ClaimsPrincipalUtils.VerifiedByIdentityProviderUser();
+            var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
             claimsIdentity.AddClaim(new Claim(EesClaimTypes.Name, "FirstName LastName"));
@@ -256,10 +258,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
-                    Publication = new Publication
-                    {
-                        Id = publicationId
-                    }
+                    Publication = new Publication { Id = publicationId }
                 };
 
                 context.ReleaseVersions.Add(releaseVersion);
@@ -344,7 +343,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         {
             const string email = "user@education.gov.uk";
 
-            var claimsPrincipal = ClaimsPrincipalUtils.VerifiedByIdentityProviderUser();
+            var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
             claimsIdentity.AddClaim(new Claim(EesClaimTypes.Name, "FirstName LastName"));
@@ -371,10 +370,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
-                    Publication = new Publication
-                    {
-                        Id = publicationId
-                    }
+                    Publication = new Publication { Id = publicationId }
                 };
 
                 context.ReleaseVersions.Add(releaseVersion);
@@ -438,7 +434,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             const string unrelatedUserEmail = "unrelated-user@education.gov.uk";
             var userId = Guid.NewGuid();
 
-            var claimsPrincipal = ClaimsPrincipalUtils.VerifiedByIdentityProviderUser();
+            var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
 
@@ -479,10 +475,10 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var (loginResult, userProfile) = response.AssertOk<SignInResponseViewModel>();
 
             // Assert registration and role assignments went successfully.
-            Assert.Equal(LoginResult.LoginSuccess , loginResult);
+            Assert.Equal(LoginResult.LoginSuccess, loginResult);
             Assert.NotNull(userProfile);
-            Assert.Equal(userId , userProfile.Id);
-            Assert.Equal("FirstName" , userProfile.FirstName);
+            Assert.Equal(userId, userProfile.Id);
+            Assert.Equal("FirstName", userProfile.FirstName);
         }
     }
 
@@ -492,7 +488,10 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         public async Task NoAccessAdminApiScope()
         {
             // Set up a user with a valid JWT but which holds no scope by which the user can access the Admin API.
-            var claimsPrincipal = ClaimsPrincipalUtils.VerifiedButNotAuthorizedByIdentityProviderUser();
+            var claimsPrincipal = DataFixture
+                .VerifiedButNotAuthorizedByIdentityProviderUser()
+                .Generate();
+
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, "email"));
 

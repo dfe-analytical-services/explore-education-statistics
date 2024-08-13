@@ -20,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -130,7 +129,7 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await GetLocationMappings(
                 Guid.NewGuid(),
@@ -1014,7 +1013,7 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
@@ -1222,7 +1221,7 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await GetFilterMappings(
                 nextDataSetVersionId: Guid.NewGuid(),
@@ -2130,7 +2129,7 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
@@ -2267,6 +2266,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
     private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
     {
-        return TestApp.SetUser(user ?? BauUser());
+        return TestApp.SetUser(user ?? DataFixture.BauUser());
     }
 }

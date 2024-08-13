@@ -1,4 +1,9 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,12 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Net.Http.Headers;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -60,14 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             },
             Results = new List<ObservationViewModel>
             {
-                new()
-                {
-                    TimePeriod = "2020_AY"
-                },
-                new()
-                {
-                    TimePeriod = "2021_AY"
-                }
+                new() { TimePeriod = "2020_AY" },
+                new() { TimePeriod = "2021_AY" }
             },
         };
 
@@ -85,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var client = SetupApp(
                     tableBuilderService: tableBuilderService.Object)
-                .SetUser(AuthenticatedUser())
+                .SetUser(DataFixture.AuthenticatedUser())
                 .CreateClient();
 
             var response = await client.PostAsync(
@@ -112,16 +105,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     (_, _, stream, _) => { stream.WriteText("Test csv"); });
 
             var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-                .SetUser(AuthenticatedUser())
+                .SetUser(DataFixture.AuthenticatedUser())
                 .CreateClient();
 
             var response = await client.PostAsync(
                 $"/api/data/tablebuilder/release/{ReleaseVersionId}",
                 content: new JsonNetContent(FullTableQueryRequest),
-                headers: new Dictionary<string, string>
-                {
-                    { HeaderNames.Accept, ContentTypes.Csv}
-                });
+                headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } });
 
             VerifyAllMocks(tableBuilderService);
 
