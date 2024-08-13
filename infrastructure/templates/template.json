@@ -3664,7 +3664,7 @@
         {
           "type": "accessPolicies",
           "apiVersion": "2016-10-01",
-          "name": "replace",
+          "name": "add",
           "location": "[resourceGroup().location]",
           "dependsOn": [
             "[variables('keyVaultName')]"
