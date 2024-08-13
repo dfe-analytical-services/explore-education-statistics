@@ -1679,7 +1679,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             await TestApp
                 .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var userWithIncorrectRole = ClaimsPrincipalUtils.UnknownRoleUser();
+            var userWithIncorrectRole = DataFixture.UnsupportedRoleUser();
 
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
@@ -1688,6 +1688,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             response.AssertForbidden();
         }
+
 
         [Theory]
         [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
@@ -1706,7 +1707,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSetId(dataSet.Id);
 
-            var userWithCorrectRole = ClaimsPrincipalUtils.AdminAccessUser();
+            var userWithCorrectRole = DataFixture.AdminAccessUser();
 
             await TestApp
                 .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
@@ -1738,9 +1739,11 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
     private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
     {
-        return TestApp.ConfigureServices(services =>
-        {
-            services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>());
-        });
+        return TestApp
+            .SetUser(user)
+            .ConfigureServices(services =>
+            {
+                services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>());
+            });
     }
 }

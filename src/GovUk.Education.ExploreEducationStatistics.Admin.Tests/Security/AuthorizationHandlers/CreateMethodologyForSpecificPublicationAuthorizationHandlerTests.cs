@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -13,7 +15,6 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -59,6 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             })
         };
 
+        private static readonly DataFixture DataFixture = new();
+
         public class ClaimTests
         {
             [Fact]
@@ -95,7 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var user = DataFixture
+                        .AuthenticatedUser(userId: UserId)
+                        .WithClaim(claim.ToString());
+
                     var authContext = CreateAuthContext(user, publication);
 
                     var expectedToPassByClaimAlone = claim == CreateAnyMethodology;
@@ -127,7 +133,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var user = DataFixture
+                        .AuthenticatedUser(userId: UserId)
+                        .WithClaim(claim.ToString());
+
                     var authContext = CreateAuthContext(user, publication);
 
                     await handler.HandleAsync(authContext);
@@ -168,7 +177,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                 var authContext = CreateAuthContext(user, Publication);
 
                 userPublicationRoleRepository
@@ -196,7 +206,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                 var authContext = CreateAuthContext(user, publication);
 
                 userPublicationRoleRepository
@@ -219,7 +230,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                 var authContext = CreateAuthContext(user, publication);
 
                 await handler.HandleAsync(authContext);

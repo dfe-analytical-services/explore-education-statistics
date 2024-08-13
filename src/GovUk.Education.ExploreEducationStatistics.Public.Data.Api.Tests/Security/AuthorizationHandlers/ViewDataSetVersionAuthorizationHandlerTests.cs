@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Constants;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -248,8 +249,8 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             .DefaultDataSetVersion()
             .WithStatus(status);
 
-        var userWithCorrectRole = ClaimsPrincipalUtils.AdminAccessUser();
-        
+        var userWithCorrectRole = _dataFixture.AdminAccessUser();
+
         var handler = BuildHandler(
             environmentName: Environments.Production,
             claimsPrincipal: userWithCorrectRole);
@@ -270,8 +271,8 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             .DefaultDataSetVersion()
             .WithStatus(status);
 
-        var userWithIncorrectRole = ClaimsPrincipalUtils.UnknownRoleUser();
-        
+        var userWithIncorrectRole = _dataFixture.UnsupportedRoleUser();
+
         var handler = BuildHandler(
             environmentName: Environments.Production,
             claimsPrincipal: userWithIncorrectRole);
@@ -326,7 +327,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             .Returns(environmentName ?? Environments.Production);
 
         var authorizationHandlerService = new AuthorizationHandlerService(
-            httpContextAccessor: httpContextAccessor, 
+            httpContextAccessor: httpContextAccessor,
             environment: environment.Object);
 
         var previewTokenService = new PreviewTokenService(publicDataDbContext);

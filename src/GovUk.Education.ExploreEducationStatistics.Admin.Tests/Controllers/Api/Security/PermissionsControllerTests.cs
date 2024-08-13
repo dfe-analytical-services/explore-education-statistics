@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
@@ -16,7 +15,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     public async Task GetGlobalPermissions_AuthenticatedUser()
     {
         var client = TestApp
-            .SetUser(AuthenticatedUser())
+            .SetUser(DataFixture.AuthenticatedUser())
             .CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
@@ -35,7 +34,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     public async Task GetGlobalPermissions_BauUser()
     {
         var client = TestApp
-            .SetUser(BauUser())
+            .SetUser(DataFixture.BauUser())
             .CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
@@ -55,7 +54,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_NotReleaseOrPublicationApprover()
     {
-        var user = AnalystUser();
+        var user = DataFixture.AnalystUser().Generate();
 
         await TestApp.AddTestData<ContentDbContext>(context =>
         {
@@ -94,7 +93,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_ReleaseApprover()
     {
-        var user = AnalystUser();
+        var user = DataFixture.AnalystUser().Generate();
 
         await TestApp.AddTestData<ContentDbContext>(context =>
         {
@@ -125,7 +124,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_PublicationApprover()
     {
-        var user = AnalystUser();
+        var user = DataFixture.AnalystUser().Generate();
 
         await TestApp.AddTestData<ContentDbContext>(context =>
         {
@@ -157,7 +156,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     public async Task GetGlobalPermissions_PreReleaseUser()
     {
         var client = TestApp
-            .SetUser(PreReleaseUser())
+            .SetUser(DataFixture.PreReleaseUser())
             .CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");

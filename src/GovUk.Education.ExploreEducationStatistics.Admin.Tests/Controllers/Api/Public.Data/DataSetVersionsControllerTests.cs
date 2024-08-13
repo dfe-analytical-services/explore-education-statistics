@@ -310,7 +310,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await ListLiveVersions(
                 dataSetId: Guid.NewGuid(),
@@ -634,7 +634,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await DeleteVersion(Guid.NewGuid(), client);
 
@@ -840,7 +840,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await GetVersionChanges(Guid.NewGuid(), client);
 
@@ -1038,7 +1038,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var updateRequest = new DataSetVersionUpdateRequest();
 
