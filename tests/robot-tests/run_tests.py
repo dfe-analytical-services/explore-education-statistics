@@ -12,6 +12,7 @@ import os
 import random
 import shutil
 import string
+import time
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -252,6 +253,8 @@ def run():
 
         if args.enable_slack_notifications:
             slack_service = SlackService()
+            # Wait for 5 seconds to ensure the merge reports are properly synchronized after rerun attempts.
+            time.sleep(5)
             slack_service.send_test_report(args.env, args.tests, failing_suites, test_run_index)
 
     except Exception as ex:
