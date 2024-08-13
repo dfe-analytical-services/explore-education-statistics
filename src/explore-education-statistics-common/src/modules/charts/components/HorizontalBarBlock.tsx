@@ -67,16 +67,6 @@ const HorizontalBarBlock = ({
   const [legendProps, renderLegend] = useLegend();
   const { isMedia: isMobileMedia } = useMobileMedia();
 
-  if (
-    axes === undefined ||
-    axes.major === undefined ||
-    axes.minor === undefined ||
-    data === undefined ||
-    meta === undefined
-  ) {
-    return <div>Unable to render chart, chart incorrectly configured</div>;
-  }
-
   const dataSetCategories: DataSetCategory[] = createDataSetCategories({
     axisConfiguration: axes.major,
     data,
@@ -271,6 +261,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
     canSetBarThickness: true,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
+    canShowAllMajorAxisTicks: false,
     canSize: true,
     canSort: true,
     hasGridLines: true,

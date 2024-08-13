@@ -70,6 +70,7 @@ export const infographicBlockDefinition: ChartDefinition = {
     canSetBarThickness: false,
     canSetDataLabelPosition: false,
     canShowDataLabels: false,
+    canShowAllMajorAxisTicks: false,
     canSize: true,
     canSort: false,
     hasGridLines: false,

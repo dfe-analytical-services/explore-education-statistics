@@ -1,3 +1,4 @@
+import { useDesktopMedia } from '@common/hooks/useMedia';
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
@@ -25,7 +26,14 @@ import parseNumber from '@common/utils/number/parseNumber';
 import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
-import React, { memo } from 'react';
+import React, {
+  memo,
+  RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Bar,
   BarChart,
@@ -38,6 +46,7 @@ import {
   YAxis,
 } from 'recharts';
 import groupBy from 'lodash/groupBy';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 
 const chartBottomMargin = 20;
 
@@ -62,16 +71,16 @@ const VerticalBarBlock = ({
   stacked,
   width,
 }: VerticalBarProps) => {
+  const { isMedia: isDesktopMedia } = useDesktopMedia();
+  const [xAxisTickWidth, setXAxisTickWidth] = useState<number>();
+  const containerRef = useRef<RefObject<HTMLDivElement>>(null);
+
+  // Make recharts show all x axis ticks, it automatically
+  // shows / hides them depending on available space otherwise.
+  const showAllXAxisTicks =
+    isDesktopMedia && axes.major.tickConfig === 'showAll';
+
   const [legendProps, renderLegend] = useLegend();
-  if (
-    axes === undefined ||
-    axes.major === undefined ||
-    axes.minor === undefined ||
-    data === undefined ||
-    meta === undefined
-  ) {
-    return <div>Unable to render chart, chart incorrectly configured</div>;
-  }
 
   const dataSetCategories: DataSetCategory[] = createDataSetCategories({
     axisConfiguration: axes.major,
@@ -91,8 +100,10 @@ const VerticalBarBlock = ({
       )
     : dataSetCategories.map(toChartData);
 
+  const majorAxisCategories = chartData.map(({ name }) => name);
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
+
   const dataSetCategoryConfigs = getDataSetCategoryConfigs({
     dataSetCategories,
     legendItems: legend.items,
@@ -124,6 +135,31 @@ const VerticalBarBlock = ({
     ...perpendicularMajorAxisReferenceLines,
   ];
 
+  const resizeTicks = useCallback(
+    (containerWidth: number) => {
+      // Set x axis tick width based on the number of ticks. 20 is to add some spacing.
+      // Only do this when showAllXAxisTicks is true, recharts handles it otherwise.
+      setXAxisTickWidth(
+        showAllXAxisTicks
+          ? (containerWidth - yAxisWidth) / majorAxisCategories.length - 20
+          : undefined,
+      );
+    },
+    [majorAxisCategories.length, showAllXAxisTicks, yAxisWidth],
+  );
+
+  useEffect(() => {
+    // A known bug with refs in recharts 2.x results in having to use `current.current`.
+    // It should be fixed in v3.
+    if (showAllXAxisTicks && containerRef.current?.current?.clientWidth) {
+      resizeTicks(containerRef.current?.current?.clientWidth);
+    }
+  }, [resizeTicks, showAllXAxisTicks]);
+
+  const [handleResize] = useDebouncedCallback((containerWidth: number) => {
+    resizeTicks(containerWidth);
+  }, 300);
+
   return (
     <ChartContainer
       height={height || 300}
@@ -138,7 +174,12 @@ const VerticalBarBlock = ({
       xAxisHeight={xAxisHeight}
       xAxisLabel={axes.major.label}
     >
-      <ResponsiveContainer width={width || '100%'} height={height || 300}>
+      <ResponsiveContainer
+        width={width || '100%'}
+        height={height || 300}
+        onResize={handleResize}
+        ref={containerRef}
+      >
         <BarChart
           aria-label={alt}
           role="img"
@@ -172,8 +213,13 @@ const VerticalBarBlock = ({
             dataKey="name"
             height={parseNumber(axes.major.size)}
             hide={!axes.major.visible}
+            interval={showAllXAxisTicks ? 0 : undefined}
             padding={{ left: 20, right: 20 }}
-            tick={axisTickStyle}
+            tick={{
+              ...axisTickStyle,
+              ...(showAllXAxisTicks &&
+                xAxisTickWidth && { width: xAxisTickWidth }),
+            }}
             tickMargin={10}
             tickFormatter={getCategoryLabel(dataSetCategories)}
             type="category"
@@ -279,6 +325,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
     canSetBarThickness: true,
     canSetDataLabelPosition: false,
     canShowDataLabels: true,
+    canShowAllMajorAxisTicks: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,

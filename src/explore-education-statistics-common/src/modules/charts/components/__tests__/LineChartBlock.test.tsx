@@ -7,9 +7,7 @@ import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { TableDataResult } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
@@ -261,26 +259,6 @@ describe('LineChartBlock', () => {
     expect(
       container.querySelectorAll('.recharts-reference-line')[1],
     ).toHaveTextContent('hello');
-  });
-
-  test('dies gracefully with bad data', () => {
-    const invalidData = undefined as unknown as TableDataResult[];
-    const invalidMeta = undefined as unknown as FullTableMeta;
-    const invalidAxes = undefined as unknown as LineChartProps['axes'];
-    const invalidLegend = undefined as unknown as LegendConfiguration;
-
-    const { container } = render(
-      <LineChartBlock
-        title=""
-        alt=""
-        height={300}
-        data={invalidData}
-        meta={invalidMeta}
-        axes={invalidAxes}
-        legend={invalidLegend}
-      />,
-    );
-    expect(container).toHaveTextContent('Unable to render chart');
   });
 
   test('can change width of chart', () => {

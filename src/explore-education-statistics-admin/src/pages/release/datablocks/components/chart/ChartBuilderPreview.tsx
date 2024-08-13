@@ -25,11 +25,13 @@ const ChartBuilderPreview = ({ chart, loading }: Props) => {
       >
         {chart && isChartRenderable(chart) ? (
           <LoadingSpinner loading={loading} text="Loading chart data">
-            <ChartRenderer
-              {...chart}
-              key={renderCount.current}
-              id="chartBuilderPreview"
-            />
+            <div className="govuk-width-container govuk-!-padding-4 dfe-border">
+              <ChartRenderer
+                {...chart}
+                key={renderCount.current}
+                id="chartBuilderPreview"
+              />
+            </div>
           </LoadingSpinner>
         ) : (
           <div className={styles.previewPlaceholder}>

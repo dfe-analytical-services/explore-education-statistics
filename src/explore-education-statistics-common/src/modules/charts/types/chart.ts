@@ -33,7 +33,7 @@ export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export type Axis = 'x' | 'y';
 export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 export type AxisType = 'major' | 'minor';
-export type TickConfig = 'default' | 'startEnd' | 'custom';
+export type TickConfig = 'default' | 'startEnd' | 'custom' | 'showAll';
 export type ReferenceLineStyle = 'dashed' | 'solid' | 'none';
 export type LineChartDataLabelPosition = 'above' | 'below';
 export type BarChartDataLabelPosition = 'inside' | 'outside';
@@ -136,6 +136,7 @@ export interface ChartCapabilities {
   canSetBarThickness: boolean;
   canSetDataLabelPosition: boolean;
   canShowDataLabels: boolean;
+  canShowAllMajorAxisTicks: boolean;
   canSize: boolean;
   canSort: boolean;
   hasGridLines: boolean;

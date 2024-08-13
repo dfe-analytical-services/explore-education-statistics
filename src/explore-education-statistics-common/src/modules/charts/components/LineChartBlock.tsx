@@ -74,16 +74,6 @@ const LineChartBlock = ({
 }: LineChartProps) => {
   const [legendProps, renderLegend] = useLegend();
 
-  if (
-    axes === undefined ||
-    axes.major === undefined ||
-    axes.minor === undefined ||
-    data === undefined ||
-    meta === undefined
-  ) {
-    return <div>Unable to render chart, chart incorrectly configured</div>;
-  }
-
   const dataSetCategories: DataSetCategory[] = createDataSetCategories({
     axisConfiguration: axes.major,
     data,
@@ -263,6 +253,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
     canSetBarThickness: false,
     canSetDataLabelPosition: true,
     canShowDataLabels: true,
+    canShowAllMajorAxisTicks: false,
     canSize: true,
     canSort: true,
     hasGridLines: true,
