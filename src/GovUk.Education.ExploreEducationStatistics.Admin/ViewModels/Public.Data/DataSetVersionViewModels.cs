@@ -68,6 +68,8 @@ public record DataSetVersionSummaryViewModel
 
     [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
+
+    public required IdTitleViewModel ReleaseVersion { get; init; }
 }
 
 public record DataSetLiveVersionSummaryViewModel : DataSetVersionSummaryViewModel
