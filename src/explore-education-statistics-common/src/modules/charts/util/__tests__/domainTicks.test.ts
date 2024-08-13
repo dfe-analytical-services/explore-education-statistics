@@ -361,6 +361,7 @@ describe('domainTicks', () => {
           name: '2022_T1',
         },
       ];
+
       test('returns the correct axis domain and ticks when tickConfig is `custom` and `tickSpacing is 1', () => {
         const result = getMajorAxisDomainTicks(extendedTestChartData, {
           ...testAxisConfig,
