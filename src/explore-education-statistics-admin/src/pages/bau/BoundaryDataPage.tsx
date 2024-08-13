@@ -112,7 +112,7 @@ const BoundaryDataPage = () => {
             <tbody>
               {boundaryLevels.map(boundaryLevel => (
                 <tr key={boundaryLevel.id}>
-                  k<td>{locationLevelsMap[boundaryLevel.level].code}</td>
+                  <td>{locationLevelsMap[boundaryLevel.level].code}</td>
                   <td>{boundaryLevel.label}</td>
                   <td>
                     <FormattedDate format="d MMM yyyy">
