@@ -29,7 +29,7 @@ resource policy 'Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolic
         }
         {
           ruleSetType: 'Microsoft_BotManagerRuleSet'
-          ruleSetVersion: '0.1'
+          ruleSetVersion: '1.0'
         }
       ]
     }
