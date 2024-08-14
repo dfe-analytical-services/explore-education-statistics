@@ -355,12 +355,11 @@ var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
   ? [userAssignedManagedIdentityParams!.principalId]
   : [functionApp.identity.principalId, stagingSlot.identity.principalId]
 
-module functionAppKeyVaultRoleAssignments 'keyVaultRoleAssignment.bicep' = {
-  name: '${functionAppName}FunctionAppKeyVaultRoleAssignment'
+module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
+  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
   params: {
     keyVaultName: keyVaultName
     principalIds: keyVaultPrincipalIds
-    role: 'Secrets User'
   }
 }
 
