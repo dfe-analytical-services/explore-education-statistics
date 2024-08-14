@@ -9,9 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,6 +41,18 @@ public class DataBlockService : IDataBlockService
         Guid releaseVersionId,
         Guid dataBlockVersionId,
         long? boundaryLevelId)
+    {
+        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
+            .OnSuccess(() => CheckDataBlockVersionExists(releaseVersionId: releaseVersionId,
+                dataBlockVersionId: dataBlockVersionId))
+            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query, boundaryLevelId));
+    }
+
+    public async Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocationsForDataBlock(
+        Guid releaseVersionId,
+        Guid dataBlockVersionId,
+        long boundaryLevelId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)

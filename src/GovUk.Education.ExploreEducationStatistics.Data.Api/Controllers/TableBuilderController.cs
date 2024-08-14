@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,14 +6,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
@@ -121,6 +121,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return actionResult;
         }
 
+        [HttpGet("tablebuilder/release/data-block/{dataBlockParentId:guid}")]
+        public async Task<ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>> QueryForTableBuilderWithGeoJsonResult(
+            Guid dataBlockParentId,
+            [FromQuery] long boundaryLevelId)
+        {
+            var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+                .OnSuccessDo(dataBlockVersion => this
+                    .CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion))
+                .OnSuccess(dataBlockVersion => GetLocations(dataBlockVersion, boundaryLevelId))
+                .HandleFailuresOrOk();
+
+            if (actionResult.Result is not NotFoundResult)
+            {
+                Response.Headers.CacheControl = "public,max-age=300";
+            }
+
+            return actionResult;
+        }
+
         [HttpGet("tablebuilder/fast-track/{dataBlockParentId:guid}")]
         public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockParentId)
         {
@@ -137,12 +156,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [BlobCache(typeof(DataBlockTableResultCacheKey))]
+        //[BlobCache(typeof(DataBlockTableResultCacheKey))]
         private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
             DataBlockVersion dataBlockVersion,
             long? boundaryLevelId = null)
         {
             return _dataBlockService.GetDataBlockTableResult(
+                releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                dataBlockVersionId: dataBlockVersion.Id,
+                boundaryLevelId);
+        }
+
+        //[BlobCache(typeof(DataBlockTableResultCacheKey))] // TODO: Create a GetLocationsCacheKey
+        private Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocations(
+            DataBlockVersion dataBlockVersion,
+            long boundaryLevelId)
+        {
+            return _dataBlockService.GetLocationsForDataBlock(
                 releaseVersionId: dataBlockVersion.ReleaseVersionId,
                 dataBlockVersionId: dataBlockVersion.Id,
                 boundaryLevelId);

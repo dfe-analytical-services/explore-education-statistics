@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -25,20 +24,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Data.ViewModels.LocationViewModelBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class SubjectResultMetaService : ISubjectResultMetaService
     {
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly IBoundaryLevelRepository _boundaryLevelRepository;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IFootnoteRepository _footnoteRepository;
-        private readonly IBoundaryDataRepository _boundaryDataRepository;
         private readonly IIndicatorRepository _indicatorRepository;
+        private readonly ILocationService _locationService;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly ISubjectRepository _subjectRepository;
@@ -47,14 +44,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ILogger _logger;
 
         public SubjectResultMetaService(
-            StatisticsDbContext statisticsDbContext,
             ContentDbContext contentDbContext,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IBoundaryLevelRepository boundaryLevelRepository,
             IFilterItemRepository filterItemRepository,
             IFootnoteRepository footnoteRepository,
-            IBoundaryDataRepository boundaryDataRepository,
             IIndicatorRepository indicatorRepository,
+            ILocationService locationService,
             ITimePeriodService timePeriodService,
             IUserService userService,
             ISubjectRepository subjectRepository,
@@ -62,14 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IOptions<LocationsOptions> locationOptions,
             ILogger<SubjectResultMetaService> logger)
         {
-            _statisticsDbContext = statisticsDbContext;
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _boundaryLevelRepository = boundaryLevelRepository;
             _filterItemRepository = filterItemRepository;
             _footnoteRepository = footnoteRepository;
-            _boundaryDataRepository = boundaryDataRepository;
             _indicatorRepository = indicatorRepository;
+            _locationService = locationService;
             _timePeriodService = timePeriodService;
             _userService = userService;
             _subjectRepository = subjectRepository;
@@ -132,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
                     var locationViewModels =
-                        await GetLocationViewModels(locations, boundaryLevelId, _locationOptions.Hierarchies);
+                        await _locationService.GetLocationViewModels(locations, boundaryLevelId, _locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location view models in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
@@ -209,53 +204,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .GetTimePeriodRange(observations)
                 .Select(tuple => new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier))
                 .ToList();
-        }
-
-        private async Task<Dictionary<string, List<LocationAttributeViewModel>>> GetLocationViewModels(
-            List<Location> locations,
-            long? boundaryLevelId,
-            Dictionary<GeographicLevel, List<string>>? hierarchies)
-        {
-            var boundaryData = await GetBoundaryData(locations, boundaryLevelId);
-
-            return BuildLocationAttributeViewModels(locations, hierarchies, boundaryData)
-                .ToDictionary(
-                    pair => pair.Key.ToString().CamelCase(),
-                    pair => pair.Value);
-        }
-
-        private async Task<Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>> GetBoundaryData(
-            List<Location> locations,
-            long? boundaryLevelId)
-        {
-            if (!boundaryLevelId.HasValue)
-            {
-                return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>();
-            }
-
-            // TODO EES-3328 This could soon be irrelevant if boundary level is about to be removed from the query
-            // but if not we should consider returning an error if this isn't found
-            var boundaryLevel = await _statisticsDbContext.BoundaryLevel.FindAsync(boundaryLevelId.Value);
-            if (boundaryLevel == null)
-            {
-                return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>();
-            }
-
-            var locationsMatchingLevel =
-                locations.Where(location => location.GeographicLevel == boundaryLevel.Level);
-
-            var codes = locationsMatchingLevel
-                .Select(location => location.ToLocationAttribute().GetCodeOrFallback())
-                .ToList();
-            var boundaryData = _boundaryDataRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, codes);
-
-            return new Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>
-            {
-                {
-                    boundaryLevel.Level,
-                    boundaryData
-                }
-            };
         }
     }
 }
