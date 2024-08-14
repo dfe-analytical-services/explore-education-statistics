@@ -36,11 +36,12 @@ public class DataSetVersionService(
     IUserService userService)
     : IDataSetVersionService
 {
-    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListLiveVersions(
-        Guid dataSetId,
-        int page,
-        int pageSize,
-        CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>>
+        ListLiveVersions(
+            Guid dataSetId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
             .OnSuccess(async () =>
@@ -98,9 +99,25 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async _ => await processorClient.CreateNextDataSetVersion(
+            .OnSuccess(async _ => await processorClient.CreateNextDataSetVersionMappings(
                 dataSetId: dataSetId,
                 releaseFileId: releaseFileId,
+                cancellationToken: cancellationToken))
+            .OnSuccess(async processorResponse => await publicDataDbContext
+                .DataSetVersions
+                .SingleAsync(
+                    dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
+                    cancellationToken))
+            .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
+    }
+
+    public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await userService.CheckIsBauUser()
+            .OnSuccess(async _ => await processorClient.CompleteNextDataSetVersionImport(
+                dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
             .OnSuccess(async processorResponse => await publicDataDbContext
                 .DataSetVersions

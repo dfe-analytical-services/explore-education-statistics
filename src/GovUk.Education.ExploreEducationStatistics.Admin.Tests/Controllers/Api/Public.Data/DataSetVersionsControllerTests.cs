@@ -47,12 +47,12 @@ public abstract class DataSetVersionsControllerTests(
     {
         private static readonly IReadOnlyList<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatuses =
             new List<DataSetVersionStatus>(
-            [
-                DataSetVersionStatus.Published,
-                DataSetVersionStatus.Withdrawn,
-                DataSetVersionStatus.Deprecated
-            ]
-        );
+                [
+                    DataSetVersionStatus.Published,
+                    DataSetVersionStatus.Withdrawn,
+                    DataSetVersionStatus.Deprecated
+                ]
+            );
 
         public static TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
             PreviouslyPublishedDataSetVersionStatuses
@@ -173,7 +173,7 @@ public abstract class DataSetVersionsControllerTests(
         [InlineData(2, 2, 9)]
         [InlineData(2, 2, 2)]
         public async Task ResultsArePaginatedCorrectly(
-            int page, 
+            int page,
             int pageSize,
             int numberOfPublishedDataSetVersions)
         {
@@ -259,7 +259,7 @@ public abstract class DataSetVersionsControllerTests(
                 .DefaultDataSet()
                 .WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => 
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
                 context.DataSets.AddRange(targetDataSet, otherDataSet));
 
             DataSetVersion targetDataSetVersion = DataFixture
@@ -380,7 +380,7 @@ public abstract class DataSetVersionsControllerTests(
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
 
             processorClient
-                .Setup(c => c.CreateNextDataSetVersion(dataSet.Id,
+                .Setup(c => c.CreateNextDataSetVersionMappings(dataSet.Id,
                     releaseFile.Id, It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
@@ -426,6 +426,35 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(viewModel.Type, nextVersion.VersionType);
         }
 
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await CreateNextVersion(
+                dataSetId: Guid.NewGuid(),
+                releaseFileId: Guid.NewGuid(),
+                client: client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task EmptyRequiredFields_Return400()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await CreateNextVersion(
+                dataSetId: Guid.Empty,
+                releaseFileId: Guid.Empty,
+                client: client);
+
+            var validationProblem = response.AssertValidationProblem();
+            Assert.Equal(2, validationProblem.Errors.Count);
+            validationProblem.AssertHasNotEmptyError("dataSetId");
+            validationProblem.AssertHasNotEmptyError("releaseFileId");
+        }
+
         private async Task<HttpResponseMessage> CreateNextVersion(
             Guid dataSetId,
             Guid releaseFileId,
@@ -440,6 +469,118 @@ public abstract class DataSetVersionsControllerTests(
                 {
                     DataSetId = dataSetId,
                     ReleaseFileId = releaseFileId
+                }));
+        }
+    }
+
+    public class CompleteNextVersionTests(
+        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithReleaseFileId(releaseFile.Id)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
+
+            processorClient
+                .Setup(c => c.CompleteNextDataSetVersionImport(
+                    nextDataSetVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new ProcessDataSetVersionResponseViewModel
+                {
+                    DataSetId = dataSet.Id,
+                    DataSetVersionId = nextDataSetVersion.Id,
+                    InstanceId = Guid.NewGuid()
+                });
+
+            var client = BuildApp(processorClient.Object).CreateClient();
+
+            var response = await CompleteNextVersionImport(
+                dataSetVersionId: nextDataSetVersion.Id,
+                client);
+
+            var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
+
+            Assert.Equal(viewModel.Id, nextDataSetVersion.Id);
+            Assert.Equal(viewModel.Version, nextDataSetVersion.Version);
+            Assert.Equal(viewModel.Status, nextDataSetVersion.Status);
+            Assert.Equal(viewModel.Type, nextDataSetVersion.VersionType);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+
+            var response = await CompleteNextVersionImport(
+                dataSetVersionId: Guid.NewGuid(),
+                client: client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task EmptyRequiredFields_Return400()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await CompleteNextVersionImport(
+                dataSetVersionId: Guid.Empty,
+                client: client);
+
+            var validationProblem = response.AssertValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotEmptyError("dataSetVersionId");
+        }
+
+        private async Task<HttpResponseMessage> CompleteNextVersionImport(
+            Guid dataSetVersionId,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var uri = new Uri($"{BaseUrl}/complete", UriKind.Relative);
+
+            return await client.PostAsync(uri,
+                new JsonNetContent(new NextDataSetVersionCompleteImportRequest
+                {
+                    DataSetVersionId = dataSetVersionId,
                 }));
         }
     }
@@ -648,10 +789,7 @@ public abstract class DataSetVersionsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var mockedChanges = new MockedChanges
-            {
-                Changes = ["test"]
-            };
+            var mockedChanges = new MockedChanges { Changes = ["test"] };
 
             var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
 
@@ -799,11 +937,11 @@ public abstract class DataSetVersionsControllerTests(
     {
         private static readonly IReadOnlyList<DataSetVersionStatus> EligibleUpdateDataSetVersionStatuses =
             new List<DataSetVersionStatus>(
-            [
-                DataSetVersionStatus.Draft,
-                DataSetVersionStatus.Mapping
-            ]
-        );
+                [
+                    DataSetVersionStatus.Draft,
+                    DataSetVersionStatus.Mapping
+                ]
+            );
 
         public static TheoryData<DataSetVersionStatus> EligibleUpdateDataSetVersionStatusesData = new(
             EligibleUpdateDataSetVersionStatuses
@@ -894,10 +1032,7 @@ public abstract class DataSetVersionsControllerTests(
         {
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
-            var updateRequest = new DataSetVersionUpdateRequest
-            {
-                DataSetVersionId = Guid.NewGuid()
-            };
+            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = Guid.NewGuid() };
 
             var response = await UpdateVersion(updateRequest, client);
 
@@ -907,10 +1042,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task DataSetVersionDoesNotExist_Returns404()
         {
-            var updateRequest = new DataSetVersionUpdateRequest
-            {
-                DataSetVersionId = Guid.NewGuid()
-            };
+            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = Guid.NewGuid() };
 
             var response = await UpdateVersion(updateRequest);
 
@@ -947,10 +1079,7 @@ public abstract class DataSetVersionsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var updateRequest = new DataSetVersionUpdateRequest
-            {
-                DataSetVersionId = nextDataSetVersion.Id
-            };
+            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = nextDataSetVersion.Id };
 
             var response = await UpdateVersion(updateRequest);
 
