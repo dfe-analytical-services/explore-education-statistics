@@ -5,6 +5,7 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
+import { Chart } from '@common/services/types/blocks';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -356,5 +357,94 @@ describe('ChartBuilder', () => {
 
       expect(screen.getAllByRole('row')).toHaveLength(1);
     });
+  });
+
+  test('calls `onTableQueryUpdate` when change boundary level', async () => {
+    const testInitialChart: Chart = {
+      type: 'map',
+      boundaryLevel: 2,
+      map: {
+        dataSetConfigs: [],
+      },
+      title: 'Data block title',
+      subtitle: '',
+      alt: 'd',
+      height: 600,
+      includeNonNumericData: false,
+      axes: {
+        major: {
+          type: 'major',
+          groupBy: 'locations',
+          groupByFilter: '',
+          groupByFilterGroups: false,
+          sortBy: 'name',
+          sortAsc: false,
+          dataSets: [
+            {
+              order: 0,
+              indicator: 'overall-absence-sessions',
+              filters: ['state-funded-primary'],
+              timePeriod: '2014_AY',
+            },
+          ],
+          referenceLines: [],
+          visible: true,
+          unit: '',
+          showGrid: false,
+          label: {
+            text: '',
+            rotated: false,
+          },
+          min: 0,
+          size: 50,
+          tickConfig: 'default',
+          tickSpacing: 1,
+        },
+      },
+      legend: { items: [] },
+    };
+
+    const handleUpdate = jest.fn();
+
+    const { user } = render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartBuilder
+          releaseId="release-1"
+          data={testFullTable.results}
+          initialChart={testInitialChart}
+          meta={{
+            ...testFullTable.subjectMeta,
+            boundaryLevels: [
+              {
+                id: 1,
+                label: 'Boundary level 1',
+              },
+              {
+                id: 2,
+                label: 'Boundary level 2',
+              },
+            ],
+          }}
+          tableTitle="Table title"
+          onChartSave={jest.fn()}
+          onChartDelete={noop}
+          onTableQueryUpdate={handleUpdate}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Chart preview' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('tab', { name: 'Boundary levels' }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: 'Boundary levels' }));
+
+    await user.selectOptions(screen.getByLabelText('Boundary level'), ['1']);
+
+    expect(handleUpdate).toHaveBeenCalledWith({ boundaryLevel: 1 });
   });
 });
