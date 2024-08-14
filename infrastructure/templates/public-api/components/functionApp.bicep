@@ -457,7 +457,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     azureFileShares: azureFileShares
   }
   dependsOn: [
-    functionAppKeyVaultRoleAssignments
+    functionAppKeyVaultAccessPolicy
     slot1FileShare
     slot2FileShare
   ]
