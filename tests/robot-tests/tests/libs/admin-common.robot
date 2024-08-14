@@ -578,6 +578,7 @@ user uploads subject
     user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
+    user waits until page finishes loading
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until data upload displays importing
