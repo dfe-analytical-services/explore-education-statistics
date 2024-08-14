@@ -21,13 +21,13 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 }
 
 @description('Look up the built-in role definition')
-resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   scope: subscription()
   name: roleIds[role]
 }
 
 @description('Grant the service principals the key vault role')
-resource keyVaultSecretUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = [for principalId in principalIds: {
+resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: keyVault
   name: guid(resourceGroup().id, principalId, roleDefinition.id)
   properties: {
