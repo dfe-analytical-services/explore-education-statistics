@@ -17,22 +17,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CreateNextDataSetVersionMappingsFunction(
     ILogger<CreateNextDataSetVersionMappingsFunction> logger,
     IDataSetVersionService dataSetVersionService,
-    IValidator<NextDataSetVersionCreateMappingsRequest> requestValidator)
+    IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator)
 {
-    [Function(nameof(CreateNextDataSetVersion))]
-    public async Task<IActionResult> CreateNextDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateNextDataSetVersion))] [FromBody]
-        NextDataSetVersionCreateMappingsRequest mappingsRequest,
+    [Function(nameof(CreateNextDataSetVersionMappings))]
+    public async Task<IActionResult> CreateNextDataSetVersionMappings(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous, "post",
+            Route = nameof(CreateNextDataSetVersionMappings))]
+        [FromBody]
+        NextDataSetVersionMappingsCreateRequest request,
         [DurableClient] DurableTaskClient client,
         CancellationToken cancellationToken)
     {
         // Identifier of the scheduled processing orchestration instance
         var instanceId = Guid.NewGuid();
 
-        return await requestValidator.Validate(mappingsRequest, cancellationToken)
+        return await requestValidator.Validate(request, cancellationToken)
             .OnSuccess(() => dataSetVersionService.CreateNextVersion(
-                dataSetId: mappingsRequest.DataSetId,
-                releaseFileId: mappingsRequest.ReleaseFileId,
+                dataSetId: request.DataSetId,
+                releaseFileId: request.ReleaseFileId,
                 instanceId,
                 cancellationToken: cancellationToken
             ))
@@ -46,7 +49,7 @@ public class CreateNextDataSetVersionMappingsFunction(
 
                 return new ProcessDataSetVersionResponseViewModel
                 {
-                    DataSetId = mappingsRequest.DataSetId,
+                    DataSetId = request.DataSetId,
                     DataSetVersionId = dataSetVersionId,
                     InstanceId = instanceId
                 };
@@ -60,7 +63,8 @@ public class CreateNextDataSetVersionMappingsFunction(
         Guid instanceId,
         CancellationToken cancellationToken)
     {
-        const string orchestratorName = nameof(ProcessNextDataSetVersionMappingsFunction.ProcessNextDataSetVersionMappings);
+        const string orchestratorName =
+            nameof(ProcessNextDataSetVersionMappingsFunction.ProcessNextDataSetVersionMappings);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
