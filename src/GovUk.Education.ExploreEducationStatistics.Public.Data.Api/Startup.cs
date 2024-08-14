@@ -68,7 +68,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             options.DefaultPolicy =
                 new RequestTimeoutPolicy
                 {
-                    Timeout = TimeSpan.FromMilliseconds(30000),
+                    Timeout = TimeSpan.FromMilliseconds(configuration.GetValue<int?>("RequestTimeoutMilliseconds") ?? 30000),
                     TimeoutStatusCode = (int)HttpStatusCode.GatewayTimeout
                 };
         });
