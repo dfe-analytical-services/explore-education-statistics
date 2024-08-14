@@ -29,16 +29,14 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
     try {
       await apiNotificationService.confirmUnsubscription(id, token);
     } catch (error) {
-      if (isAxiosError(error)) {
-        setUnsubscribeError(() => {
-          if (error.response?.status === 404) {
-            return 'NotFound';
-          }
-          return error.response?.data
-            ? error.response.data.errors[0].code
-            : 'ConfirmationError';
-        });
-      }
+      setUnsubscribeError(() => {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          return 'NotFound';
+        }
+        return isAxiosError(error) && error.response?.data
+          ? error.response.data.errors[0].code
+          : 'ConfirmationError';
+      });
 
       logger.error(error);
     }

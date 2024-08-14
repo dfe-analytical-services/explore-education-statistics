@@ -30,16 +30,14 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
     try {
       await apiNotificationService.confirmPendingSubscription(id, token);
     } catch (error) {
-      if (isAxiosError(error)) {
-        setSubscriptionError(() => {
-          if (error.response?.status === 404) {
-            return 'NotFound';
-          }
-          return error.response?.data
-            ? error.response.data.errors[0].code
-            : 'ConfirmationError';
-        });
-      }
+      setSubscriptionError(() => {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          return 'NotFound';
+        }
+        return isAxiosError(error) && error.response?.data
+          ? error.response.data.errors[0].code
+          : 'ConfirmationError';
+      });
 
       logger.error(error);
     }
