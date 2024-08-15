@@ -1,3 +1,4 @@
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { PaginatedList } from '@common/services/types/pagination';
 import apiDataSetService, {
   ApiDataSet,
@@ -9,7 +10,7 @@ import { UseQueryOptions } from '@tanstack/react-query';
 const apiDataSetQueries = {
   getDataSet(dataSetId: string): UseQueryOptions<ApiDataSet> {
     return {
-      queryKey: ['dataSet', dataSetId],
+      queryKey: ['getDataSet', dataSetId],
       queryFn: () => apiDataSetService.getDataSet(dataSetId),
     };
   },
@@ -18,7 +19,7 @@ const apiDataSetQueries = {
     dataSetVersion: string,
   ): UseQueryOptions<ApiDataSetVersion> {
     return {
-      queryKey: ['dataSetVersion', dataSetId],
+      queryKey: ['getDataSetVersion', dataSetId, dataSetVersion],
       queryFn: () =>
         apiDataSetService.getDataSetVersion(dataSetId, dataSetVersion),
     };
@@ -30,6 +31,16 @@ const apiDataSetQueries = {
     return {
       queryKey: ['listDataSetVersions', dataSetId, params ?? null],
       queryFn: () => apiDataSetService.listDataSetVersions(dataSetId, params),
+    };
+  },
+  getDataSetVersionChanges(
+    dataSetId: string,
+    dataSetVersion: string,
+  ): UseQueryOptions<ApiDataSetVersionChanges> {
+    return {
+      queryKey: ['getDataSetVersionChanges', dataSetId, dataSetVersion],
+      queryFn: () =>
+        apiDataSetService.getDataSetVersionChanges(dataSetId, dataSetVersion),
     };
   },
 } as const;

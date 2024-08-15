@@ -137,22 +137,39 @@ public class DataSetVersionChangeService(
             : null;
     }
 
-    private static Dictionary<ChangeType, List<FilterOptionChangeViewModel>>? GetFilterOptionChanges(
+    private static Dictionary<ChangeType, List<FilterOptionChangesViewModel>>? GetFilterOptionChanges(
         List<FilterOptionMetaChange> changes)
     {
         return changes.Count != 0
             ? changes
-                .Select(c => new FilterOptionChangeViewModel
-                {
-                    CurrentState = c.CurrentState is not null
-                        ? FilterOptionViewModel.Create(c.CurrentState)
-                        : null,
-                    PreviousState = c.PreviousState is not null
-                        ? FilterOptionViewModel.Create(c.PreviousState)
-                        : null,
-                })
-                .GroupBy(c => c.IsMajor() ? ChangeType.Major : ChangeType.Minor)
-                .ToDictionary(g => g.Key, g => g.ToList())
+                .Select(c => (
+                    Meta: (c.CurrentState?.Meta ?? c.PreviousState?.Meta)!,
+                    Option: new FilterOptionChangeViewModel
+                    {
+                        CurrentState = c.CurrentState is not null
+                            ? FilterOptionViewModel.Create(c.CurrentState)
+                            : null,
+                        PreviousState = c.PreviousState is not null
+                            ? FilterOptionViewModel.Create(c.PreviousState)
+                            : null,
+                    }
+                ))
+                .GroupBy(tuple => tuple.Option.IsMajor() ? ChangeType.Major : ChangeType.Minor)
+                .ToDictionary(
+                    grouping => grouping.Key,
+                    grouping => grouping
+                        .GroupBy(t => (t.Meta.PublicId, t.Meta.Label), t => t.Option)
+                        .Select(metaGroup => new FilterOptionChangesViewModel
+                        {
+                            Filter = new FilterViewModel
+                            {
+                                Id = metaGroup.Key.PublicId,
+                                Label = metaGroup.Key.Label
+                            },
+                            Options = metaGroup.ToList()
+                        })
+                        .ToList()
+                )
             : null;
     }
 
@@ -178,13 +195,13 @@ public class DataSetVersionChangeService(
                 .Where(level => !previousLevels.Contains(level))
                 .Select(level => new GeographicLevelOptionChangeViewModel
                 {
-                    CurrentState = GeographicLevelOptionViewModel.Create(level),
+                    CurrentState = GeographicLevelViewModel.Create(level),
                 }),
             ..previousLevels
                 .Where(level => !currentLevels.Contains(level))
                 .Select(level => new GeographicLevelOptionChangeViewModel
                 {
-                    PreviousState = GeographicLevelOptionViewModel.Create(level),
+                    PreviousState = GeographicLevelViewModel.Create(level),
                 }),
         ];
 
@@ -212,22 +229,35 @@ public class DataSetVersionChangeService(
             : null;
     }
 
-    private static Dictionary<ChangeType, List<LocationOptionChangeViewModel>>? GetLocationOptionChanges(
+    private static Dictionary<ChangeType, List<LocationOptionChangesViewModel>>? GetLocationOptionChanges(
         List<LocationOptionMetaChange> changes)
     {
         return changes.Count != 0
             ? changes
-                .Select(c => new LocationOptionChangeViewModel
-                {
-                    CurrentState = c.CurrentState is not null
-                        ? LocationOptionViewModel.Create(c.CurrentState.Option, c.CurrentState.PublicId)
-                        : null,
-                    PreviousState = c.PreviousState is not null
-                        ? LocationOptionViewModel.Create(c.PreviousState.Option, c.PreviousState.PublicId)
-                        : null,
-                })
-                .GroupBy(c => c.IsMajor() ? ChangeType.Major : ChangeType.Minor)
-                .ToDictionary(g => g.Key, g => g.ToList())
+                .Select(c => (
+                    Meta: (c.CurrentState?.Meta ?? c.PreviousState?.Meta)!,
+                    Option: new LocationOptionChangeViewModel
+                    {
+                        CurrentState = c.CurrentState is not null
+                            ? LocationOptionViewModel.Create(c.CurrentState.Option, c.CurrentState.PublicId)
+                            : null,
+                        PreviousState = c.PreviousState is not null
+                            ? LocationOptionViewModel.Create(c.PreviousState.Option, c.PreviousState.PublicId)
+                            : null,
+                    })
+                )
+                .GroupBy(c => c.Option.IsMajor() ? ChangeType.Major : ChangeType.Minor)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group
+                        .GroupBy(t => t.Meta.Level, t => t.Option)
+                        .Select(metaGroup => new LocationOptionChangesViewModel
+                        {
+                            Level = GeographicLevelViewModel.Create(metaGroup.Key),
+                            Options = metaGroup.ToList()
+                        })
+                        .ToList()
+                )
             : null;
     }
 

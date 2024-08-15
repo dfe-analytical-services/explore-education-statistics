@@ -18,7 +18,7 @@ public record DataSetMetaViewModel
     /// <summary>
     /// All the geographic levels associated with the data set.
     /// </summary>
-    public required IReadOnlyList<GeographicLevelOptionViewModel> GeographicLevels { get; init; }
+    public required IReadOnlyList<GeographicLevelViewModel> GeographicLevels { get; init; }
 
     /// <summary>
     /// All the locations associated with the data set, grouped by geographic level.
@@ -44,7 +44,7 @@ public record FilterOptionsViewModel : FilterViewModel
 }
 
 /// <summary>
-/// The location options available at a geographic level in the data set.
+/// The options available for a location group in the data set.
 /// </summary>
 public record LocationGroupOptionsViewModel : LocationGroupViewModel
 {

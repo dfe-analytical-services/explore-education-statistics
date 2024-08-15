@@ -26,11 +26,11 @@ small {
 }
 
 ul {
-  @extend %govuk-list--bullet;
+  @extend %govuk-list, %govuk-list--bullet;
 }
 
 ol {
-  @extend %govuk-list--number;
+  @extend %govuk-list, %govuk-list--number;
 }
 
 dt {
@@ -51,6 +51,13 @@ h3 {
 
 h4 {
   @extend %govuk-heading-s;
+}
+
+h5 {
+  @include govuk-text-colour;
+  @include govuk-font($size: 16, $weight: bold);
+  margin-top: 0;
+  @include govuk-responsive-margin(4, 'bottom');
 }
 
 hr {
@@ -74,4 +81,14 @@ blockquote {
 p pre,
 .govuk-body pre {
   white-space: normal;
+}
+
+code {
+  background: govuk-colour('light-grey');
+  // Slightly darker than govuk red for
+  // AAA contrast with background.
+  color: #d13118;
+  font-size: 1rem;
+  line-height: 1.25;
+  padding: 1px 3px;
 }

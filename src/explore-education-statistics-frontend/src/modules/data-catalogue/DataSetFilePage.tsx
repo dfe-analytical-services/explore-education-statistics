@@ -1,18 +1,20 @@
 import Button from '@common/components/Button';
 import ContentHtml from '@common/components/ContentHtml';
 import FormattedDate from '@common/components/FormattedDate';
+import PageNav, { NavItem } from '@common/components/PageNav';
 import SectionBreak from '@common/components/SectionBreak';
 import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
 import downloadService from '@common/services/downloadService';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import DataSetFileApiChangelog from '@frontend/modules/data-catalogue/components/DataSetFileApiChangelog';
 import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileApiQuickStart';
 import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
 import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
-import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
 import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
 import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
 import DataSetFileVariables from '@frontend/modules/data-catalogue/components/DataSetFileVariables';
@@ -30,7 +32,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { GetServerSideProps } from 'next';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import omit from 'lodash/omit';
 
 export const pageBaseSections = {
@@ -42,8 +44,9 @@ export const pageBaseSections = {
 } as const;
 
 export const pageApiSections = {
-  apiVersionHistory: 'API data set version history',
   apiQuickStart: 'API data set quick start',
+  apiVersionHistory: 'API data set version history',
+  apiChangelog: 'API data set changelog',
 } as const;
 
 export const pageSections = {
@@ -51,18 +54,20 @@ export const pageSections = {
   ...pageApiSections,
 } as const;
 
-export type PageSection = typeof pageSections;
-export type PageSectionId = keyof PageSection;
+export type PageSections = typeof pageSections;
+export type PageSectionId = keyof PageSections;
 
 interface Props {
   apiDataSet?: ApiDataSet;
   apiDataSetVersion?: ApiDataSetVersion;
+  apiDataSetVersionChanges?: ApiDataSetVersionChanges | null;
   dataSetFile: DataSetFile;
 }
 
 export default function DataSetFilePage({
   apiDataSet,
   apiDataSetVersion,
+  apiDataSetVersionChanges,
   dataSetFile,
 }: Props) {
   const [activeSection, setActiveSection] =
@@ -115,16 +120,36 @@ export default function DataSetFilePage({
     };
   }, [handleScroll]);
 
+  const navItems = useMemo<NavItem[]>(() => {
+    let sections: Partial<Record<PageSectionId, string>> = apiDataSet
+      ? pageSections
+      : pageBaseSections;
+
+    if (!dataSetFile.footnotes.length) {
+      sections = omit(sections, 'dataSetFootnotes');
+    }
+
+    if (
+      !apiDataSetVersionChanges ||
+      (!Object.keys(apiDataSetVersionChanges.majorChanges).length &&
+        !Object.keys(apiDataSetVersionChanges.minorChanges).length)
+    ) {
+      sections = omit(sections, 'apiChangelog');
+    }
+
+    return Object.entries(sections).map<NavItem>(([id, text]) => {
+      return {
+        id,
+        text,
+      };
+    });
+  }, [apiDataSet, apiDataSetVersionChanges, dataSetFile.footnotes.length]);
+
   if (!dataSetFile) {
     return <NotFoundPage />;
   }
 
   const { file, release, summary, title } = dataSetFile;
-
-  const allNavSections = apiDataSet ? pageSections : pageBaseSections;
-  const navSections = dataSetFile.footnotes.length
-    ? allNavSections
-    : omit(allNavSections, 'dataSetFootnotes');
 
   return (
     <Page
@@ -184,10 +209,12 @@ export default function DataSetFilePage({
           <SectionBreak size="l" />
 
           <div className="govuk-grid-row">
-            <DataSetFilePageNav
+            <PageNav
               activeSection={activeSection}
-              sections={navSections}
-              onClickItem={setActiveSection}
+              items={navItems}
+              onClickItem={sectionId => {
+                setActiveSection(sectionId as PageSectionId);
+              }}
             />
 
             <div className="govuk-grid-column-two-thirds">
@@ -216,16 +243,23 @@ export default function DataSetFilePage({
 
               {apiDataSet && apiDataSetVersion && (
                 <>
-                  <DataSetFileApiVersionHistory
-                    apiDataSetId={apiDataSet?.id}
-                    currentVersion={apiDataSetVersion.version}
-                  />
-
                   <DataSetFileApiQuickStart
                     id={apiDataSet.id}
                     name={apiDataSet.title}
                     version={apiDataSetVersion.version}
                   />
+
+                  <DataSetFileApiVersionHistory
+                    apiDataSetId={apiDataSet.id}
+                    currentVersion={apiDataSetVersion.version}
+                  />
+
+                  {apiDataSetVersionChanges && (
+                    <DataSetFileApiChangelog
+                      version={apiDataSetVersion.version}
+                      changes={apiDataSetVersionChanges}
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -251,25 +285,36 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     };
 
     if (dataSetFile.api) {
-      const [apiDataSet, apiDataSetVersion] = await Promise.all([
-        await queryClient.fetchQuery(
-          apiDataSetQueries.getDataSet(dataSetFile.api.id),
-        ),
-        await queryClient.fetchQuery(
-          apiDataSetQueries.getDataSetVersion(
-            dataSetFile.api.id,
-            dataSetFile.api.version,
+      await queryClient.prefetchQuery(
+        apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
+          page: versionPage ? Number(versionPage) : 1,
+        }),
+      );
+
+      const [apiDataSet, apiDataSetVersion, apiDataSetVersionChanges] =
+        await Promise.all([
+          queryClient.fetchQuery(
+            apiDataSetQueries.getDataSet(dataSetFile.api.id),
           ),
-        ),
-        await queryClient.fetchQuery(
-          apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
-            page: versionPage ? Number(versionPage) : 1,
-          }),
-        ),
-      ]);
+          queryClient.fetchQuery(
+            apiDataSetQueries.getDataSetVersion(
+              dataSetFile.api.id,
+              dataSetFile.api.version,
+            ),
+          ),
+          dataSetFile.api.version !== '1.0'
+            ? queryClient.fetchQuery(
+                apiDataSetQueries.getDataSetVersionChanges(
+                  dataSetFile.api.id,
+                  dataSetFile.api.version,
+                ),
+              )
+            : null,
+        ]);
 
       props.apiDataSet = apiDataSet;
       props.apiDataSetVersion = apiDataSetVersion;
+      props.apiDataSetVersionChanges = apiDataSetVersionChanges;
     }
 
     return {

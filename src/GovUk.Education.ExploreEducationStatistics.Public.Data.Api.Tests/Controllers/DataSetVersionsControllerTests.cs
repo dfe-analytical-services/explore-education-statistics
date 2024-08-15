@@ -575,8 +575,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             var query = new Dictionary<string, string?>
             {
-                { "page", page?.ToString() },
-                { "pageSize", pageSize?.ToString() },
+                { "page", page.ToString() },
+                { "pageSize", pageSize.ToString() },
             };
 
             var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/versions", query);
@@ -1020,7 +1020,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
-            var majorChanges = viewModel.MajorChanges?.Filters;
+            var majorChanges = viewModel.MajorChanges.Filters;
 
             Assert.NotNull(majorChanges);
             Assert.Equal(2, majorChanges.Count);
@@ -1037,7 +1037,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.NotNull(majorChanges[1].CurrentState);
             Assert.Equal(dataSetVersion.FilterMetas[1].PublicId, majorChanges[1].CurrentState!.Id);
 
-            var minorChanges = viewModel.MinorChanges?.Filters;
+            var minorChanges = viewModel.MinorChanges.Filters;
 
             Assert.NotNull(minorChanges);
             Assert.Equal(2, minorChanges.Count);
@@ -1127,47 +1127,66 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
-            var majorChanges = viewModel.MajorChanges?.FilterOptions;
+            var majorChanges = viewModel.MajorChanges.FilterOptions;
 
             Assert.NotNull(majorChanges);
             Assert.Equal(2, majorChanges.Count);
 
+            Assert.Equal(oldDataSetVersion.FilterMetas[0].PublicId, majorChanges[0].Filter.Id);
+            Assert.Equal(oldDataSetVersion.FilterMetas[0].Label, majorChanges[0].Filter.Label);
+
+            var majorChange1Options = majorChanges[0].Options;
+
+            Assert.Single(majorChange1Options);
+
             // Deletion
-            Assert.Null(majorChanges[0].CurrentState);
-            Assert.NotNull(majorChanges[0].PreviousState);
-            Assert.Equal(oldOptionLink1.PublicId, majorChanges[0].PreviousState!.Id);
+            Assert.Null(majorChange1Options[0].CurrentState);
+            Assert.NotNull(majorChange1Options[0].PreviousState);
+            Assert.Equal(oldOptionLink1.PublicId, majorChange1Options[0].PreviousState!.Id);
+
+            Assert.Equal(dataSetVersion.FilterMetas[0].PublicId, majorChanges[1].Filter.Id);
+            Assert.Equal(dataSetVersion.FilterMetas[0].Label, majorChanges[1].Filter.Label);
+
+            var majorChange2Options = majorChanges[1].Options;
+
+            Assert.Single(majorChange2Options);
 
             // Updated ID
-            Assert.NotNull(majorChanges[1].PreviousState);
-            Assert.Equal(oldOptionLink2.PublicId, majorChanges[1].PreviousState!.Id);
+            Assert.NotNull(majorChange2Options[0].PreviousState);
+            Assert.Equal(oldOptionLink2.PublicId, majorChange2Options[0].PreviousState!.Id);
 
-            Assert.NotNull(majorChanges[1].CurrentState);
-            Assert.Equal(newOptionLink2.PublicId, majorChanges[1].CurrentState!.Id);
+            Assert.NotNull(majorChange2Options[0].CurrentState);
+            Assert.Equal(newOptionLink2.PublicId, majorChange2Options[0].CurrentState!.Id);
 
-            Assert.NotEqual(majorChanges[1].PreviousState!.Id, majorChanges[1].CurrentState!.Id);
-            Assert.NotEqual(majorChanges[1].PreviousState!.Label, majorChanges[1].CurrentState!.Label);
+            Assert.NotEqual(majorChange2Options[0].PreviousState!.Id, majorChange2Options[0].CurrentState!.Id);
+            Assert.NotEqual(majorChange2Options[0].PreviousState!.Label, majorChange2Options[0].CurrentState!.Label);
 
-            var minorChanges = viewModel.MinorChanges?.FilterOptions;
+            var minorChanges = viewModel.MinorChanges.FilterOptions;
 
             Assert.NotNull(minorChanges);
-            Assert.Equal(2, minorChanges.Count);
+            Assert.Single(minorChanges);
+
+            Assert.Equal(dataSetVersion.FilterMetas[0].PublicId, minorChanges[0].Filter.Id);
+            Assert.Equal(dataSetVersion.FilterMetas[0].Label, minorChanges[0].Filter.Label);
+
+            var minorChangeOptions = minorChanges[0].Options;
 
             // Addition
-            Assert.Null(minorChanges[0].PreviousState);
-            Assert.NotNull(minorChanges[0].CurrentState);
-            Assert.Equal(newOptionLink1.PublicId, minorChanges[0].CurrentState!.Id);
+            Assert.Null(minorChangeOptions[0].PreviousState);
+            Assert.NotNull(minorChangeOptions[0].CurrentState);
+            Assert.Equal(newOptionLink1.PublicId, minorChangeOptions[0].CurrentState!.Id);
 
             // Updated label
-            Assert.NotNull(minorChanges[1].PreviousState);
-            Assert.Equal(oldOptionLink3.PublicId, minorChanges[1].PreviousState!.Id);
-            Assert.Equal(oldOptionLink3.Option.Label, minorChanges[1].PreviousState!.Label);
+            Assert.NotNull(minorChangeOptions[1].PreviousState);
+            Assert.Equal(oldOptionLink3.PublicId, minorChangeOptions[1].PreviousState!.Id);
+            Assert.Equal(oldOptionLink3.Option.Label, minorChangeOptions[1].PreviousState!.Label);
 
-            Assert.NotNull(minorChanges[1].CurrentState);
-            Assert.Equal(newOptionLink3.PublicId, minorChanges[1].CurrentState!.Id);
-            Assert.Equal(newOptionLink3.Option.Label, minorChanges[1].CurrentState!.Label);
+            Assert.NotNull(minorChangeOptions[1].CurrentState);
+            Assert.Equal(newOptionLink3.PublicId, minorChangeOptions[1].CurrentState!.Id);
+            Assert.Equal(newOptionLink3.Option.Label, minorChangeOptions[1].CurrentState!.Label);
 
-            Assert.Equal(minorChanges[1].PreviousState!.Id, minorChanges[1].CurrentState!.Id);
-            Assert.NotEqual(minorChanges[1].PreviousState!.Label, minorChanges[1].CurrentState!.Label);
+            Assert.Equal(minorChangeOptions[1].PreviousState!.Id, minorChangeOptions[1].CurrentState!.Id);
+            Assert.NotEqual(minorChangeOptions[1].PreviousState!.Label, minorChangeOptions[1].CurrentState!.Label);
         }
 
         [Fact]
@@ -1221,7 +1240,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
-            var majorChanges = viewModel.MajorChanges?.GeographicLevels;
+            var majorChanges = viewModel.MajorChanges.GeographicLevels;
 
             Assert.NotNull(majorChanges);
             Assert.Single(majorChanges);
@@ -1229,9 +1248,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Deletion
             Assert.Null(majorChanges[0].CurrentState);
             Assert.NotNull(majorChanges[0].PreviousState);
-            Assert.Equal(GeographicLevel.LocalAuthorityDistrict, majorChanges[0].PreviousState!.Level);
+            Assert.Equal(GeographicLevel.LocalAuthorityDistrict, majorChanges[0].PreviousState!.Code);
 
-            var minorChanges = viewModel.MinorChanges?.GeographicLevels;
+            var minorChanges = viewModel.MinorChanges.GeographicLevels;
 
             Assert.NotNull(minorChanges);
             Assert.Equal(2, minorChanges.Count);
@@ -1239,12 +1258,12 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Addition
             Assert.Null(minorChanges[0].PreviousState);
             Assert.NotNull(minorChanges[0].CurrentState);
-            Assert.Equal(GeographicLevel.Region, minorChanges[0].CurrentState!.Level);
+            Assert.Equal(GeographicLevel.Region, minorChanges[0].CurrentState!.Code);
 
             // Addition
             Assert.Null(minorChanges[1].PreviousState);
             Assert.NotNull(minorChanges[1].CurrentState);
-            Assert.Equal(GeographicLevel.LocalAuthority, minorChanges[1].CurrentState!.Level);
+            Assert.Equal(GeographicLevel.LocalAuthority, minorChanges[1].CurrentState!.Code);
         }
 
         [Fact]
@@ -1302,7 +1321,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
-            var majorChanges = viewModel.MajorChanges?.LocationGroups;
+            var majorChanges = viewModel.MajorChanges.LocationGroups;
 
             Assert.NotNull(majorChanges);
             Assert.Equal(2, majorChanges.Count);
@@ -1310,16 +1329,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Deletion
             Assert.Null(majorChanges[0].CurrentState);
             Assert.NotNull(majorChanges[0].PreviousState);
-            Assert.Equal(oldDataSetVersion.LocationMetas[0].Level, majorChanges[0].PreviousState!.Level);
+            Assert.Equal(oldDataSetVersion.LocationMetas[0].Level, majorChanges[0].PreviousState!.Level.Code);
 
             // Updated level
             Assert.NotNull(majorChanges[1].PreviousState);
-            Assert.Equal(oldDataSetVersion.LocationMetas[1].Level, majorChanges[1].PreviousState!.Level);
+            Assert.Equal(oldDataSetVersion.LocationMetas[1].Level, majorChanges[1].PreviousState!.Level.Code);
 
             Assert.NotNull(majorChanges[1].CurrentState);
-            Assert.Equal(dataSetVersion.LocationMetas[1].Level, majorChanges[1].CurrentState!.Level);
+            Assert.Equal(dataSetVersion.LocationMetas[1].Level, majorChanges[1].CurrentState!.Level.Code);
 
-            var minorChanges = viewModel.MinorChanges?.LocationGroups;
+            var minorChanges = viewModel.MinorChanges.LocationGroups;
 
             Assert.NotNull(minorChanges);
             Assert.Single(minorChanges);
@@ -1327,7 +1346,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Addition
             Assert.Null(minorChanges[0].PreviousState);
             Assert.NotNull(minorChanges[0].CurrentState);
-            Assert.Equal(dataSetVersion.LocationMetas[0].Level, minorChanges[0].CurrentState!.Level);
+            Assert.Equal(dataSetVersion.LocationMetas[0].Level, minorChanges[0].CurrentState!.Level.Code);
         }
 
         [Fact]
@@ -1369,7 +1388,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                         // Simulates only the label being changed - minor
                         .ForIndex(2, l => l
                             .SetPublicId(oldOptionLink3.PublicId)
-                            .Set((_, link) => (link.Option as LocationCodedOptionMeta)!.Code = oldOption3!.Code))
+                            .Set((_, link) => (link.Option as LocationCodedOptionMeta)!.Code = oldOption3.Code))
                         .GenerateList(3))
                     .GenerateList(1));
 
@@ -1410,21 +1429,25 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
-            var majorChanges = viewModel.MajorChanges?.LocationOptions;
+            var majorChanges = viewModel.MajorChanges.LocationOptions;
 
             Assert.NotNull(majorChanges);
-            Assert.Equal(2, majorChanges.Count);
+            Assert.Single(majorChanges);
+
+            Assert.Equal(dataSetVersion.LocationMetas[0].Level, majorChanges[0].Level.Code);
+
+            var majorChangeOptions = majorChanges[0].Options;
 
             // Deletion
-            var majorChange1Previous = Assert.IsType<LocationCodedOptionViewModel>(majorChanges[0].PreviousState);
+            var majorChange1Previous = Assert.IsType<LocationCodedOptionViewModel>(majorChangeOptions[0].PreviousState);
 
             Assert.Equal(oldOptionLink1.PublicId, majorChange1Previous.Id);
             Assert.Equal(oldOption1.Label, majorChange1Previous.Label);
             Assert.Equal(oldOption1.Code, majorChange1Previous.Code);
 
             // Updated ID and code
-            var majorChange2Previous = Assert.IsType<LocationCodedOptionViewModel>(majorChanges[1].PreviousState);
-            var majorChange2Current = Assert.IsType<LocationCodedOptionViewModel>(majorChanges[1].CurrentState);
+            var majorChange2Previous = Assert.IsType<LocationCodedOptionViewModel>(majorChangeOptions[1].PreviousState);
+            var majorChange2Current = Assert.IsType<LocationCodedOptionViewModel>(majorChangeOptions[1].CurrentState);
 
             Assert.Equal(oldOptionLink2.PublicId, majorChange2Previous.Id);
             Assert.Equal(oldOption2.Label, majorChange2Previous.Label);
@@ -1438,21 +1461,25 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.Equal(majorChange2Previous.Label, majorChange2Current.Label);
             Assert.NotEqual(majorChange2Previous.Code, majorChange2Current.Code);
 
-            var minorChanges = viewModel.MinorChanges?.LocationOptions;
+            var minorChanges = viewModel.MinorChanges.LocationOptions;
 
             Assert.NotNull(minorChanges);
-            Assert.Equal(2, minorChanges.Count);
+            Assert.Single(minorChanges);
+
+            Assert.Equal(dataSetVersion.LocationMetas[0].Level, minorChanges[0].Level.Code);
+
+            var minorChangeOptions = minorChanges[0].Options;
 
             // Addition
-            var minorChange1Current = Assert.IsType<LocationCodedOptionViewModel>(minorChanges[0].CurrentState);
+            var minorChange1Current = Assert.IsType<LocationCodedOptionViewModel>(minorChangeOptions[0].CurrentState);
 
             Assert.Equal(newOptionLink1.PublicId, minorChange1Current.Id);
             Assert.Equal(newOption1.Label, minorChange1Current.Label);
             Assert.Equal(newOption1.Code, minorChange1Current.Code);
 
             // Updated label
-            var minorChange2Previous = Assert.IsType<LocationCodedOptionViewModel>(minorChanges[1].PreviousState);
-            var minorChange2Current = Assert.IsType<LocationCodedOptionViewModel>(minorChanges[1].CurrentState);
+            var minorChange2Previous = Assert.IsType<LocationCodedOptionViewModel>(minorChangeOptions[1].PreviousState);
+            var minorChange2Current = Assert.IsType<LocationCodedOptionViewModel>(minorChangeOptions[1].CurrentState);
 
             Assert.Equal(oldOptionLink3.PublicId, minorChange2Previous.Id);
             Assert.Equal(oldOption3.Label, minorChange2Previous.Label);
@@ -1523,7 +1550,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
-            var majorChanges = viewModel.MajorChanges?.TimePeriods;
+            var majorChanges = viewModel.MajorChanges.TimePeriods;
 
             Assert.NotNull(majorChanges);
             Assert.Single(majorChanges);
@@ -1534,7 +1561,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.Equal(TimeIdentifier.CalendarYear, majorChanges[0].PreviousState!.Code);
             Assert.Equal("2020", majorChanges[0].PreviousState!.Period);
 
-            var minorChanges = viewModel.MinorChanges?.TimePeriods;
+            var minorChanges = viewModel.MinorChanges.TimePeriods;
 
             Assert.NotNull(minorChanges);
             Assert.Single(minorChanges);

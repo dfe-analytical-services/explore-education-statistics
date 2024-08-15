@@ -213,9 +213,9 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 {
                     var locationMeta = Assert.Single(
                         dataSetVersion.LocationMetas,
-                        fm => fm.Level == locationMetaViewModel.Level);
+                        m => m.Level == locationMetaViewModel.Level.Code);
 
-                    Assert.Equal(locationMeta.Level.GetEnumLabel(), locationMetaViewModel.Label);
+                    Assert.Equal(locationMeta.Level.GetEnumLabel(), locationMetaViewModel.Level.Label);
 
                     foreach (var locationOptionViewModel in locationMetaViewModel.Options)
                     {
@@ -266,7 +266,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 Assert.All(
                     content.GeographicLevels,
-                    level => Assert.Equal(level.Level.GetEnumLabel(), level.Label)
+                    level => Assert.Equal(level.Code.GetEnumLabel(), level.Label)
                 );
 
                 foreach (var indicator in content.Indicators)
