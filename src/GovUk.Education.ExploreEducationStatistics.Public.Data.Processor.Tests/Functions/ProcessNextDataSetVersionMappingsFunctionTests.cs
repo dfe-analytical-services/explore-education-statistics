@@ -472,7 +472,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -560,7 +560,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -629,13 +629,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             // Some source location options have no equivalent candidate to be mapped to, thus
             // resulting in a major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(updatedMappings.TargetDataSetVersion.FullSemanticVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         [Fact]
@@ -673,7 +673,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -710,13 +710,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             // All source location options have equivalent candidates to be mapped to, thus
             // resulting in a minor version update.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(updatedMappings.TargetDataSetVersion.FullSemanticVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         [Fact]
@@ -769,7 +769,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -810,13 +810,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             // All source location options have equivalent candidates to be mapped to, thus
             // resulting in a minor version update. The inclusion of new location options
             // not present in the original version does not matter.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(updatedMappings.TargetDataSetVersion.FullSemanticVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
         }
     }
 
@@ -868,7 +868,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -940,13 +940,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             // Some source filter options have no equivalent candidate to be mapped to, thus
             // resulting in a major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(updatedMappings.TargetDataSetVersion.FullSemanticVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         [Fact]
@@ -996,7 +996,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -1063,13 +1063,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             // All source filter options have equivalent candidates to be mapped to, thus
             // resulting in a minor version update.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(updatedMappings.TargetDataSetVersion.FullSemanticVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         [Fact]
@@ -1113,7 +1113,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -1152,13 +1152,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             // All source filter options have equivalent candidates to be mapped to, thus
             // resulting in a minor version update. The inclusion of new filter options
             // not present in the original version does not matter.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(updatedMappings.TargetDataSetVersion.FullSemanticVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         // As there is currently no way in the UI for a user to resolve unmapped filters, filters
@@ -1205,7 +1205,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -1259,13 +1259,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             // Some source filter options have no equivalent candidate to be mapped to, thus
             // resulting in a major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(updatedMappings.TargetDataSetVersion.FullSemanticVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
         }
     }
 

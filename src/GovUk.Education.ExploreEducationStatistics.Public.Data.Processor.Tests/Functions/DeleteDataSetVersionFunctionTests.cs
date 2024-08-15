@@ -67,7 +67,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             });
 
             releaseFile.PublicApiDataSetId = dataSet.Id;
-            releaseFile.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
+            releaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion();
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Update(releaseFile));
 
@@ -177,9 +177,9 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             });
 
             liveReleaseFile.PublicApiDataSetId = dataSet.Id;
-            liveReleaseFile.PublicApiDataSetVersion = liveDataSetVersion.FullSemanticVersion();
+            liveReleaseFile.PublicApiDataSetVersion = liveDataSetVersion.SemVersion();
             draftReleaseFile.PublicApiDataSetId = dataSet.Id;
-            draftReleaseFile.PublicApiDataSetVersion = draftDataSetVersion.FullSemanticVersion();
+            draftReleaseFile.PublicApiDataSetVersion = draftDataSetVersion.SemVersion();
 
             await AddTestData<ContentDbContext>(context =>
                 context.ReleaseFiles.UpdateRange(liveReleaseFile, draftReleaseFile));
@@ -307,7 +307,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .SingleAsync(f => f.Id == liveReleaseFile.Id);
 
             Assert.Equal(dataSet.Id, updatedLiveReleaseFile.PublicApiDataSetId);
-            Assert.Equal(liveDataSetVersion.FullSemanticVersion(), updatedLiveReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(liveDataSetVersion.SemVersion(), updatedLiveReleaseFile.PublicApiDataSetVersion);
         }
 
         [Theory]

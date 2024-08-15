@@ -1736,7 +1736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ForIndex(0, rv => 
                     rv.SetFile(originalFile)
                     .SetPublicApiDataSetId(dataSet.Id)
-                    .SetPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion()))
+                    .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
                 .Generate(2)
                 .ToTuple2();
@@ -2735,7 +2735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ForIndex(0, rv => 
                     rv.SetFile(originalFile)
                     .SetPublicApiDataSetId(dataSet.Id)
-                    .SetPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion()))
+                    .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
                 .Generate(2)
                 .ToTuple2();

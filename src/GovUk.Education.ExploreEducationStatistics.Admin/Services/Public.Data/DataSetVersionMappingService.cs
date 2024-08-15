@@ -199,7 +199,7 @@ public class DataSetVersionMappingService(
             .Where(rf => rf.Id == targetDataSetVersion.ReleaseFileId)
             .SingleAsync(cancellationToken);
 
-        releaseFile.PublicApiDataSetVersion = targetDataSetVersion.FullSemanticVersion();
+        releaseFile.PublicApiDataSetVersion = targetDataSetVersion.SemVersion();
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }

@@ -393,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithReleaseVersion(releaseVersion)
                 .WithFile(file)
                 .WithPublicApiDataSetId(dataSet.Id)
-                .WithPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(dataSetVersion.SemVersion());
 
             var contextId = Guid.NewGuid().ToString();
 

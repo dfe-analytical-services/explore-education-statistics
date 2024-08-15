@@ -141,7 +141,7 @@ internal class DataSetVersionMappingService(
             .Where(rf => rf.Id == mappings.TargetDataSetVersion.ReleaseFileId)
             .SingleAsync(cancellationToken);
 
-        releaseFile.PublicApiDataSetVersion = mappings.TargetDataSetVersion.FullSemanticVersion();
+        releaseFile.PublicApiDataSetVersion = mappings.TargetDataSetVersion.SemVersion();
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }

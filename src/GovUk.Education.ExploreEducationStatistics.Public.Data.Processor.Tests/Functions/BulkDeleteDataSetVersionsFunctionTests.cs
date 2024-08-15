@@ -124,14 +124,14 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             });
 
             previousReleaseFile.PublicApiDataSetId = otherDataSet.Id;
-            previousReleaseFile.PublicApiDataSetVersion = otherDataSetVersion.FullSemanticVersion();
+            previousReleaseFile.PublicApiDataSetVersion = otherDataSetVersion.SemVersion();
             targetReleaseFileWithOldFile.PublicApiDataSetId = previousReleaseFile.PublicApiDataSetId;
             targetReleaseFileWithOldFile.PublicApiDataSetVersion = previousReleaseFile.PublicApiDataSetVersion;
 
             foreach (var (targetReleaseFileWithNewFile, index) in targetReleaseFilesWithNewFiles.WithIndex())
             {
                 targetReleaseFileWithNewFile.PublicApiDataSetId = targetDataSets[index].Id;
-                targetReleaseFileWithNewFile.PublicApiDataSetVersion = targetDataSetVersions[index].FullSemanticVersion();
+                targetReleaseFileWithNewFile.PublicApiDataSetVersion = targetDataSetVersions[index].SemVersion();
             }
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.UpdateRange([
@@ -216,12 +216,12 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             // Assert that the PREVIOUS Release File is still associated with its Public API DataSet
             var previousReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == previousReleaseFile.Id);
             Assert.Equal(otherDataSet.Id, previousReleaseFilePostDelete.PublicApiDataSetId);
-            Assert.Equal(otherDataSetVersion.FullSemanticVersion(), previousReleaseFilePostDelete.PublicApiDataSetVersion);
+            Assert.Equal(otherDataSetVersion.SemVersion(), previousReleaseFilePostDelete.PublicApiDataSetVersion);
 
             // Assert that the TARGET Release File, which points to the OLD File, is still associated with its Public API DataSet
             var targetReleaseFileWithOldFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == targetReleaseFileWithOldFile.Id);
             Assert.Equal(otherDataSet.Id, previousReleaseFilePostDelete.PublicApiDataSetId);
-            Assert.Equal(otherDataSetVersion.FullSemanticVersion(), previousReleaseFilePostDelete.PublicApiDataSetVersion);
+            Assert.Equal(otherDataSetVersion.SemVersion(), previousReleaseFilePostDelete.PublicApiDataSetVersion);
         }
 
         [Theory]
@@ -338,11 +338,11 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             });
 
             release1Version1ReleaseFile.PublicApiDataSetId = release1Version1DataSet.Id;
-            release1Version1ReleaseFile.PublicApiDataSetVersion = release1Version1DataSetVersion.FullSemanticVersion();
+            release1Version1ReleaseFile.PublicApiDataSetVersion = release1Version1DataSetVersion.SemVersion();
             release2Version1ReleaseFile.PublicApiDataSetId = release2Version1DataSet.Id;
-            release2Version1ReleaseFile.PublicApiDataSetVersion = release2Version1DataSetVersion.FullSemanticVersion();
+            release2Version1ReleaseFile.PublicApiDataSetVersion = release2Version1DataSetVersion.SemVersion();
             release2Version2ReleaseFile.PublicApiDataSetId = release1Version1DataSet.Id; // Same Data Set series as release1version1
-            release2Version2ReleaseFile.PublicApiDataSetVersion = release2Version2DataSetVersion.FullSemanticVersion();
+            release2Version2ReleaseFile.PublicApiDataSetVersion = release2Version2DataSetVersion.SemVersion();
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.UpdateRange(
                 release1Version1ReleaseFile,
@@ -428,9 +428,9 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             var release2Version1ReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release2Version1ReleaseFile.Id);
 
             Assert.Equal(release1Version1DataSet.Id, release1Version1ReleaseFilePostDelete.PublicApiDataSetId);
-            Assert.Equal(release1Version1DataSetVersion.FullSemanticVersion(), release1Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
+            Assert.Equal(release1Version1DataSetVersion.SemVersion(), release1Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
             Assert.Equal(release2Version1DataSet.Id, release2Version1ReleaseFilePostDelete.PublicApiDataSetId);
-            Assert.Equal(release2Version1DataSetVersion.FullSemanticVersion(), release2Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
+            Assert.Equal(release2Version1DataSetVersion.SemVersion(), release2Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
         }
 
         private static async Task AssertMetadataIsDeleted(PublicDataDbContext publicDataDbContext, DataSetVersion dataSetVersion)

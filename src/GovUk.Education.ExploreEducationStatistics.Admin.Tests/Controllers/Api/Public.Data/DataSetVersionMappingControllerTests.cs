@@ -252,7 +252,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -393,7 +393,7 @@ public abstract class DataSetVersionMappingControllerTests(
             // Assert that this update constitutes a major version update, as some locations options
             // are 'ManualNone', indicating that some of the source location options may have been
             // removed thus creating a breaking change.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
         }
 
         [Theory]
@@ -484,7 +484,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -609,7 +609,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -643,7 +643,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next data set version correctly. 
-            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
                 .ReleaseFiles
@@ -728,7 +728,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -1263,7 +1263,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -1389,7 +1389,7 @@ public abstract class DataSetVersionMappingControllerTests(
             // belonging to mapped filters have a mapping type of "ManualNone", indicating that 
             // some of the source filter options are no longer available in the target data set
             // version, thus creating a breaking change. 
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
         }
 
         [Theory]
@@ -1483,7 +1483,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -1602,7 +1602,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
@@ -1636,7 +1636,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next version number as expected. 
-            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.FullSemanticVersion());
+            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
                 .ReleaseFiles
@@ -1717,7 +1717,7 @@ public abstract class DataSetVersionMappingControllerTests(
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.FullSemanticVersion());
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
