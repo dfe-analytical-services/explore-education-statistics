@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
@@ -15,7 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 internal class DataSetVersionMappingService(
     IDataSetMetaService dataSetMetaService,
-    PublicDataDbContext publicDataDbContext)
+    PublicDataDbContext publicDataDbContext,
+    ContentDbContext contentDbContext)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -107,20 +109,9 @@ internal class DataSetVersionMappingService(
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
-        var currentVersionNumber = await publicDataDbContext
-            .DataSetVersionMappings
-            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
-            .Select(nextVersion => nextVersion.SourceDataSetVersion)
-            .Select(sourceVersion => new
-            {
-                major = sourceVersion.VersionMajor,
-                minor = sourceVersion.VersionMinor
-            })
-            .SingleAsync(cancellationToken);
-
         // Consider the current mappings to produce a major version change if any options from the
         // original data set version are currently not mapped to options in the new version.
-        var majorLocationVersionUpdate = mappings
+        var hasMajorLocationVersionUpdate = mappings
             .LocationMappingPlan
             .Levels
             .Any(level => level
@@ -129,28 +120,30 @@ internal class DataSetVersionMappingService(
                 .Any(optionMapping =>
                     NoMappingTypes.Contains(optionMapping.Value.Type)));
 
-        var majorFilterVersionUpdate = mappings
+        var hasMajorFilterVersionUpdate = mappings
             .FilterMappingPlan
             .Mappings
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
 
-        var majorVersionUpdate = majorLocationVersionUpdate || majorFilterVersionUpdate;
+        var isMajorVersionUpdate = hasMajorLocationVersionUpdate || hasMajorFilterVersionUpdate;
 
-        var nextVersionNumber = majorVersionUpdate
-            ? new
-            {
-                major = currentVersionNumber.major + 1,
-                minor = 0
-            }
-            : currentVersionNumber with { minor = currentVersionNumber.minor + 1 };
-
-        mappings.TargetDataSetVersion.VersionMajor = nextVersionNumber.major;
-        mappings.TargetDataSetVersion.VersionMinor = nextVersionNumber.minor;
-        mappings.TargetDataSetVersion.VersionPatch = 0;
+        if (isMajorVersionUpdate)
+        {
+            mappings.TargetDataSetVersion.VersionMajor += 1;
+            mappings.TargetDataSetVersion.VersionMinor = 0;
+        }
 
         publicDataDbContext.DataSetVersionMappings.Update(mappings);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        var releaseFile = await contentDbContext.ReleaseFiles
+            .Where(rf => rf.Id == mappings.TargetDataSetVersion.ReleaseFileId)
+            .SingleAsync(cancellationToken);
+
+        releaseFile.PublicApiDataSetVersion = mappings.TargetDataSetVersion.FullSemanticVersion();
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

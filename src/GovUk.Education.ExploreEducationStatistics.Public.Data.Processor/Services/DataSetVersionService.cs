@@ -161,7 +161,7 @@ internal class DataSetVersionService(
     {
         var releaseFiles = await contentDbContext.ReleaseFiles
             .Where(rf => rf.PublicApiDataSetId == dataSetVersion.DataSetId)
-            .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.Version)
+            .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.FullSemanticVersion())
             .ToListAsync(cancellationToken);
 
         await UnlinkReleaseFilesFromApiDataSets(releaseFiles, cancellationToken);

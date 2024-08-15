@@ -75,9 +75,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public string Version => $"{VersionMajor}.{VersionMinor}";
 
-    public bool IsFirstVersion => Version == "1.0";
-
     public SemVersion FullSemanticVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
+
+    public bool IsFirstVersion => VersionMajor == 1 && VersionMinor == 0 && VersionPatch == 0;
 
     public DataSetVersionType VersionType
         => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
