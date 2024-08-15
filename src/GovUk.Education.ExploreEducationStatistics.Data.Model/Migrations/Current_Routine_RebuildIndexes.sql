@@ -27,8 +27,7 @@ BEGIN
         @ActionRequired NVARCHAR(MAX),
 
         -- Used when iterating over tables
-        @CurrentTable NVARCHAR(MAX) = '',
-        @CurrentTableIndexesProcessed INT;
+        @CurrentTable NVARCHAR(MAX) = ''
 
     DROP TABLE IF EXISTS #TableList;
 
@@ -59,7 +58,7 @@ BEGIN
                     WHEN Fragmented.FragPercent >= @FragmentationThresholdRebuild THEN 'Rebuild'
                     WHEN Fragmented.FragPercent >= @FragmentationThresholdReorganize THEN 'Reorganize'
                     ELSE 'None'
-                    END As ActionRequired
+                    END AS ActionRequired
     INTO #Stats
     FROM (SELECT idx.name                         AS IndexName,
                  sch.name                         AS SchemaName,
@@ -94,7 +93,6 @@ BEGIN
     CREATE TABLE __Log_RebuildIndexesAlterIndexes
     (
         Id               INT IDENTITY (1,1),
-        StatsRowIndex    INT           NOT NULL,
         RunId            INT           NOT NULL,
         IndexName        NVARCHAR(MAX) NOT NULL,
         SchemaName       NVARCHAR(MAX) NOT NULL,
@@ -109,6 +107,10 @@ BEGIN
         FOREIGN KEY (RunId) REFERENCES __Log_RebuildIndexes (Id),
     );
 
+    -- With this table:
+    -- - if StartTime and EndTime are set, we ran UPDATE STATISTICS on the table
+    -- - if StartTime and EndTime aren't set, that means we didn't process the table due exceeding @StopTime
+    -- - if only StartTime is set, then no indexes related to the table were processed so we skipped the UPDATE STATISTICS call
     IF OBJECT_ID(N'__Log_RebuildIndexesUpdateStatistics', N'U') IS NULL
     CREATE TABLE __Log_RebuildIndexesUpdateStatistics
     (
@@ -124,18 +126,17 @@ BEGIN
     -- Create new row for this stored procedure run
     INSERT INTO __Log_RebuildIndexes (StartTime)
     VALUES (GETUTCDATE())
-    SET @RunId = SCOPE_IDENTITY();
     -- The Id is generated, but we want it, so set @RunId equal to it here
+    SET @RunId = SCOPE_IDENTITY();
 
     -- Create rows for indexes
     SELECT @StatsCount = COUNT(Id) FROM #Stats;
 
     SET @StatsRowIndex = 1;
 
-    INSERT INTO __Log_RebuildIndexesAlterIndexes (StatsRowIndex, RunId, IndexName, SchemaName,
+    INSERT INTO __Log_RebuildIndexesAlterIndexes (RunId, IndexName, SchemaName,
                                                   ObjectName, StartFragPercent, ActionRequired)
-    SELECT Id,
-           @RunId,
+    SELECT @RunId,
            IndexName,
            SchemaName,
            ObjectName,
@@ -146,8 +147,8 @@ BEGIN
     -- Create rows for tables
     INSERT INTO __Log_RebuildIndexesUpdateStatistics (RunId, TableName)
     SELECT @RunId,
-           TL.ObjectName
-    FROM #TableList TL;
+           ObjectName
+    FROM #TableList;
 
     /*-----------------------------------------------------------------------*/
 
@@ -178,7 +179,7 @@ BEGIN
               AND IndexName = @IndexName;
 
             -- Do this check after setting StartTime, as we rely on StartTime to determine which indexes we're going
-            -- to skip if we pass @StopTime
+            -- to skip if we exceed @StopTime
             IF @ActionRequired = 'None'
                 BEGIN
                     RAISERROR ('Skipping command - fragmentation percent did not hit reorganisation threshold ''%s''.', 0, 1,
@@ -241,38 +242,35 @@ BEGIN
             FROM #TableList
             WHERE Id = @TablesRowIndex;
 
-            SET @Command = 'UPDATE STATISTICS ' + @CurrentTable;
-
-            -- Save start time
+            -- Save start time - see comment attached to this table's creation for why we set this first
             UPDATE __Log_RebuildIndexesUpdateStatistics
             SET StartTime = GETUTCDATE()
             WHERE RunId = @RunId
               AND TableName = @CurrentTable;
 
-            -- Skip if no indexes related to table were rebuilt/reorganized
-            SELECT @CurrentTableIndexesProcessed = COUNT(*)
-            FROM __Log_RebuildIndexesAlterIndexes
-            WHERE RunId = @RunId
-              AND ObjectName = @CurrentTable
-              AND EndTime IS NOT NULL
-
-            IF @CurrentTableIndexesProcessed = 0
+            -- Only run update stat query if indexes related to table were rebuilt/reorganized
+            IF EXISTS (SELECT 1
+                       FROM __Log_RebuildIndexesAlterIndexes
+                       WHERE RunId = @RunId
+                         AND ObjectName = @CurrentTable
+                         AND EndTime IS NOT NULL)
                 BEGIN
-                    RAISERROR ('No indexes related to table ''%s'' updated, so skipping update statistics.',
-                        0, 1, @CurrentTable) WITH NOWAIT;
-                    SET @TablesRowIndex += 1;
-                    CONTINUE;
+                    -- Run
+                    RAISERROR ('Updating statistics on table ''%s''.', 0, 1, @CurrentTable) WITH NOWAIT;
+
+                    SET @Command = 'UPDATE STATISTICS ' + @CurrentTable;
+
+                    EXEC (@Command);
+
+                    -- Save end time
+                    UPDATE __Log_RebuildIndexesUpdateStatistics
+                    SET EndTime = GETUTCDATE()
+                    WHERE RunId = @RunId
+                      AND TableName = @CurrentTable;
                 END
-
-            -- Run
-            RAISERROR ('Updating statistics on table ''%s''.', 0, 1, @CurrentTable) WITH NOWAIT;
-            EXEC (@Command);
-
-            -- Save end time
-            UPDATE __Log_RebuildIndexesUpdateStatistics
-            SET EndTime = GETUTCDATE()
-            WHERE RunId = @RunId
-              AND TableName = @CurrentTable;
+            ELSE
+                RAISERROR ('No indexes related to table ''%s'' updated, so skipping update statistics.',
+                    0, 1, @CurrentTable) WITH NOWAIT;
 
             -- If we completed the last update statistics query, it doesn't matter if we've exceeded @StopTime: we've
             -- not skipped anything
@@ -295,8 +293,6 @@ BEGIN
     WHERE Id = @RunId;
 
     IF @SkipRemainingTasks = 1
-        BEGIN
-            RAISERROR ('Reindexing did not complete in %d minutes. Remaining indexes skipped.', 16, 1, @StopInMinutes)
-                WITH NOWAIT;
-        END
+        RAISERROR ('Reindexing did not complete in %d minutes. Remaining indexes skipped.', 16, 1, @StopInMinutes)
+            WITH NOWAIT;
 END
