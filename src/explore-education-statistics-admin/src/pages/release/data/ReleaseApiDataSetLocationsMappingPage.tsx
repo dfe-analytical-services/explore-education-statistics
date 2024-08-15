@@ -8,7 +8,10 @@ import getApiDataSetLocationMappings, {
 import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
 import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
 import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
+import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
+import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
+import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
@@ -16,7 +19,7 @@ import {
 import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionService, {
-  PendingMappingUpdate,
+  LocationCandidate,
 } from '@admin/services/apiDataSetVersionService';
 import Tag from '@common/components/Tag';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -24,22 +27,30 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import PageNav, { NavItem } from '@common/components/PageNav';
 import NotificationBanner from '@common/components/NotificationBanner';
+import SummaryListItem from '@common/components/SummaryListItem';
 import locationLevelsMap, {
   LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import typedKeys from '@common/utils/object/typedKeys';
 import { useQuery } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 import omit from 'lodash/omit';
+import compact from 'lodash/compact';
 import { useImmer } from 'use-immer';
+
+// Fields to omit from mapping diff.
+const omittedDiffingFields: (keyof LocationCandidateWithKey)[] = [
+  'key',
+  'label',
+];
 
 export default function ReleaseApiDataSetLocationsMappingPage() {
   const [autoMappedLocations, updateAutoMappedLocations] = useImmer<
     Partial<Record<LocationLevelKey, AutoMappedLocation[]>>
   >({});
-  const [newLocationCandidates, updateNewLocationCandidates] = useImmer<
+  const [newLocations, updateNewLocations] = useImmer<
     Partial<Record<LocationLevelKey, LocationCandidateWithKey[]>>
   >({});
   const [mappableLocations, updateMappableLocations] = useImmer<
@@ -67,23 +78,23 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
     if (locationsMapping) {
       const {
         autoMappedLocations: initialAutoMappedLocations,
-        newLocationCandidates: initialNewLocationCandidates,
+        newLocations: initialNewLocations,
         mappableLocations: initialMappableLocations,
       } = getApiDataSetLocationMappings(locationsMapping);
       updateAutoMappedLocations(initialAutoMappedLocations);
-      updateNewLocationCandidates(initialNewLocationCandidates);
+      updateNewLocations(initialNewLocations);
       updateMappableLocations(initialMappableLocations);
     }
   }, [
     locationsMapping,
     updateAutoMappedLocations,
     updateMappableLocations,
-    updateNewLocationCandidates,
+    updateNewLocations,
   ]);
 
-  const totalNewLocationCandidates = Object.values(
-    newLocationCandidates,
-  ).flatMap(key => key).length;
+  const totalNewLocations = Object.values(newLocations).flatMap(
+    key => key,
+  ).length;
 
   const totalAutoMappedLocations = Object.values(autoMappedLocations).flatMap(
     key => key,
@@ -91,23 +102,25 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
   const unmappedLocationErrors = getUnmappedLocationErrors(mappableLocations);
 
-  const navItems: NavItem[] = [
-    {
-      id: 'mappable-locations',
-      text: 'Locations not found in the new data set',
-      subNavItems: getSubNavItems(mappableLocations, 'mappable'),
-    },
-    {
-      id: 'new-locations',
-      text: 'New locations',
-      subNavItems: getSubNavItems(newLocationCandidates, 'new-locations'),
-    },
-    {
-      id: 'auto-mapped-locations',
-      text: 'Auto mapped locations',
-      subNavItems: getSubNavItems(autoMappedLocations, 'auto-mapped'),
-    },
-  ];
+  const navItems: NavItem[] = useMemo(() => {
+    return [
+      {
+        id: 'mappable-locations',
+        text: 'Locations not found in the new data set',
+        subNavItems: getSubNavItems(mappableLocations, 'mappable'),
+      },
+      {
+        id: 'new-locations',
+        text: 'New locations',
+        subNavItems: getSubNavItems(newLocations, 'new-locations'),
+      },
+      {
+        id: 'auto-mapped-locations',
+        text: 'Auto mapped locations',
+        subNavItems: getSubNavItems(autoMappedLocations, 'auto-mapped'),
+      },
+    ];
+  }, [autoMappedLocations, mappableLocations, newLocations]);
 
   const updateMappingState = useCallback(
     (updates: PendingMappingUpdate[]) => {
@@ -117,7 +130,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
           ({ candidateKey, groupKey, previousMapping, sourceKey, type }) => {
             const level = groupKey as LocationLevelKey;
             const candidate = candidateKey
-              ? newLocationCandidates[level]?.find(
+              ? newLocations[level]?.find(
                   location => location.key === candidateKey,
                 )
               : undefined;
@@ -150,7 +163,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
       });
 
       // NewLocations - remove mapped candidates, add unmapped candidates
-      updateNewLocationCandidates(draft => {
+      updateNewLocations(draft => {
         updates.forEach(({ candidateKey, groupKey, previousCandidate }) => {
           const level = groupKey as LocationLevelKey;
           if (candidateKey) {
@@ -189,10 +202,10 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
       });
     },
     [
-      newLocationCandidates,
+      newLocations,
       updateAutoMappedLocations,
       updateMappableLocations,
-      updateNewLocationCandidates,
+      updateNewLocations,
     ],
   );
 
@@ -267,14 +280,14 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               </NotificationBanner>
             )}
             <p>
-              Existing locations in the publication data set should be mapped to
-              an equivalent location in the new data set. We try to
-              automatically match up locations that have the same name, but you
-              can double-check these choices.
+              Existing locations in the API data set should be mapped to an
+              equivalent location in the new data set. We try to automatically
+              match up locations that have the same name, but you can
+              double-check these choices.
             </p>
             <p>
               Any locations in the new data set that have not been mapped will
-              show as new locations in the publication data set.
+              show as new locations in the API data set.
             </p>
 
             <h3 className="govuk-heading-l" id="unmapped-locations">
@@ -285,18 +298,46 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               <>
                 {typedKeys(mappableLocations).map(level => {
                   const levelMappableLocations = mappableLocations[level];
-                  const groupLabel = locationLevelsMap[level]?.plural ?? level;
+                  const groupLabel = locationLevelsMap[level].plural;
 
                   if (levelMappableLocations?.length) {
                     return (
                       <ApiDataSetMappableTable
-                        key={`unmapped-${level}`}
+                        key={level}
+                        candidateHint={candidate =>
+                          getApiDataSetLocationCodes(candidate)
+                        }
+                        candidateIsMajorMapping={(candidate, mapping) => {
+                          return Object.entries(
+                            omit(mapping.source, omittedDiffingFields),
+                          ).some(
+                            ([key, value]) =>
+                              candidate[key as keyof LocationCandidate] !==
+                              value,
+                          );
+                        }}
                         groupKey={level}
                         groupLabel={groupLabel}
-                        label="location"
+                        itemLabel="location"
+                        itemPluralLabel="locations"
                         mappableItems={levelMappableLocations}
-                        newItems={newLocationCandidates[level]}
+                        newItems={newLocations[level]}
                         pendingUpdates={pendingUpdates}
+                        renderCandidate={candidate => (
+                          <>
+                            {candidate.label}
+                            <ApiDataSetLocationCode location={candidate} />
+                          </>
+                        )}
+                        renderSource={source => (
+                          <>
+                            {source.label}
+                            <ApiDataSetLocationCode location={source} />
+                          </>
+                        )}
+                        renderSourceDetails={source => (
+                          <LocationDetails location={source} />
+                        )}
                         onUpdate={handleUpdateMapping}
                       />
                     );
@@ -306,22 +347,22 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                 })}
               </>
             ) : (
-              <p>No locations not found in the new data set.</p>
+              <p>No locations.</p>
             )}
 
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
               id="new-locations"
             >
-              New locations ({totalNewLocationCandidates}){' '}
+              New locations ({totalNewLocations}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
-            {totalNewLocationCandidates > 0 ? (
+            {totalNewLocations > 0 ? (
               <Accordion id="new-locations" testId="new-locations-accordion">
-                {typedKeys(newLocationCandidates).map(level => {
-                  const levelNewLocations = newLocationCandidates[level];
-                  const groupLabel = locationLevelsMap[level]?.plural ?? level;
+                {typedKeys(newLocations).map(level => {
+                  const levelNewLocations = newLocations[level];
+                  const groupLabel = locationLevelsMap[level].plural;
 
                   if (levelNewLocations?.length) {
                     return (
@@ -330,13 +371,19 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                         heading={`${groupLabel} (${levelNewLocations.length})`}
                         headingTag="h4"
                         id={`new-locations-${level}`}
-                        key={`new-locations-${level}`}
+                        key={level}
                       >
                         <ApiDataSetNewItemsTable
                           groupKey={level}
                           groupLabel={groupLabel}
-                          label="location"
+                          itemPluralLabel="locations"
                           newItems={levelNewLocations}
+                          renderItem={item => (
+                            <>
+                              {item.label}
+                              <ApiDataSetLocationCode location={item} />
+                            </>
+                          )}
                         />
                       </AccordionSection>
                     );
@@ -364,24 +411,68 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               >
                 {typedKeys(autoMappedLocations).map(level => {
                   const levelAutoMappedLocations = autoMappedLocations[level];
-                  const groupLabel = locationLevelsMap[level]?.plural ?? level;
+                  const groupLabel = locationLevelsMap[level].plural;
 
                   if (levelAutoMappedLocations?.length) {
                     return (
                       <AccordionSection
                         goToTop={false}
-                        heading={`${groupLabel} (${levelAutoMappedLocations?.length})`}
+                        heading={`${groupLabel} (${levelAutoMappedLocations.length})`}
                         headingTag="h4"
                         id={`auto-mapped-${level}`}
-                        key={`auto-mapped-${level}`}
+                        key={level}
                       >
                         <ApiDataSetAutoMappedTable
+                          candidateHint={candidate =>
+                            getApiDataSetLocationCodes(candidate)
+                          }
                           groupKey={level}
                           groupLabel={groupLabel}
-                          label="location"
+                          itemLabel="location"
                           autoMappedItems={levelAutoMappedLocations}
-                          newItems={newLocationCandidates[level]}
+                          newItems={newLocations[level]}
                           pendingUpdates={pendingUpdates}
+                          renderCandidate={candidate => (
+                            <>
+                              {candidate.label}
+                              <ApiDataSetLocationCode location={candidate} />
+                            </>
+                          )}
+                          renderSource={source => (
+                            <>
+                              {source.label}
+                              <ApiDataSetLocationCode location={source} />
+                            </>
+                          )}
+                          renderSourceDetails={source => (
+                            <LocationDetails location={source} />
+                          )}
+                          searchFilter={searchTerm =>
+                            levelAutoMappedLocations.filter(item => {
+                              const { candidate, mapping } = item;
+
+                              const searchFields = compact([
+                                candidate.label,
+                                candidate.code,
+                                candidate.laEstab,
+                                candidate.oldCode,
+                                candidate.ukprn,
+                                candidate.urn,
+                                mapping.source.label,
+                                mapping.source.code,
+                                mapping.source.laEstab,
+                                mapping.source.oldCode,
+                                mapping.source.ukprn,
+                                mapping.source.urn,
+                              ]);
+
+                              return searchFields.some(field => {
+                                return field
+                                  ?.toLowerCase()
+                                  .includes(searchTerm);
+                              });
+                            })
+                          }
                           onUpdate={handleUpdateMapping}
                         />
                       </AccordionSection>
@@ -436,4 +527,17 @@ function getSubNavItems(
 
     return acc;
   }, []);
+}
+
+function LocationDetails({ location }: { location: LocationCandidate }) {
+  const { code, oldCode, urn, laEstab, ukprn } = location;
+  return (
+    <>
+      {code && <SummaryListItem term="Code">{code}</SummaryListItem>}
+      {oldCode && <SummaryListItem term="Old code">{oldCode}</SummaryListItem>}
+      {urn && <SummaryListItem term="URN">{urn}</SummaryListItem>}
+      {laEstab && <SummaryListItem term="LAESTAB">{laEstab}</SummaryListItem>}
+      {ukprn && <SummaryListItem term="UKPRN">{ukprn}</SummaryListItem>}
+    </>
+  );
 }

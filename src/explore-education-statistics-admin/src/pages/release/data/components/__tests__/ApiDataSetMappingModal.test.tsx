@@ -36,7 +36,7 @@ describe('ApiDataSetMappingModal', () => {
     const { user } = render(
       <ApiDataSetMappingModal
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={testMapping}
         newItems={testNewLocations}
         onSubmit={Promise.resolve}
@@ -54,7 +54,6 @@ describe('ApiDataSetMappingModal', () => {
       modal.getByRole('heading', { name: 'Current data set location' }),
     ).toBeInTheDocument();
     expect(modal.getByTestId('Label')).toHaveTextContent('Location 1');
-    expect(modal.getByTestId('Code')).toHaveTextContent('location-1-code');
     expect(modal.getByTestId('Identifier')).toHaveTextContent(
       'location-1-public-id',
     );
@@ -68,7 +67,7 @@ describe('ApiDataSetMappingModal', () => {
     const { user } = render(
       <ApiDataSetMappingModal
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={testMapping}
         newItems={testNewLocations}
         onSubmit={handleSubmit}

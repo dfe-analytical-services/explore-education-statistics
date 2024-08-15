@@ -1,27 +1,30 @@
 import { LocationCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import { FilterCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
-import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
 import Tag from '@common/components/Tag';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
   groupKey: LocationLevelKey | string;
   groupLabel: string;
-  label: string;
+  itemPluralLabel: string;
   newItems: FilterCandidateWithKey[] | LocationCandidateWithKey[];
+  renderItem: (
+    item: LocationCandidateWithKey | FilterCandidateWithKey,
+  ) => ReactNode;
 }
 
 export default function ApiDataSetNewItemsTable({
   groupKey,
   groupLabel,
-  label,
+  itemPluralLabel,
   newItems,
+  renderItem,
 }: Props) {
   return (
     <table data-testid={`new-items-table-${groupKey}`}>
       <caption className="govuk-visually-hidden">
-        {`Table showing new ${label}s for ${groupLabel}`}
+        {`Table showing new ${itemPluralLabel} for ${groupLabel}`}
       </caption>
       <thead>
         <tr>
@@ -31,14 +34,11 @@ export default function ApiDataSetNewItemsTable({
         </tr>
       </thead>
       <tbody>
-        {newItems.map(candidate => {
+        {newItems.map(item => {
           return (
-            <tr key={`candidate-${candidate.key}`}>
+            <tr key={item.key}>
               <td>Not applicable</td>
-              <td>
-                {candidate.label}
-                <ApiDataSetLocationCode location={candidate} />
-              </td>
+              <td>{renderItem(item)}</td>
               <td>
                 <Tag colour="grey">Minor</Tag>
               </td>

@@ -36,7 +36,7 @@ describe('ApiDataSetMappingForm', () => {
     render(
       <ApiDataSetMappingForm
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={testMapping}
         newItems={testNewLocations}
         onSubmit={Promise.resolve}
@@ -71,7 +71,7 @@ describe('ApiDataSetMappingForm', () => {
           label: 'Location 3',
         }}
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={{
           ...testMapping,
           type: 'ManualMapped',
@@ -104,7 +104,7 @@ describe('ApiDataSetMappingForm', () => {
     render(
       <ApiDataSetMappingForm
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={{ ...testMapping, type: 'ManualNone' }}
         newItems={testNewLocations}
         onSubmit={Promise.resolve}
@@ -119,7 +119,7 @@ describe('ApiDataSetMappingForm', () => {
     const { user } = render(
       <ApiDataSetMappingForm
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={testMapping}
         newItems={testNewLocations}
         onSubmit={handleSubmit}
@@ -157,7 +157,7 @@ describe('ApiDataSetMappingForm', () => {
     const { user } = render(
       <ApiDataSetMappingForm
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={testMapping}
         newItems={testNewLocations}
         onSubmit={handleSubmit}
@@ -194,7 +194,7 @@ describe('ApiDataSetMappingForm', () => {
     const { user } = render(
       <ApiDataSetMappingForm
         groupKey="region"
-        label="location"
+        itemLabel="location"
         mapping={testMapping}
         newItems={testNewLocations}
         onSubmit={Promise.resolve}
@@ -211,6 +211,6 @@ describe('ApiDataSetMappingForm', () => {
 
     expect(
       screen.getByRole('link', { name: 'Select the next data set location' }),
-    ).toHaveAttribute('href', '#map-region-form-nextItem');
+    ).toHaveAttribute('href', '#mapping-region-form-nextItem');
   });
 });

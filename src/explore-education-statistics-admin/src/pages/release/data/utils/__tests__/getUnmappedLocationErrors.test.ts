@@ -103,7 +103,7 @@ describe('getUnmappedLocationErrors', () => {
     ],
   };
 
-  test('it returns the error messages', () => {
+  test('returns the error messages', () => {
     const expected: ErrorSummaryMessage[] = [
       {
         id: 'mappable-localAuthority',

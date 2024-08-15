@@ -1,24 +1,7 @@
 import client from '@admin/services/utils/service';
 import { ApiDataSet } from '@admin/services/apiDataSetService';
-import {
-  FilterCandidateWithKey,
-  FilterMappingWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
-import {
-  LocationCandidateWithKey,
-  LocationMappingWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import { Dictionary } from '@common/types';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
-
-export interface PendingMappingUpdate {
-  candidateKey?: string;
-  groupKey: LocationLevelKey | string;
-  sourceKey: string;
-  type: MappingType;
-  previousCandidate?: FilterCandidateWithKey | LocationCandidateWithKey;
-  previousMapping: FilterMappingWithKey | LocationMappingWithKey;
-}
 
 export type MappingType =
   | 'ManualMapped'
@@ -26,29 +9,35 @@ export type MappingType =
   | 'AutoNone'
   | 'AutoMapped';
 
-interface FilterSource {
+export type Mapping<TSource> = {
+  candidateKey?: string;
+  publicId: string;
+  source: TSource;
+  type: MappingType;
+};
+
+export interface FilterSource {
   label: string;
 }
+
+export interface FilterOptionSource {
+  label: string;
+}
+
+export type FilterMapping = Mapping<FilterSource> & {
+  optionMappings: Dictionary<FilterOptionMapping>;
+};
+
+export type FilterOptionMapping = Mapping<FilterOptionSource>;
 
 export interface FilterCandidate {
   label: string;
-  options?: Dictionary<FilterSource>;
-}
-
-export interface FilterMapping {
-  candidateKey?: string;
-  publicId: string;
-  source: FilterSource;
-  type: MappingType;
-}
-
-export interface FilterColumnMapping extends FilterMapping {
-  optionMappings: Dictionary<FilterMapping>;
+  options: Dictionary<FilterSource>;
 }
 
 export interface FiltersMapping {
   candidates: Dictionary<FilterCandidate>;
-  mappings: Dictionary<FilterColumnMapping>;
+  mappings: Dictionary<FilterMapping>;
 }
 
 export interface FilterMappingUpdate {
@@ -79,12 +68,7 @@ export interface LocationCandidate {
   ukprn?: string;
 }
 
-export interface LocationMapping {
-  candidateKey?: string;
-  publicId: string;
-  type: MappingType;
-  source: LocationCandidate;
-}
+export type LocationMapping = Mapping<LocationCandidate>;
 
 export interface LocationsMapping {
   levels: Dictionary<{

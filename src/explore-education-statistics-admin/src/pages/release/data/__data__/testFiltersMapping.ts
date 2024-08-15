@@ -36,30 +36,6 @@ const testFiltersMapping: FiltersMapping = {
         Filter3Option3Key: {
           label: 'Filter 3 Option 3',
         },
-        Filter3Option4Key: {
-          label: 'Filter 3 Option 4',
-        },
-        Filter3Option5Key: {
-          label: 'Filter 3 Option 5',
-        },
-        Filter3Option6Key: {
-          label: 'Filter 3 Option 6',
-        },
-        Filter3Option7Key: {
-          label: 'Filter 3 Option 7',
-        },
-        Filter3Option8Key: {
-          label: 'Filter 3 Option 8',
-        },
-        Filter3Option9Key: {
-          label: 'Filter 3 Option 9',
-        },
-        Filter3Option10Key: {
-          label: 'Filter 3 Option 10',
-        },
-        Filter3Option11Key: {
-          label: 'Filter 3 Option 11',
-        },
       },
     },
   },
@@ -141,54 +117,6 @@ const testFiltersMapping: FiltersMapping = {
           candidateKey: 'Filter3Option3Key',
           publicId: 'filter-3-option-3-public-id',
           source: { label: 'Filter 3 Option 3' },
-          type: 'AutoMapped',
-        },
-        Filter3Option4Key: {
-          candidateKey: 'Filter3Option4Key',
-          publicId: 'filter-3-option-4-public-id',
-          source: { label: 'Filter 3 Option 4' },
-          type: 'AutoMapped',
-        },
-        Filter3Option5Key: {
-          candidateKey: 'Filter3Option5Key',
-          publicId: 'filter-3-option-5-public-id',
-          source: { label: 'Filter 3 Option 5' },
-          type: 'AutoMapped',
-        },
-        Filter3Option6Key: {
-          candidateKey: 'Filter3Option6Key',
-          publicId: 'filter-3-option-6-public-id',
-          source: { label: 'Filter 3 Option 6' },
-          type: 'AutoMapped',
-        },
-        Filter3Option7Key: {
-          candidateKey: 'Filter3Option7Key',
-          publicId: 'filter-3-option-7-public-id',
-          source: { label: 'Filter 3 Option 7' },
-          type: 'AutoMapped',
-        },
-        Filter3Option8Key: {
-          candidateKey: 'Filter3Option8Key',
-          publicId: 'filter-3-option-8-public-id',
-          source: { label: 'Filter 3 Option 8' },
-          type: 'AutoMapped',
-        },
-        Filter3Option9Key: {
-          candidateKey: 'Filter3Option9Key',
-          publicId: 'filter-3-option-9-public-id',
-          source: { label: 'Filter 3 Option 9' },
-          type: 'AutoMapped',
-        },
-        Filter3Option10Key: {
-          candidateKey: 'Filter3Option10Key',
-          publicId: 'filter-3-option-10-public-id',
-          source: { label: 'Filter 3 Option 10' },
-          type: 'AutoMapped',
-        },
-        Filter3Option11Key: {
-          candidateKey: 'Filter3Option11Key',
-          publicId: 'filter-3-option-11-public-id',
-          source: { label: 'Filter 3 Option 11' },
           type: 'AutoMapped',
         },
       },

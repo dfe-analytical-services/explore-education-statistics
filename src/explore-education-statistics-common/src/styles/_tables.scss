@@ -71,7 +71,7 @@ table,
   }
 }
 
-.dfe-has-row-highlights {
+.dfe-table--row-highlights {
   td:first-child {
     border-left: govuk-spacing(1) solid transparent;
     padding-left: govuk-spacing(1);
@@ -82,7 +82,7 @@ table,
   }
 }
 
-.dfe-table-vertical-align-middle {
+.dfe-table--vertical-align-middle {
   td {
     vertical-align: middle;
   }

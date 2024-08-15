@@ -1,12 +1,12 @@
 import ApiDataSetMappableFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnsTable';
-import { FilterColumnMapping } from '@admin/services/apiDataSetVersionService';
+import { FilterMapping } from '@admin/services/apiDataSetVersionService';
 import { Dictionary } from '@common/types';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('ApiDataSetMappableFilterColumnsTable', () => {
-  const testFilterColumns: Dictionary<FilterColumnMapping> = {
+  const testFilterColumns: Dictionary<FilterMapping> = {
     Filter1Key: {
       optionMappings: {
         Filter1Option1Key: {
@@ -76,7 +76,7 @@ describe('ApiDataSetMappableFilterColumnsTable', () => {
     expect(row1Cells[0]).toHaveTextContent('Filter 1 id: Filter1Key');
     expect(
       within(row1Cells[0]).getByRole('button', {
-        name: 'Show 3 filter options',
+        name: 'View filter options',
       }),
     ).toBeInTheDocument();
     expect(row1Cells[1]).toHaveTextContent('No mapping available');
@@ -87,7 +87,7 @@ describe('ApiDataSetMappableFilterColumnsTable', () => {
     expect(row2Cells[0]).toHaveTextContent('Filter 2 id: Filter2Key');
     expect(
       within(row2Cells[0]).getByRole('button', {
-        name: 'Show 2 filter options',
+        name: 'View filter options',
       }),
     ).toBeInTheDocument();
     expect(row2Cells[1]).toHaveTextContent('No mapping available');

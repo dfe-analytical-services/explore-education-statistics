@@ -122,7 +122,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // new Filter 1
     expect(
       newFilterOptionsAccordion.getByRole('heading', {
-        name: 'Filter 1 (1)',
+        name: 'Filter 1 (1) Column: Filter1Key',
       }),
     ).toBeInTheDocument();
     expect(
@@ -134,18 +134,18 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // auto mapped
     expect(
       screen.getByRole('heading', {
-        name: 'Auto mapped filter options (12) No action required',
+        name: 'Auto mapped filter options (4) No action required',
       }),
     ).toBeInTheDocument();
 
     const autoMappedAccordion = within(
-      screen.getByTestId('auto-mapped-accordion'),
+      screen.getByTestId('auto-mapped-filter-options-accordion'),
     );
 
     // auto mapped Filter 1
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Filter 1 (1)',
+        name: 'Filter 1 (1) Column: Filter1Key',
       }),
     ).toBeInTheDocument();
     expect(
@@ -157,14 +157,14 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // auto mapped Filter3Key
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Filter 3 (11)',
+        name: 'Filter 3 (3) Column: Filter3Key',
       }),
     ).toBeInTheDocument();
     expect(
       within(
         autoMappedAccordion.getByTestId('auto-mapped-table-Filter3Key'),
       ).getAllByRole('row'),
-    ).toHaveLength(11);
+    ).toHaveLength(4);
   });
 
   test('renders the navigation correctly', async () => {
@@ -196,12 +196,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       within(mappableSubItems[0]).getByRole('link', {
         name: 'Filter 1',
       }),
-    ).toHaveAttribute('href', '#mappable-Filter1Key');
+    ).toHaveAttribute('href', '#mappable-filter-options-filter-1-key');
     expect(
       within(mappableSubItems[1]).getByRole('link', {
         name: 'Filter 2',
       }),
-    ).toHaveAttribute('href', '#mappable-Filter2Key');
+    ).toHaveAttribute('href', '#mappable-filter-options-filter-2-key');
 
     expect(
       within(navItems[3]).getByRole('link', {
@@ -214,7 +214,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       within(newSubItems[0]).getByRole('link', {
         name: 'Filter 1',
       }),
-    ).toHaveAttribute('href', '#new-filter-options-Filter1Key');
+    ).toHaveAttribute('href', '#new-filter-options-filter-1-key');
 
     expect(
       within(navItems[5]).getByRole('link', {
@@ -227,12 +227,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       within(autoMappedSubItems[0]).getByRole('link', {
         name: 'Filter 1',
       }),
-    ).toHaveAttribute('href', '#auto-mapped-Filter1Key');
+    ).toHaveAttribute('href', '#auto-mapped-filter-options-filter-1-key');
     expect(
       within(autoMappedSubItems[1]).getByRole('link', {
         name: 'Filter 3',
       }),
-    ).toHaveAttribute('href', '#auto-mapped-Filter3Key');
+    ).toHaveAttribute('href', '#auto-mapped-filter-options-filter-3-key');
   });
 
   test('renders the notification banner if there are mappable filter options', async () => {
@@ -353,9 +353,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByText('No filter options not found in the new data set.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('No filter options.')).toBeInTheDocument();
 
     expect(screen.queryByTestId('mappable-Filter1Key')).not.toBeInTheDocument();
 
@@ -775,11 +773,11 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // auto mapped table
       expect(
         screen.getByRole('heading', {
-          name: 'Auto mapped filter options (12) No action required',
+          name: 'Auto mapped filter options (4) No action required',
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
-        screen.getByTestId('auto-mapped-accordion'),
+        screen.getByTestId('auto-mapped-filter-options-accordion'),
       );
       expect(
         autoMappedAccordion.getByRole('heading', {
@@ -865,7 +863,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         });
 
         expect(
-          screen.getByText('Auto mapped filter options (11)'),
+          screen.getByText('Auto mapped filter options (3)'),
         ).toBeInTheDocument();
       });
 
@@ -924,11 +922,11 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // auto mapped table
       expect(
         screen.getByRole('heading', {
-          name: 'Auto mapped filter options (12) No action required',
+          name: 'Auto mapped filter options (4) No action required',
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
-        screen.getByTestId('auto-mapped-accordion'),
+        screen.getByTestId('auto-mapped-filter-options-accordion'),
       );
       expect(
         autoMappedAccordion.getByRole('heading', {
@@ -996,7 +994,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         });
 
         expect(
-          screen.getByText('Auto mapped filter options (11)'),
+          screen.getByText('Auto mapped filter options (3)'),
         ).toBeInTheDocument();
       });
 
@@ -1147,7 +1145,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       expect(unmappedRows).toHaveLength(2);
       const unmappedRow1Cells = within(unmappedRows[1]).getAllByRole('cell');
       expect(unmappedRow1Cells[0]).toHaveTextContent(
-        'Filter 1 id: Filter1Key Show 4 filter options',
+        'Filter 1 id: Filter1Key View filter options',
       );
       expect(unmappedRow1Cells[1]).toHaveTextContent('No mapping available');
       expect(unmappedRow1Cells[2]).toHaveTextContent('Major');
@@ -1167,7 +1165,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       );
       expect(newColumnsRow1Cells[0]).toHaveTextContent('No mapping available');
       expect(newColumnsRow1Cells[1]).toHaveTextContent(
-        'Filter 1 id: Filter1UpdatedKey Show 4 filter options',
+        'Filter 1 id: Filter1UpdatedKey View filter options',
       );
       expect(newColumnsRow1Cells[2]).toHaveTextContent('Minor');
     });

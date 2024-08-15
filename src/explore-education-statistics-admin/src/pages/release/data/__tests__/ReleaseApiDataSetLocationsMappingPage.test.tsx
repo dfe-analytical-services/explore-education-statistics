@@ -146,7 +146,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped
     expect(
       screen.getByRole('heading', {
-        name: 'Auto mapped locations (12) No action required',
+        name: 'Auto mapped locations (6) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -181,7 +181,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped englishDevolvedArea
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'English Devolved Areas (9)',
+        name: 'English Devolved Areas (3)',
       }),
     ).toBeInTheDocument();
     expect(
@@ -190,7 +190,74 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
           'auto-mapped-table-englishDevolvedArea',
         ),
       ).getAllByRole('row'),
-    ).toHaveLength(10);
+    ).toHaveLength(4);
+  });
+
+  test('renders the location codes in the mappings tables', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getLocationsMapping.mockResolvedValue(
+      testLocationsMapping,
+    );
+
+    renderPage();
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+    expect(screen.getByText('Map locations')).toBeInTheDocument();
+
+    // mappable LAs
+    const mappableRows = within(
+      screen.getByRole('table', {
+        name: 'Local Authorities 1 unmapped location 2 mapped locations',
+      }),
+    ).getAllByRole('row');
+    const mappableRow2Cells = within(mappableRows[2]).getAllByRole('cell');
+    expect(mappableRow2Cells[0]).toHaveTextContent('Location 3');
+    expect(mappableRow2Cells[0]).toHaveTextContent('location-3-code');
+    expect(mappableRow2Cells[1]).toHaveTextContent('Location 3 updated');
+    expect(mappableRow2Cells[1]).toHaveTextContent('location-3-code-updated');
+
+    // new locations
+    const newRows = within(
+      screen.getByTestId('new-items-table-localAuthority'),
+    ).getAllByRole('row');
+    const newRow1Cells = within(newRows[1]).getAllByRole('cell');
+    expect(newRow1Cells[1]).toHaveTextContent('Location 6');
+    expect(newRow1Cells[1]).toHaveTextContent('location-6-code');
+
+    // auto mapped
+    const autoMappedRows = within(
+      screen.getByTestId('auto-mapped-table-localAuthority'),
+    ).getAllByRole('row');
+    const autoMappedRow1Cells = within(autoMappedRows[1]).getAllByRole('cell');
+    expect(autoMappedRow1Cells[0]).toHaveTextContent('Location 1');
+    expect(autoMappedRow1Cells[0]).toHaveTextContent('location-1-code');
+    expect(autoMappedRow1Cells[1]).toHaveTextContent('Location 1');
+    expect(autoMappedRow1Cells[1]).toHaveTextContent('location-1-code');
+  });
+
+  test('sets the mappable type to major if the location code has changed', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getLocationsMapping.mockResolvedValue(
+      testLocationsMapping,
+    );
+
+    renderPage();
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+    expect(screen.getByText('Map locations')).toBeInTheDocument();
+
+    // mappable LAs
+    const mappableRows = within(
+      screen.getByRole('table', {
+        name: 'Local Authorities 1 unmapped location 2 mapped locations',
+      }),
+    ).getAllByRole('row');
+    const mappableRow2Cells = within(mappableRows[2]).getAllByRole('cell');
+    expect(mappableRow2Cells[0]).toHaveTextContent('Location 3');
+    expect(mappableRow2Cells[0]).toHaveTextContent('location-3-code');
+    expect(mappableRow2Cells[1]).toHaveTextContent('Location 3 updated');
+    expect(mappableRow2Cells[1]).toHaveTextContent('location-3-code-updated');
+    expect(mappableRow2Cells[2]).toHaveTextContent('Major');
   });
 
   test('renders the navigation correctly', async () => {
@@ -379,9 +446,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByText('No locations not found in the new data set.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('No locations.')).toBeInTheDocument();
 
     expect(
       screen.queryByTestId('mappable-localAuthority'),
@@ -794,7 +859,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       // auto mapped table
       expect(
         screen.getByRole('heading', {
-          name: 'Auto mapped locations (12) No action required',
+          name: 'Auto mapped locations (6) No action required',
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
@@ -885,7 +950,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
         // Remove location from auto mapped table
         expect(
-          screen.getByText('Auto mapped locations (11)'),
+          screen.getByText('Auto mapped locations (5)'),
         ).toBeInTheDocument();
       });
 
@@ -941,7 +1006,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       // auto mapped table
       expect(
         screen.getByRole('heading', {
-          name: 'Auto mapped locations (12) No action required',
+          name: 'Auto mapped locations (6) No action required',
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
@@ -1013,7 +1078,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         });
 
         expect(
-          screen.getByText('Auto mapped locations (11)'),
+          screen.getByText('Auto mapped locations (5)'),
         ).toBeInTheDocument();
       });
 
@@ -1070,7 +1135,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         within(unmappedLocation2).getAllByRole('cell');
       expect(within(unmappedLocation2Cells[0]).getByText('Location 3'));
       expect(within(unmappedLocation2Cells[1]).getByText('Location 3 updated'));
-      expect(within(unmappedLocation2Cells[2]).getByText('Minor'));
+      expect(within(unmappedLocation2Cells[2]).getByText('Major'));
 
       expect(
         apiDataSetVersionService.updateLocationsMapping,

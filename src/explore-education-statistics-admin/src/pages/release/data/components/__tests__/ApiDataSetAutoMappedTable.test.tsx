@@ -3,7 +3,6 @@ import { AutoMappedLocation } from '@admin/pages/release/data/utils/getApiDataSe
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { AutoMappedFilter } from '../../utils/getApiDataSetFilterMappings';
 
 describe('ApiDataSetAutoMappedTable', () => {
   const testLocations: AutoMappedLocation[] = [
@@ -196,189 +195,24 @@ describe('ApiDataSetAutoMappedTable', () => {
     },
   ];
 
-  const testFilterOptions: AutoMappedFilter[] = [
-    {
-      candidate: {
-        label: 'Filter Option 1',
-        key: 'FilterOption1Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption1Key',
-        publicId: 'FilterOption-1-public-id',
-        source: {
-          label: 'Filter Option 1',
-        },
-        sourceKey: 'FilterOption1Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 2',
-        key: 'FilterOption2Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption2Key',
-        publicId: 'FilterOption-2-public-id',
-        source: {
-          label: 'Filter Option 2',
-        },
-        sourceKey: 'FilterOption2Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 3',
-        key: 'FilterOption3Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption3Key',
-        publicId: 'FilterOption-3-public-id',
-        source: {
-          label: 'Filter Option 3',
-        },
-        sourceKey: 'FilterOption3Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 4',
-        key: 'FilterOption4Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption4Key',
-        publicId: 'FilterOption-4-public-id',
-        source: {
-          label: 'Filter Option 4',
-        },
-        sourceKey: 'FilterOption4Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 5',
-        key: 'FilterOption5Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption5Key',
-        publicId: 'FilterOption-5-public-id',
-        source: {
-          label: 'Filter Option 5',
-        },
-        sourceKey: 'FilterOption5Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 6',
-        key: 'FilterOption6Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption6Key',
-        publicId: 'FilterOption-6-public-id',
-        source: {
-          label: 'Filter Option 6',
-        },
-        sourceKey: 'FilterOption6Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 7',
-        key: 'FilterOption7Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption7Key',
-        publicId: 'FilterOption-7-public-id',
-        source: {
-          label: 'Filter Option 7',
-        },
-        sourceKey: 'FilterOption7Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 8',
-        key: 'FilterOption8Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption8Key',
-        publicId: 'FilterOption-8-public-id',
-        source: {
-          label: 'Filter Option 8',
-        },
-        sourceKey: 'FilterOption8Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 9',
-        key: 'FilterOption9Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption9Key',
-        publicId: 'FilterOption-9-public-id',
-        source: {
-          label: 'Filter Option 9',
-        },
-        sourceKey: 'FilterOption9Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 10',
-        key: 'FilterOption10Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption10Key',
-        publicId: 'FilterOption-10-public-id',
-        source: {
-          label: 'Filter Option 10',
-        },
-        sourceKey: 'FilterOption10Key',
-        type: 'AutoMapped',
-      },
-    },
-    {
-      candidate: {
-        label: 'Filter Option 11',
-        key: 'FilterOption11Key',
-      },
-      mapping: {
-        candidateKey: 'FilterOption11Key',
-        publicId: 'FilterOption-11-public-id',
-        source: {
-          label: 'Filter Option 11',
-        },
-        sourceKey: 'FilterOption11Key',
-        type: 'AutoMapped',
-      },
-    },
-  ];
-
-  test('renders correctly with locations', () => {
+  test('renders correctly', () => {
     render(
       <ApiDataSetAutoMappedTable
         autoMappedItems={testLocations}
         groupKey="localAuthority"
         groupLabel="Local Authorities"
-        label="location"
+        itemLabel="location"
         newItems={[]}
+        renderCandidate={candidate => candidate.label}
+        renderSource={source => source.label}
+        searchFilter={() => []}
         onUpdate={Promise.resolve}
       />,
     );
 
     // Search
     expect(
-      screen.getByLabelText('Search auto mapped Local Authorities'),
+      screen.getByLabelText(/Search auto mapped options/),
     ).toBeInTheDocument();
 
     // Table
@@ -388,9 +222,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 1
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('Location 1');
-    expect(row1Cells[0]).toHaveTextContent('location-1-code');
     expect(row1Cells[1]).toHaveTextContent('Location 1');
-    expect(row1Cells[1]).toHaveTextContent('location-1-code');
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
@@ -401,9 +233,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 2
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('Location 2');
-    expect(row2Cells[0]).toHaveTextContent('location-2-code');
     expect(row2Cells[1]).toHaveTextContent('Location 2');
-    expect(row2Cells[1]).toHaveTextContent('location-2-code');
     expect(row2Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row2Cells[3]).getByRole('button', {
@@ -414,9 +244,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 3
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('Location 3');
-    expect(row3Cells[0]).toHaveTextContent('location-3-code');
     expect(row3Cells[1]).toHaveTextContent('Location 3');
-    expect(row3Cells[1]).toHaveTextContent('location-3-code');
     expect(row3Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row3Cells[3]).getByRole('button', {
@@ -427,9 +255,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 4
     const row4Cells = within(rows[4]).getAllByRole('cell');
     expect(row4Cells[0]).toHaveTextContent('Location 4');
-    expect(row4Cells[0]).toHaveTextContent('location-4-code');
     expect(row4Cells[1]).toHaveTextContent('Location 4');
-    expect(row4Cells[1]).toHaveTextContent('location-4-code');
     expect(row4Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row4Cells[3]).getByRole('button', {
@@ -440,9 +266,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 5
     const row5Cells = within(rows[5]).getAllByRole('cell');
     expect(row5Cells[0]).toHaveTextContent('Location 5');
-    expect(row5Cells[0]).toHaveTextContent('location-5-code');
     expect(row5Cells[1]).toHaveTextContent('Location 5');
-    expect(row5Cells[1]).toHaveTextContent('location-5-code');
     expect(row5Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row5Cells[3]).getByRole('button', {
@@ -453,9 +277,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 6
     const row6Cells = within(rows[6]).getAllByRole('cell');
     expect(row6Cells[0]).toHaveTextContent('Location 6');
-    expect(row6Cells[0]).toHaveTextContent('location-6-code');
     expect(row6Cells[1]).toHaveTextContent('Location 6');
-    expect(row6Cells[1]).toHaveTextContent('location-6-code');
     expect(row6Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row6Cells[3]).getByRole('button', {
@@ -466,9 +288,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 7
     const row7Cells = within(rows[7]).getAllByRole('cell');
     expect(row7Cells[0]).toHaveTextContent('Location 7');
-    expect(row7Cells[0]).toHaveTextContent('location-7-code');
     expect(row7Cells[1]).toHaveTextContent('Location 7');
-    expect(row7Cells[1]).toHaveTextContent('location-7-code');
     expect(row7Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row7Cells[3]).getByRole('button', {
@@ -479,9 +299,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 8
     const row8Cells = within(rows[8]).getAllByRole('cell');
     expect(row8Cells[0]).toHaveTextContent('Location 8');
-    expect(row8Cells[0]).toHaveTextContent('location-8-code');
     expect(row8Cells[1]).toHaveTextContent('Location 8');
-    expect(row8Cells[1]).toHaveTextContent('location-8-code');
     expect(row8Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row8Cells[3]).getByRole('button', {
@@ -492,9 +310,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 9
     const row9Cells = within(rows[9]).getAllByRole('cell');
     expect(row9Cells[0]).toHaveTextContent('Location 9');
-    expect(row9Cells[0]).toHaveTextContent('location-9-code');
     expect(row9Cells[1]).toHaveTextContent('Location 9');
-    expect(row9Cells[1]).toHaveTextContent('location-9-code');
     expect(row9Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row9Cells[3]).getByRole('button', {
@@ -505,156 +321,11 @@ describe('ApiDataSetAutoMappedTable', () => {
     // Row 10
     const row10Cells = within(rows[10]).getAllByRole('cell');
     expect(row10Cells[0]).toHaveTextContent('Location 10');
-    expect(row10Cells[0]).toHaveTextContent('location-10-code');
     expect(row10Cells[1]).toHaveTextContent('Location 10');
-    expect(row10Cells[1]).toHaveTextContent('location-10-code');
     expect(row10Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row10Cells[3]).getByRole('button', {
         name: 'Edit mapping for Location 10',
-      }),
-    ).toBeInTheDocument();
-
-    // Pagination
-    const pagination = within(
-      screen.getByRole('navigation', { name: 'Pagination' }),
-    );
-    expect(
-      pagination.getByRole('button', { name: 'Page 1' }),
-    ).toBeInTheDocument();
-    expect(
-      pagination.getByRole('button', { name: 'Page 2' }),
-    ).toBeInTheDocument();
-
-    expect(
-      pagination.getByRole('button', { name: 'Next page' }),
-    ).toBeInTheDocument();
-  });
-
-  test('renders correctly with filter options', () => {
-    render(
-      <ApiDataSetAutoMappedTable
-        autoMappedItems={testFilterOptions}
-        groupKey="Filter1"
-        groupLabel="Filter 1"
-        label="location"
-        newItems={[]}
-        onUpdate={Promise.resolve}
-      />,
-    );
-
-    // Search
-    expect(
-      screen.getByLabelText('Search auto mapped Filter 1'),
-    ).toBeInTheDocument();
-
-    // Table
-    const rows = within(screen.getByRole('table')).getAllByRole('row');
-    expect(rows).toHaveLength(11);
-
-    // Row 1
-    const row1Cells = within(rows[1]).getAllByRole('cell');
-    expect(row1Cells[0]).toHaveTextContent('Filter Option 1');
-    expect(row1Cells[1]).toHaveTextContent('Filter Option 1');
-    expect(
-      within(row1Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 1',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 2
-    const row2Cells = within(rows[2]).getAllByRole('cell');
-    expect(row2Cells[0]).toHaveTextContent('Filter Option 2');
-    expect(row2Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row2Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 2',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 3
-    const row3Cells = within(rows[3]).getAllByRole('cell');
-    expect(row3Cells[0]).toHaveTextContent('Filter Option 3');
-    expect(row3Cells[1]).toHaveTextContent('Filter Option 3');
-    expect(row3Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row3Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 3',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 4
-    const row4Cells = within(rows[4]).getAllByRole('cell');
-    expect(row4Cells[0]).toHaveTextContent('Filter Option 4');
-    expect(row4Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row4Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 4',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 5
-    const row5Cells = within(rows[5]).getAllByRole('cell');
-    expect(row5Cells[0]).toHaveTextContent('Filter Option 5');
-    expect(row5Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row5Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 5',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 6
-    const row6Cells = within(rows[6]).getAllByRole('cell');
-    expect(row6Cells[0]).toHaveTextContent('Filter Option 6');
-    expect(row6Cells[1]).toHaveTextContent('Filter Option 6');
-    expect(row6Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row6Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 6',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 7
-    const row7Cells = within(rows[7]).getAllByRole('cell');
-    expect(row7Cells[0]).toHaveTextContent('Filter Option 7');
-    expect(row7Cells[1]).toHaveTextContent('Filter Option 7');
-    expect(row7Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row7Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 7',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 8
-    const row8Cells = within(rows[8]).getAllByRole('cell');
-    expect(row8Cells[0]).toHaveTextContent('Filter Option 8');
-    expect(row8Cells[1]).toHaveTextContent('Filter Option 8');
-    expect(row8Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row8Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 8',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 9
-    const row9Cells = within(rows[9]).getAllByRole('cell');
-    expect(row9Cells[0]).toHaveTextContent('Filter Option 9');
-    expect(row9Cells[1]).toHaveTextContent('Filter Option 9');
-    expect(row9Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row9Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 9',
-      }),
-    ).toBeInTheDocument();
-
-    // Row 10
-    const row10Cells = within(rows[10]).getAllByRole('cell');
-    expect(row10Cells[0]).toHaveTextContent('Filter Option 10');
-    expect(row10Cells[1]).toHaveTextContent('Filter Option 10');
-    expect(row10Cells[2]).toHaveTextContent('Minor');
-    expect(
-      within(row10Cells[3]).getByRole('button', {
-        name: 'Edit mapping for Filter Option 10',
       }),
     ).toBeInTheDocument();
 
@@ -680,8 +351,29 @@ describe('ApiDataSetAutoMappedTable', () => {
         autoMappedItems={testLocations}
         groupKey="localAuthority"
         groupLabel="Local Authorities"
-        label="location"
+        itemLabel="location"
         newItems={[]}
+        renderCandidate={candidate => candidate.label}
+        renderSource={source => source.label}
+        searchFilter={() => [
+          {
+            candidate: {
+              label: 'Location 3',
+              code: 'location-3-code',
+              key: 'Location3Key',
+            },
+            mapping: {
+              candidateKey: 'Location3Key',
+              publicId: 'location-3-public-id',
+              source: {
+                label: 'Location 3',
+                code: 'location-3-code',
+              },
+              sourceKey: 'Location3Key',
+              type: 'AutoMapped',
+            },
+          },
+        ]}
         onUpdate={Promise.resolve}
       />,
     );
@@ -695,7 +387,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     ).toBeInTheDocument();
 
     await user.type(
-      screen.getByLabelText('Search auto mapped Local Authorities'),
+      screen.getByLabelText(/Search auto mapped options/),
       'location 3',
     );
 
@@ -707,9 +399,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(rows).toHaveLength(2);
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('Location 3');
-    expect(row1Cells[0]).toHaveTextContent('location-3-code');
     expect(row1Cells[1]).toHaveTextContent('Location 3');
-    expect(row1Cells[1]).toHaveTextContent('location-3-code');
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
@@ -728,8 +418,11 @@ describe('ApiDataSetAutoMappedTable', () => {
         autoMappedItems={testLocations}
         groupKey="localAuthority"
         groupLabel="Local Authorities"
-        label="location"
+        itemLabel="location"
         newItems={[]}
+        renderCandidate={candidate => candidate.label}
+        renderSource={source => source.label}
+        searchFilter={() => []}
         onUpdate={Promise.resolve}
       />,
     );
@@ -752,9 +445,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(rows).toHaveLength(2);
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('Location 11');
-    expect(row1Cells[0]).toHaveTextContent('location-11-code');
     expect(row1Cells[1]).toHaveTextContent('Location 11');
-    expect(row1Cells[1]).toHaveTextContent('location-11-code');
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
@@ -776,7 +467,7 @@ describe('ApiDataSetAutoMappedTable', () => {
         autoMappedItems={testLocations}
         groupKey="localAuthority"
         groupLabel="Local Authorities"
-        label="location"
+        itemLabel="location"
         newItems={[]}
         pendingUpdates={[
           {
@@ -786,6 +477,9 @@ describe('ApiDataSetAutoMappedTable', () => {
             type: 'ManualMapped',
           },
         ]}
+        renderCandidate={candidate => candidate.label}
+        renderSource={source => source.label}
+        searchFilter={() => []}
         onUpdate={Promise.resolve}
       />,
     );

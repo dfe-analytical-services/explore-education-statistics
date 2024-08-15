@@ -47,7 +47,7 @@ describe('ApiDataSetNewFilterColumnsTable', () => {
     expect(row1Cells[1]).toHaveTextContent('Filter 1 id: Filter1Key');
     expect(
       within(row1Cells[1]).getByRole('button', {
-        name: 'Show 3 filter options',
+        name: 'View filter options',
       }),
     ).toBeInTheDocument();
     expect(row1Cells[2]).toHaveTextContent('Minor');
@@ -58,7 +58,7 @@ describe('ApiDataSetNewFilterColumnsTable', () => {
     expect(row2Cells[1]).toHaveTextContent('Filter 2 id: Filter2Key');
     expect(
       within(row2Cells[1]).getByRole('button', {
-        name: 'Show 2 filter options',
+        name: 'View filter options',
       }),
     ).toBeInTheDocument();
     expect(row2Cells[2]).toHaveTextContent('Minor');

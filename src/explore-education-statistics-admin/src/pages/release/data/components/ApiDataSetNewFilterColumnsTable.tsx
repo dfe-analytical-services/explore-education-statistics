@@ -1,8 +1,8 @@
 import { FilterCandidate } from '@admin/services/apiDataSetVersionService';
+import ApiDataSetMappableFilterColumnOptionsModal from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnOptionsModal';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
-import CollapsibleList from '@common/components/CollapsibleList';
 import React from 'react';
 
 interface Props {
@@ -35,20 +35,14 @@ export default function ApiDataSetNewFilterColumnsTable({
                 {column.label} <br />
                 id: {key} <br />
                 {column.options && Object.keys(column.options).length > 0 && (
-                  <CollapsibleList
-                    buttonClassName="govuk-!-margin-bottom-0"
-                    collapseAfter={0}
-                    id={`filter-column-options-${key}`}
-                    itemName="filter option"
-                    itemNamePlural="filter options"
-                    listClassName="govuk-!-margin-bottom-0 govuk-!-margin-top-2"
-                  >
-                    {Object.entries(column.options).map(
-                      ([optionKey, option]) => {
-                        return <li key={optionKey}>{option.label}</li>;
-                      },
+                  <ApiDataSetMappableFilterColumnOptionsModal
+                    id={key}
+                    label={column.label}
+                    modalLabel="New data set filter column"
+                    options={Object.values(column.options).map(
+                      option => option.label,
                     )}
-                  </CollapsibleList>
+                  />
                 )}
               </td>
               <td>

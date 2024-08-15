@@ -8,7 +8,7 @@ import testFiltersMapping, {
 } from '@admin/pages/release/data/__data__/testFiltersMapping';
 import {
   FilterCandidate,
-  FilterColumnMapping,
+  FilterMapping,
 } from '@admin/services/apiDataSetVersionService';
 
 describe('getApiDataSetFilterMappings', () => {
@@ -86,7 +86,7 @@ describe('getApiDataSetFilterMappings', () => {
   });
 
   test('returns the correct new locations grouped by filter column', () => {
-    const { newFilterOptionCandidates } =
+    const { newFilterOptions } =
       getApiDataSetFilterMappings(testFiltersMapping);
 
     const expectedFilter1: FilterCandidateWithKey[] = [
@@ -96,9 +96,9 @@ describe('getApiDataSetFilterMappings', () => {
       },
     ];
 
-    expect(newFilterOptionCandidates.Filter1Key).toEqual(expectedFilter1);
-    expect(newFilterOptionCandidates.Filter2Key).toBeUndefined();
-    expect(newFilterOptionCandidates.Filter3Key).toBeUndefined();
+    expect(newFilterOptions.Filter1Key).toEqual(expectedFilter1);
+    expect(newFilterOptions.Filter2Key).toBeUndefined();
+    expect(newFilterOptions.Filter3Key).toBeUndefined();
   });
 
   test('returns the correct auto mapped locations grouped by filter column', () => {
@@ -167,126 +167,6 @@ describe('getApiDataSetFilterMappings', () => {
           type: 'AutoMapped',
         },
       },
-      {
-        candidate: {
-          key: 'Filter3Option4Key',
-          label: 'Filter 3 Option 4',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option4Key',
-          publicId: 'filter-3-option-4-public-id',
-          source: {
-            label: 'Filter 3 Option 4',
-          },
-          sourceKey: 'Filter3Option4Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Filter3Option5Key',
-          label: 'Filter 3 Option 5',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option5Key',
-          publicId: 'filter-3-option-5-public-id',
-          source: {
-            label: 'Filter 3 Option 5',
-          },
-          sourceKey: 'Filter3Option5Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Filter3Option6Key',
-          label: 'Filter 3 Option 6',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option6Key',
-          publicId: 'filter-3-option-6-public-id',
-          source: {
-            label: 'Filter 3 Option 6',
-          },
-          sourceKey: 'Filter3Option6Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Filter3Option7Key',
-          label: 'Filter 3 Option 7',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option7Key',
-          publicId: 'filter-3-option-7-public-id',
-          source: {
-            label: 'Filter 3 Option 7',
-          },
-          sourceKey: 'Filter3Option7Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Filter3Option8Key',
-          label: 'Filter 3 Option 8',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option8Key',
-          publicId: 'filter-3-option-8-public-id',
-          source: {
-            label: 'Filter 3 Option 8',
-          },
-          sourceKey: 'Filter3Option8Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Filter3Option9Key',
-          label: 'Filter 3 Option 9',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option9Key',
-          publicId: 'filter-3-option-9-public-id',
-          source: {
-            label: 'Filter 3 Option 9',
-          },
-          sourceKey: 'Filter3Option9Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Filter3Option10Key',
-          label: 'Filter 3 Option 10',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option10Key',
-          publicId: 'filter-3-option-10-public-id',
-          source: {
-            label: 'Filter 3 Option 10',
-          },
-          sourceKey: 'Filter3Option10Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Filter3Option11Key',
-          label: 'Filter 3 Option 11',
-        },
-        mapping: {
-          candidateKey: 'Filter3Option11Key',
-          publicId: 'filter-3-option-11-public-id',
-          source: {
-            label: 'Filter 3 Option 11',
-          },
-          sourceKey: 'Filter3Option11Key',
-          type: 'AutoMapped',
-        },
-      },
     ];
 
     expect(autoMappedFilterOptions.Filter1Key).toEqual(expectedFilter1);
@@ -299,7 +179,7 @@ describe('getApiDataSetFilterMappings', () => {
       testFiltersMappingUnmappedColumns,
     );
 
-    const expectedFilter1: FilterColumnMapping = {
+    const expectedFilter1: FilterMapping = {
       optionMappings: {
         Filter1Option1Key: {
           publicId: 'filter-1-option-1-public-id',
@@ -334,7 +214,7 @@ describe('getApiDataSetFilterMappings', () => {
   });
 
   test('returns the correct new filter columns', () => {
-    const { newFilterColumnCandidates } = getApiDataSetFilterMappings(
+    const { newFilterColumns } = getApiDataSetFilterMappings(
       testFiltersMappingUnmappedColumns,
     );
 
@@ -356,10 +236,8 @@ describe('getApiDataSetFilterMappings', () => {
       },
     };
 
-    expect(newFilterColumnCandidates.Filter1UpdatedKey).toEqual(
-      expectedFilter1,
-    );
-    expect(newFilterColumnCandidates.Filter1Key).toBeUndefined();
-    expect(newFilterColumnCandidates.Filter2Key).toBeUndefined();
+    expect(newFilterColumns.Filter1UpdatedKey).toEqual(expectedFilter1);
+    expect(newFilterColumns.Filter1Key).toBeUndefined();
+    expect(newFilterColumns.Filter2Key).toBeUndefined();
   });
 });

@@ -82,7 +82,7 @@ describe('getUnmappedFilterErrors', () => {
     ],
   };
 
-  test('it returns the error messages', () => {
+  test('returns the error messages', () => {
     const expected: ErrorSummaryMessage[] = [
       {
         id: 'mappable-Filter1Key',
@@ -99,7 +99,7 @@ describe('getUnmappedFilterErrors', () => {
     ).toEqual(expected);
   });
 
-  test('it does not return error messages for unmapped filter columns', () => {
+  test('does not return error messages for unmapped filter columns', () => {
     const expected: ErrorSummaryMessage[] = [
       {
         id: 'mappable-Filter1Key',

@@ -12,7 +12,7 @@ export type ToggleHandler = (open: boolean, id: string) => void;
 export interface AccordionSectionProps {
   anchorLinkIdPrefix?: string;
   anchorLinkUrl?: (id: string) => string;
-  caption?: string;
+  caption?: ReactNode | string;
   children?:
     | ReactNode
     | ((props: {
@@ -154,7 +154,7 @@ function HeadingContent({
   caption,
   heading,
 }: {
-  caption?: string;
+  caption?: ReactNode | string;
   heading: string;
 }) {
   return (

@@ -3,7 +3,6 @@ import isComponentType from '@common/utils/type-guards/components/isComponentTyp
 import React, {
   Children,
   cloneElement,
-  FunctionComponentElement,
   ReactElement,
   useEffect,
   useState,
@@ -67,9 +66,7 @@ const Wizard = ({
 
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
-  ) as unknown as FunctionComponentElement<
-    WizardStepProps & InjectedWizardProps
-  >[];
+  ) as ReactElement<WizardStepProps & InjectedWizardProps>[];
 
   const lastStep = filteredChildren.length;
 

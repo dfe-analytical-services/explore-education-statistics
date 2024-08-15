@@ -1,7 +1,7 @@
 import {
+  FilterOptionSource,
   LocationCandidate,
   MappingType,
-  PendingMappingUpdate,
 } from '@admin/services/apiDataSetVersionService';
 import {
   FilterCandidateWithKey,
@@ -10,54 +10,70 @@ import {
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import {
   LocationCandidateWithKey,
+  LocationMappingWithKey,
   MappableLocation,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
+import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import Tag, { TagProps } from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import classNames from 'classnames';
-import omit from 'lodash/omit';
-
-// Fields to omit from mapping diff.
-const omittedDiffingFields: (keyof LocationCandidateWithKey)[] = [
-  'key',
-  'label',
-];
+import kebabCase from 'lodash/kebabCase';
 
 interface Props {
+  candidateHint?: (
+    candidate: FilterCandidateWithKey | LocationCandidateWithKey,
+  ) => string;
+  candidateIsMajorMapping?: (
+    candidate: LocationCandidateWithKey,
+    mapping: LocationMappingWithKey,
+  ) => boolean;
   groupKey: string;
   groupLabel: string;
-  label: string;
+  itemLabel: string;
+  itemPluralLabel: string;
   mappableItems: MappableFilter[] | MappableLocation[];
   newItems?: FilterCandidateWithKey[] | LocationCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
-  showColumnName?: boolean;
+  renderCandidate: (
+    candidate: LocationCandidateWithKey | FilterCandidateWithKey,
+  ) => ReactNode;
+  renderCaptionEnd?: ReactNode;
+  renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
+  renderSourceDetails?: (
+    source: FilterOptionSource | LocationCandidate,
+  ) => ReactNode;
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
 export default function ApiDataSetMappableTable({
+  candidateHint,
+  candidateIsMajorMapping,
   groupKey,
   groupLabel,
-  label,
+  itemLabel,
+  itemPluralLabel,
   mappableItems,
   newItems = [],
   pendingUpdates = [],
-  showColumnName = false,
+  renderCandidate,
+  renderCaptionEnd,
+  renderSource,
+  renderSourceDetails,
   onUpdate,
 }: Props) {
   const totalUnmapped = mappableItems.filter(
-    option => option.mapping.type === 'AutoNone',
+    item => item.mapping.type === 'AutoNone',
   ).length;
   const totalManuallyMapped = mappableItems.length - totalUnmapped;
 
   return (
     <table
-      className="dfe-table-vertical-align-middle dfe-has-row-highlights"
-      id={`mappable-${groupKey}`}
+      className="dfe-table--vertical-align-middle dfe-table--row-highlights"
+      id={`mappable-filter-options-${kebabCase(groupKey)}`}
       data-testid={`mappable-table-${groupKey}`}
     >
       <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
@@ -65,26 +81,20 @@ export default function ApiDataSetMappableTable({
         <TagGroup className="govuk-!-margin-left-2">
           {totalUnmapped > 0 && (
             <Tag colour="red">
-              {`${totalUnmapped} unmapped ${label}${
-                totalUnmapped > 1 ? 's' : ''
+              {`${totalUnmapped} unmapped ${
+                totalUnmapped > 1 ? itemPluralLabel : itemLabel
               } `}
             </Tag>
           )}
           {totalManuallyMapped > 0 && (
             <Tag colour="blue">
-              {`${totalManuallyMapped} mapped ${label}${
-                totalManuallyMapped > 1 ? 's' : ''
+              {`${totalManuallyMapped} mapped ${
+                totalManuallyMapped > 1 ? itemPluralLabel : itemLabel
               } `}
             </Tag>
           )}
         </TagGroup>
-        <br />
-        {showColumnName && (
-          <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
-            Column:{' '}
-            <span className="govuk-!-font-weight-regular">{groupKey}</span>
-          </div>
-        )}
+        {renderCaptionEnd}
       </caption>
       <thead>
         <tr>
@@ -100,12 +110,10 @@ export default function ApiDataSetMappableTable({
             update => update.sourceKey === mapping.sourceKey,
           );
 
-          const isMajorMapping = candidate
-            ? Object.entries(omit(mapping.source, omittedDiffingFields)).some(
-                ([key, value]) =>
-                  candidate[key as keyof LocationCandidate] !== value,
-              )
-            : true;
+          const isMajorMapping =
+            candidate && candidateIsMajorMapping
+              ? candidateIsMajorMapping(candidate, mapping)
+              : false;
 
           return (
             <tr
@@ -114,10 +122,7 @@ export default function ApiDataSetMappableTable({
                 'rowHighlight--alert': mapping.type === 'AutoNone',
               })}
             >
-              <td>
-                {mapping.source.label}
-                <ApiDataSetLocationCode location={mapping.source} />
-              </td>
+              <td>{renderSource(mapping.source)}</td>
               <td>
                 {!candidate ? (
                   <>
@@ -128,10 +133,7 @@ export default function ApiDataSetMappableTable({
                     )}
                   </>
                 ) : (
-                  <>
-                    {candidate.label}
-                    <ApiDataSetLocationCode location={candidate} />
-                  </>
+                  <>{renderCandidate(candidate)}</>
                 )}
               </td>
               <td>
@@ -146,7 +148,7 @@ export default function ApiDataSetMappableTable({
                     hideText
                     inline
                     size="sm"
-                    text={`Updating ${label} mapping`}
+                    text={`Updating mapping for ${mapping.source.label}`}
                   />
                 ) : (
                   <>
@@ -172,10 +174,12 @@ export default function ApiDataSetMappableTable({
 
                     <ApiDataSetMappingModal
                       candidate={candidate}
+                      candidateHint={candidateHint}
                       groupKey={groupKey}
-                      label={label}
+                      itemLabel={itemLabel}
                       mapping={mapping}
                       newItems={newItems}
+                      renderSourceDetails={renderSourceDetails}
                       onSubmit={onUpdate}
                     />
                   </>

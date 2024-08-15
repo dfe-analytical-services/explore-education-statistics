@@ -8,9 +8,10 @@ import {
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import styles from '@admin/pages/release/data/components/ApiDataSetMappingModal.module.scss';
 import ApiDataSetMappingForm from '@admin/pages/release/data/components/ApiDataSetMappingForm';
+import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import {
+  FilterOptionSource,
   LocationCandidate,
-  PendingMappingUpdate,
 } from '@admin/services/apiDataSetVersionService';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
@@ -18,23 +19,31 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
   candidate?: FilterCandidateWithKey | LocationCandidateWithKey;
+  candidateHint?: (
+    candidate: FilterCandidateWithKey | LocationCandidateWithKey,
+  ) => string;
   groupKey: string;
-  label: string;
+  itemLabel: string;
   mapping: FilterMappingWithKey | LocationMappingWithKey;
   newItems: FilterCandidateWithKey[] | LocationCandidateWithKey[];
+  renderSourceDetails?: (
+    source: FilterOptionSource | LocationCandidate,
+  ) => ReactNode;
   onSubmit: (update: PendingMappingUpdate) => Promise<void>;
 }
 
 export default function ApiDataSetMappingModal({
   candidate,
+  candidateHint,
   groupKey,
-  label,
+  itemLabel,
   mapping,
   newItems,
+  renderSourceDetails,
   onSubmit,
 }: Props) {
   const [isOpen, toggleOpen] = useToggle(false);
@@ -43,7 +52,7 @@ export default function ApiDataSetMappingModal({
     <Modal
       className={styles.modal}
       open={isOpen}
-      title={`Map existing ${label}`}
+      title={`Map existing ${itemLabel}`}
       triggerButton={
         <ButtonText className="govuk-!-margin-left-2" onClick={toggleOpen.on}>
           Edit
@@ -51,17 +60,18 @@ export default function ApiDataSetMappingModal({
         </ButtonText>
       }
     >
-      <h3>{`Current data set ${label}`}</h3>
+      <h3>{`Current data set ${itemLabel}`}</h3>
       <SummaryList>
         <SummaryListItem term="Label">{mapping.source.label}</SummaryListItem>
-        <LocationDetails location={mapping.source} />
+        {renderSourceDetails?.(mapping.source)}
 
         <SummaryListItem term="Identifier">{mapping.publicId}</SummaryListItem>
       </SummaryList>
       <ApiDataSetMappingForm
         candidate={candidate}
+        candidateHint={candidateHint}
         groupKey={groupKey}
-        label={label}
+        itemLabel={itemLabel}
         mapping={mapping}
         newItems={newItems}
         onCancel={toggleOpen.off}
@@ -71,18 +81,5 @@ export default function ApiDataSetMappingModal({
         }}
       />
     </Modal>
-  );
-}
-
-function LocationDetails({ location }: { location: LocationCandidate }) {
-  const { code, oldCode, urn, laEstab, ukprn } = location;
-  return (
-    <>
-      {code && <SummaryListItem term="Code">{code}</SummaryListItem>}
-      {oldCode && <SummaryListItem term="Old code">{oldCode}</SummaryListItem>}
-      {urn && <SummaryListItem term="URN">{urn}</SummaryListItem>}
-      {laEstab && <SummaryListItem term="LAESTAB">{laEstab}</SummaryListItem>}
-      {ukprn && <SummaryListItem term="UKPRN">{ukprn}</SummaryListItem>}
-    </>
   );
 }

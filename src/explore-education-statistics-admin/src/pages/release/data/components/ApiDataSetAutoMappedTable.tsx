@@ -7,8 +7,11 @@ import {
   FilterCandidateWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
-import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
-import { PendingMappingUpdate } from '@admin/services/apiDataSetVersionService';
+import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
+import {
+  FilterOptionSource,
+  LocationCandidate,
+} from '@admin/services/apiDataSetVersionService';
 import Tag from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import Pagination from '@common/components/Pagination';
@@ -18,29 +21,46 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import chunk from 'lodash/chunk';
-import compact from 'lodash/compact';
-import React, { useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 const itemsPerPage = 10;
 const formId = 'auto-mapped-search';
 
 interface Props {
   autoMappedItems: AutoMappedLocation[] | AutoMappedFilter[];
+  candidateHint?: (
+    candidate: FilterCandidateWithKey | LocationCandidateWithKey,
+  ) => string;
   groupKey: LocationLevelKey | string;
   groupLabel: string;
-  label: string;
+  itemLabel: string;
   newItems?: LocationCandidateWithKey[] | FilterCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
+  renderCandidate: (
+    candidate: LocationCandidateWithKey | FilterCandidateWithKey,
+  ) => ReactNode;
+  renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
+  renderSourceDetails?: (
+    source: FilterOptionSource | LocationCandidate,
+  ) => ReactNode;
+  searchFilter: (
+    searchTerm: string,
+  ) => AutoMappedLocation[] | AutoMappedFilter[];
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
 export default function ApiDataSetAutoMappedTable({
   autoMappedItems,
+  candidateHint,
   groupKey,
   groupLabel,
-  label,
+  itemLabel,
   newItems = [],
   pendingUpdates = [],
+  renderCandidate,
+  renderSource,
+  renderSourceDetails,
+  searchFilter,
   onUpdate,
 }: Props) {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -48,39 +68,17 @@ export default function ApiDataSetAutoMappedTable({
 
   const filteredItems = useMemo(() => {
     if (searchTerm) {
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
-      return autoMappedItems.filter(item => {
-        const { candidate, mapping } = item as AutoMappedLocation;
-
-        const searchFields = compact([
-          candidate.label,
-          candidate.code,
-          candidate.laEstab,
-          candidate.oldCode,
-          candidate.ukprn,
-          candidate.urn,
-          mapping.source.label,
-          mapping.source.code,
-          mapping.source.laEstab,
-          mapping.source.oldCode,
-          mapping.source.ukprn,
-          mapping.source.urn,
-        ]);
-
-        return searchFields.some(field => {
-          return field?.toLowerCase().includes(lowerCaseSearchTerm);
-        });
-      });
+      return searchFilter(searchTerm.toLowerCase());
     }
     return autoMappedItems;
-  }, [autoMappedItems, searchTerm]);
+  }, [autoMappedItems, searchFilter, searchTerm]);
 
   const filteredItemsChunks = useMemo(
     () => chunk(filteredItems, itemsPerPage),
     [filteredItems],
   );
 
-  const totalfilteredItems = filteredItems.length;
+  const totalFilteredItems = filteredItems.length;
   const totalPages = filteredItemsChunks.length;
 
   const [handleSearch] = useDebouncedCallback((term: string) => {
@@ -102,7 +100,12 @@ export default function ApiDataSetAutoMappedTable({
             {autoMappedItems.length > itemsPerPage && (
               <FormSearchBar
                 id={`${formId}-search`}
-                label={`Search auto mapped ${groupLabel}`}
+                label={
+                  <>
+                    Search auto mapped options
+                    <VisuallyHidden>{`for ${groupLabel}`}</VisuallyHidden>
+                  </>
+                }
                 labelSize="s"
                 min={0}
                 name="search"
@@ -113,8 +116,8 @@ export default function ApiDataSetAutoMappedTable({
           </form>
           <VisuallyHidden>
             <p aria-atomic aria-live="polite">
-              {`${totalfilteredItems} result${
-                totalfilteredItems > 1 ? 's' : ''
+              {`${totalFilteredItems} result${
+                totalFilteredItems > 1 ? 's' : ''
               }, showing page ${currentPage} of ${totalPages}`}
             </p>
           </VisuallyHidden>
@@ -122,11 +125,11 @@ export default function ApiDataSetAutoMappedTable({
       </div>
       {filteredItemsChunks.length > 0 ? (
         <table
-          className="dfe-table-vertical-align-middle"
+          className="dfe-table--vertical-align-middl"
           data-testid={`auto-mapped-table-${groupKey}`}
         >
           <caption className="govuk-visually-hidden">
-            {`Table showing all auto mapped ${groupLabel}s`}
+            {`Table showing auto mapped options for ${groupLabel}`}
           </caption>
           <thead>
             <tr>
@@ -144,14 +147,8 @@ export default function ApiDataSetAutoMappedTable({
                 );
                 return (
                   <tr key={`mapping-${mapping.sourceKey}`}>
-                    <td>
-                      {mapping.source.label}
-                      <ApiDataSetLocationCode location={mapping.source} />
-                    </td>
-                    <td>
-                      {candidate.label}
-                      <ApiDataSetLocationCode location={candidate} />
-                    </td>
+                    <td>{renderSource(mapping.source)}</td>
+                    <td>{renderCandidate(candidate)}</td>
                     <td>
                       <Tag colour="grey">Minor</Tag>
                     </td>
@@ -162,15 +159,17 @@ export default function ApiDataSetAutoMappedTable({
                           hideText
                           inline
                           size="sm"
-                          text={`Updating ${label} mapping`}
+                          text={`Updating auto-mapping for ${mapping.source.label}`}
                         />
                       ) : (
                         <ApiDataSetMappingModal
                           candidate={candidate}
+                          candidateHint={candidateHint}
                           groupKey={groupKey}
-                          label={label}
+                          itemLabel={itemLabel}
                           mapping={mapping}
                           newItems={newItems}
+                          renderSourceDetails={renderSourceDetails}
                           onSubmit={onUpdate}
                         />
                       )}

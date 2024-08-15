@@ -1,12 +1,12 @@
-import { FilterColumnMapping } from '@admin/services/apiDataSetVersionService';
+import { FilterMapping } from '@admin/services/apiDataSetVersionService';
+import ApiDataSetMappableFilterColumnOptionsModal from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnOptionsModal';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
-import CollapsibleList from '@common/components/CollapsibleList';
 import React from 'react';
 
 interface Props {
-  mappableFilterColumns: Dictionary<FilterColumnMapping>;
+  mappableFilterColumns: Dictionary<FilterMapping>;
 }
 
 export default function ApiDataSetMappableFilterColumnsTable({
@@ -14,7 +14,7 @@ export default function ApiDataSetMappableFilterColumnsTable({
 }: Props) {
   return (
     <table
-      className="dfe-has-row-highlights"
+      className="dfe-table--row-highlights"
       id="mappable-filter-columns-table"
       data-testid="mappable-filter-columns-table"
     >
@@ -38,20 +38,14 @@ export default function ApiDataSetMappableFilterColumnsTable({
                 {column.source.label} <br />
                 id: {key}
                 <br />{' '}
-                <CollapsibleList
-                  buttonClassName="govuk-!-margin-bottom-0"
-                  collapseAfter={0}
-                  id={`filter-column-options-${key}`}
-                  itemName="filter option"
-                  itemNamePlural="filter options"
-                  listClassName="govuk-!-margin-bottom-0 govuk-!-margin-top-2"
-                >
-                  {Object.entries(column.optionMappings).map(
-                    ([optionKey, mapping]) => {
-                      return <li key={optionKey}>{mapping.source.label}</li>;
-                    },
+                <ApiDataSetMappableFilterColumnOptionsModal
+                  id={key}
+                  label={column.source.label}
+                  modalLabel="Current data set filter column"
+                  options={Object.values(column.optionMappings).map(
+                    option => option.source.label,
                   )}
-                </CollapsibleList>
+                />
               </td>
               <td>No mapping available</td>
               <td>
