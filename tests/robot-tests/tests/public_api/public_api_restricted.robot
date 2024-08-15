@@ -101,6 +101,60 @@ Approve first release
 
 
 
+Navigate to admin and create an amendment
+    user navigates to admin dashboard    Bau1
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+Change the Release type
+    user waits until page contains link    Edit release summary
+    user clicks link    Edit release summary
+    user waits until page finishes loading
+    user waits until h2 is visible    Edit release summary
+    user checks page contains radio    Official statistics in development
+    user clicks radio    Official statistics in development
+    user clicks button    Update release summary
+    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
+    user verifies release summary    Financial year
+    ...    3000-01
+    ...    Official statistics in development
+
+Upload third subject
+    user waits until large data upload is completed
+    ...    ${SUBJECT_NAME_3}
+    ...    data-file-medium-test.csv
+    ...    data-file-medium-test.meta.csv
+
+Add data guidance to third subject
+    user clicks link    Data guidance
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME_3}    meta content
+    user clicks button    Save guidance
+
+Add API dataset in the amendment
+    user scrolls to the top of the page
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+
+    user clicks button    Create API data set
+    ${modal}=    user waits until modal is visible    Create a new API data set
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_3}
+    user clicks button    Confirm new API data set
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
+
+Add release note for new release amendment
+    user clicks link    Content
+    user adds a release note    Test release note two
+    ${date}    get current datetime    %-d %B %Y
+    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
+
+Validate checklist errors after failed API data set processing
+    user edits release status
+    user checks checklist errors contains
+    ...    1 issue that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    All public API data set processing must be completed
 
 
 *** Keywords ***
