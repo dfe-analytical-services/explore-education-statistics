@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataSet.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetId);
                 Assert.Equal(dataSet.Title, deleteDataFilePlan.DeleteApiDataSetVersionPlan.DataSetTitle);
                 Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Id);
-                Assert.Equal(dataSetVersion.Version, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Version);
+                Assert.Equal(dataSetVersion.PublicVersion, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Version);
                 Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.DeleteApiDataSetVersionPlan.Status);
                 Assert.False(deleteDataFilePlan.DeleteApiDataSetVersionPlan.Valid);
                 Assert.False(deleteDataFilePlan.Valid);

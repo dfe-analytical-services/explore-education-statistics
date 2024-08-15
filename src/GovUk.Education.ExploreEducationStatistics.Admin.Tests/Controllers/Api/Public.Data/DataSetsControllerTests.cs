@@ -148,13 +148,13 @@ public abstract class DataSetsControllerTests(
                 () => Assert.Equal(dataSet.Status, dataSetViewModel.Status),
                 () => Assert.Null(dataSetViewModel.SupersedingDataSetId),
                 () => Assert.Equal(draftDataSetVersion.Id, dataSetViewModel.DraftVersion.Id),
-                () => Assert.Equal(draftDataSetVersion.Version, dataSetViewModel.DraftVersion.Version),
+                () => Assert.Equal(draftDataSetVersion.PublicVersion, dataSetViewModel.DraftVersion.Version),
                 () => Assert.Equal(draftDataSetVersion.Status, dataSetViewModel.DraftVersion.Status),
                 () => Assert.Equal(draftDataSetVersion.VersionType, dataSetViewModel.DraftVersion.Type),
                 () => Assert.Equal(draftReleaseVersion.Id, dataSetViewModel.DraftVersion.ReleaseVersion.Id),
                 () => Assert.Equal(draftReleaseVersion.Title, dataSetViewModel.DraftVersion.ReleaseVersion.Title),
                 () => Assert.Equal(liveDataSetVersion.Id, dataSetViewModel.LatestLiveVersion.Id),
-                () => Assert.Equal(liveDataSetVersion.Version, dataSetViewModel.LatestLiveVersion.Version),
+                () => Assert.Equal(liveDataSetVersion.PublicVersion, dataSetViewModel.LatestLiveVersion.Version),
                 () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
                 () => Assert.Equal(liveReleaseVersion.Id, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Id),
@@ -668,7 +668,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(dataSet.Status, viewModel.Status);
 
             Assert.Equal(liveDataSetVersion.Id, viewModel.LatestLiveVersion!.Id);
-            Assert.Equal(liveDataSetVersion.Version, viewModel.LatestLiveVersion.Version);
+            Assert.Equal(liveDataSetVersion.PublicVersion, viewModel.LatestLiveVersion.Version);
             Assert.Equal(liveDataSetVersion.Status, viewModel.LatestLiveVersion.Status);
             Assert.Equal(liveDataSetVersion.VersionType, viewModel.LatestLiveVersion.Type);
             Assert.Equal(liveDataSetVersion.TotalResults, viewModel.LatestLiveVersion.TotalResults);
@@ -693,7 +693,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(liveReleaseVersion.Title, viewModel.LatestLiveVersion.ReleaseVersion.Title);
 
             Assert.Equal(draftDataSetVersion.Id, viewModel.DraftVersion!.Id);
-            Assert.Equal(draftDataSetVersion.Version, viewModel.DraftVersion.Version);
+            Assert.Equal(draftDataSetVersion.PublicVersion, viewModel.DraftVersion.Version);
             Assert.Equal(draftDataSetVersion.Status, viewModel.DraftVersion.Status);
             Assert.Equal(draftDataSetVersion.VersionType, viewModel.DraftVersion.Type);
             Assert.Equal(draftDataSetVersion.TotalResults, viewModel.DraftVersion.TotalResults);
@@ -850,7 +850,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(new[] { releaseVersion.ReleaseId }, viewModel.PreviousReleaseIds);
 
             Assert.Equal(dataSetVersion.Id, viewModel.LatestLiveVersion!.Id);
-            Assert.Equal(dataSetVersion.Version, viewModel.LatestLiveVersion.Version);
+            Assert.Equal(dataSetVersion.PublicVersion, viewModel.LatestLiveVersion.Version);
             Assert.Equal(dataSetVersion.Status, viewModel.LatestLiveVersion.Status);
             Assert.Equal(dataSetVersion.VersionType, viewModel.LatestLiveVersion.Type);
             Assert.Equal(releaseFile.File.DataSetFileId, viewModel.LatestLiveVersion!.File.Id);
@@ -914,7 +914,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(new[] { releaseVersion.ReleaseId }, viewModel.PreviousReleaseIds);
 
             Assert.Equal(dataSetVersion.Id, viewModel.DraftVersion!.Id);
-            Assert.Equal(dataSetVersion.Version, viewModel.DraftVersion.Version);
+            Assert.Equal(dataSetVersion.PublicVersion, viewModel.DraftVersion.Version);
             Assert.Equal(dataSetVersion.Status, viewModel.DraftVersion.Status);
             Assert.Equal(dataSetVersion.VersionType, viewModel.DraftVersion.Type);
             Assert.Equal(releaseFile.File.DataSetFileId, viewModel.DraftVersion!.File.Id);
@@ -1131,7 +1131,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(dataSet.Summary, content.Summary);
             Assert.Null(dataSet.LatestLiveVersion);
             Assert.Equal(dataSetVersion!.Id, content.DraftVersion!.Id);
-            Assert.Equal(dataSetVersion.Version, content.DraftVersion!.Version);
+            Assert.Equal(dataSetVersion.PublicVersion, content.DraftVersion!.Version);
             Assert.Equal(dataSetVersion.Status, content.DraftVersion!.Status);
             Assert.Equal(dataSetVersion.VersionType, content.DraftVersion!.Type);
             Assert.Equal(releaseFile.File.DataSetFileId, content.DraftVersion!.File.Id);

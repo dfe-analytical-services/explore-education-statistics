@@ -53,7 +53,7 @@ public abstract class DataSetVersionTests
                 .DefaultDataSetVersion()
                 .WithVersionNumber(majorVersion, minorVersion);
 
-            Assert.Equal(formattedVersion, dataSetVersion.Version);
+            Assert.Equal(formattedVersion, dataSetVersion.PublicVersion);
         }
     }
 }

@@ -118,7 +118,7 @@ public abstract class DataSetVersionsControllerTests(
 
             var liveVersion = Assert.Single(viewModel.Results);
             Assert.Equal(currentDataSetVersion.Id, liveVersion.Id);
-            Assert.Equal(currentDataSetVersion.Version, liveVersion.Version);
+            Assert.Equal(currentDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(currentDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(currentDataSetVersion.VersionType, liveVersion.Type);
             Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
@@ -299,7 +299,7 @@ public abstract class DataSetVersionsControllerTests(
 
             var liveVersion = Assert.Single(viewModel.Results);
             Assert.Equal(targetDataSetVersion.Id, liveVersion.Id);
-            Assert.Equal(targetDataSetVersion.Version, liveVersion.Version);
+            Assert.Equal(targetDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(targetDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(targetDataSetVersion.VersionType, liveVersion.Type);
             Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
@@ -421,7 +421,7 @@ public abstract class DataSetVersionsControllerTests(
 
             Assert.NotNull(nextVersion);
             Assert.Equal(viewModel.Id, nextVersion.Id);
-            Assert.Equal(viewModel.Version, nextVersion.Version);
+            Assert.Equal(viewModel.Version, nextVersion.PublicVersion);
             Assert.Equal(viewModel.Status, nextVersion.Status);
             Assert.Equal(viewModel.Type, nextVersion.VersionType);
         }
@@ -538,7 +538,7 @@ public abstract class DataSetVersionsControllerTests(
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
 
             Assert.Equal(viewModel.Id, nextDataSetVersion.Id);
-            Assert.Equal(viewModel.Version, nextDataSetVersion.Version);
+            Assert.Equal(viewModel.Version, nextDataSetVersion.PublicVersion);
             Assert.Equal(viewModel.Status, nextDataSetVersion.Status);
             Assert.Equal(viewModel.Type, nextDataSetVersion.VersionType);
         }
@@ -796,7 +796,7 @@ public abstract class DataSetVersionsControllerTests(
             publicDataApiClient
                 .Setup(c => c.GetDataSetVersionChanges(
                     dataSetVersion.DataSetId,
-                    dataSetVersion.Version,
+                    dataSetVersion.PublicVersion,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
                     new HttpResponseMessage(HttpStatusCode.OK)
@@ -858,7 +858,7 @@ public abstract class DataSetVersionsControllerTests(
             publicDataApiClient
                 .Setup(c => c.GetDataSetVersionChanges(
                     dataSetVersion.DataSetId,
-                    dataSetVersion.Version,
+                    dataSetVersion.PublicVersion,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ValidationUtils.ValidationResult());
 
@@ -899,7 +899,7 @@ public abstract class DataSetVersionsControllerTests(
             publicDataApiClient
                 .Setup(c => c.GetDataSetVersionChanges(
                     dataSetVersion.DataSetId,
-                    dataSetVersion.Version,
+                    dataSetVersion.PublicVersion,
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException());
 
@@ -1004,7 +1004,7 @@ public abstract class DataSetVersionsControllerTests(
 
             Assert.NotNull(viewModel);
             Assert.Equal(nextDataSetVersion.Id, viewModel.Id);
-            Assert.Equal(nextDataSetVersion.Version, viewModel.Version);
+            Assert.Equal(nextDataSetVersion.PublicVersion, viewModel.Version);
             Assert.Equal(nextDataSetVersion.Status, viewModel.Status);
             Assert.Equal(nextDataSetVersion.VersionType, viewModel.Type);
             Assert.Equal(releaseFile.File.DataSetFileId!.Value, viewModel.File.Id);

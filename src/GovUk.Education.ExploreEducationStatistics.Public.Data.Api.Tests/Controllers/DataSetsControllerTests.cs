@@ -53,7 +53,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSet.Summary, content.Summary);
             Assert.Equal(dataSet.Status, content.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion.Version, content.LatestVersion.Version);
+            Assert.Equal(dataSetVersion.PublicVersion, content.LatestVersion.Version);
             Assert.Equal(
                 dataSetVersion.Published.TruncateNanoseconds(),
                 content.LatestVersion.Published
@@ -521,7 +521,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-                var response = await GetDataSetMeta(dataSet2.Id, dataSetVersion.Version);
+                var response = await GetDataSetMeta(dataSet2.Id, dataSetVersion.PublicVersion);
 
                 response.AssertNotFound();
             }
