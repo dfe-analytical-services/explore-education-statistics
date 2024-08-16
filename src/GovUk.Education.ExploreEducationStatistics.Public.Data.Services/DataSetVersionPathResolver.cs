@@ -34,7 +34,7 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
     public string BasePath() => _basePath;
 
     public string DirectoryPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.DataSetId.ToString(), $"v{dataSetVersion.PublicVersion}");
+        => Path.Combine(_basePath, dataSetVersion.DataSetId.ToString(), $"v{dataSetVersion.SemVersion()}");
 
     private string GetBasePath()
     {

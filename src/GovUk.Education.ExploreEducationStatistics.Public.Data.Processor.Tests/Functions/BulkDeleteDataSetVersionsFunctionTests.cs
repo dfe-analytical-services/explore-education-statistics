@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -13,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
@@ -196,7 +194,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
 
             var otherDataSetFolderEntries = Directory.GetFileSystemEntries(otherDataSetFolder!.FullName);
             var otherDataSetVersionFolder = Assert.Single(otherDataSetFolderEntries,
-                entry => new DirectoryInfo(entry).Name == $"v{otherDataSetVersion.PublicVersion}");
+                entry => new DirectoryInfo(entry).Name == $"v{otherDataSetVersion.SemVersion()}");
 
             var otherDataSetVersionFolderEntries = Directory.GetFileSystemEntries(otherDataSetVersionFolder);
             Assert.Single(otherDataSetVersionFolderEntries, entry => new System.IO.FileInfo(entry).Name == "version1.txt");
@@ -358,7 +356,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             {
                 var dataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
                 Directory.CreateDirectory(dataSetVersionDirectory);
-                await System.IO.File.Create(Path.Combine(dataSetVersionDirectory, $"{dataSetVersion.PublicVersion}.txt")).DisposeAsync();
+                await System.IO.File.Create(Path.Combine(dataSetVersionDirectory, $"{dataSetVersion.SemVersion()}.txt")).DisposeAsync();
             }
 
             var response = await BulkDeleteDataSetVersions(release2Version2.Id);
@@ -381,14 +379,14 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             Assert.True(Directory.Exists(release1Version1DataSetVersionDirectory));
 
             var release1Version1DataSetVersionDirectoryEntries = Directory.GetFileSystemEntries(release1Version1DataSetVersionDirectory);
-            Assert.Single(release1Version1DataSetVersionDirectoryEntries, entry => new System.IO.FileInfo(entry).Name == $"{release1Version1DataSetVersion.PublicVersion}.txt");
+            Assert.Single(release1Version1DataSetVersionDirectoryEntries, entry => new System.IO.FileInfo(entry).Name == $"{release1Version1DataSetVersion.SemVersion()}.txt");
 
             // Assert that the parquet folder, and its contents, for the API Data Set Version linked to Release 2 Version 1, has NOT been deleted
             var release2Version1DataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(release2Version1DataSetVersion);
             Assert.True(Directory.Exists(release2Version1DataSetVersionDirectory));
 
             var release2Version1DataSetVersionDirectoryEntries = Directory.GetFileSystemEntries(release2Version1DataSetVersionDirectory);
-            Assert.Single(release2Version1DataSetVersionDirectoryEntries, entry => new System.IO.FileInfo(entry).Name == $"{release2Version1DataSetVersion.PublicVersion}.txt");
+            Assert.Single(release2Version1DataSetVersionDirectoryEntries, entry => new System.IO.FileInfo(entry).Name == $"{release2Version1DataSetVersion.SemVersion()}.txt");
 
             // Assert that the TARGET API Data Set, linked to the release version being deleted, has NOT been deleted
             Assert.NotNull(await publicDataDbContext.DataSets.SingleOrDefaultAsync(ds => ds.Id == release1Version1DataSet.Id));
