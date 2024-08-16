@@ -6,7 +6,7 @@ import getApiDataSetLocationMappings, {
 import testLocationsMapping from '@admin/pages/release/data/__data__/testLocationsMapping';
 
 describe('getApiDataSetLocationMappings', () => {
-  test('returns the correct unmapped and manually mapped locations grouped by level', () => {
+  test('returns the correct mappable locations grouped by level', () => {
     const { mappableLocations } =
       getApiDataSetLocationMappings(testLocationsMapping);
 
@@ -25,7 +25,7 @@ describe('getApiDataSetLocationMappings', () => {
       {
         candidate: {
           key: 'Location3UpdatedKey',
-          code: 'location-3-code',
+          code: 'location-3-code-updated',
           label: 'Location 3 updated',
         },
         mapping: {
@@ -106,7 +106,7 @@ describe('getApiDataSetLocationMappings', () => {
   });
 
   test('returns the correct new locations grouped by level', () => {
-    const { newLocationCandidates } =
+    const { newLocations } =
       getApiDataSetLocationMappings(testLocationsMapping);
 
     const expectedLocalAuthority: LocationCandidateWithKey[] = [
@@ -135,11 +135,9 @@ describe('getApiDataSetLocationMappings', () => {
       },
     ];
 
-    expect(newLocationCandidates.localAuthority).toEqual(
-      expectedLocalAuthority,
-    );
-    expect(newLocationCandidates.region).toEqual(expectedRegion);
-    expect(newLocationCandidates.englishDevolvedArea).toBeUndefined();
+    expect(newLocations.localAuthority).toEqual(expectedLocalAuthority);
+    expect(newLocations.region).toEqual(expectedRegion);
+    expect(newLocations.englishDevolvedArea).toBeUndefined();
   });
 
   test('returns the correct auto mapped locations grouped by level', () => {
@@ -252,108 +250,6 @@ describe('getApiDataSetLocationMappings', () => {
             code: 'location-15-code',
           },
           sourceKey: 'Location15Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Location16Key',
-          code: 'location-16-code',
-          label: 'Location 16',
-        },
-        mapping: {
-          candidateKey: 'Location16Key',
-          publicId: 'location-16-public-id',
-          source: {
-            label: 'Location 16',
-            code: 'location-16-code',
-          },
-          sourceKey: 'Location16Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Location17Key',
-          code: 'location-17-code',
-          label: 'Location 17',
-        },
-        mapping: {
-          candidateKey: 'Location17Key',
-          publicId: 'location-17-public-id',
-          source: {
-            label: 'Location 17',
-            code: 'location-17-code',
-          },
-          sourceKey: 'Location17Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Location18Key',
-          code: 'location-18-code',
-          label: 'Location 18',
-        },
-        mapping: {
-          candidateKey: 'Location18Key',
-          publicId: 'location-18-public-id',
-          source: {
-            label: 'Location 18',
-            code: 'location-18-code',
-          },
-          sourceKey: 'Location18Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Location19Key',
-          code: 'location-19-code',
-          label: 'Location 19',
-        },
-        mapping: {
-          candidateKey: 'Location19Key',
-          publicId: 'location-19-public-id',
-          source: {
-            label: 'Location 19',
-            code: 'location-19-code',
-          },
-          sourceKey: 'Location19Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Location20Key',
-          code: 'location-20-code',
-          label: 'Location 20',
-        },
-        mapping: {
-          candidateKey: 'Location20Key',
-          publicId: 'location-20-public-id',
-          source: {
-            label: 'Location 20',
-            code: 'location-20-code',
-          },
-          sourceKey: 'Location20Key',
-          type: 'AutoMapped',
-        },
-      },
-      {
-        candidate: {
-          key: 'Location21Key',
-          code: 'location-21-code',
-          label: 'Location 21',
-        },
-        mapping: {
-          candidateKey: 'Location21Key',
-          publicId: 'location-21-public-id',
-          source: {
-            label: 'Location 21',
-            code: 'location-21-code',
-          },
-          sourceKey: 'Location21Key',
           type: 'AutoMapped',
         },
       },

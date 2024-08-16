@@ -1,77 +1,100 @@
 import {
-  MappableLocation,
-  LocationCandidateWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import ApiDataSetLocationMappingModal from '@admin/pages/release/data/components/ApiDataSetLocationMappingModal';
-import styles from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage.module.scss';
-import { PendingLocationMappingUpdate } from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
-import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
-import {
+  FilterOptionSource,
   LocationCandidate,
   MappingType,
 } from '@admin/services/apiDataSetVersionService';
+import {
+  FilterOptionCandidateWithKey,
+  MappableFilterOption,
+} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
+import {
+  LocationCandidateWithKey,
+  LocationMappingWithKey,
+  MappableLocation,
+} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import Tag, { TagProps } from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import locationLevelsMap, {
-  LocationLevelKey,
-} from '@common/utils/locationLevelsMap';
-import omit from 'lodash/omit';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import classNames from 'classnames';
-
-// Fields to omit from location mapping diff.
-const omittedDiffingFields: (keyof LocationCandidateWithKey)[] = [
-  'key',
-  'label',
-];
+import kebabCase from 'lodash/kebabCase';
 
 interface Props {
-  level: LocationLevelKey;
-  locations: MappableLocation[];
-  newLocations?: LocationCandidateWithKey[];
-  pendingUpdates?: PendingLocationMappingUpdate[];
-  onUpdate: (update: PendingLocationMappingUpdate) => Promise<void>;
+  candidateHint?: (
+    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
+  ) => string;
+  candidateIsMajorMapping?: (
+    candidate: LocationCandidateWithKey,
+    mapping: LocationMappingWithKey,
+  ) => boolean;
+  groupKey: string;
+  groupLabel: string;
+  itemLabel: string;
+  itemPluralLabel: string;
+  mappableItems: MappableFilterOption[] | MappableLocation[];
+  newItems?: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
+  pendingUpdates?: PendingMappingUpdate[];
+  renderCandidate: (
+    candidate: LocationCandidateWithKey | FilterOptionCandidateWithKey,
+  ) => ReactNode;
+  renderCaptionEnd?: ReactNode;
+  renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
+  renderSourceDetails?: (
+    source: FilterOptionSource | LocationCandidate,
+  ) => ReactNode;
+  onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
-export default function ApiDataSetMappableLocationsTable({
-  level,
-  locations,
-  newLocations = [],
+export default function ApiDataSetMappableTable({
+  candidateHint,
+  candidateIsMajorMapping,
+  groupKey,
+  groupLabel,
+  itemLabel,
+  itemPluralLabel,
+  mappableItems,
+  newItems = [],
   pendingUpdates = [],
+  renderCandidate,
+  renderCaptionEnd,
+  renderSource,
+  renderSourceDetails,
   onUpdate,
 }: Props) {
-  const totalUnmapped = locations.filter(
-    location => location.mapping.type === 'AutoNone',
+  const totalUnmapped = mappableItems.filter(
+    item => item.mapping.type === 'AutoNone',
   ).length;
-  const totalManuallyMapped = locations.length - totalUnmapped;
+  const totalManuallyMapped = mappableItems.length - totalUnmapped;
 
   return (
     <table
-      className={`${styles.table} hasRowHighlights`}
-      id={`mappable-${level}`}
-      data-testid={`mappable-table-${level}`}
+      className="dfe-table--vertical-align-middle dfe-table--row-highlights"
+      id={`mappable-filter-options-${kebabCase(groupKey)}`}
+      data-testid={`mappable-table-${groupKey}`}
     >
       <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
-        {locationLevelsMap[level]?.plural ?? level}{' '}
+        {groupLabel}{' '}
         <TagGroup className="govuk-!-margin-left-2">
           {totalUnmapped > 0 && (
             <Tag colour="red">
-              {`${totalUnmapped} unmapped location${
-                totalUnmapped > 1 ? 's' : ''
+              {`${totalUnmapped} unmapped ${
+                totalUnmapped > 1 ? itemPluralLabel : itemLabel
               } `}
             </Tag>
           )}
           {totalManuallyMapped > 0 && (
             <Tag colour="blue">
-              {`${totalManuallyMapped} mapped location${
-                totalManuallyMapped > 1 ? 's' : ''
+              {`${totalManuallyMapped} mapped ${
+                totalManuallyMapped > 1 ? itemPluralLabel : itemLabel
               } `}
             </Tag>
           )}
         </TagGroup>
+        {renderCaptionEnd}
       </caption>
       <thead>
         <tr>
@@ -82,17 +105,15 @@ export default function ApiDataSetMappableLocationsTable({
         </tr>
       </thead>
       <tbody>
-        {Object.values(locations).map(({ candidate, mapping }) => {
+        {Object.values(mappableItems).map(({ candidate, mapping }) => {
           const isPendingUpdate = pendingUpdates.some(
             update => update.sourceKey === mapping.sourceKey,
           );
 
-          const isMajorMapping = candidate
-            ? Object.entries(omit(mapping.source, omittedDiffingFields)).some(
-                ([key, value]) =>
-                  candidate[key as keyof LocationCandidate] !== value,
-              )
-            : true;
+          const isMajorMapping =
+            candidate && candidateIsMajorMapping
+              ? candidateIsMajorMapping(candidate, mapping)
+              : false;
 
           return (
             <tr
@@ -101,13 +122,7 @@ export default function ApiDataSetMappableLocationsTable({
                 'rowHighlight--alert': mapping.type === 'AutoNone',
               })}
             >
-              <td>
-                {mapping.source.label}
-                <br />
-                <span className={styles.code}>
-                  {getApiDataSetLocationCodes(mapping.source)}
-                </span>
-              </td>
+              <td>{renderSource(mapping.source)}</td>
               <td>
                 {!candidate ? (
                   <>
@@ -118,13 +133,7 @@ export default function ApiDataSetMappableLocationsTable({
                     )}
                   </>
                 ) : (
-                  <>
-                    {candidate.label}
-                    <br />
-                    <span className={styles.code}>
-                      {getApiDataSetLocationCodes(candidate)}
-                    </span>
-                  </>
+                  <>{renderCandidate(candidate)}</>
                 )}
               </td>
               <td>
@@ -139,7 +148,7 @@ export default function ApiDataSetMappableLocationsTable({
                     hideText
                     inline
                     size="sm"
-                    text="Updating location mapping"
+                    text={`Updating mapping for ${mapping.source.label}`}
                   />
                 ) : (
                   <>
@@ -147,7 +156,7 @@ export default function ApiDataSetMappableLocationsTable({
                       <ButtonText
                         onClick={async () => {
                           await onUpdate({
-                            level,
+                            groupKey,
                             previousCandidate: candidate,
                             previousMapping: mapping,
                             sourceKey: mapping.sourceKey,
@@ -162,11 +171,15 @@ export default function ApiDataSetMappableLocationsTable({
                         </VisuallyHidden>
                       </ButtonText>
                     )}
-                    <ApiDataSetLocationMappingModal
+
+                    <ApiDataSetMappingModal
                       candidate={candidate}
-                      level={level}
+                      candidateHint={candidateHint}
+                      groupKey={groupKey}
+                      itemLabel={itemLabel}
                       mapping={mapping}
-                      newLocations={newLocations}
+                      newItems={newItems}
+                      renderSourceDetails={renderSourceDetails}
                       onSubmit={onUpdate}
                     />
                   </>
@@ -190,7 +203,6 @@ function getUpdateTagText(type: MappingType, isMajorMapping: boolean): string {
       return 'N/A';
   }
 }
-
 function getUpdateTagColour(
   type: MappingType,
   isMajorMapping: boolean,

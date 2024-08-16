@@ -3,7 +3,7 @@ import { MappableLocation } from '@admin/pages/release/data/utils/getApiDataSetL
 import { Dictionary } from '@common/types';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 
-describe('getUnmappedLocationTotalsByLevel', () => {
+describe('getUnmappedLocationErrors', () => {
   const testMappableLocations: Dictionary<MappableLocation[]> = {
     localAuthority: [
       {
@@ -103,7 +103,7 @@ describe('getUnmappedLocationTotalsByLevel', () => {
     ],
   };
 
-  test('it returns the error messages', () => {
+  test('returns the error messages', () => {
     const expected: ErrorSummaryMessage[] = [
       {
         id: 'mappable-localAuthority',

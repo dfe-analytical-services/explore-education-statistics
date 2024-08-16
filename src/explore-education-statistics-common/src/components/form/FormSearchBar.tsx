@@ -5,13 +5,13 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import styles from '@common/components/form/FormSearchBar.module.scss';
 import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 interface Props {
   className?: string;
   hideLabel?: boolean;
   id: string;
-  label: string;
+  label: ReactNode | string;
   labelSize?: 'xl' | 'l' | 'm' | 's';
   min?: number;
   name: string;

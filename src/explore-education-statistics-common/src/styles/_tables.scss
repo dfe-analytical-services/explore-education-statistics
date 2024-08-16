@@ -71,7 +71,7 @@ table,
   }
 }
 
-.hasRowHighlights {
+.dfe-table--row-highlights {
   td:first-child {
     border-left: govuk-spacing(1) solid transparent;
     padding-left: govuk-spacing(1);
@@ -79,5 +79,11 @@ table,
 
   .rowHighlight--alert td:first-child {
     border-left-color: govuk-colour('red');
+  }
+}
+
+.dfe-table--vertical-align-middle {
+  td {
+    vertical-align: middle;
   }
 }

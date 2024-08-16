@@ -1,4 +1,4 @@
-import ApiDataSetLocationMappingModal from '@admin/pages/release/data/components/ApiDataSetLocationMappingModal';
+import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import {
   LocationMappingWithKey,
   LocationCandidateWithKey,
@@ -6,7 +6,7 @@ import {
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 
-describe('ApiDataSetLocationMappingModal', () => {
+describe('ApiDataSetMappingModal', () => {
   const testMapping: LocationMappingWithKey = {
     publicId: 'location-1-public-id',
     sourceKey: 'Location1Key',
@@ -34,10 +34,11 @@ describe('ApiDataSetLocationMappingModal', () => {
 
   test('clicking the edit button shows the modal', async () => {
     const { user } = render(
-      <ApiDataSetLocationMappingModal
-        level="region"
+      <ApiDataSetMappingModal
+        groupKey="region"
+        itemLabel="location"
         mapping={testMapping}
-        newLocations={testNewLocations}
+        newItems={testNewLocations}
         onSubmit={Promise.resolve}
       />,
     );
@@ -53,7 +54,6 @@ describe('ApiDataSetLocationMappingModal', () => {
       modal.getByRole('heading', { name: 'Current data set location' }),
     ).toBeInTheDocument();
     expect(modal.getByTestId('Label')).toHaveTextContent('Location 1');
-    expect(modal.getByTestId('Code')).toHaveTextContent('location-1-code');
     expect(modal.getByTestId('Identifier')).toHaveTextContent(
       'location-1-public-id',
     );
@@ -65,10 +65,11 @@ describe('ApiDataSetLocationMappingModal', () => {
   test('submitting the form calls `onSubmit` and closes the modal', async () => {
     const handleSubmit = jest.fn();
     const { user } = render(
-      <ApiDataSetLocationMappingModal
-        level="region"
+      <ApiDataSetMappingModal
+        groupKey="region"
+        itemLabel="location"
         mapping={testMapping}
-        newLocations={testNewLocations}
+        newItems={testNewLocations}
         onSubmit={handleSubmit}
       />,
     );
@@ -84,9 +85,10 @@ describe('ApiDataSetLocationMappingModal', () => {
     );
 
     await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
+
     expect(handleSubmit).toHaveBeenCalledWith({
       candidateKey: 'Location2Key',
-      level: 'region',
+      groupKey: 'region',
       previousCandidate: undefined,
       previousMapping: {
         publicId: 'location-1-public-id',

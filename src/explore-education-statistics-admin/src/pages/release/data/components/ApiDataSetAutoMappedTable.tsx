@@ -2,10 +2,16 @@ import {
   AutoMappedLocation,
   LocationCandidateWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import styles from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage.module.scss';
-import { PendingLocationMappingUpdate } from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
-import ApiDataSetLocationMappingModal from '@admin/pages/release/data/components/ApiDataSetLocationMappingModal';
-import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
+import {
+  AutoMappedFilterOption,
+  FilterOptionCandidateWithKey,
+} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
+import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
+import {
+  FilterOptionSource,
+  LocationCandidate,
+} from '@admin/services/apiDataSetVersionService';
 import Tag from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import Pagination from '@common/components/Pagination';
@@ -15,68 +21,65 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import chunk from 'lodash/chunk';
-import compact from 'lodash/compact';
-import React, { useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
-const locationsPerPage = 10;
+const itemsPerPage = 10;
 const formId = 'auto-mapped-search';
 
 interface Props {
-  level: LocationLevelKey;
-  locations: AutoMappedLocation[];
-  newLocations?: LocationCandidateWithKey[];
-  pendingUpdates?: PendingLocationMappingUpdate[];
-  onUpdate: (update: PendingLocationMappingUpdate) => Promise<void>;
+  autoMappedItems: AutoMappedLocation[] | AutoMappedFilterOption[];
+  candidateHint?: (
+    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
+  ) => string;
+  groupKey: LocationLevelKey | string;
+  groupLabel: string;
+  itemLabel: string;
+  newItems?: LocationCandidateWithKey[] | FilterOptionCandidateWithKey[];
+  pendingUpdates?: PendingMappingUpdate[];
+  renderCandidate: (
+    candidate: LocationCandidateWithKey | FilterOptionCandidateWithKey,
+  ) => ReactNode;
+  renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
+  renderSourceDetails?: (
+    source: FilterOptionSource | LocationCandidate,
+  ) => ReactNode;
+  searchFilter: (
+    searchTerm: string,
+  ) => AutoMappedLocation[] | AutoMappedFilterOption[];
+  onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
-export default function ApiDataSetAutoMappedLocationsTable({
-  level,
-  locations,
-  newLocations = [],
+export default function ApiDataSetAutoMappedTable({
+  autoMappedItems,
+  candidateHint,
+  groupKey,
+  groupLabel,
+  itemLabel,
+  newItems = [],
   pendingUpdates = [],
+  renderCandidate,
+  renderSource,
+  renderSourceDetails,
+  searchFilter,
   onUpdate,
 }: Props) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>();
 
-  const filteredLocations = useMemo(() => {
+  const filteredItems = useMemo(() => {
     if (searchTerm) {
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
-
-      return locations.filter(location => {
-        const { candidate, mapping } = location;
-
-        const searchFields = compact([
-          candidate.label,
-          candidate.code,
-          candidate.laEstab,
-          candidate.oldCode,
-          candidate.ukprn,
-          candidate.urn,
-          mapping.source.label,
-          mapping.source.code,
-          mapping.source.laEstab,
-          mapping.source.oldCode,
-          mapping.source.ukprn,
-          mapping.source.urn,
-        ]);
-
-        return searchFields.some(field => {
-          return field?.toLowerCase().includes(lowerCaseSearchTerm);
-        });
-      });
+      return searchFilter(searchTerm.toLowerCase());
     }
+    return autoMappedItems;
+  }, [autoMappedItems, searchFilter, searchTerm]);
 
-    return locations;
-  }, [locations, searchTerm]);
-
-  const filteredLocationChunks = useMemo(
-    () => chunk(filteredLocations, locationsPerPage),
-    [filteredLocations],
+  const filteredItemsChunks = useMemo(
+    () => chunk(filteredItems, itemsPerPage),
+    [filteredItems],
   );
 
-  const totalFilteredLocations = filteredLocations.length;
-  const totalPages = filteredLocationChunks.length;
+  const totalFilteredItems = filteredItems.length;
+  const totalPages = filteredItemsChunks.length;
 
   const [handleSearch] = useDebouncedCallback((term: string) => {
     setSearchTerm(term);
@@ -94,10 +97,15 @@ export default function ApiDataSetAutoMappedLocationsTable({
               e.preventDefault();
             }}
           >
-            {locations.length > locationsPerPage && (
+            {autoMappedItems.length > itemsPerPage && (
               <FormSearchBar
                 id={`${formId}-search`}
-                label="Search auto mapped locations"
+                label={
+                  <>
+                    Search auto mapped options
+                    <VisuallyHidden>{`for ${groupLabel}`}</VisuallyHidden>
+                  </>
+                }
                 labelSize="s"
                 min={0}
                 name="search"
@@ -108,20 +116,20 @@ export default function ApiDataSetAutoMappedLocationsTable({
           </form>
           <VisuallyHidden>
             <p aria-atomic aria-live="polite">
-              {`${totalFilteredLocations} result${
-                totalFilteredLocations > 1 ? 's' : ''
+              {`${totalFilteredItems} result${
+                totalFilteredItems > 1 ? 's' : ''
               }, showing page ${currentPage} of ${totalPages}`}
             </p>
           </VisuallyHidden>
         </div>
       </div>
-      {filteredLocationChunks.length > 0 ? (
+      {filteredItemsChunks.length > 0 ? (
         <table
-          className={styles.table}
-          data-testid={`auto-mapped-table-${level}`}
+          className="dfe-table--vertical-align-middl"
+          data-testid={`auto-mapped-table-${groupKey}`}
         >
           <caption className="govuk-visually-hidden">
-            Table showing all auto mapped locations
+            {`Table showing auto mapped options for ${groupLabel}`}
           </caption>
           <thead>
             <tr>
@@ -132,27 +140,15 @@ export default function ApiDataSetAutoMappedLocationsTable({
             </tr>
           </thead>
           <tbody>
-            {filteredLocationChunks[currentPage - 1].map(
+            {filteredItemsChunks[currentPage - 1].map(
               ({ candidate, mapping }) => {
                 const isPendingUpdate = !!pendingUpdates.find(
                   update => update.sourceKey === mapping.sourceKey,
                 );
                 return (
                   <tr key={`mapping-${mapping.sourceKey}`}>
-                    <td>
-                      {mapping.source.label}
-                      <br />
-                      <span className={styles.code}>
-                        {getApiDataSetLocationCodes(mapping.source)}
-                      </span>
-                    </td>
-                    <td>
-                      {candidate.label}
-                      <br />
-                      <span className={styles.code}>
-                        {getApiDataSetLocationCodes(candidate)}
-                      </span>
-                    </td>
+                    <td>{renderSource(mapping.source)}</td>
+                    <td>{renderCandidate(candidate)}</td>
                     <td>
                       <Tag colour="grey">Minor</Tag>
                     </td>
@@ -163,14 +159,17 @@ export default function ApiDataSetAutoMappedLocationsTable({
                           hideText
                           inline
                           size="sm"
-                          text="Updating location mapping"
+                          text={`Updating auto-mapping for ${mapping.source.label}`}
                         />
                       ) : (
-                        <ApiDataSetLocationMappingModal
+                        <ApiDataSetMappingModal
                           candidate={candidate}
-                          level={level}
+                          candidateHint={candidateHint}
+                          groupKey={groupKey}
+                          itemLabel={itemLabel}
                           mapping={mapping}
-                          newLocations={newLocations}
+                          newItems={newItems}
+                          renderSourceDetails={renderSourceDetails}
                           onSubmit={onUpdate}
                         />
                       )}
