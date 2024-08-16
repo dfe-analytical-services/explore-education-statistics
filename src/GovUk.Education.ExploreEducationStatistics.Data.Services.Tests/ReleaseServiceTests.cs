@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -240,6 +241,139 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Single(subjects[1].Indicators);
                 Assert.Equal("subject 2 indicator group 1 indicator 1", subjects[1].Indicators[0]);
+            }
+        }
+
+        [Fact]
+        public async Task ListSubjects_NoSubjects()
+        {
+            var statsReleaseVersion = new Data.Model.ReleaseVersion();
+
+            var contentReleaseVersion = new ReleaseVersion
+            {
+                Id = statsReleaseVersion.Id,
+            };
+
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+            await using var contentDbContext = InMemoryContentDbContext();
+
+            statisticsDbContext.ReleaseVersion.Add(statsReleaseVersion);
+            contentDbContext.ReleaseVersions.Add(contentReleaseVersion);
+
+            var service = BuildReleaseService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext
+            );
+
+            var result = await service.ListSubjects(contentReleaseVersion.Id);
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task ListSubjects_StatsDbHasMissingSubject()
+        {
+            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                ReleaseVersion = statisticsReleaseVersion,
+                Subject = new Subject()
+            };
+
+            var subject1Filter1 = new Filter
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 1",
+            };
+
+            var subject1IndicatorGroup1 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 1",
+                Indicators = new List<Indicator>
+                {
+                    new() { Label = "subject 1 indicator group 1 indicator 1" },
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject1);
+                statisticsDbContext.Filter.Add(subject1Filter1);
+                statisticsDbContext.IndicatorGroup.Add(subject1IndicatorGroup1);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentReleaseVersion = new ReleaseVersion
+            {
+                Id = statisticsReleaseVersion.Id,
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                ReleaseVersion = contentReleaseVersion,
+                Name = "Data set 1",
+                File = new File
+                {
+                    Filename = "data1.csv",
+                    ContentLength = 10240,
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject1.Subject.Id
+                },
+                Summary = "Data set 1 guidance"
+            };
+
+            var releaseFile2 = new ReleaseFile
+            {
+                ReleaseVersion = contentReleaseVersion,
+                Name = "Data set 2",
+                File = new File
+                {
+                    Filename = "data2.csv",
+                    ContentLength = 20480,
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                },
+                Summary = "Data set 2 guidance"
+            };
+
+            var import1 = new DataImport
+            {
+                File = releaseFile1.File,
+                Status = DataImportStatus.COMPLETE
+            };
+
+            var import2 = new DataImport
+            {
+                File = releaseFile2.File,
+                Status = DataImportStatus.COMPLETE
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.AddRangeAsync(import1, import2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext
+                );
+
+                var exception = await Assert.ThrowsAsync<DataException>(() =>
+                    service.ListSubjects(contentReleaseVersion.Id));
+
+                Assert.Equal("Statistics DB has a different number of subjects than the Content DB\n"
+                             + $"StatsDB subjects: {releaseSubject1.SubjectId}\n"
+                             + $"ContentDb files: {releaseFile1.FileId},{releaseFile2.FileId}\n",
+                    exception.Message);
             }
         }
 
