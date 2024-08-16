@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -6,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -156,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        //[BlobCache(typeof(DataBlockTableResultCacheKey))]
+        [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
             DataBlockVersion dataBlockVersion,
             long? boundaryLevelId = null)
@@ -167,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 boundaryLevelId);
         }
 
-        //[BlobCache(typeof(DataBlockTableResultCacheKey))] // TODO: Create a GetLocationsCacheKey
+        [BlobCache(typeof(LocationsForDataBlockCacheKey))]
         private Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocations(
             DataBlockVersion dataBlockVersion,
             long boundaryLevelId)
