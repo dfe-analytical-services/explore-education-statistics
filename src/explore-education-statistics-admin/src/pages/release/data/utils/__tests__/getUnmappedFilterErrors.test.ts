@@ -1,11 +1,11 @@
 import getUnmappedFilterErrors from '@admin/pages/release/data/utils/getUnmappedFilterErrors';
-import { MappableFilter } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import { MappableFilterOption } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import { Dictionary } from '@common/types';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 import testFiltersMapping from '@admin/pages/release/data/__data__/testFiltersMapping';
 
 describe('getUnmappedFilterErrors', () => {
-  const testMappableFilters: Dictionary<MappableFilter[]> = {
+  const testMappableFilters: Dictionary<MappableFilterOption[]> = {
     Filter1Key: [
       {
         mapping: {

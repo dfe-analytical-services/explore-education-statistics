@@ -3,8 +3,8 @@ import {
   LocationCandidateWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import {
-  AutoMappedFilter,
-  FilterCandidateWithKey,
+  AutoMappedFilterOption,
+  FilterOptionCandidateWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
@@ -27,17 +27,17 @@ const itemsPerPage = 10;
 const formId = 'auto-mapped-search';
 
 interface Props {
-  autoMappedItems: AutoMappedLocation[] | AutoMappedFilter[];
+  autoMappedItems: AutoMappedLocation[] | AutoMappedFilterOption[];
   candidateHint?: (
-    candidate: FilterCandidateWithKey | LocationCandidateWithKey,
+    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => string;
   groupKey: LocationLevelKey | string;
   groupLabel: string;
   itemLabel: string;
-  newItems?: LocationCandidateWithKey[] | FilterCandidateWithKey[];
+  newItems?: LocationCandidateWithKey[] | FilterOptionCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
   renderCandidate: (
-    candidate: LocationCandidateWithKey | FilterCandidateWithKey,
+    candidate: LocationCandidateWithKey | FilterOptionCandidateWithKey,
   ) => ReactNode;
   renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
   renderSourceDetails?: (
@@ -45,7 +45,7 @@ interface Props {
   ) => ReactNode;
   searchFilter: (
     searchTerm: string,
-  ) => AutoMappedLocation[] | AutoMappedFilter[];
+  ) => AutoMappedLocation[] | AutoMappedFilterOption[];
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 

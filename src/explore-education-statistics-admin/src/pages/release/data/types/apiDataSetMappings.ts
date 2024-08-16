@@ -1,7 +1,7 @@
 import { MappingType } from '@admin/services/apiDataSetVersionService';
 import {
-  FilterCandidateWithKey,
-  FilterMappingWithKey,
+  FilterOptionCandidateWithKey,
+  FilterOptionMappingWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import {
   LocationCandidateWithKey,
@@ -14,6 +14,6 @@ export interface PendingMappingUpdate {
   groupKey: LocationLevelKey | string;
   sourceKey: string;
   type: MappingType;
-  previousCandidate?: FilterCandidateWithKey | LocationCandidateWithKey;
-  previousMapping: FilterMappingWithKey | LocationMappingWithKey;
+  previousCandidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
+  previousMapping: FilterOptionMappingWithKey | LocationMappingWithKey;
 }

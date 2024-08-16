@@ -4,8 +4,8 @@ import {
   MappingType,
 } from '@admin/services/apiDataSetVersionService';
 import {
-  FilterCandidateWithKey,
-  MappableFilter,
+  FilterOptionCandidateWithKey,
+  MappableFilterOption,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import {
@@ -25,7 +25,7 @@ import kebabCase from 'lodash/kebabCase';
 
 interface Props {
   candidateHint?: (
-    candidate: FilterCandidateWithKey | LocationCandidateWithKey,
+    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => string;
   candidateIsMajorMapping?: (
     candidate: LocationCandidateWithKey,
@@ -35,11 +35,11 @@ interface Props {
   groupLabel: string;
   itemLabel: string;
   itemPluralLabel: string;
-  mappableItems: MappableFilter[] | MappableLocation[];
-  newItems?: FilterCandidateWithKey[] | LocationCandidateWithKey[];
+  mappableItems: MappableFilterOption[] | MappableLocation[];
+  newItems?: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
   renderCandidate: (
-    candidate: LocationCandidateWithKey | FilterCandidateWithKey,
+    candidate: LocationCandidateWithKey | FilterOptionCandidateWithKey,
   ) => ReactNode;
   renderCaptionEnd?: ReactNode;
   renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;

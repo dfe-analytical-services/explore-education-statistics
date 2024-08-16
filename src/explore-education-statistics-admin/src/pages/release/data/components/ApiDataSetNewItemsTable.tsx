@@ -1,5 +1,5 @@
 import { LocationCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import { FilterCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import { FilterOptionCandidateWithKey } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import Tag from '@common/components/Tag';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import React, { ReactNode } from 'react';
@@ -8,9 +8,9 @@ interface Props {
   groupKey: LocationLevelKey | string;
   groupLabel: string;
   itemPluralLabel: string;
-  newItems: FilterCandidateWithKey[] | LocationCandidateWithKey[];
+  newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
   renderItem: (
-    item: LocationCandidateWithKey | FilterCandidateWithKey,
+    item: LocationCandidateWithKey | FilterOptionCandidateWithKey,
   ) => ReactNode;
 }
 

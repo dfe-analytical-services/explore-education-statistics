@@ -1,9 +1,9 @@
 import Link from '@admin/components/Link';
 import ButtonLink from '@admin/components/ButtonLink';
 import getApiDataSetFilterMappings, {
-  AutoMappedFilter,
-  FilterCandidateWithKey,
-  MappableFilter,
+  AutoMappedFilterOption,
+  FilterOptionCandidateWithKey,
+  MappableFilterOption,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
 import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
@@ -41,20 +41,20 @@ import compact from 'lodash/compact';
 
 export default function ReleaseApiDataSetFiltersMappingPage() {
   const [autoMappedFilterOptions, updateAutoMappedFilterOptions] = useImmer<
-    Dictionary<AutoMappedFilter[]>
+    Dictionary<AutoMappedFilterOption[]>
   >({});
   const [newFilterOptions, updateNewFilterOptions] = useImmer<
-    Dictionary<FilterCandidateWithKey[]>
+    Dictionary<FilterOptionCandidateWithKey[]>
   >({});
   const [mappableFilterOptions, updateMappableFilterOptions] = useImmer<
-    Dictionary<MappableFilter[]>
+    Dictionary<MappableFilterOption[]>
   >({});
-  const [mappableFilterColumns, updateMappableFilterColumns] = useImmer<
+  const [mappableFilters, updateMappableFilters] = useImmer<
     Dictionary<FilterMapping>
   >({});
-  const [newFilterColumns, updateNewFilterColumns] = useImmer<
-    Dictionary<FilterCandidate>
-  >({});
+  const [newFilters, updateNewFilters] = useImmer<Dictionary<FilterCandidate>>(
+    {},
+  );
   const [pendingUpdates, setPendingUpdates] = useState<PendingMappingUpdate[]>(
     [],
   );
@@ -75,25 +75,20 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
   useEffect(() => {
     if (filtersMapping) {
-      const {
-        autoMappedFilterOptions: initialAutoMappedFilterOptions,
-        newFilterOptions: initialNewFilterOptions,
-        mappableFilterOptions: initialMappableFilterOptions,
-        mappableFilterColumns: initialMappableFilterColumns,
-        newFilterColumns: initialNewFilterColumns,
-      } = getApiDataSetFilterMappings(filtersMapping);
-      updateAutoMappedFilterOptions(initialAutoMappedFilterOptions);
-      updateNewFilterOptions(initialNewFilterOptions);
-      updateMappableFilterOptions(initialMappableFilterOptions);
-      updateMappableFilterColumns(initialMappableFilterColumns);
-      updateNewFilterColumns(initialNewFilterColumns);
+      const mappings = getApiDataSetFilterMappings(filtersMapping);
+
+      updateAutoMappedFilterOptions(mappings.autoMappedFilterOptions);
+      updateNewFilterOptions(mappings.newFilterOptions);
+      updateMappableFilterOptions(mappings.mappableFilterOptions);
+      updateMappableFilters(mappings.mappableFilters);
+      updateNewFilters(mappings.newFilters);
     }
   }, [
     filtersMapping,
     updateAutoMappedFilterOptions,
-    updateMappableFilterColumns,
+    updateMappableFilters,
     updateMappableFilterOptions,
-    updateNewFilterColumns,
+    updateNewFilters,
     updateNewFilterOptions,
   ]);
 
@@ -314,7 +309,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               become new filters in the API data set.
             </p>
 
-            {Object.keys(mappableFilterColumns).length > 0 && (
+            {Object.keys(mappableFilters).length > 0 && (
               <>
                 <h3
                   className="govuk-heading-l dfe-flex dfe-align-items--center"
@@ -327,7 +322,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                 </h3>
 
                 <ApiDataSetMappableFilterColumnsTable
-                  mappableFilterColumns={mappableFilterColumns}
+                  mappableFilterColumns={mappableFilters}
                 />
               </>
             )}
@@ -369,7 +364,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               <p>No filter options.</p>
             )}
 
-            {Object.keys(newFilterColumns).length > 0 && (
+            {Object.keys(newFilters).length > 0 && (
               <>
                 <h3
                   className="govuk-heading-l govuk-!-margin-top-8"
@@ -378,7 +373,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   New filter columns <Tag colour="grey">No action required</Tag>
                 </h3>
                 <ApiDataSetNewFilterColumnsTable
-                  newFilterColumns={newFilterColumns}
+                  newFilterColumns={newFilters}
                 />
               </>
             )}

@@ -1,6 +1,6 @@
 import {
-  FilterCandidateWithKey,
-  FilterMappingWithKey,
+  FilterOptionCandidateWithKey,
+  FilterOptionMappingWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import styles from '@admin/pages/release/data/components/ApiDataSetMappingModal.module.scss';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
@@ -26,14 +26,14 @@ interface FormValues {
 }
 
 interface Props {
-  candidate?: FilterCandidateWithKey | LocationCandidateWithKey;
+  candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
   candidateHint?: (
-    candidate: FilterCandidateWithKey | LocationCandidateWithKey,
+    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => string;
   groupKey: string;
   itemLabel: string;
-  mapping: FilterMappingWithKey | LocationMappingWithKey;
-  newItems: FilterCandidateWithKey[] | LocationCandidateWithKey[];
+  mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
+  newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
   onCancel?: () => void;
   onSubmit: (update: PendingMappingUpdate) => Promise<void>;
 }
@@ -133,8 +133,8 @@ function getInitialValues({
   candidate,
   mapping,
 }: {
-  candidate?: FilterCandidateWithKey | LocationCandidateWithKey;
-  mapping: FilterMappingWithKey | LocationMappingWithKey;
+  candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
+  mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
 }) {
   if (candidate) {
     return { nextItem: candidate.key };

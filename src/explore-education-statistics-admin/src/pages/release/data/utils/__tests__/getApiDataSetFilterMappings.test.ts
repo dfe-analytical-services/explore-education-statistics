@@ -1,7 +1,7 @@
 import getApiDataSetFilterMappings, {
-  AutoMappedFilter,
-  FilterCandidateWithKey,
-  MappableFilter,
+  AutoMappedFilterOption,
+  FilterOptionCandidateWithKey,
+  MappableFilterOption,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import testFiltersMapping, {
   testFiltersMappingUnmappedColumns,
@@ -16,7 +16,7 @@ describe('getApiDataSetFilterMappings', () => {
     const { mappableFilterOptions } =
       getApiDataSetFilterMappings(testFiltersMapping);
 
-    const expectedFilter1: MappableFilter[] = [
+    const expectedFilterOption1: MappableFilterOption[] = [
       {
         mapping: {
           publicId: 'filter-1-option-2-public-id',
@@ -48,7 +48,7 @@ describe('getApiDataSetFilterMappings', () => {
       },
     ];
 
-    const expectedFilter2: MappableFilter[] = [
+    const expectedFilterOption2: MappableFilterOption[] = [
       {
         candidate: {
           key: 'Filter2Option1UpdatedKey',
@@ -80,8 +80,8 @@ describe('getApiDataSetFilterMappings', () => {
       },
     ];
 
-    expect(mappableFilterOptions.Filter1Key).toEqual(expectedFilter1);
-    expect(mappableFilterOptions.Filter2Key).toEqual(expectedFilter2);
+    expect(mappableFilterOptions.Filter1Key).toEqual(expectedFilterOption1);
+    expect(mappableFilterOptions.Filter2Key).toEqual(expectedFilterOption2);
     expect(mappableFilterOptions.Filter3Key).toBeUndefined();
   });
 
@@ -89,14 +89,14 @@ describe('getApiDataSetFilterMappings', () => {
     const { newFilterOptions } =
       getApiDataSetFilterMappings(testFiltersMapping);
 
-    const expectedFilter1: FilterCandidateWithKey[] = [
+    const expectedFilterOption1: FilterOptionCandidateWithKey[] = [
       {
         key: 'Filter1Option2UpdatedKey',
         label: 'Filter 1 Option 2 updated',
       },
     ];
 
-    expect(newFilterOptions.Filter1Key).toEqual(expectedFilter1);
+    expect(newFilterOptions.Filter1Key).toEqual(expectedFilterOption1);
     expect(newFilterOptions.Filter2Key).toBeUndefined();
     expect(newFilterOptions.Filter3Key).toBeUndefined();
   });
@@ -105,7 +105,7 @@ describe('getApiDataSetFilterMappings', () => {
     const { autoMappedFilterOptions } =
       getApiDataSetFilterMappings(testFiltersMapping);
 
-    const expectedFilter1: AutoMappedFilter[] = [
+    const expectedFilterOption1: AutoMappedFilterOption[] = [
       {
         candidate: {
           key: 'Filter1Option1Key',
@@ -121,7 +121,7 @@ describe('getApiDataSetFilterMappings', () => {
       },
     ];
 
-    const expectedFilter3: AutoMappedFilter[] = [
+    const expectedFilterOption3: AutoMappedFilterOption[] = [
       {
         candidate: {
           key: 'Filter3Option1Key',
@@ -169,13 +169,13 @@ describe('getApiDataSetFilterMappings', () => {
       },
     ];
 
-    expect(autoMappedFilterOptions.Filter1Key).toEqual(expectedFilter1);
+    expect(autoMappedFilterOptions.Filter1Key).toEqual(expectedFilterOption1);
     expect(autoMappedFilterOptions.Filter2Key).toBeUndefined();
-    expect(autoMappedFilterOptions.Filter3Key).toEqual(expectedFilter3);
+    expect(autoMappedFilterOptions.Filter3Key).toEqual(expectedFilterOption3);
   });
 
   test('returns the correct mappable filter columns', () => {
-    const { mappableFilterColumns } = getApiDataSetFilterMappings(
+    const { mappableFilters } = getApiDataSetFilterMappings(
       testFiltersMappingUnmappedColumns,
     );
 
@@ -209,12 +209,12 @@ describe('getApiDataSetFilterMappings', () => {
       type: 'AutoNone',
     };
 
-    expect(mappableFilterColumns.Filter1Key).toEqual(expectedFilter1);
-    expect(mappableFilterColumns.Filter2Key).toBeUndefined();
+    expect(mappableFilters.Filter1Key).toEqual(expectedFilter1);
+    expect(mappableFilters.Filter2Key).toBeUndefined();
   });
 
   test('returns the correct new filter columns', () => {
-    const { newFilterColumns } = getApiDataSetFilterMappings(
+    const { newFilters } = getApiDataSetFilterMappings(
       testFiltersMappingUnmappedColumns,
     );
 
@@ -236,8 +236,8 @@ describe('getApiDataSetFilterMappings', () => {
       },
     };
 
-    expect(newFilterColumns.Filter1UpdatedKey).toEqual(expectedFilter1);
-    expect(newFilterColumns.Filter1Key).toBeUndefined();
-    expect(newFilterColumns.Filter2Key).toBeUndefined();
+    expect(newFilters.Filter1UpdatedKey).toEqual(expectedFilter1);
+    expect(newFilters.Filter1Key).toBeUndefined();
+    expect(newFilters.Filter2Key).toBeUndefined();
   });
 });

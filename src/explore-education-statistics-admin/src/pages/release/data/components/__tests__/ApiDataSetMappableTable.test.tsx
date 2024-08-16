@@ -2,10 +2,10 @@ import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDat
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { MappableFilter } from '../../utils/getApiDataSetFilterMappings';
+import { MappableFilterOption } from '../../utils/getApiDataSetFilterMappings';
 
 describe('ApiDataSetMappableTable', () => {
-  const testFilterOptions: MappableFilter[] = [
+  const testFilterOptions: MappableFilterOption[] = [
     {
       mapping: {
         publicId: 'filter-option-1-public-id',

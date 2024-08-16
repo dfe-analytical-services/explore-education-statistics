@@ -2,10 +2,10 @@ import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDat
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { FilterCandidateWithKey } from '../../utils/getApiDataSetFilterMappings';
+import { FilterOptionCandidateWithKey } from '../../utils/getApiDataSetFilterMappings';
 
 describe('ApiDataSetNewItemsTable', () => {
-  const testFilterOptions: FilterCandidateWithKey[] = [
+  const testFilterOptions: FilterOptionCandidateWithKey[] = [
     {
       key: 'FilterOption1Key',
       label: 'Filter Option 1',

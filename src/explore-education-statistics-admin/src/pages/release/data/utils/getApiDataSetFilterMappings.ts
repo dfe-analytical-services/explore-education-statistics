@@ -7,51 +7,51 @@ import {
 } from '@admin/services/apiDataSetVersionService';
 import { Dictionary } from '@common/types';
 
-export interface FilterCandidateWithKey extends FilterOptionSource {
+export interface FilterOptionCandidateWithKey extends FilterOptionSource {
   key: string;
 }
-export interface FilterMappingWithKey extends FilterOptionMapping {
+export interface FilterOptionMappingWithKey extends FilterOptionMapping {
   sourceKey: string;
 }
 
-export interface AutoMappedFilter {
-  candidate: FilterCandidateWithKey;
-  mapping: FilterMappingWithKey;
+export interface AutoMappedFilterOption {
+  candidate: FilterOptionCandidateWithKey;
+  mapping: FilterOptionMappingWithKey;
 }
 
-export interface MappableFilter {
-  candidate?: FilterCandidateWithKey;
-  mapping: FilterMappingWithKey;
+export interface MappableFilterOption {
+  candidate?: FilterOptionCandidateWithKey;
+  mapping: FilterOptionMappingWithKey;
 }
 
 export default function getApiDataSetFilterMappings(
   filtersMapping: FiltersMapping,
 ): {
-  autoMappedFilterOptions: Dictionary<AutoMappedFilter[]>;
-  newFilterOptions: Dictionary<FilterCandidateWithKey[]>;
-  mappableFilterOptions: Dictionary<MappableFilter[]>;
-  mappableFilterColumns: Dictionary<FilterMapping>;
-  newFilterColumns: Dictionary<FilterCandidate>;
+  autoMappedFilterOptions: Dictionary<AutoMappedFilterOption[]>;
+  newFilterOptions: Dictionary<FilterOptionCandidateWithKey[]>;
+  mappableFilterOptions: Dictionary<MappableFilterOption[]>;
+  mappableFilters: Dictionary<FilterMapping>;
+  newFilters: Dictionary<FilterCandidate>;
 } {
-  const mappableFilterOptions: Dictionary<MappableFilter[]> = {};
-  const newFilterOptions: Dictionary<FilterCandidateWithKey[]> = {};
-  const autoMappedFilterOptions: Dictionary<AutoMappedFilter[]> = {};
+  const mappableFilterOptions: Dictionary<MappableFilterOption[]> = {};
+  const newFilterOptions: Dictionary<FilterOptionCandidateWithKey[]> = {};
+  const autoMappedFilterOptions: Dictionary<AutoMappedFilterOption[]> = {};
 
   // For MVP these aren't actually mappable, but will be later on.
-  const mappableFilterColumns: Dictionary<FilterMapping> = {};
-  const newFilterColumns: Dictionary<FilterCandidate> = {};
+  const mappableFilters: Dictionary<FilterMapping> = {};
+  const newFilters: Dictionary<FilterCandidate> = {};
 
   const { candidates, mappings } = filtersMapping;
 
   const mappedOptionCandidateKeys = new Set<string>();
 
   Object.entries(mappings).forEach(([filterKey, filterMapping]) => {
-    const mappable: MappableFilter[] = [];
-    const autoMapped: AutoMappedFilter[] = [];
+    const mappable: MappableFilterOption[] = [];
+    const autoMapped: AutoMappedFilterOption[] = [];
 
     // Column is unmapped
     if (filterMapping.type === 'AutoNone') {
-      mappableFilterColumns[filterKey] = { ...filterMapping };
+      mappableFilters[filterKey] = { ...filterMapping };
 
       return;
     }
@@ -141,15 +141,15 @@ export default function getApiDataSetFilterMappings(
 
     const optionCandidates = candidates[filterKey]?.options ?? {};
 
-    const newFilterOptionsForLevel: FilterCandidateWithKey[] = filtersMapping
-      .candidates[filterKey]
-      ? Object.entries(optionCandidates)
-          .filter(([key, _]) => !mappedOptionCandidateKeys.has(key))
-          .map(([key, candidate]) => ({
-            ...candidate,
-            key,
-          }))
-      : [];
+    const newFilterOptionsForLevel: FilterOptionCandidateWithKey[] =
+      filtersMapping.candidates[filterKey]
+        ? Object.entries(optionCandidates)
+            .filter(([key, _]) => !mappedOptionCandidateKeys.has(key))
+            .map(([key, candidate]) => ({
+              ...candidate,
+              key,
+            }))
+        : [];
 
     if (autoMapped.length) {
       autoMappedFilterOptions[filterKey] = autoMapped;
@@ -164,7 +164,7 @@ export default function getApiDataSetFilterMappings(
 
   Object.entries(candidates).forEach(([filterKey, filterCandidate]) => {
     if (!filtersMapping.mappings[filterKey]) {
-      newFilterColumns[filterKey] = filterCandidate;
+      newFilters[filterKey] = filterCandidate;
     }
   });
 
@@ -172,7 +172,7 @@ export default function getApiDataSetFilterMappings(
     autoMappedFilterOptions,
     mappableFilterOptions,
     newFilterOptions,
-    mappableFilterColumns,
-    newFilterColumns,
+    mappableFilters,
+    newFilters,
   };
 }

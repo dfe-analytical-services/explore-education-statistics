@@ -76,14 +76,10 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
   useEffect(() => {
     if (locationsMapping) {
-      const {
-        autoMappedLocations: initialAutoMappedLocations,
-        newLocations: initialNewLocations,
-        mappableLocations: initialMappableLocations,
-      } = getApiDataSetLocationMappings(locationsMapping);
-      updateAutoMappedLocations(initialAutoMappedLocations);
-      updateNewLocations(initialNewLocations);
-      updateMappableLocations(initialMappableLocations);
+      const mappings = getApiDataSetLocationMappings(locationsMapping);
+      updateAutoMappedLocations(mappings.autoMappedLocations);
+      updateNewLocations(mappings.newLocations);
+      updateMappableLocations(mappings.mappableLocations);
     }
   }, [
     locationsMapping,

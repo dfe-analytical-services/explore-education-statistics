@@ -1,4 +1,4 @@
-import { MappableFilter } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import { MappableFilterOption } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import { FiltersMapping } from '@admin/services/apiDataSetVersionService';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 import typedKeys from '@common/utils/object/typedKeys';
@@ -6,7 +6,7 @@ import { Dictionary } from '@common/types';
 import sumBy from 'lodash/sumBy';
 
 export default function getUnmappedFilterErrors(
-  mappableFilters: Dictionary<MappableFilter[]>,
+  mappableFilters: Dictionary<MappableFilterOption[]>,
   filtersMapping: FiltersMapping,
 ): ErrorSummaryMessage[] {
   const errors: ErrorSummaryMessage[] = [];

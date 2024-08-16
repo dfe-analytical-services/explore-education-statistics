@@ -1,6 +1,6 @@
 import {
-  FilterCandidateWithKey,
-  FilterMappingWithKey,
+  FilterOptionCandidateWithKey,
+  FilterOptionMappingWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import {
   LocationCandidateWithKey,
@@ -22,14 +22,14 @@ import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
 
 interface Props {
-  candidate?: FilterCandidateWithKey | LocationCandidateWithKey;
+  candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
   candidateHint?: (
-    candidate: FilterCandidateWithKey | LocationCandidateWithKey,
+    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => string;
   groupKey: string;
   itemLabel: string;
-  mapping: FilterMappingWithKey | LocationMappingWithKey;
-  newItems: FilterCandidateWithKey[] | LocationCandidateWithKey[];
+  mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
+  newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
   renderSourceDetails?: (
     source: FilterOptionSource | LocationCandidate,
   ) => ReactNode;
