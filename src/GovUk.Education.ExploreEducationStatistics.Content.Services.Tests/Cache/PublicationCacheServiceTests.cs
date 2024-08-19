@@ -178,7 +178,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var service = BuildService(publicationService.Object);
 
-        var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+        var result = await service.GetPublicationTree(PublicationTreeFilter.FastTrack);
 
         VerifyAllMocks(PublicBlobCacheService);
 
@@ -213,58 +213,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var service = BuildService();
 
-        var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+        var result = await service.GetPublicationTree(PublicationTreeFilter.FastTrack);
 
         VerifyAllMocks(PublicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_DataCatalogue_SomeLiveReleaseHasData_Included()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
-            {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = true
-                    })
-                }
-            }
-        };
-
-        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataCatalogue);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_DataCatalogue_NoLiveReleaseHasData_Excluded()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
-            {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = false
-                    })
-                }
-            }
-        };
-
-        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataCatalogue);
     }
 
     [Fact]

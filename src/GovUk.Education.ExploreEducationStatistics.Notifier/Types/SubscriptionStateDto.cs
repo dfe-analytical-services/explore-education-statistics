@@ -7,4 +7,4 @@ public record SubscriptionStateDto()
     public string Title { get; set; }
     
     public SubscriptionStatus Status { get; set; }
-};
+}

@@ -131,7 +131,7 @@ public class HealthCheckFunctions(
             && FileShareMount.IsHealthy
             && CoreStorageConnection.IsHealthy
             && ContentDbConnection.IsHealthy;
-    };
+    }
 
     public record HealthCheckSummary
     {

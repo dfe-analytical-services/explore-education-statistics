@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 public enum PermalinkStatus
 {

@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Theory]
         [InlineData("test/")]
         [InlineData("test&")]
-        [InlineData($"test\0")]
+        [InlineData("test\0")]
         public async Task ValidateDataFilesForUpload_DataSetTitleCannotContainSpecialCharacters(string dataSetTitle)
         {
             await using var context = InMemoryContentDbContext();
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [InlineData("test ")]
         [InlineData("test/")]
         [InlineData("test&")]
-        [InlineData($"test\0")]
+        [InlineData("test\0")]
         public async Task ValidateDataFilesForUpload_DataFileNamesCannotContainSpacesOrSpecialCharacters(string dataFileName)
         {
             await using var context = InMemoryContentDbContext();

@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
 
             publicationCacheService
-                .Setup(s => s.GetPublicationTree(PublicationTreeFilter.DataCatalogue))
+                .Setup(s => s.GetPublicationTree(PublicationTreeFilter.FastTrack))
                 .ReturnsAsync(new List<PublicationTreeThemeViewModel>
                 {
                     new()
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 });
 
-            var result = await controller.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+            var result = await controller.GetPublicationTree(PublicationTreeFilter.FastTrack);
 
             VerifyAllMocks(publicationCacheService);
 
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationService = new Mock<IPublicationService>(Strict);
 
             publicationService.Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<PublicationSitemapItemViewModel>()
+                .ReturnsAsync(new List<PublicationSitemapItemViewModel>
                 {
                     new()
                     {

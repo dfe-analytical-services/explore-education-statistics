@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
             {
                 throw new ArgumentException("Timeout configuration section cannot be null when using the " +
                                             $"{nameof(CancellationTokenTimeoutAttribute)} alongside a timeout " +
-                                            $"configuration key");
+                                            "configuration key");
             }
             
             var timeoutConfig = _timeoutConfiguration.GetSection(configurationKey).Value;

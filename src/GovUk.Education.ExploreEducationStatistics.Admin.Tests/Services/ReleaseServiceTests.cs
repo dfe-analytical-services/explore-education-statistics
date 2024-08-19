@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new HtmlBlock
                         {
                             Id = Guid.NewGuid(),
-                            Body = @"<div></div>",
+                            Body = "<div></div>",
                             Order = 1,
                             Comments = new List<Comment>
                             {

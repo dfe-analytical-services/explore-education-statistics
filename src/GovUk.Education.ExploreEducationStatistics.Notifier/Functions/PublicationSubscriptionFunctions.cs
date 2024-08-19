@@ -117,7 +117,7 @@ public class PublicationSubscriptionFunctions(
                         templateId: _emailTemplateOptions.SubscriptionVerificationId,
                         values);
 
-                    return new OkObjectResult(new SubscriptionStateDto()
+                    return new OkObjectResult(new SubscriptionStateDto
                     {
                         Slug = req.Slug,
                         Title = req.Title,
@@ -170,7 +170,7 @@ public class PublicationSubscriptionFunctions(
         }
 
         await publicationSubscriptionRepository.RemoveSubscriber(table, sub);
-        return new OkObjectResult(new SubscriptionStateDto()
+        return new OkObjectResult(new SubscriptionStateDto
         {
             Slug = sub.Slug,
             Title = sub.Title,
@@ -226,7 +226,7 @@ public class PublicationSubscriptionFunctions(
                     templateId: _emailTemplateOptions.SubscriptionConfirmationId,
                     values);
 
-                return new OkObjectResult(new SubscriptionStateDto()
+                return new OkObjectResult(new SubscriptionStateDto
                 {
                     Slug = sub.Slug,
                     Title = sub.Title,
