@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -74,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var expectedValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://admin-uri"},
+                {"url", "https://admin-uri"},
                 {"role", Owner.ToString()},
                 {"publication", "Test Publication"},
             };

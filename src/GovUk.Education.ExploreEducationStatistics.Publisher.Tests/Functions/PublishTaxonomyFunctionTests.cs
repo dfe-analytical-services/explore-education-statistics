@@ -51,7 +51,7 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
 
             List<AllMethodologiesThemeViewModel> expectedMethodologyTree =
             [
-                new AllMethodologiesThemeViewModel()
+                new AllMethodologiesThemeViewModel
                 {
                     Id = topic.Theme.Id,
                     Title = topic.Theme.Title,

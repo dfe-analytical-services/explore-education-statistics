@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
 using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 

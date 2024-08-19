@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services

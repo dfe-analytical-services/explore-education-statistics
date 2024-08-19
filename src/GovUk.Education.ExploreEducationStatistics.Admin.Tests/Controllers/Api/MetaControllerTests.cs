@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {

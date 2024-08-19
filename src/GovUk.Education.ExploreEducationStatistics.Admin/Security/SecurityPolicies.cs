@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
     public enum SecurityPolicies

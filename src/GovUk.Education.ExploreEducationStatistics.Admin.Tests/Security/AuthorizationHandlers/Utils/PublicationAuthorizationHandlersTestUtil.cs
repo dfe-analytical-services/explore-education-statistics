@@ -7,13 +7,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils
 {
@@ -157,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var handler = handlerSupplier(contentDbContext);
                 await handler.HandleAsync(authContext);
-                Assert.False(authContext.HasSucceeded, $"Should fail when user has no publication role");
+                Assert.False(authContext.HasSucceeded, "Should fail when user has no publication role");
             }
         }
 

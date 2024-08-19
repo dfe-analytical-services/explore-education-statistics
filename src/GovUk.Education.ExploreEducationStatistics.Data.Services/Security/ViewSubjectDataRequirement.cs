@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 

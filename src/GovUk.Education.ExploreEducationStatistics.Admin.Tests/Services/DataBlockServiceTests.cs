@@ -1692,7 +1692,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = BuildDataBlockService(context);
             var result = await service.Update(Guid.NewGuid(),
-                new DataBlockUpdateRequest()
+                new DataBlockUpdateRequest
                 {
                     Heading = "Heading 1",
                     Name = "Name 1",

@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
-using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;

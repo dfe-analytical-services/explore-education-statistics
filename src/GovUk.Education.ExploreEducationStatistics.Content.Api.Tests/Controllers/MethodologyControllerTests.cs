@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<MethodologySitemapItemViewModel>()
+                .ReturnsAsync(new List<MethodologySitemapItemViewModel>
                 {
                     new()
                     {

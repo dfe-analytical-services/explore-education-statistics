@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         
         public static List<EnumValue> GetValues<T>() where T: Enum
         {
-            return (from object itemType in Enum.GetValues(typeof(T)) select new EnumValue() {Name = Enum.GetName(typeof(T), itemType), Value = (int) itemType}).ToList();
+            return (from object itemType in Enum.GetValues(typeof(T)) select new EnumValue {Name = Enum.GetName(typeof(T), itemType), Value = (int) itemType}).ToList();
         }
         
         public class EnumValue

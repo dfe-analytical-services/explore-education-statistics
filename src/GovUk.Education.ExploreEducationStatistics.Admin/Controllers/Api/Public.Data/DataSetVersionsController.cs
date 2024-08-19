@@ -96,7 +96,7 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .HandleFailuresOrNoOp();
     }
 
-    [HttpPatch()]
+    [HttpPatch]
     [Produces("application/json")]
     public async Task<ActionResult<DataSetDraftVersionViewModel>> UpdateVersion(
         [FromBody] DataSetVersionUpdateRequest dataSetVersionUpdateRequest,
