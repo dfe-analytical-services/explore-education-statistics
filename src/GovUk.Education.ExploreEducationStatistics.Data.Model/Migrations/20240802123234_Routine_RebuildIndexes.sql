@@ -52,7 +52,6 @@ BEGIN
         StartTime  DATETIME2 NOT NULL,
         EndTime    DATETIME2,
         HitTimeout BIT,
-        ReportSent DATETIME2,
         PRIMARY KEY (Id),
     );
 
