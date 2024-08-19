@@ -26,6 +26,7 @@ using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json.Serialization;
+using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
@@ -34,6 +35,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 {
     private readonly IConfiguration _miniProfilerConfig =
         configuration.GetRequiredSection(MiniProfilerOptions.Section);
+    private readonly IConfiguration _requestTimeoutConfig =
+        configuration.GetSection(RequestTimeoutOptions.Section);
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -68,7 +71,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             options.DefaultPolicy =
                 new RequestTimeoutPolicy
                 {
-                    Timeout = TimeSpan.FromMilliseconds(configuration.GetValue<int?>("RequestTimeoutMilliseconds") ?? 30000),
+                    Timeout = TimeSpan.FromMilliseconds(_requestTimeoutConfig.GetValue<int?>(nameof(RequestTimeoutOptions.RequestTimeoutMilliseconds)) ?? 30000),
                     TimeoutStatusCode = (int)HttpStatusCode.GatewayTimeout
                 };
         });
@@ -141,6 +144,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddOptions<ContentApiOptions>()
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
+        services.AddOptions<RequestTimeoutOptions>()
+            .Bind(configuration.GetSection(RequestTimeoutOptions.Section));
         services.AddOptions<DataFilesOptions>()
             .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
         services.AddOptions<MiniProfilerOptions>()

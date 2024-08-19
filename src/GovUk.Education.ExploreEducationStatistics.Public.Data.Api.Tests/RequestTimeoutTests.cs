@@ -1,10 +1,12 @@
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests;
 
@@ -61,7 +63,7 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
     }
 
     [ApiController]
-    private class TestController(IConfiguration configuration) : ControllerBase
+    private class TestController(IOptions<RequestTimeoutOptions> requestTimeoutOptions) : ControllerBase
     {
         [HttpGet(nameof(TestGet))]
         public async Task<ActionResult> TestGet(CancellationToken _)
@@ -98,7 +100,7 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
             return NoContent();
         }
 
-        private readonly int RequestTimeout = configuration.GetValue<int?>("RequestTimeoutMilliseconds")
+        private readonly int RequestTimeout = requestTimeoutOptions.Value.RequestTimeoutMilliseconds
             ?? throw new Exception("Must populate 'RequestTimeoutMilliseconds' in the integration test app settings.");
     }
 
@@ -111,7 +113,7 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
                 builder.ConfigureAppConfiguration((hostContext, config) => 
                     config.AddInMemoryCollection(new Dictionary<string, string?>()
                     {
-                        { "RequestTimeoutMilliseconds", "100" }
+                        { $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.RequestTimeoutMilliseconds)}", "100" }
                     }));
             })
             .ConfigureServices(s =>
