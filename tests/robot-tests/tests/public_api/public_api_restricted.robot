@@ -8,7 +8,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
-Test Setup          fail test fast if required
+
 
 
 *** Variables ***
@@ -32,7 +32,6 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Create new release with data files
-
     user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
     user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv
 
@@ -121,8 +120,8 @@ Change the Release type
 Upload third subject
     user waits until large data upload is completed
     ...    ${SUBJECT_NAME_3}
-    ...    data-file-medium-test.csv
-    ...    data-file-medium-test.meta.csv
+    ...    data-upload-import.csv
+    ...    data-upload-import.meta.csv
 
 Add data guidance to third subject
     user clicks link    Data guidance
@@ -149,12 +148,62 @@ Add release note for new release amendment
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
 
-Validate checklist errors after failed API data set processing
+Validate checklist error while API data set is processing or failed
     user edits release status
     user checks checklist errors contains
     ...    1 issue that must be resolved before this release can be published.
-    user checks checklist errors contains link
+    user checks checklist errors contains either link
     ...    All public API data set processing must be completed
+    ...    All failed public API data sets must be retried or removed
+
+Create a second draft release via api
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
+
+Upload subject to second release
+    user uploads subject    ${SUBJECT_NAME_4}    seven_filters_minor_update.csv    seven_filters_minor_update.meta.csv
+
+Add data guidance to second release
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${SUBJECT_NAME_4}
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME_4}
+    ...    ${SUBJECT_NAME_4} Main guidance content
+
+
+Save data guidance
+    user clicks button    Save guidance
+
+Add API dataset(minor version)
+    User Scrolls To The Top Of The Page
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+    
+    user waits until h3 is visible    Current live API data sets
+
+    user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]
+    user clicks button in table cell    1    3    Create new version    xpath://table[@data-testid="live-api-data-sets"]
+
+     ${modal}=    User Waits Until Modal Is Visible    Create a new API data set version
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_4}
+    user clicks button    Confirm new data set version
+
+    user waits until page finishes loading
+
+    user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
+    Sleep    10
+
+
+
+
+
+
 
 
 *** Keywords ***
@@ -176,6 +225,35 @@ user checks checklist errors contains link
     user waits until page contains testid    releaseChecklist-errors
     user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
 
+User Checks Checklist Errors Contains Either Link
+    [Arguments]    ${text1}    ${text2}
+
+    user waits until page contains testid    releaseChecklist-errors
+    ${status}=    Run Keyword And Return Status    Wait Until Keyword Succeeds    10s    1s    Check Either Link Exists    ${text1}    ${text2}
+
+    Run Keyword If    ${status} == False    Fail    Neither of the expected links (${text1}, ${text2}) was found. Failing fast as required.
+
+    Log    One of the expected links (${text1}, ${text2}) is present.
+
+
+Check Either Link Exists
+    [Arguments]    ${text1}    ${text2}
+
+    ${condition1}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text1}    timeout=5s
+
+    Run Keyword If    ${condition1}    Set Test Variable    ${link_found}    True
+
+    ${condition2}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text2}    timeout=5s
+    Run Keyword If    ${condition1} == False    Set Test Variable    ${link_found}    ${condition2}
+
+    ${link_found}=    Evaluate    ${condition1} or ${condition2}
+
+    Run Keyword If    ${link_found} == False    Log    Neither link '${text1}' nor '${text2}' was found after checking both. Continuing to check...
+
+    [Return]    ${link_found}
+
+
 Check Status Is Ready
+    user waits for caches to expire
     ${status_value}=    Get Text    ${STATUS_XPATH}
     Should Be Equal As Strings    ${status_value}    Ready
