@@ -98,14 +98,22 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
             return NoContent();
         }
 
-        private readonly int RequestTimeout = configuration.GetValue<int?>("RequestTimeoutMilliseconds") 
+        private readonly int RequestTimeout = configuration.GetValue<int?>("RequestTimeoutMilliseconds")
             ?? throw new Exception("Must populate 'RequestTimeoutMilliseconds' in the integration test app settings.");
     }
 
     private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp
-            .WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)))
+            .WithWebHostBuilder(builder =>
+            {
+                builder.WithAdditionalControllers(typeof(TestController));
+                builder.ConfigureAppConfiguration((hostContext, config) => 
+                    config.AddInMemoryCollection(new Dictionary<string, string?>()
+                    {
+                        { "RequestTimeoutMilliseconds", "100" }
+                    }));
+            })
             .ConfigureServices(s =>
             {
                 s.Configure<ApiVersioningOptions>(options => options.AssumeDefaultVersionWhenUnspecified = true);
