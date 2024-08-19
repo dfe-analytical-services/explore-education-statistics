@@ -23,11 +23,11 @@ interface Props {
 const ConfirmUnsubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
   const [submitted, toggleSubmitted] = useToggle(false);
   const [unsubscribeError, setUnsubscribeError] = useState<string>();
-  const { id, title } = dataSetFile;
+  const { id: dataSetId, title } = dataSetFile;
 
   const onConfirm = async () => {
     try {
-      await apiNotificationService.confirmUnsubscription(id, token);
+      await apiNotificationService.confirmUnsubscription(dataSetId, token);
     } catch (error) {
       setUnsubscribeError(() => {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -96,7 +96,7 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
         { name: 'Data catalogue', link: '/data-catalogue' },
         {
           name: title,
-          link: `/data-catalogue/data-set/${id}`,
+          link: `/data-catalogue/data-set/${dataSetId}`,
         },
       ]}
     >
@@ -107,7 +107,9 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
         <Panel headingTag="h2" title="Unsubscribed">
           <p>You have successfully unsubscribed from these updates.</p>
           <p>
-            <Link to={`/data-catalogue/data-set/${id}`}>View {title}</Link>
+            <Link to={`/data-catalogue/data-set/${dataSetId}`}>
+              View {title}
+            </Link>
           </p>
         </Panel>
       ) : (

@@ -24,11 +24,11 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
   const [submitted, toggleSubmitted] = useToggle(false);
   const [subscriptionError, setSubscriptionError] = useState<string>();
 
-  const { id, title } = dataSetFile;
+  const { id: dataSetId, title } = dataSetFile;
 
   const onConfirm = async () => {
     try {
-      await apiNotificationService.confirmPendingSubscription(id, token);
+      await apiNotificationService.confirmPendingSubscription(dataSetId, token);
     } catch (error) {
       setSubscriptionError(() => {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -53,7 +53,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
             <p>
               Your subscription verification token has expired. You can try
               again by re-subscribing from the{' '}
-              <Link to={`/data-catalogue/data-set/${id}`}>
+              <Link to={`/data-catalogue/data-set/${dataSetId}`}>
                 data set's main screen.
               </Link>
             </p>
@@ -72,7 +72,9 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
           <>
             <p>You are already subscribed to this data set.</p>
             <p>
-              <Link to={`/data-catalogue/data-set/${id}`}>View {title}</Link>
+              <Link to={`/data-catalogue/data-set/${dataSetId}`}>
+                View {title}
+              </Link>
             </p>
           </>
         );
@@ -125,7 +127,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
         { name: 'Data catalogue', link: '/data-catalogue' },
         {
           name: title,
-          link: `/data-catalogue/data-set/${id}`,
+          link: `/data-catalogue/data-set/${dataSetId}`,
         },
       ]}
     >
@@ -136,7 +138,9 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
         <Panel headingTag="h2" title="Subscribed">
           <p>You have successfully subscribed to these updates.</p>
           <p>
-            <Link to={`/data-catalogue/data-set/${id}`}>View {title}</Link>
+            <Link to={`/data-catalogue/data-set/${dataSetId}`}>
+              View {title}
+            </Link>
           </p>
         </Panel>
       ) : (

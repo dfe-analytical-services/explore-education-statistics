@@ -20,15 +20,17 @@ const apiNotificationService = {
     );
   },
   async confirmPendingSubscription(
-    id: string,
+    dataSetId: string,
     token: string,
-  ): Promise<ApiSubscription | undefined> {
+  ): Promise<ApiSubscription> {
     return notificationApi.post<ApiSubscription>(
-      `public-api/${id}/verify-subscription/${token}`,
+      `public-api/${dataSetId}/verify-subscription/${token}`,
     );
   },
-  confirmUnsubscription(id: string, token: string): Promise<ApiSubscription> {
-    return notificationApi.delete(`public-api/${id}/unsubscribe/${token}`);
+  confirmUnsubscription(dataSetId: string, token: string): Promise<void> {
+    return notificationApi.delete(
+      `public-api/${dataSetId}/unsubscribe/${token}`,
+    );
   },
 };
 export default apiNotificationService;

@@ -39,12 +39,12 @@ interface Props {
 }
 
 const NewSubscriptionPage: NextPage<Props> = ({ dataSetFile }) => {
-  const { id, title } = dataSetFile;
+  const { id: dataSetId, title } = dataSetFile;
 
   const handleFormSubmit = async ({ email }: FormValues) => {
     await apiNotificationService.requestPendingSubscription({
       email,
-      dataSetId: id,
+      dataSetId,
       dataSetTitle: title,
     });
   };
@@ -58,7 +58,7 @@ const NewSubscriptionPage: NextPage<Props> = ({ dataSetFile }) => {
         { name: 'Data catalogue', link: '/data-catalogue' },
         {
           name: title,
-          link: `/data-catalogue/data-set/${id}`,
+          link: `/data-catalogue/data-set/${dataSetId}`,
         },
       ]}
     >
