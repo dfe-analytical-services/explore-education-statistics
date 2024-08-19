@@ -25,9 +25,17 @@ describe('LiveApiDataSetsTable', () => {
       summary: 'Data set 2 summary',
       status: 'Published',
       latestLiveVersion: {
+        file: {
+          id: 'file-id',
+          title: 'file-title',
+        },
         published: '2024-02-01T09:30:00+00:00',
         id: 'version-2',
         version: '1.0',
+        releaseVersion: {
+          id: 'release-version-id',
+          title: 'Release Version',
+        },
         status: 'Published',
         type: 'Major',
       },
@@ -39,8 +47,16 @@ describe('LiveApiDataSetsTable', () => {
       summary: 'Data set 1 summary',
       status: 'Published',
       latestLiveVersion: {
+        file: {
+          id: 'file-id',
+          title: 'file-title',
+        },
         published: '2024-02-01T09:30:00+00:00',
         id: 'version-1',
+        releaseVersion: {
+          id: 'release-version-id',
+          title: 'Release Version',
+        },
         version: '2.0',
         status: 'Published',
         type: 'Major',
@@ -53,9 +69,17 @@ describe('LiveApiDataSetsTable', () => {
       summary: 'Data set 3 summary',
       status: 'Published',
       latestLiveVersion: {
+        file: {
+          id: 'file-id',
+          title: 'file-title',
+        },
         published: '2024-02-01T09:30:00+00:00',
         id: 'version-3',
         version: '1.2',
+        releaseVersion: {
+          id: 'release-version-id',
+          title: 'Release Version',
+        },
         status: 'Published',
         type: 'Minor',
       },

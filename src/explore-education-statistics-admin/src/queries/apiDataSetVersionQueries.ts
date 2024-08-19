@@ -1,17 +1,27 @@
-import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import apiDataSetVersionService, {
+  ListVersionsParams,
+} from '@admin/services/apiDataSetVersionService';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 const apiDataSetVersionQueries = createQueryKeys('apiDataSetVersionQueries', {
-  getFiltersMapping(versionId: string) {
+  list(query: ListVersionsParams) {
     return {
-      queryKey: [versionId],
-      queryFn: () => apiDataSetVersionService.getFiltersMapping(versionId),
+      queryKey: [query],
+      queryFn: () => apiDataSetVersionService.listVersions(query),
     };
   },
-  getLocationsMapping(versionId: string) {
+  getFiltersMapping(dataSetVersionId: string) {
     return {
-      queryKey: [versionId],
-      queryFn: () => apiDataSetVersionService.getLocationsMapping(versionId),
+      queryKey: [dataSetVersionId],
+      queryFn: () =>
+        apiDataSetVersionService.getFiltersMapping(dataSetVersionId),
+    };
+  },
+  getLocationsMapping(dataSetVersionId: string) {
+    return {
+      queryKey: [dataSetVersionId],
+      queryFn: () =>
+        apiDataSetVersionService.getLocationsMapping(dataSetVersionId),
     };
   },
 });
