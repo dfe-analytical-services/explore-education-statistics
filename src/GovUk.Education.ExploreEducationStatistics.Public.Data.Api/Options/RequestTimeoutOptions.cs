@@ -2,7 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 
 public class RequestTimeoutOptions
 {
-    public const string Section = "RequestTimeouts";
+    public const string Section = "RequestTimeout";
 
-    public int? RequestTimeoutMilliseconds { get; init; }
+    public int? TimeoutMilliseconds { get; init; }
 }
