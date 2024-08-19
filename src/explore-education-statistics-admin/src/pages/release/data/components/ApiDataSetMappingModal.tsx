@@ -7,8 +7,9 @@ import {
   LocationMappingWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import styles from '@admin/pages/release/data/components/ApiDataSetMappingModal.module.scss';
-import ApiDataSetMappingForm from '@admin/pages/release/data/components/ApiDataSetMappingForm';
-import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
+import ApiDataSetMappingForm, {
+  ApiDataSetMappingFormValues,
+} from '@admin/pages/release/data/components/ApiDataSetMappingForm';
 import {
   FilterOptionSource,
   LocationCandidate,
@@ -33,7 +34,7 @@ interface Props {
   renderSourceDetails?: (
     source: FilterOptionSource | LocationCandidate,
   ) => ReactNode;
-  onSubmit: (update: PendingMappingUpdate) => Promise<void>;
+  onSubmit: (values: ApiDataSetMappingFormValues) => Promise<void> | void;
 }
 
 export default function ApiDataSetMappingModal({
@@ -73,10 +74,10 @@ export default function ApiDataSetMappingModal({
         groupKey={groupKey}
         itemLabel={itemLabel}
         mapping={mapping}
-        newItems={newItems}
+        newCandidates={newItems}
         onCancel={toggleOpen.off}
-        onSubmit={async update => {
-          await onSubmit(update);
+        onSubmit={async values => {
+          await onSubmit(values);
           toggleOpen.off();
         }}
       />

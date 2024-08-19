@@ -38,7 +38,7 @@ describe('ApiDataSetMappingForm', () => {
         groupKey="region"
         itemLabel="location"
         mapping={testMapping}
-        newItems={testNewLocations}
+        newCandidates={testNewLocations}
         onSubmit={Promise.resolve}
       />,
     );
@@ -77,7 +77,7 @@ describe('ApiDataSetMappingForm', () => {
           type: 'ManualMapped',
           candidateKey: 'Location3Key',
         }}
-        newItems={[testNewLocations[0], testNewLocations[2]]}
+        newCandidates={[testNewLocations[0], testNewLocations[2]]}
         onSubmit={Promise.resolve}
       />,
     );
@@ -106,7 +106,7 @@ describe('ApiDataSetMappingForm', () => {
         groupKey="region"
         itemLabel="location"
         mapping={{ ...testMapping, type: 'ManualNone' }}
-        newItems={testNewLocations}
+        newCandidates={testNewLocations}
         onSubmit={Promise.resolve}
       />,
     );
@@ -121,7 +121,7 @@ describe('ApiDataSetMappingForm', () => {
         groupKey="region"
         itemLabel="location"
         mapping={testMapping}
-        newItems={testNewLocations}
+        newCandidates={testNewLocations}
         onSubmit={handleSubmit}
       />,
     );
@@ -159,7 +159,7 @@ describe('ApiDataSetMappingForm', () => {
         groupKey="region"
         itemLabel="location"
         mapping={testMapping}
-        newItems={testNewLocations}
+        newCandidates={testNewLocations}
         onSubmit={handleSubmit}
       />,
     );
@@ -196,7 +196,7 @@ describe('ApiDataSetMappingForm', () => {
         groupKey="region"
         itemLabel="location"
         mapping={testMapping}
-        newItems={testNewLocations}
+        newCandidates={testNewLocations}
         onSubmit={Promise.resolve}
       />,
     );

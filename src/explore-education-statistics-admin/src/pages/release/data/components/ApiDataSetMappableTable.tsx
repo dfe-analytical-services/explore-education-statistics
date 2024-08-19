@@ -1,3 +1,4 @@
+import { ApiDataSetMappingFormValues } from '@admin/pages/release/data/components/ApiDataSetMappingForm';
 import {
   FilterOptionSource,
   LocationCandidate,
@@ -69,6 +70,20 @@ export default function ApiDataSetMappableTable({
     item => item.mapping.type === 'AutoNone',
   ).length;
   const totalManuallyMapped = mappableItems.length - totalUnmapped;
+
+  const handleSubmit = async ({
+    candidateKey,
+  }: ApiDataSetMappingFormValues) => {
+    await onSubmit({
+      candidateKey:
+        nextCandidateKey !== noMappingValue ? nextCandidateKey : undefined,
+      groupKey,
+      sourceKey: mapping.sourceKey,
+      type: nextCandidateKey !== noMappingValue ? 'ManualMapped' : 'ManualNone',
+      previousCandidate: candidate,
+      previousMapping: mapping,
+    });
+  };
 
   return (
     <table
@@ -180,7 +195,7 @@ export default function ApiDataSetMappableTable({
                       mapping={mapping}
                       newItems={newItems}
                       renderSourceDetails={renderSourceDetails}
-                      onSubmit={onUpdate}
+                      onSubmit={handleSubmit}
                     />
                   </>
                 )}
