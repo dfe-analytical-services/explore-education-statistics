@@ -44,39 +44,6 @@ BEGIN
     SELECT TRIM(value)
     FROM STRING_SPLIT(@Tables, ',');
 
-    /*-----------------------------------------------------------------------*/
-
-    DROP TABLE IF EXISTS #Stats;
-
-    -- Get a list of all indexes and their fragmentation percentage
-    SELECT Id = IDENTITY(INT, 1, 1),
-                Fragmented.IndexName,
-                Fragmented.SchemaName,
-                Fragmented.ObjectName,
-                Fragmented.FragPercent,
-                CASE
-                    WHEN Fragmented.FragPercent >= @FragmentationThresholdRebuild THEN 'Rebuild'
-                    WHEN Fragmented.FragPercent >= @FragmentationThresholdReorganize THEN 'Reorganize'
-                    ELSE 'None'
-                    END AS ActionRequired
-    INTO #Stats
-    FROM (SELECT idx.name                         AS IndexName,
-                 sch.name                         AS SchemaName,
-                 tl.ObjectName,
-                 ips.avg_fragmentation_in_percent AS FragPercent
-          FROM #TableList AS tl
-                   JOIN sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, 'LIMITED') ips
-                        ON ips.object_id = OBJECT_ID(tl.ObjectName, 'U')
-                   JOIN sys.indexes idx ON idx.object_id = ips.object_id AND idx.index_id = ips.index_id
-                   JOIN sys.objects obj ON obj.object_id = ips.object_id
-                   JOIN sys.schemas sch ON sch.schema_id = obj.schema_id
-          WHERE ips.alloc_unit_type_desc = 'IN_ROW_DATA') AS Fragmented;
-
-    ALTER TABLE #Stats
-        ADD PRIMARY KEY (Id);
-
-    /*-----------------------------------------------------------------------*/
-
     -- Create result tables if necessary
     IF OBJECT_ID(N'__Log_RebuildIndexes', N'U') IS NULL
     CREATE TABLE __Log_RebuildIndexes
@@ -128,6 +95,39 @@ BEGIN
     VALUES (GETUTCDATE())
     -- The Id is generated, but we want it, so set @RunId equal to it here
     SET @RunId = SCOPE_IDENTITY();
+
+    /*-----------------------------------------------------------------------*/
+
+    DROP TABLE IF EXISTS #Stats;
+
+    -- Get a list of all indexes and their fragmentation percentage
+    SELECT Id = IDENTITY(INT, 1, 1),
+                Fragmented.IndexName,
+                Fragmented.SchemaName,
+                Fragmented.ObjectName,
+                Fragmented.FragPercent,
+                CASE
+                    WHEN Fragmented.FragPercent >= @FragmentationThresholdRebuild THEN 'Rebuild'
+                    WHEN Fragmented.FragPercent >= @FragmentationThresholdReorganize THEN 'Reorganize'
+                    ELSE 'None'
+                    END AS ActionRequired
+    INTO #Stats
+    FROM (SELECT idx.name                         AS IndexName,
+                 sch.name                         AS SchemaName,
+                 tl.ObjectName,
+                 ips.avg_fragmentation_in_percent AS FragPercent
+          FROM #TableList AS tl
+                   JOIN sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, 'LIMITED') ips
+                        ON ips.object_id = OBJECT_ID(tl.ObjectName, 'U')
+                   JOIN sys.indexes idx ON idx.object_id = ips.object_id AND idx.index_id = ips.index_id
+                   JOIN sys.objects obj ON obj.object_id = ips.object_id
+                   JOIN sys.schemas sch ON sch.schema_id = obj.schema_id
+          WHERE ips.alloc_unit_type_desc = 'IN_ROW_DATA') AS Fragmented;
+
+    ALTER TABLE #Stats
+        ADD PRIMARY KEY (Id);
+
+    /*-----------------------------------------------------------------------*/
 
     -- Create rows for indexes
     SELECT @StatsCount = COUNT(Id) FROM #Stats;
