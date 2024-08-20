@@ -26,6 +26,8 @@ public abstract record DataSetVersionViewModel
 
     public long TotalResults { get; init; }
 
+    public required string Notes { get; init; }
+
     public TimePeriodRangeViewModel? TimePeriods { get; init; }
 
     public IReadOnlyList<string>? GeographicLevels { get; init; }
@@ -66,6 +68,8 @@ public record DataSetVersionSummaryViewModel
 
     [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
+
+    public required IdTitleViewModel ReleaseVersion { get; init; }
 }
 
 public record DataSetLiveVersionSummaryViewModel : DataSetVersionSummaryViewModel

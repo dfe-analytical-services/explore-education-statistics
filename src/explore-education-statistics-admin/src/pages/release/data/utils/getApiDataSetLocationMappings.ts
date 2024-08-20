@@ -3,99 +3,152 @@ import {
   LocationMapping,
   LocationsMapping,
 } from '@admin/services/apiDataSetVersionService';
-import { Dictionary } from '@common/types';
-import { LocationLevelsType } from '@common/utils/locationLevelsMap';
-import difference from 'lodash/difference';
+import { LocationLevelKey } from '@common/utils/locationLevelsMap';
+import { camelCase } from 'lodash';
+
+export interface LocationCandidateWithKey extends LocationCandidate {
+  key: string;
+}
+export interface LocationMappingWithKey extends LocationMapping {
+  sourceKey: string;
+}
 
 export interface AutoMappedLocation {
-  candidate: LocationCandidate;
-  mapping: LocationMapping;
+  candidate: LocationCandidateWithKey;
+  mapping: LocationMappingWithKey;
 }
-export interface NewLocationCandidate {
-  candidate: LocationCandidate;
-}
-export interface UnmappedAndManuallyMappedLocation {
-  candidate?: LocationCandidate;
-  mapping: LocationMapping;
+
+export interface MappableLocation {
+  candidate?: LocationCandidateWithKey;
+  mapping: LocationMappingWithKey;
 }
 
 export default function getApiDataSetLocationMappings(
   locationsMapping: LocationsMapping,
 ): {
-  autoMappedLocations: AutoMappedLocation[];
-  newLocationCandidates: Dictionary<NewLocationCandidate[]>;
-  unmappedAndManuallyMappedLocations: Dictionary<
-    UnmappedAndManuallyMappedLocation[]
-  >;
+  autoMappedLocations: Partial<Record<LocationLevelKey, AutoMappedLocation[]>>;
+  newLocations: Partial<Record<LocationLevelKey, LocationCandidateWithKey[]>>;
+  mappableLocations: Partial<Record<LocationLevelKey, MappableLocation[]>>;
 } {
-  const levels = Object.keys(locationsMapping?.levels);
-  const unmappedAndManuallyMappedLocations: Dictionary<
-    UnmappedAndManuallyMappedLocation[]
+  const mappableLocations: Partial<
+    Record<LocationLevelKey, MappableLocation[]>
   > = {};
-  const newLocationCandidates: Dictionary<NewLocationCandidate[]> = {};
-  // auto mapped locations aren't grouped by level
-  const autoMappedLocations: AutoMappedLocation[] = [];
+  const newLocations: Partial<
+    Record<LocationLevelKey, LocationCandidateWithKey[]>
+  > = {};
+  const autoMappedLocations: Partial<
+    Record<LocationLevelKey, AutoMappedLocation[]>
+  > = {};
 
-  levels.forEach(level => {
-    const unmapped: {
-      candidate?: LocationCandidate;
-      mapping: LocationMapping;
-    }[] = [];
-    const autoMapped: {
-      candidate: LocationCandidate;
-      mapping: LocationMapping;
-    }[] = [];
-    const levelCandidates =
-      locationsMapping.levels[level as LocationLevelsType].candidates;
+  Object.keys(locationsMapping.levels).forEach(level => {
+    const mappable: MappableLocation[] = [];
+    const autoMapped: AutoMappedLocation[] = [];
 
-    Object.values(
-      locationsMapping.levels[level as LocationLevelsType].mappings,
-    ).forEach(mapping => {
-      if (mapping.type === 'AutoMapped' && mapping.candidateKey) {
+    const levelMappings = locationsMapping.levels[level]?.mappings ?? {};
+    const levelCandidates = locationsMapping.levels[level]?.candidates ?? {};
+
+    const mappedCandidateKeys = new Set<string>();
+
+    Object.entries(levelMappings).forEach(([key, mapping]) => {
+      if (mapping.type === 'AutoMapped') {
+        if (!mapping.candidateKey) {
+          throw new Error(
+            `Candidate key missing for AutoMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
+        }
+
+        mappedCandidateKeys.add(mapping.candidateKey);
+
         const candidate = levelCandidates[mapping.candidateKey];
-        autoMapped.push({ candidate, mapping });
+
+        if (candidate) {
+          autoMapped.push({
+            candidate: { ...candidate, key: mapping.candidateKey },
+            mapping: { ...mapping, sourceKey: key },
+          });
+        } else {
+          throw new Error(
+            `Cannot find candidate for AutoMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
+        }
       }
-      if (mapping.type === 'ManualMapped' && mapping.candidateKey) {
+
+      if (mapping.type === 'ManualMapped') {
+        if (!mapping.candidateKey) {
+          throw new Error(
+            `Candidate key missing for ManualMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
+        }
+
+        mappedCandidateKeys.add(mapping.candidateKey);
+
         const candidate = levelCandidates[mapping.candidateKey];
-        unmapped.push({ candidate, mapping });
+
+        if (candidate) {
+          mappable.push({
+            candidate: { ...candidate, key: mapping.candidateKey },
+            mapping: { ...mapping, sourceKey: key },
+          });
+        } else {
+          throw new Error(
+            `Cannot find candidate for ManualMapped location: ${JSON.stringify({
+              level,
+              key,
+              mapping,
+            })}`,
+          );
+        }
       }
+
       if (mapping.type === 'AutoNone' || mapping.type === 'ManualNone') {
-        unmapped.push({ mapping });
+        mappable.push({ mapping: { ...mapping, sourceKey: key } });
       }
-      return mapping;
     });
 
-    const candidateKeys = Object.keys(
-      locationsMapping.levels[level as LocationLevelsType].candidates,
-    );
-    const mappingKeys = Object.keys(
-      locationsMapping.levels[level as LocationLevelsType].mappings,
-    );
+    // New locations:
+    // - completely new locations (have a unique key)
+    // - locations that were auto mapped but the mapping has been removed
+    // (the original mapping and the candidate have the same key)
+    const newLocationsForLevel: LocationCandidateWithKey[] = Object.entries(
+      levelCandidates,
+    )
+      .filter(([key, _]) => !mappedCandidateKeys.has(key))
+      .map(([key, candidate]) => ({
+        ...candidate,
+        key,
+      }));
 
-    const newLocations: { candidate: LocationCandidate }[] = difference(
-      candidateKeys,
-      mappingKeys,
-    ).map(key => {
-      return {
-        candidate:
-          locationsMapping.levels[level as LocationLevelsType]?.candidates[key],
-      };
-    });
+    // TODO remove camelCase
+    const levelKey = camelCase(level) as LocationLevelKey;
 
-    if (unmapped.length) {
-      unmappedAndManuallyMappedLocations[level] = unmapped;
+    if (mappable.length) {
+      mappableLocations[levelKey] = mappable;
     }
+
     if (autoMapped.length) {
-      autoMappedLocations.push(...autoMapped);
+      autoMappedLocations[levelKey] = autoMapped;
     }
-    if (newLocations.length) {
-      newLocationCandidates[level] = newLocations;
+
+    if (newLocationsForLevel.length) {
+      newLocations[levelKey] = newLocationsForLevel;
     }
   });
 
   return {
     autoMappedLocations,
-    newLocationCandidates,
-    unmappedAndManuallyMappedLocations,
+    newLocations,
+    mappableLocations,
   };
 }

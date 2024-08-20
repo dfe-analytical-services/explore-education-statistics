@@ -1,8 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using System;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Requests;
 
@@ -18,10 +18,6 @@ public record FullTableQueryRequest
 
     public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
 
-    // BoundaryLevel is used by DataBlockUpdateRequest, and TableBuilderController#Query with Map Charts
-    // Also see EES-3328 and EES-3319
-    public long? BoundaryLevel { get; set; }
-
     public FullTableQuery AsFullTableQuery()
     {
         return new FullTableQuery
@@ -31,7 +27,6 @@ public record FullTableQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = this.Filters,
             Indicators = this.Indicators,
-            BoundaryLevel = this.BoundaryLevel,
         };
     }
 
@@ -72,7 +67,6 @@ public class LocationsOrTimePeriodsQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = [],
             Indicators = [],
-            BoundaryLevel = null,
         };
     }
 

@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using Dapper;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -137,6 +139,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Services
 
         services.AddFluentValidation();
+        services.AddValidatorsFromAssembly(typeof(DataSetGetQueryLocations.Validator).Assembly); // Adds *all* validators from Public.Data.Requests
         services.AddFluentValidationRulesToSwagger();
 
         services.AddHttpClient<IContentApiClient, ContentApiClient>((provider, httpClient) =>
@@ -153,6 +156,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IDataSetService, DataSetService>();
         services.AddScoped<IDataSetQueryService, DataSetQueryService>();
         services.AddScoped<IDataSetQueryParser, DataSetQueryParser>();
+        services.AddScoped<IDataSetVersionChangeService, DataSetVersionChangeService>();
 
         services.AddScoped<IParquetDataRepository, ParquetDataRepository>();
         services.AddScoped<IParquetFilterRepository, ParquetFilterRepository>();

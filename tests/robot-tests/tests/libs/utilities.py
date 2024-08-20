@@ -30,6 +30,7 @@ if not utilities_init.initialised:
 
         return parent_locator
 
+
     def _find_by_label(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
@@ -41,10 +42,12 @@ if not utilities_init.initialised:
         for_id = labels[0].get_attribute("for")
         return get_child_elements(parent_locator, f"id:{for_id}")
 
+
     def _find_by_testid(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
         return get_child_elements(parent_locator, f'css:[data-testid="{criteria}"]')
+
 
     # Register locator strategies
 
@@ -85,8 +88,21 @@ def raise_assertion_error(err_msg):
     raise AssertionError(err_msg)
 
 
+def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
+    last_exception = None
+    for attempt in range(retries):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            last_exception = e
+            logger.warn(f"Attempt {attempt + 1}/{retries} failed with error: {e}. Retrying in {delay} seconds...")
+            time.sleep(delay)
+    # Raise the last exception if all retries failed
+    raise last_exception
+
+
 def user_waits_until_parent_contains_element(
-    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None
+    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None, retries: int = 5, delay: float = 1.0
 ):
     try:
         child_locator = _normalise_child_locator(child_locator)
@@ -96,7 +112,10 @@ def user_waits_until_parent_contains_element(
             return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
-            return waiting()._wait_until(
+            return retry_or_fail_with_delay(
+                waiting()._wait_until,
+                retries,
+                delay,
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
                 timeout,
@@ -109,7 +128,10 @@ def user_waits_until_parent_contains_element(
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
-        waiting()._wait_until(
+        retry_or_fail_with_delay(
+            waiting()._wait_until,
+            retries,
+            delay,
             parent_contains_matching_elements,
             "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
             timeout,
@@ -163,31 +185,35 @@ def user_waits_until_parent_does_not_contain_element(
         raise_assertion_error(err)
 
 
-def get_child_element(parent_locator: object, child_locator: str):
-    try:
-        children = get_child_elements(parent_locator, child_locator)
+def get_child_element(parent_locator: object, child_locator: str, retries: int = 5, delay: float = 1.0):
+    for attempt in range(retries):
+        try:
+            children = get_child_elements(parent_locator, child_locator)
+            if not children:
+                if attempt < retries - 1:
+                    logger.info(f"Retrying... ({attempt + 1}/{retries})")
+                    time.sleep(delay)
+                    continue
+                else:
+                    raise_assertion_error(
+                        f"No elements matching child locator '{child_locator}' under parent locator '{parent_locator}' after {retries} retries"
+                    )
+            if len(children) > 1:
+                logger.warning(
+                    f"Multiple ({len(children)}) elements found for child locator '{child_locator}' under parent locator '{parent_locator}'. "
+                    f"Returning the first element. Consider refining the parent selector."
+                )
+            return children[0]
 
-        if len(children) == 0:
-            raise_assertion_error(
-                f"Found no elements matching child locator {child_locator} under parent "
-                f"locator {parent_locator} in utilities.py#get_child_element()"
-            )
-
-        if len(children) > 1:
-            logger.warn(
-                f"Found {len(children)} child elements matching child locator {child_locator} "
-                f"under parent locator {parent_locator} in utilities.py#get_child_element() - "
-                f"was expecting only one. Consider making the parent selector more specific. "
-                f"Returning the first element found."
-            )
-
-        return children[0]
-    except Exception as err:
-        logger.warn(
-            f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
-            f"locator {child_locator} - {err}"
-        )
-        raise_assertion_error(err)
+        except Exception as err:
+            if attempt < retries - 1:
+                logger.info(f"Retrying due to error... ({attempt + 1}/{retries})")
+                time.sleep(delay)
+                continue
+            else:
+                raise_assertion_error(
+                    f"Error in get_child_element() with parent '{parent_locator}' and child locator '{child_locator}': {err}"
+                )
 
 
 def get_child_elements(parent_locator: object, child_locator: str):
@@ -377,8 +403,10 @@ def remove_auth_from_url(publicUrl: str):
     if parsed_url.port:
         netloc += f":{parsed_url.port}"
 
-    modified_url_without_auth = urlunparse((parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment))
+    modified_url_without_auth = urlunparse(
+        (parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment))
     return modified_url_without_auth
+
 
 def get_child_element_with_retry(parent_locator: object, child_locator: str, max_retries=3, retry_delay=2):
     retry_count = 0

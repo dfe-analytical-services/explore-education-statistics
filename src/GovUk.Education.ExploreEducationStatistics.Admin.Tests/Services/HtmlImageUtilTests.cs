@@ -1,6 +1,5 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {

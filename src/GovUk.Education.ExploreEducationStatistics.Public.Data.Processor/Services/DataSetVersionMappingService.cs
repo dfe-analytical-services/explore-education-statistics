@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
@@ -15,12 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 internal class DataSetVersionMappingService(
     IDataSetMetaService dataSetMetaService,
-    PublicDataDbContext publicDataDbContext)
+    PublicDataDbContext publicDataDbContext,
+    ContentDbContext contentDbContext)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
     [
-        MappingType.None,
+        MappingType.AutoNone
+    ];
+
+    private static readonly MappingType[] NoMappingTypes =
+    [
+        MappingType.ManualNone,
         MappingType.AutoNone
     ];
 
@@ -76,6 +83,7 @@ internal class DataSetVersionMappingService(
     {
         var mappings = await publicDataDbContext
             .DataSetVersionMappings
+            .Include(mapping => mapping.TargetDataSetVersion)
             .SingleAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken);
@@ -92,18 +100,50 @@ internal class DataSetVersionMappingService(
                 .Any(optionMapping =>
                     IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
 
+        // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
+        // omit checking the status of filters that have a mapping of AutoNone.
         mappings.FilterMappingsComplete = !mappings
             .FilterMappingPlan
             .Mappings
-            .Any(filterMapping =>
-                IncompleteMappingTypes.Contains(filterMapping.Value.Type)
-                || filterMapping
-                    .Value
-                    .OptionMappings
-                    .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
+            .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
-        publicDataDbContext.Update(mappings);
+        // Consider the current mappings to produce a major version change if any options from the
+        // original data set version are currently not mapped to options in the new version.
+        var hasMajorLocationVersionUpdate = mappings
+            .LocationMappingPlan
+            .Levels
+            .Any(level => level
+                .Value
+                .Mappings
+                .Any(optionMapping =>
+                    NoMappingTypes.Contains(optionMapping.Value.Type)));
+
+        var hasMajorFilterVersionUpdate = mappings
+            .FilterMappingPlan
+            .Mappings
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
+
+        var isMajorVersionUpdate = hasMajorLocationVersionUpdate || hasMajorFilterVersionUpdate;
+
+        if (isMajorVersionUpdate)
+        {
+            mappings.TargetDataSetVersion.VersionMajor += 1;
+            mappings.TargetDataSetVersion.VersionMinor = 0;
+        }
+
+        publicDataDbContext.DataSetVersionMappings.Update(mappings);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        var releaseFile = await contentDbContext.ReleaseFiles
+            .Where(rf => rf.Id == mappings.TargetDataSetVersion.ReleaseFileId)
+            .SingleAsync(cancellationToken);
+
+        releaseFile.PublicApiDataSetVersion = mappings.TargetDataSetVersion.SemVersion();
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

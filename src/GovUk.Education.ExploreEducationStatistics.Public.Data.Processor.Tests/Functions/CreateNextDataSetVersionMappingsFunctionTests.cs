@@ -90,7 +90,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             Assert.Equal(2, updatedDataSet.Versions.Count);
             var nextDataSetVersion = updatedDataSet
                 .Versions
-                .OrderBy(v => v.FullSemanticVersion())
+                .OrderBy(v => v.SemVersion())
                 .Last();
             Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
 
@@ -131,7 +131,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst());
+                nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst());
         }
 
         [Fact]
@@ -144,7 +144,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst());
+                nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst());
         }
 
         [Fact]
@@ -160,7 +160,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
 
             result.AssertNotFoundWithValidationProblem<DataSet, Guid>(
                 expectedId: dataSetId,
-                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst());
+                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst());
         }
 
         [Fact]
@@ -214,7 +214,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
         }
 
@@ -323,7 +323,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileNotInDataSetPublication.Code
             );
         }
@@ -346,7 +346,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst(),
                 expectedCode: ValidationMessages.DataSetNoLiveVersion.Code
             );
         }
@@ -397,7 +397,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
-                expectedPath: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst(),
+                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
                 expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
             );
         }
@@ -470,8 +470,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             DurableTaskClient? durableTaskClient = null)
         {
             var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
-            return await function.CreateNextDataSetVersion(
-                new NextDataSetVersionCreateMappingsRequest
+            return await function.CreateNextDataSetVersionMappings(
+                new NextDataSetVersionMappingsCreateRequest
                 {
                     DataSetId = dataSetId,
                     ReleaseFileId = releaseFileId

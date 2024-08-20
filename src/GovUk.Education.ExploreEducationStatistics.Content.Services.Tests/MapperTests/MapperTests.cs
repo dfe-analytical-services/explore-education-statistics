@@ -12,7 +12,7 @@ public class MapperTests
     [Fact]
     public void CanMapContactsToContactViewModels()
     {
-        var mockContact = new Contact()
+        var mockContact = new Contact
         {
             ContactName = "Mock Contact Name",
             ContactTelNo = "Mock Contact Tel No.",

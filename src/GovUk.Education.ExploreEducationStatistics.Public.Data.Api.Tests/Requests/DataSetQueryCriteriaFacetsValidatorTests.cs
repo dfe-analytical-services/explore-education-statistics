@@ -5,6 +5,7 @@ using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Dat
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
+[Collection("Set FluentValidation property name camel case configuration")]
 public abstract class DataSetQueryCriteriaFacetsValidatorTests
 {
     private readonly DataSetQueryCriteriaFacets.Validator _validator = new();
@@ -37,7 +38,7 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
             };
 
             _validator.TestValidate(facets)
-                .ShouldHaveValidationErrorFor(f => f.Filters!.Eq)
+                .ShouldHaveValidationErrorFor("filters.eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
@@ -70,7 +71,7 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
             };
 
             _validator.TestValidate(facets)
-                .ShouldHaveValidationErrorFor(f => f.GeographicLevels!.Eq)
+                .ShouldHaveValidationErrorFor("geographicLevels.eq")
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
         }
     }
@@ -103,7 +104,7 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
             };
 
             _validator.TestValidate(facets)
-                .ShouldHaveValidationErrorFor(f => f.Locations!.Eq!.Level)
+                .ShouldHaveValidationErrorFor("locations.eq.level")
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
         }
     }
@@ -136,7 +137,7 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
             };
 
             _validator.TestValidate(facets)
-                .ShouldHaveValidationErrorFor(f => f.TimePeriods!.Eq!.Code)
+                .ShouldHaveValidationErrorFor("timePeriods.eq.code")
                 .WithErrorCode(ValidationMessages.TimePeriodAllowedCode.Code);
         }
     }
@@ -194,16 +195,16 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
 
             var result = _validator.TestValidate(facets);
 
-            result.ShouldHaveValidationErrorFor(f => f.Filters!.Eq)
+            result.ShouldHaveValidationErrorFor("filters.eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor(f => f.GeographicLevels!.Eq)
+            result.ShouldHaveValidationErrorFor("geographicLevels.eq")
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
 
-            result.ShouldHaveValidationErrorFor("Locations.Eq.Id")
+            result.ShouldHaveValidationErrorFor("locations.eq.id")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
 
-            result.ShouldHaveValidationErrorFor(f => f.TimePeriods!.Eq!.Period)
+            result.ShouldHaveValidationErrorFor("timePeriods.eq.period")
                 .WithErrorCode(ValidationMessages.TimePeriodInvalidYearRange.Code);
         }
     }

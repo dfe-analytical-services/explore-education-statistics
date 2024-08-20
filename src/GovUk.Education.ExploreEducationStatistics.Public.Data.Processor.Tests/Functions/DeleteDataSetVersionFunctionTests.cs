@@ -34,8 +34,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithPublication(DataFixture
-                        .DefaultPublication()))
+                    .WithPublication(DataFixture.DefaultPublication()))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
@@ -52,7 +51,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0, 0)
+                .WithVersionNumber(major: 1, minor: 0)
                 .WithStatus(dataSetVersionStatus)
                 .WithReleaseFileId(releaseFile.Id)
                 .WithDataSet(dataSet)
@@ -68,7 +67,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             });
 
             releaseFile.PublicApiDataSetId = dataSet.Id;
-            releaseFile.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
+            releaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion();
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Update(releaseFile));
 
@@ -129,8 +128,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         {
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithPublication(DataFixture
-                        .DefaultPublication()))
+                    .WithPublication(DataFixture.DefaultPublication()))
                 .WithFile(() => DataFixture.DefaultFile(FileType.Data))
                 .GenerateList(2);
 
@@ -151,7 +149,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 
             DataSetVersion liveDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0, 0)
+                .WithVersionNumber(major: 1, minor: 0)
                 .WithStatusPublished()
                 .WithReleaseFileId(liveReleaseFile.Id)
                 .WithDataSet(dataSet)
@@ -163,7 +161,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 
             DataSetVersion draftDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(2, 0, 0)
+                .WithVersionNumber(major: 2, minor: 0, patch: 1)
                 .WithStatus(dataSetVersionStatus)
                 .WithReleaseFileId(draftReleaseFile.Id)
                 .WithDataSet(dataSet)
@@ -179,9 +177,9 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             });
 
             liveReleaseFile.PublicApiDataSetId = dataSet.Id;
-            liveReleaseFile.PublicApiDataSetVersion = liveDataSetVersion.FullSemanticVersion();
+            liveReleaseFile.PublicApiDataSetVersion = liveDataSetVersion.SemVersion();
             draftReleaseFile.PublicApiDataSetId = dataSet.Id;
-            draftReleaseFile.PublicApiDataSetVersion = draftDataSetVersion.FullSemanticVersion();
+            draftReleaseFile.PublicApiDataSetVersion = draftDataSetVersion.SemVersion();
 
             await AddTestData<ContentDbContext>(context =>
                 context.ReleaseFiles.UpdateRange(liveReleaseFile, draftReleaseFile));
@@ -309,7 +307,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .SingleAsync(f => f.Id == liveReleaseFile.Id);
 
             Assert.Equal(dataSet.Id, updatedLiveReleaseFile.PublicApiDataSetId);
-            Assert.Equal(liveDataSetVersion.FullSemanticVersion(), updatedLiveReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal(liveDataSetVersion.SemVersion(), updatedLiveReleaseFile.PublicApiDataSetVersion);
         }
 
         [Theory]
@@ -327,7 +325,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0, 0)
+                .WithVersionNumber(major: 1, minor: 0)
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet);
 
@@ -351,8 +349,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithPublication(DataFixture
-                        .DefaultPublication()))
+                    .WithPublication(DataFixture.DefaultPublication()))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
@@ -369,7 +366,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0, 0)
+                .WithVersionNumber(major: 1, minor: 0)
                 .WithStatusDraft()
                 .WithReleaseFileId(releaseFile.Id)
                 .WithDataSet(dataSet)

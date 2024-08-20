@@ -140,7 +140,7 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
             .SetUser(AuthenticatedUser(RoleClaim(RoleNames.BauUser)))
             .CreateClient();
 
-        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, @"Resources/REG - Regions England BUC 202212.geojson");
+        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Resources/REG - Regions England BUC 202212.geojson");
         var content = new MultipartFormDataContent
         {
             { new StringContent("Region"), "level" },

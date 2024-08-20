@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -143,6 +144,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 Assert.Single(path);
                 Assert.Equal(typeof(ActionResult), path[0]);
             }
+        }
+
+        public class GetSubclassesTests
+        {
+            [Fact]
+            public void EmptyWhenNoSubclasses()
+            {
+                var subclasses = typeof(NotDerived)
+                    .GetSubclasses()
+                    .ToList();
+
+                Assert.Empty(subclasses);
+            }
+
+            [Fact]
+            public void ReturnsSubclasses()
+            {
+                var subclasses = typeof(Base)
+                    .GetSubclasses()
+                    .ToList();
+
+                Assert.Equal(2, subclasses.Count);
+                Assert.Equal(typeof(Derived1), subclasses[0]);
+                Assert.Equal(typeof(Derived2), subclasses[1]);
+            }
+
+            private class Base;
+            private class Derived1 : Base;
+            private class Derived2 : Derived1;
+
+            private class NotDerived;
         }
 
         public class IsSimpleTests

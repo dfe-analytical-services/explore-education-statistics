@@ -15,9 +15,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public IEnumerable<Guid> Filters { get; set; } = new List<Guid>();
 
         public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
-
-        // TODO EES-3328 - remove BoundaryLevel from FullTableQuery as we now store it on
-        // MapChart configuration instead
-        public long? BoundaryLevel { get; set; }
     }
 }

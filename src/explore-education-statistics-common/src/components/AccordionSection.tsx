@@ -1,4 +1,4 @@
-import CopyLinkButton from '@common/components/CopyLinkButton';
+import CopyLinkModal from '@common/components/CopyLinkModal';
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
@@ -12,7 +12,7 @@ export type ToggleHandler = (open: boolean, id: string) => void;
 export interface AccordionSectionProps {
   anchorLinkIdPrefix?: string;
   anchorLinkUrl?: (id: string) => string;
-  caption?: string;
+  caption?: ReactNode | string;
   children?:
     | ReactNode
     | ((props: {
@@ -79,8 +79,8 @@ const AccordionSection = ({
     >
       <div className="govuk-accordion__section-header">
         {anchorLinkUrl && (
-          <CopyLinkButton
-            className={styles.copyLinkButton}
+          <CopyLinkModal
+            buttonClassName={styles.copyLinkButton}
             url={anchorLinkUrl(anchorId)}
           />
         )}
@@ -154,7 +154,7 @@ function HeadingContent({
   caption,
   heading,
 }: {
-  caption?: string;
+  caption?: ReactNode | string;
   heading: string;
 }) {
   return (

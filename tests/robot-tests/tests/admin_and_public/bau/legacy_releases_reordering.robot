@@ -17,6 +17,7 @@ ${PUBLICATION_NAME}=                    ui-tests-legacy-releases-%{RUN_IDENTIFIE
 ${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_NAME}
 ${DESCRIPTION}=                         legacy release description
 ${UPDATED_DESCRIPTION}=                 updated legacy release description
+${PUBLIC_URL_WITHOUT_AUTH}           ${EMPTY}
 
 
 *** Test Cases ***
@@ -51,8 +52,11 @@ Validate that publication and legacy releases exist in the page
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
 
+    ${PUBLIC_URL_WITHOUT_AUTH}=    remove auth from url    %{PUBLIC_URL}
+    set suite variable    ${PUBLIC_URL_WITHOUT_AUTH}
+
     user checks table cell contains    1    1    Academic year 2020/21
-    user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_NAME}/2020-21
+    user checks table cell contains    1    2    ${PUBLIC_URL_WITHOUT_AUTH}/find-statistics/${PUBLICATION_NAME}/2020-21
     user checks table cell contains    1    3    Unpublished
 
     user checks table cell contains    2    1    ${DESCRIPTION}
@@ -78,6 +82,7 @@ Add headline text block to Content page
 
 Approve release
     user clicks link    Sign off
+    sleep    1
     user approves original release for immediate publication
     user waits until page contains element    testid:public-release-url
     ${PUBLIC_RELEASE_LINK}=    get value    xpath://*[@data-testid="public-release-url"]

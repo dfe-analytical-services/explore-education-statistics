@@ -69,6 +69,7 @@ export const testMapConfiguration: Chart = {
       },
     ],
   },
+  boundaryLevel: 1,
   type: 'map',
   title: '',
   alt: '',

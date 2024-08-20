@@ -131,11 +131,14 @@ Update methodology details
     user waits until page contains element    xpath://h2[contains(text(),'Edit methodology summary')]
     user clicks radio    Set an alternative title
     user enters text into element    id:updateMethodologyForm-title    ${PUBLICATION_NAME}-methodology update
+    user waits until button is clickable    Update methodology
     user clicks button    Update methodology
+    user waits until page finishes loading
 
 Navigate to sign-off page and approve the methodology immediately
     user clicks link    Sign off
-    User clicks button    Edit status
+    user waits until h2 is visible    Sign off
+    user clicks button    Edit status
     user waits until page finishes loading
     user clicks radio    Approved for publication
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Internal note

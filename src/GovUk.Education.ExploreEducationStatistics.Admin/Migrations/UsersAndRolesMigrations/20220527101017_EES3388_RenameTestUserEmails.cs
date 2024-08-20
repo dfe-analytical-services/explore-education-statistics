@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.MigrationConstants;
 
-#nullable disable
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations;
 
 public partial class EES3388_RenameTestUserEmails : Migration

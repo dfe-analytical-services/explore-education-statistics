@@ -2,9 +2,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 
 public class AppSettingsOptions
 {
-    public const string AppSettings = "AppSettings";
+    public const string Section = "AppSettings";
 
-    public string PublishReleaseContentCronSchedule { get; init; } = null!;
+    public required string PrivateStorageConnectionString { get; init; }
 
-    public string PublishReleasesCronSchedule { get; init; } = null!;
+    public required string PublicStorageConnectionString { get; init; }
+
+    public required string NotifierStorageConnectionString { get; init; }
+
+    public required string PublisherStorageConnectionString { get; init; }
+
+    public required string PublishReleaseContentCronSchedule { get; init; }
+
+    public required string PublishReleasesCronSchedule { get; init; }
 }

@@ -1,0 +1,12 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.message {
+  height: 2rem;
+  margin: govuk-spacing(2) 0;
+}
+
+.container {
+  @include govuk-media-query($from: tablet) {
+    width: 500px;
+  }
+}

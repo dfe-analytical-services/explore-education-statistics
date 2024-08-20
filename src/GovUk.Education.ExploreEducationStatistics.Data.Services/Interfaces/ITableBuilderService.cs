@@ -1,12 +1,12 @@
 #nullable enable
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseVersionId,
             FullTableQuery query,
+            long? boundaryLevelId,
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> QueryToCsvStream(

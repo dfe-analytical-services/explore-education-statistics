@@ -1,13 +1,14 @@
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
@@ -17,7 +18,7 @@ public class HealthCheckFunctions(
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IConfiguration configuration)
+    IOptions<AppSettingsOptions> appSettingsOptions)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
@@ -89,7 +90,7 @@ public class HealthCheckFunctions(
 
         try
         {
-            var connectionString = configuration.GetValue<string>("CoreStorage");
+            var connectionString = appSettingsOptions.Value.PrivateStorageConnectionString;
             var blobClient = new BlobServiceClient(connectionString);
             var response = await blobClient.GetAccountInfoAsync();
             return response.HasValue
@@ -130,7 +131,7 @@ public class HealthCheckFunctions(
             && FileShareMount.IsHealthy
             && CoreStorageConnection.IsHealthy
             && ContentDbConnection.IsHealthy;
-    };
+    }
 
     public record HealthCheckSummary
     {

@@ -58,6 +58,7 @@ public class FilterOptionMetaChange : Change<FilterOptionMetaChange.State>
                 b.HasOne(s => s.Option)
                     .WithMany();
 
+                b.Navigation(s => s.Meta).AutoInclude();
                 b.Navigation(s => s.Option).AutoInclude();
             });
 
@@ -69,6 +70,7 @@ public class FilterOptionMetaChange : Change<FilterOptionMetaChange.State>
                 b.HasOne(s => s.Option)
                     .WithMany();
 
+                b.Navigation(s => s.Meta).AutoInclude();
                 b.Navigation(s => s.Option).AutoInclude();
             });
         }
@@ -130,6 +132,7 @@ public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
                 b.HasOne(s => s.Option)
                     .WithMany();
 
+                b.Navigation(s => s.Meta).AutoInclude();
                 b.Navigation(s => s.Option).AutoInclude();
             });
 
@@ -141,6 +144,7 @@ public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
                 b.HasOne(s => s.Option)
                     .WithMany();
 
+                b.Navigation(s => s.Meta).AutoInclude();
                 b.Navigation(s => s.Option).AutoInclude();
             });
         }
@@ -155,6 +159,8 @@ public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
         public LocationOptionMeta Option { get; set; } = null!;
 
         public required int OptionId { get; set; }
+
+        public required string PublicId { get; set; }
     }
 }
 

@@ -10,7 +10,7 @@ variables:
   BuildConfiguration: 'Release'
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
-  NODE_VERSION: 20.14.0
+  NODE_VERSION: 20.16.0
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
 
 trigger:

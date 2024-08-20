@@ -24,25 +24,7 @@ public class DataBlockViewModel : IContentBlockViewModel
 
     public FullTableQuery Query { get; set; }
 
-    private List<IChart> ChartsInternal;
-
-    // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
-    // own Boundary Level selection
-    public List<IChart> Charts
-    {
-        get => ChartsInternal;
-        set
-        {
-            value.ForEach(chart =>
-            {
-                if (chart is MapChart { BoundaryLevel: null } mapChart)
-                {
-                    mapChart.BoundaryLevel = Query.BoundaryLevel;
-                }
-            });
-            ChartsInternal = value;
-        }
-    }
+    public List<IChart> Charts { get; set; }
 
     public TableBuilderConfiguration Table { get; set; }
 }

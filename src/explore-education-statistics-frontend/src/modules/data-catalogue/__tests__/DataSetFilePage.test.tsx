@@ -1,11 +1,12 @@
-import _downloadService from '@common/services/downloadService';
 import render from '@common-test/render';
-import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
+import _downloadService from '@common/services/downloadService';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import {
   testApiDataSet,
   testApiDataSetVersion,
   testDataSetFile,
 } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
@@ -16,8 +17,6 @@ const downloadService = _downloadService as jest.Mocked<
 >;
 
 describe('DataSetFilePage', () => {
-  const testDataSetFileWithoutFootnotes = { ...testDataSetFile, footnotes: [] };
-
   test('renders the data set file heading, summary and info', async () => {
     render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
@@ -143,7 +142,9 @@ describe('DataSetFilePage', () => {
   });
 
   test('does not render the data set footnotes section when there are no footnotes', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFileWithoutFootnotes} />);
+    render(
+      <DataSetFilePage dataSetFile={{ ...testDataSetFile, footnotes: [] }} />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -197,7 +198,9 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the page navigation correctly when there are no footnotes', async () => {
-      render(<DataSetFilePage dataSetFile={testDataSetFileWithoutFootnotes} />);
+      render(
+        <DataSetFilePage dataSetFile={{ ...testDataSetFile, footnotes: [] }} />,
+      );
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -272,8 +275,8 @@ describe('DataSetFilePage', () => {
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
       expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
-      expect(navLinks[6]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[5]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[6]).toHaveAttribute('href', '#apiVersionHistory');
     });
 
     test('renders the page navigation correctly when there are no footnotes', async () => {
@@ -281,7 +284,7 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          dataSetFile={testDataSetFileWithoutFootnotes}
+          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
         />,
       );
 
@@ -297,8 +300,44 @@ describe('DataSetFilePage', () => {
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[4]).toHaveAttribute('href', '#apiVersionHistory');
-      expect(navLinks[5]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[4]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
+    });
+
+    test('renders the page navigation correctly when there is an API changelog', async () => {
+      const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
+        majorChanges: {
+          filters: [
+            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+          ],
+        },
+        minorChanges: {},
+      };
+
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersionChanges={testApiDataSetVersionChanges}
+          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+
+      const navLinks = nav.getAllByRole('link');
+      expect(navLinks).toHaveLength(7);
+      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+      expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[4]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
+      expect(navLinks[6]).toHaveAttribute('href', '#apiChangelog');
     });
 
     test('renders the API version history section', async () => {
@@ -331,6 +370,71 @@ describe('DataSetFilePage', () => {
       expect(
         screen.getByRole('heading', { name: 'API data set quick start' }),
       ).toBeInTheDocument();
+    });
+
+    test('renders the API changelog', async () => {
+      const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
+        majorChanges: {
+          filters: [
+            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+          ],
+        },
+        minorChanges: {},
+      };
+
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={{
+            ...testApiDataSetVersion,
+            version: '2.0',
+          }}
+          apiDataSetVersionChanges={testApiDataSetVersionChanges}
+          dataSetFile={testDataSetFile}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('heading', { name: 'API data set changelog' }),
+      ).toBeInTheDocument();
+    });
+
+    test('does not render the API changelog if none provided', async () => {
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          dataSetFile={testDataSetFile}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('heading', { name: 'API data set changelog' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not render the API changelog if it is empty', async () => {
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersionChanges={{
+            majorChanges: {},
+            minorChanges: {},
+          }}
+          dataSetFile={testDataSetFile}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('heading', { name: 'API data set changelog' }),
+      ).not.toBeInTheDocument();
     });
   });
 });

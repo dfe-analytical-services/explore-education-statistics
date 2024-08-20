@@ -15,6 +15,7 @@ public class RequiredPropertySchemaFilterTests
         {
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new RequiredPropertySchemaFilter()],
+            SupportNonNullableReferenceTypes = true
         },
         new JsonSerializerDataContractResolver(new JsonSerializerOptions
         {
@@ -45,12 +46,22 @@ public class RequiredPropertySchemaFilterTests
     }
 
     [Fact]
-    public void RequiredNonNullableReferenceTypeMarkedAsRequired()
+    public void RequiredReferenceTypePropertiesMarkedAsRequired()
     {
         var schema = GenerateSchema<TestClassReferenceTypes>();
 
-        Assert.Single(schema.Required);
+        Assert.Equal(2, schema.Required.Count);
         Assert.Contains(nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst(), schema.Required);
+        Assert.Contains(nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst(), schema.Required);
+    }
+
+    [Fact]
+    public void RequiredNullableReferenceTypeMarkedAsNullable()
+    {
+        var schema = GenerateSchema<TestClassReferenceTypes>();
+
+        Assert.True(schema.Properties[nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst()].Nullable);
+        Assert.False(schema.Properties[nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst()].Nullable);
     }
 
     [Fact]

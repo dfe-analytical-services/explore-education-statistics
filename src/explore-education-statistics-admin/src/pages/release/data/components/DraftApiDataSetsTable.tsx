@@ -48,7 +48,7 @@ export default function DraftApiDataSetsTable({
 
   return (
     <table
-      className={`${styles.table} hasRowHighlights`}
+      className={`${styles.table} dfe-table--row-highlights`}
       data-testid="draft-api-data-sets"
     >
       <thead>

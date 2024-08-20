@@ -101,7 +101,7 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --slot staging \
                   --settings \
-                    "CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                    "AppSettings__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
                     "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
                     "DataFiles__BasePath=$(dataFilesFileShareMountPath)"
 

@@ -21,8 +21,7 @@ public static class FluentValidationServiceCollectionExtensions
     {
         ValidatorOptions.Global.LanguageManager = new FluentValidationLanguageManager();
 
-        ValidatorOptions.Global.PropertyNameResolver = (_, memberInfo, expression) =>
-            JsonNamingPolicy.CamelCase.ConvertName(ResolvePropertyName(memberInfo, expression));
+        ValidatorOptions.Global.UseCamelCasePropertyNames();
 
         services.AddValidatorsFromAssembly(assembly);
 
@@ -32,6 +31,12 @@ public static class FluentValidationServiceCollectionExtensions
         });
 
         return services;
+    }
+
+    public static void UseCamelCasePropertyNames(this ValidatorConfiguration globalConfig)
+    {
+        globalConfig.PropertyNameResolver = (_, memberInfo, expression) =>
+            JsonNamingPolicy.CamelCase.ConvertName(ResolvePropertyName(memberInfo, expression));
     }
 
     private static string ResolvePropertyName(MemberInfo? memberInfo, LambdaExpression? expression)

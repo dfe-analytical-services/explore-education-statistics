@@ -118,7 +118,7 @@ describe('PageNav', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
-  test('calls the onClickItem method with the  item id when clicked', async () => {
+  test('calls the `onClickItem` method with the item id when clicked', async () => {
     const handleClick = jest.fn();
     const { user } = render(
       <PageNav

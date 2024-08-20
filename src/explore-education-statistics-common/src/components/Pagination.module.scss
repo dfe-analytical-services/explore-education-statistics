@@ -1,0 +1,12 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.pagination {
+  :global(.govuk-pagination__item button) {
+    text-align: center;
+  }
+
+  :global(.govuk-pagination__item--current button) {
+    color: govuk-colour('white');
+    font-weight: $govuk-font-weight-bold;
+  }
+}

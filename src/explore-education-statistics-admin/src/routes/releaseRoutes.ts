@@ -1,6 +1,10 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
+import ReleaseApiDataSetFiltersMappingPage from '@admin/pages/release/data/ReleaseApiDataSetFiltersMappingPage';
 import ReleaseApiDataSetLocationsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
+import ReleaseApiDataSetPreviewPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewPage';
+import ReleaseApiDataSetPreviewTokenPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenPage';
+import ReleaseApiDataSetPreviewTokenLogPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenLogPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
@@ -48,6 +52,11 @@ export type ReleaseFootnoteRouteParams = ReleaseRouteParams & {
 export type ReleaseDataSetRouteParams = ReleaseRouteParams & {
   dataSetId: string;
 };
+
+export type ReleaseDataSetPreviewTokenRouteParams =
+  ReleaseDataSetRouteParams & {
+    previewTokenId: string;
+  };
 
 export interface ReleaseRouteProps extends ProtectedRouteProps {
   title: string;
@@ -116,10 +125,38 @@ export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
   protectionAction: permissions => permissions.isBauUser,
 };
 
+export const releaseApiDataSetFiltersMappingRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/filters-mapping',
+  title: 'API data set filters mapping',
+  component: ReleaseApiDataSetFiltersMappingPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
 export const releaseApiDataSetLocationsMappingRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/locations-mapping',
   title: 'API data set locations mapping',
   component: ReleaseApiDataSetLocationsMappingPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetPreviewRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/preview',
+  title: 'Preview API data set',
+  component: ReleaseApiDataSetPreviewPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetPreviewTokenRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/preview/:previewTokenId',
+  title: 'API data set preview token',
+  component: ReleaseApiDataSetPreviewTokenPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetPreviewTokenLogRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/token-log',
+  title: 'View API data set token log',
+  component: ReleaseApiDataSetPreviewTokenLogPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 

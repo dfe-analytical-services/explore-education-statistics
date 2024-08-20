@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .SetContentBlocks(_fixture
                             .DefaultHtmlBlock()
                             .WithComments(ListOf(
-                                new Comment()
+                                new Comment
                                 {
                                     Id = Guid.NewGuid(),
                                     Content = "RelatedDashboards comment"
@@ -733,7 +733,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     <li>Content 4</li>
                 </ul>".TrimIndent();
 
-            var htmlBlock2Body = $@"
+            var htmlBlock2Body = @"
                     <p>
                         Content block 2
                         <comment-start name=""comment-1""></comment-start>
@@ -743,7 +743,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Content 2
                     </p>".TrimIndent();
 
-            var expectedHtmlBlock2Body = $@"
+            var expectedHtmlBlock2Body = @"
                     <p>
                         Content block 2
                         
@@ -753,7 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Content 2
                     </p>".TrimIndent();
 
-            var htmlBlock3Body = $@"
+            var htmlBlock3Body = @"
                     <p>
                         Content block 3
                         <comment-start name=""comment-1""></comment-start>
@@ -761,7 +761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         <comment-end name=""comment-1""></comment-end>
                     </p>".TrimIndent();
 
-            var expectedHtmlBlock3Body = $@"
+            var expectedHtmlBlock3Body = @"
                     <p>
                         Content block 3
                         

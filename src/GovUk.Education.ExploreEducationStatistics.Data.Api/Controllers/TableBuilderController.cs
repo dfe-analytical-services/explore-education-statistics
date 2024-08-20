@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -17,6 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), boundaryLevelId: null, cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
@@ -104,12 +104,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         // DataBlockVersions rather than simply picking the latest published one.
         [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
-            Guid dataBlockParentId)
+            Guid dataBlockParentId,
+            [FromQuery] long? boundaryLevelId)
         {
             var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessDo(dataBlockVersion => this
                     .CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion))
-                .OnSuccess(GetDataBlockTableResult)
+                .OnSuccess(dataBlockVersion => GetDataBlockTableResult(dataBlockVersion, boundaryLevelId))
                 .HandleFailuresOrOk();
 
             if (actionResult.Result is not NotFoundResult)
@@ -124,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockParentId)
         {
             return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
-                .OnSuccessCombineWith(GetDataBlockTableResult)
+                .OnSuccessCombineWith(dataBlockVersion => GetDataBlockTableResult(dataBlockVersion))
                 .OnSuccessCombineWith(tuple =>
                     _releaseVersionRepository.GetLatestPublishedReleaseVersion(tuple.Item1.ReleaseVersion.PublicationId)
                         .OrNotFound())
@@ -138,11 +139,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
-            DataBlockVersion dataBlockVersion)
+            DataBlockVersion dataBlockVersion,
+            long? boundaryLevelId = null)
         {
             return _dataBlockService.GetDataBlockTableResult(
                 releaseVersionId: dataBlockVersion.ReleaseVersionId,
-                dataBlockVersionId: dataBlockVersion.Id);
+                dataBlockVersionId: dataBlockVersion.Id,
+                boundaryLevelId);
         }
 
         private static FastTrackViewModel BuildFastTrackViewModel(

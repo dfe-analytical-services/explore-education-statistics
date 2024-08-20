@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
@@ -46,13 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
 
         protected BlobStorageService(
-            string connectionStringConfigName,
-            ILogger<IBlobStorageService> logger,
-            IConfiguration configuration)
+            string connectionString,
+            ILogger<IBlobStorageService> logger)
         {
-            var privateConnectionString = configuration.GetValue<string>(connectionStringConfigName);
-            _connectionString = privateConnectionString;
-            _client = new BlobServiceClient(privateConnectionString);
+            _connectionString = connectionString;
+            _client = new BlobServiceClient(connectionString);
             _logger = logger;
             _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
         }

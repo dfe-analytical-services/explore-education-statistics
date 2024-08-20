@@ -161,7 +161,7 @@ internal class DataSetVersionService(
     {
         var releaseFiles = await contentDbContext.ReleaseFiles
             .Where(rf => rf.PublicApiDataSetId == dataSetVersion.DataSetId)
-            .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.Version)
+            .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.SemVersion())
             .ToListAsync(cancellationToken);
 
         await UnlinkReleaseFilesFromApiDataSets(releaseFiles, cancellationToken);
@@ -280,7 +280,7 @@ internal class DataSetVersionService(
         return dataSet is null
             ? ValidationUtils.NotFoundResult<DataSet, Guid>(
                 id: dataSetId,
-                path: nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst())
+                path: nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst())
             : dataSet;
     }
 
@@ -350,7 +350,7 @@ internal class DataSetVersionService(
         return releaseFile is null
             ? ValidationUtils.NotFoundResult<ReleaseFile, Guid>(
                 id: releaseFileId,
-                path: nameof(NextDataSetVersionCreateMappingsRequest.ReleaseFileId).ToLowerFirst())
+                path: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst())
             : releaseFile;
     }
 
@@ -484,7 +484,7 @@ internal class DataSetVersionService(
         CancellationToken cancellationToken)
     {
         releaseFile.PublicApiDataSetId = dataSetVersion.DataSetId;
-        releaseFile.PublicApiDataSetVersion = dataSetVersion.FullSemanticVersion();
+        releaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion();
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -522,7 +522,7 @@ internal class DataSetVersionService(
         {
             Code = message.Code,
             Message = message.Message,
-            Path = nameof(NextDataSetVersionCreateMappingsRequest.DataSetId).ToLowerFirst(),
+            Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst(),
             Detail = new InvalidErrorDetail<Guid>(dataSetId)
         };
     }

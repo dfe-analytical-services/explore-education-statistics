@@ -77,6 +77,7 @@ using Notify.Interfaces;
 using Semver;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Thinktecture;
@@ -123,6 +124,7 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -158,25 +160,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.AddControllers(options =>
-            {
-                options.AddCommaSeparatedQueryModelBinderProvider();
-                options.AddTrimStringBinderProvider();
-            })
+                {
+                    options.AddCommaSeparatedQueryModelBinderProvider();
+                    options.AddTrimStringBinderProvider();
+                })
                 .AddControllersAsServices();
 
             services.AddHttpContextAccessor();
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator).Assembly); // Adds *all* validators from Common
+            services.AddValidatorsFromAssembly(typeof(FullTableQueryRequest.Validator)
+                .Assembly); // Adds *all* validators from Common
 
             services.AddMvc(options =>
-            {
-                options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
-                options.Filters.Add(new OperationCancelledExceptionFilter());
-                options.Filters.Add(new ProblemDetailsResultFilter());
-                options.EnableEndpointRouting = false;
-                options.AllowEmptyInputInBodyModelBinding = true;
-            })
+                {
+                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.Filters.Add(new ProblemDetailsResultFilter());
+                    options.EnableEndpointRouting = false;
+                    options.AllowEmptyInputInBodyModelBinding = true;
+                })
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -352,6 +355,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<PublicDataProcessorOptions>(
                 configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
+            services.Configure<PublicDataApiOptions>(
+                configuration.GetRequiredSection(PublicDataApiOptions.Section));
             services.Configure<PreReleaseOptions>(configuration);
             services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
             services.Configure<ReleaseApprovalOptions>(
@@ -461,6 +466,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
                 });
 
+                services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
+                    httpClient.BaseAddress = new Uri(options.Value.Url);
+                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Admin");
+                });
+
                 services.AddTransient<IDataSetService, DataSetService>();
                 services.AddTransient<IDataSetVersionService, DataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
@@ -539,12 +551,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
-
-            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
-
-            services.AddTransient<ICoreTableStorageService, CoreTableStorageService>();
-            services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>();
+            services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
+                new PrivateBlobStorageService(configuration.GetValue<string>("CoreStorage"),
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
+                new PublicBlobStorageService(configuration.GetValue<string>("PublicStorage"),
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+            services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
+                new PublisherTableStorageService(publisherStorageConnectionString));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -703,9 +717,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
-            }
+                {
+                    endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+                }
             );
 
             app.UseMvc();
@@ -779,28 +793,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid releaseFileId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersion(
+        public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
             Guid dataSetId,
             Guid releaseFileId,
+            CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
+            Guid dataSetVersionId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
             Guid releaseVersionId,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new Either<ActionResult,Unit>(Unit.Instance));
+            return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
 
         public Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
             Guid dataSetVersionId,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new Either<ActionResult,Unit>(Unit.Instance));
+            return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
         }
     }
 
     internal class NoOpDataSetVersionService : IDataSetVersionService
     {
+        public Task<Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListLiveVersions(
+            Guid dataSetId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10));
+        }
+
         public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
             Guid releaseVersionId,
             CancellationToken cancellationToken = default)
@@ -821,10 +848,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid dataSetId,
             CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
+        public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
+            Guid dataSetVersionId,
+            CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
         public Task<Either<ActionResult, Unit>> DeleteVersion(
-            Guid dataSetVersionId, CancellationToken cancellationToken = default)
+            Guid dataSetVersionId,
+            CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
+        }
+
+        public Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
+            Guid dataSetVersionId,
+            CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
+            DataSetVersionUpdateRequest updateRequest,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new Either<ActionResult, DataSetDraftVersionViewModel>(new NotFoundResult()));
         }
     }
 
@@ -835,10 +879,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
-            Guid nextDataSetVersionId,
-            BatchLocationMappingUpdatesRequest request,
-            CancellationToken cancellationToken = default)
+        public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>>
+            ApplyBatchLocationMappingUpdates(
+                Guid nextDataSetVersionId,
+                BatchLocationMappingUpdatesRequest request,
+                CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
@@ -846,9 +891,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
-            BatchFilterOptionMappingUpdatesRequest request,
-            CancellationToken cancellationToken = default) =>
+        public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>>
+            ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
+                BatchFilterOptionMappingUpdatesRequest request,
+                CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
     }
 

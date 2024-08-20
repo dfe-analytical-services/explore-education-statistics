@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -15,6 +12,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult> Query(
             Guid releaseVersionId,
             [FromBody] FullTableQueryRequest request,
+            [FromQuery] long? boundaryLevelId,
             CancellationToken cancellationToken = default)
         {
             if (Request.AcceptsCsv(exact: true))
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             }
 
             return await _tableBuilderService
-                .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
+                .Query(releaseVersionId, request.AsFullTableQuery(), boundaryLevelId, cancellationToken)
                 .HandleFailuresOr(Ok);
         }
 
@@ -70,23 +71,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseVersionId,
             Guid dataBlockParentId,
+            [FromQuery] long? boundaryLevelId,
             CancellationToken cancellationToken = default)
         {
             return await _dataBlockService
                 .GetDataBlockVersionForRelease(releaseVersionId: releaseVersionId, dataBlockParentId: dataBlockParentId)
-                .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, cancellationToken))
+                .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, boundaryLevelId, cancellationToken))
                 .HandleFailuresOrOk();
         }
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
             DataBlockVersion dataBlockVersion,
+            long? boundaryLevelId,
             CancellationToken cancellationToken)
         {
             return await _userService
                 .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)
                 .OnSuccess(_ => _tableBuilderService.Query(releaseVersionId: dataBlockVersion.ReleaseVersionId,
                     dataBlockVersion.Query,
+                    boundaryLevelId,
                     cancellationToken));
         }
     }

@@ -1,4 +1,5 @@
 import { publicApi } from '@common/services/api';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { PaginatedList } from '@common/services/types/pagination';
 
 export type ApiDataSetType = 'Major' | 'Minor';
@@ -71,6 +72,14 @@ const apiDataSetService = {
     params?: ApiDataSetVersionsListRequest,
   ): Promise<PaginatedList<ApiDataSetVersion>> {
     return publicApi.get(`/data-sets/${dataSetId}/versions`, { params });
+  },
+  getDataSetVersionChanges(
+    dataSetId: string,
+    dataSetVersion: string,
+  ): Promise<ApiDataSetVersionChanges> {
+    return publicApi.get(
+      `/data-sets/${dataSetId}/versions/${dataSetVersion}/changes`,
+    );
   },
 };
 

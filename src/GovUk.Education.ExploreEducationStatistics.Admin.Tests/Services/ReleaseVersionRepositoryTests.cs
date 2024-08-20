@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -191,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleasesForUser_PublicationRole_Owner_Draft()
         {
             var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole()
+            var userPublicationRole1 = new UserPublicationRole
             {
                 UserId = userId,
                 Publication = new Publication
@@ -231,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleasesForUser_PublicationRole_Approver_Approved()
         {
             var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole()
+            var userPublicationRole1 = new UserPublicationRole
             {
                 UserId = userId,
                 Publication = new Publication

@@ -46,7 +46,7 @@ export default function PageNav({
               className="govuk-!-padding-top-4"
               id="main-content"
               text="Back to top"
-              onClick={() => onClickItem?.('dataSetDetails')}
+              onClick={() => onClickItem?.(items[0].id)}
             />
           )}
         </ul>

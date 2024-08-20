@@ -154,7 +154,7 @@ public class DataSetFileService : IDataSetFileService
             .HavingLatestPublishedReleaseVersions(latestReleaseVersions, latestOnly: false);
 
         return await latestReleaseFiles
-            .Select(rf => new DataSetSitemapItemViewModel()
+            .Select(rf => new DataSetSitemapItemViewModel
             {
                 Id = rf.File.DataSetFileId!.Value.ToString(),
                 LastModified = rf.Published
@@ -174,15 +174,14 @@ public class DataSetFileService : IDataSetFileService
             .ToListAsync();
     }
 
-    public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
-        Guid dataSetId)
+    public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId)
     {
         var releaseFile = await _contentDbContext.ReleaseFiles
             .Include(rf => rf.ReleaseVersion.Publication.Topic.Theme)
             .Include(rf => rf.ReleaseVersion.Publication.SupersededBy)
             .Include(rf => rf.File)
             .Where(rf =>
-                rf.File.DataSetFileId == dataSetId
+                rf.File.DataSetFileId == dataSetFileId
                 && rf.ReleaseVersion.Published.HasValue
                 && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value)
             .OrderByDescending(rf => rf.ReleaseVersion.Version)
@@ -329,7 +328,8 @@ public class DataSetFileService : IDataSetFileService
             .ToList();
     }
 
-    private static List<string> GetOrderedFilters(List<FilterMeta> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)
+    private static List<string> GetOrderedFilters(
+        List<FilterMeta> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)
     {
         var filterSequence = filterSequenceEntries?
             .Select(fs => fs.Id)
@@ -343,7 +343,8 @@ public class DataSetFileService : IDataSetFileService
         return filters.Select(f => f.Label).ToList();
     }
 
-    private static List<string> GetOrderedIndicators(List<IndicatorMeta> metaIndicators, List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries)
+    private static List<string> GetOrderedIndicators(
+        List<IndicatorMeta> metaIndicators, List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries)
     {
         var indicatorSequence = indicatorGroupSequenceEntries?
             .SelectMany(seq => seq.ChildSequence)
@@ -359,7 +360,7 @@ public class DataSetFileService : IDataSetFileService
 
     private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(ReleaseFile releaseFile)
     {
-        if (releaseFile.PublicApiDataSetId is null || releaseFile.PublicApiVersionString is null)
+        if (releaseFile.PublicApiDataSetId is null || releaseFile.PublicApiDataSetVersionString is null)
         {
             return null;
         }
@@ -367,7 +368,7 @@ public class DataSetFileService : IDataSetFileService
         return new DataSetFileApiViewModel
         {
             Id = releaseFile.PublicApiDataSetId.Value,
-            Version = releaseFile.PublicApiVersionString,
+            Version = releaseFile.PublicApiDataSetVersionString,
         };
     }
 }

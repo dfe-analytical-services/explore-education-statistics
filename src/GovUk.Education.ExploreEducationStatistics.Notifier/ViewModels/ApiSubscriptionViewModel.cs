@@ -1,6 +1,6 @@
-using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using System;
 using System.Text.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 

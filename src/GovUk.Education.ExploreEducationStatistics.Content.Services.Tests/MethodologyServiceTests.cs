@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Owner = true
                     }
                 },
-                Contact = new Contact()
+                Contact = new Contact
                 {
                     TeamEmail = "team-email",
                     TeamName = "team-name",

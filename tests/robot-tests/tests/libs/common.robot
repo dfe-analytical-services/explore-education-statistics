@@ -518,6 +518,13 @@ user clicks button
     ${button}=    user gets button element    ${text}    ${parent}
     user clicks element    ${button}
 
+user waits until button is clickable
+    [Arguments]    ${button_text}
+    wait until element is visible    xpath=//button[text()="${button_text}"]
+    wait until element is enabled    xpath=//button[text()="${button_text}"]
+    element should be visible    xpath=//button[text()="${button_text}"]
+    element should be enabled    xpath=//button[text()="${button_text}"]
+
 user clicks button containing text
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    xpath://button[contains(text(), "${text}")]    ${parent}
