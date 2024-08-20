@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 public class FluentValidationPropertyNamesTestsFixture
 {
