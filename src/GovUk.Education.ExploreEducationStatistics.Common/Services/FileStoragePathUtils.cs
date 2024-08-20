@@ -54,6 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{ReleasesDirectory}/{releaseVersionId}/{DataBlocksDirectory}/{dataBlockId}.json";
         }
 
+        public static string PrivateContentDataBlockLocationsPath(
+            Guid releaseVersionId,
+            Guid dataBlockId,
+            long boundaryLevelId)
+        {
+            return $"{ReleasesDirectory}/{releaseVersionId}/{DataBlocksDirectory}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
+        }
+
         public static string PrivateContentSubjectMetaPath(Guid releaseVersionId, Guid subjectId)
         {
             return $"{ReleasesDirectory}/{releaseVersionId}/{SubjectMetaDirectory}/{subjectId}.json";
@@ -73,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Guid dataBlockId,
             long boundaryLevelId)
         {
-            return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}/{boundaryLevelId}-locations.json";
+            return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
         }
 
         public static string PublicContentSubjectMetaParentPath(string publicationSlug, string releaseSlug)

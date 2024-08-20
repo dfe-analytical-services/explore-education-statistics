@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("tablebuilder/release/data-block/{dataBlockParentId:guid}")]
-        public async Task<ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>> QueryForTableBuilderWithGeoJsonResult(
+        public async Task<ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>> QueryForDataBlockWithGeoJsonResult(
             Guid dataBlockParentId,
             [FromQuery] long boundaryLevelId)
         {
