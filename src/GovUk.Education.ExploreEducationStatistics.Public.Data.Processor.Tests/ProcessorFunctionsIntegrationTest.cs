@@ -83,7 +83,7 @@ public abstract class ProcessorFunctionsIntegrationTest(
         var dataSet = await publicDataDbContext
             .DataSets
             .SingleAsync(ds => ds.Id == dataSetId);
-        
+
         DataSetVersionImport dataSetVersionImport = DataFixture
             .DefaultDataSetVersionImport()
             .WithStage(importStage);
@@ -91,12 +91,16 @@ public abstract class ProcessorFunctionsIntegrationTest(
         DataSetVersion dataSetVersion = DataFixture
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
-            .WithReleaseFileId(releaseFileId ?? Guid.NewGuid())
             .WithStatus(status ?? DataSetVersionStatus.Processing)
             .WithImports(() => [dataSetVersionImport])
             .WithVersionNumber(major: versionMajor, minor: versionMinor)
             .FinishWith(dsv =>
             {
+                if (releaseFileId != null)
+                {
+                    dsv.Release.ReleaseFileId = releaseFileId.Value;
+                }
+
                 if (status == DataSetVersionStatus.Published)
                 {
                     dsv.DataSet.LatestLiveVersion = dsv;

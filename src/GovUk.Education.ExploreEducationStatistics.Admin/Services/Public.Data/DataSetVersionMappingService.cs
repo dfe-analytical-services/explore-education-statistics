@@ -196,7 +196,7 @@ public class DataSetVersionMappingService(
 
         var releaseFile = await contentDbContext
             .ReleaseFiles
-            .Where(rf => rf.Id == targetDataSetVersion.ReleaseFileId)
+            .Where(rf => rf.Id == targetDataSetVersion.Release.ReleaseFileId)
             .SingleAsync(cancellationToken);
 
         releaseFile.PublicApiDataSetVersion = targetDataSetVersion.SemVersion();
