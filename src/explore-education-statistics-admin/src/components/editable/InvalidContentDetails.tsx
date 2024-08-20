@@ -162,19 +162,33 @@ export default function InvalidContentDetails({
             modalContent={
               <>
                 <p>
-                  Headings should be structured in logical way. In EES you have
-                  the options of normal paragraph text and headings 3, 4 and 5.
-                  Section titles are set to heading level 2.
+                  Heading should be structured in logical way. This means that
+                  you shouldn't skip heading levels while going downwards (h1 to
+                  h2 to h3…). All headings must be preceded by a level that is:
                 </p>
 
-                <p>All headings must be preceded by a level that is</p>
                 <ul>
-                  <li>One level below (e.g. 3 logically follows 2)</li>
-                  <li>Equal (e.g. multiple 3 headings in a row)</li>
+                  <li>One level lower (e.g. where a h2 is followed by a h3)</li>
+                  <li>Equal (e.g. multiple h3 headings in a row)</li>
                   <li>
-                    Any higher level (e.g. coming back to 3 after a 4 or 5)
+                    A higher level (e.g. having a h3 then h4 then h5, and then
+                    back up to h3)
                   </li>
                 </ul>
+                <p>
+                  In EES you have the options of normal paragraph text and
+                  headings 3, 4 and 5 and all section titles are set to heading
+                  level 2. For example having a h4 as the first heading in a
+                  section means that the heading order is:
+                </p>
+                <ul>
+                  <li>h2 (section title)</li>
+                  <li>h4</li>
+                </ul>
+                <p>
+                  In this example the leap from the h2 to the h4 is unexpected,
+                  and you should use a h3 instead of a h4.
+                </p>
                 <p>You can set the heading level in the toolbar:</p>
                 <p>
                   <img
@@ -201,13 +215,27 @@ export default function InvalidContentDetails({
                 <p>
                   The correct use of headings is a critical consideration for
                   accessibility. Screen reader users have the ability to have
-                  pages read out by Header titles alone, this provides a way to
-                  quickly understand the content of the page without having to
-                  read through all of it.
+                  pages read out by header titles alone as this provides a way
+                  to quickly understand the content of the page without having
+                  to read through all of it.
                 </p>
+                <p>Overuse of bold text can cause confusion:</p>
+                <ul>
+                  <li>
+                    when used instead of headings, this means the text won't be
+                    recognised as a structural heading
+                  </li>
+                  <li>
+                    using it for full sentences or paragraphs can make text more
+                    difficult to read and may cause confusion with some users
+                    who notice a change in format and assume it is a heading
+                    that's not been marked up correctly
+                  </li>
+                </ul>
                 <p>
-                  Do not use bold for headings as it won't be recognised as a
-                  structural heading
+                  We recommend using bold sparingly and suggest that you only
+                  use it for the particular words or phrases within a sentence
+                  that you'd like to highlight.
                 </p>
               </>
             }
