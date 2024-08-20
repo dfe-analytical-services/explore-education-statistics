@@ -11,15 +11,18 @@ import _apiDataSetService, {
   ApiDataSetDraftVersion,
   ApiDataSetLiveVersion,
 } from '@admin/services/apiDataSetService';
+import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import { Release } from '@admin/services/releaseService';
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
 jest.mock('@admin/services/apiDataSetService');
+jest.mock('@admin/services/apiDataSetVersionService');
 
 const apiDataSetService = jest.mocked(_apiDataSetService);
+const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetDetailsPage', () => {
   const testDataSet: ApiDataSet = {
@@ -396,10 +399,213 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).not.toBeInTheDocument();
   });
 
+  describe('finalising', () => {
+    beforeEach(() => {
+      jest.useFakeTimers({ advanceTimers: true });
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('shows the finalise banner when mapping is complete', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+
+      renderPage();
+
+      expect(
+        await screen.findByText('Draft version details'),
+      ).toBeInTheDocument();
+
+      const banner = within(screen.getByTestId('notificationBanner'));
+      expect(
+        banner.getByRole('heading', { name: 'Action required' }),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByText('Draft API data set version is ready to be finalised'),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByRole('button', { name: 'Finalise this data set version' }),
+      ).toBeInTheDocument();
+    });
+
+    test('successfully finalised', async () => {
+      apiDataSetService.getDataSet.mockResolvedValueOnce({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+      apiDataSetService.getDataSet.mockResolvedValueOnce({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          status: 'Draft',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+
+      const { user } = renderPage();
+
+      expect(
+        await screen.findByText('Draft version details'),
+      ).toBeInTheDocument();
+
+      expect(apiDataSetVersionService.completeVersion).not.toHaveBeenCalled();
+
+      const banner = within(screen.getByTestId('notificationBanner'));
+      expect(
+        banner.getByRole('heading', { name: 'Action required' }),
+      ).toBeInTheDocument();
+
+      await user.click(
+        banner.getByRole('button', { name: 'Finalise this data set version' }),
+      );
+
+      await waitFor(() => {
+        expect(apiDataSetVersionService.completeVersion).toHaveBeenCalledTimes(
+          1,
+        );
+        expect(apiDataSetVersionService.completeVersion).toHaveBeenCalledWith({
+          dataSetVersionId: 'draft-version-id',
+        });
+      });
+
+      expect(
+        banner.getByRole('heading', { name: 'Finalising' }),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByText('Finalising draft API data set version'),
+      ).toBeInTheDocument();
+      expect(
+        banner.queryByRole('button', {
+          name: 'Finalise this data set version',
+        }),
+      ).not.toBeInTheDocument();
+
+      jest.runOnlyPendingTimers();
+
+      await waitFor(() => {
+        expect(
+          banner.getByText(
+            'Draft API data set version is ready to be published',
+          ),
+        ).toBeInTheDocument();
+      });
+
+      expect(
+        banner.getByRole('heading', {
+          name: 'Mappings finalised',
+        }),
+      ).toBeInTheDocument();
+
+      expect(
+        banner.queryByRole('button', {
+          name: 'Finalise this data set version',
+        }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('finalising failed', async () => {
+      apiDataSetService.getDataSet.mockResolvedValueOnce({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+      apiDataSetService.getDataSet.mockResolvedValueOnce({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          status: 'Failed',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+
+      const { user } = renderPage();
+
+      expect(
+        await screen.findByText('Draft version details'),
+      ).toBeInTheDocument();
+
+      expect(apiDataSetVersionService.completeVersion).not.toHaveBeenCalled();
+
+      const banner = within(screen.getByTestId('notificationBanner'));
+      expect(
+        banner.getByRole('heading', { name: 'Action required' }),
+      ).toBeInTheDocument();
+
+      await user.click(
+        banner.getByRole('button', { name: 'Finalise this data set version' }),
+      );
+
+      await waitFor(() => {
+        expect(apiDataSetVersionService.completeVersion).toHaveBeenCalledTimes(
+          1,
+        );
+        expect(apiDataSetVersionService.completeVersion).toHaveBeenCalledWith({
+          dataSetVersionId: 'draft-version-id',
+        });
+      });
+
+      expect(
+        banner.getByRole('heading', { name: 'Finalising' }),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByText('Finalising draft API data set version'),
+      ).toBeInTheDocument();
+      expect(
+        banner.queryByRole('button', {
+          name: 'Finalise this data set version',
+        }),
+      ).not.toBeInTheDocument();
+
+      jest.runOnlyPendingTimers();
+
+      await waitFor(() => {
+        expect(banner.getByText('There is a problem')).toBeInTheDocument();
+      });
+
+      expect(
+        banner.getByText('Data set version finalisation failed'),
+      ).toBeInTheDocument();
+    });
+  });
+
   function renderPage(options?: { release?: Release; dataSetId?: string }) {
     const { release = testRelease, dataSetId = 'data-set-id' } = options ?? {};
 
-    render(
+    return render(
       <TestConfigContextProvider>
         <ReleaseContextProvider release={release}>
           <MemoryRouter
