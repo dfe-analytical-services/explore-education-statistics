@@ -337,6 +337,14 @@ public abstract class DataSetVersionsControllerTests(
             validationProblem.AssertHasNotEmptyError("dataSetId");
         }
 
+        [Fact]
+        public async Task DataSetDoesNotExist_Returns404()
+        {
+            var response = await ListLiveVersions(dataSetId: Guid.NewGuid());
+
+            response.AssertNotFound();
+        }
+
         private async Task<HttpResponseMessage> ListLiveVersions(
             Guid dataSetId,
             int? page = null,

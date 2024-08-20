@@ -43,11 +43,14 @@ public class DataSetVersionService(
             CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async () =>
+            .OnSuccess(() => publicDataDbContext.DataSets
+                .AsNoTracking()
+                .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken))
+            .OnSuccess(async dataSet =>
             {
                 var dataSetVersionsQueryable = publicDataDbContext.DataSetVersions
                     .AsNoTracking()
-                    .Where(ds => ds.DataSetId == dataSetId)
+                    .Where(ds => ds.DataSetId == dataSet.Id)
                     .WherePublicStatus();
 
                 var dataSetVersions = await dataSetVersionsQueryable
