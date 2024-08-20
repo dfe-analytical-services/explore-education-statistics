@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
@@ -30,5 +31,6 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
         await TestApp.EnsureDatabaseDeleted<StatisticsDbContext>();
         await TestApp.EnsureDatabaseDeleted<UsersAndRolesDbContext>();
         await TestApp.ClearTestData<PublicDataDbContext>();
+        TestApp.Services.GetRequiredService<PublicDataDbContext>().ChangeTracker.Clear();
     }
 }
