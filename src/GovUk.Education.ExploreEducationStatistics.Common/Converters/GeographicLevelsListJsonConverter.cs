@@ -36,7 +36,8 @@ public class GeographicLevelsListJsonConverter : JsonConverter<IList<GeographicL
         while (reader.Read() && reader.TokenType == JsonToken.String)
         {
             var value = (string)reader.Value;
-            var geographicLevel = geographicLevels.First(gl => gl.GetEnumValue() == value);
+            var geographicLevel = geographicLevels.First(gl => gl.GetEnumValue() == value
+                                                               || gl.GetEnumLabel() == value); // EES-4670 Can be removed after migration done in EES-5140
             result.Add(geographicLevel);
         }
 
