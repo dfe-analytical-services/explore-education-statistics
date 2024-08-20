@@ -68,40 +68,41 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
         [HttpGet(nameof(TestGet))]
         public async Task<ActionResult> TestGet(CancellationToken _)
         {
-            await Task.Delay(RequestTimeout + 100, HttpContext.RequestAborted);
+            await Task.Delay(_requestTimeout + 100, HttpContext.RequestAborted);
             return Ok();
         }
 
         [HttpPost(nameof(TestPost))]
         public async Task<ActionResult> TestPost(CancellationToken _)
         {
-            await Task.Delay(RequestTimeout + 100, HttpContext.RequestAborted);
+            await Task.Delay(_requestTimeout + 100, HttpContext.RequestAborted);
             return Ok();
         }
 
         [HttpPut(nameof(TestPut))]
         public async Task<ActionResult> TestPut(CancellationToken _)
         {
-            await Task.Delay(RequestTimeout + 100, HttpContext.RequestAborted);
+            await Task.Delay(_requestTimeout + 100, HttpContext.RequestAborted);
             return Ok();
         }
 
         [HttpPatch(nameof(TestPatch))]
         public async Task<ActionResult> TestPatch(CancellationToken _)
         {
-            await Task.Delay(RequestTimeout + 100, HttpContext.RequestAborted);
+            await Task.Delay(_requestTimeout + 100, HttpContext.RequestAborted);
             return Ok();
         }
 
         [HttpDelete(nameof(TestDelete))]
         public async Task<ActionResult> TestDelete(CancellationToken _)
         {
-            await Task.Delay(RequestTimeout + 100, HttpContext.RequestAborted);
+            await Task.Delay(_requestTimeout + 100, HttpContext.RequestAborted);
             return NoContent();
         }
 
-        private readonly int RequestTimeout = requestTimeoutOptions.Value.RequestTimeoutMilliseconds
-            ?? throw new Exception("Must populate 'RequestTimeoutMilliseconds' in the integration test app settings.");
+        private readonly int _requestTimeout = requestTimeoutOptions.Value.TimeoutMilliseconds
+            ?? throw new Exception(
+                $"Must populate '{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}' in the integration test app settings.");
     }
 
     private WebApplicationFactory<Startup> BuildApp()
@@ -113,7 +114,7 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
                 builder.ConfigureAppConfiguration((hostContext, config) => 
                     config.AddInMemoryCollection(new Dictionary<string, string?>()
                     {
-                        { $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.RequestTimeoutMilliseconds)}", "100" }
+                        { $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}", "100" }
                     }));
             })
             .ConfigureServices(s =>
