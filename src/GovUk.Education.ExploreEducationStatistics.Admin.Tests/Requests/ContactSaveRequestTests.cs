@@ -1,7 +1,6 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Requests;
 

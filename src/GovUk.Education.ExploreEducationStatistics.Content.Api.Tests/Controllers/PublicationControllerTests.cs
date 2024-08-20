@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationService = new Mock<IPublicationService>(Strict);
 
             publicationService.Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<PublicationSitemapItemViewModel>()
+                .ReturnsAsync(new List<PublicationSitemapItemViewModel>
                 {
                     new()
                     {

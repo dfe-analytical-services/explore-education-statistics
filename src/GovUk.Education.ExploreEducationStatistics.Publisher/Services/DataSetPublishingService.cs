@@ -91,7 +91,7 @@ public class DataSetPublishingService(
             {
                 DataSetId = version.DataSetId,
                 DataSetFileId = dataSetFileIds[version.ReleaseFileId],
-                Version = version.Version
+                Version = version.PublicVersion
             })
             .ToList();
 

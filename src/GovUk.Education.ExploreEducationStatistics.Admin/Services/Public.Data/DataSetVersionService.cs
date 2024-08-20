@@ -19,7 +19,6 @@ using Microsoft.EntityFrameworkCore;
 using Semver;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -162,7 +161,7 @@ public class DataSetVersionService(
                 .SingleOrNotFoundAsync(cancellationToken: cancellationToken))
             .OnSuccess(dsv => publicDataApiClient.GetDataSetVersionChanges(
                 dataSetId: dsv.DataSetId,
-                dataSetVersion: dsv.Version,
+                dataSetVersion: dsv.PublicVersion,
                 cancellationToken: cancellationToken
             ));
     }
@@ -213,7 +212,7 @@ public class DataSetVersionService(
         return new DataSetLiveVersionSummaryViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             ReleaseVersion = MapReleaseVersion(releaseVersion),
@@ -230,7 +229,7 @@ public class DataSetVersionService(
         return new DataSetVersionSummaryViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion)
@@ -302,7 +301,7 @@ public class DataSetVersionService(
         return new DataSetDraftVersionViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),

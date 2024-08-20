@@ -22,6 +22,11 @@ public static class ReleaseFileGeneratorExtensions
             .SetDefault(rf => rf.Summary)
             .SetDefault(rf => rf.Published);
 
+    public static Generator<ReleaseFile> WithId(
+        this Generator<ReleaseFile> generator,
+        Guid id)
+        => generator.ForInstance(s => s.SetId(id));
+
     public static Generator<ReleaseFile> WithFile(
         this Generator<ReleaseFile> generator,
         File file)
@@ -106,6 +111,11 @@ public static class ReleaseFileGeneratorExtensions
         int minor,
         int patch = 0)
         => generator.ForInstance(s => s.SetPublicApiDataSetVersion(major, minor, patch));
+
+    public static InstanceSetters<ReleaseFile> SetId(
+        this InstanceSetters<ReleaseFile> setters,
+        Guid id)
+        => setters.Set(rf => rf.Id, id);
 
     public static InstanceSetters<ReleaseFile> SetFile(
         this InstanceSetters<ReleaseFile> setters,

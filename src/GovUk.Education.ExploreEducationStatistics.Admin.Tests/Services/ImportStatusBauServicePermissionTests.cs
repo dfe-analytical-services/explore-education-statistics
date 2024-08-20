@@ -1,5 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ImportStatusBauServiceTests;

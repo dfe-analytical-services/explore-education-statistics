@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
@@ -203,7 +202,7 @@ internal class DataSetService(
     {
         return new DataSetLatestVersionViewModel
         {
-            Version = latestVersion.Version,
+            Version = latestVersion.PublicVersion,
             Published = latestVersion.Published!.Value,
             TotalResults = latestVersion.TotalResults,
             TimePeriods = MapTimePeriods(latestVersion.MetaSummary!.TimePeriodRange),
@@ -228,7 +227,7 @@ internal class DataSetService(
     {
         return new DataSetVersionViewModel
         {
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
             Published = dataSetVersion.Published!.Value,

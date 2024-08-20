@@ -27,6 +27,7 @@ describe('chartBuilderReducer', () => {
       canSetBarThickness: true,
       canSetDataLabelPosition: true,
       canShowDataLabels: true,
+      canShowAllMajorAxisTicks: false,
       canSize: true,
       canSort: true,
       hasGridLines: true,

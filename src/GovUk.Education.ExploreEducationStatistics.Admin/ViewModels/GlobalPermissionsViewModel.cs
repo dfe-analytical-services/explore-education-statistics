@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record GlobalPermissionsViewModel(
     bool CanAccessSystem,

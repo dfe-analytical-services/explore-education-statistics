@@ -1,9 +1,5 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {

@@ -287,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dependentBlocks.Add(await CreateDependentDataBlock(block));
             }
 
-            return new DeleteDataBlockPlanViewModel()
+            return new DeleteDataBlockPlanViewModel
             {
                 ReleaseId = releaseVersionId,
                 DependentDataBlocks = dependentBlocks

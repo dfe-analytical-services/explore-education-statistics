@@ -21,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -127,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -163,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -197,11 +196,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -237,11 +236,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -275,15 +274,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
+                .WithFilterItems(new List<FilterItem> { filterItem })
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -349,11 +348,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
+                .WithIndicators(new List<Indicator> { indicator })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
+                .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -390,23 +389,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
+                .WithFilterItems(new List<FilterItem> { filterItem })
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Indicator indicator = _fixture
                 .DefaultIndicator()
                 .Generate();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
+                .WithIndicators(new List<Indicator> { indicator })
                 .Generate();
             Subject subject1 = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
+                .WithFilters(new List<Filter> { filter })
+                .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
                 .Generate();
             Subject subject2 = _fixture
                 .DefaultSubject()
@@ -476,23 +475,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
+                .WithFilterItems(new List<FilterItem> { filterItem })
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Indicator indicator = _fixture
                 .DefaultIndicator()
                 .Generate();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
+                .WithIndicators(new List<Indicator> { indicator })
                 .Generate();
             Subject subject1 = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
+                .WithFilters(new List<Filter> { filter })
+                .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
                 .Generate();
             Subject subject2 = _fixture
                 .DefaultSubject()
@@ -639,7 +638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -681,7 +680,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -721,11 +720,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -767,11 +766,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -811,15 +810,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
+                .WithFilterItems(new List<FilterItem> { filterItem })
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
+                .WithFilters(new List<Filter> { filter })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -897,11 +896,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
+                .WithIndicators(new List<Indicator> { indicator })
                 .Generate();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
+                .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
                 .Generate();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -944,23 +943,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
+                .WithFilterItems(new List<FilterItem> { filterItem })
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Indicator indicator = _fixture
                 .DefaultIndicator()
                 .Generate();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
+                .WithIndicators(new List<Indicator> { indicator })
                 .Generate();
             Subject subject1 = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
+                .WithFilters(new List<Filter> { filter })
+                .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
                 .Generate();
             Subject subject2 = _fixture
                 .DefaultSubject()
@@ -1033,23 +1032,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Generate();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
+                .WithFilterItems(new List<FilterItem> { filterItem })
                 .Generate();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
+                .WithFilterGroups(new List<FilterGroup> { filterGroup })
                 .Generate();
             Indicator indicator = _fixture
                 .DefaultIndicator()
                 .Generate();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
+                .WithIndicators(new List<Indicator> { indicator })
                 .Generate();
             Subject subject1 = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
+                .WithFilters(new List<Filter> { filter })
+                .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
                 .Generate();
             Subject subject2 = _fixture
                 .DefaultSubject()
