@@ -122,8 +122,13 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(currentDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(currentDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(currentDataSetVersion.VersionType, liveVersion.Type);
+
             Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
             Assert.Equal(releaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+
+            Assert.Equal(releaseFile.File.DataSetFileId, liveVersion.File.Id);
+            Assert.Equal(releaseFile.Name, liveVersion.File.Title);
+
             liveVersion.Published.AssertEqual(currentDataSetVersion.Published!.Value);
         }
 
@@ -306,8 +311,13 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(targetDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(targetDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(targetDataSetVersion.VersionType, liveVersion.Type);
+
             Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
             Assert.Equal(targetReleaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+
+            Assert.Equal(targetReleaseFile.File.DataSetFileId, liveVersion.File.Id);
+            Assert.Equal(targetReleaseFile.Name, liveVersion.File.Title);
+
             liveVersion.Published.AssertEqual(targetDataSetVersion.Published!.Value);
         }
 
