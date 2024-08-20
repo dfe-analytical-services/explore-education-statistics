@@ -2,13 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -27,14 +30,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -184,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
-            Guid releaseVersionId, 
+            Guid releaseVersionId,
             CancellationToken cancellationToken = default)
         {
             return _persistenceHelper
@@ -282,19 +285,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId: releaseVersionId))
                 .OnSuccess(async releaseVersion =>
                 {
-                    releaseVersion.Slug = request.Slug;
-                    releaseVersion.Type = request.Type;
-                    releaseVersion.ReleaseName = request.Year.ToString();
-                    releaseVersion.TimePeriodCoverage = request.TimePeriodCoverage;
-                    releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
+                    return await _context.RequireTransaction(async () =>
+                    {
+                        releaseVersion.Slug = request.Slug;
+                        releaseVersion.Type = request.Type;
+                        releaseVersion.ReleaseName = request.Year.ToString();
+                        releaseVersion.TimePeriodCoverage = request.TimePeriodCoverage;
+                        releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
 
-                    _context.ReleaseVersions.Update(releaseVersion);
-                    await _context.SaveChangesAsync();
-                    return await GetRelease(releaseVersionId);
+                        await _dataSetVersionService.UpdateVersionsForReleaseVersion(
+                            releaseVersionId,
+                            slug: releaseVersion.Slug,
+                            title: releaseVersion.Title);
+
+                        await _context.SaveChangesAsync();
+
+                        return await GetRelease(releaseVersionId);
+                    });
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> UpdateReleasePublished(Guid releaseVersionId,
+        public async Task<Either<ActionResult, Unit>> UpdateReleasePublished(
+            Guid releaseVersionId,
             ReleasePublishedUpdateRequest request)
         {
             return await _persistenceHelper
@@ -472,14 +484,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
                             subjectId: tuple.releaseFile.File.SubjectId);
 
-                    var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null 
-                    ? null 
+                    var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
+                    ? null
                     : new DeleteApiDataSetVersionPlanViewModel
                     {
                         DataSetId = tuple.apiDataSetVersion.DataSetId,
                         DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
                         Id = tuple.apiDataSetVersion.Id,
-                        Version = tuple.apiDataSetVersion.Version,
+                        Version = tuple.apiDataSetVersion.PublicVersion,
                         Status = tuple.apiDataSetVersion.Status,
                         Valid = false
                     };
@@ -508,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (releaseFile.File.ReplacedById.HasValue)
                     {
                         return await RemoveDataFiles(
-                            releaseVersionId: releaseVersionId, 
+                            releaseVersionId: releaseVersionId,
                             fileId: releaseFile.File.ReplacedById.Value);
                     }
 
@@ -556,7 +568,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId);
         }
 
-        private async Task<Either<ActionResult, ReleaseFile>> CheckReleaseDataFileExists(Guid releaseVersionId, Guid fileId)
+        private async Task<Either<ActionResult, ReleaseFile>> CheckReleaseDataFileExists(
+            Guid releaseVersionId, Guid fileId)
         {
             return await _context.ReleaseFiles
                 .Include(rf => rf.File)
@@ -568,7 +581,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     : rf);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(string slug,
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(
+            string slug,
             Guid publicationId,
             Guid? releaseVersionId = null)
         {
@@ -592,7 +606,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !releaseVersions.Any(rv => rv.PreviousVersionId == releaseVersionId && rv.Id != releaseVersionId);
         }
 
-        private async Task CreateGenericContentFromTemplate(Guid templateReleaseVersionId,
+        private async Task CreateGenericContentFromTemplate(
+            Guid templateReleaseVersionId,
             ReleaseVersion newReleaseVersion)
         {
             var templateReleaseVersion = await _context
@@ -645,15 +660,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return await _dataSetVersionService.GetDataSetVersion(
-                releaseFile.PublicApiDataSetId.Value,
-                releaseFile.PublicApiDataSetVersion!, 
-                cancellationToken)
+                    releaseFile.PublicApiDataSetId.Value,
+                    releaseFile.PublicApiDataSetVersion!,
+                    cancellationToken)
                 .OnSuccess(dsv => (DataSetVersion?)dsv)
                 .OnFailureDo(_ => throw new ApplicationException(
                     $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseVersionId, ReleaseFile releaseFile)
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(
+            Guid releaseVersionId, ReleaseFile releaseFile)
         {
             var import = await _dataImportService.GetImport(releaseFile.FileId);
             var importStatus = import?.Status ?? DataImportStatus.NOT_FOUND;
@@ -670,7 +686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (releaseFile.PublicApiDataSetId is not null)
             {
-                return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
+                return ValidationUtils.ValidationResult(new ErrorViewModel
                 {
                     Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
                     Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,

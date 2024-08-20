@@ -17,9 +17,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DataSet DataSet { get; set; } = null!;
 
-    public required DataSetVersionStatus Status { get; set; }
+    public required Release Release { get; set; }
 
-    public required Guid ReleaseFileId { get; set; }
+    public required DataSetVersionStatus Status { get; set; }
 
     public required int VersionMajor { get; set; }
 
@@ -73,11 +73,11 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DateTimeOffset? Updated { get; set; }
 
-    public string Version => $"{VersionMajor}.{VersionMinor}";
+    public string PublicVersion => $"{VersionMajor}.{VersionMinor}";
 
-    public bool IsFirstVersion => Version == "1.0";
+    public SemVersion SemVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
-    public SemVersion FullSemanticVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
+    public bool IsFirstVersion => VersionMajor == 1 && VersionMinor == 0 && VersionPatch == 0;
 
     public DataSetVersionType VersionType
         => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
@@ -133,11 +133,19 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                     );
             });
 
+            builder.OwnsOne(dsv => dsv.Release,
+                ownedBuilder =>
+                {
+                    ownedBuilder
+                        .HasIndex(r => r.DataSetFileId);
+                    ownedBuilder
+                        .HasIndex(r => r.ReleaseFileId)
+                        .IsUnique();
+                });
+
             builder.HasIndex(dsv => new { dsv.DataSetId, dsv.VersionMajor, dsv.VersionMinor, dsv.VersionPatch })
                 .HasDatabaseName("IX_DataSetVersions_DataSetId_VersionNumber")
                 .IsUnique();
-
-            builder.HasIndex(dsv => dsv.ReleaseFileId);
         }
     }
 }

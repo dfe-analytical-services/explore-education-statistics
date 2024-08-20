@@ -1,5 +1,9 @@
 @import '~govuk-frontend/dist/govuk/base';
 
+.dfe-border {
+  border: 1px solid govuk-colour('mid-grey');
+}
+
 .dfe-border-bottom {
   border-bottom: 1px solid govuk-colour('mid-grey');
 }

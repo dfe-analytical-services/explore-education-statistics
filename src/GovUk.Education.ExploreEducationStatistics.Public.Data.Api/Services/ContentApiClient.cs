@@ -39,12 +39,12 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
                     var message = await response.Content.ReadAsStringAsync(cancellationToken);
 
                     logger.LogError(
-                            """
-                            Failed to retrieve publications with status code: {statusCode}. 
-                            Message: {message}",
-                            """,
-                            response.StatusCode,
-                            message
+                        """
+                        Failed to retrieve publications with status code: {statusCode}. 
+                        Message: {message}",
+                        """,
+                        response.StatusCode,
+                        message
                     );
 
                     response.EnsureSuccessStatusCode();
@@ -56,7 +56,7 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             .ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>(cancellationToken);
 
         return publications
-            ?? throw new NullReferenceException("Could not deserialize content API response.");
+               ?? throw new NullReferenceException("Could not deserialize content API response.");
     }
 
     public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(
@@ -100,33 +100,6 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             .ReadFromJsonAsync<PublishedPublicationSummaryViewModel>(cancellationToken);
 
         return publication
-            ?? throw new NullReferenceException("Could not deserialize from content API response.");
-    }
-
-    public async Task<IReadOnlyList<ReleaseFileViewModel>> ListReleaseFiles(
-        ReleaseFileListRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var response = await httpClient
-            .PostAsJsonAsync($"api/release-files", request, cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await response.Content.ReadAsStringAsync(cancellationToken);
-
-            logger.LogError(
-                """
-                Failed to release files with status code: {statusCode}. 
-                Message: {message}
-                """,
-                response.StatusCode,
-                message
-            );
-
-            response.EnsureSuccessStatusCode();
-        }
-
-        return await response.Content
-            .ReadFromJsonAsync<List<ReleaseFileViewModel>>(cancellationToken) ?? [];
+               ?? throw new NullReferenceException("Could not deserialize from content API response.");
     }
 }

@@ -87,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         [EnumMember(Value = "default")] Default,
         startEnd,
+        showAll,
         custom
     }
 

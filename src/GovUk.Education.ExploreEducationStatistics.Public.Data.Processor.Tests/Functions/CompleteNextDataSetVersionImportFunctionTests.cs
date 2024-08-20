@@ -35,13 +35,13 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             new(EnumUtil
                 .GetEnums<DataSetVersionStatus>()
                 .Except([DataSetVersionStatus.Mapping]));
-        
+
         public static TheoryData<DataSetVersionImportStage> NonManualMappingStages =
             new(EnumUtil
                 .GetEnums<DataSetVersionImportStage>()
                 .Except([DataSetVersionImportStage.ManualMapping]));
 
-        
+
         [Fact]
         public async Task Success()
         {
@@ -288,7 +288,8 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .WithVersionNumber(1, 0)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .WithReleaseFileId(dataFile.Id)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(dataFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .Generate(1))
@@ -318,7 +319,8 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .WithVersionNumber(1, 1)
                 .WithStatusMapping()
                 .WithDataSet(dataSet)
-                .WithReleaseFileId(dataFile.Id)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(dataFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .WithStage(DataSetVersionImportStage.ManualMapping)

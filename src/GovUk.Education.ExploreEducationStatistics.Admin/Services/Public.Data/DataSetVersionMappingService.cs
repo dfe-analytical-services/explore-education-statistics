@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos;
@@ -29,7 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 public class DataSetVersionMappingService(
     IPostgreSqlRepository postgreSqlRepository,
     IUserService userService,
-    PublicDataDbContext publicDataDbContext)
+    PublicDataDbContext publicDataDbContext,
+    ContentDbContext contentDbContext)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -162,39 +164,44 @@ public class DataSetVersionMappingService(
     {
         // Consider the current mappings to produce a major version change if any options from the
         // original data set version are currently not mapped to options in the new version.
-        var majorVersionUpdate = locationMappingTypes
+        var isMajorVersionUpdate = locationMappingTypes
             .Concat(filterAndOptionMappingTypes
                 .Select(mappings => mappings.OptionMappingType))
             .Any(type => NoMappingTypes.Contains(type));
 
-        var currentVersionNumber = await publicDataDbContext
+        var sourceDataSetVersion = await publicDataDbContext
             .DataSetVersionMappings
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.SourceDataSetVersion)
-            .Select(sourceVersion => new
-            {
-                major = sourceVersion.VersionMajor,
-                minor = sourceVersion.VersionMinor
-            })
             .SingleAsync(cancellationToken);
 
-        var nextVersionNumber = majorVersionUpdate
-            ? new
-            {
-                major = currentVersionNumber.major + 1,
-                minor = 0
-            }
-            : currentVersionNumber with { minor = currentVersionNumber.minor + 1 };
+        var targetDataSetVersion = await publicDataDbContext
+            .DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
+            .Select(nextVersion => nextVersion.TargetDataSetVersion)
+            .SingleAsync(cancellationToken);
 
-        await publicDataDbContext
-            .DataSetVersions
-            .Where(dataSetVersion => dataSetVersion.Id == nextDataSetVersionId)
-            .ExecuteUpdateAsync(
-                setPropertyCalls: s => s
-                    .SetProperty(dataSetVersion => dataSetVersion.VersionMajor, nextVersionNumber.major)
-                    .SetProperty(dataSetVersion => dataSetVersion.VersionMinor, nextVersionNumber.minor)
-                    .SetProperty(dataSetVersion => dataSetVersion.VersionPatch, 0),
-                cancellationToken: cancellationToken);
+        if (isMajorVersionUpdate)
+        {
+            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor + 1;
+            targetDataSetVersion.VersionMinor = 0;
+        }
+        else
+        {
+            targetDataSetVersion.VersionMajor = sourceDataSetVersion.VersionMajor;
+            targetDataSetVersion.VersionMinor = sourceDataSetVersion.VersionMinor + 1;
+        }
+
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        var releaseFile = await contentDbContext
+            .ReleaseFiles
+            .Where(rf => rf.Id == targetDataSetVersion.Release.ReleaseFileId)
+            .SingleAsync(cancellationToken);
+
+        releaseFile.PublicApiDataSetVersion = targetDataSetVersion.SemVersion();
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private async Task UpdateMappingCompleteFlags(

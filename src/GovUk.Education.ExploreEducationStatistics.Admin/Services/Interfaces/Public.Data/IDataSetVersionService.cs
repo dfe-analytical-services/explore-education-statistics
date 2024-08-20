@@ -52,4 +52,10 @@ public interface IDataSetVersionService
     Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
         DataSetVersionUpdateRequest updateRequest,
         CancellationToken cancellationToken = default);
+
+    Task UpdateVersionsForReleaseVersion(
+        Guid releaseVersionId,
+        string slug,
+        string title,
+        CancellationToken cancellationToken = default);
 }

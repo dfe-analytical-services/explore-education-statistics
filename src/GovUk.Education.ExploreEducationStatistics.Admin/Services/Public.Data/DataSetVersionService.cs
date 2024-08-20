@@ -1,4 +1,10 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -17,12 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Semver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
@@ -82,7 +82,7 @@ public class DataSetVersionService(
 
         return await publicDataDbContext
             .DataSetVersions
-            .Where(dataSetVersion => releaseFileIds.Contains(dataSetVersion.ReleaseFileId))
+            .Where(dataSetVersion => releaseFileIds.Contains(dataSetVersion.Release.ReleaseFileId))
             .Include(dataSetVersion => dataSetVersion.DataSet)
             .Select(dataSetVersion => new DataSetVersionStatusSummary(
                 dataSetVersion.Id,
@@ -161,7 +161,7 @@ public class DataSetVersionService(
                 .SingleOrNotFoundAsync(cancellationToken: cancellationToken))
             .OnSuccess(dsv => publicDataApiClient.GetDataSetVersionChanges(
                 dataSetId: dsv.DataSetId,
-                dataSetVersion: dsv.Version,
+                dataSetVersion: dsv.PublicVersion,
                 cancellationToken: cancellationToken
             ));
     }
@@ -182,12 +182,41 @@ public class DataSetVersionService(
             .OnSuccess(async dataSetVersion => await MapDraftVersion(dataSetVersion, cancellationToken));
     }
 
+    public async Task UpdateVersionsForReleaseVersion(
+        Guid releaseVersionId,
+        string slug,
+        string title,
+        CancellationToken cancellationToken = default)
+    {
+        var releaseFileIds = await contentDbContext
+            .ReleaseFiles
+            .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data)
+            .Select(rf => rf.Id)
+            .ToListAsync(cancellationToken);
+
+        var dataSetVersions = await publicDataDbContext
+            .DataSetVersions
+            .Where(dataSetVersion => releaseFileIds.Contains(dataSetVersion.Release.ReleaseFileId))
+            .ToListAsync(cancellationToken);
+
+        if (dataSetVersions.Count > 0)
+        {
+            foreach (var dsv in dataSetVersions)
+            {
+                dsv.Release.Slug = slug;
+                dsv.Release.Title = title;
+            }
+
+            await publicDataDbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
     private async Task<IReadOnlyDictionary<Guid, ReleaseVersion>> GetReleasesVersionsByDataSetVersionId(
         IReadOnlyList<DataSetVersion> dataSetVersions,
         CancellationToken cancellationToken)
     {
         var dataSetVersionsByReleaseFileId = dataSetVersions
-            .ToDictionary(dsv => dsv.ReleaseFileId);
+            .ToDictionary(dsv => dsv.Release.ReleaseFileId);
 
         var releaseVersionsByReleaseFileId = await contentDbContext
             .ReleaseFiles
@@ -212,7 +241,7 @@ public class DataSetVersionService(
         return new DataSetLiveVersionSummaryViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             ReleaseVersion = MapReleaseVersion(releaseVersion),
@@ -229,7 +258,7 @@ public class DataSetVersionService(
         return new DataSetVersionSummaryViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion)
@@ -301,7 +330,7 @@ public class DataSetVersionService(
         return new DataSetDraftVersionViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),
@@ -325,7 +354,7 @@ public class DataSetVersionService(
     {
         return await contentDbContext.ReleaseFiles
             .AsNoTracking()
-            .Where(rf => rf.Id == dataSetVersion.ReleaseFileId)
+            .Where(rf => rf.Id == dataSetVersion.Release.ReleaseFileId)
             .Include(rf => rf.ReleaseVersion)
             .Include(rf => rf.File)
             .SingleAsync(cancellationToken);
