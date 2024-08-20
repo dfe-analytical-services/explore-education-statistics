@@ -234,7 +234,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var result = Assert.Single(viewModel.Results);
 
-            Assert.Equal(dataSetVersion.Version, result.Version);
+            Assert.Equal(dataSetVersion.PublicVersion, result.Version);
             Assert.Equal(dataSetVersion.VersionType, result.Type);
             Assert.Equal(dataSetVersion.Status, result.Status);
             Assert.Equal(
@@ -331,7 +331,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.Equal(1, viewModel.Paging.PageSize);
             Assert.Equal(1, viewModel.Paging.TotalResults);
             var result = Assert.Single(viewModel.Results);
-            Assert.Equal(dataSet1Version.Version, result.Version);
+            Assert.Equal(dataSet1Version.PublicVersion, result.Version);
         }
 
         [Theory]
@@ -627,7 +627,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var response = await GetDataSetVersion(
                 dataSet.Id,
-                dataSetVersion.Version,
+                dataSetVersion.PublicVersion,
                 contentApiClient.Object
             );
 
@@ -636,7 +636,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             MockUtils.VerifyAllMocks(contentApiClient);
 
             Assert.NotNull(viewModel);
-            Assert.Equal(dataSetVersion.Version, viewModel.Version);
+            Assert.Equal(dataSetVersion.PublicVersion, viewModel.Version);
             Assert.Equal(dataSetVersion.VersionType, viewModel.Type);
             Assert.Equal(dataSetVersion.Status, viewModel.Status);
             Assert.Equal(
@@ -693,7 +693,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.PublicVersion);
 
             response.AssertForbidden();
         }
@@ -718,7 +718,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetDataSetVersion(dataSet2.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet2.Id, dataSetVersion.PublicVersion);
 
             response.AssertNotFound();
         }
@@ -753,7 +753,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetDataSetVersion(Guid.NewGuid(), dataSetVersion.Version);
+            var response = await GetDataSetVersion(Guid.NewGuid(), dataSetVersion.PublicVersion);
 
             response.AssertNotFound();
         }
@@ -783,7 +783,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 ))
                 .ReturnsAsync([]);
 
-            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.Version, contentApiClient.Object);
+            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.PublicVersion, contentApiClient.Object);
 
             response.AssertInternalServerError();
         }
@@ -813,7 +813,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 ))
                 .ThrowsAsync(new Exception("Something went wrong"));
 
-            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.Version, contentApiClient.Object);
+            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.PublicVersion, contentApiClient.Object);
 
             response.AssertInternalServerError();
         }
@@ -942,7 +942,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.TimePeriodMetaChanges.AddRange(timePeriodMetaChanges);
             });
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -1016,7 +1016,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.FilterMetaChanges.AddRange(filterMetaChanges);
             });
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -1123,7 +1123,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.FilterOptionMetaChanges.AddRange(filterOptionMetaChanges);
             });
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -1236,7 +1236,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.GeographicLevelMetaChanges.Add(geographicLevelMetaChange);
             });
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -1317,7 +1317,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.LocationMetaChanges.AddRange(locationMetaChanges);
             });
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -1425,7 +1425,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.LocationOptionMetaChanges.AddRange(locationOptionMetaChanges);
             });
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -1546,7 +1546,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 context.TimePeriodMetaChanges.AddRange(timePeriodMetaChanges);
             });
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
 
@@ -1593,7 +1593,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet.Id, dataSetVersion.PublicVersion);
 
             response.AssertForbidden();
         }
@@ -1618,7 +1618,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetDataSetVersionChanges(dataSet2.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(dataSet2.Id, dataSetVersion.PublicVersion);
 
             response.AssertNotFound();
         }
@@ -1653,7 +1653,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetDataSetVersionChanges(Guid.NewGuid(), dataSetVersion.Version);
+            var response = await GetDataSetVersionChanges(Guid.NewGuid(), dataSetVersion.PublicVersion);
 
             response.AssertNotFound();
         }

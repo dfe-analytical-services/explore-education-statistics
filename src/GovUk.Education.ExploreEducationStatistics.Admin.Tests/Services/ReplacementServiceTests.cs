@@ -1736,7 +1736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ForIndex(0, rv => 
                     rv.SetFile(originalFile)
                     .SetPublicApiDataSetId(dataSet.Id)
-                    .SetPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion()))
+                    .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
                 .Generate(2)
                 .ToTuple2();
@@ -1789,7 +1789,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataSet.Id, replacementPlan.DeleteApiDataSetVersionPlan.DataSetId);
                 Assert.Equal(dataSet.Title, replacementPlan.DeleteApiDataSetVersionPlan.DataSetTitle);
                 Assert.Equal(dataSetVersion.Id, replacementPlan.DeleteApiDataSetVersionPlan.Id);
-                Assert.Equal(dataSetVersion.Version, replacementPlan.DeleteApiDataSetVersionPlan.Version);
+                Assert.Equal(dataSetVersion.PublicVersion, replacementPlan.DeleteApiDataSetVersionPlan.Version);
                 Assert.Equal(dataSetVersion.Status, replacementPlan.DeleteApiDataSetVersionPlan.Status);
                 Assert.False(replacementPlan.DeleteApiDataSetVersionPlan.Valid);
 
@@ -2735,7 +2735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ForIndex(0, rv => 
                     rv.SetFile(originalFile)
                     .SetPublicApiDataSetId(dataSet.Id)
-                    .SetPublicApiDataSetVersion(dataSetVersion.FullSemanticVersion()))
+                    .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
                 .Generate(2)
                 .ToTuple2();

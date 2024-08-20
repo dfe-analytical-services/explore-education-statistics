@@ -125,7 +125,7 @@ internal class DataSetService(
             ? new DataSetVersionSummaryViewModel
             {
                 Id = dataSetVersion.Id,
-                Version = dataSetVersion.Version,
+                Version = dataSetVersion.PublicVersion,
                 Status = dataSetVersion.Status,
                 Type = dataSetVersion.VersionType,
                 ReleaseVersion = MapReleaseVersion(releaseVersionsByDataSetVersionId[dataSetVersion.Id])
@@ -141,7 +141,7 @@ internal class DataSetService(
             ? new DataSetLiveVersionSummaryViewModel
             {
                 Id = dataSetVersion.Id,
-                Version = dataSetVersion.Version,
+                Version = dataSetVersion.PublicVersion,
                 Published = dataSetVersion.Published!.Value,
                 Status = dataSetVersion.Status,
                 Type = dataSetVersion.VersionType,
@@ -251,7 +251,7 @@ internal class DataSetService(
         return new DataSetDraftVersionViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),
@@ -292,7 +292,7 @@ internal class DataSetService(
         return new DataSetLiveVersionViewModel
         {
             Id = dataSetVersion.Id,
-            Version = dataSetVersion.Version,
+            Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),

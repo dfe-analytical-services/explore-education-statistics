@@ -141,7 +141,7 @@ public abstract class DataSetVersionPathResolverTests
                 Path.Combine(
                     resolver.BasePath(),
                     version.DataSetId.ToString(),
-                    "v1.0"
+                    "v1.0.0"
                 ),
                 resolver.DirectoryPath(version));
         }

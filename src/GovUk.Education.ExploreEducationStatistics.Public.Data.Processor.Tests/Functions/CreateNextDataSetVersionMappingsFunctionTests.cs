@@ -90,7 +90,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             Assert.Equal(2, updatedDataSet.Versions.Count);
             var nextDataSetVersion = updatedDataSet
                 .Versions
-                .OrderBy(v => v.FullSemanticVersion())
+                .OrderBy(v => v.SemVersion())
                 .Last();
             Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
 
