@@ -18,7 +18,9 @@ ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
 ${SUBJECT_NAME_3}=      UI test subject 3
 ${SUBJECT_NAME_4}=      UI test subject 4
+${SUBJECT_NAME_5}=      UI test subject 5
 ${STATUS_XPATH}    xpath=(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
+
 
 
 *** Test Cases ***
@@ -197,7 +199,89 @@ Add API dataset(minor version)
     user waits until page finishes loading
 
     user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
-    Sleep    10
+
+Validate the summary contents inside the 'draft version details' table
+    user waits until h3 is visible    Draft version details
+    User Waits Until Element Contains    css=dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
+    ${mapping_status}=    Get Text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd    
+    Log    ${mapping_status}
+    Should Be Equal As Strings    ${mapping_status}    Action required
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+
+Validate checklist error for a draft API dataset which shows mapping error
+    user edits release status
+    user checks checklist errors contains
+    ...    1 issue that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    All public API data set mappings must be completed
+
+Create a third draft release via api
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3020
+
+Upload subject to third release
+    user uploads subject    ${SUBJECT_NAME_5}    institution_and_provider.csv    institution_and_provider.meta.csv
+
+Add data guidance to third release
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${SUBJECT_NAME_5}
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME_5}
+    ...    ${SUBJECT_NAME_5} Main guidance content
+
+
+Save data guidance
+    user clicks button    Save guidance
+
+Add API dataset(Major version)
+    User Scrolls To The Top Of The Page
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+
+    user waits until h3 is visible    Current live API data sets
+
+    user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]
+    user clicks button in table cell    1    3    Create new version    xpath://table[@data-testid="live-api-data-sets"]
+
+     ${modal}=    user waits until modal is visible    Create a new API data set version
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_5}
+    user clicks button    Confirm new data set version
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
+
+Validate the summary contents inside the 'draft version details' table
+    user waits until h3 is visible    Draft version details
+    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd     v2.0    %{WAIT_LONG}
+    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
+    ${mapping_status}=    Get Text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
+    Log    ${mapping_status}
+    Should Be Equal As Strings    ${mapping_status}    Action required
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+
+Validate checklist error for a draft API dataset which shows mapping error
+    user edits release status
+    user checks checklist errors contains
+    ...    1 issue that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    All public API data set mappings must be completed
+
 
 
 
@@ -240,14 +324,12 @@ Check Either Link Exists
     [Arguments]    ${text1}    ${text2}
 
     ${condition1}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text1}    timeout=5s
-
     Run Keyword If    ${condition1}    Set Test Variable    ${link_found}    True
 
     ${condition2}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text2}    timeout=5s
     Run Keyword If    ${condition1} == False    Set Test Variable    ${link_found}    ${condition2}
 
     ${link_found}=    Evaluate    ${condition1} or ${condition2}
-
     Run Keyword If    ${link_found} == False    Log    Neither link '${text1}' nor '${text2}' was found after checking both. Continuing to check...
 
     [Return]    ${link_found}
