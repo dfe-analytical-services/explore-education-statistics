@@ -129,6 +129,7 @@ public class PublicationCacheService : IPublicationCacheService
         {
             case PublicationTreeFilter.DataTables:
                 return publication.LatestReleaseHasData;
+            case PublicationTreeFilter.DataCatalogue:
             case PublicationTreeFilter.FastTrack:
                 return publication.AnyLiveReleaseHasData;
             default:
