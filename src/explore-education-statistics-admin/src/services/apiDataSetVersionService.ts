@@ -9,6 +9,56 @@ export type MappingType =
   | 'AutoNone'
   | 'AutoMapped';
 
+export type Mapping<TSource> = {
+  candidateKey?: string;
+  publicId: string;
+  source: TSource;
+  type: MappingType;
+};
+
+export interface FilterSource {
+  label: string;
+}
+
+export interface FilterOptionSource {
+  label: string;
+}
+
+export type FilterMapping = Mapping<FilterSource> & {
+  optionMappings: Dictionary<FilterOptionMapping>;
+};
+
+export type FilterOptionMapping = Mapping<FilterOptionSource>;
+
+export interface FilterCandidate {
+  label: string;
+  options: Dictionary<FilterSource>;
+}
+
+export interface FiltersMapping {
+  candidates: Dictionary<FilterCandidate>;
+  mappings: Dictionary<FilterMapping>;
+}
+
+export interface FilterMappingUpdate {
+  sourceKey: string;
+  candidateKey?: string;
+  type: MappingType;
+  filterKey: string;
+}
+
+interface FilterOptionsMappingUpdateRequest {
+  updates: FilterMappingUpdate[];
+}
+
+interface FilterOptionsMappingUpdateResponse {
+  updates: {
+    filterKey: string;
+    mapping: FilterMapping;
+    sourceKey: string;
+  }[];
+}
+
 export interface LocationCandidate {
   label: string;
   code?: string;
@@ -18,12 +68,7 @@ export interface LocationCandidate {
   ukprn?: string;
 }
 
-export interface LocationMapping {
-  candidateKey?: string;
-  publicId: string;
-  type: MappingType;
-  source: LocationCandidate;
-}
+export type LocationMapping = Mapping<LocationCandidate>;
 
 export interface LocationsMapping {
   levels: Dictionary<{
@@ -58,20 +103,37 @@ const apiDataSetVersionService = {
   }): Promise<ApiDataSet> {
     return client.post('/public-data/data-set-versions', data);
   },
-  deleteVersion(versionId: string): Promise<void> {
-    return client.delete(`/public-data/data-set-versions/${versionId}`);
+  completeVersion(data: { dataSetVersionId: string }): Promise<ApiDataSet> {
+    return client.post('/public-data/data-set-versions/complete', data);
   },
-  getLocationsMapping(versionId: string): Promise<LocationsMapping> {
+  deleteVersion(dataSetVersionId: string): Promise<void> {
+    return client.delete(`/public-data/data-set-versions/${dataSetVersionId}`);
+  },
+  getFiltersMapping(dataSetVersionId: string): Promise<FiltersMapping> {
     return client.get(
-      `/public-data/data-set-versions/${versionId}/mapping/locations`,
+      `/public-data/data-set-versions/${dataSetVersionId}/mapping/filters`,
+    );
+  },
+  updateFilterOptionsMapping(
+    dataSetVersionId: string,
+    data: FilterOptionsMappingUpdateRequest,
+  ): Promise<FilterOptionsMappingUpdateResponse> {
+    return client.patch(
+      `/public-data/data-set-versions/${dataSetVersionId}/mapping/filters/options`,
+      data,
+    );
+  },
+  getLocationsMapping(dataSetVersionId: string): Promise<LocationsMapping> {
+    return client.get(
+      `/public-data/data-set-versions/${dataSetVersionId}/mapping/locations`,
     );
   },
   updateLocationsMapping(
-    versionId: string,
+    dataSetVersionId: string,
     data: LocationsMappingUpdateRequest,
   ): Promise<LocationsMappingUpdateResponse> {
     return client.patch(
-      `/public-data/data-set-versions/${versionId}/mapping/locations`,
+      `/public-data/data-set-versions/${dataSetVersionId}/mapping/locations`,
       data,
     );
   },

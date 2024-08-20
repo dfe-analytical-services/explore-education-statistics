@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         DataSetId = tuple.apiDataSetVersion.DataSetId,
                         DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
                         Id = tuple.apiDataSetVersion.Id,
-                        Version = tuple.apiDataSetVersion.Version,
+                        Version = tuple.apiDataSetVersion.PublicVersion,
                         Status = tuple.apiDataSetVersion.Status,
                         Valid = false,
                     };

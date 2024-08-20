@@ -41,11 +41,21 @@ public interface IDataSetVersionService
         Guid dataSetId,
         CancellationToken cancellationToken = default);
 
+    Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default);
+
     Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
         DataSetVersionUpdateRequest updateRequest,
+        CancellationToken cancellationToken = default);
+
+    Task UpdateVersionsForReleaseVersion(
+        Guid releaseVersionId,
+        string slug,
+        string title,
         CancellationToken cancellationToken = default);
 }

@@ -48,6 +48,20 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .HandleFailuresOrOk();
     }
 
+    [HttpPost]
+    [Produces("application/json")]
+    [Route("complete")]
+    public async Task<ActionResult<DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
+        [FromBody] NextDataSetVersionCompleteImportRequest nextDataSetVersionCompleteImportRequest,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetVersionService
+            .CompleteNextVersionImport(
+                dataSetVersionId: nextDataSetVersionCompleteImportRequest.DataSetVersionId,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
     [HttpDelete("{dataSetVersionId:guid}")]
     [Produces("application/json")]
     public async Task<ActionResult> DeleteVersion(
@@ -82,7 +96,7 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .HandleFailuresOrNoOp();
     }
 
-    [HttpPatch()]
+    [HttpPatch]
     [Produces("application/json")]
     public async Task<ActionResult<DataSetDraftVersionViewModel>> UpdateVersion(
         [FromBody] DataSetVersionUpdateRequest dataSetVersionUpdateRequest,

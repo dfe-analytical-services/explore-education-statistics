@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {

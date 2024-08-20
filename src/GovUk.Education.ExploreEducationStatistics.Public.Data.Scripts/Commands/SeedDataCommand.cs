@@ -324,8 +324,8 @@ public class SeedDataCommand : ICommand
                 VersionMajor = 1,
                 VersionMinor = 0,
                 Status = DataSetVersionStatus.Published,
+                Release = _seed.Release,
                 Notes = string.Empty,
-                ReleaseFileId = _seed.ReleaseFileId ?? Guid.NewGuid(),
                 DataSetId = _seed.DataSet.Id,
                 TotalResults = totalResults,
                 MetaSummary = new DataSetVersionMetaSummary

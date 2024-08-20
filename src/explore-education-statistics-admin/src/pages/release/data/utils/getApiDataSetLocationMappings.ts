@@ -27,15 +27,13 @@ export default function getApiDataSetLocationMappings(
   locationsMapping: LocationsMapping,
 ): {
   autoMappedLocations: Partial<Record<LocationLevelKey, AutoMappedLocation[]>>;
-  newLocationCandidates: Partial<
-    Record<LocationLevelKey, LocationCandidateWithKey[]>
-  >;
+  newLocations: Partial<Record<LocationLevelKey, LocationCandidateWithKey[]>>;
   mappableLocations: Partial<Record<LocationLevelKey, MappableLocation[]>>;
 } {
   const mappableLocations: Partial<
     Record<LocationLevelKey, MappableLocation[]>
   > = {};
-  const newLocationCandidates: Partial<
+  const newLocations: Partial<
     Record<LocationLevelKey, LocationCandidateWithKey[]>
   > = {};
   const autoMappedLocations: Partial<
@@ -123,7 +121,7 @@ export default function getApiDataSetLocationMappings(
     // - completely new locations (have a unique key)
     // - locations that were auto mapped but the mapping has been removed
     // (the original mapping and the candidate have the same key)
-    const newLocations: LocationCandidateWithKey[] = Object.entries(
+    const newLocationsForLevel: LocationCandidateWithKey[] = Object.entries(
       levelCandidates,
     )
       .filter(([key, _]) => !mappedCandidateKeys.has(key))
@@ -143,14 +141,14 @@ export default function getApiDataSetLocationMappings(
       autoMappedLocations[levelKey] = autoMapped;
     }
 
-    if (newLocations.length) {
-      newLocationCandidates[levelKey] = newLocations;
+    if (newLocationsForLevel.length) {
+      newLocations[levelKey] = newLocationsForLevel;
     }
   });
 
   return {
     autoMappedLocations,
-    newLocationCandidates,
+    newLocations,
     mappableLocations,
   };
 }

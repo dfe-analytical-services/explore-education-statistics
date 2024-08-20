@@ -40,25 +40,37 @@ internal class ProcessorClient(
             cancellationToken: cancellationToken);
     }
 
-    public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersion(
+    public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
         CancellationToken cancellationToken = default)
     {
-        var request = new NextDataSetVersionCreateMappingsRequest
+        var request = new NextDataSetVersionMappingsCreateRequest
         {
             ReleaseFileId = releaseFileId,
             DataSetId = dataSetId
         };
 
-        return await SendPost<NextDataSetVersionCreateMappingsRequest, ProcessDataSetVersionResponseViewModel>(
-            "api/CreateNextDataSetVersion",
+        return await SendPost<NextDataSetVersionMappingsCreateRequest, ProcessDataSetVersionResponseViewModel>(
+            "api/CreateNextDataSetVersionMappings",
             request,
             cancellationToken: cancellationToken);
     }
-    
+
+    public async Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new NextDataSetVersionCompleteImportRequest { DataSetVersionId = dataSetVersionId };
+
+        return await SendPost<NextDataSetVersionCompleteImportRequest, ProcessDataSetVersionResponseViewModel>(
+            "api/CompleteNextDataSetVersionImport",
+            request,
+            cancellationToken: cancellationToken);
+    }
+
     public async Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
-        Guid releaseVersionId, 
+        Guid releaseVersionId,
         CancellationToken cancellationToken = default)
     {
         return await SendDelete(
@@ -72,7 +84,7 @@ internal class ProcessorClient(
     {
         return await SendDelete(
             $"api/DeleteDataSetVersion/{dataSetVersionId}",
-            response => 
+            response =>
                 response.StatusCode == HttpStatusCode.NotFound ? new NotFoundResult() : null,
             cancellationToken: cancellationToken);
     }
@@ -115,7 +127,7 @@ internal class ProcessorClient(
         await AddBearerToken(cancellationToken);
 
         var response = await requestFunction.Invoke();
-        
+
         var customHandlerResponse = customResponseHandler?.Invoke(response);
 
         if (customHandlerResponse is not null)

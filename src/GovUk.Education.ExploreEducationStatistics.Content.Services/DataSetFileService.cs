@@ -154,7 +154,7 @@ public class DataSetFileService : IDataSetFileService
             .HavingLatestPublishedReleaseVersions(latestReleaseVersions, latestOnly: false);
 
         return await latestReleaseFiles
-            .Select(rf => new DataSetSitemapItemViewModel()
+            .Select(rf => new DataSetSitemapItemViewModel
             {
                 Id = rf.File.DataSetFileId!.Value.ToString(),
                 LastModified = rf.Published

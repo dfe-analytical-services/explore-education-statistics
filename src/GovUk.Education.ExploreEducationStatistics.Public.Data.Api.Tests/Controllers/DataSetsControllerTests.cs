@@ -53,7 +53,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSet.Summary, content.Summary);
             Assert.Equal(dataSet.Status, content.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion.Version, content.LatestVersion.Version);
+            Assert.Equal(dataSetVersion.PublicVersion, content.LatestVersion.Version);
             Assert.Equal(
                 dataSetVersion.Published.TruncateNanoseconds(),
                 content.LatestVersion.Published
@@ -213,9 +213,9 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 {
                     var locationMeta = Assert.Single(
                         dataSetVersion.LocationMetas,
-                        fm => fm.Level == locationMetaViewModel.Level);
+                        m => m.Level == locationMetaViewModel.Level.Code);
 
-                    Assert.Equal(locationMeta.Level.GetEnumLabel(), locationMetaViewModel.Label);
+                    Assert.Equal(locationMeta.Level.GetEnumLabel(), locationMetaViewModel.Level.Label);
 
                     foreach (var locationOptionViewModel in locationMetaViewModel.Options)
                     {
@@ -266,7 +266,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 Assert.All(
                     content.GeographicLevels,
-                    level => Assert.Equal(level.Level.GetEnumLabel(), level.Label)
+                    level => Assert.Equal(level.Code.GetEnumLabel(), level.Label)
                 );
 
                 foreach (var indicator in content.Indicators)
@@ -521,7 +521,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-                var response = await GetDataSetMeta(dataSet2.Id, dataSetVersion.Version);
+                var response = await GetDataSetMeta(dataSet2.Id, dataSetVersion.PublicVersion);
 
                 response.AssertNotFound();
             }

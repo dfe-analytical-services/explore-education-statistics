@@ -12,7 +12,7 @@ const testLocationsMapping: LocationsMapping = {
         },
         Location3UpdatedKey: {
           label: 'Location 3 updated',
-          code: 'location-3-code',
+          code: 'location-3-code-updated',
         },
         Location5Key: {
           label: 'Location 5',
@@ -148,30 +148,6 @@ const testLocationsMapping: LocationsMapping = {
           label: 'Location 15',
           code: 'location-15-code',
         },
-        Location16Key: {
-          label: 'Location 16',
-          code: 'location-16-code',
-        },
-        Location17Key: {
-          label: 'Location 17',
-          code: 'location-17-code',
-        },
-        Location18Key: {
-          label: 'Location 18',
-          code: 'location-18-code',
-        },
-        Location19Key: {
-          label: 'Location 19',
-          code: 'location-19-code',
-        },
-        Location20Key: {
-          label: 'Location 20',
-          code: 'location-20-code',
-        },
-        Location21Key: {
-          label: 'Location 21',
-          code: 'location-21-code',
-        },
       },
       mappings: {
         Location13Key: {
@@ -198,60 +174,6 @@ const testLocationsMapping: LocationsMapping = {
           source: {
             label: 'Location 15',
             code: 'location-15-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location16Key: {
-          candidateKey: 'Location16Key',
-          publicId: 'location-16-public-id',
-          source: {
-            label: 'Location 16',
-            code: 'location-16-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location17Key: {
-          candidateKey: 'Location17Key',
-          publicId: 'location-17-public-id',
-          source: {
-            label: 'Location 17',
-            code: 'location-17-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location18Key: {
-          candidateKey: 'Location18Key',
-          publicId: 'location-18-public-id',
-          source: {
-            label: 'Location 18',
-            code: 'location-18-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location19Key: {
-          candidateKey: 'Location19Key',
-          publicId: 'location-19-public-id',
-          source: {
-            label: 'Location 19',
-            code: 'location-19-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location20Key: {
-          candidateKey: 'Location20Key',
-          publicId: 'location-20-public-id',
-          source: {
-            label: 'Location 20',
-            code: 'location-20-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location21Key: {
-          candidateKey: 'Location21Key',
-          publicId: 'location-21-public-id',
-          source: {
-            label: 'Location 21',
-            code: 'location-21-code',
           },
           type: 'AutoMapped',
         },

@@ -9,9 +9,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -243,6 +247,15 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
             var client = BuildApp().CreateClient();
 
             List<LocationMappingUpdateRequest> updates =
@@ -314,6 +327,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             var expectedFullMappings = new Dictionary<GeographicLevel, LocationLevelMappings>
@@ -375,6 +389,11 @@ public abstract class DataSetVersionMappingControllerTests(
             // Assert that the batch saves still show the location mappings as incomplete, as there
             // are still mappings with type "AutoNone" in the plan.
             Assert.False(updatedMappings.LocationMappingsComplete);
+
+            // Assert that this update constitutes a major version update, as some locations options
+            // are 'ManualNone', indicating that some of the source location options may have been
+            // removed thus creating a breaking change.
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
         }
 
         [Theory]
@@ -460,6 +479,15 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile())
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
             var client = BuildApp().CreateClient();
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
@@ -494,14 +522,14 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Theory]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0")]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1")]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1")]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0.0")]
         public async Task Success_VersionUpdate(
             MappingType updatedMappingType,
             MappingType unchangedMappingType,
@@ -576,6 +604,15 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
             var client = BuildApp().CreateClient();
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
@@ -606,7 +643,13 @@ public abstract class DataSetVersionMappingControllerTests(
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next data set version correctly. 
-            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.Version);
+            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
+
+            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
+                .ReleaseFiles
+                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
+
+            Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         [Fact]
@@ -679,6 +722,15 @@ public abstract class DataSetVersionMappingControllerTests(
             {
                 context.DataSetVersionMappings.Add(mappings);
             });
+
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
             var client = BuildApp().CreateClient();
 
@@ -1206,6 +1258,15 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
             var client = BuildApp().CreateClient();
 
             List<FilterOptionMappingUpdateRequest> updates =
@@ -1328,7 +1389,7 @@ public abstract class DataSetVersionMappingControllerTests(
             // belonging to mapped filters have a mapping type of "ManualNone", indicating that 
             // some of the source filter options are no longer available in the target data set
             // version, thus creating a breaking change. 
-            Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
         }
 
         [Theory]
@@ -1417,6 +1478,15 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
             var client = BuildApp().CreateClient();
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
@@ -1451,14 +1521,14 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Theory]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1")]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0")]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1")]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0")]
-        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0.0")]
         public async Task Success_VersionUpdate(
             MappingType updatedMappingType,
             MappingType unchangedMappingType,
@@ -1527,6 +1597,15 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
             var client = BuildApp().CreateClient();
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
@@ -1557,7 +1636,13 @@ public abstract class DataSetVersionMappingControllerTests(
                 .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next version number as expected. 
-            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.Version);
+            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
+
+            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
+                .ReleaseFiles
+                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
+
+            Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         [Theory]
@@ -1627,6 +1712,15 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
             var client = BuildApp().CreateClient();
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
@@ -1659,7 +1753,7 @@ public abstract class DataSetVersionMappingControllerTests(
             // Assert that the batch save calculates the next version number as a major change,
             // as filter options that were in the source data set version no longer appear in the
             // next version. 
-            Assert.Equal("2.0", updatedMappings.TargetDataSetVersion.Version);
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
         }
 
         [Fact]

@@ -2,7 +2,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.Extensions.Options;
-using Xunit;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;

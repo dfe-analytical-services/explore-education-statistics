@@ -98,6 +98,7 @@ var containerAppEnvironmentNameSuffix = '01'
 var dataFilesFileShareMountName = 'public-api-fileshare-mount'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 var publicApiStorageAccountName = '${subscription}eespapisa'
+var appGatewayManagedIdentityName = '${subscription}-ees-id-agw-01'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -384,6 +385,20 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     }]
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
+  }
+}
+
+// TODO EES-5407 - incorporate this change with the automating of the app gateway creation.
+resource appGatewayManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  name: appGatewayManagedIdentityName
+}
+
+module appGatewayKeyVaultRoleAssignments 'components/keyVaultRoleAssignment.bicep' = {
+  name: 'appGatewayKeyVaultRoleAssignment'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: [appGatewayManagedIdentity.properties.principalId]
+    role: 'Secrets User'
   }
 }
 

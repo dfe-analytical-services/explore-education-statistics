@@ -355,11 +355,12 @@ var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
   ? [userAssignedManagedIdentityParams!.principalId]
   : [functionApp.identity.principalId, stagingSlot.identity.principalId]
 
-module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
-  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
+module functionAppKeyVaultRoleAssignments 'keyVaultRoleAssignment.bicep' = {
+  name: '${functionAppName}FunctionAppKeyVaultRoleAssignment'
   params: {
     keyVaultName: keyVaultName
     principalIds: keyVaultPrincipalIds
+    role: 'Secrets User'
   }
 }
 
@@ -457,7 +458,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     azureFileShares: azureFileShares
   }
   dependsOn: [
-    functionAppKeyVaultAccessPolicy
+    functionAppKeyVaultRoleAssignments
     slot1FileShare
     slot2FileShare
   ]

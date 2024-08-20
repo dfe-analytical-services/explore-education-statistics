@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 () => { locations.GetLocationAttributesHierarchical(hierarchies); }
             );
 
-            Assert.Equal($"Location does not have a property NotAPropertyOfLocation", exception.Message);
+            Assert.Equal("Location does not have a property NotAPropertyOfLocation", exception.Message);
         }
 
         [Fact]

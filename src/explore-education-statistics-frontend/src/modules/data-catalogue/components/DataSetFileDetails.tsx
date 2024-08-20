@@ -16,9 +16,13 @@ import React from 'react';
 
 interface Props {
   dataSetFile: DataSetFile;
+  hasApiDataSet?: boolean;
 }
 
-export default function DataSetFileDetails({ dataSetFile }: Props) {
+export default function DataSetFileDetails({
+  dataSetFile,
+  hasApiDataSet = false,
+}: Props) {
   const {
     release,
     file: {
@@ -105,6 +109,17 @@ export default function DataSetFileDetails({ dataSetFile }: Props) {
         {timePeriodRange && (timePeriodRange.from || timePeriodRange.to) && (
           <SummaryListItem term="Time period">
             {getTimePeriodString(timePeriodRange)}
+          </SummaryListItem>
+        )}
+        {hasApiDataSet && (
+          <SummaryListItem term="Notifications">
+            <Link
+              className="govuk-!-display-none-print"
+              unvisited
+              to={`/api-subscriptions/new-subscription/${dataSetFile.id}`}
+            >
+              Get email updates about this API data set
+            </Link>
           </SummaryListItem>
         )}
       </SummaryList>

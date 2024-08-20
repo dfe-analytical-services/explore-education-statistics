@@ -69,6 +69,7 @@ export const mapBlockDefinition: ChartDefinition = {
     canSetBarThickness: false,
     canSetDataLabelPosition: false,
     canShowDataLabels: false,
+    canShowAllMajorAxisTicks: false,
     canSize: true,
     canSort: false,
     hasGridLines: false,

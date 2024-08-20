@@ -32,14 +32,19 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task Success()
         {
+            var subjectId = Guid.NewGuid();
+
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithPublication(DataFixture.DefaultPublication()))
-                .WithFiles(DataFixture.DefaultFile()
-                    .ForIndex(0, s => s.SetType(FileType.Data))
-                    .ForIndex(1, s => s.SetType(FileType.Metadata))
-                    .WithSubjectId(Guid.NewGuid())
-                    .Generate(2))
+                .WithFiles([
+                    DataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithSubjectId(subjectId),
+                    DataFixture
+                        .DefaultFile(FileType.Metadata)
+                        .WithSubjectId(subjectId)
+                ])
                 .GenerateList()
                 .ToTuple2();
 
@@ -94,12 +99,16 @@ public abstract class CreateDataSetFunctionTests(
             var dataSetVersion = Assert.Single(dataSet.Versions);
             Assert.Equal(dataSetVersion, dataSet.LatestDraftVersion);
 
-            Assert.Equal(releaseFile.Id, dataSetVersion.ReleaseFileId);
             Assert.Equal(dataSet.Id, dataSetVersion.DataSetId);
             Assert.Equal(DataSetVersionStatus.Processing, dataSetVersion.Status);
             Assert.Empty(dataSetVersion.Notes);
             Assert.Equal(1, dataSetVersion.VersionMajor);
             Assert.Equal(0, dataSetVersion.VersionMinor);
+
+            Assert.Equal(releaseFile.File.DataSetFileId, dataSetVersion.Release.DataSetFileId);
+            Assert.Equal(releaseFile.Id, dataSetVersion.Release.ReleaseFileId);
+            Assert.Equal(releaseFile.ReleaseVersion.Slug, dataSetVersion.Release.Slug);
+            Assert.Equal(releaseFile.ReleaseVersion.Title, dataSetVersion.Release.Title);
 
             // Assert a single import was created
             var dataSetVersionImport = Assert.Single(dataSetVersion.Imports);
@@ -155,7 +164,8 @@ public abstract class CreateDataSetFunctionTests(
             DataSet dataSet = DataFixture.DefaultDataSet();
 
             DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion()
-                .WithReleaseFileId(releaseFile.Id)
+                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                     .WithReleaseFileId(releaseFile.Id))
                 .WithDataSet(dataSet);
 
             await AddTestData<ContentDbContext>(context =>
@@ -182,13 +192,19 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task ReleaseVersionNotDraft_ReturnsValidationProblem()
         {
+            var subjectId = Guid.NewGuid();
+
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithApprovalStatus(ReleaseApprovalStatus.Approved))
-                .WithFiles(DataFixture.DefaultFile()
-                    .ForIndex(0, s => s.SetType(FileType.Data))
-                    .ForIndex(1, s => s.SetType(FileType.Metadata))
-                    .Generate(2))
+                .WithFiles([
+                    DataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithSubjectId(subjectId),
+                    DataFixture
+                        .DefaultFile(FileType.Metadata)
+                        .WithSubjectId(subjectId)
+                ])
                 .GenerateList()
                 .ToTuple2();
 
