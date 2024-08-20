@@ -48,6 +48,7 @@ export interface ApiDataSetVersion {
   status: DataSetVersionStatus;
   type: DataSetVersionType;
   file: IdTitlePair;
+  notes?: string;
   releaseVersion: IdTitlePair;
   totalResults: number;
 }

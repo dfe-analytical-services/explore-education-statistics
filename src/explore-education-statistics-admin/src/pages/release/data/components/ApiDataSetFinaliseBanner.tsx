@@ -6,12 +6,14 @@ import Button from '@common/components/Button';
 import React from 'react';
 
 interface Props {
+  changelogPath: string;
   draftVersionStatus?: DataSetDraftVersionStatus;
   finalisingStatus?: DataSetFinalisingStatus;
   onFinalise: () => void;
 }
 
 export default function ApiDataSetFinaliseBanner({
+  changelogPath,
   draftVersionStatus,
   finalisingStatus,
   onFinalise,
@@ -72,7 +74,7 @@ export default function ApiDataSetFinaliseBanner({
         </p>
 
         <p>
-          <Link to="/todo">View changelog and public guidance notes</Link>
+          <Link to={changelogPath}>View changelog and guidance notes</Link>
         </p>
       </NotificationBanner>
     );

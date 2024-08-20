@@ -9,6 +9,7 @@ describe('ApiDataSetFinaliseBanner', () => {
   test('renders the finalising banner when `finalisingStatus` is `finalising', () => {
     render(
       <ApiDataSetFinaliseBanner
+        changelogPath="/changelog"
         finalisingStatus="finalising"
         onFinalise={noop}
       />,
@@ -25,6 +26,7 @@ describe('ApiDataSetFinaliseBanner', () => {
   test('renders the action required banner when `draftVersionStatus` is `Mapping', () => {
     render(
       <ApiDataSetFinaliseBanner
+        changelogPath="/changelog"
         draftVersionStatus="Mapping"
         onFinalise={noop}
       />,
@@ -45,6 +47,7 @@ describe('ApiDataSetFinaliseBanner', () => {
     render(
       <MemoryRouter>
         <ApiDataSetFinaliseBanner
+          changelogPath="/changelog"
           draftVersionStatus="Draft"
           onFinalise={noop}
         />
@@ -64,6 +67,7 @@ describe('ApiDataSetFinaliseBanner', () => {
   test('renders the error banner when `finalisingStatus` is `finalised` and `draftVersionStatus` is `Draft', () => {
     render(
       <ApiDataSetFinaliseBanner
+        changelogPath="/changelog"
         draftVersionStatus="Failed"
         finalisingStatus="finalised"
         onFinalise={noop}

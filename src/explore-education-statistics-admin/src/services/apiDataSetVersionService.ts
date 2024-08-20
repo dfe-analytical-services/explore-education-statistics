@@ -2,7 +2,9 @@ import client from '@admin/services/utils/service';
 import {
   ApiDataSet,
   ApiDataSetLiveVersionSummary,
+  ApiDataSetVersion,
 } from '@admin/services/apiDataSetService';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { PaginatedList } from '@common/services/types/pagination';
 import { Dictionary } from '@common/types';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
@@ -155,6 +157,17 @@ const apiDataSetVersionService = {
       `/public-data/data-set-versions/${dataSetVersionId}/mapping/locations`,
       data,
     );
+  },
+  getChanges(dataSetVersionId: string): Promise<ApiDataSetVersionChanges> {
+    return client.get(
+      `/public-data/data-set-versions/${dataSetVersionId}/changes`,
+    );
+  },
+  updateNotes(data: {
+    dataSetVersionId: string;
+    notes: string;
+  }): Promise<ApiDataSetVersion> {
+    return client.patch(`/public-data/data-set-versions`, data);
   },
 } as const;
 
