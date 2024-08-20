@@ -42,7 +42,7 @@ public abstract class DataSetVersionsControllerTests(
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
-    public class ListLiveVersionsTests(
+    public class ListVersionsTests(
         TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
         private static readonly IReadOnlyList<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatuses =
@@ -54,11 +54,11 @@ public abstract class DataSetVersionsControllerTests(
                 ]
             );
 
-        public static TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
+        public static readonly TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
             PreviouslyPublishedDataSetVersionStatuses
         );
 
-        public static TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
+        public static readonly TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
             EnumUtil.GetEnums<DataSetVersionStatus>().Except(PreviouslyPublishedDataSetVersionStatuses)
         );
 
@@ -325,6 +325,18 @@ public abstract class DataSetVersionsControllerTests(
             response.AssertForbidden();
         }
 
+        [Fact]
+        public async Task NoDataSetId_Returns400()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await client.GetAsync(BaseUrl);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasNotEmptyError("dataSetId");
+        }
+
         private async Task<HttpResponseMessage> ListLiveVersions(
             Guid dataSetId,
             int? page = null,
@@ -335,11 +347,12 @@ public abstract class DataSetVersionsControllerTests(
 
             var queryParams = new Dictionary<string, string?>
             {
+                { "dataSetId", dataSetId.ToString() },
                 { "page", page?.ToString() },
                 { "pageSize", pageSize?.ToString() }
             };
 
-            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}", queryParams);
+            var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
 
             return await client.GetAsync(uri);
         }
