@@ -19,7 +19,6 @@ ${SUBJECT_NAME_2}=      UI test subject 2
 ${SUBJECT_NAME_3}=      UI test subject 3
 ${SUBJECT_NAME_4}=      UI test subject 4
 ${SUBJECT_NAME_5}=      UI test subject 5
-${STATUS_XPATH}    xpath=(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
 
 
 
@@ -29,6 +28,7 @@ Create publication
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
+
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Financial year    3000-01    Accredited official statistics
@@ -56,40 +56,54 @@ Add data guidance to subjects
 Save data guidance
     user clicks button    Save guidance
 
-Add 1st API dataset
-    User Scrolls To The Top Of The Page
+Create 1st API dataset
+    user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
 
-
     user clicks button    Create API data set
-    ${modal}=    User Waits Until Modal Is Visible    Create a new API data set
+    ${modal}=    user waits until modal is visible    Create a new API data set
     user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
-
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Check Status Is Ready
+    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
 
-Add 2nd API dataset
-    
+Create 2nd API dataset
     user clicks link    Back to API data sets
     user clicks button    Create API data set
-    ${modal}=    User Waits Until Modal Is Visible    Create a new API data set
+    ${modal}=    user waits until modal is visible    Create a new API data set
     user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_2}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
-
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
 User waits until the 2nd API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Check Status Is Ready
+    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+
+Verify the contents inside the 'Draft API datasets' table
+    user clicks link    Back to API data sets
+    user waits until h3 is visible    Draft API data sets
+
+
+    user checks table column heading contains    1    1    Draft version    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    2    Name             xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    3    Status           xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    4    Actions          xpath://table[@data-testid='draft-api-data-sets']
+    
+
+    user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table cell contains    1    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
+    
+    user checks table cell contains    2    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table cell contains    2    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
+    
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -99,8 +113,6 @@ Add headline text block to Content page
 Approve first release
     user clicks link    Sign off
     user approves release for immediate publication
-
-
 
 Navigate to admin and create an amendment
     user navigates to admin dashboard    Bau1
@@ -119,7 +131,7 @@ Change the Release type
     ...    3000-01
     ...    Official statistics in development
 
-Upload third subject
+Upload third subject(large data file)
     user waits until large data upload is completed
     ...    ${SUBJECT_NAME_3}
     ...    data-upload-import.csv
@@ -130,7 +142,7 @@ Add data guidance to third subject
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_3}    meta content
     user clicks button    Save guidance
 
-Add API dataset in the amendment
+Create an API dataset through the amendment
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -143,6 +155,23 @@ Add API dataset in the amendment
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
+User waits until the 2nd API dataset status changes to 'Failed'
+    user waits until h3 is visible    Draft version details
+    wait until keyword succeeds    20x    5s    Verify status of API Datasets    Failed
+
+Verify the contents inside the 'Draft API datasets' table
+    user clicks link    Back to API data sets
+    user waits until h3 is visible    Draft API data sets
+
+    user checks table column heading contains    1    1    Draft version    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    2    Name             xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    3    Status           xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    4    Actions          xpath://table[@data-testid='draft-api-data-sets']
+
+
+    user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table cell contains    1    3    Failed    xpath://table[@data-testid='draft-api-data-sets']
+
 Add release note for new release amendment
     user clicks link    Content
     user adds a release note    Test release note two
@@ -150,7 +179,7 @@ Add release note for new release amendment
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
 
-Validate checklist error while API data set is processing or failed
+Validate checklist error while API data set is still processing or being failed
     user edits release status
     user checks checklist errors contains
     ...    1 issue that must be resolved before this release can be published.
@@ -178,12 +207,11 @@ Add data guidance to second release
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_4}
     ...    ${SUBJECT_NAME_4} Main guidance content
 
-
 Save data guidance
     user clicks button    Save guidance
 
-Add API dataset(minor version)
-    User Scrolls To The Top Of The Page
+Create a different version of an API dataset(Minor version)
+    user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
     
@@ -192,26 +220,24 @@ Add API dataset(minor version)
     user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]
     user clicks button in table cell    1    3    Create new version    xpath://table[@data-testid="live-api-data-sets"]
 
-     ${modal}=    User Waits Until Modal Is Visible    Create a new API data set version
+    ${modal}=    user waits until modal is visible    Create a new API data set version
     user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_4}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading
-
     user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
 
 Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
-    User Waits Until Element Contains    css=dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
-    ${mapping_status}=    Get Text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd    
-    Log    ${mapping_status}
-    Should Be Equal As Strings    ${mapping_status}    Action required
+    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd     v1.1    %{WAIT_LONG}
+    user waits until element contains    css=dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
+    ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
+    should be equal as strings    ${mapping_status}    Action required
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
-
 
 Validate checklist error for a draft API dataset which shows mapping error
     user edits release status
@@ -244,8 +270,8 @@ Add data guidance to third release
 Save data guidance
     user clicks button    Save guidance
 
-Add API dataset(Major version)
-    User Scrolls To The Top Of The Page
+Create a different version of API dataset (major version)
+    user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
 
@@ -265,15 +291,13 @@ Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
     user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd     v2.0    %{WAIT_LONG}
     user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
-    ${mapping_status}=    Get Text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
-    Log    ${mapping_status}
-    Should Be Equal As Strings    ${mapping_status}    Action required
+    ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
+    should be equal as strings    ${mapping_status}    Action required
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
-
 
 Validate checklist error for a draft API dataset which shows mapping error
     user edits release status
@@ -311,18 +335,14 @@ user checks checklist errors contains link
 
 User Checks Checklist Errors Contains Either Link
     [Arguments]    ${text1}    ${text2}
-
     user waits until page contains testid    releaseChecklist-errors
     ${status}=    Run Keyword And Return Status    Wait Until Keyword Succeeds    10s    1s    Check Either Link Exists    ${text1}    ${text2}
 
     Run Keyword If    ${status} == False    Fail    Neither of the expected links (${text1}, ${text2}) was found. Failing fast as required.
-
     Log    One of the expected links (${text1}, ${text2}) is present.
-
 
 Check Either Link Exists
     [Arguments]    ${text1}    ${text2}
-
     ${condition1}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text1}    timeout=5s
     Run Keyword If    ${condition1}    Set Test Variable    ${link_found}    True
 
@@ -335,7 +355,8 @@ Check Either Link Exists
     [Return]    ${link_found}
 
 
-Check Status Is Ready
+Verify status of API Datasets
+    [Arguments]    ${expected_status}
     user waits for caches to expire
-    ${status_value}=    Get Text    ${STATUS_XPATH}
-    Should Be Equal As Strings    ${status_value}    Ready
+    ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
+    should be equal as strings    ${status_value}    ${expected_status}
