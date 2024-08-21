@@ -12,6 +12,7 @@ public enum DataSetVersionImportStage
     CreatingMappings,
     AutoMapping,
     ManualMapping,
+    GeneratingChangelog,
     ImportingData,
     WritingDataFiles,
     Completing

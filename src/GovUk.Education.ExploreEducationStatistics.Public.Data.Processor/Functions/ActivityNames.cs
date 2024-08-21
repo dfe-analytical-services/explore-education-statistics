@@ -16,6 +16,8 @@ internal static class ActivityNames
     public const string CompleteNextDataSetVersionMappingProcessing =
         nameof(ProcessNextDataSetVersionMappingsFunction.CompleteNextDataSetVersionMappingProcessing);
 
+    public const string GenerateChangelog =
+        nameof(ProcessCompletionOfNextDataSetVersionFunction.GenerateChangelog);
     public const string UpdateFileStoragePath =
         nameof(ProcessCompletionOfNextDataSetVersionFunction.UpdateFileStoragePath);
     public const string CompleteNextDataSetVersionImportProcessing =
