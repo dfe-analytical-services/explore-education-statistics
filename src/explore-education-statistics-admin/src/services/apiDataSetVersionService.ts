@@ -63,7 +63,7 @@ interface FilterOptionsMappingUpdateResponse {
   }[];
 }
 
-export interface LocationCandidate {
+export interface LocationOptionSource {
   label: string;
   code?: string;
   oldCode?: string;
@@ -72,11 +72,13 @@ export interface LocationCandidate {
   ukprn?: string;
 }
 
-export type LocationMapping = Mapping<LocationCandidate>;
+export type LocationCandidate = LocationOptionSource;
+
+export type LocationMapping = Mapping<LocationOptionSource>;
 
 export interface LocationsMapping {
   levels: Dictionary<{
-    candidates: Dictionary<LocationCandidate>;
+    candidates: Dictionary<LocationOptionSource>;
     mappings: Dictionary<LocationMapping>;
   }>;
 }
