@@ -1,17 +1,17 @@
-import React from 'react';
-import { GetServerSideProps, NextPage } from 'next';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Button from '@common/components/Button';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Form from '@common/components/form/Form';
 import FormProvider from '@common/components/form/FormProvider';
+import Panel from '@common/components/Panel';
 import useMounted from '@common/hooks/useMounted';
 import publicationService from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import Page from '@frontend/components/Page';
 import notificationService from '@frontend/services/notificationService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
-import SubscriptionStatusMessage from '@frontend/modules/subscriptions/components/SubscriptionStatusMessage';
+import React from 'react';
+import { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 
 interface FormValues {
@@ -78,7 +78,7 @@ const SubscriptionPage: NextPage<Props> = ({
           <LoadingSpinner
             loading={formState.isSubmitting || formState.isLoading}
           >
-            {!formState.isSubmitSuccessful && (
+            {!formState.isSubmitSuccessful ? (
               <>
                 <p>Subscribe to receive updates when:</p>
                 <ul className="govuk-list govuk-list--bullet">
@@ -101,12 +101,10 @@ const SubscriptionPage: NextPage<Props> = ({
                   </Button>
                 </Form>
               </>
-            )}
-            {formState.isSubmitSuccessful && (
-              <SubscriptionStatusMessage
-                title="Subscribed"
-                message="Thank you. Check your email to confirm your subscription."
-              />
+            ) : (
+              <Panel headingTag="h2" title="Subscribed">
+                <p>Thank you. Check your email to confirm your subscription.</p>
+              </Panel>
             )}
           </LoadingSpinner>
         )}

@@ -256,7 +256,14 @@ const ChartAxisConfiguration = ({
     let schema = Yup.object<ChartAxisConfigurationFormValues>({
       size: Yup.number().positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf<TickConfig>(
-        ['default', 'startEnd', 'custom'],
+        [
+          'default',
+          'startEnd',
+          'custom',
+          ...(type === 'major' && capabilities.canShowAllMajorAxisTicks
+            ? ['showAll' as TickConfig]
+            : []),
+        ],
         'Select a valid tick display type',
       ),
       tickSpacing: Yup.number().when('tickConfig', {
@@ -433,6 +440,7 @@ const ChartAxisConfiguration = ({
   }, [
     axisDefinition?.axis,
     axisDefinition?.capabilities.canRotateLabel,
+    capabilities.canShowAllMajorAxisTicks,
     capabilities.canSort,
     capabilities.hasGridLines,
     capabilities.hasReferenceLines,
@@ -653,6 +661,15 @@ const ChartAxisConfiguration = ({
                         label: 'Start and end only',
                         value: 'startEnd',
                       },
+                      ...(type === 'major' &&
+                      capabilities.canShowAllMajorAxisTicks
+                        ? [
+                            {
+                              label: 'Show all',
+                              value: 'showAll',
+                            },
+                          ]
+                        : []),
                       {
                         label: 'Custom',
                         value: 'custom',

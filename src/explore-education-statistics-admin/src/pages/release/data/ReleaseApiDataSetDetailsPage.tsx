@@ -3,6 +3,7 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/ApiDataSetVersionSummaryList';
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
+import ApiDataSetFinaliseBanner from '@admin/pages/release/data/components/ApiDataSetFinaliseBanner';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
@@ -25,8 +26,10 @@ import Tag, { TagProps } from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
 import TaskListItem from '@common/components/TaskListItem';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
+
+export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
 // TODO: EES-4367
 const showChangelog = false;
@@ -40,6 +43,9 @@ export default function ReleaseApiDataSetDetailsPage() {
   const { publicAppUrl } = useConfig();
   const { release } = useReleaseContext();
 
+  const [finalisingStatus, setFinalisingStatus] =
+    useState<DataSetFinalisingStatus>(undefined);
+
   const {
     data: dataSet,
     isLoading,
@@ -47,7 +53,10 @@ export default function ReleaseApiDataSetDetailsPage() {
   } = useQuery({
     ...apiDataSetQueries.get(dataSetId),
     refetchInterval: data => {
-      return data?.draftVersion?.status === 'Processing' ? 3000 : false;
+      return data?.draftVersion?.status === 'Processing' ||
+        finalisingStatus === 'finalising'
+        ? 3000
+        : false;
     },
   });
 
@@ -57,6 +66,24 @@ export default function ReleaseApiDataSetDetailsPage() {
     dataSet?.latestLiveVersion && dataSet?.draftVersion
       ? 'govuk-grid-column-one-half-from-desktop'
       : 'govuk-grid-column-two-thirds-from-desktop';
+
+  const handleFinalise = async () => {
+    if (dataSet?.draftVersion) {
+      setFinalisingStatus('finalising');
+      await apiDataSetVersionService.completeVersion({
+        dataSetVersionId: dataSet?.draftVersion?.id,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (
+      finalisingStatus === 'finalising' &&
+      dataSet?.draftVersion?.status !== 'Mapping'
+    ) {
+      setFinalisingStatus('finalised');
+    }
+  }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
 
   const draftVersionSummary = dataSet?.draftVersion ? (
     <ApiDataSetVersionSummaryList
@@ -156,16 +183,15 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
-  function getDataSetStatusColour(status: DataSetStatus): TagProps['colour'] {
-    switch (status) {
-      case 'Deprecated':
-        return 'purple';
-      case 'Withdrawn':
-        return 'red';
-      default:
-        return 'blue';
-    }
-  }
+  const mappingComplete =
+    dataSet?.draftVersion?.mappingStatus &&
+    dataSet.draftVersion.mappingStatus.filtersComplete &&
+    dataSet.draftVersion.mappingStatus.locationsComplete;
+
+  const showDraftVersionTasks =
+    finalisingStatus !== 'finalising' &&
+    (dataSet?.draftVersion?.status === 'Draft' ||
+      dataSet?.draftVersion?.status === 'Mapping');
 
   return (
     <>
@@ -186,6 +212,14 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
+            {mappingComplete && (
+              <ApiDataSetFinaliseBanner
+                draftVersionStatus={dataSet.draftVersion?.status}
+                finalisingStatus={finalisingStatus}
+                onFinalise={handleFinalise}
+              />
+            )}
+
             <SummaryList
               className="govuk-!-margin-bottom-8"
               testId="data-set-summary"
@@ -200,7 +234,7 @@ export default function ReleaseApiDataSetDetailsPage() {
               </SummaryListItem>
             </SummaryList>
 
-            {dataSet.draftVersion?.status === 'Mapping' && (
+            {showDraftVersionTasks && dataSet.draftVersion && (
               <div className="govuk-grid-row">
                 <div className={columnSizeClassName}>
                   <h3>Draft version tasks</h3>
@@ -342,4 +376,15 @@ export default function ReleaseApiDataSetDetailsPage() {
       </LoadingSpinner>
     </>
   );
+}
+
+function getDataSetStatusColour(status: DataSetStatus): TagProps['colour'] {
+  switch (status) {
+    case 'Deprecated':
+      return 'purple';
+    case 'Withdrawn':
+      return 'red';
+    default:
+      return 'blue';
+  }
 }

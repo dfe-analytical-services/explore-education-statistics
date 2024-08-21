@@ -248,7 +248,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
@@ -480,7 +480,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
@@ -605,7 +605,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
@@ -724,7 +724,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
@@ -1259,7 +1259,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
@@ -1479,7 +1479,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
@@ -1598,7 +1598,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
@@ -1713,7 +1713,7 @@ public abstract class DataSetVersionMappingControllerTests(
             });
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.ReleaseFileId)
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)

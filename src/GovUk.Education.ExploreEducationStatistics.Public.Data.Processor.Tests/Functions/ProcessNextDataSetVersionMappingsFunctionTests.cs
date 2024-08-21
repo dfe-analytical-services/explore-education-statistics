@@ -468,7 +468,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 }));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -556,7 +556,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -669,7 +669,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -765,7 +765,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -864,7 +864,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -992,7 +992,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -1109,7 +1109,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -1201,7 +1201,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)

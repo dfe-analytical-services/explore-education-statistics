@@ -8,9 +8,6 @@ using RichardSzalay.MockHttp;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Requests;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
@@ -209,72 +206,6 @@ public abstract class ContentApiClientTests
             Assert.Equal(result.Slug, right.Slug);
             Assert.Equal(result.Summary, right.Summary);
             Assert.Equal(result.Published, right.Published);
-        }
-    }
-
-    public class ListReleaseFilesTests : ContentApiClientTests
-    {
-        [Theory]
-        [InlineData(HttpStatusCode.RequestTimeout)]
-        [InlineData(HttpStatusCode.InternalServerError)]
-        [InlineData(HttpStatusCode.BadGateway)]
-        [InlineData(HttpStatusCode.Unauthorized)]
-        [InlineData(HttpStatusCode.BadRequest)]
-        [InlineData(HttpStatusCode.Conflict)]
-        [InlineData(HttpStatusCode.Forbidden)]
-        [InlineData(HttpStatusCode.Gone)]
-        [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task FailureStatusCode_ThrowsException(
-            HttpStatusCode responseStatusCode)
-        {
-            _mockHttp.Expect(HttpMethod.Post, $"http://localhost/api/release-files")
-                .Respond(responseStatusCode);
-
-            var request = new ReleaseFileListRequest { Ids = [] };
-
-            await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                await _contentApiClient.ListReleaseFiles(request));
-
-            _mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        [Fact]
-        public async Task Success_ReturnsReleaseFiles()
-        {
-            var result = new List<ReleaseFileViewModel>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    File = new FileInfo
-                    {
-                        Name = "Test file",
-                        FileName = "test-file.csv",
-                        Size = "10 KB"
-                    },
-                    Release = new ReleaseSummaryViewModel
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test title",
-                        Slug = "test-slug",
-                        YearTitle = "Academic year 2020",
-                        CoverageTitle = "Academic year",
-                        Type = ReleaseType.AdHocStatistics,
-                        LatestRelease = false,
-                    }
-                }
-            };
-
-            _mockHttp.Expect(HttpMethod.Post, $"http://localhost/api/release-files")
-                .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(result));
-
-            var request = new ReleaseFileListRequest { Ids = [result[0].Id] };
-
-            var viewModels = await _contentApiClient.ListReleaseFiles(request);
-
-            _mockHttp.VerifyNoOutstandingExpectation();
-
-            Assert.Equal(result, viewModels);
         }
     }
 
