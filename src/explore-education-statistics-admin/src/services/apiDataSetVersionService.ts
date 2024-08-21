@@ -1,5 +1,9 @@
 import client from '@admin/services/utils/service';
-import { ApiDataSet } from '@admin/services/apiDataSetService';
+import {
+  ApiDataSet,
+  ApiDataSetLiveVersionSummary,
+} from '@admin/services/apiDataSetService';
+import { PaginatedList } from '@common/services/types/pagination';
 import { Dictionary } from '@common/types';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 
@@ -96,6 +100,12 @@ interface LocationsMappingUpdateResponse {
   }[];
 }
 
+export interface ListVersionsParams {
+  dataSetId: string;
+  page?: number;
+  pageSize?: number;
+}
+
 const apiDataSetVersionService = {
   createVersion(data: {
     dataSetId: string;
@@ -108,6 +118,13 @@ const apiDataSetVersionService = {
   },
   deleteVersion(dataSetVersionId: string): Promise<void> {
     return client.delete(`/public-data/data-set-versions/${dataSetVersionId}`);
+  },
+  listVersions(
+    params?: ListVersionsParams,
+  ): Promise<PaginatedList<ApiDataSetLiveVersionSummary>> {
+    return client.get(`/public-data/data-set-versions`, {
+      params,
+    });
   },
   getFiltersMapping(dataSetVersionId: string): Promise<FiltersMapping> {
     return client.get(

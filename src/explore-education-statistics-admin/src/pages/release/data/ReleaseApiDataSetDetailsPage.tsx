@@ -8,6 +8,7 @@ import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext'
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetFiltersMappingRoute,
+  releaseApiDataSetHistoryPageRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
@@ -33,8 +34,6 @@ export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
 // TODO: EES-4367
 const showChangelog = false;
-// TODO: EES-4382
-const showVersionHistory = false;
 
 export default function ReleaseApiDataSetDetailsPage() {
   const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
@@ -173,9 +172,20 @@ export default function ReleaseApiDataSetDetailsPage() {
               <Link to="/todo">View changelog and guidance notes</Link>
             </li>
           )}
-          {showVersionHistory && (
+          {dataSet.latestLiveVersion.version !== '1.0' && (
             <li>
-              <Link to="/todo">View version history</Link>
+              <Link
+                to={generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetHistoryPageRoute.path,
+                  {
+                    publicationId: release.publicationId,
+                    releaseId: release.id,
+                    dataSetId,
+                  },
+                )}
+              >
+                View version history
+              </Link>
             </li>
           )}
         </ul>

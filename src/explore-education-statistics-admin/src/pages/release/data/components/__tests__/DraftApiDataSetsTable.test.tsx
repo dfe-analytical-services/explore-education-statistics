@@ -46,9 +46,17 @@ describe('DraftApiDataSetsTable', () => {
         type: 'Major',
       },
       latestLiveVersion: {
+        file: {
+          id: 'file-id',
+          title: 'file-title',
+        },
         published: '2024-02-01T09:30:00+00:00',
         id: 'version-3',
         version: '1.0',
+        releaseVersion: {
+          id: 'release-version-id',
+          title: 'Release Version',
+        },
         status: 'Published',
         type: 'Major',
       },
@@ -66,9 +74,17 @@ describe('DraftApiDataSetsTable', () => {
         type: 'Minor',
       },
       latestLiveVersion: {
+        file: {
+          id: 'file-id',
+          title: 'file-title',
+        },
         published: '2024-02-01T09:30:00+00:00',
         id: 'version-1',
         version: '1.0',
+        releaseVersion: {
+          id: 'release-version-id',
+          title: 'Release Version',
+        },
         status: 'Published',
         type: 'Major',
       },
