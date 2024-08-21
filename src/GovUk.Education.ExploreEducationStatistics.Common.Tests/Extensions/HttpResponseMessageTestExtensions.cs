@@ -96,6 +96,11 @@ public static class HttpResponseMessageTestExtensions
         Assert.Equal(Unauthorized, message.StatusCode);
     }
 
+    public static void AssertGatewayTimeout(this HttpResponseMessage message)
+    {
+        Assert.Equal(GatewayTimeout, message.StatusCode);
+    }
+
     public static void AssertNotModified(this HttpResponseMessage message)
     {
         Assert.Equal(NotModified, message.StatusCode);

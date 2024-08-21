@@ -1,9 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using Dapper;
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -21,10 +18,15 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Text.Json.Serialization;
+using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
@@ -33,6 +35,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 {
     private readonly IConfiguration _miniProfilerConfig =
         configuration.GetRequiredSection(MiniProfilerOptions.Section);
+    private readonly IConfiguration _requestTimeoutConfig =
+        configuration.GetSection(RequestTimeoutOptions.Section);
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -62,6 +66,16 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // MVC
 
+        services.AddRequestTimeouts(options =>
+        {
+            options.DefaultPolicy =
+                new RequestTimeoutPolicy
+                {
+                    Timeout = TimeSpan.FromMilliseconds(_requestTimeoutConfig.GetValue<int?>(nameof(RequestTimeoutOptions.TimeoutMilliseconds)) ?? 30000),
+                    TimeoutStatusCode = (int)HttpStatusCode.GatewayTimeout
+                };
+        });
+
         services
             .AddControllers(options =>
             {
@@ -69,7 +83,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 options.ReturnHttpNotAcceptable = true;
                 options.EnableEndpointRouting = false;
 
-                options.Filters.Add<OperationCancelledExceptionFilter>();
                 options.Filters.Add<ProblemDetailsResultFilter>();
                 options.AddInvalidRequestInputResultFilter();
                 options.AddCommaSeparatedQueryModelBinderProvider();
@@ -131,6 +144,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddOptions<ContentApiOptions>()
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
+        services.AddOptions<RequestTimeoutOptions>()
+            .Bind(configuration.GetSection(RequestTimeoutOptions.Section));
         services.AddOptions<DataFilesOptions>()
             .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
         services.AddOptions<MiniProfilerOptions>()
@@ -182,7 +197,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Rewrites
 
-        app.UseRewriter(new RewriteOptions {Rules = {new LowercasePathRule()}});
+        app.UseRewriter(new RewriteOptions { Rules = { new LowercasePathRule() } });
 
         // Caching and compression
 
@@ -203,6 +218,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Routing / endpoints
 
         app.UseRouting();
+
+        app.UseRequestTimeouts();
+
         app.UseEndpoints(builder =>
         {
             builder.MapControllers();

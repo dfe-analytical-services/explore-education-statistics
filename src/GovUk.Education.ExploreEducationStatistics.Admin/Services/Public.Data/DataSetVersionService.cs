@@ -43,11 +43,14 @@ public class DataSetVersionService(
             CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
-            .OnSuccess(async () =>
+            .OnSuccess(() => publicDataDbContext.DataSets
+                .AsNoTracking()
+                .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken))
+            .OnSuccess(async dataSet =>
             {
                 var dataSetVersionsQueryable = publicDataDbContext.DataSetVersions
                     .AsNoTracking()
-                    .Where(ds => ds.DataSetId == dataSetId)
+                    .Where(ds => ds.DataSetId == dataSet.Id)
                     .WherePublicStatus();
 
                 var dataSetVersions = await dataSetVersionsQueryable
@@ -56,7 +59,7 @@ public class DataSetVersionService(
                     .ToListAsync(cancellationToken);
 
                 var releasesVersionsByDataSetVersionId =
-                    await GetReleasesVersionsByDataSetVersionId(dataSetVersions, cancellationToken);
+                    await GetReleaseFilesByDataSetVersionId(dataSetVersions, cancellationToken);
 
                 var results = dataSetVersions
                     .Select(dsv => MapLiveVersionSummary(dsv, releasesVersionsByDataSetVersionId[dsv.Id]))
@@ -211,32 +214,27 @@ public class DataSetVersionService(
         }
     }
 
-    private async Task<IReadOnlyDictionary<Guid, ReleaseVersion>> GetReleasesVersionsByDataSetVersionId(
+    private async Task<IReadOnlyDictionary<Guid, ReleaseFile>> GetReleaseFilesByDataSetVersionId(
         IReadOnlyList<DataSetVersion> dataSetVersions,
         CancellationToken cancellationToken)
     {
         var dataSetVersionsByReleaseFileId = dataSetVersions
             .ToDictionary(dsv => dsv.Release.ReleaseFileId);
 
-        var releaseVersionsByReleaseFileId = await contentDbContext
+        return await contentDbContext
             .ReleaseFiles
             .Include(rf => rf.ReleaseVersion)
+            .Include(rf => rf.File)
             .Where(releaseFile => dataSetVersionsByReleaseFileId.Keys.Contains(releaseFile.Id))
             .ToDictionaryAsync(
-                rf => rf.Id,
-                rf => rf.ReleaseVersion,
+                rf => dataSetVersionsByReleaseFileId[rf.Id].Id,
+                rf => rf,
                 cancellationToken);
-
-        return releaseVersionsByReleaseFileId
-            .ToDictionary(
-                d => dataSetVersionsByReleaseFileId[d.Key].Id,
-                d => d.Value
-            );
     }
 
     private static DataSetLiveVersionSummaryViewModel MapLiveVersionSummary(
         DataSetVersion dataSetVersion,
-        ReleaseVersion releaseVersion)
+        ReleaseFile releaseFile)
     {
         return new DataSetLiveVersionSummaryViewModel
         {
@@ -244,7 +242,8 @@ public class DataSetVersionService(
             Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
-            ReleaseVersion = MapReleaseVersion(releaseVersion),
+            ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
+            File = MapVersionFile(releaseFile),
             Published = dataSetVersion.Published!.Value
         };
     }
@@ -261,7 +260,8 @@ public class DataSetVersionService(
             Version = dataSetVersion.PublicVersion,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
-            ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion)
+            ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
+            File = MapVersionFile(releaseFile)
         };
     }
 
