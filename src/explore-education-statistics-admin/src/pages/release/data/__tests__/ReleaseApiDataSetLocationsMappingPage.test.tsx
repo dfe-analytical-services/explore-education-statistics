@@ -356,7 +356,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       banner.getByRole('link', {
         name: 'There is 1 unmapped local authority',
       }),
-    ).toHaveAttribute('href', '#mappable-localAuthority');
+    ).toHaveAttribute('href', '#mappable-table-localAuthority');
   });
 
   test('does not render the notification banner if there are no unmapped locations', async () => {
@@ -685,7 +685,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {
@@ -806,7 +806,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {
@@ -889,7 +889,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {
@@ -1211,7 +1211,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {

@@ -17,7 +17,7 @@ export default function getUnmappedLocationErrors(
 
     if (total) {
       errors.push({
-        id: `mappable-${level}`,
+        id: `mappable-table-${level}`,
         message: `There ${total > 1 ? 'are' : 'is'} ${total} unmapped ${
           total > 1
             ? locationLevelsMap[level]?.plural.toLowerCase() ?? level

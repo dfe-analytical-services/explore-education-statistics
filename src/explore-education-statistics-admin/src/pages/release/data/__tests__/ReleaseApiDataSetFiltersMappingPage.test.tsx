@@ -256,12 +256,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       banner.getByRole('link', {
         name: 'There are 2 unmapped Filter 1 filter options',
       }),
-    ).toHaveAttribute('href', '#mappable-Filter1Key');
+    ).toHaveAttribute('href', '#mappable-table-filter-1-key');
     expect(
       banner.getByRole('link', {
         name: 'There is 1 unmapped Filter 2 filter option',
       }),
-    ).toHaveAttribute('href', '#mappable-Filter2Key');
+    ).toHaveAttribute('href', '#mappable-table-filter-2-key');
   });
 
   test('does not render the notification banner if there are no unmapped filter options', async () => {
@@ -486,7 +486,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       // mappable table
       const mappableFilter1Table = screen.getByRole('table', {
@@ -617,7 +617,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       const mappableFilter1Table = screen.getByRole('table', {
         name: 'Filter 1 2 unmapped filter options 1 mapped filter option Column: Filter1Key',
@@ -705,7 +705,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       const mappableFilter1Table = screen.getByRole('table', {
         name: 'Filter 1 2 unmapped filter options 1 mapped filter option Column: Filter1Key',
@@ -1035,7 +1035,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       // mappable table
       const mappableFilter1Table = screen.getByRole('table', {
