@@ -42,7 +42,7 @@ public abstract class DataSetVersionsControllerTests(
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
-    public class ListLiveVersionsTests(
+    public class ListVersionsTests(
         TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
         private static readonly IReadOnlyList<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatuses =
@@ -54,11 +54,11 @@ public abstract class DataSetVersionsControllerTests(
                 ]
             );
 
-        public static TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
+        public static readonly TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
             PreviouslyPublishedDataSetVersionStatuses
         );
 
-        public static TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
+        public static readonly TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
             EnumUtil.GetEnums<DataSetVersionStatus>().Except(PreviouslyPublishedDataSetVersionStatuses)
         );
 
@@ -122,8 +122,13 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(currentDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(currentDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(currentDataSetVersion.VersionType, liveVersion.Type);
+
             Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
             Assert.Equal(releaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+
+            Assert.Equal(releaseFile.File.DataSetFileId, liveVersion.File.Id);
+            Assert.Equal(releaseFile.Name, liveVersion.File.Title);
+
             liveVersion.Published.AssertEqual(currentDataSetVersion.Published!.Value);
         }
 
@@ -306,8 +311,13 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(targetDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(targetDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(targetDataSetVersion.VersionType, liveVersion.Type);
+
             Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
             Assert.Equal(targetReleaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+
+            Assert.Equal(targetReleaseFile.File.DataSetFileId, liveVersion.File.Id);
+            Assert.Equal(targetReleaseFile.Name, liveVersion.File.Title);
+
             liveVersion.Published.AssertEqual(targetDataSetVersion.Published!.Value);
         }
 
@@ -325,6 +335,26 @@ public abstract class DataSetVersionsControllerTests(
             response.AssertForbidden();
         }
 
+        [Fact]
+        public async Task NoDataSetId_Returns400()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await client.GetAsync(BaseUrl);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasNotEmptyError("dataSetId");
+        }
+
+        [Fact]
+        public async Task DataSetDoesNotExist_Returns404()
+        {
+            var response = await ListLiveVersions(dataSetId: Guid.NewGuid());
+
+            response.AssertNotFound();
+        }
+
         private async Task<HttpResponseMessage> ListLiveVersions(
             Guid dataSetId,
             int? page = null,
@@ -335,11 +365,12 @@ public abstract class DataSetVersionsControllerTests(
 
             var queryParams = new Dictionary<string, string?>
             {
+                { "dataSetId", dataSetId.ToString() },
                 { "page", page?.ToString() },
                 { "pageSize", pageSize?.ToString() }
             };
 
-            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}", queryParams);
+            var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
 
             return await client.GetAsync(uri);
         }
