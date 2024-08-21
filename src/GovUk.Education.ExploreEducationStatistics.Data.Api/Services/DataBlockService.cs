@@ -58,7 +58,7 @@ public class DataBlockService : IDataBlockService
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(() => CheckDataBlockVersionExists(releaseVersionId: releaseVersionId,
                 dataBlockVersionId: dataBlockVersionId))
-            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query, boundaryLevelId));
+            .OnSuccess(dataBlock => _tableBuilderService.QueryForBoundaryLevel(releaseVersionId, dataBlock.Query, boundaryLevelId));
     }
 
     private async Task<Either<ActionResult, DataBlockVersion>> CheckDataBlockVersionExists(

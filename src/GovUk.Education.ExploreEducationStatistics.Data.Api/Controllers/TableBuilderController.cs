@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
             Guid dataBlockParentId,
-            [FromQuery] long? boundaryLevelId)
+            [FromQuery] long? boundaryLevelId) // TODO: Remove in EES-5433
         {
             var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessDo(dataBlockVersion => this
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return actionResult;
         }
 
-        [HttpGet("tablebuilder/release/data-block/{dataBlockParentId:guid}")]
+        [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}/geojson")]
         public async Task<ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>> QueryForDataBlockWithGeoJsonResult(
             Guid dataBlockParentId,
             [FromQuery] long boundaryLevelId)

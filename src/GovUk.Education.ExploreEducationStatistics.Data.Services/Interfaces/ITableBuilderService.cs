@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
             long? boundaryLevelId,
             CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> Query(
+        Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> QueryForBoundaryLevel(
             Guid releaseVersionId,
             FullTableQuery query,
             long boundaryLevelId,

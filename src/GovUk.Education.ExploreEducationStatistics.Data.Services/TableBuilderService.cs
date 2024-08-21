@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> Query(
+        public async Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> QueryForBoundaryLevel(
             Guid releaseVersionId,
             FullTableQuery query,
             long boundaryLevelId,
