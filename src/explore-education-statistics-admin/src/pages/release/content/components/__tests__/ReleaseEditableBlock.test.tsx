@@ -1,4 +1,5 @@
 import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
@@ -1316,25 +1317,29 @@ describe('ReleaseEditableBlock', () => {
     releaseContent: ReleaseContentType = testReleaseContent,
   ): RenderResult {
     return baseRender(
-      <AuthContextTestProvider
-        user={{
-          id: testCurrentUser.id,
-          name: testCurrentUser.displayName,
-          permissions: {} as GlobalPermissions,
-        }}
-      >
-        unattachedDataBlocks: [],
-        <ReleaseContentHubContextProvider releaseId={releaseContent.release.id}>
-          <ReleaseContentProvider
-            value={{
-              ...releaseContent,
-              canUpdateRelease: true,
-            }}
+      <TestConfigContextProvider>
+        <AuthContextTestProvider
+          user={{
+            id: testCurrentUser.id,
+            name: testCurrentUser.displayName,
+            permissions: {} as GlobalPermissions,
+          }}
+        >
+          unattachedDataBlocks: [],
+          <ReleaseContentHubContextProvider
+            releaseId={releaseContent.release.id}
           >
-            <MemoryRouter>{child}</MemoryRouter>
-          </ReleaseContentProvider>
-        </ReleaseContentHubContextProvider>
-      </AuthContextTestProvider>,
+            <ReleaseContentProvider
+              value={{
+                ...releaseContent,
+                canUpdateRelease: true,
+              }}
+            >
+              <MemoryRouter>{child}</MemoryRouter>
+            </ReleaseContentProvider>
+          </ReleaseContentHubContextProvider>
+        </AuthContextTestProvider>
+      </TestConfigContextProvider>,
     );
   }
 });
