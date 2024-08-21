@@ -79,6 +79,8 @@ const DataBlockPageTabs = ({
     };
 
     const boundaryLevel = dataBlock.charts[0]?.boundaryLevel ?? undefined;
+
+    // EES-5401 currently geojson is on the locations in tableData.subjectMeta
     const tableData = await tableBuilderService.getTableData(
       query,
       releaseId,
@@ -102,6 +104,8 @@ const DataBlockPageTabs = ({
     }
 
     const table = mapFullTable(tableData);
+
+    console.log('table', table);
 
     try {
       const tableHeaders = mapTableHeadersConfig(

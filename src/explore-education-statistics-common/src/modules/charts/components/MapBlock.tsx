@@ -114,6 +114,7 @@ export default function MapBlock({
   dataClassification: deprecatedDataClassification,
   data,
   map,
+  // EES-5401 currently geojson is on the locations in meta here (passed down through various components from tableData.subjectMeta in DataBlockPageTabs)
   meta,
   legend,
   position = { lat: 53.00986, lng: -3.2524038 },
@@ -130,6 +131,11 @@ export default function MapBlock({
     [axes.major],
   );
 
+  // EES-5401 fetch geojson using the releaseId, dataBlockParentId and boundaryLevelId.
+  // These will need to be passed down to this from parent component(s)
+  // Boundary level is on chart props.
+
+  // EES-5401 pass the geojson into createMapDataSetCategories
   const dataSetCategories = useMemo<MapDataSetCategory[]>(
     () => createMapDataSetCategories(axisMajor, data, meta),
     [axisMajor, data, meta],
@@ -187,6 +193,9 @@ export default function MapBlock({
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
     if (dataSetCategories.length && selectedDataSetConfig) {
+      console.log('rebuild', selectedDataSetConfig, dataSetCategories);
+      // EES-5401 the geojson on the data set categories is used to
+      // generate the feature which are shown on the map,
       const { features: newFeatures, dataGroups: newDataGroups } =
         generateFeaturesAndDataGroups({
           selectedDataSetConfig,

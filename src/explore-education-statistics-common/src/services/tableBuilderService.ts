@@ -290,6 +290,18 @@ const tableBuilderService = {
   ): Promise<FastTrackTableAndReleaseMeta> {
     return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
   },
+
+  // EES-5401 fetch geojson
+  getGeoJson(
+    releaseId: string,
+    dataBlockParentId: string,
+    boundaryLevelId: number,
+  ): Promise<Dictionary<LocationOption[]>> {
+    return dataApi.get(
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}/geojson`,
+      { params: { boundaryLevelId } },
+    );
+  },
 };
 
 export default tableBuilderService;

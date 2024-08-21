@@ -13,6 +13,7 @@ export interface MapDataSetCategory extends DataSetCategory {
   filter: LocationFilter;
 }
 
+// EES-5401 pass geojson into here
 export default function createMapDataSetCategories(
   axis: AxisConfiguration,
   data: TableDataResult[],
@@ -27,6 +28,7 @@ export default function createMapDataSetCategories(
     .map(category => {
       return {
         ...category,
+        // EES-5401 instead of using meta pass in the new geojson and use it to add the geojson to the dataSetCategories
         geoJson: meta.locations.find(
           location => location.id === category.filter.id,
         )?.geoJson,
