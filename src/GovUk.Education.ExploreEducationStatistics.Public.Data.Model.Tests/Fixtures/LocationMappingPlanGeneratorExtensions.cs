@@ -15,7 +15,8 @@ public static class LocationMappingPlanGeneratorExtensions
     public static Generator<LocationMappingPlan> LocationMappingPlanFromLocationMeta(
         this DataFixture fixture,
         List<LocationMeta>? sourceLocations = null,
-        List<LocationMeta>? targetLocations = null)
+        List<LocationMeta>? targetLocations = null,
+        IReadOnlyDictionary<string, string>? mappedCandidateOptionKeysBySourceOptionKey = null)
     {
         var locationMappingPlanGenerator = fixture.Generator<LocationMappingPlan>();
 
@@ -35,13 +36,24 @@ public static class LocationMappingPlanGeneratorExtensions
             
             sourceLocationsForLevel?.Options.ForEach(option =>
             {
+                var sourceKey = MappingKeyFunctions.LocationOptionMetaKeyGenerator(option);
+
+                var locationOptionMapping = fixture
+                    .DefaultLocationOptionMapping()
+                    .WithCandidateKey(null) // This might break other stuff? If not, maybe it should default to null anyway
+                    .WithSource(fixture.DefaultMappableLocationOption()
+                        .WithLabel(option.Label)
+                        .WithCodes(option.ToRow()));
+
+                if (mappedCandidateOptionKeysBySourceOptionKey is not null && mappedCandidateOptionKeysBySourceOptionKey.TryGetValue(sourceKey, out var candidateKey))
+                {
+                    locationOptionMapping = locationOptionMapping
+                        .WithManualMapped(candidateKey);
+                }
+
                 levelGenerator.AddMapping(
-                    sourceKey: MappingKeyGenerators.LocationOptionMeta(option),
-                    mapping: fixture
-                        .DefaultLocationOptionMapping()
-                        .WithSource(fixture.DefaultMappableLocationOption()
-                            .WithLabel(option.Label)
-                            .WithCodes(option.ToRow())));
+                    sourceKey: sourceKey,
+                    mapping: locationOptionMapping);
             });
             
             var targetLocationsForLevel = targetLocations?

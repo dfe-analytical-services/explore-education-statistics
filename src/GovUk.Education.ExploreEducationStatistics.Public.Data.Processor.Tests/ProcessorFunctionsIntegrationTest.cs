@@ -61,13 +61,27 @@ public abstract class ProcessorFunctionsIntegrationTest(
     protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSet(
         DataSetVersionImportStage importStage,
         DataSetVersionStatus? status = null,
-        Guid? releaseFileId = null)
+        Guid? releaseFileId = null,
+        IEnumerable<FilterMeta>? filterMetas = null,
+        IEnumerable<LocationMeta>? locationMetas = null,
+        GeographicLevelMeta? geographicLevelMeta = null,
+        IEnumerable<IndicatorMeta>? indicatorMetas = null,
+        IEnumerable<TimePeriodMeta>? timePeriodMetas = null)
     {
         DataSet dataSet = DataFixture.DefaultDataSet();
 
         await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-        return await CreateDataSetVersionAndImport(dataSet.Id, importStage, status, releaseFileId);
+        return await CreateDataSetVersionAndImport(
+            dataSetId: dataSet.Id, 
+            importStage: importStage, 
+            status: status,
+            releaseFileId: releaseFileId,
+            filterMetas: filterMetas,
+            locationMetas: locationMetas,
+            geographicLevelMeta: geographicLevelMeta,
+            indicatorMetas: indicatorMetas,
+            timePeriodMetas: timePeriodMetas);
     }
 
     protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersionAndImport(
@@ -76,7 +90,12 @@ public abstract class ProcessorFunctionsIntegrationTest(
         DataSetVersionStatus? status = null,
         Guid? releaseFileId = null,
         int versionMajor = 1,
-        int versionMinor = 0)
+        int versionMinor = 0,
+        IEnumerable<FilterMeta>? filterMetas = null,
+        IEnumerable<LocationMeta>? locationMetas = null,
+        GeographicLevelMeta? geographicLevelMeta = null,
+        IEnumerable<IndicatorMeta>? indicatorMetas = null,
+        IEnumerable<TimePeriodMeta>? timePeriodMetas = null)
     {
         await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -88,7 +107,7 @@ public abstract class ProcessorFunctionsIntegrationTest(
             .DefaultDataSetVersionImport()
             .WithStage(importStage);
 
-        DataSetVersion dataSetVersion = DataFixture
+        var dataSetVersionGenerator = DataFixture
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
             .WithStatus(status ?? DataSetVersionStatus.Processing)
@@ -110,6 +129,38 @@ public abstract class ProcessorFunctionsIntegrationTest(
                     dsv.DataSet.LatestDraftVersion = dsv;
                 }
             });
+
+        if (filterMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithFilterMetas(() => filterMetas);
+        }
+
+        if (locationMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithLocationMetas(() => locationMetas);
+        }
+
+        if (geographicLevelMeta is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithGeographicLevelMeta(() => geographicLevelMeta);
+        }
+
+        if (indicatorMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithIndicatorMetas(() => indicatorMetas);
+        }
+
+        if (timePeriodMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithTimePeriodMetas(() => timePeriodMetas);
+        }
+
+        var dataSetVersion = dataSetVersionGenerator.Generate();
 
         await AddTestData<PublicDataDbContext>(context =>
         {
