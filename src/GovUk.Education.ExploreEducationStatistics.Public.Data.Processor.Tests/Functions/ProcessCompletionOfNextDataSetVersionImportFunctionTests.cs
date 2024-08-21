@@ -253,125 +253,17 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     }
                 ];
 
-            var oldLocationMetasByLevel = allChanges
-                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Deleted)
-                .Select(pc => DataFixture
-                    .DefaultLocationMeta()
-                    .WithDataSetVersionId(originalVersion.Id)
-                    .WithLevel(pc.ParentIdentifier)
-                    .Generate())
-                .ToDictionary(lm => lm.Level);
+            var (originalVersionLocationMetasWithLinksByLevel, newVersionLocationMetasWithLinksByLevel) = await CreateMeta(
+                allChanges: allChanges,
+                originalVersion: originalVersion,
+                newVersion: newVersion);
 
-            var newLocationMetasByLevel = allChanges
-                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Added)
-                .Select(pc => DataFixture
-                    .DefaultLocationMeta()
-                    .WithDataSetVersionId(newVersion.Id)
-                    .WithLevel(pc.ParentIdentifier)
-                    .Generate())
-                .ToDictionary(lm => lm.Level);
-
-            await CreateMeta(locationMetas: oldLocationMetasByLevel.Values);
-            await CreateMeta(locationMetas: newLocationMetasByLevel.Values);
-
-            var oldLocationOptionMetaLinks = new List<LocationOptionMetaLink>();
-
-            foreach (var parentChange in allChanges)
-            {
-                foreach (var optionChange in parentChange.OptionChanges)
-                {
-                    if (optionChange.ChangeType
-                        is ChangeType.Unchanged
-                        or ChangeType.Changed
-                        or ChangeType.Deleted)
-                    {
-                        var metaId = oldLocationMetasByLevel[parentChange.ParentIdentifier].Id;
-
-                        oldLocationOptionMetaLinks.Add(CreateAddedLocationOptionLink(
-                            level: parentChange.ParentIdentifier, 
-                            metaId: metaId));
-                    }
-                }
-            }
-
-            await CreateMeta(locationOptionMetaLinks: oldLocationOptionMetaLinks);
-
-            var originalVersionLocationMetasWithLinksByLevel = (await GetLocationMeta(originalVersion))
-                .ToDictionary(lm => lm.Level);
-
-            var newLocationOptionMetaLinks = new List<LocationOptionMetaLink>();
-
-            foreach (var parentChange in allChanges)
-            {
-                if (parentChange.ChangeType is ChangeType.Deleted)
-                {
-                    continue;
-                }
-
-                originalVersionLocationMetasWithLinksByLevel.TryGetValue(parentChange.ParentIdentifier, out var originalLocationMeta);
-                var newLocationMeta = newLocationMetasByLevel[parentChange.ParentIdentifier];
-
-                foreach (var optionChange in parentChange.OptionChanges)
-                {
-                    if (optionChange.ChangeType is ChangeType.Deleted)
-                    {
-                        continue;
-                    }
-
-                    var metaId = newLocationMeta.Id;
-
-                    if (optionChange.ChangeType is ChangeType.Added)
-                    {
-                        newLocationOptionMetaLinks.Add(CreateAddedLocationOptionLink(
-                            level: parentChange.ParentIdentifier, 
-                            metaId: metaId));
-
-                        continue;
-                    }
-
-                    if (optionChange.ChangeType is ChangeType.Changed)
-                    {
-                        newLocationOptionMetaLinks.Add(CreateChangedLocationOptionLink(
-                            level: parentChange.ParentIdentifier,
-                            metaId: metaId,
-                            originalLocationMeta: originalLocationMeta!,
-                            optionChange: optionChange));
-
-                        continue;
-                    }
-
-                    newLocationOptionMetaLinks.Add(CreateUnchangedLocationOptionLink(
-                        metaId: metaId,
-                        originalLocationMeta: originalLocationMeta!,
-                        optionChange: optionChange));
-                }
-            }
-
-            await CreateMeta(locationOptionMetaLinks: newLocationOptionMetaLinks);
-
-            var newVersionLocationMetasWithLinksByLevel = (await GetLocationMeta(newVersion))
-                .ToDictionary(lm => lm.Level); // Refetching to get the links back this time
-
-            var mappedCandidateOptionKeysBySourceOptionKey = allChanges
-                .SelectMany(
-                    pc => pc.OptionChanges,
-                    (pc, oc) => new { GeographicLevel = pc.ParentIdentifier, OptionChange = oc })
-                .Where(a => a.OptionChange.ChangeType is ChangeType.Unchanged or ChangeType.Changed) // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
-                .ToDictionary(
-                    a => LocationOptionMetaKeyGenerator(originalVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex].Option),
-                    a => LocationOptionMetaKeyGenerator(newVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex].Option));
-
-            DataSetVersionMapping mappings = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(originalVersion.Id)
-                .WithTargetDataSetVersionId(newVersion.Id)
-                .WithLocationMappingPlan(
-                    DataFixture.LocationMappingPlanFromLocationMeta(
-                        sourceLocations: [.. originalVersionLocationMetasWithLinksByLevel.Values],
-                        targetLocations: [.. newVersionLocationMetasWithLinksByLevel.Values],
-                        mappedCandidateOptionKeysBySourceOptionKey: mappedCandidateOptionKeysBySourceOptionKey));
-
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
+            await CreateMappings(
+                allChanges: allChanges,
+                originalVersion: originalVersion,
+                newVersion: newVersion,
+                originalVersionLocationMetasWithLinksByLevel: originalVersionLocationMetasWithLinksByLevel,
+                newVersionLocationMetasWithLinksByLevel: newVersionLocationMetasWithLinksByLevel);
 
             await GenerateChangelog(instanceId);
 
@@ -456,6 +348,238 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     }
                 }
             }
+        }
+
+        private async Task<(IReadOnlyDictionary<GeographicLevel, LocationMeta> originalVersionLocationMetasWithLinksByLevel, IReadOnlyDictionary<GeographicLevel, LocationMeta> newVersionLocationMetasWithLinksByLevel)> CreateMeta(
+            IReadOnlyList<ParentChange<GeographicLevel>> allChanges,
+            DataSetVersion originalVersion,
+            DataSetVersion newVersion)
+        {
+            var oldLocationMetasByLevel = allChanges
+                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Deleted)
+                .Select(pc => DataFixture
+                    .DefaultLocationMeta()
+                    .WithDataSetVersionId(originalVersion.Id)
+                    .WithLevel(pc.ParentIdentifier)
+                    .Generate())
+                .ToDictionary(lm => lm.Level);
+
+            await CreateMeta(locationMetas: oldLocationMetasByLevel.Values);
+
+            var newLocationMetasByLevel = allChanges
+                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Added)
+                .Select(pc => DataFixture
+                    .DefaultLocationMeta()
+                    .WithDataSetVersionId(newVersion.Id)
+                    .WithLevel(pc.ParentIdentifier)
+                    .Generate())
+                .ToDictionary(lm => lm.Level);
+
+            await CreateMeta(locationMetas: newLocationMetasByLevel.Values);
+
+            var oldLocationOptionMetaLinks = new List<LocationOptionMetaLink>();
+
+            foreach (var parentChange in allChanges)
+            {
+                foreach (var optionChange in parentChange.OptionChanges)
+                {
+                    if (optionChange.ChangeType
+                        is ChangeType.Unchanged
+                        or ChangeType.Changed
+                        or ChangeType.Deleted)
+                    {
+                        var metaId = oldLocationMetasByLevel[parentChange.ParentIdentifier].Id;
+
+                        oldLocationOptionMetaLinks.Add(CreateAddedLocationOptionLink(
+                            level: parentChange.ParentIdentifier,
+                            metaId: metaId));
+                    }
+                }
+            }
+
+            await CreateMeta(locationOptionMetaLinks: oldLocationOptionMetaLinks);
+
+            var originalVersionLocationMetasWithLinksByLevel = (await GetLocationMeta(originalVersion))
+                .ToDictionary(lm => lm.Level);
+
+            var newLocationOptionMetaLinks = new List<LocationOptionMetaLink>();
+
+            foreach (var parentChange in allChanges)
+            {
+                if (parentChange.ChangeType is ChangeType.Deleted)
+                {
+                    continue;
+                }
+
+                originalVersionLocationMetasWithLinksByLevel.TryGetValue(parentChange.ParentIdentifier, out var originalLocationMeta);
+                var newLocationMeta = newLocationMetasByLevel[parentChange.ParentIdentifier];
+
+                foreach (var optionChange in parentChange.OptionChanges)
+                {
+                    if (optionChange.ChangeType is ChangeType.Deleted)
+                    {
+                        continue;
+                    }
+
+                    var metaId = newLocationMeta.Id;
+
+                    if (optionChange.ChangeType is ChangeType.Added)
+                    {
+                        newLocationOptionMetaLinks.Add(CreateAddedLocationOptionLink(
+                            level: parentChange.ParentIdentifier,
+                            metaId: metaId));
+
+                        continue;
+                    }
+
+                    if (optionChange.ChangeType is ChangeType.Changed)
+                    {
+                        newLocationOptionMetaLinks.Add(CreateChangedLocationOptionLink(
+                            level: parentChange.ParentIdentifier,
+                            metaId: metaId,
+                            originalLocationMeta: originalLocationMeta!,
+                            optionChange: optionChange));
+
+                        continue;
+                    }
+
+                    newLocationOptionMetaLinks.Add(CreateUnchangedLocationOptionLink(
+                        metaId: metaId,
+                        originalLocationMeta: originalLocationMeta!,
+                        optionChange: optionChange));
+                }
+            }
+
+            await CreateMeta(locationOptionMetaLinks: newLocationOptionMetaLinks);
+
+            var newVersionLocationMetasWithLinksByLevel = (await GetLocationMeta(newVersion))
+                .ToDictionary(lm => lm.Level); // Refetching to get the links back this time
+
+            return (originalVersionLocationMetasWithLinksByLevel, newVersionLocationMetasWithLinksByLevel);
+        }
+
+        private LocationOptionMetaLink CreateAddedLocationOptionLink(GeographicLevel level, int metaId)
+        {
+            switch (level)
+            {
+                case GeographicLevel.LocalAuthority:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                        .WithMetaId(metaId);
+                case GeographicLevel.School:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                        .WithMetaId(metaId);
+                case GeographicLevel.RscRegion:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationRscRegionOptionMeta())
+                        .WithMetaId(metaId);
+                case GeographicLevel.Provider:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationProviderOptionMeta())
+                        .WithMetaId(metaId);
+                default:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationCodedOptionMeta())
+                        .WithMetaId(metaId);
+            }
+        }
+
+        private LocationOptionMetaLink CreateChangedLocationOptionLink(
+            GeographicLevel level,
+            int metaId,
+            LocationMeta originalLocationMeta,
+            OptionChange optionChange)
+        {
+            switch (level)
+            {
+                case GeographicLevel.LocalAuthority:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                        .WithMetaId(metaId)
+                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                case GeographicLevel.School:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                        .WithMetaId(metaId)
+                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                case GeographicLevel.RscRegion:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationRscRegionOptionMeta())
+                        .WithMetaId(metaId)
+                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                case GeographicLevel.Provider:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationProviderOptionMeta())
+                        .WithMetaId(metaId)
+                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                default:
+                    return DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithOption(DataFixture.DefaultLocationCodedOptionMeta())
+                        .WithMetaId(metaId)
+                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+            }
+        }
+
+        private LocationOptionMetaLink CreateUnchangedLocationOptionLink(
+            int metaId,
+            LocationMeta originalLocationMeta,
+            OptionChange optionChange)
+        {
+            return DataFixture
+                .DefaultLocationOptionMetaLink()
+                .WithMetaId(metaId)
+                .WithOptionId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].OptionId)
+                .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+        }
+
+        private async Task CreateMappings(
+            List<ParentChange<GeographicLevel>> allChanges,
+            DataSetVersion originalVersion, 
+            DataSetVersion newVersion, 
+            IReadOnlyDictionary<GeographicLevel, LocationMeta> originalVersionLocationMetasWithLinksByLevel,
+            IReadOnlyDictionary<GeographicLevel, LocationMeta> newVersionLocationMetasWithLinksByLevel)
+        {
+            var mappedCandidateOptionKeysBySourceOptionKey = allChanges
+                .SelectMany(
+                    pc => pc.OptionChanges,
+                    (pc, oc) => new { GeographicLevel = pc.ParentIdentifier, OptionChange = oc })
+                .Where(a => a.OptionChange.ChangeType is ChangeType.Unchanged or ChangeType.Changed) // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
+                .ToDictionary(
+                    a => LocationOptionMetaKeyGenerator(originalVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex].Option),
+                    a => LocationOptionMetaKeyGenerator(newVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex].Option));
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(newVersion.Id)
+                .WithLocationMappingPlan(
+                    DataFixture.LocationMappingPlanFromLocationMeta(
+                        sourceLocations: [.. originalVersionLocationMetasWithLinksByLevel.Values],
+                        targetLocations: [.. newVersionLocationMetasWithLinksByLevel.Values],
+                        mappedCandidateOptionKeysBySourceOptionKey: mappedCandidateOptionKeysBySourceOptionKey));
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
+        }
+
+        private async Task<IReadOnlyList<LocationMeta>> GetLocationMeta(DataSetVersion version)
+        {
+            return await GetDbContext<PublicDataDbContext>()
+                .LocationMetas
+                .Include(dsv => dsv.Options)
+                .Include(dsv => dsv.OptionLinks)
+                .Where(lm => lm.DataSetVersionId == version.Id)
+                .ToListAsync();
         }
     }
 
@@ -674,16 +798,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         });
     }
 
-    private async Task<IReadOnlyList<LocationMeta>> GetLocationMeta(DataSetVersion version)
-    {
-        return await GetDbContext<PublicDataDbContext>()
-            .LocationMetas
-            .Include(dsv => dsv.Options)
-            .Include(dsv => dsv.OptionLinks)
-            .Where(lm => lm.DataSetVersionId == version.Id)
-            .ToListAsync();
-    }
-
     private async Task<DataSetVersion> GetVersionWithChangelogs(DataSetVersion version)
     {
         return await GetDbContext<PublicDataDbContext>()
@@ -696,91 +810,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             .Include(dsv => dsv.IndicatorMetaChanges)
             .Include(dsv => dsv.TimePeriodMetaChanges)
             .SingleAsync(dsv => dsv.Id == version.Id);
-    }
-
-    private LocationOptionMetaLink CreateAddedLocationOptionLink(GeographicLevel level, int metaId)
-    {
-        switch (level)
-        {
-            case GeographicLevel.LocalAuthority:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
-                    .WithMetaId(metaId);
-            case GeographicLevel.School:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                    .WithMetaId(metaId);
-            case GeographicLevel.RscRegion:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                    .WithMetaId(metaId);
-            case GeographicLevel.Provider:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationProviderOptionMeta())
-                    .WithMetaId(metaId);
-            default:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationCodedOptionMeta())
-                    .WithMetaId(metaId);
-        }
-    }
-
-    private LocationOptionMetaLink CreateChangedLocationOptionLink(
-        GeographicLevel level, 
-        int metaId,
-        LocationMeta originalLocationMeta,
-        OptionChange optionChange)
-    {
-        switch (level)
-        {
-            case GeographicLevel.LocalAuthority:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
-                    .WithMetaId(metaId)
-                    .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
-            case GeographicLevel.School:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                    .WithMetaId(metaId)
-                    .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
-            case GeographicLevel.RscRegion:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                    .WithMetaId(metaId)
-                    .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
-            case GeographicLevel.Provider:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationProviderOptionMeta())
-                    .WithMetaId(metaId)
-                    .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
-            default:
-                return DataFixture
-                    .DefaultLocationOptionMetaLink()
-                    .WithOption(DataFixture.DefaultLocationCodedOptionMeta())
-                    .WithMetaId(metaId)
-                    .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
-        }
-    }
-
-    private LocationOptionMetaLink CreateUnchangedLocationOptionLink(
-        int metaId,
-        LocationMeta originalLocationMeta,
-        OptionChange optionChange)
-    {
-        return DataFixture
-            .DefaultLocationOptionMetaLink()
-            .WithMetaId(metaId)
-            .WithOptionId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].OptionId)
-            .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
     }
 
     // This is to make setting up the tests easier and safer to change.
