@@ -1,3 +1,4 @@
+using AngleSharp.Html;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 
@@ -14,7 +15,9 @@ public static class FilterMappingPlanGeneratorExtensions
     public static Generator<FilterMappingPlan> FilterMappingPlanFromFilterMeta(
         this DataFixture fixture,
         List<FilterMeta>? sourceFilters = null,
-        List<FilterMeta>? targetFilters = null)
+        List<FilterMeta>? targetFilters = null,
+        IReadOnlyDictionary<string, string>? mappedFilterCandidateKeysBySourceFilterKey = null,
+        IReadOnlyDictionary<string, string>? mappedOptionCandidateKeysByOptionSourceKey = null)
     {
         var filterMappingPlanGenerator = fixture.Generator<FilterMappingPlan>();
     
@@ -22,21 +25,39 @@ public static class FilterMappingPlanGeneratorExtensions
         {
             var filterMappingGenerator = fixture
                 .DefaultFilterMapping()
+                .WithCandidateKey(null) // This might break other stuff? If not, maybe it should default to null anyway
                 .WithSource(fixture
                     .DefaultMappableFilter()
                     .WithLabel(sourceFilter.Label))
                 .WithPublicId(sourceFilter.PublicId);
-           
+
+            if (mappedFilterCandidateKeysBySourceFilterKey is not null && mappedFilterCandidateKeysBySourceFilterKey.TryGetValue(sourceFilter.PublicId, out var candidateKey))
+            {
+                filterMappingGenerator = filterMappingGenerator
+                    .WithManualMapped(candidateKey);
+            }
+
             sourceFilter.Options.ForEach(option =>
             {
+                var sourceKey = MappingKeyFunctions.FilterOptionKeyGenerator(option);
+
+                var filterOptionMapping = fixture
+                    .DefaultFilterOptionMapping()
+                    .WithCandidateKey(null) // This might break other stuff? If not, maybe it should default to null anyway
+                    .WithSource(fixture
+                        .DefaultMappableFilterOption()
+                        .WithLabel(option.Label))
+                    .WithPublicId($"{sourceFilter.PublicId} :: {option.Label}");
+
+                if (mappedOptionCandidateKeysByOptionSourceKey is not null && mappedOptionCandidateKeysByOptionSourceKey.TryGetValue(sourceKey, out var candidateKey))
+                {
+                    filterOptionMapping = filterOptionMapping
+                        .WithManualMapped(candidateKey);
+                }
+
                 filterMappingGenerator.AddOptionMapping(
-                    sourceKey: MappingKeyGenerators.FilterOptionMeta(option),
-                    fixture
-                        .DefaultFilterOptionMapping()
-                        .WithSource(fixture
-                            .DefaultMappableFilterOption()
-                            .WithLabel(option.Label))
-                        .WithPublicId($"{sourceFilter.PublicId} :: {option.Label}"));
+                    sourceKey: sourceKey,
+                    mapping: filterOptionMapping);
             });
 
             filterMappingPlanGenerator.AddFilterMapping(

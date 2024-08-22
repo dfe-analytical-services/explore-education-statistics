@@ -80,7 +80,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
         nextVersion.FilterMetaChanges = [.. filterMetaChanges, .. filterMetaAdditions];
 
         var filterOptionMetaChanges = mappings.FilterMappingPlan.Mappings
-            .Where(fm => fm.Value.CandidateKey.HasValue()) // DON'T CREATE A CHANGELOG ENTRY FOR ANY FILTER OPTIONS WHICH HAVE HAD THEIR ENTIRE FILTERR DELETED
+            .Where(fm => fm.Value.CandidateKey.HasValue()) // DON'T CREATE A CHANGELOG ENTRY FOR ANY FILTER OPTIONS WHICH HAVE HAD THEIR ENTIRE FILTER DELETED
             .SelectMany(
                 fm => fm.Value.OptionMappings,
                 (fm, fom) => new { FilterMapping = fm, OptionMapping = fom })

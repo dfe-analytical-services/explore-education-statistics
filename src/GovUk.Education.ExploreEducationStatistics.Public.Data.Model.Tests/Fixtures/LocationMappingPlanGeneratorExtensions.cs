@@ -16,7 +16,7 @@ public static class LocationMappingPlanGeneratorExtensions
         this DataFixture fixture,
         List<LocationMeta>? sourceLocations = null,
         List<LocationMeta>? targetLocations = null,
-        IReadOnlyDictionary<string, string>? mappedCandidateOptionKeysBySourceOptionKey = null)
+        IReadOnlyDictionary<string, string>? mappedOptionCandidateKeysByOptionSourceKey = null)
     {
         var locationMappingPlanGenerator = fixture.Generator<LocationMappingPlan>();
 
@@ -45,7 +45,7 @@ public static class LocationMappingPlanGeneratorExtensions
                         .WithLabel(option.Label)
                         .WithCodes(option.ToRow()));
 
-                if (mappedCandidateOptionKeysBySourceOptionKey is not null && mappedCandidateOptionKeysBySourceOptionKey.TryGetValue(sourceKey, out var candidateKey))
+                if (mappedOptionCandidateKeysByOptionSourceKey is not null && mappedOptionCandidateKeysByOptionSourceKey.TryGetValue(sourceKey, out var candidateKey))
                 {
                     locationOptionMapping = locationOptionMapping
                         .WithManualMapped(candidateKey);

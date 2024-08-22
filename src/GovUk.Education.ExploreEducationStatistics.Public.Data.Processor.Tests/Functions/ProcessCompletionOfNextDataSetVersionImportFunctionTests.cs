@@ -135,16 +135,499 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    // When we say 'Not mapped' we actually mean it is auto-mapped to the SAME candidate key
+    public class GenerateChangelogTestsFilterTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : GenerateChangelogTests(fixture)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            // SCENARIOS WE TEST:
+            // filter DELETED, with all options DELETED. ===> Should just have 1 changelog for the DELETED filter.
+            // filter ADDED, with ADDED options. ===> Should have 1 changelog for the ADDED filter, and 1 changelog for EACH of the ADDED options.
+            // filter UNCHANGED, options UNCHANGED. ===> Should have NO changelogs.
+            // filter UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 changelog EACH of the DELETED options and EACH of the ADDED options.
+            // filter UNCHANGED, SOME options CHANGED. ===> Should have 1 changelog for EACH of the CHANGED options.
+            // filter CHANGED, options UNCHANGED. ===> Should just have 1 changelog for the CHANGED filter.
+            // filter CHANGED + SOME options CHANGED. ===> Should have 1 changelog for the CHANGED filter, and 1 changelog for EACH of the CHANGED options.
 
-    // WHAT TO TEST FOR:
-    // Entire FILTER deleted, with all options deleted. ===> Should just have 1 changelog for the deletion of the FILTER.
-    // Entire FILTER added, with new options. ===> Should have 1 changelog for the FILTER, and 1 changelog for EACH of the new OPTIONS.
-    // filter NOT mapped, NO options mapped. ===> Should have NO changelogs.
-    // filter NOT mapped, with some deleted OPTIONS and some new OPTIONS. ===> Should have 1 changelog EACH of the deleted OPTIONS and EACH of the new OPTIONS.
-    // FILTER mapped, NO options mapped. ===> Should just have 1 changelog for the FILTER.
-    // filter NOT mapped, SOME OPTIONS mapped. ===> Should have 1 changelog for EACH of the mapped OPTIONS.
-    // FILTER mapped + SOME OPTIONS mapped. ===> Should have 1 changelog for the FILTER, and 1 changelog for EACH of the OPTIONS.
+            var (instanceId, originalVersion, newVersion) = await CreateNextDataSetVersionWithMeta(
+                importStage: Stage.PreviousStage());
+
+            // Here we define what changes have occurred between the original and new data set versions.
+            // The metadata and mappings are then automatically calculated and stored from this, which can then be used
+            // to generate the changelogs.
+            List<FilterChange> allChanges =
+                [
+                    new FilterChange {
+                        ParentIdentifier = "filter 1",
+                        ChangeType = ChangeType.Deleted,
+                        FilterIndex = 0,
+                        OptionChanges =
+                            [
+                                new OptionChange {
+                                    ChangeType = ChangeType.Deleted,
+                                    OptionIndex = 0
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Deleted,
+                                    OptionIndex = 1
+                                }
+                            ]
+                    },
+                    new FilterChange {
+                        ParentIdentifier = "filter 2",
+                        ChangeType = ChangeType.Added,
+                        FilterIndex = 0,
+                        OptionChanges =
+                            [
+                                new OptionChange {
+                                    ChangeType = ChangeType.Added,
+                                    OptionIndex = 0
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Added,
+                                    OptionIndex = 1
+                                }
+                            ]
+                    },
+                    new FilterChange {
+                        ParentIdentifier = "filter 3",
+                        ChangeType = ChangeType.Unchanged,
+                        FilterIndex = 1,
+                        OptionChanges =
+                            [
+                                new OptionChange {
+                                    ChangeType = ChangeType.Unchanged,
+                                    OptionIndex = 0
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Unchanged,
+                                    OptionIndex = 1
+                                }
+                            ]
+                    },
+                    new FilterChange {
+                        ParentIdentifier = "filter 4",
+                        ChangeType = ChangeType.Unchanged,
+                        FilterIndex = 2,
+                        OptionChanges =
+                            [
+                                new OptionChange {
+                                    ChangeType = ChangeType.Unchanged,
+                                    OptionIndex = 0
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Deleted,
+                                    OptionIndex = 1
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Added,
+                                    OptionIndex = 1
+                                }
+                            ]
+                    },
+                    new FilterChange {
+                        ParentIdentifier = "filter 5",
+                        ChangeType = ChangeType.Unchanged,
+                        FilterIndex = 3,
+                        OptionChanges =
+                            [
+                                new OptionChange {
+                                    ChangeType = ChangeType.Unchanged,
+                                    OptionIndex = 0
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Changed,
+                                    OptionIndex = 1
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Changed,
+                                    OptionIndex = 2
+                                }
+                            ]
+                    },
+                    new FilterChange {
+                        ParentIdentifier = "filter 6",
+                        ChangeType = ChangeType.Changed,
+                        FilterIndex = 4,
+                        OptionChanges =
+                            [
+                                new OptionChange {
+                                    ChangeType = ChangeType.Unchanged,
+                                    OptionIndex = 0
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Unchanged,
+                                    OptionIndex = 1
+                                }
+                            ]
+                    },
+                    new FilterChange {
+                        ParentIdentifier = "filter 7",
+                        ChangeType = ChangeType.Changed,
+                        FilterIndex = 5,
+                        OptionChanges =
+                            [
+                                new OptionChange {
+                                    ChangeType = ChangeType.Unchanged,
+                                    OptionIndex = 0
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Changed,
+                                    OptionIndex = 1
+                                },
+                                new OptionChange {
+                                    ChangeType = ChangeType.Changed,
+                                    OptionIndex = 2
+                                }
+                            ]
+                    }
+                ];
+
+            var (originalVersionLocationMetasWithLinksByPublicId, newVersionLocationMetasWithLinksByPublicId) = await CreateMeta(
+                allChanges: allChanges,
+                originalVersion: originalVersion,
+                newVersion: newVersion);
+
+            await CreateMappings(
+                allChanges: allChanges,
+                originalVersion: originalVersion,
+                newVersion: newVersion,
+                originalVersionFilterMetasWithLinksByPublicId: originalVersionLocationMetasWithLinksByPublicId,
+                newVersionFilterMetasWithLinksByPublicId: newVersionLocationMetasWithLinksByPublicId);
+
+            await GenerateChangelog(instanceId);
+
+            var newVersionWithChangelogs = await GetVersionWithChangelogs(newVersion);
+
+            // Should have 2 FilterMetaChanges:
+            // 1 for the DELETED 'filter 1'
+            // 1 for the ADDED 'filter 2'.
+            // NOTE: At the moment we are unable to detect FILTER mappings due to their public ID also being their key.
+            // We also don't currently have the functionality to map top-level filters either. So here, we are just checking for 2 changelogs.
+            // In the future, when we allow for top-level filter mappings, this will check for the other 2 changelogs from 'filter 6' and
+            // 'filter 7' too.
+            Assert.Equal(2, newVersionWithChangelogs.FilterMetaChanges.Count);
+
+            // Should have 8 FilterOptionMetaChanges:
+            // 2 for the 2 ADDED 'filter 2' options
+            // 1 for the ADDED 'filter 4' option
+            // 1 for the DELETED 'filter 4' option
+            // 2 for the 2 CHANGED 'filter 5' options
+            // 2 for the 2 CHANGED 'filter 7' options
+            Assert.Equal(8, newVersionWithChangelogs.FilterOptionMetaChanges.Count);
+
+            // All changelogs should be for the new data set version
+            Assert.All(newVersionWithChangelogs.FilterMetaChanges, lmc => Assert.Equal(newVersionWithChangelogs.Id, lmc.DataSetVersionId));
+            Assert.All(newVersionWithChangelogs.FilterOptionMetaChanges, lomc => Assert.Equal(newVersionWithChangelogs.Id, lomc.DataSetVersionId));
+
+            foreach (var parentChange in allChanges)
+            {
+                originalVersionLocationMetasWithLinksByPublicId.TryGetValue(parentChange.ParentIdentifier, out var originalFilterMeta);
+                newVersionLocationMetasWithLinksByPublicId.TryGetValue(parentChange.ParentIdentifier, out var newFilterMeta);
+
+                // If the parent level has been DELETED, there should just be 1 changelog for this but none for the options - hence, we exit early
+                if (parentChange.ChangeType is ChangeType.Deleted)
+                {
+                    Assert.Single(newVersionWithChangelogs.FilterMetaChanges, lmc =>
+                        lmc.PreviousStateId == originalFilterMeta!.Id
+                        && lmc.CurrentStateId == null);
+
+                    continue;
+                }
+
+                // If the parent level has been ADDED, there should be 1 changelog for this. There will also be changelogs for the options - hence, we DON'T exit early
+                if (parentChange.ChangeType is ChangeType.Added)
+                {
+                    Assert.Single(newVersionWithChangelogs.FilterMetaChanges, lmc =>
+                        lmc.PreviousStateId == null
+                        && lmc.CurrentStateId == newFilterMeta!.Id);
+                }
+
+                foreach (var optionChange in parentChange.OptionChanges)
+                {
+                    // If the option is UNCHANGED, there should be no changelog for this
+                    if (optionChange.ChangeType is ChangeType.Unchanged)
+                    {
+                        continue;
+                    }
+
+                    var originalOptionLink = originalFilterMeta?.OptionLinks[optionChange.OptionIndex];
+                    var newOptionLink = newFilterMeta?.OptionLinks[optionChange.OptionIndex];
+
+                    switch (optionChange.ChangeType)
+                    {
+                        // If the option has been DELETED, ADDED or CHANGED, there should be 1 changelog for this
+                        case ChangeType.Deleted:
+                            Assert.Single(newVersionWithChangelogs.FilterOptionMetaChanges, lmc =>
+                                lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
+                                && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
+                                && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
+                                && lmc.CurrentState == null);
+                            break;
+                        case ChangeType.Added:
+                            Assert.Single(newVersionWithChangelogs.FilterOptionMetaChanges, lmc =>
+                                lmc.PreviousState == null
+                                && lmc.CurrentState?.MetaId == newOptionLink!.MetaId
+                                && lmc.CurrentState?.OptionId == newOptionLink.OptionId
+                                && lmc.CurrentState?.PublicId == newOptionLink.PublicId);
+                            break;
+                        case ChangeType.Changed:
+                            Assert.Single(newVersionWithChangelogs.FilterOptionMetaChanges, lmc =>
+                                lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
+                                && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
+                                && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
+                                && lmc.CurrentState?.MetaId == newOptionLink!.MetaId
+                                && lmc.CurrentState?.OptionId == newOptionLink.OptionId
+                                && lmc.CurrentState?.PublicId == newOptionLink.PublicId);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private async Task<(
+            IReadOnlyDictionary<string, FilterMeta> originalVersionFilterMetasWithLinksByPublicId,
+            IReadOnlyDictionary<string, FilterMeta> newVersionFilterMetasWithLinksByPublicId)>
+            CreateMeta(
+            IReadOnlyList<FilterChange> allChanges,
+            DataSetVersion originalVersion,
+            DataSetVersion newVersion)
+        {
+            var oldFilterMetasByPublicId = allChanges
+                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Changed or ChangeType.Deleted)
+                .Select(pc => CreateAddedFilter(
+                    versionId: originalVersion.Id,
+                    parentChange: pc))
+                .ToDictionary(lm => lm.PublicId);
+
+            var oldFilterMetas = oldFilterMetasByPublicId.Values.ToList();
+
+            await CreateMeta(filterMetas: oldFilterMetas);
+
+            var newFilterMetasByPublicId = allChanges
+                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Changed or ChangeType.Added)
+                .Select(pc =>
+                {
+                    if (pc.ChangeType is ChangeType.Added)
+                    {
+                        return CreateAddedFilter(
+                            versionId: newVersion.Id,
+                            parentChange: pc);
+                    }
+
+                    if (pc.ChangeType is ChangeType.Changed)
+                    {
+                        return CreateChangedFilter(
+                            versionId: newVersion.Id,
+                            oldFilterMetas: oldFilterMetas,
+                            parentChange: pc);
+                    }
+
+                    return CreateUnchangedFilter(
+                        versionId: newVersion.Id,
+                        oldFilterMetas: oldFilterMetas,
+                        parentChange: pc);
+                })
+                .ToDictionary(lm => lm.PublicId);
+
+            await CreateMeta(filterMetas: newFilterMetasByPublicId.Values);
+
+            // The above is SLIGHTLY different than that for locations
+
+            var oldFilterOptionMetaLinks = new List<FilterOptionMetaLink>();
+
+            foreach (var parentChange in allChanges)
+            {
+                foreach (var optionChange in parentChange.OptionChanges)
+                {
+                    if (optionChange.ChangeType
+                        is ChangeType.Unchanged
+                        or ChangeType.Changed
+                        or ChangeType.Deleted)
+                    {
+                        var metaId = oldFilterMetasByPublicId[parentChange.ParentIdentifier].Id;
+
+                        oldFilterOptionMetaLinks.Add(CreateAddedFilterOptionLink(metaId));
+                    }
+                }
+            }
+
+            await CreateMeta(filterOptionMetaLinks: oldFilterOptionMetaLinks);
+
+            // The above could POTENTIALLY be refactored out from both filters and locations
+
+            var originalVersionFilterMetasWithLinksByPublicId = (await GetFilterMeta(originalVersion))
+                .ToDictionary(lm => lm.PublicId);
+
+            var newFilterOptionMetaLinks = new List<FilterOptionMetaLink>();
+
+            foreach (var parentChange in allChanges)
+            {
+                if (parentChange.ChangeType is ChangeType.Deleted)
+                {
+                    continue;
+                }
+
+                originalVersionFilterMetasWithLinksByPublicId.TryGetValue(parentChange.ParentIdentifier, out var originalFilterMeta);
+                var newFilterMeta = newFilterMetasByPublicId[parentChange.ParentIdentifier];
+
+                foreach (var optionChange in parentChange.OptionChanges)
+                {
+                    if (optionChange.ChangeType is ChangeType.Deleted)
+                    {
+                        continue;
+                    }
+
+                    var metaId = newFilterMeta.Id;
+
+                    if (optionChange.ChangeType is ChangeType.Added)
+                    {
+                        newFilterOptionMetaLinks.Add(CreateAddedFilterOptionLink(metaId));
+
+                        continue;
+                    }
+
+                    if (optionChange.ChangeType is ChangeType.Changed)
+                    {
+                        newFilterOptionMetaLinks.Add(CreateChangedFilterOptionLink(
+                            metaId: metaId,
+                            originalFilterMeta:originalFilterMeta!,
+                            optionChange: optionChange));
+
+                        continue;
+                    }
+
+                    newFilterOptionMetaLinks.Add(CreateUnchangedFilterOptionLink(
+                        metaId: metaId,
+                        originalFilterMeta: originalFilterMeta!,
+                        optionChange: optionChange));
+                }
+            }
+
+            await CreateMeta(filterOptionMetaLinks: newFilterOptionMetaLinks);
+
+            var newVersionFilterMetasWithLinksByPublicId = (await GetFilterMeta(newVersion))
+                .ToDictionary(lm => lm.PublicId); // Refetching to get the links back this time
+
+            return (originalVersionFilterMetasWithLinksByPublicId, newVersionFilterMetasWithLinksByPublicId);
+
+            // This can 100% be reused across the filters and locations!
+        }
+
+        private FilterMeta CreateAddedFilter(
+            Guid versionId,
+            FilterChange parentChange)
+        {
+            return DataFixture
+                .DefaultFilterMeta()
+                .WithDataSetVersionId(versionId)
+                .WithPublicId(parentChange.ParentIdentifier);
+        }
+
+        private FilterMeta CreateChangedFilter(
+            Guid versionId,
+            IReadOnlyList<FilterMeta> oldFilterMetas,
+            FilterChange parentChange)
+        {
+            return DataFixture
+                .DefaultFilterMeta()
+                .WithDataSetVersionId(versionId)
+                .WithPublicId(oldFilterMetas[parentChange.FilterIndex].PublicId);
+        }
+
+        private FilterMeta CreateUnchangedFilter(
+            Guid versionId,
+            IReadOnlyList<FilterMeta> oldFilterMetas,
+            FilterChange parentChange)
+        {
+            return DataFixture
+                .DefaultFilterMeta()
+                .WithDataSetVersionId(versionId)
+                .WithPublicId(oldFilterMetas[parentChange.FilterIndex].PublicId)
+                .WithLabel(oldFilterMetas[parentChange.FilterIndex].Label)
+                .WithHint(oldFilterMetas[parentChange.FilterIndex].Hint);
+        }
+
+        private FilterOptionMetaLink CreateAddedFilterOptionLink(int metaId)
+        {
+            return DataFixture
+                .DefaultFilterOptionMetaLink()
+                .WithOption(DataFixture.DefaultFilterOptionMeta())
+                .WithMetaId(metaId);
+        }
+
+        private FilterOptionMetaLink CreateChangedFilterOptionLink(
+            int metaId,
+            FilterMeta originalFilterMeta,
+            OptionChange optionChange)
+        {
+            return DataFixture
+                .DefaultFilterOptionMetaLink()
+                .WithOption(DataFixture.DefaultFilterOptionMeta())
+                .WithMetaId(metaId)
+                .WithPublicId(originalFilterMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+        }
+
+        private FilterOptionMetaLink CreateUnchangedFilterOptionLink(
+            int metaId,
+            FilterMeta originalFilterMeta,
+            OptionChange optionChange)
+        {
+            return DataFixture
+                .DefaultFilterOptionMetaLink()
+                .WithMetaId(metaId)
+                .WithOptionId(originalFilterMeta!.OptionLinks[optionChange.OptionIndex].OptionId)
+                .WithPublicId(originalFilterMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+        }
+
+        private async Task CreateMappings(
+            List<FilterChange> allChanges,
+            DataSetVersion originalVersion,
+            DataSetVersion newVersion,
+            IReadOnlyDictionary<string, FilterMeta> originalVersionFilterMetasWithLinksByPublicId,
+            IReadOnlyDictionary<string, FilterMeta> newVersionFilterMetasWithLinksByPublicId)
+        {
+            var mappedFilterCandidateKeysBySourceFilterKey = allChanges
+                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Changed) // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
+                .ToDictionary(
+                    pc => FilterKeyGenerator(originalVersionFilterMetasWithLinksByPublicId[pc.ParentIdentifier]),
+                    pc => FilterKeyGenerator(newVersionFilterMetasWithLinksByPublicId[pc.ParentIdentifier]));
+
+            var mappedOptionCandidateKeysByOptionSourceKey = allChanges
+                .SelectMany(
+                    pc => pc.OptionChanges,
+                    (pc, oc) => new { PublicId = pc.ParentIdentifier, OptionChange = oc })
+                .Where(a => a.OptionChange.ChangeType is ChangeType.Unchanged or ChangeType.Changed) // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
+                .ToDictionary(
+                    a => FilterOptionKeyGenerator(originalVersionFilterMetasWithLinksByPublicId[a.PublicId].OptionLinks[a.OptionChange.OptionIndex].Option),
+                    a => FilterOptionKeyGenerator(newVersionFilterMetasWithLinksByPublicId[a.PublicId].OptionLinks[a.OptionChange.OptionIndex].Option));
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(newVersion.Id)
+                .WithFilterMappingPlan(
+                    DataFixture.FilterMappingPlanFromFilterMeta(
+                        sourceFilters: [.. originalVersionFilterMetasWithLinksByPublicId.Values],
+                        targetFilters: [.. newVersionFilterMetasWithLinksByPublicId.Values],
+                        mappedFilterCandidateKeysBySourceFilterKey: mappedFilterCandidateKeysBySourceFilterKey,
+                        mappedOptionCandidateKeysByOptionSourceKey: mappedOptionCandidateKeysByOptionSourceKey));
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
+        }
+
+        private async Task<IReadOnlyList<FilterMeta>> GetFilterMeta(DataSetVersion version)
+        {
+            return await GetDbContext<PublicDataDbContext>()
+                .FilterMetas
+                .Include(dsv => dsv.Options)
+                .Include(dsv => dsv.OptionLinks)
+                .Where(lm => lm.DataSetVersionId == version.Id)
+                .ToListAsync();
+        }
+    }
 
     public class GenerateChangelogTestsLocationTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
@@ -154,11 +637,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         public async Task Success()
         {
             // SCENARIOS WE TEST:
-            // Entire LOCATION deleted, with all options deleted. ===> Should just have 1 changelog for the deletion of the LOCATION.
-            // Entire LOCATION added, with new options. ===> Should have 1 changelog for the LOCATION, and 1 changelog for EACH of the new OPTIONS.
-            // location UNCHANGED, NO options changed. ===> Should have NO changelogs.
-            // location UNCHANGED, with some deleted OPTIONS and some new OPTIONS. ===> Should have 1 changelog for EACH of the deleted OPTIONS and EACH of the new OPTIONS.
-            // location UNCHANGED, SOME OPTIONS changed. ===> Should have 1 changelog for EACH of the changed OPTIONS.
+            // location DELETED, with all options DELETED. ===> Should just have 1 changelog for the DELETED location.
+            // location ADDED, with ADDED options. ===> Should have 1 changelog for the ADDED location, and 1 changelog for EACH of the ADDED options.
+            // location UNCHANGED, options UNCHANGED. ===> Should have NO changelogs.
+            // location UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 changelog for EACH of the DELETED options and EACH of the ADDED options.
+            // location UNCHANGED, SOME options CHANGED. ===> Should have 1 changelog for EACH of the CHANGED options.
 
             var (instanceId, originalVersion, newVersion) = await CreateNextDataSetVersionWithMeta(
                 importStage: Stage.PreviousStage());
@@ -166,9 +649,9 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             // Here we define what changes have occurred between the original and new data set versions.
             // The metadata and mappings are then automatically calculated and stored from this, which can then be used
             // to generate the changelogs.
-            List<ParentChange<GeographicLevel>> allChanges =
+            List<LocationChange> allChanges =
                 [
-                    new ParentChange<GeographicLevel> {
+                    new LocationChange {
                         ParentIdentifier = GeographicLevel.LocalAuthority,
                         ChangeType = ChangeType.Deleted,
                         OptionChanges =
@@ -183,7 +666,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 }
                             ]
                     },
-                    new ParentChange<GeographicLevel> {
+                    new LocationChange {
                         ParentIdentifier = GeographicLevel.School,
                         ChangeType = ChangeType.Added,
                         OptionChanges =
@@ -198,7 +681,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 }
                             ]
                     },
-                    new ParentChange<GeographicLevel> {
+                    new LocationChange {
                         ParentIdentifier = GeographicLevel.Country,
                         ChangeType = ChangeType.Unchanged,
                         OptionChanges =
@@ -213,7 +696,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 }
                             ]
                     },
-                    new ParentChange<GeographicLevel> {
+                    new LocationChange {
                         ParentIdentifier = GeographicLevel.RscRegion,
                         ChangeType = ChangeType.Unchanged,
                         OptionChanges =
@@ -232,7 +715,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 }
                             ]
                     },
-                    new ParentChange<GeographicLevel> {
+                    new LocationChange {
                         ParentIdentifier = GeographicLevel.Provider,
                         ChangeType = ChangeType.Unchanged,
                         OptionChanges =
@@ -350,8 +833,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             }
         }
 
-        private async Task<(IReadOnlyDictionary<GeographicLevel, LocationMeta> originalVersionLocationMetasWithLinksByLevel, IReadOnlyDictionary<GeographicLevel, LocationMeta> newVersionLocationMetasWithLinksByLevel)> CreateMeta(
-            IReadOnlyList<ParentChange<GeographicLevel>> allChanges,
+        private async Task<(
+            IReadOnlyDictionary<GeographicLevel, LocationMeta> originalVersionLocationMetasWithLinksByLevel,
+            IReadOnlyDictionary<GeographicLevel, LocationMeta> newVersionLocationMetasWithLinksByLevel)>
+            CreateMeta(
+            IReadOnlyList<LocationChange> allChanges,
             DataSetVersion originalVersion,
             DataSetVersion newVersion)
         {
@@ -544,13 +1030,13 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
 
         private async Task CreateMappings(
-            List<ParentChange<GeographicLevel>> allChanges,
-            DataSetVersion originalVersion, 
-            DataSetVersion newVersion, 
+            List<LocationChange> allChanges,
+            DataSetVersion originalVersion,
+            DataSetVersion newVersion,
             IReadOnlyDictionary<GeographicLevel, LocationMeta> originalVersionLocationMetasWithLinksByLevel,
             IReadOnlyDictionary<GeographicLevel, LocationMeta> newVersionLocationMetasWithLinksByLevel)
         {
-            var mappedCandidateOptionKeysBySourceOptionKey = allChanges
+            var mappedOptionCandidateKeysByOptionSourceKey = allChanges
                 .SelectMany(
                     pc => pc.OptionChanges,
                     (pc, oc) => new { GeographicLevel = pc.ParentIdentifier, OptionChange = oc })
@@ -567,7 +1053,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     DataFixture.LocationMappingPlanFromLocationMeta(
                         sourceLocations: [.. originalVersionLocationMetasWithLinksByLevel.Values],
                         targetLocations: [.. newVersionLocationMetasWithLinksByLevel.Values],
-                        mappedCandidateOptionKeysBySourceOptionKey: mappedCandidateOptionKeysBySourceOptionKey));
+                        mappedOptionCandidateKeysByOptionSourceKey: mappedOptionCandidateKeysByOptionSourceKey));
 
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
         }
@@ -812,20 +1298,29 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             .SingleAsync(dsv => dsv.Id == version.Id);
     }
 
-    // This is to make setting up the tests easier and safer to change.
+    // These classes are to make setting up the tests easier and safer to change.
     // We define what changes we want the hypothetical new data set version to have, relative to it's original version, and
     // the metadata and mappings are then worked out for us.
-    private class ParentChange<TParentIdentifier>
+    private abstract record ParentChange<TParentIdentifier>
     {
         public TParentIdentifier ParentIdentifier { get; init; }
         public ChangeType ChangeType { get; init; }
         public IReadOnlyList<OptionChange> OptionChanges { get; init; } = [];
     }
 
-    private class OptionChange
+    private record OptionChange
     {
         public ChangeType ChangeType { get; init; }
         public int OptionIndex { get; init; } // This is the index of the corresponding option for the original data set version, or for the new data set version
+    }
+
+    private record LocationChange : ParentChange<GeographicLevel>
+    {
+    }
+
+    private record FilterChange : ParentChange<string>
+    {
+        public int FilterIndex { get; init; } // This is the index of the corresponding filter for the original data set version, or for the new data set version
     }
 
     private enum ChangeType
