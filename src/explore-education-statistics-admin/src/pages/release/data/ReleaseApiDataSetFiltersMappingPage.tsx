@@ -108,6 +108,14 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
   const navItems: NavItem[] = useMemo(() => {
     return [
+      ...(Object.keys(mappableFilters).length > 0
+        ? [
+            {
+              id: 'mappable-filter-columns',
+              text: 'Filter columns not found in new data set',
+            },
+          ]
+        : []),
       {
         id: 'mappable-filter-options',
         text: 'Filter options not found in new data set',
@@ -118,6 +126,14 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
           };
         }),
       },
+      ...(Object.keys(newFilters).length > 0
+        ? [
+            {
+              id: 'new-filter-columns',
+              text: 'New filter columns',
+            },
+          ]
+        : []),
       {
         id: 'new-filter-options',
         text: 'New filter options',

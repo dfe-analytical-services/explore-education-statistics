@@ -1123,6 +1123,51 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
   });
 
   describe('unmapped filter columns', () => {
+    test('renders navigation items for filter columns', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+      apiDataSetVersionService.getFiltersMapping.mockResolvedValue(
+        testFiltersMappingUnmappedColumns,
+      );
+
+      renderPage();
+
+      expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+
+      const navItems = nav.getAllByRole('listitem');
+
+      expect(navItems).toHaveLength(6);
+
+      expect(
+        within(navItems[0]).getByRole('link', {
+          name: 'Filter columns not found in new data set',
+        }),
+      ).toHaveAttribute('href', '#mappable-filter-columns');
+
+      expect(
+        within(navItems[1]).getByRole('link', {
+          name: 'Filter options not found in new data set',
+        }),
+      ).toHaveAttribute('href', '#mappable-filter-options');
+
+      expect(
+        within(navItems[2]).getByRole('link', { name: 'New filter columns' }),
+      ).toHaveAttribute('href', '#new-filter-columns');
+
+      expect(
+        within(navItems[3]).getByRole('link', { name: 'New filter options' }),
+      ).toHaveAttribute('href', '#new-filter-options');
+
+      expect(
+        within(navItems[4]).getByRole('link', {
+          name: 'Auto mapped filter options',
+        }),
+      ).toHaveAttribute('href', '#auto-mapped-filter-options');
+    });
+
     test('renders correctly with unmapped filter columns', async () => {
       apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
       apiDataSetVersionService.getFiltersMapping.mockResolvedValue(
