@@ -866,6 +866,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             => throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
+            Guid dataSetVersionId,
             DataSetVersionUpdateRequest updateRequest,
             CancellationToken cancellationToken = default)
         {

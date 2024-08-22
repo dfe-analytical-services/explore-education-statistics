@@ -24,6 +24,12 @@ const apiDataSetVersionQueries = createQueryKeys('apiDataSetVersionQueries', {
         apiDataSetVersionService.getLocationsMapping(dataSetVersionId),
     };
   },
+  getChanges(dataSetVersionId: string) {
+    return {
+      queryKey: [dataSetVersionId],
+      queryFn: () => apiDataSetVersionService.getChanges(dataSetVersionId),
+    };
+  },
 });
 
 export default apiDataSetVersionQueries;

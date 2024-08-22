@@ -970,27 +970,22 @@ public abstract class DataSetVersionsControllerTests(
         }
     }
 
-    public class UpdateVersionTests(
-        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class UpdateVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        private static readonly IReadOnlyList<DataSetVersionStatus> EligibleUpdateDataSetVersionStatuses =
-            new List<DataSetVersionStatus>(
-                [
-                    DataSetVersionStatus.Draft,
-                    DataSetVersionStatus.Mapping
-                ]
-            );
+        private static readonly IReadOnlyList<DataSetVersionStatus> UpdateableStatuses =
+        [
+            DataSetVersionStatus.Draft,
+            DataSetVersionStatus.Mapping
+        ];
 
-        public static TheoryData<DataSetVersionStatus> EligibleUpdateDataSetVersionStatusesData = new(
-            EligibleUpdateDataSetVersionStatuses
-        );
+        public static readonly TheoryData<DataSetVersionStatus> UpdateableStatusesData = new(UpdateableStatuses);
 
-        public static TheoryData<DataSetVersionStatus> NonEligibleUpdateDataSetVersionStatusesData = new(
-            EnumUtil.GetEnums<DataSetVersionStatus>().Except(EligibleUpdateDataSetVersionStatuses)
+        public static readonly TheoryData<DataSetVersionStatus> ReadOnlyStatusesData = new(
+            EnumUtil.GetEnums<DataSetVersionStatus>().Except(UpdateableStatuses)
         );
 
         [Theory]
-        [MemberData(nameof(EligibleUpdateDataSetVersionStatusesData))]
+        [MemberData(nameof(UpdateableStatusesData))]
         public async Task Success(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -1033,11 +1028,10 @@ public abstract class DataSetVersionsControllerTests(
 
             var updateRequest = new DataSetVersionUpdateRequest
             {
-                DataSetVersionId = nextDataSetVersion.Id,
                 Notes = "updated notes."
             };
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(nextDataSetVersion.Id, updateRequest);
 
             var viewModel = response.AssertOk<DataSetDraftVersionViewModel>();
 
@@ -1071,9 +1065,9 @@ public abstract class DataSetVersionsControllerTests(
         {
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
-            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = Guid.NewGuid() };
+            var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(updateRequest, client);
+            var response = await UpdateVersion(Guid.NewGuid(), updateRequest, client);
 
             response.AssertForbidden();
         }
@@ -1081,15 +1075,15 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task DataSetVersionDoesNotExist_Returns404()
         {
-            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = Guid.NewGuid() };
+            var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(Guid.NewGuid(), updateRequest);
 
             response.AssertNotFound();
         }
 
         [Theory]
-        [MemberData(nameof(NonEligibleUpdateDataSetVersionStatusesData))]
+        [MemberData(nameof(ReadOnlyStatusesData))]
         public async Task DataSetVersionCannotBeUpdated_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
@@ -1118,9 +1112,9 @@ public abstract class DataSetVersionsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = nextDataSetVersion.Id };
+            var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(nextDataSetVersion.Id, updateRequest);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1153,26 +1147,26 @@ public abstract class DataSetVersionsControllerTests(
 
             var updateRequest = new DataSetVersionUpdateRequest
             {
-                DataSetVersionId = dataSetVersion.Id,
                 Notes = "updated notes."
             };
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(dataSetVersion.Id, updateRequest);
 
             var validationProblem = response.AssertValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "notes",
-                expectedCode: ValidationMessages.DataSetVersionCannotHaveChangelogNotes.Code);
+                expectedCode: ValidationMessages.DataSetVersionCannotHaveNotes.Code);
         }
 
         private async Task<HttpResponseMessage> UpdateVersion(
+            Guid dataSetVersionId,
             DataSetVersionUpdateRequest updateRequest,
             HttpClient? client = null)
         {
             client ??= BuildApp().CreateClient();
 
-            return await client.PatchAsync(BaseUrl, new JsonNetContent(updateRequest));
+            return await client.PatchAsJsonAsync($"{BaseUrl}/{dataSetVersionId}", updateRequest);
         }
     }
 
