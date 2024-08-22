@@ -110,7 +110,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
     return [
       {
         id: 'mappable-filter-options',
-        text: 'Filter options not found in the new data set',
+        text: 'Filter options not found in new data set',
         subNavItems: Object.keys(mappableFilterOptions).map(filterKey => {
           return {
             id: `mappable-filter-options-${kebabCase(filterKey)}`,
@@ -315,7 +315,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   className="govuk-heading-l dfe-flex dfe-align-items--center"
                   id="mappable-filter-columns"
                 >
-                  Filter columns not found in the new data set{' '}
+                  Filter columns not found in new data set{' '}
                   <Tag className="govuk-!-margin-left-2" colour="grey">
                     No action required
                   </Tag>
@@ -328,7 +328,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             )}
 
             <h3 className="govuk-heading-l" id="mappable-filter-options">
-              Filter options not found in the new data set
+              Filter options not found in new data set
             </h3>
 
             {Object.keys(mappableFilterOptions).length > 0 && filtersMapping ? (

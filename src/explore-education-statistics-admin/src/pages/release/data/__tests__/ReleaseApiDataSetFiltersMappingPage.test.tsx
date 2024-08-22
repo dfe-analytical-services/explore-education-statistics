@@ -86,7 +86,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // mappable
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in the new data set',
+        name: 'Filter options not found in new data set',
       }),
     ).toBeInTheDocument();
 
@@ -187,7 +187,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       within(navItems[0]).getByRole('link', {
-        name: 'Filter options not found in the new data set',
+        name: 'Filter options not found in new data set',
       }),
     ).toHaveAttribute('href', '#mappable-filter-options');
     const mappableSubItems = within(navItems[0]).getAllByRole('listitem');
@@ -349,7 +349,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in the new data set',
+        name: 'Filter options not found in new data set',
       }),
     ).toBeInTheDocument();
 
@@ -1135,7 +1135,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       expect(
         screen.getByRole('heading', {
-          name: 'Filter columns not found in the new data set No action required',
+          name: 'Filter columns not found in new data set No action required',
         }),
       ).toBeInTheDocument();
 
