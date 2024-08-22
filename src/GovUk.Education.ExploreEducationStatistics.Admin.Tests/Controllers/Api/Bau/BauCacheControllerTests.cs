@@ -1,16 +1,16 @@
 #nullable enable
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau.BauCacheController;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -79,11 +79,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.ClearPrivateCache(
                 new ClearPrivateCachePathsViewModel
                 {
-                    Paths = new HashSet<string>
-                    {
+                    Paths =
+                    [
                         "data-blocks",
                         "subject-meta"
-                    }
+                    ]
                 }
             );
 
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var glossaryCacheService = new Mock<IGlossaryCacheService>(Strict);
 
             glossaryCacheService.Setup(s => s.UpdateGlossary())
-                .ReturnsAsync(new List<GlossaryCategoryViewModel>());
+                .ReturnsAsync([]);
 
             var controller = BuildController(glossaryCacheService: glossaryCacheService.Object);
 
@@ -275,6 +275,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
+        public async Task ClearPrivateGeoJsonCacheJson()
+        {
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
+            privateBlobStorageService
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
+                .Returns(Task.CompletedTask);
+
+            var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
+
+            var result = await controller.ClearPrivateGeoJsonCacheJson();
+
+            VerifyAllMocks(privateBlobStorageService);
+
+            result.AssertNoContent();
+
+            var guid = Guid.NewGuid();
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, $"releases/{guid}/data-blocks/{guid}-boundary-levels/{guid}-1.json");
+            Assert.Matches(regex, $"releases/{guid}/data-blocks/{guid}-boundary-levels/{guid}-12.json");
+            Assert.Matches(regex, $"releases/{guid}/data-blocks/{guid}-boundary-levels/{guid}-123.json");
+            Assert.DoesNotMatch(regex, $"releases/{guid}/data-blocks/{guid}");
+            Assert.DoesNotMatch(regex, $"releases/{guid}/data-blocks/{guid}-boundary-levels/");
+            Assert.DoesNotMatch(regex, $"releases/{guid}/data-blocks/{guid}-boundary-levels/{guid}-.json");
+            Assert.DoesNotMatch(regex, $"releases/{guid}/data-blocks/{guid}-boundary-levels/{guid}-a.json");
+            Assert.DoesNotMatch(regex, $"releases/{guid}/data-blocks/{guid}-boundary-levels/{guid}-1234.json");
+        }
+
+        [Fact]
+        public async Task ClearPublicGeoJsonCacheJson()
+        {
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
+            publicBlobStorageService
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+                .Returns(Task.CompletedTask);
+
+            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
+
+            var result = await controller.ClearPublicGeoJsonCacheJson();
+
+            VerifyAllMocks(publicBlobStorageService);
+
+            result.AssertNoContent();
+
+            var guid = Guid.NewGuid();
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-1.json");
+            Assert.Matches(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-12.json");
+            Assert.Matches(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-123.json");
+            Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}");
+            Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/");
+            Assert.DoesNotMatch(regex, $"publications/publication-1/releases/abcd-ef/data-blocks/{guid}-boundary-levels/{guid}-1.json");
+            Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-1/data-blocks/{guid}-boundary-levels/{guid}-.json");
+            Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-.json");
+            Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-a.json");
+            Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-1234.json");
+        }
+
+        [Fact]
         public async Task ClearPublicCacheReleases_SingleValidPath()
         {
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
@@ -331,11 +401,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.ClearPublicCacheReleases(
                 new ClearPublicCacheReleasePathsViewModel
                 {
-                    Paths = new HashSet<string>
-                    {
+                    Paths =
+                    [
                         "data-blocks",
                         "subject-meta"
-                    }
+                    ]
                 }
             );
 
@@ -374,7 +444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             publicationCacheService
                 .Setup(s => s.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
+                .ReturnsAsync([]);
 
             var controller = BuildController(publicationCacheService: publicationCacheService.Object);
 
@@ -400,12 +470,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             publicationCacheService
                 .Setup(s => s.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
+                .ReturnsAsync([]);
 
             methodologyCacheService
                 .Setup(s => s.UpdateSummariesTree())
                 .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                    new List<AllMethodologiesThemeViewModel>()));
+                    []));
 
             var controller = BuildController(
                 methodologyCacheService: methodologyCacheService.Object,
@@ -417,11 +487,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.UpdatePublicCacheTrees(
                 new UpdatePublicCacheTreePathsViewModel
                 {
-                    CacheEntries = new HashSet<string>
-                    {
+                    CacheEntries =
+                    [
                         publicationTreeOption,
                         methodologyTreeOption
-                    }
+                    ]
                 }
             );
 

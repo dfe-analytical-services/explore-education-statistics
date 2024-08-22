@@ -10,9 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
@@ -44,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult> Query(
             Guid releaseVersionId,
             [FromBody] FullTableQueryRequest request,
-            [FromQuery] long? boundaryLevelId,
+            [FromQuery] long? boundaryLevelId, // TODO: Remove in EES-5433
             CancellationToken cancellationToken = default)
         {
             if (Request.AcceptsCsv(exact: true))
@@ -71,12 +73,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseVersionId,
             Guid dataBlockParentId,
-            [FromQuery] long? boundaryLevelId,
+            [FromQuery] long? boundaryLevelId, // TODO: Remove in EES-5433
             CancellationToken cancellationToken = default)
         {
             return await _dataBlockService
                 .GetDataBlockVersionForRelease(releaseVersionId: releaseVersionId, dataBlockParentId: dataBlockParentId)
                 .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, boundaryLevelId, cancellationToken))
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("data/tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}/geojson")]
+        public async Task<ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>> QueryForDataBlockWithGeoJson(
+            Guid releaseVersionId,
+            Guid dataBlockParentId,
+            [FromQuery] long boundaryLevelId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _dataBlockService
+                .GetDataBlockVersionForRelease(releaseVersionId, dataBlockParentId)
+                .OnSuccess(dataBlockVersion => GetLocations(releaseVersionId, dataBlockVersion, boundaryLevelId, cancellationToken))
                 .HandleFailuresOrOk();
         }
 
@@ -92,6 +107,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     dataBlockVersion.Query,
                     boundaryLevelId,
                     cancellationToken));
+        }
+
+        [BlobCache(typeof(LocationsForDataBlockCacheKey))]
+        private async Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocations(
+            Guid releaseVersionId,
+            DataBlockVersion dataBlockVersion,
+            long boundaryLevelId,
+            CancellationToken cancellationToken)
+        {
+            return await _userService
+                .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)
+                .OnSuccess(_ => _tableBuilderService.QueryForBoundaryLevel(releaseVersionId, dataBlockVersion.Query, boundaryLevelId, cancellationToken));
         }
     }
 }
