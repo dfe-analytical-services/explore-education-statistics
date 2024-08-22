@@ -29,8 +29,12 @@ export default function ApiDataSetNewFilterColumnsTable({
             <tr key={`column-${key}`}>
               <td>No mapping available</td>
               <td>
-                {column.label} <br />
-                id: {key} <br />
+                {column.label}
+                <br />
+                <span className="dfe-colour--dark-grey">
+                  ID: <code>{key}</code>
+                </span>
+                <br />
                 {column.options && Object.keys(column.options).length > 0 && (
                   <ApiDataSetMappableFilterColumnOptionsModal
                     id={key}

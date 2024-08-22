@@ -32,9 +32,12 @@ export default function ApiDataSetMappableFilterColumnsTable({
           return (
             <tr key={`column-${key}`}>
               <td>
-                {column.source.label} <br />
-                id: {key}
-                <br />{' '}
+                {column.source.label}
+                <br />
+                <span className="dfe-colour--dark-grey">
+                  ID: <code>{key}</code>
+                </span>
+                <br />
                 <ApiDataSetMappableFilterColumnOptionsModal
                   id={key}
                   label={column.source.label}

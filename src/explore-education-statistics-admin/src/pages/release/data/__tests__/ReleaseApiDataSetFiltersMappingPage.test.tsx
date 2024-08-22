@@ -1144,9 +1144,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       ).getAllByRole('row');
       expect(unmappedRows).toHaveLength(2);
       const unmappedRow1Cells = within(unmappedRows[1]).getAllByRole('cell');
-      expect(unmappedRow1Cells[0]).toHaveTextContent(
-        'Filter 1 id: Filter1Key View filter options',
-      );
+      expect(unmappedRow1Cells[0]).toHaveTextContent('Filter 1');
+      expect(unmappedRow1Cells[0]).toHaveTextContent('ID: Filter1Key');
+      expect(unmappedRow1Cells[0]).toHaveTextContent('View filter options');
       expect(unmappedRow1Cells[1]).toHaveTextContent('No mapping available');
       expect(unmappedRow1Cells[2]).toHaveTextContent('Major');
 
@@ -1164,9 +1164,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         'cell',
       );
       expect(newColumnsRow1Cells[0]).toHaveTextContent('No mapping available');
-      expect(newColumnsRow1Cells[1]).toHaveTextContent(
-        'Filter 1 id: Filter1UpdatedKey View filter options',
-      );
+      expect(newColumnsRow1Cells[1]).toHaveTextContent('Filter 1');
+      expect(newColumnsRow1Cells[1]).toHaveTextContent('ID: Filter1UpdatedKey');
+      expect(newColumnsRow1Cells[1]).toHaveTextContent('View filter options');
       expect(newColumnsRow1Cells[2]).toHaveTextContent('Minor');
     });
   });

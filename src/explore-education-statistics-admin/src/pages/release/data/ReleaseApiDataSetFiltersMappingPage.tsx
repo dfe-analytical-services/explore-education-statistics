@@ -349,9 +349,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                         <br />
                         <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
                           Column:{' '}
-                          <span className="govuk-!-font-weight-regular">
+                          <code className="govuk-!-font-weight-regular">
                             {filterKey}
-                          </span>
+                          </code>
                         </div>
                       </>
                     }
@@ -395,11 +395,12 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   if (newFilterOptions[filterKey].length) {
                     const filterLabel =
                       filtersMapping.candidates[filterKey].label;
+
                     return (
                       <AccordionSection
                         caption={
                           <>
-                            <strong>Column:</strong> {filterKey}
+                            <strong>Column:</strong> <code>{filterKey}</code>
                           </>
                         }
                         goToTop={false}
@@ -446,11 +447,12 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   ) {
                     const filterLabel =
                       filtersMapping.mappings[filterKey].source.label;
+
                     return (
                       <AccordionSection
                         caption={
                           <>
-                            <strong>Column:</strong> {filterKey}
+                            <strong>Column:</strong> <code>{filterKey}</code>
                           </>
                         }
                         goToTop={false}
