@@ -15,9 +15,6 @@ ${PUBLICATION_NAME}=    UI tests - public api restricted %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
-${SUBJECT_NAME_3}=      UI test subject 3
-${SUBJECT_NAME_4}=      UI test subject 4
-${SUBJECT_NAME_5}=      UI test subject 5
 
 
 
@@ -99,9 +96,9 @@ Click on 'cancel' button while attempting to remove draft API dataset
 
     user clicks button in table cell    1    4    Remove draft    xpath://table[@data-testid='draft-api-data-sets']
 
-     ${modal}=    user waits until modal is visible     Remove this draft API data set version
-     User Clicks Button By Indexing    Cancel    3
-     user waits until h2 is visible    API data sets
+    ${modal}=    user waits until modal is visible     Remove this draft API data set version
+    User Clicks Button By Indexing    Cancel    3
+    user waits until h2 is visible    API data sets
 
 Verify the contents inside the 'Draft API datasets' table
     user waits until h3 is visible    Draft API data sets
