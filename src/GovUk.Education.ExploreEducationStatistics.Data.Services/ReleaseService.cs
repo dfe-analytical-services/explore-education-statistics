@@ -72,23 +72,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Where(rs => rs.ReleaseVersionId == releaseVersionId && subjectsToInclude.Contains(rs.SubjectId))
                 .ToListAsync();
 
+            if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+                    releaseSubjects.Select(rs => rs.SubjectId).ToList(),
+                    subjectsToInclude
+                    ))
+            {
+                throw new DataException($"""
+                    Statistics DB has a different subjects than the Content DB
+                    StatsDB subjects: {releaseSubjects.Select(rs => rs.SubjectId).JoinToString(',')}
+                    ContentDb subjects: {subjectsToInclude.JoinToString(',')}
+                    """);
+            }
+
             var releaseFiles = await QueryReleaseDataFiles(releaseVersionId)
                 .Where(rf => rf.File.SubjectId.HasValue
-                             && rf.ReleaseVersionId == releaseVersionId
                              && subjectsToInclude.Contains(rf.File.SubjectId.Value))
                 .ToListAsync();
-
-            // This check was added to protect against EES-5404
-            if (releaseSubjects.Count != releaseFiles.Count)
-            {
-                var subjectsStr = releaseSubjects.Select(rs => rs.SubjectId).JoinToString(',');
-                var filesStr = releaseFiles.Select(rf => rf.FileId).JoinToString(',');
-
-                throw new DataException(
-                    "Statistics DB has a different number of subjects than the Content DB\n"
-                    + $"StatsDB subjects: {subjectsStr}\n"
-                    + $"ContentDb files: {filesStr}\n");
-            }
 
             return (await releaseSubjects
                     .SelectAsync(

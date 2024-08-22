@@ -7,12 +7,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
@@ -27,6 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class ReleaseServiceTests
     {
+
+        private readonly DataFixture _fixture = new();
         [Fact]
         public async Task ListSubjects()
         {
@@ -273,89 +278,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects_StatsDbHasMissingSubject()
         {
-            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+            Data.Model.ReleaseVersion statisticsReleaseVersion = _fixture.DefaultStatsReleaseVersion();
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                ReleaseVersion = statisticsReleaseVersion,
-                Subject = new Subject()
-            };
-
-            var subject1Filter1 = new Filter
-            {
-                Subject = releaseSubject1.Subject,
-                Label = "subject 1 filter 1",
-            };
-
-            var subject1IndicatorGroup1 = new IndicatorGroup
-            {
-                Subject = releaseSubject1.Subject,
-                Label = "subject 1 indicator group 1",
-                Indicators = new List<Indicator>
-                {
-                    new() { Label = "subject 1 indicator group 1 indicator 1" },
-                }
-            };
+            ReleaseSubject releaseSubject1 = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statisticsReleaseVersion)
+                .WithSubject(_fixture.DefaultSubject());
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 statisticsDbContext.ReleaseSubject.Add(releaseSubject1);
-                statisticsDbContext.Filter.Add(subject1Filter1);
-                statisticsDbContext.IndicatorGroup.Add(subject1IndicatorGroup1);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentReleaseVersion = new ReleaseVersion
-            {
-                Id = statisticsReleaseVersion.Id,
-            };
+            ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion()
+                .WithId(statisticsReleaseVersion.Id);
 
-            var releaseFile1 = new ReleaseFile
-            {
-                ReleaseVersion = contentReleaseVersion,
-                Name = "Data set 1",
-                File = new File
-                {
-                    Filename = "data1.csv",
-                    ContentLength = 10240,
-                    Type = FileType.Data,
-                    SubjectId = releaseSubject1.Subject.Id
-                },
-                Summary = "Data set 1 guidance"
-            };
+            ReleaseFile releaseFile1 = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(contentReleaseVersion)
+                .WithFile(_fixture.DefaultFile(FileType.Data)
+                    .WithSubjectId(releaseSubject1.SubjectId));
 
-            var releaseFile2 = new ReleaseFile
-            {
-                ReleaseVersion = contentReleaseVersion,
-                Name = "Data set 2",
-                File = new File
-                {
-                    Filename = "data2.csv",
-                    ContentLength = 20480,
-                    Type = FileType.Data,
-                    SubjectId = Guid.NewGuid(),
-                },
-                Summary = "Data set 2 guidance"
-            };
+            ReleaseFile releaseFile2 = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(contentReleaseVersion)
+                .WithFile(_fixture.DefaultFile(FileType.Data)
+                    .WithSubjectId(Guid.NewGuid()));
 
-            var import1 = new DataImport
-            {
-                File = releaseFile1.File,
-                Status = DataImportStatus.COMPLETE
-            };
+            DataImport import1 = _fixture.DefaultDataImport()
+                .WithFile(releaseFile1.File)
+                .WithStatus(DataImportStatus.COMPLETE);
 
-            var import2 = new DataImport
-            {
-                File = releaseFile2.File,
-                Status = DataImportStatus.COMPLETE
-            };
+            DataImport import2 = _fixture.DefaultDataImport()
+                .WithFile(releaseFile2.File)
+                .WithStatus(DataImportStatus.COMPLETE);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
-                await contentDbContext.AddRangeAsync(import1, import2);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.DataImports.AddRangeAsync(import1, import2);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -370,9 +331,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var exception = await Assert.ThrowsAsync<DataException>(() =>
                     service.ListSubjects(contentReleaseVersion.Id));
 
-                Assert.Equal("Statistics DB has a different number of subjects than the Content DB\n"
-                             + $"StatsDB subjects: {releaseSubject1.SubjectId}\n"
-                             + $"ContentDb files: {releaseFile1.FileId},{releaseFile2.FileId}\n",
+                Assert.Equal($"""
+                             Statistics DB has a different subjects than the Content DB
+                             StatsDB subjects: {releaseSubject1.SubjectId}
+                             ContentDb subjects: {releaseFile1.File.SubjectId},{releaseFile2.File.SubjectId}
+                             """,
                     exception.Message);
             }
         }
