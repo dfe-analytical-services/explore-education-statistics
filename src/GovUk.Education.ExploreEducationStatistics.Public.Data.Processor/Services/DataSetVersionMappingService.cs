@@ -93,42 +93,34 @@ internal class DataSetVersionMappingService(
         AutoMapLocations(mappings.LocationMappingPlan);
         AutoMapFilters(mappings.FilterMappingPlan);
 
-        mappings.LocationMappingsComplete = !mappings
-            .LocationMappingPlan
+        mappings.LocationMappingsComplete = !mappings.LocationMappingPlan
             .Levels
-            .Any(level => level
-                .Value
-                .Mappings
-                .Any(optionMapping =>
-                    IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
+            // Ignore any levels where candidates or mappings are empty as this means the level
+            // has been added or deleted from the data set and is not a mappable change.
+            .Where(level => level.Value.Candidates.Count != 0 && level.Value.Mappings.Count != 0)
+            .Any(level => level.Value.Mappings
+                .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type)));
 
         // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
         // omit checking the status of filters that have a mapping of AutoNone.
-        mappings.FilterMappingsComplete = !mappings
-            .FilterMappingPlan
+        mappings.FilterMappingsComplete = !mappings.FilterMappingPlan
             .Mappings
             .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
-        // Consider the current mappings to produce a major version change if any options from the
-        // original data set version are currently not mapped to options in the new version.
-        var hasMajorLocationVersionUpdate = mappings
-            .LocationMappingPlan
+        var hasMajorLocationChange =  mappings.LocationMappingPlan
             .Levels
-            .Any(level => level
-                .Value
-                .Mappings
-                .Any(optionMapping =>
-                    NoMappingTypes.Contains(optionMapping.Value.Type)));
+            .Any(level => level.Value.Candidates.Count == 0
+                          || level.Value.Mappings
+                              .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type)));
 
-        var hasMajorFilterVersionUpdate = mappings
-            .FilterMappingPlan
+        var hasMajorFilterUpdate = mappings.FilterMappingPlan
             .Mappings
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
 
-        var isMajorVersionUpdate = hasMajorLocationVersionUpdate || hasMajorFilterVersionUpdate;
+        var isMajorVersionUpdate = hasMajorLocationChange || hasMajorFilterUpdate;
 
         if (isMajorVersionUpdate)
         {
