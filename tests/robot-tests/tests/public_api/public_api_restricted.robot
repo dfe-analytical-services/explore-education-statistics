@@ -2,6 +2,7 @@
 *** Settings ***
 Library             ../libs/admin_api.py
 Resource            ../libs/admin-common.robot
+Resource            ../libs/admin/manage-content-common.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 
