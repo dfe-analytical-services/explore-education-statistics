@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
-import ApiDataSetNotesForm, {
-  ApiDataSetNotesFormValues,
-} from '@admin/pages/release/data/components/ApiDataSetNotesForm';
+import ApiDataSetGuidanceNotesForm, {
+  ApiDataSetGuidanceNotesFormValues,
+} from '@admin/pages/release/data/components/ApiDataSetGuidanceNotesForm';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetChangelogRouteParams,
@@ -47,7 +47,9 @@ export default function ReleaseApiDataSetChangelogPage() {
     }
   }, [dataSetVersion?.notes, isDraft, toggleShowForm]);
 
-  const handleUpdateNotes = async ({ notes }: ApiDataSetNotesFormValues) => {
+  const handleUpdateNotes = async ({
+    notes,
+  }: ApiDataSetGuidanceNotesFormValues) => {
     await apiDataSetVersionService.updateNotes(dataSetVersionId, {
       notes,
     });
@@ -80,7 +82,7 @@ export default function ReleaseApiDataSetChangelogPage() {
         </div>
         <p>
           <Tag colour={isDraft ? 'green' : 'blue'}>{`${
-            isDraft ? 'Ready' : 'Published'
+            isDraft ? 'Draft' : 'Published'
           } v${dataSetVersion?.version}`}</Tag>
         </p>
         <p>
@@ -90,7 +92,7 @@ export default function ReleaseApiDataSetChangelogPage() {
         </p>
 
         {isDraft && showForm ? (
-          <ApiDataSetNotesForm
+          <ApiDataSetGuidanceNotesForm
             notes={dataSetVersion?.notes}
             onSubmit={handleUpdateNotes}
           />
@@ -98,9 +100,8 @@ export default function ReleaseApiDataSetChangelogPage() {
           <>
             <h3>Public guidance notes</h3>
             <p>
-              {dataSetVersion?.notes
-                ? dataSetVersion.notes
-                : 'No notes have been added for this API data set.'}
+              {dataSetVersion?.notes ||
+                'No notes have been added for this API data set.'}
             </p>
             {isDraft && (
               <Button onClick={toggleShowForm.on}>

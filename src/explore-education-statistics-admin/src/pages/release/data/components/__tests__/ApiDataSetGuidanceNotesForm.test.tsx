@@ -1,33 +1,35 @@
-import ApiDataSetNotesForm from '@admin/pages/release/data/components/ApiDataSetNotesForm';
+import ApiDataSetGuidanceNotesForm from '@admin/pages/release/data/components/ApiDataSetGuidanceNotesForm';
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 
-describe('ApiDataSetNotesForm', () => {
+describe('ApiDataSetGuidanceNotesForm', () => {
   test('renders correctly', () => {
-    render(<ApiDataSetNotesForm onSubmit={noop} />);
+    render(<ApiDataSetGuidanceNotesForm onSubmit={noop} />);
 
     expect(screen.getByLabelText('Public guidance notes')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Add public guidance notes' }),
+      screen.getByRole('button', { name: 'Save public guidance notes' }),
     ).toBeInTheDocument();
   });
 
   test('renders correctly with initial notes', () => {
-    render(<ApiDataSetNotesForm notes="Test notes" onSubmit={noop} />);
+    render(<ApiDataSetGuidanceNotesForm notes="Test notes" onSubmit={noop} />);
 
     expect(screen.getByLabelText('Public guidance notes')).toHaveValue(
       'Test notes',
     );
     expect(
-      screen.getByRole('button', { name: 'Update public guidance notes' }),
+      screen.getByRole('button', { name: 'Save public guidance notes' }),
     ).toBeInTheDocument();
   });
 
   test('submitting form calls the `onSubmit` handler', async () => {
     const handleSubmit = jest.fn();
 
-    const { user } = render(<ApiDataSetNotesForm onSubmit={handleSubmit} />);
+    const { user } = render(
+      <ApiDataSetGuidanceNotesForm onSubmit={handleSubmit} />,
+    );
 
     await user.type(
       screen.getByLabelText('Public guidance notes'),
@@ -37,7 +39,7 @@ describe('ApiDataSetNotesForm', () => {
     expect(handleSubmit).not.toHaveBeenCalled();
 
     await user.click(
-      screen.getByRole('button', { name: 'Add public guidance notes' }),
+      screen.getByRole('button', { name: 'Save public guidance notes' }),
     );
 
     await waitFor(() => {

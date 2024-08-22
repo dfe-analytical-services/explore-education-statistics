@@ -22,7 +22,7 @@ jest.mock('@admin/services/apiDataSetVersionService');
 const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
-describe('ReleaseApiDataSetPreviewTokenPage', () => {
+describe('ReleaseApiDataSetChangelogPage', () => {
   const testDataSet: ApiDataSet = {
     id: 'data-set-id',
     title: 'Data set title',
@@ -127,12 +127,12 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
 
     expect(await screen.findByText('Data set title')).toBeInTheDocument();
 
-    expect(screen.getByText('Ready v2.0')).toBeInTheDocument();
+    expect(screen.getByText('Draft v2.0')).toBeInTheDocument();
     expect(screen.getByText('Major update')).toBeInTheDocument();
 
     expect(screen.getByLabelText('Public guidance notes')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Add public guidance notes' }),
+      screen.getByRole('button', { name: 'Save public guidance notes' }),
     ).toBeInTheDocument();
 
     expect(
@@ -172,7 +172,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
     expect(apiDataSetVersionService.updateNotes).not.toHaveBeenCalled();
 
     await user.click(
-      screen.getByRole('button', { name: 'Add public guidance notes' }),
+      screen.getByRole('button', { name: 'Save public guidance notes' }),
     );
 
     await waitFor(() => {

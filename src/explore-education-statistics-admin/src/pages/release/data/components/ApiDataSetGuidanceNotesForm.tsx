@@ -5,16 +5,16 @@ import FormProvider from '@common/components/form/FormProvider';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 
-export interface ApiDataSetNotesFormValues {
+export interface ApiDataSetGuidanceNotesFormValues {
   notes: string;
 }
 
 export interface ApiDataSetCreateFormProps {
   notes?: string;
-  onSubmit: (values: ApiDataSetNotesFormValues) => void;
+  onSubmit: (values: ApiDataSetGuidanceNotesFormValues) => void;
 }
 
-export default function ApiDataSetNotesForm({
+export default function ApiDataSetGuidanceNotesForm({
   notes,
   onSubmit,
 }: ApiDataSetCreateFormProps) {
@@ -22,16 +22,16 @@ export default function ApiDataSetNotesForm({
     <FormProvider initialValues={{ notes }}>
       {({ formState }) => {
         return (
-          <Form id="apiDataSetCreateForm" onSubmit={onSubmit}>
+          <Form id="guidanceNotesForm" onSubmit={onSubmit}>
             <FormFieldTextArea
               name="notes"
               label="Public guidance notes"
-              hint="Use the public guidance notes to highlight any extra information to your end users that may not be apparent in the automated changelog below."
+              hint="Highlight any extra information that may not be apparent in the automated changelog below."
             />
 
             <ButtonGroup>
               <Button type="submit" ariaDisabled={formState.isSubmitting}>
-                {`${notes ? 'Update' : 'Add'} public guidance notes`}
+                Save public guidance notes
               </Button>
 
               <LoadingSpinner
@@ -40,7 +40,7 @@ export default function ApiDataSetNotesForm({
                 inline
                 loading={formState.isSubmitting}
                 size="sm"
-                text="Updating notes"
+                text="Saving notes"
               />
             </ButtonGroup>
           </Form>

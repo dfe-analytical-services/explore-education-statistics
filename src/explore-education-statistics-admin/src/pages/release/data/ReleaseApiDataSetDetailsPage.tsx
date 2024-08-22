@@ -251,17 +251,12 @@ export default function ReleaseApiDataSetDetailsPage() {
 
             {mappingComplete && dataSet.draftVersion && (
               <ApiDataSetFinaliseBanner
-                changelogPath={generatePath<ReleaseDataSetChangelogRouteParams>(
-                  releaseApiDataSetChangelogRoute.path,
-                  {
-                    publicationId: release.publicationId,
-                    releaseId: release.id,
-                    dataSetId,
-                    dataSetVersionId: dataSet.draftVersion.id,
-                  },
-                )}
+                dataSetId={dataSetId}
+                dataSetVersionId={dataSet.draftVersion.id}
                 draftVersionStatus={dataSet.draftVersion.status}
                 finalisingStatus={finalisingStatus}
+                publicationId={release.publicationId}
+                releaseId={release.id}
                 onFinalise={handleFinalise}
               />
             )}

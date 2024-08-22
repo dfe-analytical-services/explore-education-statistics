@@ -1,21 +1,32 @@
 import Link from '@admin/components/Link';
 import { DataSetFinalisingStatus } from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
+import {
+  releaseApiDataSetChangelogRoute,
+  ReleaseDataSetChangelogRouteParams,
+} from '@admin/routes/releaseRoutes';
 import { DataSetDraftVersionStatus } from '@admin/services/apiDataSetService';
 import NotificationBanner from '@common/components/NotificationBanner';
 import Button from '@common/components/Button';
 import React from 'react';
+import { generatePath } from 'react-router-dom';
 
 interface Props {
-  changelogPath: string;
+  dataSetId: string;
+  dataSetVersionId: string;
   draftVersionStatus?: DataSetDraftVersionStatus;
   finalisingStatus?: DataSetFinalisingStatus;
+  releaseId: string;
+  publicationId: string;
   onFinalise: () => void;
 }
 
 export default function ApiDataSetFinaliseBanner({
-  changelogPath,
+  dataSetId,
+  dataSetVersionId,
   draftVersionStatus,
   finalisingStatus,
+  releaseId,
+  publicationId,
   onFinalise,
 }: Props) {
   if (finalisingStatus === 'finalising') {
@@ -74,7 +85,19 @@ export default function ApiDataSetFinaliseBanner({
         </p>
 
         <p>
-          <Link to={changelogPath}>View changelog and guidance notes</Link>
+          <Link
+            to={generatePath<ReleaseDataSetChangelogRouteParams>(
+              releaseApiDataSetChangelogRoute.path,
+              {
+                publicationId,
+                releaseId,
+                dataSetId,
+                dataSetVersionId,
+              },
+            )}
+          >
+            View changelog and guidance notes
+          </Link>
         </p>
       </NotificationBanner>
     );

@@ -9,7 +9,10 @@ describe('ApiDataSetFinaliseBanner', () => {
   test('renders the finalising banner when `finalisingStatus` is `finalising', () => {
     render(
       <ApiDataSetFinaliseBanner
-        changelogPath="/changelog"
+        dataSetId="data-set-id"
+        dataSetVersionId="data-set-version-id"
+        releaseId="release-id"
+        publicationId="publication-id"
         finalisingStatus="finalising"
         onFinalise={noop}
       />,
@@ -26,7 +29,10 @@ describe('ApiDataSetFinaliseBanner', () => {
   test('renders the action required banner when `draftVersionStatus` is `Mapping', () => {
     render(
       <ApiDataSetFinaliseBanner
-        changelogPath="/changelog"
+        dataSetId="data-set-id"
+        dataSetVersionId="data-set-version-id"
+        releaseId="release-id"
+        publicationId="publication-id"
         draftVersionStatus="Mapping"
         onFinalise={noop}
       />,
@@ -47,7 +53,10 @@ describe('ApiDataSetFinaliseBanner', () => {
     render(
       <MemoryRouter>
         <ApiDataSetFinaliseBanner
-          changelogPath="/changelog"
+          dataSetId="data-set-id"
+          dataSetVersionId="data-set-version-id"
+          releaseId="release-id"
+          publicationId="publication-id"
           draftVersionStatus="Draft"
           onFinalise={noop}
         />
@@ -67,7 +76,10 @@ describe('ApiDataSetFinaliseBanner', () => {
   test('renders the error banner when `finalisingStatus` is `finalised` and `draftVersionStatus` is `Draft', () => {
     render(
       <ApiDataSetFinaliseBanner
-        changelogPath="/changelog"
+        dataSetId="data-set-id"
+        dataSetVersionId="data-set-version-id"
+        releaseId="release-id"
+        publicationId="publication-id"
         draftVersionStatus="Failed"
         finalisingStatus="finalised"
         onFinalise={noop}
