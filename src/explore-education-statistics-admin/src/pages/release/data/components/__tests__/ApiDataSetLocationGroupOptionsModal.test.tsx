@@ -50,13 +50,13 @@ describe('ApiDataSetLocationGroupOptionsModal', () => {
     expect(items).toHaveLength(3);
 
     expect(items[0]).toHaveTextContent('Location 1');
-    expect(items[0]).toHaveTextContent('location-1-code');
+    expect(items[0]).toHaveTextContent('Code: location-1-code');
 
     expect(items[1]).toHaveTextContent('Location 2');
-    expect(items[1]).toHaveTextContent('location-2-code');
+    expect(items[1]).toHaveTextContent('Code: location-2-code');
 
     expect(items[2]).toHaveTextContent('Location 3');
-    expect(items[2]).toHaveTextContent('location-3-code');
+    expect(items[2]).toHaveTextContent('Code: location-3-code');
   });
 
   test('pagination works correctly', async () => {
@@ -91,10 +91,10 @@ describe('ApiDataSetLocationGroupOptionsModal', () => {
     expect(page1Items).toHaveLength(2);
 
     expect(page1Items[0]).toHaveTextContent('Location 1');
-    expect(page1Items[0]).toHaveTextContent('location-1-code');
+    expect(page1Items[0]).toHaveTextContent('Code: location-1-code');
 
     expect(page1Items[1]).toHaveTextContent('Location 2');
-    expect(page1Items[1]).toHaveTextContent('location-2-code');
+    expect(page1Items[1]).toHaveTextContent('Code: location-2-code');
 
     const pagination = within(modal.getByRole('navigation'));
 
@@ -123,6 +123,6 @@ describe('ApiDataSetLocationGroupOptionsModal', () => {
     expect(page2Items).toHaveLength(1);
 
     expect(page2Items[0]).toHaveTextContent('Location 3');
-    expect(page2Items[0]).toHaveTextContent('location-3-code');
+    expect(page2Items[0]).toHaveTextContent('Code: location-3-code');
   });
 });

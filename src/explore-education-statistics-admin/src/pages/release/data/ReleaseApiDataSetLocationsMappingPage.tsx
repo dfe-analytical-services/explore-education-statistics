@@ -7,7 +7,6 @@ import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDat
 import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
 import ApiDataSetNewLocationGroupsTable from '@admin/pages/release/data/components/ApiDataSetNewLocationGroupsTable';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
-import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
 import getApiDataSetLocationMappings, {
   AutoMappedLocation,
   LocationCandidateWithKey,
@@ -354,9 +353,9 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                     return (
                       <ApiDataSetMappableTable
                         key={level}
-                        candidateHint={candidate =>
-                          getApiDataSetLocationCodes(candidate)
-                        }
+                        candidateHint={candidate => (
+                          <ApiDataSetLocationCode location={candidate} />
+                        )}
                         candidateIsMajorMapping={(candidate, mapping) => {
                           return Object.entries(
                             omit(mapping.source, omittedDiffingFields),
@@ -491,9 +490,9 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                         key={level}
                       >
                         <ApiDataSetAutoMappedTable
-                          candidateHint={candidate =>
-                            getApiDataSetLocationCodes(candidate)
-                          }
+                          candidateHint={candidate => (
+                            <ApiDataSetLocationCode location={candidate} />
+                          )}
                           groupKey={level}
                           groupLabel={groupLabel}
                           itemLabel="location"

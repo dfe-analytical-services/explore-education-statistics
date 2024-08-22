@@ -214,9 +214,11 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).getAllByRole('row');
     const mappableRow2Cells = within(mappableRows[2]).getAllByRole('cell');
     expect(mappableRow2Cells[0]).toHaveTextContent('Location 3');
-    expect(mappableRow2Cells[0]).toHaveTextContent('location-3-code');
+    expect(mappableRow2Cells[0]).toHaveTextContent('Code: location-3-code');
     expect(mappableRow2Cells[1]).toHaveTextContent('Location 3 updated');
-    expect(mappableRow2Cells[1]).toHaveTextContent('location-3-code-updated');
+    expect(mappableRow2Cells[1]).toHaveTextContent(
+      'Code: location-3-code-updated',
+    );
 
     // new locations
     const newRows = within(
@@ -232,9 +234,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).getAllByRole('row');
     const autoMappedRow1Cells = within(autoMappedRows[1]).getAllByRole('cell');
     expect(autoMappedRow1Cells[0]).toHaveTextContent('Location 1');
-    expect(autoMappedRow1Cells[0]).toHaveTextContent('location-1-code');
+    expect(autoMappedRow1Cells[0]).toHaveTextContent('Code: location-1-code');
     expect(autoMappedRow1Cells[1]).toHaveTextContent('Location 1');
-    expect(autoMappedRow1Cells[1]).toHaveTextContent('location-1-code');
+    expect(autoMappedRow1Cells[1]).toHaveTextContent('Code: location-1-code');
   });
 
   test('sets the mappable type to major if the location code has changed', async () => {
@@ -256,9 +258,11 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).getAllByRole('row');
     const mappableRow2Cells = within(mappableRows[2]).getAllByRole('cell');
     expect(mappableRow2Cells[0]).toHaveTextContent('Location 3');
-    expect(mappableRow2Cells[0]).toHaveTextContent('location-3-code');
+    expect(mappableRow2Cells[0]).toHaveTextContent('Code: location-3-code');
     expect(mappableRow2Cells[1]).toHaveTextContent('Location 3 updated');
-    expect(mappableRow2Cells[1]).toHaveTextContent('location-3-code-updated');
+    expect(mappableRow2Cells[1]).toHaveTextContent(
+      'Code: location-3-code-updated',
+    );
     expect(mappableRow2Cells[2]).toHaveTextContent('Major');
   });
 

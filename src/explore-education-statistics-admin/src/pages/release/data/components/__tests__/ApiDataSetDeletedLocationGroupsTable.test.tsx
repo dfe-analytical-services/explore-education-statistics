@@ -143,13 +143,13 @@ describe('ApiDataSetDeletedLocationGroupsTable', () => {
     expect(optionItems).toHaveLength(3);
 
     expect(optionItems[0]).toHaveTextContent('Location option 1');
-    expect(optionItems[0]).toHaveTextContent('location-opt-1-code');
+    expect(optionItems[0]).toHaveTextContent('Code: location-opt-1-code');
 
     expect(optionItems[1]).toHaveTextContent('Location option 2');
-    expect(optionItems[1]).toHaveTextContent('location-opt-2-code');
+    expect(optionItems[1]).toHaveTextContent('Code: location-opt-2-code');
 
     expect(optionItems[2]).toHaveTextContent('Location option 3');
-    expect(optionItems[2]).toHaveTextContent('location-opt-3-code');
+    expect(optionItems[2]).toHaveTextContent('Code: location-opt-3-code');
 
     await user.click(screen.getByRole('button', { name: 'Close modal' }));
 
@@ -166,9 +166,9 @@ describe('ApiDataSetDeletedLocationGroupsTable', () => {
     expect(optionItems).toHaveLength(2);
 
     expect(optionItems[0]).toHaveTextContent('Location option 4');
-    expect(optionItems[0]).toHaveTextContent('location-opt-4-code');
+    expect(optionItems[0]).toHaveTextContent('Code: location-opt-4-code');
 
     expect(optionItems[1]).toHaveTextContent('Location option 5');
-    expect(optionItems[1]).toHaveTextContent('location-opt-5-code');
+    expect(optionItems[1]).toHaveTextContent('Code: location-opt-5-code');
   });
 });

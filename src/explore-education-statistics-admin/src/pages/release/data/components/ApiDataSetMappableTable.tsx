@@ -26,7 +26,7 @@ import classNames from 'classnames';
 interface Props {
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => string;
+  ) => ReactNode;
   candidateIsMajorMapping?: (
     candidate: LocationCandidateWithKey,
     mapping: LocationMappingWithKey,

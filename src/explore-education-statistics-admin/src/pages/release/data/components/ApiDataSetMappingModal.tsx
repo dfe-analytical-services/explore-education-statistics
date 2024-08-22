@@ -25,7 +25,7 @@ interface Props {
   candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => string;
+  ) => ReactNode;
   groupKey: string;
   itemLabel: string;
   mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
