@@ -203,7 +203,7 @@ def validate_environment_variables():
         assert os.getenv(env_var) is not None, f"Environment variable {env_var} is not set"
 
 
-# If running all tests, or admin, admin_and_public, admin_and_public_2 or seed_data suites,
+# If running all tests, or admin, admin_and_public, admin_and_public_2, public_api or seed_data suites,
 # these change data on environments and require test themes, test topics and user authentication.
 #
 # We check for both explicit forward slashes AND OS-specific separators here, as in Windows
@@ -217,6 +217,7 @@ def includes_data_changing_tests(arguments: argparse.Namespace):
         or arguments.tests == f"tests{os.sep}"
         or f"{os.sep}admin" in arguments.tests
         or "/admin" in arguments.tests
+        or f"{os.sep}public_api" in arguments.tests
         or f"{os.sep}seed_data" in arguments.tests
         or "/seed_data" in arguments.tests
     )

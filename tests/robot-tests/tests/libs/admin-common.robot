@@ -601,6 +601,27 @@ user waits until data upload displays importing
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
     user checks headed table body row contains    Status    Importing    ${section}    %{WAIT_DATA_FILE_IMPORT}
 
+user waits until large data upload is completed
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    ${FOLDER}=${FILES_DIR}
+    user clicks link    Data and files
+    user waits until page contains element    id:dataFileUploadForm-subjectTitle    %{WAIT_SMALL}
+    user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
+    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
+    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
+    user clicks button    Upload data files
+    user waits until page finishes loading
+    user waits for caches to expire
+    user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
+    user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
+    user scrolls to accordion section    ${SUBJECT_NAME}
+    user opens accordion section    ${SUBJECT_NAME}
+    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
+    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
+
 user waits until data upload is completed
     [Arguments]
     ...    ${SUBJECT_NAME}
