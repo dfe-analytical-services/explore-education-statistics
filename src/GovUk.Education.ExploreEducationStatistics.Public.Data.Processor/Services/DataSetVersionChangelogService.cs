@@ -223,8 +223,6 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
             })
             .ToList();
 
-        // check for duplicates. if a group has been deleted, don't need a changelog entry for the old options beneath it. BUT bear in mind, we still want to account for options which have been deleted, but their parent hasn't
-
         var locationOptionMetaDeletionsAndChanges = mappings.LocationMappingPlan
             .Levels
             .Where(locationGroupMappings => locationGroupMappings.Value.Candidates.Any()) // DON'T CREATE A CHANGELOG ENTRY FOR ANY LOCATION OPTIONS WHICH HAVE HAD THEIR ENTIRE LOCATION GROUP DELETED
