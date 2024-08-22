@@ -9,7 +9,13 @@
   }
 }
 
+.navItem {
+  margin-bottom: govuk-spacing(2) !important;
+}
+
 .subNav {
+  margin-bottom: govuk-spacing(2);
+  margin-top: govuk-spacing(2) !important;
   padding-left: govuk-spacing(4);
 }
 
