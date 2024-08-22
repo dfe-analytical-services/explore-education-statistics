@@ -2,7 +2,6 @@
 *** Settings ***
 Library             ../libs/admin_api.py
 Resource            ../libs/admin-common.robot
-Resource            ../libs/admin/manage-content-common.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -24,7 +23,7 @@ ${SUBJECT_NAME_5}=      UI test subject 5
 
 *** Test Cases ***
 Create publication
-   ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -175,6 +174,7 @@ Verify the contents inside the 'Draft API datasets' table
 Add release note for new release amendment
     user clicks link    Content
     user adds a release note    Test release note two
+
     ${date}    get current datetime    %-d %B %Y
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
@@ -280,9 +280,11 @@ Create a different version of API dataset (major version)
     user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]
     user clicks button in table cell    1    3    Create new version    xpath://table[@data-testid="live-api-data-sets"]
 
-     ${modal}=    user waits until modal is visible    Create a new API data set version
+    ${modal}=    user waits until modal is visible    Create a new API data set version
+
     user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_5}
     user clicks button    Confirm new data set version
+
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
@@ -291,6 +293,7 @@ Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
     user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd     v2.0    %{WAIT_LONG}
     user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
+
     ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
     should be equal as strings    ${mapping_status}    Action required
 
