@@ -18,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -159,7 +158,7 @@ public class DataSetVersionMappingService(
     private async Task UpdateVersionNumber(
         Guid nextDataSetVersionId,
         List<MappingType> locationMappingTypes,
-        List<FilterAndOptionMappingTypeDto> filterAndOptionMappingTypes,
+        List<FilterAndOptionMappingTypes> filterAndOptionMappingTypes,
         CancellationToken cancellationToken)
     {
         // Consider the current mappings to produce a major version change if any options from the
@@ -207,7 +206,7 @@ public class DataSetVersionMappingService(
     private async Task UpdateMappingCompleteFlags(
         Guid nextDataSetVersionId,
         List<MappingType> locationMappingTypes,
-        List<FilterAndOptionMappingTypeDto> filterAndOptionMappingTypes,
+        List<FilterAndOptionMappingTypes> filterAndOptionMappingTypes,
         CancellationToken cancellationToken)
     {
         // Find any location options that have a mapping type that indicates the user
@@ -237,7 +236,6 @@ public class DataSetVersionMappingService(
                 cancellationToken: cancellationToken);
     }
 
-#pragma warning disable EF1002
     private async Task<List<MappingType>> GetDistinctLocationOptionMappingTypes(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
@@ -245,11 +243,10 @@ public class DataSetVersionMappingService(
         var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
 
         // Find the distinct mapping types across all location options across all levels.
-        var types = await publicDataDbContext
-            .Set<JsonString>()
-            .FromSqlRaw(sql:
+        var types = await publicDataDbContext.Database
+            .SqlQueryRaw<string>(sql:
                 $"""
-                 SELECT DISTINCT OptionMappingType "{nameof(JsonString.StringValue)}" FROM (
+                 SELECT DISTINCT OptionMappingType "Value" FROM (
                      SELECT OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
                      jsonb_each(Mapping."{nameof(DataSetVersionMapping.LocationMappingPlan)}" -> '{nameof(LocationMappingPlan.Levels)}') Level,
                      jsonb_each(Level.value -> '{nameof(LocationLevelMappings.Mappings)}') OptionMapping,
@@ -261,13 +258,11 @@ public class DataSetVersionMappingService(
             .ToListAsync(cancellationToken);
 
         return types
-            .Select(jsonString => EnumUtil.GetFromEnumValue<MappingType>(jsonString.StringValue))
+            .Select(EnumUtil.GetFromEnumValue<MappingType>)
             .ToList();
     }
-#pragma warning restore EF1002
 
-#pragma warning disable EF1002
-    private async Task<List<FilterAndOptionMappingTypeDto>> GetDistinctFilterAndOptionMappingTypes(
+    private async Task<List<FilterAndOptionMappingTypes>> GetDistinctFilterAndOptionMappingTypes(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
     {
@@ -275,13 +270,12 @@ public class DataSetVersionMappingService(
 
         // Find all the distinct combinations of parent filters' mapping types against the distinct
         // mapping types of their children.
-        var typeCombinations = await publicDataDbContext
-            .Set<FilterAndOptionMappingTypeDto>()
-            .FromSqlRaw(sql:
-                $"""
+        var typeCombinations = await publicDataDbContext.Database
+            .SqlQueryRaw<FilterAndOptionMappingTypes>(
+                sql: $"""
                  SELECT DISTINCT 
-                     FilterMappingType "{nameof(FilterAndOptionMappingTypeDto.FilterMappingType)}",
-                     OptionMappingType "{nameof(FilterAndOptionMappingTypeDto.OptionMappingType)}" 
+                     FilterMappingType "{nameof(FilterAndOptionMappingTypes.FilterMappingTypeRaw)}",
+                     OptionMappingType "{nameof(FilterAndOptionMappingTypes.OptionMappingTypeRaw)}" 
                  FROM (
                      SELECT FilterMappingType, OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
                      jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" -> 'Mappings') FilterMapping,
@@ -296,7 +290,6 @@ public class DataSetVersionMappingService(
 
         return typeCombinations;
     }
-#pragma warning restore EF1002
 
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will validate that the chosen mapping candidates
@@ -593,5 +586,16 @@ public class DataSetVersionMappingService(
             .SingleOrNotFoundAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken);
+    }
+
+    private record FilterAndOptionMappingTypes
+    {
+        public required string FilterMappingTypeRaw { get; init; }
+
+        public required string OptionMappingTypeRaw { get; init; }
+
+        public MappingType FilterMappingType => EnumUtil.GetFromEnumValue<MappingType>(FilterMappingTypeRaw);
+
+        public MappingType OptionMappingType => EnumUtil.GetFromEnumValue<MappingType>(OptionMappingTypeRaw);
     }
 }
