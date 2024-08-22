@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -16,6 +11,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.PublicationsSortBy;
 
@@ -184,8 +184,8 @@ public class PublicationService : IPublicationService
         {
             Published =>
                 sortDirection == Asc
-                    ? queryable.OrderBy(result => result.Value.LatestPublishedReleaseVersion!.Published)
-                    : queryable.OrderByDescending(result => result.Value.LatestPublishedReleaseVersion!.Published),
+                    ? queryable.OrderBy(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value))
+                    : queryable.OrderByDescending(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value)),
             Relevance =>
                 sortDirection == Asc
                     ? queryable.OrderBy(result => result.Rank)
