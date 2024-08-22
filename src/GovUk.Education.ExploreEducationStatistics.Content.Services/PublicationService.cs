@@ -185,8 +185,8 @@ public class PublicationService : IPublicationService
         {
             Published =>
                 sortDirection == Asc
-                    ? queryable.OrderBy(result => result.Value.LatestPublishedReleaseVersion!.Published)
-                    : queryable.OrderByDescending(result => result.Value.LatestPublishedReleaseVersion!.Published),
+                    ? queryable.OrderBy(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value))
+                    : queryable.OrderByDescending(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value)),
             Relevance =>
                 sortDirection == Asc
                     ? queryable.OrderBy(result => result.Rank)
