@@ -163,11 +163,16 @@ const apiDataSetVersionService = {
       `/public-data/data-set-versions/${dataSetVersionId}/changes`,
     );
   },
-  updateNotes(data: {
-    dataSetVersionId: string;
-    notes: string;
-  }): Promise<ApiDataSetVersion> {
-    return client.patch(`/public-data/data-set-versions`, data);
+  updateNotes(
+    dataSetVersionId: string,
+    data: {
+      notes: string;
+    },
+  ): Promise<ApiDataSetVersion> {
+    return client.patch(
+      `/public-data/data-set-versions/${dataSetVersionId}`,
+      data,
+    );
   },
 } as const;
 

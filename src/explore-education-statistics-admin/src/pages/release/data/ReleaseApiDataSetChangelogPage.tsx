@@ -48,8 +48,7 @@ export default function ReleaseApiDataSetChangelogPage() {
   }, [dataSetVersion?.notes, isDraft, toggleShowForm]);
 
   const handleUpdateNotes = async ({ notes }: ApiDataSetNotesFormValues) => {
-    await apiDataSetVersionService.updateNotes({
-      dataSetVersionId,
+    await apiDataSetVersionService.updateNotes(dataSetVersionId, {
       notes,
     });
     refetchDataSet();

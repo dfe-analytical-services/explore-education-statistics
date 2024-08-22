@@ -177,10 +177,10 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
 
     await waitFor(() => {
       expect(apiDataSetVersionService.updateNotes).toHaveBeenCalledTimes(1);
-      expect(apiDataSetVersionService.updateNotes).toHaveBeenCalledWith({
-        dataSetVersionId: 'draft-version-id',
-        notes: 'Test notes',
-      });
+      expect(apiDataSetVersionService.updateNotes).toHaveBeenCalledWith(
+        'draft-version-id',
+        { notes: 'Test notes' },
+      );
     });
   });
 
