@@ -25,6 +25,22 @@ interface Props {
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
+// EES-5402 update this component to assign a boundary level per data set.
+//
+// Currently boundaryLevel is on chart options and applies to all data sets in the map.
+// This will need to be retained to use as a fallback for existing maps.
+//
+// For new maps we'll set the boundary level per data set, this could be stored in
+// a similar way to data groupings.
+// Data groupings are on map.dataSetConfigs, could add boundary level to these, e.g.
+// [
+//   {
+//     boundaryLevel: 15,
+//     dataGrouping: {...},
+//     dataSet: {...}
+//   }
+// ]
+
 export default function ChartBoundaryLevelsConfiguration({
   buttons,
   meta,
