@@ -44,7 +44,8 @@ describe('ApiDataSetNewFilterColumnsTable', () => {
     // Row 1
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('No mapping available');
-    expect(row1Cells[1]).toHaveTextContent('Filter 1 id: Filter1Key');
+    expect(row1Cells[1]).toHaveTextContent('Filter 1');
+    expect(row1Cells[1]).toHaveTextContent('ID: Filter1Key');
     expect(
       within(row1Cells[1]).getByRole('button', {
         name: 'View filter options',
@@ -55,7 +56,8 @@ describe('ApiDataSetNewFilterColumnsTable', () => {
     // Row 2
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('No mapping available');
-    expect(row2Cells[1]).toHaveTextContent('Filter 2 id: Filter2Key');
+    expect(row2Cells[1]).toHaveTextContent('Filter 2');
+    expect(row2Cells[1]).toHaveTextContent('ID: Filter2Key');
     expect(
       within(row2Cells[1]).getByRole('button', {
         name: 'View filter options',

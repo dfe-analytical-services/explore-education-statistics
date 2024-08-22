@@ -4,6 +4,8 @@ import getApiDataSetLocationMappings, {
   MappableLocation,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import testLocationsMapping from '@admin/pages/release/data/__data__/testLocationsMapping';
+import { LocationCandidate } from '@admin/services/apiDataSetVersionService';
+import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 
 describe('getApiDataSetLocationMappings', () => {
   test('returns the correct mappable locations grouped by level', () => {
@@ -260,5 +262,157 @@ describe('getApiDataSetLocationMappings', () => {
     expect(autoMappedLocations.englishDevolvedArea).toEqual(
       expectedEnglishDevolvedArea,
     );
+  });
+
+  test('returns the correct deleted location groups', () => {
+    const { deletedLocationGroups } = getApiDataSetLocationMappings({
+      levels: {
+        LocalAuthority: {
+          candidates: {
+            Location1Key: {
+              label: 'Location 1',
+              code: 'location-1-code',
+              oldCode: 'location-1-oldCode',
+            },
+            Location2Key: {
+              label: 'Location 2',
+              code: 'location-2-code',
+              oldCode: 'location-2-oldCode',
+            },
+          },
+          mappings: {},
+        },
+        Region: {
+          candidates: {},
+          mappings: {
+            Location3Key: {
+              candidateKey: 'Location3Key',
+              publicId: 'location-3-public-id',
+              type: 'AutoNone',
+              source: { label: 'Location 3', code: 'location-3-code' },
+            },
+            Location4Key: {
+              candidateKey: 'Location4Key',
+              publicId: 'location-4-public-id',
+              type: 'AutoNone',
+              source: { label: 'Location 4', code: 'location-4-code' },
+            },
+          },
+        },
+        School: {
+          candidates: {},
+          mappings: {
+            Location3Key: {
+              candidateKey: 'Location5Key',
+              publicId: 'location-5-public-id',
+              type: 'AutoNone',
+              source: {
+                label: 'Location 5',
+                urn: 'location-5-urn',
+                laEstab: 'location-5-laEstab',
+              },
+            },
+            Location4Key: {
+              candidateKey: 'Location6Key',
+              publicId: 'location-6-public-id',
+              type: 'AutoNone',
+              source: {
+                label: 'Location 6',
+                urn: 'location-6-urn',
+                laEstab: 'location-6-laEstab',
+              },
+            },
+          },
+        },
+      },
+    });
+
+    expect(deletedLocationGroups).toEqual<
+      Partial<Record<LocationLevelKey, LocationCandidate[]>>
+    >({
+      region: [
+        { code: 'location-3-code', label: 'Location 3' },
+        { code: 'location-4-code', label: 'Location 4' },
+      ],
+      school: [
+        {
+          label: 'Location 5',
+          urn: 'location-5-urn',
+          laEstab: 'location-5-laEstab',
+        },
+        {
+          label: 'Location 6',
+          urn: 'location-6-urn',
+          laEstab: 'location-6-laEstab',
+        },
+      ],
+    });
+  });
+
+  test('returns the correct new location groups', () => {
+    const { newLocationGroups } = getApiDataSetLocationMappings({
+      levels: {
+        LocalAuthority: {
+          candidates: {
+            Location1Key: {
+              label: 'Location 1',
+              code: 'location-1-code',
+              oldCode: 'location-1-oldCode',
+            },
+            Location2Key: {
+              label: 'Location 2',
+              code: 'location-2-code',
+              oldCode: 'location-2-oldCode',
+            },
+          },
+          mappings: {},
+        },
+        Region: {
+          candidates: {
+            Location1Key: { label: 'Location 3', code: 'location-3-code' },
+            Location2Key: { label: 'Location 4', code: 'location-4-code' },
+          },
+          mappings: {},
+        },
+        EnglishDevolvedArea: {
+          candidates: {},
+          mappings: {
+            Location3Key: {
+              candidateKey: 'Location5Key',
+              publicId: 'location-5-public-id',
+              type: 'AutoNone',
+              source: { label: 'Location 5', code: 'location-5-code' },
+            },
+            Location4Key: {
+              candidateKey: 'Location6Key',
+              publicId: 'location-6-public-id',
+              type: 'AutoNone',
+              source: { label: 'Location 6', code: 'location-6-code' },
+            },
+          },
+        },
+      },
+    });
+
+    expect(newLocationGroups).toEqual<
+      Partial<Record<LocationLevelKey, LocationCandidate[]>>
+    >({
+      localAuthority: [
+        {
+          code: 'location-1-code',
+          label: 'Location 1',
+          oldCode: 'location-1-oldCode',
+        },
+        {
+          code: 'location-2-code',
+          label: 'Location 2',
+          oldCode: 'location-2-oldCode',
+        },
+      ],
+      region: [
+        { code: 'location-3-code', label: 'Location 3' },
+        { code: 'location-4-code', label: 'Location 4' },
+      ],
+    });
   });
 });

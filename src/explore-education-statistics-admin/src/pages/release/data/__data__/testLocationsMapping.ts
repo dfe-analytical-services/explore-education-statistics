@@ -1,9 +1,12 @@
 import { LocationsMapping } from '@admin/services/apiDataSetVersionService';
-// localAuthority: autoMapped = 1 & 5, autoNone = 2, manualMapped = 3, manualNone = 4, new = 6 & 7
-// region: autoMapped = 8, manualMapped = 9 & 10, new: 11
-// englishDevolvedArea: autoMapped = 13 - 21
+
 const testLocationsMapping: LocationsMapping = {
   levels: {
+    // autoMapped = 1 & 5
+    // autoNone = 2
+    // manualMapped = 3
+    // manualNone = 4
+    // new = 6 & 7
     localAuthority: {
       candidates: {
         Location1Key: {
@@ -73,6 +76,9 @@ const testLocationsMapping: LocationsMapping = {
         },
       },
     },
+    // autoMapped = 8
+    // manualMapped = 9 & 10
+    // new: 11
     region: {
       candidates: {
         Location8Key: {
@@ -134,6 +140,7 @@ const testLocationsMapping: LocationsMapping = {
         },
       },
     },
+    // autoMapped = 13 - 15
     englishDevolvedArea: {
       candidates: {
         Location13Key: {
@@ -183,3 +190,81 @@ const testLocationsMapping: LocationsMapping = {
 };
 
 export default testLocationsMapping;
+
+export const testLocationsMappingGroups: LocationsMapping = {
+  levels: {
+    ...testLocationsMapping.levels,
+    // Group has been deleted
+    sponsor: {
+      candidates: {},
+      mappings: {
+        Location16Key: {
+          publicId: 'location-16-public-id',
+          source: {
+            label: 'Location 16',
+            code: 'location-16-code',
+          },
+          type: 'AutoNone',
+        },
+        Location17Key: {
+          publicId: 'location-17-public-id',
+          source: {
+            label: 'Location 17',
+            code: 'location-17-code',
+          },
+          type: 'AutoNone',
+        },
+      },
+    },
+    // Group has been deleted
+    localAuthorityDistrict: {
+      candidates: {},
+      mappings: {
+        Location18Key: {
+          publicId: 'location-18-public-id',
+          source: {
+            label: 'Location 18',
+            code: 'location-18-code',
+          },
+          type: 'AutoNone',
+        },
+        Location19Key: {
+          publicId: 'location-19-public-id',
+          source: {
+            label: 'Location 19',
+            code: 'location-19-code',
+          },
+          type: 'AutoNone',
+        },
+      },
+    },
+    // Group has been added
+    ward: {
+      candidates: {
+        Location20Key: {
+          label: 'Location 20',
+          code: 'location-20-code',
+        },
+        Location21Key: {
+          label: 'Location 21',
+          code: 'location-21-code',
+        },
+      },
+      mappings: {},
+    },
+    // Group has been added
+    opportunityArea: {
+      candidates: {
+        Location22Key: {
+          label: 'Location 22',
+          code: 'location-22-code',
+        },
+        Location23Key: {
+          label: 'Location 23',
+          code: 'location-23-code',
+        },
+      },
+      mappings: {},
+    },
+  },
+};
