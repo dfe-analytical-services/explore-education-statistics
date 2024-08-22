@@ -518,6 +518,19 @@ user clicks button
     ${button}=    user gets button element    ${text}    ${parent}
     user clicks element    ${button}
 
+user clicks button by indexing
+    [Arguments]    ${text}    ${index}=1
+    ${xpath}=    create button xpath    ${text}    ${index}
+    ${button}=    get webelement    ${xpath}
+    user clicks element   ${button}
+
+create button xpath
+    [Arguments]    ${text}    ${index}=1
+     ${xpath}=    Set Variable    (//button[text()='${text}'])[${index}]
+    [Return]    ${xpath}
+
+
+
 user waits until button is clickable
     [Arguments]    ${button_text}
     wait until element is visible    xpath=//button[text()="${button_text}"]
