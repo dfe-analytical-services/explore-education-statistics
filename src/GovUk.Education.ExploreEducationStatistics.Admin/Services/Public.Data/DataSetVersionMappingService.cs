@@ -244,15 +244,16 @@ public class DataSetVersionMappingService(
 
         // Find the distinct mapping types across all location options across all levels.
         var types = await publicDataDbContext.Database
-            .SqlQueryRaw<string>(sql:
+            .SqlQueryRaw<string>(
                 $"""
-                 SELECT DISTINCT OptionMappingType "Value" FROM (
-                     SELECT OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
-                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.LocationMappingPlan)}" -> '{nameof(LocationMappingPlan.Levels)}') Level,
+                 SELECT DISTINCT OptionMappingType "Value" 
+                 FROM 
+                     "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.LocationMappingPlan)}" 
+                                    -> '{nameof(LocationMappingPlan.Levels)}') Level,
                      jsonb_each(Level.value -> '{nameof(LocationLevelMappings.Mappings)}') OptionMapping,
                      jsonb_extract_path_text(OptionMapping.value, '{nameof(LocationOptionMapping.Type)}') OptionMappingType
-                     WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
-                 )
+                 WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
                  """,
                 parameters: [targetDataSetVersionIdParam])
             .ToListAsync(cancellationToken);
@@ -272,19 +273,23 @@ public class DataSetVersionMappingService(
         // mapping types of their children.
         var typeCombinations = await publicDataDbContext.Database
             .SqlQueryRaw<FilterAndOptionMappingTypes>(
-                sql: $"""
-                 SELECT DISTINCT 
-                     FilterMappingType "{nameof(FilterAndOptionMappingTypes.FilterMappingTypeRaw)}",
-                     OptionMappingType "{nameof(FilterAndOptionMappingTypes.OptionMappingTypeRaw)}" 
-                 FROM (
-                     SELECT FilterMappingType, OptionMappingType FROM "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
-                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" -> 'Mappings') FilterMapping,
-                     jsonb_each(FilterMapping.value -> '{nameof(FilterMapping.OptionMappings)}') OptionMapping,
-                     jsonb_extract_path_text(FilterMapping.value, '{nameof(FilterMapping.Type)}') FilterMappingType,
-                     jsonb_extract_path_text(OptionMapping.value, '{nameof(FilterOptionMapping.Type)}') OptionMappingType
-                     WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
-                 )
-                 """,
+                $"""
+                SELECT DISTINCT 
+                    FilterMappingType "{nameof(FilterAndOptionMappingTypes.FilterMappingTypeRaw)}",
+                    OptionMappingType "{nameof(FilterAndOptionMappingTypes.OptionMappingTypeRaw)}" 
+                FROM (
+                    SELECT FilterMappingType, 
+                           OptionMappingType 
+                    FROM 
+                        "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                        jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" 
+                                       -> '{nameof(FilterMappingPlan.Mappings)}') FilterMapping,
+                        jsonb_each(FilterMapping.value -> '{nameof(FilterMapping.OptionMappings)}') OptionMapping,
+                        jsonb_extract_path_text(FilterMapping.value, '{nameof(FilterMapping.Type)}') FilterMappingType,
+                        jsonb_extract_path_text(OptionMapping.value, '{nameof(FilterOptionMapping.Type)}') OptionMappingType
+                    WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
+                )
+                """,
                 parameters: [targetDataSetVersionIdParam])
             .ToListAsync(cancellationToken);
 
