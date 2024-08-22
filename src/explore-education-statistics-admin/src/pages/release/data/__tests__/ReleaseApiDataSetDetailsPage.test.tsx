@@ -141,6 +141,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(
       screen.queryByRole('heading', { name: 'Latest live version details' }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Draft version tasks' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('map-locations-task')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('map-filters-task')).not.toBeInTheDocument();
   });
 
   test('renders correctly with processed draft version only', async () => {
@@ -182,6 +188,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(
       screen.queryByRole('heading', { name: 'Latest live version details' }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Draft version tasks' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('map-locations-task')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('map-filters-task')).not.toBeInTheDocument();
   });
 
   test('renders correctly with latest live version only', async () => {
@@ -225,15 +237,25 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(
       screen.queryByRole('button', { name: 'Remove draft version' }),
     ).not.toBeInTheDocument();
+
     expect(
       screen.queryByRole('heading', { name: 'Draft version details' }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Draft version tasks' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('map-locations-task')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('map-filters-task')).not.toBeInTheDocument();
   });
 
   test('renders correctly with draft and latest live version', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
-      draftVersion: testDraftVersion,
+      draftVersion: {
+        ...testDraftVersion,
+        mappingStatus: { filtersComplete: false, locationsComplete: false },
+      },
       latestLiveVersion: testLiveVersion,
     });
 
@@ -242,6 +264,30 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(
       await screen.findByText('Draft version details'),
     ).toBeInTheDocument();
+
+    // Tasks
+
+    expect(
+      screen.getByRole('heading', { name: 'Draft version tasks' }),
+    ).toBeInTheDocument();
+
+    const mapLocationsTask = within(screen.getByTestId('map-locations-task'));
+    expect(
+      mapLocationsTask.getByRole('link', { name: 'Map locations' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/locations-mapping',
+    );
+    expect(mapLocationsTask.getByText('Incomplete')).toBeInTheDocument();
+
+    const mapFiltersTask = within(screen.getByTestId('map-filters-task'));
+    expect(
+      mapFiltersTask.getByRole('link', { name: 'Map filters' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/filters-mapping',
+    );
+    expect(mapFiltersTask.getByText('Incomplete')).toBeInTheDocument();
 
     // Draft version
 
@@ -437,6 +483,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       expect(
         banner.getByRole('button', { name: 'Finalise this data set version' }),
       ).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Draft version tasks' }),
+      ).toBeInTheDocument();
     });
 
     test('successfully finalised', async () => {
@@ -503,6 +552,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         }),
       ).not.toBeInTheDocument();
 
+      expect(
+        screen.queryByRole('heading', { name: 'Draft version tasks' }),
+      ).not.toBeInTheDocument();
+
       jest.runOnlyPendingTimers();
 
       await waitFor(() => {
@@ -524,6 +577,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           name: 'Finalise this data set version',
         }),
       ).not.toBeInTheDocument();
+
+      expect(
+        screen.getByRole('heading', { name: 'Draft version tasks' }),
+      ).toBeInTheDocument();
     });
 
     test('finalising failed', async () => {
@@ -599,6 +656,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       expect(
         banner.getByText('Data set version finalisation failed'),
       ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('heading', { name: 'Draft version tasks' }),
+      ).not.toBeInTheDocument();
     });
   });
 

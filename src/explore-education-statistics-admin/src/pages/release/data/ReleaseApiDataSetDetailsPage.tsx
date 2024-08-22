@@ -200,6 +200,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const showDraftVersionTasks =
     finalisingStatus !== 'finalising' &&
+    dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
 
