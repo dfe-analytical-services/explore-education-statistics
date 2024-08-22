@@ -28,20 +28,18 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         // We use the COALESCE function below to ensure that we're testing the existence of
         // the given key against a non-null JSON fragment. Without this, an exception is thrown
         // whereas we are wanting to return false. 
-        var response = await context
-            .Set<JsonBool>()
-            .FromSqlRaw(
+        var result = await context.Database
+            .SqlQueryRaw<bool>(
                 sql: $"""
                       SELECT COALESCE("{request.JsonbColumnName}" #> @jsonPath, '[]'::jsonb)
-                      ? @keyValue "{nameof(JsonBool.BoolValue)}"
+                      ? @keyValue "Value"
                       FROM "{request.TableName}"
                       WHERE "{request.IdColumnName}" = @rowId
                       """,
                 parameters: [jsonPathParam, keyValueParam, rowIdParam])
             .SingleOrDefaultAsync(cancellationToken);
 
-        return response?.BoolValue is not null
-               && JsonSerializer.Deserialize<bool>(response.BoolValue);
+        return result;
     }
 #pragma warning restore EF1002
 
@@ -56,19 +54,18 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         var jsonPathParam = new NpgsqlParameter("jsonPath", request.PathSegments);
         var rowIdParam = new NpgsqlParameter("rowId", request.RowId);
 
-        var response = await context
-            .Set<JsonFragment>()
-            .FromSqlRaw(
+        var result = await context.Database
+            .SqlQueryRaw<string>(
                 sql: $"""
-                      SELECT "{request.JsonbColumnName}" #> @jsonPath "{nameof(JsonFragment.JsonValue)}"
+                      SELECT "{request.JsonbColumnName}" #> @jsonPath "Value"
                       FROM "{request.TableName}"
                       WHERE "{request.IdColumnName}" = @rowId
                       """,
                 parameters: [jsonPathParam, rowIdParam])
             .SingleOrDefaultAsync(cancellationToken);
 
-        return response?.JsonValue is not null
-            ? JsonSerializer.Deserialize<TResponse>(response.JsonValue)
+        return result is not null
+            ? JsonSerializer.Deserialize<TResponse>(result)
             : null;
     }
 #pragma warning restore EF1002
