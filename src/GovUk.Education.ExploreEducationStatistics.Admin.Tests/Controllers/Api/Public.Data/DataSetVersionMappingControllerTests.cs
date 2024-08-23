@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -256,8 +255,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             List<LocationMappingUpdateRequest> updates =
             [
                 new()
@@ -277,8 +274,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             var viewModel = response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
@@ -325,10 +321,10 @@ public abstract class DataSetVersionMappingControllerTests(
             // that were updated.
             viewModel.AssertDeepEqualTo(expectedUpdateResponse, ignoreCollectionOrders: true);
 
-            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             var expectedFullMappings = new Dictionary<GeographicLevel, LocationLevelMappings>
             {
@@ -488,8 +484,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "target-location-1-key"
                 : null;
@@ -507,14 +501,13 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the LocationMappingsComplete flag as expected given
             // the combination of the requested mapping update and the existing mapping that is untouched. 
@@ -613,8 +606,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "target-location-1-key"
                 : null;
@@ -632,15 +623,14 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next data set version correctly. 
             Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
@@ -732,8 +722,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             List<LocationMappingUpdateRequest> updates =
             [
                 // This mapping exists.
@@ -764,8 +752,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -781,9 +768,9 @@ public abstract class DataSetVersionMappingControllerTests(
                 expectedPath: "updates[2].sourceKey",
                 expectedCode: nameof(ValidationMessages.DataSetVersionMappingSourcePathDoesNotExist));
 
-            var retrievedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var retrievedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
@@ -866,8 +853,6 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
-            var client = BuildApp().CreateClient();
-
             List<LocationMappingUpdateRequest> updates =
             [
                 // This candidate exists.
@@ -906,8 +891,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -923,9 +907,9 @@ public abstract class DataSetVersionMappingControllerTests(
 
             Assert.Equal(2, validationProblem.Errors.Count);
 
-            var retrievedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var retrievedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
@@ -939,8 +923,8 @@ public abstract class DataSetVersionMappingControllerTests(
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
             var response = await ApplyBatchLocationMappingUpdates(
-                Guid.NewGuid(),
-                new List<LocationMappingUpdateRequest>(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates: [],
                 client);
 
             response.AssertForbidden();
@@ -949,12 +933,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task DataSetVersionMappingDoesNotExist_Returns404()
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchLocationMappingUpdates(
-                Guid.NewGuid(),
-                new List<LocationMappingUpdateRequest>(),
-                client);
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates: []);
 
             response.AssertNotFound();
         }
@@ -962,14 +943,12 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task EmptyRequiredFields_Return400()
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchLocationMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new LocationMappingUpdateRequest()
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Equal(3, validationProblem.Errors.Count);
@@ -983,10 +962,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [InlineData(MappingType.ManualMapped, "")]
         public async Task MappingTypeExpectsCandidateKey_Returns400(MappingType type, string? candidateKeyValue)
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchLocationMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new LocationMappingUpdateRequest
                     {
@@ -995,8 +973,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         Type = type,
                         CandidateKey = candidateKeyValue
                     }
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
@@ -1010,10 +987,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [InlineData(MappingType.ManualNone)]
         public async Task MappingTypeDoeNotExpectCandidateKey_Returns400(MappingType type)
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchLocationMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new LocationMappingUpdateRequest
                     {
@@ -1022,8 +998,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         Type = type,
                         CandidateKey = "target-location-1"
                     }
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
@@ -1039,10 +1014,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [InlineData(MappingType.AutoNone)]
         public async Task InvalidMappingTypeForManualInteraction_Returns400(MappingType type)
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchLocationMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new LocationMappingUpdateRequest
                     {
@@ -1051,8 +1025,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         Type = type,
                         CandidateKey = null
                     }
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
@@ -1141,11 +1114,8 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
-            var client = BuildApp().CreateClient();
-
             var response = await GetFilterMappings(
-                nextDataSetVersionId: nextDataSetVersion.Id,
-                client);
+                nextDataSetVersionId: nextDataSetVersion.Id);
 
             var retrievedMappings = response.AssertOk<FilterMappingPlan>();
 
@@ -1161,8 +1131,8 @@ public abstract class DataSetVersionMappingControllerTests(
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
             var response = await GetFilterMappings(
-                Guid.NewGuid(),
-                client);
+                nextDataSetVersionId: Guid.NewGuid(),
+                client: client);
 
             response.AssertForbidden();
         }
@@ -1170,11 +1140,7 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task DataSetVersionMappingDoesNotExist_Returns404()
         {
-            var client = BuildApp().CreateClient();
-
-            var response = await GetFilterMappings(
-                Guid.NewGuid(),
-                client);
+            var response = await GetFilterMappings(Guid.NewGuid());
 
             response.AssertNotFound();
         }
@@ -1267,8 +1233,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             List<FilterOptionMappingUpdateRequest> updates =
             [
                 new()
@@ -1288,8 +1252,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             var viewModel = response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
@@ -1328,10 +1291,10 @@ public abstract class DataSetVersionMappingControllerTests(
             // that were updated.
             viewModel.AssertDeepEqualTo(expectedUpdateResponse, ignoreCollectionOrders: true);
 
-            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(mapping => mapping.TargetDataSetVersion)
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             var expectedFullMappings = new Dictionary<string, FilterMapping>
             {
@@ -1487,8 +1450,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
                 : null;
@@ -1506,14 +1467,13 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the LocationMappingsComplete flag as expected given the
             // combination of the requested mapping update and the existing mapping that is untouched. 
@@ -1606,8 +1566,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
                 : null;
@@ -1625,15 +1583,14 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next version number as expected. 
             Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
@@ -1721,8 +1678,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var client = BuildApp().CreateClient();
-
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
                 : null;
@@ -1740,15 +1695,14 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next version number as a major change,
             // as filter options that were in the source data set version no longer appear in the
@@ -1814,8 +1768,6 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
-            var client = BuildApp().CreateClient();
-
             List<FilterOptionMappingUpdateRequest> updates =
             [
                 // This mapping exists.
@@ -1838,8 +1790,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1851,9 +1802,9 @@ public abstract class DataSetVersionMappingControllerTests(
 
             Assert.Single(validationProblem.Errors);
 
-            var retrievedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var retrievedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
@@ -1927,8 +1878,6 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
-            var client = BuildApp().CreateClient();
-
             List<FilterOptionMappingUpdateRequest> updates =
             [
                 // This candidate exists.
@@ -1967,8 +1916,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1984,9 +1932,9 @@ public abstract class DataSetVersionMappingControllerTests(
 
             Assert.Equal(2, validationProblem.Errors.Count);
 
-            var retrievedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var retrievedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
@@ -2048,8 +1996,6 @@ public abstract class DataSetVersionMappingControllerTests(
                 context.DataSetVersionMappings.Add(mappings);
             });
 
-            var client = BuildApp().CreateClient();
-
             List<FilterOptionMappingUpdateRequest> updates =
             [
                 // This candidate exists, but the filter that owns "filter-1-option-1-key" has not itself
@@ -2065,8 +2011,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                updates: updates,
-                client);
+                updates: updates);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -2078,9 +2023,9 @@ public abstract class DataSetVersionMappingControllerTests(
 
             Assert.Single(validationProblem.Errors);
 
-            var retrievedMappings = TestApp.GetDbContext<PublicDataDbContext>()
+            var retrievedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Single(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
@@ -2094,9 +2039,9 @@ public abstract class DataSetVersionMappingControllerTests(
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
             var response = await ApplyBatchFilterOptionMappingUpdates(
-                Guid.NewGuid(),
-                new List<FilterOptionMappingUpdateRequest>(),
-                client);
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates: [],
+                client: client);
 
             response.AssertForbidden();
         }
@@ -2104,12 +2049,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task DataSetVersionMappingDoesNotExist_Returns404()
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchFilterOptionMappingUpdates(
-                Guid.NewGuid(),
-                new List<FilterOptionMappingUpdateRequest>(),
-                client);
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates: []);
 
             response.AssertNotFound();
         }
@@ -2117,14 +2059,12 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task EmptyRequiredFields_Return400()
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchFilterOptionMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new FilterOptionMappingUpdateRequest()
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Equal(3, validationProblem.Errors.Count);
@@ -2138,10 +2078,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [InlineData(MappingType.ManualMapped, "")]
         public async Task MappingTypeExpectsCandidateKey_Returns400(MappingType type, string? candidateKeyValue)
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchFilterOptionMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new FilterOptionMappingUpdateRequest
                     {
@@ -2150,8 +2089,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         Type = type,
                         CandidateKey = candidateKeyValue
                     }
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -2167,10 +2105,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [InlineData(MappingType.ManualNone)]
         public async Task MappingTypeDoeNotExpectCandidateKey_Returns400(MappingType type)
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchFilterOptionMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new FilterOptionMappingUpdateRequest
                     {
@@ -2179,8 +2116,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         Type = type,
                         CandidateKey = "target-location-1"
                     }
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -2198,10 +2134,9 @@ public abstract class DataSetVersionMappingControllerTests(
         [InlineData(MappingType.AutoNone)]
         public async Task InvalidMappingTypeForManualInteraction_Returns400(MappingType type)
         {
-            var client = BuildApp().CreateClient();
-
             var response = await ApplyBatchFilterOptionMappingUpdates(
-                Guid.NewGuid(),
+                nextDataSetVersionId: Guid.NewGuid(),
+                updates:
                 [
                     new FilterOptionMappingUpdateRequest
                     {
@@ -2210,8 +2145,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         Type = type,
                         CandidateKey = null
                     }
-                ],
-                client);
+                ]);
 
             var validationProblem = response.AssertValidationProblem();
 
