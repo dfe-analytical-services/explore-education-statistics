@@ -260,7 +260,8 @@ internal class DataSetService(
             dataSetVersion.LocationMetas = await publicDataDbContext.LocationMetas
                 .AsNoTracking()
                 .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-                .Include(lm => lm.Options)
+                .Include(lm => lm.OptionLinks)
+                .ThenInclude(l => l.Option)
                 .ToListAsync(cancellationToken: cancellationToken);
         }
 
