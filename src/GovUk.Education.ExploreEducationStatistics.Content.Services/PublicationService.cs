@@ -185,8 +185,12 @@ public class PublicationService : IPublicationService
         {
             Published =>
                 sortDirection == Asc
-                    ? queryable.OrderBy(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value))
-                    : queryable.OrderByDescending(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value)),
+                    ? queryable
+                        .OrderBy(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value))
+                        .ThenByReleaseType()
+                    : queryable
+                        .OrderByDescending(result => DateOnly.FromDateTime(result.Value.LatestPublishedReleaseVersion!.Published!.Value))
+                        .ThenByReleaseType(),
             Relevance =>
                 sortDirection == Asc
                     ? queryable.OrderBy(result => result.Rank)
@@ -198,10 +202,8 @@ public class PublicationService : IPublicationService
             _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, message: null)
         };
 
-        // Order by release type, then publication ID to provide a stable sort order
-        orderedQueryable = orderedQueryable
-            .ThenByReleaseType()!
-            .ThenBy(result => result.Value.Id);
+        // Then sort by publication id to provide a stable sort order
+        orderedQueryable = orderedQueryable.ThenBy(result => result.Value.Id);
 
         // Get the total results count for the paginated response
         var totalResults = await orderedQueryable.CountAsync();
