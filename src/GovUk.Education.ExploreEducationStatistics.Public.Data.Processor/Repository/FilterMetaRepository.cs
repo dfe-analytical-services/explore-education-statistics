@@ -135,7 +135,7 @@ public class FilterMetaRepository(
                             publicIdMappings: publicIdMappings,
                             filter: meta,
                             option: option,
-                            defaultPublicIdFn: () => 
+                            defaultPublicIdFn: () =>
                                 SqidEncoder.Encode(startIndex + publicIdsGeneratedFromSequence++)),
                         MetaId = meta.Id,
                         OptionId = option.Id
@@ -260,7 +260,7 @@ public class FilterMetaRepository(
         return publicIdMappings
                    .GetPublicIdForFilterOptionCandidate(
                        filterKey: MappingKeyFunctions.FilterKeyGenerator(filter),
-                       MappingKeyFunctions.FilterOptionKeyGenerator(option))
+                       MappingKeyFunctions.FilterOptionMetaKeyGenerator(option))
                ?? defaultPublicIdFn.Invoke();
     }
 

@@ -10,7 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
+using ValidationMessages =
+    GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
@@ -155,7 +156,7 @@ internal class DataSetVersionMappingService(
             .OnSuccessCombineWith(nextDataSetVersion =>
                 GetImportInManualMappingStage(request, nextDataSetVersion));
     }
-    
+
     private static Either<ActionResult, DataSetVersionImport> GetImportInManualMappingStage(
         NextDataSetVersionCompleteImportRequest request,
         DataSetVersion nextDataSetVersion)
@@ -188,7 +189,7 @@ internal class DataSetVersionMappingService(
         if (nextVersion is null)
         {
             return ValidationUtils.NotFoundResult<DataSetVersion, Guid>(
-                request.DataSetVersionId, 
+                request.DataSetVersionId,
                 nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst());
         }
 
@@ -325,7 +326,7 @@ internal class DataSetVersionMappingService(
         }
     }
 
-    private LocationMappingPlan CreateLocationMappings(
+    private static LocationMappingPlan CreateLocationMappings(
         List<LocationMeta> sourceLocationMeta,
         IDictionary<LocationMeta, List<LocationOptionMetaRow>> targetLocationMeta)
     {
@@ -345,13 +346,13 @@ internal class DataSetVersionMappingService(
                     return new LocationLevelMappings
                     {
                         Mappings = level
-                            .Options
-                            .Select(option => option.ToRow())
+                            .OptionLinks
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
-                                elementSelector: option => new LocationOptionMapping
+                                keySelector: MappingKeyFunctions.LocationOptionMetaLinkKeyGenerator,
+                                elementSelector: link => new LocationOptionMapping
                                 {
-                                    Source = CreateLocationOptionFromMetaRow(option)
+                                    PublicId = link.PublicId,
+                                    Source = CreateLocationOptionFromMetaLink(link)
                                 }),
                         Candidates = candidatesForLevel
                             .ToDictionary(
@@ -391,7 +392,7 @@ internal class DataSetVersionMappingService(
         };
     }
 
-    private FilterMappingPlan CreateFilterMappings(
+    private static FilterMappingPlan CreateFilterMappings(
         List<FilterMeta> sourceFilterMeta,
         IDictionary<FilterMeta, List<FilterOptionMeta>> targetFilterMeta)
     {
@@ -403,11 +404,15 @@ internal class DataSetVersionMappingService(
                     {
                         Source = new MappableFilter { Label = filter.Label },
                         OptionMappings = filter
-                            .Options
+                            .OptionLinks
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
-                                elementSelector: option =>
-                                    new FilterOptionMapping { Source = CreateFilterOptionFromMetaRow(option) })
+                                keySelector: MappingKeyFunctions.FilterOptionMetaLinkKeyGenerator,
+                                elementSelector: link =>
+                                    new FilterOptionMapping
+                                    {
+                                        PublicId = link.PublicId,
+                                        Source = CreateFilterOptionFromMetaLink(link)
+                                    })
                     });
 
         var filterTargets = targetFilterMeta
@@ -422,8 +427,8 @@ internal class DataSetVersionMappingService(
                         Label = meta.filterMeta.Label,
                         Options = meta.optionsMeta
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
-                                elementSelector: CreateFilterOptionFromMetaRow)
+                                keySelector: MappingKeyFunctions.FilterOptionMetaKeyGenerator,
+                                elementSelector: CreateFilterOptionFromMeta)
                     });
 
         var filters = new FilterMappingPlan
@@ -433,6 +438,11 @@ internal class DataSetVersionMappingService(
         };
 
         return filters;
+    }
+
+    private static MappableLocationOption CreateLocationOptionFromMetaLink(LocationOptionMetaLink link)
+    {
+        return CreateLocationOptionFromMetaRow(link.Option.ToRow());
     }
 
     private static MappableLocationOption CreateLocationOptionFromMetaRow(LocationOptionMetaRow option)
@@ -448,9 +458,14 @@ internal class DataSetVersionMappingService(
         };
     }
 
-    private static MappableFilterOption CreateFilterOptionFromMetaRow(FilterOptionMeta option)
+    private static MappableFilterOption CreateFilterOptionFromMeta(FilterOptionMeta option)
     {
         return new MappableFilterOption { Label = option.Label };
+    }
+
+    private static MappableFilterOption CreateFilterOptionFromMetaLink(FilterOptionMetaLink link)
+    {
+        return CreateFilterOptionFromMeta(link.Option);
     }
 
     private async Task<List<LocationMeta>> GetLocationMeta(
@@ -460,18 +475,20 @@ internal class DataSetVersionMappingService(
         return await publicDataDbContext
             .LocationMetas
             .AsNoTracking()
-            .Include(levelMeta => levelMeta.Options)
+            .Include(meta => meta.OptionLinks)
+            .ThenInclude(link => link.Option)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }
 
-    private async Task<List<FilterMeta>> GetFilterMeta(Guid sourceVersionId, CancellationToken cancellationToken)
+    private async Task<List<FilterMeta>> GetFilterMeta(Guid dataSetVersionId, CancellationToken cancellationToken)
     {
         return await publicDataDbContext
             .FilterMetas
             .AsNoTracking()
-            .Include(filterMeta => filterMeta.Options)
-            .Where(meta => meta.DataSetVersionId == sourceVersionId)
+            .Include(meta => meta.OptionLinks)
+            .ThenInclude(link => link.Option)
+            .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }
 

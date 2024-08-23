@@ -29,7 +29,7 @@ public static class FilterMappingPlanGeneratorExtensions
             sourceFilter.Options.ForEach(option =>
             {
                 filterMappingGenerator.AddOptionMapping(
-                    sourceKey: MappingKeyFunctions.FilterOptionKeyGenerator(option),
+                    sourceKey: MappingKeyFunctions.FilterOptionMetaKeyGenerator(option),
                     fixture
                         .DefaultFilterOptionMapping()
                         .WithSource(fixture
@@ -52,7 +52,7 @@ public static class FilterMappingPlanGeneratorExtensions
             targetFilter.Options.ForEach(option =>
             {
                 filterCandidateGenerator.AddOptionCandidate(
-                    targetKey: MappingKeyFunctions.FilterOptionKeyGenerator(option),
+                    targetKey: MappingKeyFunctions.FilterOptionMetaKeyGenerator(option),
                     fixture
                         .DefaultMappableFilterOption()
                         .WithLabel(option.Label));

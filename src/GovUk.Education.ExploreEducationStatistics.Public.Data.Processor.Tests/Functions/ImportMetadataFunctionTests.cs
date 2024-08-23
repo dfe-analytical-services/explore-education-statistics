@@ -192,13 +192,13 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .LocationMappingPlanFromLocationMeta(sourceLocations: testData.ExpectedLocations));
-            
+
             var random = new Random();
 
-            mappings.LocationMappingPlan.Levels.ForEach(level => 
-                level.Value.Mappings.ForEach(mapping => 
-                    mapping.Value.Type = random.Next(1) == 0 
-                        ? MappingType.AutoNone 
+            mappings.LocationMappingPlan.Levels.ForEach(level =>
+                level.Value.Mappings.ForEach(mapping =>
+                    mapping.Value.Type = random.Next(1) == 0
+                        ? MappingType.AutoNone
                         : MappingType.ManualNone));
 
             // Amend a couple of arbitrary mappings to identify some candidates.
@@ -222,7 +222,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 Type = MappingType.ManualMapped,
                 CandidateKey = mappedOption2Key
             };
-            
+
             await AddTestData<PublicDataDbContext>(context =>
             {
                 context.DataSetVersionMappings.Add(mappings);
@@ -398,14 +398,14 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             {
                 PublicId = "option-1-public-id",
                 Type = MappingType.AutoMapped,
-                CandidateKey = MappingKeyFunctions.FilterOptionKeyGenerator(mappedOption1)
+                CandidateKey = MappingKeyFunctions.FilterOptionMetaKeyGenerator(mappedOption1)
             };
 
             var option2Mapping = new FilterOptionMapping
             {
                 PublicId = "option-2-public-id",
                 Type = MappingType.ManualMapped,
-                CandidateKey = MappingKeyFunctions.FilterOptionKeyGenerator(mappedOption2)
+                CandidateKey = MappingKeyFunctions.FilterOptionMetaKeyGenerator(mappedOption2)
             };
 
             var i = 0;
@@ -426,13 +426,13 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                                 OptionMappings = filter
                                     .Options
                                     .ToDictionary(
-                                        keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
+                                        keySelector: MappingKeyFunctions.FilterOptionMetaKeyGenerator,
                                         elementSelector: option =>
                                             option == mappedOption1 ? option1Mapping
                                             : option == mappedOption2 ? option2Mapping
                                             : new FilterOptionMapping
                                             {
-                                                Type = i++ % 2 == 0 
+                                                Type = i++ % 2 == 0
                                                     ? MappingType.AutoNone
                                                     : MappingType.ManualNone
                                             })
