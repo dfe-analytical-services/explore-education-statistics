@@ -25,8 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithReleases(_dataFixture
                     .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var userReleaseRole1 = new UserReleaseRole
             {

@@ -388,17 +388,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var (theme1, theme2) = _dataFixture
                     .DefaultTheme()
-                    .ForIndex(0, themeSetter => themeSetter.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .ForIndex(0, s => s.SetPublications(ListOf(publication1)))
-                        .ForIndex(1, s => s.SetPublications(ListOf(publication2)))
-                        .Generate(2)))
-                    .ForIndex(1, themeSetter => themeSetter.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .ForIndex(0, s => s.SetPublications(ListOf(publication3)))
-                        .Generate(1)))
-                    .Generate(2)
-                    .ToTuple2();
+                    .ForIndex(0,
+                        themeSetter => themeSetter.SetTopics(_dataFixture
+                            .DefaultTopic()
+                            .ForIndex(0, s => s.SetPublications(ListOf(publication1)))
+                            .ForIndex(1, s => s.SetPublications(ListOf(publication2)))
+                            .Generate(2)))
+                    .ForIndex(1,
+                        themeSetter => themeSetter.SetTopics(_dataFixture
+                            .DefaultTopic()
+                            .ForIndex(0, s => s.SetPublications(ListOf(publication3)))
+                            .Generate(1)))
+                    .GenerateTuple2();
 
                 var contextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryContentDbContext(contextId))
@@ -891,8 +892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .ForIndex(1, s => s.SetSupersededBy(supersedingPublication))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 Theme theme = _dataFixture
                     .DefaultTheme()

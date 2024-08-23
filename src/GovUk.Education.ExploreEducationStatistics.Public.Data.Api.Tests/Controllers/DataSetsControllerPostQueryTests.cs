@@ -7,6 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -32,12 +34,8 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     public class AccessTests(TestApplicationFactory testApp) : DataSetsControllerPostQueryTests(testApp)
     {
         [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
         public async Task VersionNotAvailable_Returns403(DataSetVersionStatus versionStatus)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
@@ -54,8 +52,8 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
         public async Task VersionAvailable_Returns200(DataSetVersionStatus versionStatus)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
@@ -108,6 +106,123 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             );
 
             response.AssertNotFound();
+        }
+    }
+
+    public class PreviewTokenTests(TestApplicationFactory testApp) : DataSetsControllerPostQueryTests(testApp)
+    {
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatusesIncludingDraft),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task PreviewTokenIsActive_Returns200(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()]);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                previewTokenId: dataSetVersion.PreviewTokens[0].Id,
+                request: new DataSetQueryRequest { Indicators = ["sess_authorised"] });
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            Assert.NotNull(viewModel);
+        }
+
+        [Fact]
+        public async Task PreviewTokenIsExpired_Returns403()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(DataSetVersionStatus.Draft)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken(expired: true)]);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                previewTokenId: dataSetVersion.PreviewTokens[0].Id,
+                request: new DataSetQueryRequest { Indicators = ["sess_authorised"] });
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task PreviewTokenIsForWrongDataSetVersion_Returns403()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var (dataSetVersion1, dataSetVersion2) = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(DataSetVersionStatus.Draft)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                .Generate(2)
+                .ToTuple2();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.AddRange(dataSetVersion1, dataSetVersion2));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion1.PublicVersion,
+                previewTokenId: dataSetVersion2.PreviewTokens[0].Id,
+                request: new DataSetQueryRequest { Indicators = ["sess_authorised"] });
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatusesExceptDraft),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task PreviewTokenIsForUnavailableDataSetVersion_Returns403(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()]);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.AddRange(dataSetVersion));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                previewTokenId: dataSetVersion.PreviewTokens[0].Id,
+                request: new DataSetQueryRequest { Indicators = ["sess_authorised"] });
+
+            response.AssertForbidden();
         }
     }
 
@@ -2759,7 +2874,8 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     private async Task<HttpResponseMessage> QueryDataSet(
         Guid dataSetId,
         DataSetQueryRequest request,
-        string? dataSetVersion = null)
+        string? dataSetVersion = null,
+        Guid? previewTokenId = null)
     {
         var query = new Dictionary<string, StringValues>();
 
@@ -2769,6 +2885,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         var client = BuildApp().CreateClient();
+        client.AddPreviewTokenHeader(previewTokenId);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 

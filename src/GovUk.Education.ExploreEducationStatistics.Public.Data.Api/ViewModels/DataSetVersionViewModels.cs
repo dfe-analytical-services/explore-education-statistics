@@ -40,7 +40,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// When the version was published.
     /// </summary>
-    public required DateTimeOffset Published { get; init; }
+    public DateTimeOffset? Published { get; init; }
 
     /// <summary>
     /// When the version was withdrawn.

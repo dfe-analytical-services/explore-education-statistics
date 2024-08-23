@@ -224,8 +224,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .WithFile(dataFile)
                 .ForIndex(0, s => s.SetReleaseVersion(originalReleaseVersion))
                 .ForIndex(1, s => s.SetReleaseVersion(amendmentReleaseVersion))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -290,16 +289,14 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             var (dataFile, newDataFile) = DataFixture
                 .DefaultFile(FileType.Data)
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var (originalReleaseDataFile, amendmentReleaseDataFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithFile(dataFile)
                 .ForIndex(0, s => s.SetReleaseVersion(originalReleaseVersion))
                 .ForIndex(1, s => s.SetReleaseVersion(amendmentReleaseVersion))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             ReleaseFile newReleaseDataFile = DataFixture
                 .DefaultReleaseFile()
