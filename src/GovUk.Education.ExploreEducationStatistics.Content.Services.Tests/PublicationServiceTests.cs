@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -16,6 +12,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using MockQueryable.Moq;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -1695,6 +1695,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Published = new DateTime(2022, 1, 1)
                 };
 
+                // Two releases with the same published date should be ordered by Type
+                var releaseVersionD = new ReleaseVersion
+                {
+                    Type = AdHocStatistics,
+                    Published = new DateTime(2023, 1, 1)
+                };
+
+                var releaseVersionE = new ReleaseVersion
+                {
+                    Type = OfficialStatistics,
+                    Published = new DateTime(2023, 1, 1)
+                };
+
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
@@ -1713,23 +1726,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     LatestPublishedReleaseVersion = releaseVersionC
                 };
 
+                var publicationD = new Publication
+                {
+                    Title = "Publication D",
+                    LatestPublishedReleaseVersion = releaseVersionD
+                };
+
+                var publicationE = new Publication
+                {
+                    Title = "Publication E",
+                    LatestPublishedReleaseVersion = releaseVersionE
+                };
+
                 var themes = new List<Theme>
             {
                 new()
                 {
                     Title = "Theme 1 title",
-                    Topics = new List<Topic>
-                    {
+                    Topics =
+                    [
                         new()
                         {
-                            Publications = new List<Publication>
-                            {
+                            Publications =
+                            [
                                 publicationB,
                                 publicationC,
-                                publicationA
-                            }
+                                publicationA,
+                                publicationD,
+                                publicationE
+                            ]
                         }
-                    }
+                    ]
                 }
             };
 
@@ -1750,18 +1777,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     )).AssertRight();
                     var results = pagedResult.Results;
 
-                    Assert.Equal(3, results.Count);
+                    Assert.Equal(5, results.Count);
 
                     // Expect results sorted by published date in descending order
 
-                    Assert.Equal(publicationC.Id, results[0].Id);
-                    Assert.Equal(new DateTime(2022, 1, 1), results[0].Published);
+                    Assert.Equal(publicationE.Id, results[0].Id);
+                    Assert.Equal(new DateTime(2023, 1, 1), results[0].Published);
 
-                    Assert.Equal(publicationB.Id, results[1].Id);
-                    Assert.Equal(new DateTime(2021, 1, 1), results[1].Published);
+                    Assert.Equal(publicationD.Id, results[1].Id);
+                    Assert.Equal(new DateTime(2023, 1, 1), results[1].Published);
 
-                    Assert.Equal(publicationA.Id, results[2].Id);
-                    Assert.Equal(new DateTime(2020, 1, 1), results[2].Published);
+                    Assert.Equal(publicationC.Id, results[2].Id);
+                    Assert.Equal(new DateTime(2022, 1, 1), results[2].Published);
+
+                    Assert.Equal(publicationB.Id, results[3].Id);
+                    Assert.Equal(new DateTime(2021, 1, 1), results[3].Published);
+
+                    Assert.Equal(publicationA.Id, results[4].Id);
+                    Assert.Equal(new DateTime(2020, 1, 1), results[4].Published);
+
+
                 }
             }
 
@@ -2043,7 +2078,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var firstReleaseVersionPublishedDate = "2019-02-03T07:34:12";
                 var firstReleaseVersionUpdateDate = "2019-02-04T08:29:54";
-            
+
                 var publicationUpdatedDate = DateTime.Parse(publicationUpdated);
                 var firstReleaseVersionPublished = DateTime.Parse(firstReleaseVersionPublishedDate);
                 var firstReleaseVersionUpdated = DateTime.Parse(firstReleaseVersionUpdateDate);
@@ -2108,7 +2143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     var item = Assert.Single(result);
                     Assert.Equal(publication.Slug, item.Slug);
                     Assert.Equal(publicationUpdatedDate, item.LastModified);
-                    
+
                     Assert.NotNull(item.Releases);
                     var nonDraftReleaseVersion = Assert.Single(item.Releases);
 
