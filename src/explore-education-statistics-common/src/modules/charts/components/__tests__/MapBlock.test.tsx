@@ -21,6 +21,9 @@ describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
+    releaseId: 'release-1',
+    dataBlockParentId: 'data-block-parent-1',
+    boundaryLevel: 1,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
     legend: testMapConfiguration.legend as LegendConfiguration,

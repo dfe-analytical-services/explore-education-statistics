@@ -44,11 +44,7 @@ const DataBlockTabs = ({
     value: fullTable,
     isLoading,
     error,
-  } = useTableQuery(
-    releaseId,
-    dataBlock.dataBlockParentId,
-    dataBlock.charts[0]?.boundaryLevel,
-  );
+  } = useTableQuery(releaseId, dataBlock.dataBlockParentId);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 
@@ -88,16 +84,22 @@ const DataBlockTabs = ({
 
                   const axes = { ...chart.axes } as Required<AxesConfiguration>;
 
-                  if (chart.type === 'infographic') {
+                  const commonChartProps = {
+                    ...chart,
+                    releaseId: releaseId,
+                    dataBlockParentId: dataBlock.dataBlockParentId,
+                    id: `${id}-chart`,
+                    axes,
+                    data: fullTable?.results,
+                    meta: fullTable?.subjectMeta,
+                    source: dataBlock?.source,
+                  };
+
+                  if (commonChartProps.type === 'infographic') {
                     return (
                       <ChartRenderer
-                        {...chart}
+                        {...commonChartProps}
                         key={key}
-                        id={`${id}-chart`}
-                        axes={axes}
-                        data={fullTable?.results}
-                        meta={fullTable?.subjectMeta}
-                        source={dataBlock?.source}
                         getInfographic={getInfographic}
                       />
                     );
@@ -105,13 +107,9 @@ const DataBlockTabs = ({
 
                   return (
                     <ChartRenderer
-                      {...chart}
+                      {...commonChartProps}
                       key={key}
                       id={`${id}-chart`}
-                      axes={axes}
-                      data={fullTable?.results}
-                      meta={fullTable?.subjectMeta}
-                      source={dataBlock?.source}
                     />
                   );
                 })}

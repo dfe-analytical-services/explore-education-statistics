@@ -275,20 +275,25 @@ const tableBuilderService = {
   async getDataBlockTableData(
     releaseId: string,
     dataBlockParentId: string,
-    boundaryLevelId?: number | undefined,
   ): Promise<TableDataResponse> {
-    return boundaryLevelId
-      ? dataApi.get(
-          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}?boundaryLevelId=${boundaryLevelId}`,
-        )
-      : dataApi.get(
-          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
-        );
+    return dataApi.get(
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
+    );
   },
   getFastTrackTableAndReleaseMeta(
     dataBlockParentId: string,
   ): Promise<FastTrackTableAndReleaseMeta> {
     return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
+  },
+  getGeoJson(
+    releaseId: string,
+    dataBlockParentId: string,
+    boundaryLevelId: number,
+  ): Promise<Dictionary<LocationOption[]>> {
+    return dataApi.get(
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}/geojson`,
+      { params: { boundaryLevelId } },
+    );
   },
 };
 

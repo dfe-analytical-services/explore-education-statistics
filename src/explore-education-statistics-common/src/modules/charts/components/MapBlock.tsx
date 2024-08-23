@@ -1,3 +1,6 @@
+import tableBuilderQueries from '@common/modules/find-statistics/queries/tableBuilderQueries';
+import { useQuery } from '@tanstack/react-query';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import { SelectOption } from '@common/components/form/FormSelect';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import createMapDataSetCategories, {
@@ -28,8 +31,9 @@ import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
+import mapLocationOptionsToFilters from '@common/modules/table-tool/utils/mapLocationOptionsToFilters';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -46,6 +50,9 @@ export type MapFeatureCollection = FeatureCollection<
 >;
 
 export interface MapBlockProps extends ChartProps {
+  releaseId: string;
+  dataBlockParentId: string;
+  boundaryLevel: number;
   axes: {
     major: AxisConfiguration;
   };
@@ -108,7 +115,36 @@ export const mapBlockDefinition: ChartDefinition = {
   },
 };
 
-export default function MapBlock({
+export default function MapBlockWrapper(props: MapBlockProps): ReactNode {
+  const { releaseId, dataBlockParentId, boundaryLevel, meta } = props;
+
+  const {
+    data: geoJson = {},
+    isLoading,
+    error,
+  } = useQuery({
+    ...tableBuilderQueries.getGeoJson(
+      releaseId,
+      dataBlockParentId,
+      boundaryLevel,
+    ),
+  });
+
+  if (isLoading) return <LoadingSpinner text="Gathering map data" />;
+  if (error) throw Error('failed to get geoJson');
+
+  return (
+    <MapBlock
+      {...props}
+      meta={{
+        ...meta,
+        locations: mapLocationOptionsToFilters(geoJson),
+      }}
+    />
+  );
+}
+
+function MapBlock({
   id,
   dataGroups: deprecatedDataGroups,
   dataClassification: deprecatedDataClassification,

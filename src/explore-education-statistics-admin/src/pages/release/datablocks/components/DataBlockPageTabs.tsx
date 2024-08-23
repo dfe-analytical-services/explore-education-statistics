@@ -78,12 +78,8 @@ const DataBlockPageTabs = ({
       releaseId,
     };
 
-    const boundaryLevel = dataBlock.charts[0]?.boundaryLevel ?? undefined;
-    const tableData = await tableBuilderService.getTableData(
-      query,
-      releaseId,
-      boundaryLevel,
-    );
+    const tableData = await tableBuilderService.getTableData(query, releaseId);
+
     const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(
       query,
       tableData,

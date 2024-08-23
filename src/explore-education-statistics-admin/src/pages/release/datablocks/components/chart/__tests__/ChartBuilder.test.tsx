@@ -362,6 +362,8 @@ describe('ChartBuilder', () => {
   test('calls `onTableQueryUpdate` when change boundary level', async () => {
     const testInitialChart: Chart = {
       type: 'map',
+      releaseId: 'release-1',
+      dataBlockParentId: 'data-block-parent-1',
       boundaryLevel: 2,
       map: {
         dataSetConfigs: [],

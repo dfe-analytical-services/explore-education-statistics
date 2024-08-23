@@ -7,7 +7,6 @@ import ChartRenderer, {
 } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
-import { produce } from 'immer';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -40,6 +39,8 @@ describe('ChartRenderer', () => {
   };
   const testFullTableMeta = mapFullTable(testChartTableData);
   const testMapChartRenderer: ChartRendererProps = {
+    releaseId: 'release-1',
+    dataBlockParentId: 'data-block-parent-1',
     type: 'map',
     meta: testFullTableMeta.subjectMeta,
     data: testFullTableMeta.results,
@@ -62,17 +63,5 @@ describe('ChartRenderer', () => {
     expect(footnotes).toHaveTextContent(
       'This map uses the boundary data Countries December 2017 Ultra Generalised Clipped Boundaries in UK',
     );
-  });
-
-  test('does not render auto-generated boundary level footnote when boundary level not provided', async () => {
-    render(
-      <ChartRenderer
-        id="test-id"
-        {...produce(testMapChartRenderer, draft => {
-          draft.boundaryLevel = undefined;
-        })}
-      />,
-    );
-    expect(screen.queryByTestId('footnotes')).not.toBeInTheDocument();
   });
 });

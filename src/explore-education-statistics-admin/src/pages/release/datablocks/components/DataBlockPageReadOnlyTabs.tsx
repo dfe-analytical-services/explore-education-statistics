@@ -32,7 +32,6 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
     const tableData = await tableBuilderService.getTableData(
       dataBlock.query,
       releaseId,
-      dataBlock.charts[0].boundaryLevel,
     );
     const table = mapFullTable(tableData);
 

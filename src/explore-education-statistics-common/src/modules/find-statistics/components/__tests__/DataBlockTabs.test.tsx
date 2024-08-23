@@ -161,7 +161,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByText('Could not load content')).toHaveLength(2);
@@ -195,7 +194,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(
@@ -227,7 +225,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -263,7 +260,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -298,7 +294,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -339,7 +334,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
@@ -352,6 +346,9 @@ describe('DataBlockTabs', () => {
   test.skip('renders map', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
+    );
+    tableBuilderService.getGeoJson.mockResolvedValue(
+      testMapTableData.subjectMeta.locations,
     );
 
     const { container } = render(
@@ -368,10 +365,20 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        1,
+      );
+
+      expect(tableBuilderService.getGeoJson).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+        testMapConfiguration.type === 'map' &&
+          testMapConfiguration.boundaryLevel,
       );
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(tableBuilderService.getGeoJson).toBeCalled();
+      expect(tableBuilderService.getGeoJson).toBeCalledTimes(1);
     });
   });
 
