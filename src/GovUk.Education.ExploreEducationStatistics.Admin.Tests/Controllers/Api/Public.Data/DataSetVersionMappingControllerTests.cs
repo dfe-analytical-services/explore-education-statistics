@@ -393,18 +393,19 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Theory]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, false)]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, true)]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, true)]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, true)]
-        [InlineData(MappingType.ManualNone, MappingType.AutoNone, false)]
-        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, true)]
-        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, true)]
-        [InlineData(MappingType.ManualNone, MappingType.ManualNone, true)]
-        public async Task Success_MappingsComplete(
+        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, false, "2.0.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, true, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, true, "1.1.0")]
+        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, true, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoNone, false, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, true, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, true, "2.0.0")]
+        [InlineData(MappingType.ManualNone, MappingType.ManualNone, true, "2.0.0")]
+        public async Task Success_MappingsCompleteAndVersionUpdated(
             MappingType updatedMappingType,
             MappingType unchangedMappingType,
-            bool expectedMappingsComplete)
+            bool expectedMappingsComplete,
+            string expectedVersion)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -484,10 +485,6 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
-                ? "target-location-1-key"
-                : null;
-
             List<LocationMappingUpdateRequest> updates =
             [
                 new()
@@ -495,7 +492,9 @@ public abstract class DataSetVersionMappingControllerTests(
                     Level = GeographicLevel.LocalAuthority,
                     SourceKey = "source-location-1-key",
                     Type = updatedMappingType,
-                    CandidateKey = mappingCandidateKey
+                    CandidateKey = updatedMappingType == MappingType.ManualMapped
+                        ? "target-location-1-key"
+                        : null
                 }
             ];
 
@@ -507,26 +506,22 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            // Assert that the batch save calculates the LocationMappingsComplete flag as expected given
-            // the combination of the requested mapping update and the existing mapping that is untouched. 
             Assert.Equal(expectedMappingsComplete, updatedMappings.LocationMappingsComplete);
+
+            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
+
+            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
+                .ReleaseFiles
+                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
+
+            Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion);
         }
 
-        [Theory]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoNone, "2.0.0")]
-        [InlineData(MappingType.ManualMapped, MappingType.AutoMapped, "1.1.0")]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualMapped, "1.1.0")]
-        [InlineData(MappingType.ManualMapped, MappingType.ManualNone, "2.0.0")]
-        [InlineData(MappingType.ManualNone, MappingType.AutoNone, "2.0.0")]
-        [InlineData(MappingType.ManualNone, MappingType.AutoMapped, "2.0.0")]
-        [InlineData(MappingType.ManualNone, MappingType.ManualMapped, "2.0.0")]
-        [InlineData(MappingType.ManualNone, MappingType.ManualNone, "2.0.0")]
-        public async Task Success_VersionUpdate(
-            MappingType updatedMappingType,
-            MappingType unchangedMappingType,
-            string expectedVersion)
+        [Fact]
+        public async Task Success_DeletedLevel_MajorUpdate()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -573,6 +568,7 @@ public abstract class DataSetVersionMappingControllerTests(
                             .AddCandidate(
                                 targetKey: "target-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption()))
+                    // Country level has been deleted and has no candidates.
                     .AddLevel(
                         level: GeographicLevel.Country,
                         mappings: DataFixture
@@ -582,15 +578,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 mapping: DataFixture
                                     .DefaultLocationOptionMapping()
                                     .WithSource(DataFixture.DefaultMappableLocationOption())
-                                    .WithType(unchangedMappingType)
-                                    .WithCandidateKey(unchangedMappingType switch
-                                    {
-                                        MappingType.ManualMapped or MappingType.AutoMapped => "target-location-1-key",
-                                        _ => null
-                                    }))
-                            .AddCandidate(
-                                targetKey: "target-location-1-key",
-                                candidate: DataFixture.DefaultMappableLocationOption())));
+                                    .WithAutoNone())));
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -600,15 +588,11 @@ public abstract class DataSetVersionMappingControllerTests(
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithId(nextDataSetVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
                 .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
-
-            var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
-                ? "target-location-1-key"
-                : null;
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -616,8 +600,8 @@ public abstract class DataSetVersionMappingControllerTests(
                 {
                     Level = GeographicLevel.LocalAuthority,
                     SourceKey = "source-location-1-key",
-                    Type = updatedMappingType,
-                    CandidateKey = mappingCandidateKey
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "target-location-1-key"
                 }
             ];
 
@@ -632,14 +616,124 @@ public abstract class DataSetVersionMappingControllerTests(
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            // Assert that the batch save calculates the next data set version correctly. 
-            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
+            // This update completes the mapping but as there's a
+            // location level deletion, it's a major version update.
+            Assert.True(updatedMappings.LocationMappingsComplete);
+
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
                 .ReleaseFiles
                 .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
 
-            Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion);
+            Assert.Equal("2.0.0", updatedReleaseFile.PublicApiDataSetVersion);
+        }
+
+        [Fact]
+        public async Task Success_AddedLevel_MinorUpdate()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "source-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "target-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption()))
+                    // Country level has been added and only has candidates.
+                    .AddLevel(
+                        level: GeographicLevel.Country,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddCandidate(
+                                targetKey: "source-location-1-key",
+                                candidate: DataFixture
+                                    .DefaultMappableLocationOption())));
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersionMappings.Add(mappings);
+            });
+
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextDataSetVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile())
+                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            List<LocationMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "target-location-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchLocationMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates);
+
+            response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
+
+            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // This update completes the mapping as a location level was added
+            // and isn't considered as needing to be mapped - minor version update.
+            Assert.True(updatedMappings.LocationMappingsComplete);
+
+            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
+
+            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
+                .ReleaseFiles
+                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
+
+            Assert.Equal("1.1.0", updatedReleaseFile.PublicApiDataSetVersion);
         }
 
         [Fact]
