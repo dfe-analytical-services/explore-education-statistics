@@ -7,12 +7,14 @@ import ApiDataSetFinaliseBanner from '@admin/pages/release/data/components/ApiDa
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
+  releaseApiDataSetChangelogRoute,
   releaseApiDataSetFiltersMappingRoute,
   releaseApiDataSetHistoryPageRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
   releaseApiDataSetsRoute,
+  ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
@@ -31,9 +33,6 @@ import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
-
-// TODO: EES-4367
-const showChangelog = false;
 
 export default function ReleaseApiDataSetDetailsPage() {
   const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
@@ -94,6 +93,21 @@ export default function ReleaseApiDataSetDetailsPage() {
         <ul className="govuk-list">
           {dataSet.draftVersion.status === 'Draft' && (
             <>
+              <li>
+                <Link
+                  to={generatePath<ReleaseDataSetChangelogRouteParams>(
+                    releaseApiDataSetChangelogRoute.path,
+                    {
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                      dataSetId,
+                      dataSetVersionId: dataSet.draftVersion.id,
+                    },
+                  )}
+                >
+                  View changelog and guidance notes
+                </Link>
+              </li>
               <li>
                 <Link
                   to={generatePath<ReleaseDataSetRouteParams>(
@@ -167,9 +181,21 @@ export default function ReleaseApiDataSetDetailsPage() {
               View live data set (opens in new tab)
             </a>
           </li>
-          {showChangelog && (
+          {dataSet.latestLiveVersion.version !== '1.0' && (
             <li>
-              <Link to="/todo">View changelog and guidance notes</Link>
+              <Link
+                to={generatePath<ReleaseDataSetChangelogRouteParams>(
+                  releaseApiDataSetChangelogRoute.path,
+                  {
+                    publicationId: release.publicationId,
+                    releaseId: release.id,
+                    dataSetId,
+                    dataSetVersionId: dataSet.latestLiveVersion.id,
+                  },
+                )}
+              >
+                View changelog and guidance notes
+              </Link>
             </li>
           )}
           {dataSet.latestLiveVersion.version !== '1.0' && (
@@ -200,6 +226,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const showDraftVersionTasks =
     finalisingStatus !== 'finalising' &&
+    dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
 
@@ -222,10 +249,14 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
-            {mappingComplete && (
+            {mappingComplete && dataSet.draftVersion && (
               <ApiDataSetFinaliseBanner
-                draftVersionStatus={dataSet.draftVersion?.status}
+                dataSetId={dataSetId}
+                dataSetVersionId={dataSet.draftVersion.id}
+                draftVersionStatus={dataSet.draftVersion.status}
                 finalisingStatus={finalisingStatus}
+                publicationId={release.publicationId}
+                releaseId={release.id}
                 onFinalise={handleFinalise}
               />
             )}

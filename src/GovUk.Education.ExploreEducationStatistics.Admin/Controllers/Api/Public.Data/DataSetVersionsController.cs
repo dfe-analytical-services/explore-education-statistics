@@ -95,14 +95,16 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .HandleFailuresOrNoOp();
     }
 
-    [HttpPatch]
+    [HttpPatch("{dataSetVersionId:guid}")]
     [Produces("application/json")]
     public async Task<ActionResult<DataSetDraftVersionViewModel>> UpdateVersion(
+        Guid dataSetVersionId,
         [FromBody] DataSetVersionUpdateRequest dataSetVersionUpdateRequest,
         CancellationToken cancellationToken)
     {
         return await dataSetVersionService
             .UpdateVersion(
+                dataSetVersionId: dataSetVersionId,
                 updateRequest: dataSetVersionUpdateRequest,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();

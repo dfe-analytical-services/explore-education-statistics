@@ -6,6 +6,7 @@ import ReleaseApiDataSetPreviewPage from '@admin/pages/release/data/ReleaseApiDa
 import ReleaseApiDataSetPreviewTokenPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenPage';
 import ReleaseApiDataSetPreviewTokenLogPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenLogPage';
 import ReleaseApiDataSetHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetHistoryPage';
+import ReleaseApiDataSetChangelogPage from '@admin/pages/release/data/ReleaseApiDataSetChangelogPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
@@ -58,6 +59,10 @@ export type ReleaseDataSetPreviewTokenRouteParams =
   ReleaseDataSetRouteParams & {
     previewTokenId: string;
   };
+
+export type ReleaseDataSetChangelogRouteParams = ReleaseDataSetRouteParams & {
+  dataSetVersionId: string;
+};
 
 export interface ReleaseRouteProps extends ProtectedRouteProps {
   title: string;
@@ -165,6 +170,13 @@ export const releaseApiDataSetHistoryPageRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/history',
   title: 'API data set version history',
   component: ReleaseApiDataSetHistoryPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetChangelogRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/changelog/:dataSetVersionId',
+  title: 'View API data set token log',
+  component: ReleaseApiDataSetChangelogPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 

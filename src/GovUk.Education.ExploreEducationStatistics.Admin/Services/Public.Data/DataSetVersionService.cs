@@ -170,12 +170,13 @@ public class DataSetVersionService(
     }
 
     public async Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
+        Guid dataSetVersionId,
         DataSetVersionUpdateRequest updateRequest,
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
             .OnSuccess(async () => await GetDataSetVersion(
-                dataSetVersionId: updateRequest.DataSetVersionId,
+                dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
             .OnSuccessDo(dataSetVersion => CheckCanUpdateVersion(dataSetVersion, updateRequest))
             .OnSuccess(async dataSetVersion => await UpdateVersion(
@@ -286,7 +287,7 @@ public class DataSetVersionService(
                 Code = ValidationMessages.DataSetVersionCannotBeUpdated.Code,
                 Message = ValidationMessages.DataSetVersionCannotBeUpdated.Message,
                 Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
-                Path = nameof(DataSetVersionUpdateRequest.DataSetVersionId).ToLowerFirst()
+                Path = "dataSetVersionId"
             });
         }
 
@@ -294,9 +295,8 @@ public class DataSetVersionService(
         {
             return ValidationUtils.ValidationResult(new ErrorViewModel
             {
-                Code = ValidationMessages.DataSetVersionCannotHaveChangelogNotes.Code,
-                Message = ValidationMessages.DataSetVersionCannotHaveChangelogNotes.Message,
-                Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+                Code = ValidationMessages.DataSetVersionCannotHaveNotes.Code,
+                Message = ValidationMessages.DataSetVersionCannotHaveNotes.Message,
                 Path = nameof(DataSetVersionUpdateRequest.Notes).ToLowerFirst()
             });
         }

@@ -73,7 +73,7 @@ function NavItem({
   onClick,
 }: NavItem) {
   return (
-    <li className={className}>
+    <li className={classNames(styles.navItem, className)}>
       <a
         className={classNames(
           'govuk-link--no-visited-state govuk-link--no-underline',
