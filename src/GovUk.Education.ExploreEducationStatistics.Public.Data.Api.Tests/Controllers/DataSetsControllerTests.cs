@@ -183,18 +183,23 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 Assert.NotNull(content);
 
-                foreach (var filterMetaViewModel in content.Filters)
+                Assert.Equal(dataSetVersion.FilterMetas.Count, content.Filters.Count);
+
+                foreach (var filter in content.Filters)
                 {
                     var filterMeta = Assert.Single(dataSetVersion.FilterMetas,
-                        fm => fm.PublicId == filterMetaViewModel.Id);
-                    Assert.Equal(filterMeta.Hint, filterMetaViewModel.Hint);
-                    Assert.Equal(filterMeta.Label, filterMetaViewModel.Label);
+                        fm => fm.PublicId == filter.Id);
+
+                    Assert.Equal(filterMeta.Hint, filter.Hint);
+                    Assert.Equal(filterMeta.Label, filter.Label);
 
                     var allFilterMetaLinks = filterMeta.Options
                         .SelectMany(o => o.MetaLinks)
                         .ToList();
 
-                    foreach (var filterOptionMetaViewModel in filterMetaViewModel.Options)
+                    Assert.Equal(filterMeta.OptionLinks.Count, filter.Options.Count);
+
+                    foreach (var filterOptionMetaViewModel in filter.Options)
                     {
                         var filterOptionMetaLink = Assert.Single(
                             allFilterMetaLinks,
@@ -209,19 +214,22 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     }
                 }
 
-                foreach (var locationMetaViewModel in content.Locations)
+                Assert.Equal(dataSetVersion.LocationMetas.Count, content.Locations.Count);
+
+                foreach (var locationGroup in content.Locations)
                 {
                     var locationMeta = Assert.Single(
                         dataSetVersion.LocationMetas,
-                        m => m.Level == locationMetaViewModel.Level.Code);
+                        m => m.Level == locationGroup.Level.Code);
 
-                    Assert.Equal(locationMeta.Level.GetEnumLabel(), locationMetaViewModel.Level.Label);
+                    Assert.Equal(locationMeta.Level.GetEnumLabel(), locationGroup.Level.Label);
+                    Assert.Equal(locationMeta.OptionLinks.Count, locationGroup.Options.Count);
 
-                    foreach (var locationOptionViewModel in locationMetaViewModel.Options)
+                    foreach (var locationOption in locationGroup.Options)
                     {
                         var locationOptionMetaLink = Assert.Single(
                             locationMeta.OptionLinks,
-                            o => o.PublicId == locationOptionViewModel.Id);
+                            o => o.PublicId == locationOption.Id);
 
                         var locationOptionMeta = locationOptionMetaLink.Option;
 
@@ -229,31 +237,31 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         {
                             case LocationCodedOptionMeta codedMeta:
                                 var codedViewModel =
-                                    Assert.IsType<LocationCodedOptionViewModel>(locationOptionViewModel);
+                                    Assert.IsType<LocationCodedOptionViewModel>(locationOption);
                                 Assert.Equal(codedMeta.Label, codedViewModel.Label);
                                 Assert.Equal(codedMeta.Code, codedViewModel.Code);
                                 break;
                             case LocationLocalAuthorityOptionMeta localAuthorityMeta:
                                 var localAuthorityViewModel =
-                                    Assert.IsType<LocationLocalAuthorityOptionViewModel>(locationOptionViewModel);
+                                    Assert.IsType<LocationLocalAuthorityOptionViewModel>(locationOption);
                                 Assert.Equal(localAuthorityMeta.Label, localAuthorityViewModel.Label);
                                 Assert.Equal(localAuthorityMeta.Code, localAuthorityViewModel.Code);
                                 Assert.Equal(localAuthorityMeta.OldCode, localAuthorityViewModel.OldCode);
                                 break;
                             case LocationProviderOptionMeta providerMeta:
                                 var providerViewModel =
-                                    Assert.IsType<LocationProviderOptionViewModel>(locationOptionViewModel);
+                                    Assert.IsType<LocationProviderOptionViewModel>(locationOption);
                                 Assert.Equal(providerMeta.Label, providerViewModel.Label);
                                 Assert.Equal(providerMeta.Ukprn, providerViewModel.Ukprn);
                                 break;
                             case LocationRscRegionOptionMeta rscRegionMeta:
                                 var rscRegionViewModel =
-                                    Assert.IsType<LocationRscRegionOptionViewModel>(locationOptionViewModel);
+                                    Assert.IsType<LocationRscRegionOptionViewModel>(locationOption);
                                 Assert.Equal(rscRegionMeta.Label, rscRegionViewModel.Label);
                                 break;
                             case LocationSchoolOptionMeta schoolMeta:
                                 var schoolViewModel =
-                                    Assert.IsType<LocationSchoolOptionViewModel>(locationOptionViewModel);
+                                    Assert.IsType<LocationSchoolOptionViewModel>(locationOption);
                                 Assert.Equal(schoolMeta.Label, schoolViewModel.Label);
                                 Assert.Equal(schoolMeta.Urn, schoolViewModel.Urn);
                                 Assert.Equal(schoolMeta.LaEstab, schoolViewModel.LaEstab);
@@ -264,10 +272,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     }
                 }
 
+                Assert.Equal(dataSetVersion.GeographicLevelMeta!.Levels.Count, content.GeographicLevels.Count);
                 Assert.All(
                     content.GeographicLevels,
                     level => Assert.Equal(level.Code.GetEnumLabel(), level.Label)
                 );
+
+                Assert.Equal(dataSetVersion.IndicatorMetas.Count, content.Indicators.Count);
 
                 foreach (var indicator in content.Indicators)
                 {
@@ -277,6 +288,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     Assert.Equal(indicatorMeta.Unit, indicator.Unit);
                     Assert.Equal(indicatorMeta.DecimalPlaces, indicator.DecimalPlaces);
                 }
+
+                Assert.Equal(dataSetVersion.TimePeriodMetas.Count, content.TimePeriods.Count);
 
                 foreach (var timePeriod in content.TimePeriods)
                 {
