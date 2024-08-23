@@ -5,6 +5,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CsvHelper;
@@ -244,6 +246,37 @@ public class DataSetFileService : IDataSetFileService
             Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes),
             Api = BuildDataSetFileApiViewModel(releaseFile)
         };
+    }
+
+    public async Task<ActionResult> DownloadDataSetFile(
+        Guid dataSetFileId)
+    {
+        var releaseFile = await _contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .Where(rf =>
+                rf.File.DataSetFileId == dataSetFileId
+                && rf.ReleaseVersion.Published.HasValue
+                && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value)
+            .OrderByDescending(rf => rf.ReleaseVersion.Version)
+            .FirstOrDefaultAsync();
+
+        if (releaseFile == null
+            || !await _releaseVersionRepository.IsLatestPublishedReleaseVersion(
+                releaseFile.ReleaseVersionId))
+        {
+            return new NotFoundResult();
+        }
+
+        var stream = await DatafileStreamProvider();
+
+        return new FileStreamResult(stream, "text/csv")
+        {
+            FileDownloadName = releaseFile.File.Filename,
+        };
+
+        Task<Stream> DatafileStreamProvider() => _publicBlobStorageService.StreamBlob(
+            containerName: BlobContainers.PublicReleaseFiles,
+            path: releaseFile.PublicPath());
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
