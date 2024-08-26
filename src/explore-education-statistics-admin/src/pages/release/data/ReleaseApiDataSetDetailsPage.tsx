@@ -9,7 +9,7 @@ import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetChangelogRoute,
   releaseApiDataSetFiltersMappingRoute,
-  releaseApiDataSetHistoryPageRoute,
+  releaseApiDataSetVersionHistoryRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
@@ -209,7 +209,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             <li>
               <Link
                 to={generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetHistoryPageRoute.path,
+                  releaseApiDataSetVersionHistoryRoute.path,
                   {
                     publicationId: release.publicationId,
                     releaseId: dataSet.latestLiveVersion.releaseVersion.id,

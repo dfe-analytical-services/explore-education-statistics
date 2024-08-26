@@ -1,9 +1,9 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import ReleaseApiDataSetHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetHistoryPage';
+import ReleaseApiDataSetVersionHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetVersionHistoryPage';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import {
-  releaseApiDataSetHistoryPageRoute,
+  releaseApiDataSetVersionHistoryRoute,
   ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
@@ -22,7 +22,7 @@ jest.mock('@admin/services/apiDataSetVersionService');
 const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
-describe('ReleaseApiDataSetPreviewTokenPage', () => {
+describe('ReleaseApiDataSetVersionHistoryPage', () => {
   const testDataSet: ApiDataSet = {
     id: 'data-set-id',
     title: 'Data set title',
@@ -247,7 +247,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
-                releaseApiDataSetHistoryPageRoute.path,
+                releaseApiDataSetVersionHistoryRoute.path,
                 {
                   publicationId: testRelease.publicationId,
                   releaseId: testRelease.id,
@@ -257,8 +257,8 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
             ]}
           >
             <Route
-              component={ReleaseApiDataSetHistoryPage}
-              path={releaseApiDataSetHistoryPageRoute.path}
+              component={ReleaseApiDataSetVersionHistoryPage}
+              path={releaseApiDataSetVersionHistoryRoute.path}
             />
           </MemoryRouter>
         </ReleaseContextProvider>

@@ -210,7 +210,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       summary.getByRole('link', { name: 'View preview token log' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/token-log',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview-tokens',
     );
     expect(
       summary.getByRole('button', { name: 'Remove draft version' }),
@@ -268,7 +268,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       summary.getByRole('link', { name: 'View version history' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/history',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/versions',
     );
 
     // Draft version sections not rendered
@@ -366,7 +366,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       draftSummary.getByRole('link', { name: 'View preview token log' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/token-log',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview-tokens',
     );
     expect(
       draftSummary.getByRole('button', { name: 'Remove draft version' }),
@@ -409,7 +409,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       liveSummary.getByRole('link', { name: 'View version history' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/history',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/versions',
     );
   });
 
@@ -440,7 +440,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       summary.getByRole('link', { name: 'View preview token log' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/token-log',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview-tokens',
     );
     expect(
       summary.getByRole('button', { name: 'Remove draft version' }),
@@ -539,7 +539,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       summary.getByRole('link', { name: 'View version history' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/history',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/versions',
     );
   });
 

@@ -23,7 +23,7 @@ jest.mock('@admin/services/previewTokenService');
 const apiDataSetService = jest.mocked(_apiDataSetService);
 const previewTokenService = jest.mocked(_previewTokenService);
 
-describe('ReleaseApiDataSetPreviewTokenPage', () => {
+describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
   const testDataSet: ApiDataSet = {
     id: 'data-set-id',
     title: 'Data set title',
@@ -99,7 +99,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview/token-id-1',
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview-tokens/token-id-1',
     );
     expect(
       within(row1Cells[5]).getByRole('button', { name: 'Revoke Test label 1' }),
@@ -134,7 +134,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview/token-id-3',
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview-tokens/token-id-3',
     );
     expect(
       within(row3Cells[5]).getByRole('button', { name: 'Revoke Test label 3' }),
