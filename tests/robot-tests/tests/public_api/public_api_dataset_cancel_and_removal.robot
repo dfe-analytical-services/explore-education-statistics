@@ -3,6 +3,7 @@ Library             ../libs/admin_api.py
 Resource            ../libs/admin-common.robot
 Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-common.robot
+Resource            ../libs/public-api-common.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -157,13 +158,3 @@ Search with 1st API dataset
     user clicks radio    Newest
     user checks page contains link    ${SUBJECT_NAME_1}
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_1}
-
-
-
-
-*** Keywords ***
-Verify status of API Datasets
-    [Arguments]    ${expected_status}
-    user waits for caches to expire
-    ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
-    should be equal as strings    ${status_value}    ${expected_status}
