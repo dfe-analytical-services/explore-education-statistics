@@ -218,6 +218,7 @@ def includes_data_changing_tests(arguments: argparse.Namespace):
         or f"{os.sep}admin" in arguments.tests
         or "/admin" in arguments.tests
         or f"{os.sep}public_api" in arguments.tests
+        or "/public_api" in arguments.tests
         or f"{os.sep}seed_data" in arguments.tests
         or "/seed_data" in arguments.tests
     )

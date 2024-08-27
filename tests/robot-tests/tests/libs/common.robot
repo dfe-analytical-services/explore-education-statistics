@@ -518,16 +518,11 @@ user clicks button
     ${button}=    user gets button element    ${text}    ${parent}
     user clicks element    ${button}
 
-user clicks button by indexing
+user clicks button by index
     [Arguments]    ${text}    ${index}=1
-    ${xpath}=    create button xpath    ${text}    ${index}
+    ${xpath}=    set variable    (//button[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
     user clicks element   ${button}
-
-create button xpath
-    [Arguments]    ${text}    ${index}=1
-     ${xpath}=    Set Variable    (//button[text()='${text}'])[${index}]
-    [Return]    ${xpath}
 
 
 
