@@ -3,6 +3,7 @@
 Library             ../libs/admin_api.py
 Resource            ../libs/admin-common.robot
 Resource            ../libs/admin/manage-content-common.robot
+Resource            ../libs/public-api-common.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -23,7 +24,7 @@ ${SUBJECT_NAME_5}=      UI test subject 5
 
 
 *** Test Cases ***
-Create publication
+Create publication and release
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -33,7 +34,7 @@ Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
-Create new release with data files
+Upload data files
     user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
     user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv
 
@@ -117,19 +118,6 @@ Approve first release
 Navigate to admin and create an amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
-
-Change the Release type
-    user waits until page contains link    Edit release summary
-    user clicks link    Edit release summary
-    user waits until page finishes loading
-    user waits until h2 is visible    Edit release summary
-    user checks page contains radio    Official statistics in development
-    user clicks radio    Official statistics in development
-    user clicks button    Update release summary
-    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    Financial year
-    ...    3000-01
-    ...    Official statistics in development
 
 Upload third subject(large data file)
     user waits until large data upload is completed
@@ -310,57 +298,3 @@ Validate checklist error for a draft API dataset which shows mapping error
     user checks checklist errors contains link
     ...    All public API data set mappings must be completed
 
-
-
-
-
-
-
-
-
-*** Keywords ***
-user edits release status
-    user clicks link    Sign off
-    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
-
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-
-
-user checks checklist errors contains
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-errors
-    user waits until element contains    testid:releaseChecklist-errors    ${text}
-
-user checks checklist errors contains link
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-errors
-    user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
-
-User Checks Checklist Errors Contains Either Link
-    [Arguments]    ${text1}    ${text2}
-    user waits until page contains testid    releaseChecklist-errors
-    ${status}=    Run Keyword And Return Status    Wait Until Keyword Succeeds    10s    1s    Check Either Link Exists    ${text1}    ${text2}
-
-    Run Keyword If    ${status} == False    Fail    Neither of the expected links (${text1}, ${text2}) was found. Failing fast as required.
-    Log    One of the expected links (${text1}, ${text2}) is present.
-
-Check Either Link Exists
-    [Arguments]    ${text1}    ${text2}
-    ${condition1}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text1}    timeout=5s
-    Run Keyword If    ${condition1}    Set Test Variable    ${link_found}    True
-
-    ${condition2}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text2}    timeout=5s
-    Run Keyword If    ${condition1} == False    Set Test Variable    ${link_found}    ${condition2}
-
-    ${link_found}=    Evaluate    ${condition1} or ${condition2}
-    Run Keyword If    ${link_found} == False    Log    Neither link '${text1}' nor '${text2}' was found after checking both. Continuing to check...
-
-    [Return]    ${link_found}
-
-
-Verify status of API Datasets
-    [Arguments]    ${expected_status}
-    user waits for caches to expire
-    ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
-    should be equal as strings    ${status_value}    ${expected_status}
