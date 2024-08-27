@@ -11,7 +11,6 @@ user edits release status
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
 
-
 user checks checklist errors contains
     [Arguments]    ${text}
     user waits until page contains testid    releaseChecklist-errors
@@ -22,7 +21,7 @@ user checks checklist errors contains link
     user waits until page contains testid    releaseChecklist-errors
     user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
 
-User Checks Checklist Errors Contains Either Link
+user checks checklist errors contains either link
     [Arguments]    ${text1}    ${text2}
     user waits until page contains testid    releaseChecklist-errors
     ${status}=    Run Keyword And Return Status    Wait Until Keyword Succeeds    10s    1s    Check Either Link Exists    ${text1}    ${text2}
@@ -30,7 +29,7 @@ User Checks Checklist Errors Contains Either Link
     Run Keyword If    ${status} == False    Fail    Neither of the expected links (${text1}, ${text2}) was found. Failing fast as required.
     Log    One of the expected links (${text1}, ${text2}) is present.
 
-Check Either Link Exists
+check either link exists
     [Arguments]    ${text1}    ${text2}
     ${condition1}=    Run Keyword And Return Status    user waits until parent contains element without retries    testid:releaseChecklist-errors    link:${text1}    timeout=5s
     Run Keyword If    ${condition1}    Set Test Variable    ${link_found}    True
@@ -42,8 +41,7 @@ Check Either Link Exists
     Run Keyword If    ${link_found} == False    Log    Neither link '${text1}' nor '${text2}' was found after checking both. Continuing to check...
     [Return]    ${link_found}
 
-
-Verify status of API Datasets
+verify status of API Datasets
     [Arguments]    ${expected_status}
     user waits for caches to expire
     ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
