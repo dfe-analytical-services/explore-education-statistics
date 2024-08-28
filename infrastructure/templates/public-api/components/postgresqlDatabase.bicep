@@ -74,9 +74,6 @@ param tagValues object
 ])
 param createMode string = 'Default'
 
-@description('The id of the VNet to which this database server will be connected via a private endpoint')
-param vnetId string
-
 @description('The id of the subnet which will be used to install the private endpoint for allowing secure connection to the database server over the VNet')
 param subnetId string
 
@@ -131,61 +128,14 @@ resource rules 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-
   }
 }]
 
-var privateLinkDnsZoneName = 'privatelink.postgres.database.azure.com'
-
-var privateEndpointName = '${databaseServerName}-plink'
-
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
-  name: privateEndpointName
-  location: location
-  properties: {
-    subnet: {
-      id: subnetId
-    }
-    privateLinkServiceConnections: [
-      {
-        name: privateEndpointName
-        properties: {
-          privateLinkServiceId: postgreSQLDatabase.id
-          groupIds: [
-            'postgresqlServer'
-          ]
-        }
-      }
-    ]
-  }
-}
-
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: privateLinkDnsZoneName
-  location: 'global'
-  properties: {}
-}
-
-resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: privateDnsZone
-  name: '${privateLinkDnsZoneName}-link'
-  location: 'global'
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: vnetId
-    }
-  }
-}
-
-resource privateEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = {
-  name: 'default'
-  parent: privateEndpoint
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: replace(privateLinkDnsZoneName, '.', '-')
-        properties: {
-          privateDnsZoneId: privateDnsZone.id
-        }
-      }
-    ]
+module privateEndpointModule 'privateEndpoint.bicep' = {
+  name: 'postgresPrivateEndpointDeploy'
+  params: {
+    serviceId: postgreSQLDatabase.id
+    serviceName: postgreSQLDatabase.name
+    serviceType: 'postgresqlServer'
+    subnetId: subnetId
+    tagValues: tagValues
   }
 }
 

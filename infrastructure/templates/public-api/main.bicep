@@ -134,6 +134,13 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   }
 }
 
+module privateDnsZonesModule 'application/privateDnsZones.bicep' = {
+  name: 'privateDnsZonesDeploy'
+  params: {
+    vnetId: vNetModule.outputs.vnetId
+  }
+}
+
 // TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 // Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
 module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
@@ -221,9 +228,11 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
     tagValues: tagValues
     firewallRules: formattedPostgreSqlFirewallRules
     databaseNames: ['public_data']
-    vnetId: vNetModule.outputs.vNetRef
     subnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
   }
+  dependsOn: [
+    privateDnsZonesModule
+  ]
 }
 
 var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'

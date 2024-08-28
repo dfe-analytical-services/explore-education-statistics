@@ -7,6 +7,9 @@ param storageAccountName string
 @description('Storage Account Network Rules')
 param allowedSubnetIds string[] = []
 
+@description('Optional subnet id for allowing inbound traffic over the VNet via a private endpoint')
+param privateEndpointSubnetId string?
+
 @description('Storage Account Network Firewall Rules')
 param firewallRules {
   name: string
@@ -87,6 +90,17 @@ module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
     secretValue: key
     contentType: 'text/plain'
     secretName: accessKeySecretName
+  }
+}
+
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetId != null) {
+  name: '${storageAccountName}PrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    serviceType: 'sites'
+    subnetId: privateEndpointSubnetId!
+    tagValues: tagValues
   }
 }
 

@@ -48,7 +48,7 @@ resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01'
 }
 
 @description('The fully qualified Azure resource ID of the Network.')
-output vNetRef string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
+output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
 
 @description('The fully qualified Azure resource ID of the Data Processor Function App Subnet.')
 output dataProcessorSubnetRef string = dataProcessorSubnet.id
