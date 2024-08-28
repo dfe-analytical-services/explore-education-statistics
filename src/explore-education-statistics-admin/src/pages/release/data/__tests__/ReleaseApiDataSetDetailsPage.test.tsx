@@ -1,5 +1,5 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import { testRelease as testBaseRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import {
@@ -25,6 +25,18 @@ const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetDetailsPage', () => {
+  const testLiveRelease: Release = {
+    ...testBaseRelease,
+    id: 'release-1-id',
+    title: 'Release 1',
+  };
+
+  const testDraftRelease: Release = {
+    ...testBaseRelease,
+    id: 'release-2-id',
+    title: 'Release 2',
+  };
+
   const testDataSet: ApiDataSet = {
     id: 'data-set-id',
     title: 'Data set title',
@@ -35,14 +47,14 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
   const testLiveVersion: ApiDataSetLiveVersion = {
     id: 'live-version-id',
-    version: '1.0',
+    version: '1.1',
     type: 'Minor',
     status: 'Published',
     totalResults: 10_000,
     published: '2024-03-01T09:30:00+00:00',
     releaseVersion: {
-      id: 'release-1-id',
-      title: 'Test release 1',
+      id: testLiveRelease.id,
+      title: testLiveRelease.title,
     },
     file: {
       id: 'live-file-id',
@@ -64,8 +76,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     type: 'Minor',
     totalResults: 0,
     releaseVersion: {
-      id: 'release-2-id',
-      title: 'Test release 2',
+      id: testDraftRelease.id,
+      title: testDraftRelease.title,
     },
     file: {
       id: 'processing-file-id',
@@ -80,8 +92,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     type: 'Major',
     totalResults: 20_000,
     releaseVersion: {
-      id: 'release-2-id',
-      title: 'Test release 2',
+      id: testDraftRelease.id,
+      title: testDraftRelease.title,
     },
     file: {
       id: 'draft-file-id',
@@ -120,6 +132,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     renderPage();
 
+    expect(screen.queryByTestId('draft-version-tasks')).not.toBeInTheDocument();
+
     expect(
       await screen.findByText('Draft version details'),
     ).toBeInTheDocument();
@@ -137,16 +151,11 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(summary.queryByTestId('Geographic levels')).not.toBeInTheDocument();
     expect(summary.queryByTestId('Indicators')).not.toBeInTheDocument();
     expect(summary.queryByTestId('Filters')).not.toBeInTheDocument();
+    expect(summary.queryByTestId('Actions')).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole('heading', { name: 'Latest live version details' }),
+      screen.queryByTestId('live-version-summary'),
     ).not.toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('heading', { name: 'Draft version tasks' }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByTestId('map-locations-task')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('map-filters-task')).not.toBeInTheDocument();
   });
 
   test('renders correctly with processed draft version only', async () => {
@@ -156,6 +165,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
 
     renderPage();
+
+    expect(screen.queryByTestId('draft-version-tasks')).not.toBeInTheDocument();
 
     expect(
       await screen.findByText('Draft version details'),
@@ -182,18 +193,34 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       'Test draft filter',
     );
     expect(
-      screen.getByRole('button', { name: 'Remove draft version' }),
+      summary.getByRole('link', {
+        name: 'View changelog and guidance notes',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/changelog/draft-version-id',
+    );
+    expect(
+      summary.getByRole('link', { name: 'Preview API data set' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview',
+    );
+    expect(
+      summary.getByRole('link', { name: 'View preview token log' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview-tokens',
+    );
+    expect(
+      summary.getByRole('button', { name: 'Remove draft version' }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Latest live version details' }),
-    ).not.toBeInTheDocument();
+    // Latest live version sections not rendered
 
     expect(
-      screen.queryByRole('heading', { name: 'Draft version tasks' }),
+      screen.queryByTestId('live-version-summary'),
     ).not.toBeInTheDocument();
-    expect(screen.queryByTestId('map-locations-task')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('map-filters-task')).not.toBeInTheDocument();
   });
 
   test('renders correctly with latest live version only', async () => {
@@ -214,7 +241,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     const summary = within(screen.getByTestId('live-version-summary'));
 
-    expect(summary.getByTestId('Version')).toHaveTextContent('v1.0');
+    expect(summary.getByTestId('Version')).toHaveTextContent('v1.1');
     expect(summary.getByTestId('Status')).toHaveTextContent('Published');
     expect(summary.getByTestId('Time periods')).toHaveTextContent(
       '2018 to 2023',
@@ -226,27 +253,35 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       'Test live filter',
     );
     expect(
-      within(summary.getByTestId('Actions')).getByRole('link', {
-        name: /View live data set/,
-      }),
+      summary.getByRole('link', { name: /View live data set/ }),
     ).toHaveAttribute(
       'href',
       'http://localhost/data-catalogue/data-set/live-file-id',
     );
-
     expect(
-      screen.queryByRole('button', { name: 'Remove draft version' }),
-    ).not.toBeInTheDocument();
+      summary.getByRole('link', { name: 'View changelog and guidance notes' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/changelog/live-version-id',
+    );
+    expect(
+      summary.getByRole('link', { name: 'View version history' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/versions',
+    );
+
+    // Draft version sections not rendered
+
+    expect(screen.queryByTestId('draft-version-tasks')).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('heading', { name: 'Draft version details' }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole('heading', { name: 'Draft version tasks' }),
+      screen.queryByTestId('draft-version-summary'),
     ).not.toBeInTheDocument();
-    expect(screen.queryByTestId('map-locations-task')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('map-filters-task')).not.toBeInTheDocument();
   });
 
   test('renders correctly with draft and latest live version', async () => {
@@ -272,20 +307,22 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).toBeInTheDocument();
 
     const mapLocationsTask = within(screen.getByTestId('map-locations-task'));
+
     expect(
       mapLocationsTask.getByRole('link', { name: 'Map locations' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/locations-mapping',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/locations-mapping',
     );
     expect(mapLocationsTask.getByText('Incomplete')).toBeInTheDocument();
 
     const mapFiltersTask = within(screen.getByTestId('map-filters-task'));
+
     expect(
       mapFiltersTask.getByRole('link', { name: 'Map filters' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/filters-mapping',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/filters-mapping',
     );
     expect(mapFiltersTask.getByText('Incomplete')).toBeInTheDocument();
 
@@ -312,6 +349,26 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       'Test draft filter',
     );
     expect(
+      draftSummary.getByRole('link', {
+        name: 'View changelog and guidance notes',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/changelog/draft-version-id',
+    );
+    expect(
+      draftSummary.getByRole('link', { name: 'Preview API data set' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview',
+    );
+    expect(
+      draftSummary.getByRole('link', { name: 'View preview token log' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview-tokens',
+    );
+    expect(
       draftSummary.getByRole('button', { name: 'Remove draft version' }),
     ).toBeInTheDocument();
 
@@ -323,7 +380,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     const liveSummary = within(screen.getByTestId('live-version-summary'));
 
-    expect(liveSummary.getByTestId('Version')).toHaveTextContent('v1.0');
+    expect(liveSummary.getByTestId('Version')).toHaveTextContent('v1.1');
     expect(liveSummary.getByTestId('Status')).toHaveTextContent('Published');
     expect(liveSummary.getByTestId('Time periods')).toHaveTextContent(
       '2018 to 2023',
@@ -335,35 +392,158 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       'Test live filter',
     );
     expect(
-      within(liveSummary.getByTestId('Actions')).getByRole('link', {
-        name: /View live data set/,
-      }),
+      liveSummary.getByRole('link', { name: /View live data set/ }),
     ).toHaveAttribute(
       'href',
       'http://localhost/data-catalogue/data-set/live-file-id',
     );
+    expect(
+      liveSummary.getByRole('link', {
+        name: 'View changelog and guidance notes',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/changelog/live-version-id',
+    );
+    expect(
+      liveSummary.getByRole('link', { name: 'View version history' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/versions',
+    );
   });
 
-  test('does not render the Remove draft version button when cannot update the release', async () => {
+  test('renders the correct draft version (v1) actions', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
-      draftVersion: testDraftVersion,
-      latestLiveVersion: testLiveVersion,
+      draftVersion: {
+        ...testDraftVersion,
+        version: '1.0',
+      },
     });
 
-    renderPage({ release: { ...testRelease, approvalStatus: 'Approved' } });
+    renderPage();
 
     expect(
       await screen.findByText('Draft version details'),
     ).toBeInTheDocument();
 
-    const draftSummary = within(screen.getByTestId('draft-version-summary'));
+    const summary = within(screen.getByTestId('draft-version-summary'));
+
     expect(
-      draftSummary.queryByRole('button', { name: 'Remove draft version' }),
+      summary.getByRole('link', { name: 'Preview API data set' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview',
+    );
+    expect(
+      summary.getByRole('link', { name: 'View preview token log' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2-id/api-data-sets/data-set-id/preview-tokens',
+    );
+    expect(
+      summary.getByRole('button', { name: 'Remove draft version' }),
+    ).toBeInTheDocument();
+    expect(
+      summary.queryByRole('link', {
+        name: 'View changelog and guidance notes',
+      }),
     ).not.toBeInTheDocument();
   });
 
-  test('renders the create new version button when release can be updated and there is no draft version', async () => {
+  test('does not render the `Remove draft version` button when release cannot be updated', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testDraftVersion,
+    });
+
+    renderPage({
+      release: { ...testDraftRelease, approvalStatus: 'Approved' },
+    });
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+
+    const summary = within(screen.getByTestId('draft-version-summary'));
+
+    expect(
+      summary.queryByRole('button', { name: 'Remove draft version' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders correct latest live version (v1) actions', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      latestLiveVersion: {
+        ...testLiveVersion,
+        version: '1.0',
+      },
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Latest live version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Latest live version details' }),
+    ).toBeInTheDocument();
+
+    const summary = within(screen.getByTestId('live-version-summary'));
+
+    // Not rendered for v1
+    expect(
+      summary.queryByRole('link', {
+        name: 'View changelog and guidance notes',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      summary.queryByRole('link', { name: 'View version history' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders correct latest live version (non-v1) actions when release cannot be updated', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage({
+      release: { ...testDraftRelease, approvalStatus: 'Approved' },
+    });
+
+    expect(
+      await screen.findByText('Latest live version details'),
+    ).toBeInTheDocument();
+
+    const summary = within(screen.getByTestId('live-version-summary'));
+
+    expect(
+      summary.getByRole('link', { name: /View live data set/ }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/data-catalogue/data-set/live-file-id',
+    );
+    expect(
+      summary.getByRole('link', {
+        name: 'View changelog and guidance notes',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/changelog/live-version-id',
+    );
+    expect(
+      summary.getByRole('link', { name: 'View version history' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1-id/api-data-sets/data-set-id/versions',
+    );
+  });
+
+  test('renders the `Create new version` button when release can be updated and no draft version', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       latestLiveVersion: testLiveVersion,
@@ -382,13 +562,15 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).toBeInTheDocument();
   });
 
-  test('does not render the create new version button when cannot update the release', async () => {
+  test('does not render the `Create new version` button when release cannot be updated', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       latestLiveVersion: testLiveVersion,
     });
 
-    renderPage({ release: { ...testRelease, approvalStatus: 'Approved' } });
+    renderPage({
+      release: { ...testDraftRelease, approvalStatus: 'Approved' },
+    });
 
     expect(
       await screen.findByText('Latest live version details'),
@@ -401,7 +583,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not render the create new version button when there is a draft version', async () => {
+  test('does not render the `Create new version` button when there is a draft version', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       draftVersion: testDraftVersion,
@@ -421,7 +603,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not render the create new version button when release series includes a previous version of this data set', async () => {
+  test('does not render the `Create new version` button when release series includes a previous version of this data set', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       latestLiveVersion: testLiveVersion,
@@ -429,7 +611,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     renderPage({
       release: {
-        ...testRelease,
+        ...testDraftRelease,
         releaseId: testDataSet.previousReleaseIds[0],
       },
     });
@@ -664,7 +846,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
   });
 
   function renderPage(options?: { release?: Release; dataSetId?: string }) {
-    const { release = testRelease, dataSetId = 'data-set-id' } = options ?? {};
+    const { release = testDraftRelease, dataSetId = 'data-set-id' } =
+      options ?? {};
 
     return render(
       <TestConfigContextProvider>
