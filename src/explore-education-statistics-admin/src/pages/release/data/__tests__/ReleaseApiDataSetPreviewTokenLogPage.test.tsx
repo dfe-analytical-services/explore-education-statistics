@@ -76,7 +76,7 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
     },
   ];
 
-  test('renders the table correctly', async () => {
+  test('renders correctly with tokens', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     previewTokenService.listPreviewTokens.mockResolvedValue(testTokens);
 
@@ -139,6 +139,39 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
     expect(
       within(row3Cells[5]).getByRole('button', { name: 'Revoke Test label 3' }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText('No preview tokens have been created.'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'Generate preview token' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview',
+    );
+  });
+
+  test('renders correctly with no tokens', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    previewTokenService.listPreviewTokens.mockResolvedValue([]);
+
+    renderPage();
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText('No preview tokens have been created.'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'Generate preview token' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview',
+    );
   });
 
   test('revoking a token', async () => {
