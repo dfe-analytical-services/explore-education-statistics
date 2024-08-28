@@ -111,7 +111,7 @@ Click on 'View Details' link
     user waits until h3 is visible    Draft version details
     user checks row data heading in the Draft version details table
 
-User checks cell contents below the 'Draft API datasets' summary table
+User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value    v1.0                                       xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
     user checks contents inside the cell value    Ready                                      xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
     user checks contents inside the cell value    Financial year 3000-01                     xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]

@@ -59,10 +59,9 @@ user checks contents inside the cell value
     should be equal as strings    ${status_value}    ${expected_text}
 
 user checks row data heading in the Draft version details table
-    ${elements}=  Create List  Version  Status  Release  Data set file  Geographic levels  Time periods  Indicators  Filters  Actions
+    ${elements}=  create list  Version  Status  Release  Data set file  Geographic levels  Time periods  Indicators  Filters  Actions
 
     FOR  ${element}  IN  @{elements}
-        # Define the XPath pattern within the loop, incorporating the element dynamically
-        ${xpath}=  Set Variable  //dl[@data-testid="draft-version-summary"]//div[@data-testid="${element}"]/dt
-        Element Should Be Visible  xpath=${xpath}
+        ${xpath}=  set variable  //dl[@data-testid="draft-version-summary"]//div[@data-testid="${element}"]/dt
+        element should be visible  xpath=${xpath}
     END
