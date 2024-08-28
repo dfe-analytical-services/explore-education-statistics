@@ -251,24 +251,3 @@ public record FilterMappingPlan
 
     public Dictionary<string, FilterMappingCandidate> Candidates { get; init; } = [];
 }
-
-public static class MappingKeyFunctions
-{
-    public static Func<LocationOptionMetaRow, string> LocationOptionMetaRowKeyGenerator =>
-        option => $"{option.Label} :: {option.GetRowKeyPretty()}";
-
-    public static Func<LocationOptionMeta, string> LocationOptionMetaKeyGenerator =>
-        option => LocationOptionMetaRowKeyGenerator(option.ToRow());
-
-    public static Func<LocationOptionMetaLink, string> LocationOptionMetaLinkKeyGenerator =>
-        link => LocationOptionMetaKeyGenerator(link.Option);
-
-    public static Func<FilterMeta, string> FilterKeyGenerator =>
-        filter => filter.PublicId;
-
-    public static Func<FilterOptionMeta, string> FilterOptionMetaKeyGenerator =>
-        option => option.Label;
-
-    public static Func<FilterOptionMetaLink, string> FilterOptionMetaLinkKeyGenerator =>
-        link => FilterOptionMetaKeyGenerator(link.Option);
-}

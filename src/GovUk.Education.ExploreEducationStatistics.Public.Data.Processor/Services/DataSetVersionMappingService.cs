@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -348,7 +349,7 @@ internal class DataSetVersionMappingService(
                         Mappings = level
                             .OptionLinks
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionMetaLinkKeyGenerator,
+                                keySelector: MappingKeyGenerators.LocationOptionMetaLink,
                                 elementSelector: link => new LocationOptionMapping
                                 {
                                     PublicId = link.PublicId,
@@ -356,7 +357,7 @@ internal class DataSetVersionMappingService(
                                 }),
                         Candidates = candidatesForLevel
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
+                                keySelector: MappingKeyGenerators.LocationOptionMetaRow,
                                 elementSelector: CreateLocationOptionFromMetaRow)
                     };
                 });
@@ -378,7 +379,7 @@ internal class DataSetVersionMappingService(
                     Candidates = meta
                         .optionsMeta
                         .ToDictionary(
-                            keySelector: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator,
+                            keySelector: MappingKeyGenerators.LocationOptionMetaRow,
                             elementSelector: CreateLocationOptionFromMetaRow)
                 });
 
@@ -398,7 +399,7 @@ internal class DataSetVersionMappingService(
     {
         var filterMappings = sourceFilterMeta
             .ToDictionary(
-                keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                keySelector: MappingKeyGenerators.Filter,
                 elementSelector: filter =>
                     new FilterMapping
                     {
@@ -406,7 +407,7 @@ internal class DataSetVersionMappingService(
                         OptionMappings = filter
                             .OptionLinks
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.FilterOptionMetaLinkKeyGenerator,
+                                keySelector: MappingKeyGenerators.FilterOptionMetaLink,
                                 elementSelector: link =>
                                     new FilterOptionMapping
                                     {
@@ -420,14 +421,14 @@ internal class DataSetVersionMappingService(
                 filterMeta: meta.Key,
                 optionsMeta: meta.Value))
             .ToDictionary(
-                keySelector: meta => MappingKeyFunctions.FilterKeyGenerator(meta.filterMeta),
+                keySelector: meta => MappingKeyGenerators.Filter(meta.filterMeta),
                 elementSelector: meta =>
                     new FilterMappingCandidate
                     {
                         Label = meta.filterMeta.Label,
                         Options = meta.optionsMeta
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.FilterOptionMetaKeyGenerator,
+                                keySelector: MappingKeyGenerators.FilterOptionMeta,
                                 elementSelector: CreateFilterOptionFromMeta)
                     });
 

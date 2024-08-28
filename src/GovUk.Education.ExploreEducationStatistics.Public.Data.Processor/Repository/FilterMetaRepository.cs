@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
@@ -259,8 +260,8 @@ public class FilterMetaRepository(
     {
         return publicIdMappings
                    .GetPublicIdForFilterOptionCandidate(
-                       filterKey: MappingKeyFunctions.FilterKeyGenerator(filter),
-                       MappingKeyFunctions.FilterOptionMetaKeyGenerator(option))
+                       filterKey: MappingKeyGenerators.Filter(filter),
+                       MappingKeyGenerators.FilterOptionMeta(option))
                ?? defaultPublicIdFn.Invoke();
     }
 

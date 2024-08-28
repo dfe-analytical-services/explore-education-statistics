@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
@@ -204,8 +205,8 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             // Amend a couple of arbitrary mappings to identify some candidates.
             var firstLevel = testData.ExpectedLocations.First();
             var lastLevel = testData.ExpectedLocations.Last();
-            var mappedOption1Key = MappingKeyFunctions.LocationOptionMetaKeyGenerator(firstLevel.Options.First());
-            var mappedOption2Key = MappingKeyFunctions.LocationOptionMetaKeyGenerator(lastLevel.Options.Last());
+            var mappedOption1Key = MappingKeyGenerators.LocationOptionMeta(firstLevel.Options.First());
+            var mappedOption2Key = MappingKeyGenerators.LocationOptionMeta(lastLevel.Options.Last());
             var mappedOption1 = mappings.GetLocationOptionMapping(firstLevel.Level, mappedOption1Key);
             var mappedOption2 = mappings.GetLocationOptionMapping(lastLevel.Level, mappedOption2Key);
 
@@ -398,14 +399,14 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             {
                 PublicId = "option-1-public-id",
                 Type = MappingType.AutoMapped,
-                CandidateKey = MappingKeyFunctions.FilterOptionMetaKeyGenerator(mappedOption1)
+                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption1)
             };
 
             var option2Mapping = new FilterOptionMapping
             {
                 PublicId = "option-2-public-id",
                 Type = MappingType.ManualMapped,
-                CandidateKey = MappingKeyFunctions.FilterOptionMetaKeyGenerator(mappedOption2)
+                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption2)
             };
 
             var i = 0;
@@ -420,13 +421,13 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     Mappings = testData
                         .ExpectedFilters
                         .ToDictionary(
-                            keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                            keySelector: MappingKeyGenerators.Filter,
                             elementSelector: filter => new FilterMapping
                             {
                                 OptionMappings = filter
                                     .Options
                                     .ToDictionary(
-                                        keySelector: MappingKeyFunctions.FilterOptionMetaKeyGenerator,
+                                        keySelector: MappingKeyGenerators.FilterOptionMeta,
                                         elementSelector: option =>
                                             option == mappedOption1 ? option1Mapping
                                             : option == mappedOption2 ? option2Mapping
