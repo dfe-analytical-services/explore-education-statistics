@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 
@@ -7,7 +8,7 @@ public interface IDataSetVersionPathResolver
 {
     string BasePath();
 
-    string DirectoryPath(DataSetVersion dataSetVersion);
+    string DirectoryPath(DataSetVersion dataSetVersion, SemVersion? versionNumber = null);
 
     string CsvDataPath(DataSetVersion dataSetVersion)
         => Path.Combine(DirectoryPath(dataSetVersion), DataSetFilenames.CsvDataFile);

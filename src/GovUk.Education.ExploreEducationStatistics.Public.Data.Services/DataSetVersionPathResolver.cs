@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 
@@ -33,8 +34,13 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string BasePath() => _basePath;
 
-    public string DirectoryPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.DataSetId.ToString(), $"v{dataSetVersion.SemVersion()}");
+    public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion? versionNumber = null)
+    {
+        return Path.Combine(
+            _basePath,
+            dataSetVersion.DataSetId.ToString(),
+            $"v{versionNumber ?? dataSetVersion.SemVersion()}");
+    }
 
     private string GetBasePath()
     {
