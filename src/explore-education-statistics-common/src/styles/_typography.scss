@@ -1,3 +1,4 @@
+@import '~govuk-frontend/dist/govuk/base';
 @import '~govuk-frontend/dist/govuk/core/lists';
 @import '~govuk-frontend/dist/govuk/core/section-break';
 @import '~govuk-frontend/dist/govuk/core/typography';
@@ -26,11 +27,21 @@ small {
 }
 
 ul {
-  @extend %govuk-list, %govuk-list--bullet;
+  @extend %govuk-list--bullet;
+  @include govuk-responsive-margin(4, 'bottom');
 }
 
 ol {
-  @extend %govuk-list, %govuk-list--number;
+  @extend %govuk-list--number;
+  @include govuk-responsive-margin(4, 'bottom');
+}
+
+ol,
+ul {
+  ul,
+  ol {
+    margin-top: govuk-spacing(2);
+  }
 }
 
 dt {
