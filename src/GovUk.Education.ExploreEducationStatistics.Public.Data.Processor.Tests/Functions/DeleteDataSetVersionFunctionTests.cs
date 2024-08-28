@@ -8,9 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
 public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
@@ -26,10 +28,8 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.DeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task Success_FirstDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -53,8 +53,9 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(major: 1, minor: 0)
                 .WithStatus(dataSetVersionStatus)
-                .WithReleaseFileId(releaseFile.Id)
                 .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(releaseFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .Generate(1))
@@ -120,10 +121,8 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.DeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task Success_SubsequentDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
         {
             var releaseFiles = DataFixture.DefaultReleaseFile()
@@ -151,8 +150,9 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(major: 1, minor: 0)
                 .WithStatusPublished()
-                .WithReleaseFileId(liveReleaseFile.Id)
                 .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(liveReleaseFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .WithStage(DataSetVersionImportStage.Completing)
@@ -163,8 +163,9 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(major: 2, minor: 0, patch: 1)
                 .WithStatus(dataSetVersionStatus)
-                .WithReleaseFileId(draftReleaseFile.Id)
                 .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(draftReleaseFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .Generate(1))
@@ -288,7 +289,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 
             // Assert that the DRAFT Data Set Version Import has been deleted
             Assert.Null(await publicDataDbContext.DataSetVersionImports
-                .SingleOrDefaultAsync(i => i .Id == draftDataSetVersion.Imports.Single().Id));
+                .SingleOrDefaultAsync(i => i.Id == draftDataSetVersion.Imports.Single().Id));
 
             // Assert that the LIVE Data Set Version Import has NOT been deleted
             Assert.Single(await publicDataDbContext.DataSetVersionImports
@@ -311,10 +312,8 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task VersionCanNotBeDeleted_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
@@ -368,8 +367,9 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithVersionNumber(major: 1, minor: 0)
                 .WithStatusDraft()
-                .WithReleaseFileId(releaseFile.Id)
                 .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(releaseFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .Generate(1))

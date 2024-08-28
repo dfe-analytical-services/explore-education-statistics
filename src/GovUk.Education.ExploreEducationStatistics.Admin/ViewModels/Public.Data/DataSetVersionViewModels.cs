@@ -70,6 +70,8 @@ public record DataSetVersionSummaryViewModel
     public required DataSetVersionType Type { get; init; }
 
     public required IdTitleViewModel ReleaseVersion { get; init; }
+
+    public required IdTitleViewModel File { get; init; }
 }
 
 public record DataSetLiveVersionSummaryViewModel : DataSetVersionSummaryViewModel

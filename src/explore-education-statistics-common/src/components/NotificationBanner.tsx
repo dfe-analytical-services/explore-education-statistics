@@ -1,18 +1,37 @@
+import styles from '@common/components/NotificationBanner.module.scss';
+import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
+  fullWidthContent?: boolean;
   heading?: string;
+  role?: 'region' | 'alert';
   title: string;
+  variant?: 'error' | 'success';
 }
 
-const NotificationBanner = ({ children, heading, title }: Props) => {
+const NotificationBanner = ({
+  children,
+  fullWidthContent = false,
+  heading,
+  role = 'region',
+  title,
+  variant,
+}: Props) => {
   return (
     <div
       aria-labelledby="govuk-notification-banner-title"
-      className="govuk-notification-banner govuk-!-margin-bottom-6"
+      className={classNames(
+        'govuk-notification-banner govuk-!-margin-bottom-6',
+        {
+          [styles.fullWidthContent]: fullWidthContent,
+          [styles.error]: variant === 'error',
+          'govuk-notification-banner--success': variant === 'success',
+        },
+      )}
       data-testid="notificationBanner"
-      role="region"
+      role={role}
     >
       <div className="govuk-notification-banner__header">
         <h2

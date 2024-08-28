@@ -4,7 +4,6 @@ import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
-import { AltTextWarningMessage } from '@admin/components/form/FormFieldEditor';
 import glossaryService from '@admin/services/glossaryService';
 import { UserDetails } from '@admin/services/types/user';
 import { ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';
@@ -15,7 +14,6 @@ import {
 import toHtml from '@admin/utils/markdown/toHtml';
 import ContentHtml from '@common/components/ContentHtml';
 import Tooltip from '@common/components/Tooltip';
-import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   commentTagAttributes,
@@ -26,7 +24,7 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import mapValues from 'lodash/mapValues';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 interface EditableContentBlockProps {
   actionThrottle?: number;
@@ -88,7 +86,6 @@ const EditableContentBlock = ({
   onSubmit,
 }: EditableContentBlockProps) => {
   const { comments } = useCommentsContext();
-  const [showAltTextMessage, toggleAltTextMessage] = useToggle(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const content = useMemo(
@@ -123,17 +120,6 @@ const EditableContentBlock = ({
       },
     };
   }, [comments, transformImageAttributes]);
-
-  // Check content for images without alt text.
-  useEffect(() => {
-    if (content && !isEditing) {
-      const hasInvalidImage = !!contentRef.current?.querySelector(
-        'img:not([alt]), img[alt=""]',
-      );
-
-      toggleAltTextMessage(hasInvalidImage);
-    }
-  }, [content, isEditing, toggleAltTextMessage]);
 
   if (isEditing && !lockedBy) {
     return (
@@ -173,8 +159,6 @@ const EditableContentBlock = ({
       showCommentsList={false}
       onViewComments={onEditing}
     >
-      {showAltTextMessage && <AltTextWarningMessage />}
-
       {locked && lockedBy && (
         <EditableBlockLockedMessage locked={locked} lockedBy={lockedBy} />
       )}

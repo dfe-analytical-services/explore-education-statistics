@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -253,21 +254,22 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                     levelMeta => new LocationLevelMappings
                     {
                         Mappings = levelMeta
-                            .Options
+                            .OptionLinks
                             .ToDictionary(
-                                keySelector: MappingKeyFunctions.LocationOptionMetaKeyGenerator,
-                                elementSelector: option => new LocationOptionMapping
+                                keySelector: MappingKeyGenerators.LocationOptionMetaLink,
+                                elementSelector: link => new LocationOptionMapping
                                 {
                                     CandidateKey = null,
+                                    PublicId = link.PublicId,
                                     Type = MappingType.None,
                                     Source = new MappableLocationOption
                                     {
-                                        Label = option.Label,
-                                        Code = option.ToRow().Code,
-                                        OldCode = option.ToRow().OldCode,
-                                        Urn = option.ToRow().Urn,
-                                        LaEstab = option.ToRow().LaEstab,
-                                        Ukprn = option.ToRow().Ukprn
+                                        Label = link.Option.Label,
+                                        Code = link.Option.ToRow().Code,
+                                        OldCode = link.Option.ToRow().OldCode,
+                                        Urn = link.Option.ToRow().Urn,
+                                        LaEstab = link.Option.ToRow().LaEstab,
+                                        Ukprn = link.Option.ToRow().Ukprn
                                     }
                                 })
                     });
@@ -316,16 +318,15 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             var expectedLocationLevels = ProcessorTestData
                 .AbsenceSchool
                 .ExpectedLocations
-                .Select(levelMeta => (level: levelMeta.Level, options: levelMeta.Options))
                 .ToDictionary(
-                    keySelector: levelMeta => levelMeta.level,
+                    keySelector: levelMeta => levelMeta.Level,
                     elementSelector: levelMeta =>
                         new LocationLevelMappings
                         {
                             Candidates = levelMeta
-                                .options
+                                .Options
                                 .ToDictionary(
-                                    keySelector: MappingKeyFunctions.LocationOptionMetaKeyGenerator,
+                                    keySelector: MappingKeyGenerators.LocationOptionMeta,
                                     elementSelector: option => new MappableLocationOption
                                     {
                                         Label = option.Label,
@@ -374,7 +375,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             var expectedFilterMappings = initialFilterMeta
                 .ToDictionary(
-                    keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                    keySelector: MappingKeyGenerators.Filter,
                     elementSelector: filter =>
                         new FilterMapping
                         {
@@ -382,15 +383,16 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             Type = MappingType.None,
                             Source = new MappableFilter { Label = filter.Label },
                             OptionMappings = filter
-                                .Options
+                                .OptionLinks
                                 .ToDictionary(
-                                    keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
-                                    elementSelector: option =>
+                                    keySelector: MappingKeyGenerators.FilterOptionMetaLink,
+                                    elementSelector: link =>
                                         new FilterOptionMapping
                                         {
                                             CandidateKey = null,
+                                            PublicId = link.PublicId,
                                             Type = MappingType.None,
-                                            Source = new MappableFilterOption { Label = option.Label }
+                                            Source = new MappableFilterOption { Label = link.Option.Label }
                                         })
                         });
 
@@ -416,7 +418,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 .AbsenceSchool
                 .ExpectedFilters
                 .ToDictionary(
-                    keySelector: MappingKeyFunctions.FilterKeyGenerator,
+                    keySelector: MappingKeyGenerators.Filter,
                     elementSelector: filter =>
                         new FilterMappingCandidate
                         {
@@ -424,7 +426,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             Options = filter
                                 .Options
                                 .ToDictionary(
-                                    keySelector: MappingKeyFunctions.FilterOptionKeyGenerator,
+                                    keySelector: MappingKeyGenerators.FilterOptionMeta,
                                     elementSelector: optionMeta =>
                                         new MappableFilterOption { Label = optionMeta.Label })
                         });
@@ -468,7 +470,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 }));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -556,7 +558,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -669,7 +671,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -765,7 +767,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -864,7 +866,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -992,7 +994,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -1109,7 +1111,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)
@@ -1201,7 +1203,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.ReleaseFileId)
+                .WithId(nextVersion.Release.ReleaseFileId)
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
                 .WithFile(DataFixture.DefaultFile())
                 .WithPublicApiDataSetId(nextVersion.DataSetId)

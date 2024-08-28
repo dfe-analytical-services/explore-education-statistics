@@ -89,7 +89,9 @@ Searching
     user presses keys    pupil absence
     user clicks button    Search
     user checks page contains button    pupil absence
-    user checks radio is checked    Newest
+    user clicks radio    Relevance
+    user waits until page finishes loading
+    user checks page contains button    pupil absence
     user checks list item contains    testid:publicationsList    1   Pupil absence in schools in England
 
 Removing search

@@ -130,9 +130,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<DateTimeOffset?>("Published")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ReleaseFileId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -156,8 +153,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReleaseFileId");
 
                     b.HasIndex("DataSetId", "VersionMajor", "VersionMinor", "VersionPatch")
                         .IsUnique()
@@ -920,9 +915,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                 .IsRequired();
                         });
 
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Release", "Release", b1 =>
+                        {
+                            b1.Property<Guid>("DataSetVersionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("DataSetFileId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("ReleaseFileId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Slug")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("DataSetVersionId");
+
+                            b1.HasIndex("DataSetFileId");
+
+                            b1.HasIndex("ReleaseFileId")
+                                .IsUnique();
+
+                            b1.ToTable("DataSetVersions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DataSetVersionId");
+                        });
+
                     b.Navigation("DataSet");
 
                     b.Navigation("MetaSummary");
+
+                    b.Navigation("Release")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImport", b =>

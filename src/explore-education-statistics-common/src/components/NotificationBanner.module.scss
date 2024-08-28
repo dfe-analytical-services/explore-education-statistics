@@ -1,0 +1,10 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.fullWidthContent * {
+  max-width: none;
+}
+
+.error {
+  background-color: govuk-colour('red');
+  border-color: govuk-colour('red');
+}

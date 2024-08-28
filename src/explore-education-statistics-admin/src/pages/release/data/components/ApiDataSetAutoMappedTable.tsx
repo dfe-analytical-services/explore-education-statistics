@@ -30,7 +30,7 @@ interface Props {
   autoMappedItems: AutoMappedLocation[] | AutoMappedFilterOption[];
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => string;
+  ) => ReactNode;
   groupKey: LocationLevelKey | string;
   groupLabel: string;
   itemLabel: string;

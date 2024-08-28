@@ -25,7 +25,9 @@ export interface ApiDataSetDraftVersionSummary
 }
 
 export interface ApiDataSetLiveVersionSummary extends ApiDataSetVersionSummary {
+  file: IdTitlePair;
   published: string;
+  releaseVersion: IdTitlePair;
   status: DataSetLiveVersionStatus;
 }
 
@@ -46,6 +48,7 @@ export interface ApiDataSetVersion {
   status: DataSetVersionStatus;
   type: DataSetVersionType;
   file: IdTitlePair;
+  notes?: string;
   releaseVersion: IdTitlePair;
   totalResults: number;
 }

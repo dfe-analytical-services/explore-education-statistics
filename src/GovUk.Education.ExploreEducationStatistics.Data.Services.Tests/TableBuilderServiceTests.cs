@@ -436,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    options: options
+                    tableBuilderOptions: options
                 );
 
                 var result = await service.Query(query);
@@ -799,7 +799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildTableBuilderService(
                     statisticsDbContext: statisticsDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    options: options
+                    tableBuilderOptions: options
                 );
 
                 var result = await service.Query(releaseSubject.ReleaseVersionId, query, null);
@@ -1167,7 +1167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    options: options
+                    tableBuilderOptions: options
                 );
 
                 using var stream = new MemoryStream();
@@ -1668,7 +1668,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildTableBuilderService(
                     statisticsDbContext: statisticsDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    options: options
+                    tableBuilderOptions: options
                 );
 
                 using var stream = new MemoryStream();
@@ -1681,7 +1681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static IOptions<TableBuilderOptions> DefaultOptions()
+        private static IOptions<TableBuilderOptions> DefaultTableBuilderOptions()
         {
             return Options.Create(new TableBuilderOptions
             {
@@ -1689,10 +1689,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             });
         }
 
+        private static IOptions<LocationsOptions> DefaultLocationOptions()
+        {
+            return Options.Create(new LocationsOptions
+            {
+                Hierarchies = new()
+                {
+                    { GeographicLevel.LocalAuthority, ["Region"] },
+                    { GeographicLevel.LocalAuthorityDistrict, ["Region"] },
+                    { GeographicLevel.School, ["LocalAuthority"] },
+                }
+            });
+        }
+
         private static TableBuilderService BuildTableBuilderService(
             StatisticsDbContext statisticsDbContext,
             ContentDbContext? contentDbContext = null,
             IFilterItemRepository? filterItemRepository = null,
+            ILocationService? locationService = null,
             IObservationService? observationService = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
             ISubjectResultMetaService? subjectResultMetaService = null,
@@ -1700,11 +1714,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
-            IOptions<TableBuilderOptions>? options = null)
+            IOptions<TableBuilderOptions>? tableBuilderOptions = null,
+            IOptions<LocationsOptions>? locationsOptions = null)
         {
             return new(
                 statisticsDbContext,
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
+                locationService ?? Mock.Of<ILocationService>(Strict),
                 observationService ?? Mock.Of<IObservationService>(Strict),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
@@ -1712,7 +1728,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectRepository ?? new SubjectRepository(statisticsDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext ?? Mock.Of<ContentDbContext>()),
-                options ?? DefaultOptions()
+                tableBuilderOptions ?? DefaultTableBuilderOptions(),
+                locationsOptions ?? DefaultLocationOptions()
             );
         }
     }

@@ -50,6 +50,13 @@ public interface IDataSetVersionService
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
+        Guid dataSetVersionId,
         DataSetVersionUpdateRequest updateRequest,
+        CancellationToken cancellationToken = default);
+
+    Task UpdateVersionsForReleaseVersion(
+        Guid releaseVersionId,
+        string slug,
+        string title,
         CancellationToken cancellationToken = default);
 }

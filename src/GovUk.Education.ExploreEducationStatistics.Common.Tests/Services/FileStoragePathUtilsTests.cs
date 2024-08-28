@@ -1,7 +1,7 @@
 #nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using System;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
@@ -29,6 +29,13 @@ public class FileStoragePathUtilsTests
             {
                 { "publication-slug", "release-slug", Guid.NewGuid() },
                 { "  publication-SLUG  ", "  release-SLUG  ", Guid.NewGuid() }
+            };
+
+        public static TheoryData<string, string, Guid, long> PublicationReleaseIdAndBoundaryLevelData =
+            new()
+            {
+                { "publication-slug", "release-slug", Guid.NewGuid(), 1 },
+                { "  publication-SLUG  ", "  release-SLUG  ", Guid.NewGuid(), 1 }
             };
 
         [Theory]
@@ -76,6 +83,22 @@ public class FileStoragePathUtilsTests
                 FileStoragePathUtils.PublicContentDataBlockPath(publicationSlug: publicationSlug,
                     releaseSlug: releaseSlug,
                     dataBlockId));
+        }
+
+        [Theory]
+        [MemberData(nameof(PublicationReleaseIdAndBoundaryLevelData))]
+        public void PublicContentDataBlockLocationsPath(
+            string publicationSlug,
+            string releaseSlug,
+            Guid dataBlockId,
+            long boundaryLevelId)
+        {
+            Assert.Equal($"publications/publication-slug/releases/release-slug/data-blocks/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json",
+                FileStoragePathUtils.PublicContentDataBlockLocationsPath(
+                    publicationSlug: publicationSlug,
+                    releaseSlug: releaseSlug,
+                    dataBlockId,
+                    boundaryLevelId));
         }
 
         [Theory]
@@ -131,6 +154,14 @@ public class FileStoragePathUtilsTests
             }
         }
 
+        private class TestDataWithBoundaryLevelId : TheoryData<Guid, Guid, long>
+        {
+            public TestDataWithBoundaryLevelId()
+            {
+                Add(Guid.NewGuid(), Guid.NewGuid(), 1);
+            }
+        }
+
         [Theory]
         [ClassData(typeof(TestData))]
         public void PrivateContentDataBlockPath(Guid releaseVersionId,
@@ -139,6 +170,20 @@ public class FileStoragePathUtilsTests
             Assert.Equal($"releases/{releaseVersionId}/data-blocks/{dataBlockId}.json",
                 FileStoragePathUtils.PrivateContentDataBlockPath(releaseVersionId: releaseVersionId,
                     dataBlockId: dataBlockId));
+        }
+
+        [Theory]
+        [ClassData(typeof(TestDataWithBoundaryLevelId))]
+        public void PrivateContentDataBlockLocationsPath(
+            Guid releaseVersionId,
+            Guid dataBlockId,
+            long boundaryLevelId)
+        {
+            Assert.Equal($"releases/{releaseVersionId}/data-blocks/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json",
+                FileStoragePathUtils.PrivateContentDataBlockLocationsPath(
+                    releaseVersionId,
+                    dataBlockId,
+                    boundaryLevelId));
         }
 
         [Theory]

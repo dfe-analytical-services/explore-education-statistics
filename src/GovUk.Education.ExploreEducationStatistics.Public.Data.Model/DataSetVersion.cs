@@ -17,9 +17,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DataSet DataSet { get; set; } = null!;
 
-    public required DataSetVersionStatus Status { get; set; }
+    public required Release Release { get; set; }
 
-    public required Guid ReleaseFileId { get; set; }
+    public required DataSetVersionStatus Status { get; set; }
 
     public required int VersionMajor { get; set; }
 
@@ -133,11 +133,19 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                     );
             });
 
+            builder.OwnsOne(dsv => dsv.Release,
+                ownedBuilder =>
+                {
+                    ownedBuilder
+                        .HasIndex(r => r.DataSetFileId);
+                    ownedBuilder
+                        .HasIndex(r => r.ReleaseFileId)
+                        .IsUnique();
+                });
+
             builder.HasIndex(dsv => new { dsv.DataSetId, dsv.VersionMajor, dsv.VersionMinor, dsv.VersionPatch })
                 .HasDatabaseName("IX_DataSetVersions_DataSetId_VersionNumber")
                 .IsUnique();
-
-            builder.HasIndex(dsv => dsv.ReleaseFileId);
         }
     }
 }

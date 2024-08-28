@@ -1,7 +1,12 @@
 #nullable enable
+using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -61,5 +66,27 @@ public static class HttpRequestExtensions
         return accept?.Any(acceptedType =>
             mediaTypes.Any(type => exact ? type.Equals(acceptedType) : type.IsSubsetOf(acceptedType))
         ) ?? false;
+    }
+
+    public static async Task<TJsonType?> GetJsonBody<TJsonType>(this HttpRequest request, bool allowEmptyBody = true)
+        where TJsonType : class
+    {
+        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+
+        if (requestBody.IsNullOrEmpty() && allowEmptyBody)
+        {
+            return null;
+        }
+
+        return JsonConvert.DeserializeObject<TJsonType>(requestBody) ??
+               throw new ArgumentException($"Could not deserialize request body to type {typeof(TJsonType)}");
+    }
+
+    public static bool TryGetHeader(
+        this HttpRequest httpRequest,
+        string headerName,
+        out StringValues headerValues)
+    {
+        return httpRequest.Headers.TryGetValue(headerName, out headerValues);
     }
 }

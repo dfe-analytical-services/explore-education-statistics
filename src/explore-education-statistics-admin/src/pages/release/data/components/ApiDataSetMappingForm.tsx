@@ -17,7 +17,7 @@ import FormProvider from '@common/components/form/FormProvider';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/validation/yup';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 const noMappingValue = 'noMapping';
 
@@ -29,7 +29,7 @@ interface Props {
   candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => string;
+  ) => ReactNode;
   groupKey: string;
   itemLabel: string;
   mapping: FilterOptionMappingWithKey | LocationMappingWithKey;

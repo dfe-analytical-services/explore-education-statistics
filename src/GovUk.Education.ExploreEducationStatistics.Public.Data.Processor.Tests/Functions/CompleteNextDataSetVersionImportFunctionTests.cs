@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DurableTask;
@@ -31,17 +32,11 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CompleteNextDataSetVersionImportFunctionTests(fixture)
     {
-        public static TheoryData<DataSetVersionStatus> NonMappingDataSetVersionStatuses =
-            new(EnumUtil
-                .GetEnums<DataSetVersionStatus>()
-                .Except([DataSetVersionStatus.Mapping]));
-        
         public static TheoryData<DataSetVersionImportStage> NonManualMappingStages =
             new(EnumUtil
                 .GetEnums<DataSetVersionImportStage>()
                 .Except([DataSetVersionImportStage.ManualMapping]));
 
-        
         [Fact]
         public async Task Success()
         {
@@ -135,9 +130,9 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
         }
 
         [Theory]
-        [MemberData(nameof(NonMappingDataSetVersionStatuses))]
-        public async Task DataSetVersionNotInMappingStatus_ReturnsValidationProblem(
-            DataSetVersionStatus status)
+        [MemberData(nameof(DataSetVersionStatusTheoryData.StatusesExceptMapping),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
+        public async Task DataSetVersionNotInMappingStatus_ReturnsValidationProblem(DataSetVersionStatus status)
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
@@ -288,7 +283,8 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .WithVersionNumber(1, 0)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .WithReleaseFileId(dataFile.Id)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(dataFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .Generate(1))
@@ -318,7 +314,8 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .WithVersionNumber(1, 1)
                 .WithStatusMapping()
                 .WithDataSet(dataSet)
-                .WithReleaseFileId(dataFile.Id)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(dataFile.Id))
                 .WithImports(() => DataFixture
                     .DefaultDataSetVersionImport()
                     .WithStage(DataSetVersionImportStage.ManualMapping)
@@ -362,8 +359,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                         .DefaultFile(FileType.Metadata)
                         .WithSubjectId(subjectId)
                 ])
-                .GenerateList()
-                .ToTuple2();
+                .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
                 context.ReleaseFiles.AddRange(dataFile, metaFile));

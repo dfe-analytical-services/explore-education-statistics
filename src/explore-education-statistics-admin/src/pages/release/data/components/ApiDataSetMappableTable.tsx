@@ -19,14 +19,14 @@ import ButtonText from '@common/components/ButtonText';
 import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import kebabCase from 'lodash/kebabCase';
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
-import kebabCase from 'lodash/kebabCase';
 
 interface Props {
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => string;
+  ) => ReactNode;
   candidateIsMajorMapping?: (
     candidate: LocationCandidateWithKey,
     mapping: LocationMappingWithKey,
@@ -73,7 +73,7 @@ export default function ApiDataSetMappableTable({
   return (
     <table
       className="dfe-table--vertical-align-middle dfe-table--row-highlights"
-      id={`mappable-filter-options-${kebabCase(groupKey)}`}
+      id={`mappable-table-${kebabCase(groupKey)}`}
       data-testid={`mappable-table-${groupKey}`}
     >
       <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">

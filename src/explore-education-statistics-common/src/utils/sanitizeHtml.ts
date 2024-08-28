@@ -25,8 +25,6 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
     'h4',
     'h5',
     'strong',
-    'em',
-    'i',
     'a',
     'ul',
     'ol',

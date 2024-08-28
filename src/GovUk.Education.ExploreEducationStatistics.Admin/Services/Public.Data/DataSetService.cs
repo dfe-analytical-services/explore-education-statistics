@@ -56,7 +56,7 @@ internal class DataSetService(
                     await GetDataSetReleaseVersions(dataSets, cancellationToken);
 
                 var results = dataSets
-                    .Select(ds => MapDataSetSummary(ds, dataSetReleaseVersions[ds.Id]))
+                    .Select(ds => MapDataSetSummary(ds, dataSetReleaseVersions[ds.Id].ReleaseFilesByDataSetVersionId))
                     .ToList();
 
                 return new PaginatedListViewModel<DataSetSummaryViewModel>(
@@ -94,10 +94,10 @@ internal class DataSetService(
 
     private DataSetSummaryViewModel MapDataSetSummary(
         DataSet dataSet,
-        DataSetReleaseVersions dataSetReleaseVersions)
+        IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByDataSetVersionId)
     {
-        var previousReleaseIds = dataSetReleaseVersions.ReleaseVersionsByDataSetVersionId
-            .Select(r => r.Value.ReleaseId)
+        var previousReleaseIds = releaseFilesByDataSetVersionId
+            .Select(r => r.Value.ReleaseVersion.ReleaseId)
             .ToList();
 
         return new DataSetSummaryViewModel
@@ -107,19 +107,15 @@ internal class DataSetService(
             Summary = dataSet.Summary,
             Status = dataSet.Status,
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
-            DraftVersion = MapDraftSummaryVersion(
-                dataSet.LatestDraftVersion,
-                dataSetReleaseVersions.ReleaseVersionsByDataSetVersionId),
-            LatestLiveVersion = MapLiveSummaryVersion(
-                dataSet.LatestLiveVersion,
-                dataSetReleaseVersions.ReleaseVersionsByDataSetVersionId),
+            DraftVersion = MapDraftSummaryVersion(dataSet.LatestDraftVersion, releaseFilesByDataSetVersionId),
+            LatestLiveVersion = MapLiveSummaryVersion(dataSet.LatestLiveVersion, releaseFilesByDataSetVersionId),
             PreviousReleaseIds = previousReleaseIds
         };
     }
 
     private static DataSetVersionSummaryViewModel? MapDraftSummaryVersion(
         DataSetVersion? dataSetVersion,
-        IReadOnlyDictionary<Guid, ReleaseVersion> releaseVersionsByDataSetVersionId)
+        IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByDataSetVersionId)
     {
         return dataSetVersion != null
             ? new DataSetVersionSummaryViewModel
@@ -128,14 +124,15 @@ internal class DataSetService(
                 Version = dataSetVersion.PublicVersion,
                 Status = dataSetVersion.Status,
                 Type = dataSetVersion.VersionType,
-                ReleaseVersion = MapReleaseVersion(releaseVersionsByDataSetVersionId[dataSetVersion.Id])
+                ReleaseVersion = MapReleaseVersion(releaseFilesByDataSetVersionId[dataSetVersion.Id].ReleaseVersion),
+                File = MapVersionFile(releaseFilesByDataSetVersionId[dataSetVersion.Id])
             }
             : null;
     }
 
     private static DataSetLiveVersionSummaryViewModel? MapLiveSummaryVersion(
         DataSetVersion? dataSetVersion,
-        IReadOnlyDictionary<Guid, ReleaseVersion> releaseVersionsByDataSetVersionId)
+        IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByDataSetVersionId)
     {
         return dataSetVersion != null
             ? new DataSetLiveVersionSummaryViewModel
@@ -145,7 +142,8 @@ internal class DataSetService(
                 Published = dataSetVersion.Published!.Value,
                 Status = dataSetVersion.Status,
                 Type = dataSetVersion.VersionType,
-                ReleaseVersion = MapReleaseVersion(releaseVersionsByDataSetVersionId[dataSetVersion.Id])
+                ReleaseVersion = MapReleaseVersion(releaseFilesByDataSetVersionId[dataSetVersion.Id].ReleaseVersion),
+                File = MapVersionFile(releaseFilesByDataSetVersionId[dataSetVersion.Id])
             }
             : null;
     }
@@ -194,35 +192,28 @@ internal class DataSetService(
     {
         var dataSetsByPreviousReleaseFileId = dataSets
             .SelectMany(ds => ds.Versions)
-            .ToDictionary(dsv => dsv.ReleaseFileId, dsv => dsv.DataSet);
+            .ToDictionary(dsv => dsv.Release.ReleaseFileId, dsv => dsv.DataSet);
 
-        var releaseVersionsByReleaseFileId = await contentDbContext
+        var releaseFiles = await contentDbContext
             .ReleaseFiles
             .Include(rf => rf.ReleaseVersion)
-            .Where(releaseFile => dataSetsByPreviousReleaseFileId.Keys.Contains(releaseFile.Id))
-            .ToDictionaryAsync(
-                rf => rf.Id,
-                rf => rf.ReleaseVersion,
-                cancellationToken);
+            .Include(rf => rf.File)
+            .Where(rf => dataSetsByPreviousReleaseFileId.Keys.Contains(rf.Id))
+            .ToListAsync(cancellationToken);
 
-        return releaseVersionsByReleaseFileId
-            .Select(d => new
-            {
-                ReleaseFileId = d.Key,
-                ReleaseVersion = d.Value,
-                DataSet = dataSetsByPreviousReleaseFileId[d.Key]
-            })
-            .GroupBy(a => a.DataSet)
+        return releaseFiles
+            .GroupBy(rf => dataSetsByPreviousReleaseFileId[rf.Id])
             .ToDictionary(
-                g => g.Key.Id,
-                g => new DataSetReleaseVersions
+                group => group.Key.Id,
+                group => new DataSetReleaseVersions
                 {
-                    ReleaseVersionsByDataSetVersionId = g
+                    ReleaseFilesByDataSetVersionId = group
                         .ToDictionary(
-                            a => a.DataSet.Versions.Single(v => v.ReleaseFileId == a.ReleaseFileId).Id,
-                            a => a.ReleaseVersion
+                            rf => group.Key.Versions.Single(v => v.Release.ReleaseFileId == rf.Id).Id,
+                            rf => rf
                         )
-                });
+                }
+            );
     }
 
     private async Task<IReadOnlyDictionary<Guid, ReleaseFile>> GetReleaseFilesByDataSetVersionId(
@@ -231,7 +222,7 @@ internal class DataSetService(
     {
         var dataSetVersionsByReleaseFileId = dataSet
             .Versions
-            .ToDictionary(dsv => dsv.ReleaseFileId);
+            .ToDictionary(dsv => dsv.Release.ReleaseFileId);
 
         return await contentDbContext
             .ReleaseFiles
@@ -327,7 +318,8 @@ internal class DataSetService(
         };
     }
 
-    private async Task<Either<ActionResult, Publication>> CheckPublicationExists(Guid publicationId,
+    private async Task<Either<ActionResult, Publication>> CheckPublicationExists(
+        Guid publicationId,
         CancellationToken cancellationToken)
     {
         return await contentDbContext.Publications
@@ -347,6 +339,7 @@ internal class DataSetService(
 
     private record DataSetReleaseVersions
     {
-        public IReadOnlyDictionary<Guid, ReleaseVersion> ReleaseVersionsByDataSetVersionId { get; init; } = new Dictionary<Guid, ReleaseVersion>();
+        public IReadOnlyDictionary<Guid, ReleaseFile> ReleaseFilesByDataSetVersionId { get; init; }
+            = new Dictionary<Guid, ReleaseFile>();
     }
 }

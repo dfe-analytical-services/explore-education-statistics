@@ -6,10 +6,16 @@ import EditableContentForm from '@admin/components/editable/EditableContentForm'
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { AuthContext, User } from '@admin/contexts/AuthContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import {
+  render as baseRender,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 describe('EditableContentForm', () => {
   const testUser1: User = {
@@ -563,4 +569,10 @@ describe('EditableContentForm', () => {
       });
     });
   });
+
+  function render(element: ReactElement) {
+    baseRender(
+      <TestConfigContextProvider>{element}</TestConfigContextProvider>,
+    );
+  }
 });
