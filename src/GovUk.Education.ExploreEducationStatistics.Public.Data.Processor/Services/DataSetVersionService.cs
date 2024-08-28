@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Semver;
 using Release = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Release;
 using ValidationMessages =
     GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
@@ -447,6 +448,9 @@ internal class DataSetVersionService(
         ReleaseFile releaseFile,
         CancellationToken cancellationToken)
     {
+        var nextVersion = dataSet.LatestLiveVersion?.DefaultNextVersion()
+                          ?? new SemVersion(major: 1, minor: 0, patch: 0);
+
         var dataSetVersion = new DataSetVersion
         {
             DataSetId = dataSet.Id,
@@ -460,8 +464,9 @@ internal class DataSetVersionService(
                 Title = releaseFile.ReleaseVersion.Title
             },
             Notes = "",
-            VersionMajor = dataSet.LatestLiveVersion?.VersionMajor ?? 1,
-            VersionMinor = dataSet.LatestLiveVersion?.VersionMinor + 1 ?? 0
+            VersionMajor = nextVersion.Major,
+            VersionMinor = nextVersion.Minor,
+            VersionPatch = nextVersion.Patch
         };
 
         dataSet.Versions.Add(dataSetVersion);
