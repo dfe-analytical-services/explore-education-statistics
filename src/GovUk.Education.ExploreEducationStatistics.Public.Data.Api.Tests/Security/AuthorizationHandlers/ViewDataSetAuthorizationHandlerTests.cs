@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
@@ -11,8 +12,8 @@ public class ViewDataSetAuthorizationHandlerTests
     private readonly DataFixture _dataFixture = new();
 
     [Theory]
-    [InlineData(DataSetStatus.Deprecated)]
-    [InlineData(DataSetStatus.Published)]
+    [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
+        MemberType = typeof(DataSetStatusTheoryData))]
     public void Success(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture
@@ -28,8 +29,8 @@ public class ViewDataSetAuthorizationHandlerTests
     }
 
     [Theory]
-    [InlineData(DataSetStatus.Draft)]
-    [InlineData(DataSetStatus.Withdrawn)]
+    [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
+        MemberType = typeof(DataSetStatusTheoryData))]
     public void Failure(DataSetStatus status)
     {
         DataSet dataSet = _dataFixture

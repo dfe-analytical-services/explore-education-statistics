@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
@@ -31,10 +32,8 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.DeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task ReleaseVersionIsLinkedToOldFileWithApiDataSet(DataSetVersionStatus dataSetVersionStatus)
         {
             Publication publication = DataFixture.DefaultPublication();
@@ -233,10 +232,8 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.DeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task ReleaseVersionIsLinkedToSubsequentDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
         {
             Publication publication = DataFixture.DefaultPublication();
@@ -483,12 +480,9 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task DataSetVersionCanNotBeDeleted_Returns400(
-            DataSetVersionStatus dataSetVersionStatus)
+        [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
+        public async Task DataSetVersionCanNotBeDeleted_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
                 .WithPublication(DataFixture.DefaultPublication());
@@ -497,8 +491,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 .DefaultReleaseFile()
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion)
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
             {
@@ -509,8 +502,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 .DefaultDataSet()
                 .WithPublicationId(releaseVersion.PublicationId)
                 .WithStatusPublished()
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet1, dataSet2));
 
@@ -523,7 +515,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 .WithVersionNumber(major: 1, minor: 0)
                 .WithStatus(dataSetVersionStatus)
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-            
+
             // Data set version that is in a deletable state
             DataSetVersion dataSet2Version = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)

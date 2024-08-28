@@ -20,7 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
 
-export default function ReleaseApiDataSetHistoryPage() {
+export default function ReleaseApiDataSetVersionHistoryPage() {
   const { publicAppUrl } = useConfig();
   const { page } = useQueryParams<{ page: string }>();
   const [currentPage, setCurrentPage] = useState<number>(

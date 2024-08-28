@@ -31,12 +31,12 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     public DateTimeOffset Created { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
-    
+
     public LocationLevelMappings GetLocationLevelMappings(GeographicLevel level)
     {
         return LocationMappingPlan.Levels[level];
     }
-    
+
     public LocationOptionMapping GetLocationOptionMapping(GeographicLevel level, string locationOptionKey)
     {
         return GetLocationLevelMappings(level).Mappings[locationOptionKey];
@@ -46,7 +46,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     {
         return FilterMappingPlan.Mappings[filterKey];
     }
-    
+
     public FilterOptionMapping GetFilterOptionMapping(string filterKey, string filterOptionKey)
     {
         return GetFilterMapping(filterKey).OptionMappings[filterOptionKey];
@@ -126,7 +126,7 @@ public enum MappingType
 public abstract record MappableElement
 {
     public string Label { get; init; }
-};
+}
 
 public abstract record MappableElementWithOptions<TMappableOption>
     : MappableElement
@@ -250,19 +250,4 @@ public record FilterMappingPlan
     public Dictionary<string, FilterMapping> Mappings { get; init; } = [];
 
     public Dictionary<string, FilterMappingCandidate> Candidates { get; init; } = [];
-}
-
-public static class MappingKeyFunctions
-{
-    public static Func<LocationOptionMetaRow, string> LocationOptionMetaRowKeyGenerator =>
-        option => $"{option.Label} :: {option.GetRowKeyPretty()}";
-
-    public static Func<LocationOptionMeta, string> LocationOptionMetaKeyGenerator =>
-        option => LocationOptionMetaRowKeyGenerator(option.ToRow());
-
-    public static Func<FilterMeta, string> FilterKeyGenerator =>
-        filter => filter.PublicId;
-
-    public static Func<FilterOptionMeta, string> FilterOptionKeyGenerator =>
-        option => option.Label;
 }

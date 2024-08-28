@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -170,7 +171,7 @@ public class LocationMetaRepository(
         return publicIdMappings
                    .GetPublicIdForCandidate(
                        level: level,
-                       candidateKey: MappingKeyFunctions.LocationOptionMetaRowKeyGenerator(option))
+                       candidateKey: MappingKeyGenerators.LocationOptionMetaRow(option))
                ?? SqidEncoder.Encode(option.Id);
     }
 

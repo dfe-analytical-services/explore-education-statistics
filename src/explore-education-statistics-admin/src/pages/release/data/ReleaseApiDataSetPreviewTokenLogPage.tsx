@@ -1,6 +1,8 @@
+import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import {
   releaseApiDataSetDetailsRoute,
+  releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenRoute,
   ReleaseDataSetPreviewTokenRouteParams,
   ReleaseDataSetRouteParams,
@@ -59,7 +61,9 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
       <LoadingSpinner loading={isLoadingDataSet || isLoadingPreviewTokens}>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-three-quarters">
-            <span className="govuk-caption-l">API preview token log</span>
+            <span className="govuk-caption-l">
+              API data set preview token log
+            </span>
             <h2>{dataSet?.title}</h2>
           </div>
         </div>
@@ -142,8 +146,21 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
             </tbody>
           </table>
         ) : (
-          <p>No tokens have been created.</p>
+          <p>No preview tokens have been created.</p>
         )}
+
+        <ButtonLink
+          to={generatePath<ReleaseDataSetRouteParams>(
+            releaseApiDataSetPreviewRoute.path,
+            {
+              publicationId,
+              releaseId,
+              dataSetId,
+            },
+          )}
+        >
+          Generate preview token
+        </ButtonLink>
       </LoadingSpinner>
     </>
   );

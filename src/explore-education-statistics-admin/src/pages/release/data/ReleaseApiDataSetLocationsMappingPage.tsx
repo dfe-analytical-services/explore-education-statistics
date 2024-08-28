@@ -1,43 +1,44 @@
-import Link from '@admin/components/Link';
 import ButtonLink from '@admin/components/ButtonLink';
+import Link from '@admin/components/Link';
+import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
+import ApiDataSetDeletedLocationGroupsTable from '@admin/pages/release/data/components/ApiDataSetDeletedLocationGroupsTable';
+import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
+import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
+import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
+import ApiDataSetNewLocationGroupsTable from '@admin/pages/release/data/components/ApiDataSetNewLocationGroupsTable';
+import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import getApiDataSetLocationMappings, {
   AutoMappedLocation,
   LocationCandidateWithKey,
   MappableLocation,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
-import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
-import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
-import ApiDataSetLocationCode from '@admin/pages/release/data/components/ApiDataSetLocationCode';
-import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
-import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
+import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
+import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
-import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
-import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionService, {
   LocationCandidate,
 } from '@admin/services/apiDataSetVersionService';
-import Tag from '@common/components/Tag';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import PageNav, { NavItem } from '@common/components/PageNav';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import NotificationBanner from '@common/components/NotificationBanner';
+import PageNav, { NavItem } from '@common/components/PageNav';
 import SummaryListItem from '@common/components/SummaryListItem';
+import Tag from '@common/components/Tag';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import locationLevelsMap, {
   LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
-import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import typedKeys from '@common/utils/object/typedKeys';
 import { useQuery } from '@tanstack/react-query';
+import compact from 'lodash/compact';
+import omit from 'lodash/omit';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
-import omit from 'lodash/omit';
-import compact from 'lodash/compact';
 import { useImmer } from 'use-immer';
 
 // Fields to omit from mapping diff.
@@ -56,6 +57,14 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
   const [mappableLocations, updateMappableLocations] = useImmer<
     Partial<Record<LocationLevelKey, MappableLocation[]>>
   >({});
+
+  const [newLocationGroups, updateNewLocationGroups] = useImmer<
+    Partial<Record<LocationLevelKey, LocationCandidate[]>>
+  >({});
+  const [deletedLocationGroups, updateDeletedLocationGroups] = useImmer<
+    Partial<Record<LocationLevelKey, LocationCandidate[]>>
+  >({});
+
   const [pendingUpdates, setPendingUpdates] = useState<PendingMappingUpdate[]>(
     [],
   );
@@ -77,14 +86,20 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
   useEffect(() => {
     if (locationsMapping) {
       const mappings = getApiDataSetLocationMappings(locationsMapping);
+
       updateAutoMappedLocations(mappings.autoMappedLocations);
       updateNewLocations(mappings.newLocations);
       updateMappableLocations(mappings.mappableLocations);
+
+      updateNewLocationGroups(mappings.newLocationGroups);
+      updateDeletedLocationGroups(mappings.deletedLocationGroups);
     }
   }, [
     locationsMapping,
     updateAutoMappedLocations,
+    updateDeletedLocationGroups,
     updateMappableLocations,
+    updateNewLocationGroups,
     updateNewLocations,
   ]);
 
@@ -100,11 +115,27 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
   const navItems: NavItem[] = useMemo(() => {
     return [
+      ...(Object.keys(deletedLocationGroups).length > 0
+        ? [
+            {
+              id: 'deleted-location-groups',
+              text: 'Location groups not found in new data set',
+            },
+          ]
+        : []),
       {
         id: 'mappable-locations',
-        text: 'Locations not found in the new data set',
+        text: 'Locations not found in new data set',
         subNavItems: getSubNavItems(mappableLocations, 'mappable'),
       },
+      ...(Object.keys(newLocationGroups).length > 0
+        ? [
+            {
+              id: 'new-location-groups',
+              text: 'New location groups',
+            },
+          ]
+        : []),
       {
         id: 'new-locations',
         text: 'New locations',
@@ -116,7 +147,13 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
         subNavItems: getSubNavItems(autoMappedLocations, 'auto-mapped'),
       },
     ];
-  }, [autoMappedLocations, mappableLocations, newLocations]);
+  }, [
+    autoMappedLocations,
+    deletedLocationGroups,
+    mappableLocations,
+    newLocationGroups,
+    newLocations,
+  ]);
 
   const updateMappingState = useCallback(
     (updates: PendingMappingUpdate[]) => {
@@ -259,6 +296,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
       <LoadingSpinner loading={isLoadingDataSet || isLoadingMapping}>
         <div className="govuk-grid-row">
           <PageNav items={navItems} />
+
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map locations</span>
             <h2>{dataSet?.title}</h2>
@@ -286,8 +324,23 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               show as new locations in the API data set.
             </p>
 
+            {Object.keys(deletedLocationGroups).length > 0 && (
+              <>
+                <h3 className="govuk-heading-l" id="deleted-location-groups">
+                  {`Location groups not found in new data set (${
+                    Object.keys(deletedLocationGroups).length
+                  }) `}
+                  <Tag colour="grey">No action required</Tag>
+                </h3>
+
+                <ApiDataSetDeletedLocationGroupsTable
+                  locationGroups={deletedLocationGroups}
+                />
+              </>
+            )}
+
             <h3 className="govuk-heading-l" id="unmapped-locations">
-              Locations not found in the new data set
+              Locations not found in new data set
             </h3>
 
             {typedKeys(mappableLocations).length > 0 ? (
@@ -300,9 +353,9 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                     return (
                       <ApiDataSetMappableTable
                         key={level}
-                        candidateHint={candidate =>
-                          getApiDataSetLocationCodes(candidate)
-                        }
+                        candidateHint={candidate => (
+                          <ApiDataSetLocationCode location={candidate} />
+                        )}
                         candidateIsMajorMapping={(candidate, mapping) => {
                           return Object.entries(
                             omit(mapping.source, omittedDiffingFields),
@@ -344,6 +397,24 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               </>
             ) : (
               <p>No locations.</p>
+            )}
+
+            {Object.keys(newLocationGroups).length > 0 && (
+              <>
+                <h3
+                  className="govuk-heading-l govuk-!-margin-top-8"
+                  id="new-location-groups"
+                >
+                  {`New location groups (${
+                    Object.keys(deletedLocationGroups).length
+                  }) `}
+                  <Tag colour="grey">No action required</Tag>
+                </h3>
+
+                <ApiDataSetNewLocationGroupsTable
+                  locationGroups={newLocationGroups}
+                />
+              </>
             )}
 
             <h3
@@ -419,9 +490,9 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                         key={level}
                       >
                         <ApiDataSetAutoMappedTable
-                          candidateHint={candidate =>
-                            getApiDataSetLocationCodes(candidate)
-                          }
+                          candidateHint={candidate => (
+                            <ApiDataSetLocationCode location={candidate} />
+                          )}
                           groupKey={level}
                           groupLabel={groupLabel}
                           itemLabel="location"

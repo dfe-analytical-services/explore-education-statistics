@@ -25,7 +25,10 @@ export default function TaskListItem({
   const hintId = `${id}-hint`;
 
   return (
-    <li className={classNames('govuk-task-list__item', styles.item, className)}>
+    <li
+      className={classNames('govuk-task-list__item', styles.item, className)}
+      data-testid={id}
+    >
       <div
         className={classNames(
           'govuk-task-list__name-and-hint',

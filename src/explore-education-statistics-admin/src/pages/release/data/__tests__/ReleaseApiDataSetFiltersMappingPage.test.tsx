@@ -86,7 +86,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // mappable
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in the new data set',
+        name: 'Filter options not found in new data set',
       }),
     ).toBeInTheDocument();
 
@@ -187,7 +187,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       within(navItems[0]).getByRole('link', {
-        name: 'Filter options not found in the new data set',
+        name: 'Filter options not found in new data set',
       }),
     ).toHaveAttribute('href', '#mappable-filter-options');
     const mappableSubItems = within(navItems[0]).getAllByRole('listitem');
@@ -256,12 +256,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       banner.getByRole('link', {
         name: 'There are 2 unmapped Filter 1 filter options',
       }),
-    ).toHaveAttribute('href', '#mappable-Filter1Key');
+    ).toHaveAttribute('href', '#mappable-table-filter-1-key');
     expect(
       banner.getByRole('link', {
         name: 'There is 1 unmapped Filter 2 filter option',
       }),
-    ).toHaveAttribute('href', '#mappable-Filter2Key');
+    ).toHaveAttribute('href', '#mappable-table-filter-2-key');
   });
 
   test('does not render the notification banner if there are no unmapped filter options', async () => {
@@ -349,7 +349,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in the new data set',
+        name: 'Filter options not found in new data set',
       }),
     ).toBeInTheDocument();
 
@@ -486,7 +486,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       // mappable table
       const mappableFilter1Table = screen.getByRole('table', {
@@ -617,7 +617,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       const mappableFilter1Table = screen.getByRole('table', {
         name: 'Filter 1 2 unmapped filter options 1 mapped filter option Column: Filter1Key',
@@ -705,7 +705,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       const mappableFilter1Table = screen.getByRole('table', {
         name: 'Filter 1 2 unmapped filter options 1 mapped filter option Column: Filter1Key',
@@ -1035,7 +1035,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-Filter1Key');
+      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
 
       // mappable table
       const mappableFilter1Table = screen.getByRole('table', {
@@ -1123,6 +1123,51 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
   });
 
   describe('unmapped filter columns', () => {
+    test('renders navigation items for filter columns', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+      apiDataSetVersionService.getFiltersMapping.mockResolvedValue(
+        testFiltersMappingUnmappedColumns,
+      );
+
+      renderPage();
+
+      expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+
+      const navItems = nav.getAllByRole('listitem');
+
+      expect(navItems).toHaveLength(6);
+
+      expect(
+        within(navItems[0]).getByRole('link', {
+          name: 'Filter columns not found in new data set',
+        }),
+      ).toHaveAttribute('href', '#mappable-filter-columns');
+
+      expect(
+        within(navItems[1]).getByRole('link', {
+          name: 'Filter options not found in new data set',
+        }),
+      ).toHaveAttribute('href', '#mappable-filter-options');
+
+      expect(
+        within(navItems[2]).getByRole('link', { name: 'New filter columns' }),
+      ).toHaveAttribute('href', '#new-filter-columns');
+
+      expect(
+        within(navItems[3]).getByRole('link', { name: 'New filter options' }),
+      ).toHaveAttribute('href', '#new-filter-options');
+
+      expect(
+        within(navItems[4]).getByRole('link', {
+          name: 'Auto mapped filter options',
+        }),
+      ).toHaveAttribute('href', '#auto-mapped-filter-options');
+    });
+
     test('renders correctly with unmapped filter columns', async () => {
       apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
       apiDataSetVersionService.getFiltersMapping.mockResolvedValue(
@@ -1135,7 +1180,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       expect(
         screen.getByRole('heading', {
-          name: 'Filter columns not found in the new data set No action required',
+          name: 'Filter columns not found in new data set No action required',
         }),
       ).toBeInTheDocument();
 
@@ -1144,9 +1189,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       ).getAllByRole('row');
       expect(unmappedRows).toHaveLength(2);
       const unmappedRow1Cells = within(unmappedRows[1]).getAllByRole('cell');
-      expect(unmappedRow1Cells[0]).toHaveTextContent(
-        'Filter 1 id: Filter1Key View filter options',
-      );
+      expect(unmappedRow1Cells[0]).toHaveTextContent('Filter 1');
+      expect(unmappedRow1Cells[0]).toHaveTextContent('ID: Filter1Key');
+      expect(unmappedRow1Cells[0]).toHaveTextContent('View filter options');
       expect(unmappedRow1Cells[1]).toHaveTextContent('No mapping available');
       expect(unmappedRow1Cells[2]).toHaveTextContent('Major');
 
@@ -1164,9 +1209,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         'cell',
       );
       expect(newColumnsRow1Cells[0]).toHaveTextContent('No mapping available');
-      expect(newColumnsRow1Cells[1]).toHaveTextContent(
-        'Filter 1 id: Filter1UpdatedKey View filter options',
-      );
+      expect(newColumnsRow1Cells[1]).toHaveTextContent('Filter 1');
+      expect(newColumnsRow1Cells[1]).toHaveTextContent('ID: Filter1UpdatedKey');
+      expect(newColumnsRow1Cells[1]).toHaveTextContent('View filter options');
       expect(newColumnsRow1Cells[2]).toHaveTextContent('Minor');
     });
   });
