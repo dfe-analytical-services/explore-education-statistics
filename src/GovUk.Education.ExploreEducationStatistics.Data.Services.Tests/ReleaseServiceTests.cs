@@ -1,17 +1,21 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
@@ -26,6 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class ReleaseServiceTests
     {
+
+        private readonly DataFixture _fixture = new();
         [Fact]
         public async Task ListSubjects()
         {
@@ -240,6 +246,97 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Single(subjects[1].Indicators);
                 Assert.Equal("subject 2 indicator group 1 indicator 1", subjects[1].Indicators[0]);
+            }
+        }
+
+        [Fact]
+        public async Task ListSubjects_NoSubjects()
+        {
+            var statsReleaseVersion = new Data.Model.ReleaseVersion();
+
+            var contentReleaseVersion = new ReleaseVersion
+            {
+                Id = statsReleaseVersion.Id,
+            };
+
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+            await using var contentDbContext = InMemoryContentDbContext();
+
+            statisticsDbContext.ReleaseVersion.Add(statsReleaseVersion);
+            contentDbContext.ReleaseVersions.Add(contentReleaseVersion);
+
+            var service = BuildReleaseService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext
+            );
+
+            var result = await service.ListSubjects(contentReleaseVersion.Id);
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task ListSubjects_StatsDbHasMissingSubject()
+        {
+            Data.Model.ReleaseVersion statisticsReleaseVersion = _fixture.DefaultStatsReleaseVersion();
+
+            ReleaseSubject releaseSubject1 = _fixture.DefaultReleaseSubject()
+                .WithReleaseVersion(statisticsReleaseVersion)
+                .WithSubject(_fixture.DefaultSubject());
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject1);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion()
+                .WithId(statisticsReleaseVersion.Id);
+
+            ReleaseFile releaseFile1 = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(contentReleaseVersion)
+                .WithFile(_fixture.DefaultFile(FileType.Data)
+                    .WithSubjectId(releaseSubject1.SubjectId));
+
+            ReleaseFile releaseFile2 = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(contentReleaseVersion)
+                .WithFile(_fixture.DefaultFile(FileType.Data)
+                    .WithSubjectId(Guid.NewGuid()));
+
+            DataImport import1 = _fixture.DefaultDataImport()
+                .WithFile(releaseFile1.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
+            DataImport import2 = _fixture.DefaultDataImport()
+                .WithFile(releaseFile2.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.DataImports.AddRangeAsync(import1, import2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext
+                );
+
+                var exception = await Assert.ThrowsAsync<DataException>(() =>
+                    service.ListSubjects(contentReleaseVersion.Id));
+
+                Assert.Equal($"""
+                             Statistics DB has a different subjects than the Content DB
+                             StatsDB subjects: {releaseSubject1.SubjectId}
+                             ContentDb subjects: {releaseFile1.File.SubjectId},{releaseFile2.File.SubjectId}
+                             """,
+                    exception.Message);
             }
         }
 
