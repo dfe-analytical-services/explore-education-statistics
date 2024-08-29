@@ -106,7 +106,7 @@ Verify the contents inside the 'Draft API datasets' table
     user checks table cell contains    2    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
 
 
-Click on 'View Details' link
+Click on 'View Details' link(First API dataset)
     user clicks link in table cell    1    4    View details    xpath://table[@data-testid='draft-api-data-sets']
     user waits until h3 is visible    Draft version details
     user checks row data heading in the Draft version details table
@@ -168,8 +168,45 @@ User revokes created API token
     user clicks button    Confirm
     user waits until page finishes loading
     user waits until modal is not visible    Revoke this token    %{WAIT_LONG}
-    User Waits Until Page Contains    Generate API data set preview token
+    user waits until page contains    Generate API data set preview token
 
+Again,user click on 'Generate Token'
+    user clicks button     Generate token
+
+User creates API token through 'Generate API token' modal window
+    ${modal}=    user waits until modal is visible    Generate API token
+    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    API Token
+    user clicks checkbox by selector        css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
+    user clicks button    Continue
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Generate API token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token
+    user waits until h2 is visible    ${SUBJECT_NAME_1}
+
+User cancells to revoke created API token
+    user clicks button    Revoke this token
+    ${modal}=    user waits until modal is visible    Revoke this token
+    user clicks button    Cancel
+    user waits until page finishes loading
+    user waits until modal is not visible    Revoke this token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token
+    user waits until h2 is visible    ${SUBJECT_NAME_1}
+
+User cancells to create API token
+    user clicks link    Back to API data set details
+    user clicks link containing text    Preview API data set
+    user clicks button     Generate token
+
+    ${modal}=    user waits until modal is visible    Generate API token
+    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    API Token
+    user clicks checkbox by selector        css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
+    user clicks button    Cancel
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Generate API token    %{WAIT_LONG}
+    user waits until page contains    Generate API data set preview token
+    user waits until h2 is visible    ${SUBJECT_NAME_1}
 
 Add headline text block to Content page
     user clicks link    Back to API data set details
