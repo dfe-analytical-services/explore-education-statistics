@@ -50,6 +50,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             [
                 ActivityNames.UpdateFileStoragePath,
                 ActivityNames.ImportMetadata,
+                ActivityNames.GenerateChangelog,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
                 ActivityNames.CompleteNextDataSetVersionImportProcessing
