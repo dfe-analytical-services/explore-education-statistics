@@ -139,10 +139,9 @@ User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value      Number of years after achievement of learning aim    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[6]
     user checks contents inside the cell value      Provision                                 xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[7]
 
-    user checks contents inside the cell value      View changelog and guidance notes         xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
-    user checks contents inside the cell value      Preview API data set                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
-    user checks contents inside the cell value      View API data set token log               xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/a
-    user checks contents inside the cell value      Remove draft version                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[4]/button
+    user checks contents inside the cell value      Preview API data set                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
+    user checks contents inside the cell value      View preview token log                    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
+    user checks contents inside the cell value      Remove draft version                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/button
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
