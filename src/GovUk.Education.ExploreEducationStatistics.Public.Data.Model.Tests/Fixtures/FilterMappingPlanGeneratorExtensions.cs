@@ -20,7 +20,7 @@ public static class FilterMappingPlanGeneratorExtensions
         IReadOnlyDictionary<string, string>? mappedOptionCandidateKeysByOptionSourceKey = null)
     {
         var filterMappingPlanGenerator = fixture.Generator<FilterMappingPlan>();
-    
+
         sourceFilters?.ForEach(sourceFilter =>
         {
             var filterMappingGenerator = fixture
@@ -31,7 +31,8 @@ public static class FilterMappingPlanGeneratorExtensions
                     .WithLabel(sourceFilter.Label))
                 .WithPublicId(sourceFilter.PublicId);
 
-            if (mappedFilterCandidateKeysBySourceFilterKey is not null && mappedFilterCandidateKeysBySourceFilterKey.TryGetValue(sourceFilter.PublicId, out var candidateKey))
+            if (mappedFilterCandidateKeysBySourceFilterKey is not null &&
+                mappedFilterCandidateKeysBySourceFilterKey.TryGetValue(sourceFilter.PublicId, out var candidateKey))
             {
                 filterMappingGenerator = filterMappingGenerator
                     .WithManualMapped(candidateKey);
@@ -43,13 +44,15 @@ public static class FilterMappingPlanGeneratorExtensions
 
                 var filterOptionMapping = fixture
                     .DefaultFilterOptionMapping()
-                    .WithCandidateKey(null) // This might break other stuff? If not, maybe it should default to null anyway
+                    // This might break other stuff? If not, maybe it should default to null anyway
+                    .WithCandidateKey(null)
                     .WithSource(fixture
                         .DefaultMappableFilterOption()
                         .WithLabel(option.Label))
                     .WithPublicId($"{sourceFilter.PublicId} :: {option.Label}");
 
-                if (mappedOptionCandidateKeysByOptionSourceKey is not null && mappedOptionCandidateKeysByOptionSourceKey.TryGetValue(sourceKey, out var candidateKey))
+                if (mappedOptionCandidateKeysByOptionSourceKey is not null &&
+                    mappedOptionCandidateKeysByOptionSourceKey.TryGetValue(sourceKey, out var candidateKey))
                 {
                     filterOptionMapping = filterOptionMapping
                         .WithManualMapped(candidateKey);
@@ -64,13 +67,13 @@ public static class FilterMappingPlanGeneratorExtensions
                 columnName: sourceFilter.PublicId,
                 filterMappingGenerator);
         });
-        
+
         targetFilters?.ForEach(targetFilter =>
         {
             var filterCandidateGenerator = fixture
                 .DefaultFilterMappingCandidate()
                 .WithLabel(targetFilter.Label);
-            
+
             targetFilter.Options.ForEach(option =>
             {
                 filterCandidateGenerator.AddOptionCandidate(
@@ -84,16 +87,16 @@ public static class FilterMappingPlanGeneratorExtensions
                 columnName: targetFilter.PublicId,
                 filterCandidateGenerator);
         });
-        
+
         return filterMappingPlanGenerator;
     }
-    
+
     public static Generator<FilterMappingPlan> AddFilterMapping(
         this Generator<FilterMappingPlan> generator,
         string columnName,
         FilterMapping mapping)
         => generator.ForInstance(s => s.AddFilterMapping(columnName, mapping));
-    
+
     public static Generator<FilterMappingPlan> AddFilterCandidate(
         this Generator<FilterMappingPlan> generator,
         string columnName,
@@ -196,7 +199,7 @@ public static class FilterMappingPlanGeneratorExtensions
         this Generator<FilterMapping> generator,
         string candidateKey)
         => generator.ForInstance(s => s.SetCandidateKey(candidateKey));
-    
+
     public static Generator<FilterMapping> AddOptionMapping(
         this Generator<FilterMapping> generator,
         string sourceKey,
@@ -235,7 +238,7 @@ public static class FilterMappingPlanGeneratorExtensions
         string columnName,
         FilterOptionMapping mapping)
         => instanceSetter.Set((_, plan) => plan.OptionMappings.Add(columnName, mapping));
-    
+
     /**
      * FilterMappingCandidate
      */
@@ -249,7 +252,7 @@ public static class FilterMappingPlanGeneratorExtensions
         this Generator<FilterMappingCandidate> generator,
         string label)
         => generator.ForInstance(s => s.SetLabel(label));
-    
+
     public static Generator<FilterMappingCandidate> AddOptionCandidate(
         this Generator<FilterMappingCandidate> generator,
         string targetKey,
@@ -325,7 +328,7 @@ public static class FilterMappingPlanGeneratorExtensions
         => generator.ForInstance(s => s
             .SetType(MappingType.None)
             .SetCandidateKey(null));
-    
+
     public static Generator<FilterOptionMapping> WithAutoMapped(
         this Generator<FilterOptionMapping> generator,
         string candidateKey)

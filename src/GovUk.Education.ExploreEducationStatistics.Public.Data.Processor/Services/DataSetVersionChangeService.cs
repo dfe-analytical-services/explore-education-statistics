@@ -65,10 +65,11 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         return Unit.Instance;
     }
 
-    private async Task<(List<FilterMetaChange> filterMetaChanges, List<FilterOptionMetaChange> filterOptionMetaChanges)> GenerateFilterChanges(
-        DataSetVersion nextVersion, 
-        DataSetVersionMapping mappings, 
-        CancellationToken cancellationToken)
+    private async Task<(List<FilterMetaChange> filterMetaChanges, List<FilterOptionMetaChange> filterOptionMetaChanges)>
+        GenerateFilterChanges(
+            DataSetVersion nextVersion,
+            DataSetVersionMapping mappings,
+            CancellationToken cancellationToken)
     {
         var oldFilterMetas = await publicDataDbContext
             .FilterMetas
@@ -99,7 +100,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 cancellationToken);
 
         var filterMetaDeletionsAndChanges = mappings.FilterMappingPlan.Mappings
-            .Where(kv => kv.Key != kv.Value.CandidateKey) // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            .Where(kv => kv.Key != kv.Value.CandidateKey)
             .Select(kv => new FilterMetaChange
             {
                 DataSetVersionId = nextVersion.Id,
@@ -122,11 +124,13 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             .ToList();
 
         var filterOptionMetaDeletionsAndChanges = mappings.FilterMappingPlan.Mappings
-            .Where(fm => fm.Value.CandidateKey.HasValue()) // DON'T CREATE A CHANGE FOR ANY FILTER OPTIONS WHICH HAVE HAD THEIR ENTIRE FILTER DELETED
+            // DON'T CREATE A CHANGE FOR ANY FILTER OPTIONS WHICH HAVE HAD THEIR ENTIRE FILTER DELETED
+            .Where(fm => fm.Value.CandidateKey.HasValue())
             .SelectMany(
                 fm => fm.Value.OptionMappings,
                 (fm, fom) => new { FilterMapping = fm, OptionMapping = fom })
-            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey) // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey)
             .Select(a => new FilterOptionMetaChange
             {
                 DataSetVersionId = nextVersion.Id,
@@ -139,9 +143,14 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 CurrentState = a.OptionMapping.Value.CandidateKey.HasValue()
                     ? new FilterOptionMetaChange.State
                     {
-                        MetaId = newFilterMetas[a.FilterMapping.Value.CandidateKey!].OptionLinks[a.OptionMapping.Value.CandidateKey].MetaId,
-                        OptionId = newFilterMetas[a.FilterMapping.Value.CandidateKey!].OptionLinks[a.OptionMapping.Value.CandidateKey].OptionId,
-                        PublicId = newFilterMetas[a.FilterMapping.Value.CandidateKey!].OptionLinks[a.OptionMapping.Value.CandidateKey].PublicId,
+                        MetaId =
+                            newFilterMetas[a.FilterMapping.Value.CandidateKey!]
+                                .OptionLinks[a.OptionMapping.Value.CandidateKey].MetaId,
+                        OptionId =
+                            newFilterMetas[a.FilterMapping.Value.CandidateKey!]
+                                .OptionLinks[a.OptionMapping.Value.CandidateKey].OptionId,
+                        PublicId = newFilterMetas[a.FilterMapping.Value.CandidateKey!]
+                            .OptionLinks[a.OptionMapping.Value.CandidateKey].PublicId,
                     }
                     : null
             })
@@ -150,12 +159,20 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         var filterOptionMetaAdditions = mappings.FilterMappingPlan.Candidates
             .SelectMany(
                 fc => fc.Value.Options,
-                (fc, foc) => new { FilterCandidateKey = (string?)fc.Key, OptionCandidateKey = (string?)foc.Key })
+                (fc, foc) => new
+                {
+                    FilterCandidateKey = (string?)fc.Key,
+                    OptionCandidateKey = (string?)foc.Key
+                })
             .Except(
                 mappings.FilterMappingPlan.Mappings
-                .SelectMany(
-                    fm => fm.Value.OptionMappings,
-                    (fm, fom) => new { FilterCandidateKey = fm.Value.CandidateKey, OptionCandidateKey = fom.Value.CandidateKey }
+                    .SelectMany(
+                        fm => fm.Value.OptionMappings,
+                        (fm, fom) => new
+                        {
+                            FilterCandidateKey = fm.Value.CandidateKey,
+                            OptionCandidateKey = fom.Value.CandidateKey
+                        }
                     ))
             .Select(a => new FilterOptionMetaChange
             {
@@ -170,15 +187,18 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             });
 
         List<FilterMetaChange> filterMetaChanges = [.. filterMetaDeletionsAndChanges, .. filterMetaAdditions];
-        List<FilterOptionMetaChange> filterOptionMetaChanges = [.. filterOptionMetaDeletionsAndChanges, .. filterOptionMetaAdditions];
+        List<FilterOptionMetaChange> filterOptionMetaChanges =
+            [.. filterOptionMetaDeletionsAndChanges, .. filterOptionMetaAdditions];
 
         return (filterMetaChanges, filterOptionMetaChanges);
     }
 
-    private async Task<(List<LocationMetaChange> locationMetaChanges, List<LocationOptionMetaChange> locationOptionMetaChanges)> GenerateLocationChanges(
-        DataSetVersion nextVersion,
-        DataSetVersionMapping mappings,
-        CancellationToken cancellationToken)
+    private async
+        Task<(List<LocationMetaChange> locationMetaChanges, List<LocationOptionMetaChange> locationOptionMetaChanges)>
+        GenerateLocationChanges(
+            DataSetVersion nextVersion,
+            DataSetVersionMapping mappings,
+            CancellationToken cancellationToken)
     {
         var oldLocationMetas = await publicDataDbContext
             .LocationMetas
@@ -210,7 +230,9 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 
         var locationMetaChanges = mappings.LocationMappingPlan
             .Levels
-            .Where(locationGroupMappings => !locationGroupMappings.Value.Mappings.Any() || !locationGroupMappings.Value.Candidates.Any()) // ONLY INCLUDE ADDS AND DELETES FOR LOCATION LEVELS
+            // ONLY INCLUDE ADDS AND DELETES FOR LOCATION LEVELS
+            .Where(locationGroupMappings => !locationGroupMappings.Value.Mappings.Any() ||
+                                            !locationGroupMappings.Value.Candidates.Any())
             .Select(locationGroupMappings => new LocationMetaChange
             {
                 DataSetVersionId = nextVersion.Id,
@@ -225,11 +247,17 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 
         var locationOptionMetaDeletionsAndChanges = mappings.LocationMappingPlan
             .Levels
-            .Where(locationGroupMappings => locationGroupMappings.Value.Candidates.Any()) // DON'T CREATE A CHANGE FOR ANY LOCATION OPTIONS WHICH HAVE HAD THEIR ENTIRE LOCATION GROUP DELETED
+            // DON'T CREATE A CHANGE FOR ANY LOCATION OPTIONS WHICH HAVE HAD THEIR ENTIRE LOCATION GROUP DELETED
+            .Where(locationGroupMappings => locationGroupMappings.Value.Candidates.Any())
             .SelectMany(
                 lm => lm.Value.Mappings,
-                (lm, lom) => new { LocationGroup = lm.Key, OptionMapping = lom })
-            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey) // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+                (lm, lom) => new
+                {
+                    LocationGroup = lm.Key,
+                    OptionMapping = lom
+                })
+            // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey)
             .Select(a => new LocationOptionMetaChange
             {
                 DataSetVersionId = nextVersion.Id,
@@ -242,9 +270,12 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 CurrentState = a.OptionMapping.Value.CandidateKey.HasValue()
                     ? new LocationOptionMetaChange.State
                     {
-                        MetaId = newLocationMetas[a.LocationGroup].OptionLinks[a.OptionMapping.Value.CandidateKey].MetaId,
-                        OptionId = newLocationMetas[a.LocationGroup].OptionLinks[a.OptionMapping.Value.CandidateKey].OptionId,
-                        PublicId = newLocationMetas[a.LocationGroup].OptionLinks[a.OptionMapping.Value.CandidateKey].PublicId,
+                        MetaId =
+                            newLocationMetas[a.LocationGroup].OptionLinks[a.OptionMapping.Value.CandidateKey].MetaId,
+                        OptionId =
+                            newLocationMetas[a.LocationGroup].OptionLinks[a.OptionMapping.Value.CandidateKey].OptionId,
+                        PublicId = newLocationMetas[a.LocationGroup].OptionLinks[a.OptionMapping.Value.CandidateKey]
+                            .PublicId,
                     }
                     : null
             })
@@ -254,13 +285,21 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             .Levels
             .SelectMany(
                 lm => lm.Value.Candidates,
-                (lm, loc) => new { LocationGroup = lm.Key, OptionCandidateKey = (string?)loc.Key })
+                (lm, loc) => new
+                {
+                    LocationGroup = lm.Key,
+                    OptionCandidateKey = (string?)loc.Key
+                })
             .Except(
                 mappings.LocationMappingPlan
-                .Levels
-                .SelectMany(
-                    lm => lm.Value.Mappings,
-                    (lm, lom) => new { LocationGroup = lm.Key, OptionCandidateKey = lom.Value.CandidateKey }
+                    .Levels
+                    .SelectMany(
+                        lm => lm.Value.Mappings,
+                        (lm, lom) => new
+                        {
+                            LocationGroup = lm.Key,
+                            OptionCandidateKey = lom.Value.CandidateKey
+                        }
                     ))
             .Select(a => new LocationOptionMetaChange
             {
@@ -274,7 +313,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 }
             });
 
-        List<LocationOptionMetaChange> locationOptionMetaChanges = [.. locationOptionMetaDeletionsAndChanges, .. locationOptionMetaAdditions];
+        List<LocationOptionMetaChange> locationOptionMetaChanges =
+            [.. locationOptionMetaDeletionsAndChanges, .. locationOptionMetaAdditions];
 
         return (locationMetaChanges, locationOptionMetaChanges);
     }
@@ -291,9 +331,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             .GeographicLevelMetas
             .SingleAsync(lm => lm.DataSetVersionId == nextVersion.Id, cancellationToken);
 
-        return newGeographicLevelMetas.Levels.Order().SequenceEqual(oldGeographicLevelMetas.Levels.Order()) // DO WE HAVE AN EXTENSION METHOD FOR THIS?
-            ?
-            null
+        return newGeographicLevelMetas.Levels.Order().SequenceEqual(oldGeographicLevelMetas.Levels.Order())
+            ? null
             : new GeographicLevelMetaChange
             {
                 DataSetVersionId = nextVersion.Id,

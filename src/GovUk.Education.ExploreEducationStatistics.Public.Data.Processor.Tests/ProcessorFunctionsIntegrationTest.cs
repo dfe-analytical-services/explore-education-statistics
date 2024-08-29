@@ -40,7 +40,8 @@ public abstract class ProcessorFunctionsIntegrationTest(
         return Task.CompletedTask;
     }
 
-    protected void SetupCsvDataFilesForDataSetVersion(ProcessorTestData processorTestData,
+    protected void SetupCsvDataFilesForDataSetVersion(
+        ProcessorTestData processorTestData,
         DataSetVersion dataSetVersion)
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
@@ -73,8 +74,8 @@ public abstract class ProcessorFunctionsIntegrationTest(
         await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
         return await CreateDataSetVersionAndImport(
-            dataSetId: dataSet.Id, 
-            importStage: importStage, 
+            dataSetId: dataSet.Id,
+            importStage: importStage,
             status: status,
             releaseFileId: releaseFileId,
             filterMetas: filterMetas,
