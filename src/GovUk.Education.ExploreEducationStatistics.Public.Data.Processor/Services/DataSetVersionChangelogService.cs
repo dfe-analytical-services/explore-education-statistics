@@ -1,7 +1,7 @@
-using AngleSharp.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -76,11 +76,11 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
             .ThenInclude(fm => fm.Option)
             .Where(fm => fm.DataSetVersionId == nextVersion.DataSet.LatestLiveVersionId)
             .ToDictionaryAsync(
-                MappingKeyFunctions.FilterKeyGenerator,
+                MappingKeyGenerators.Filter,
                 fm => new
                 {
                     FilterMeta = fm,
-                    OptionLinks = fm.OptionLinks.ToDictionary(foml => MappingKeyFunctions.FilterOptionKeyGenerator(foml.Option))
+                    OptionLinks = fm.OptionLinks.ToDictionary(l => MappingKeyGenerators.FilterOptionMetaLink(l))
                 },
                 cancellationToken);
 
@@ -90,11 +90,11 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
             .ThenInclude(fm => fm.Option)
             .Where(fm => fm.DataSetVersionId == nextVersion.Id)
             .ToDictionaryAsync(
-                MappingKeyFunctions.FilterKeyGenerator,
+                MappingKeyGenerators.Filter,
                 fm => new
                 {
                     FilterMeta = fm,
-                    OptionLinks = fm.OptionLinks.ToDictionary(foml => MappingKeyFunctions.FilterOptionKeyGenerator(foml.Option))
+                    OptionLinks = fm.OptionLinks.ToDictionary(l => MappingKeyGenerators.FilterOptionMetaLink(l))
                 },
                 cancellationToken);
 
@@ -190,7 +190,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
                 lm => new
                 {
                     LocationMeta = lm,
-                    OptionLinks = lm.OptionLinks.ToDictionary(loml => MappingKeyFunctions.LocationOptionMetaKeyGenerator(loml.Option))
+                    OptionLinks = lm.OptionLinks.ToDictionary(l => MappingKeyGenerators.LocationOptionMetaLink(l))
                 },
                 cancellationToken);
 
@@ -204,7 +204,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
                 lm => new
                 {
                     LocationMeta = lm,
-                    OptionLinks = lm.OptionLinks.ToDictionary(loml => MappingKeyFunctions.LocationOptionMetaKeyGenerator(loml.Option))
+                    OptionLinks = lm.OptionLinks.ToDictionary(l => MappingKeyGenerators.LocationOptionMetaLink(l))
                 },
                 cancellationToken);
 

@@ -36,7 +36,7 @@ public static class LocationMappingPlanGeneratorExtensions
             
             sourceLocationsForLevel?.Options.ForEach(option =>
             {
-                var sourceKey = MappingKeyFunctions.LocationOptionMetaKeyGenerator(option);
+                var sourceKey = MappingKeyGenerators.LocationOptionMeta(option);
 
                 var locationOptionMapping = fixture
                     .DefaultLocationOptionMapping()

@@ -39,7 +39,7 @@ public static class FilterMappingPlanGeneratorExtensions
 
             sourceFilter.Options.ForEach(option =>
             {
-                var sourceKey = MappingKeyFunctions.FilterOptionKeyGenerator(option);
+                var sourceKey = MappingKeyGenerators.FilterOptionMeta(option);
 
                 var filterOptionMapping = fixture
                     .DefaultFilterOptionMapping()

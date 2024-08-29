@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -12,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Public.Data.Model.MappingKeyFunctions;
 using FilterMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta;
 using IndicatorMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta;
 
@@ -592,8 +592,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             var mappedFilterCandidateKeysBySourceFilterKey = allChanges
                 .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Changed) // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
                 .ToDictionary(
-                    pc => FilterKeyGenerator(originalVersionFilterMetasWithLinksByPublicId[pc.ParentIdentifier]),
-                    pc => FilterKeyGenerator(newVersionFilterMetasWithLinksByPublicId[pc.ParentIdentifier]));
+                    pc => MappingKeyGenerators.Filter(originalVersionFilterMetasWithLinksByPublicId[pc.ParentIdentifier]),
+                    pc => MappingKeyGenerators.Filter(newVersionFilterMetasWithLinksByPublicId[pc.ParentIdentifier]));
 
             var mappedOptionCandidateKeysByOptionSourceKey = allChanges
                 .SelectMany(
@@ -601,8 +601,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     (pc, oc) => new { PublicId = pc.ParentIdentifier, OptionChange = oc })
                 .Where(a => a.OptionChange.ChangeType is ChangeType.Unchanged or ChangeType.Changed) // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
                 .ToDictionary(
-                    a => FilterOptionKeyGenerator(originalVersionFilterMetasWithLinksByPublicId[a.PublicId].OptionLinks[a.OptionChange.OptionIndex].Option),
-                    a => FilterOptionKeyGenerator(newVersionFilterMetasWithLinksByPublicId[a.PublicId].OptionLinks[a.OptionChange.OptionIndex].Option));
+                    a => MappingKeyGenerators.FilterOptionMetaLink(originalVersionFilterMetasWithLinksByPublicId[a.PublicId].OptionLinks[a.OptionChange.OptionIndex]),
+                    a => MappingKeyGenerators.FilterOptionMetaLink(newVersionFilterMetasWithLinksByPublicId[a.PublicId].OptionLinks[a.OptionChange.OptionIndex]));
 
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -1042,8 +1042,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     (pc, oc) => new { GeographicLevel = pc.ParentIdentifier, OptionChange = oc })
                 .Where(a => a.OptionChange.ChangeType is ChangeType.Unchanged or ChangeType.Changed) // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
                 .ToDictionary(
-                    a => LocationOptionMetaKeyGenerator(originalVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex].Option),
-                    a => LocationOptionMetaKeyGenerator(newVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex].Option));
+                    a => MappingKeyGenerators.LocationOptionMetaLink(originalVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex]),
+                    a => MappingKeyGenerators.LocationOptionMetaLink(newVersionLocationMetasWithLinksByLevel[a.GeographicLevel].OptionLinks[a.OptionChange.OptionIndex]));
 
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
