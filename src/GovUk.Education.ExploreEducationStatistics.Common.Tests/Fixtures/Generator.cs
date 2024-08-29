@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using Bogus;
 using Bogus.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Binder = Bogus.Binder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -142,10 +143,18 @@ public class Generator<T> where T : class
     /// Generate multiple instances of <see cref="T"/>.
     /// </summary>
     /// <param name="count">The number of instances.</param>
-    public IEnumerable<T> Generate(int count) {
-
+    public IEnumerable<T> Generate(int count)
+    {
         return Enumerable.Range(1, count)
             .Select(i => GenerateWithRange(index: i - 1, length: count));
+    }
+
+    /// <summary>
+    /// Generate a tuple of two instances of <see cref="T"/>.
+    /// </summary>
+    public Tuple<T, T> GenerateTuple2()
+    {
+        return Generate(2).ToTuple2();
     }
 
     public List<T> GenerateList(int count) => Generate(count).ToList();

@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -379,10 +380,8 @@ public abstract class DataSetsControllerTests(
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task PublicationHasSingleDataSetWithoutLiveVersion_LatestLiveVersionIsEmpty(
             DataSetVersionStatus dataSetVersionStatus)
         {

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -468,8 +469,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
         }
 
         [Theory]
-        [InlineData(DataSetStatus.Published)]
-        [InlineData(DataSetStatus.Deprecated)]
+        [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetStatusTheoryData))]
         public async Task DataSetIsAvailable_Returns200_CorrectViewModel(DataSetStatus dataSetStatus)
         {
             var publicationId = Guid.NewGuid();
@@ -604,8 +605,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
         }
 
         [Theory]
-        [InlineData(DataSetStatus.Draft)]
-        [InlineData(DataSetStatus.Withdrawn)]
+        [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetStatusTheoryData))]
         public async Task DataSetUnavailable_Returns200_EmptyList(DataSetStatus dataSetStatus)
         {
             var publicationId = Guid.NewGuid();

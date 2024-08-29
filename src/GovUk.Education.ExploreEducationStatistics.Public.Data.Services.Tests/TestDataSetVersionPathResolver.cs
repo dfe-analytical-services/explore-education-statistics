@@ -2,6 +2,7 @@ using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 
@@ -17,5 +18,8 @@ public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string Directory { get; set; } = string.Empty;
 
-    public string DirectoryPath(DataSetVersion dataSetVersion) => Path.Combine(_basePath, Directory);
+    public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion? versionNumber = null)
+    {
+        return Path.Combine(_basePath, Directory);
+    }
 }

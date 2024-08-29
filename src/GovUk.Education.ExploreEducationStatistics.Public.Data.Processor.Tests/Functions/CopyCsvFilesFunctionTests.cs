@@ -39,8 +39,7 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                     .ForIndex(0, s => s.SetType(FileType.Data))
                     .ForIndex(1, s => s.SetType(FileType.Metadata))
                     .GenerateList())
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
             {

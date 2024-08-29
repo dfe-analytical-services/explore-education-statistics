@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_ReplacementFileAttachedToDifferentRelease()
         {
-            var (release1, release2) = _fixture.DefaultReleaseVersion().GenerateList(2).ToTuple2();
+            var (release1, release2) = _fixture.DefaultReleaseVersion().GenerateTuple2();
 
             var originalFile = new File
             {
@@ -236,8 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -329,8 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -769,8 +767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -997,8 +994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -1217,8 +1213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -1463,8 +1458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -1718,8 +1712,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             File originalFile = _fixture
                 .DefaultFile()
@@ -1738,8 +1731,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SetPublicApiDataSetId(dataSet.Id)
                     .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
             dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
@@ -1809,8 +1801,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -2387,8 +2378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -2527,8 +2517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -2617,8 +2606,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -2717,8 +2705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             File originalFile = _fixture
                 .DefaultFile()
@@ -2737,8 +2724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SetPublicApiDataSetId(dataSet.Id)
                     .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
                 .ForIndex(1, rv => rv.SetFile(replacementFile))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
             dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
@@ -2801,8 +2787,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -3394,8 +3379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -3751,8 +3735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -4043,8 +4026,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsReleaseVersion)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {
@@ -4257,8 +4239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithReleaseVersion(statsRelease)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var originalFile = new File
             {

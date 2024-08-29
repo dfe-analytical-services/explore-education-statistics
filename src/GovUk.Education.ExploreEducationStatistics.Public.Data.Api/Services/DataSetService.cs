@@ -183,7 +183,7 @@ internal class DataSetService(
             Version = dataSetVersion.PublicVersion,
             Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
-            Published = dataSetVersion.Published!.Value,
+            Published = dataSetVersion.Published,
             Withdrawn = dataSetVersion.Withdrawn,
             Notes = dataSetVersion.Notes,
             TotalResults = dataSetVersion.TotalResults,

@@ -4,11 +4,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fix
 
 public static class PreviewTokenGeneratorExtensions
 {
-    public static Generator<PreviewToken> DefaultPreviewToken(this DataFixture fixture)
-        => fixture.Generator<PreviewToken>().WithDefaults();
+    public static Generator<PreviewToken> DefaultPreviewToken(this DataFixture fixture, bool expired = false)
+        => fixture.Generator<PreviewToken>().WithDefaults(expired);
 
-    public static Generator<PreviewToken> WithDefaults(this Generator<PreviewToken> generator)
-        => generator.ForInstance(s => s.SetDefaults());
+    public static Generator<PreviewToken> WithDefaults(this Generator<PreviewToken> generator, bool expired = false)
+        => generator.ForInstance(s => s.SetDefaults(expired));
 
     public static Generator<PreviewToken> WithDataSetVersion(
         this Generator<PreviewToken> generator,
@@ -35,13 +35,15 @@ public static class PreviewTokenGeneratorExtensions
         string label)
         => generator.ForInstance(s => s.SetLabel(label));
 
-    public static InstanceSetters<PreviewToken> SetDefaults(this InstanceSetters<PreviewToken> setters)
+    public static InstanceSetters<PreviewToken> SetDefaults(
+        this InstanceSetters<PreviewToken> setters,
+        bool expired = false)
         => setters
             .SetDefault(pt => pt.Id)
             .SetDefault(pt => pt.Label)
             .SetDefault(pt => pt.DataSetVersionId)
             .SetDefault(pt => pt.CreatedByUserId)
-            .Set(pt => pt.Expiry, DateTimeOffset.UtcNow.AddDays(1));
+            .Set(pt => pt.Expiry, expired ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1));
 
     public static InstanceSetters<PreviewToken> SetDataSetVersion(
         this InstanceSetters<PreviewToken> instanceSetter,

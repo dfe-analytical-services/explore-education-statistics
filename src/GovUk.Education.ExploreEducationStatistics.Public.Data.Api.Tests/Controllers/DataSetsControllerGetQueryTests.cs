@@ -3,7 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -30,12 +32,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
     public class AccessTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
         public async Task VersionNotAvailable_Returns403(DataSetVersionStatus versionStatus)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
@@ -49,8 +47,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
         public async Task VersionAvailable_Returns200(DataSetVersionStatus versionStatus)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
@@ -94,6 +92,123 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             response.AssertNotFound();
+        }
+    }
+
+    public class PreviewTokenTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatusesIncludingDraft),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task PreviewTokenIsActive_Returns200(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()]);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                previewTokenId: dataSetVersion.PreviewTokens[0].Id,
+                indicators: ["sess_authorised"]);
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            Assert.NotNull(viewModel);
+        }
+
+        [Fact]
+        public async Task PreviewTokenIsExpired_Returns403()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(DataSetVersionStatus.Draft)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken(expired: true)]);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                previewTokenId: dataSetVersion.PreviewTokens[0].Id,
+                indicators: ["sess_authorised"]);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task PreviewTokenIsForWrongDataSetVersion_Returns403()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var (dataSetVersion1, dataSetVersion2) = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(DataSetVersionStatus.Draft)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
+                .Generate(2)
+                .ToTuple2();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.AddRange(dataSetVersion1, dataSetVersion2));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion1.PublicVersion,
+                previewTokenId: dataSetVersion2.PreviewTokens[0].Id,
+                indicators: ["sess_authorised"]);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatusesExceptDraft),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        public async Task PreviewTokenIsForUnavailableDataSetVersion_Returns403(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()]);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.AddRange(dataSetVersion));
+
+            var response = await QueryDataSet(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                previewTokenId: dataSetVersion.PreviewTokens[0].Id,
+                indicators: ["sess_authorised"]);
+
+            response.AssertForbidden();
         }
     }
 
@@ -325,7 +440,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class GeographicLevelsValidationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class GeographicLevelsValidationTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
         [InlineData("geographicLevels.in[0]")]
@@ -733,7 +849,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
     public class TimePeriodsValidationTests(TestApplicationFactory testApp)
         : DataSetsControllerGetQueryTests(testApp)
     {
- [Fact]
+        [Fact]
         public async Task Empty_Returns400()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -1229,7 +1345,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
     public class GeographicLevelsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
     {
-         [Theory]
+        [Theory]
         [InlineData("geographicLevels.eq", 132)]
         [InlineData("geographicLevels.notEq", 84)]
         [InlineData("geographicLevels.in", 132)]
@@ -1339,7 +1455,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
     public class LocationsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
     {
-         [Theory]
+        [Theory]
         [InlineData("locations.eq", 36)]
         [InlineData("locations.notEq", 180)]
         [InlineData("locations.in", 36)]
@@ -1505,7 +1621,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
     public class TimePeriodsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
     {
-         [Theory]
+        [Theory]
         [InlineData("timePeriods.eq", 72)]
         [InlineData("timePeriods.notEq", 144)]
         [InlineData("timePeriods.in", 72)]
@@ -1697,7 +1813,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(ValidationMessages.DebugEnabled.Code, warning.Code);
             Assert.Equal(ValidationMessages.DebugEnabled.Message, warning.Message);
         }
-        
+
         [Fact]
         public async Task SingleIndicator_Returns200_CorrectViewModel()
         {
@@ -2057,7 +2173,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         int? pageSize = null,
         IEnumerable<string>? sorts = null,
         bool? debug = null,
-        IDictionary<string, StringValues>? queryParameters = null)
+        IDictionary<string, StringValues>? queryParameters = null,
+        Guid? previewTokenId = null)
     {
         var query = new Dictionary<string, StringValues>
         {
@@ -2095,6 +2212,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
 
         var client = BuildApp().CreateClient();
+        client.AddPreviewTokenHeader(previewTokenId);
 
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 

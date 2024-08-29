@@ -1290,8 +1290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetFootnote_ReleaseAndFootnoteNotRelated()
         {
-            var (releaseVersion, otherReleaseVersion) =
-                _fixture.DefaultStatsReleaseVersion().GenerateList(2).ToTuple2();
+            var (releaseVersion, otherReleaseVersion) = _fixture.DefaultStatsReleaseVersion().GenerateTuple2();
 
             var releaseFootnote = _fixture
                 .DefaultReleaseFootnote()

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -45,25 +46,9 @@ public abstract class DataSetVersionsControllerTests(
     public class ListVersionsTests(
         TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        private static readonly IReadOnlyList<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatuses =
-            new List<DataSetVersionStatus>(
-                [
-                    DataSetVersionStatus.Published,
-                    DataSetVersionStatus.Withdrawn,
-                    DataSetVersionStatus.Deprecated
-                ]
-            );
-
-        public static readonly TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
-            PreviouslyPublishedDataSetVersionStatuses
-        );
-
-        public static readonly TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
-            EnumUtil.GetEnums<DataSetVersionStatus>().Except(PreviouslyPublishedDataSetVersionStatuses)
-        );
-
         [Theory]
-        [MemberData(nameof(PreviouslyPublishedDataSetVersionStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task OnlyPreviouslyPublishedVersionsReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -133,7 +118,8 @@ public abstract class DataSetVersionsControllerTests(
         }
 
         [Theory]
-        [MemberData(nameof(DraftDataSetVersionStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task DraftVersionsNotReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
@@ -972,20 +958,9 @@ public abstract class DataSetVersionsControllerTests(
 
     public class UpdateVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        private static readonly IReadOnlyList<DataSetVersionStatus> UpdateableStatuses =
-        [
-            DataSetVersionStatus.Draft,
-            DataSetVersionStatus.Mapping
-        ];
-
-        public static readonly TheoryData<DataSetVersionStatus> UpdateableStatusesData = new(UpdateableStatuses);
-
-        public static readonly TheoryData<DataSetVersionStatus> ReadOnlyStatusesData = new(
-            EnumUtil.GetEnums<DataSetVersionStatus>().Except(UpdateableStatuses)
-        );
-
         [Theory]
-        [MemberData(nameof(UpdateableStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.UpdateableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task Success(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -1083,7 +1058,8 @@ public abstract class DataSetVersionsControllerTests(
         }
 
         [Theory]
-        [MemberData(nameof(ReadOnlyStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.ReadOnlyStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task DataSetVersionCannotBeUpdated_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture

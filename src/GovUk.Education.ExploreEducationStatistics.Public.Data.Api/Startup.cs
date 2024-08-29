@@ -166,6 +166,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddSecurity();
 
+        services.AddScoped<IPreviewTokenService, PreviewTokenService>();
+
         services.AddSingleton<IDataSetVersionPathResolver, DataSetVersionPathResolver>();
         services.AddScoped<IPublicationService, PublicationService>();
         services.AddScoped<IDataSetService, DataSetService>();

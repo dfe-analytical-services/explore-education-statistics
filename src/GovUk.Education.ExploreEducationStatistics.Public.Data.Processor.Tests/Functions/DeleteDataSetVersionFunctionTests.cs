@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +28,8 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.DeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task Success_FirstDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -122,10 +121,8 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Cancelled)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.DeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task Success_SubsequentDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
         {
             var releaseFiles = DataFixture.DefaultReleaseFile()
@@ -315,10 +312,8 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Deprecated)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task VersionCanNotBeDeleted_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture

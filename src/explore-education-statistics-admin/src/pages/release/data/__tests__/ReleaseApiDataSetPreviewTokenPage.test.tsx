@@ -1,25 +1,24 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import ReleaseApiDataSetPreviewTokenPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenPage';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import ReleaseApiDataSetPreviewTokenPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenPage';
 import {
-  releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenRoute,
   ReleaseDataSetPreviewTokenRouteParams,
 } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
 } from '@admin/services/apiDataSetService';
-import { Release } from '@admin/services/releaseService';
 import _previewTokenService, {
   PreviewToken,
 } from '@admin/services/previewTokenService';
+import { Release } from '@admin/services/releaseService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
+import addHours from 'date-fns/addHours';
+import { createMemoryHistory, MemoryHistory } from 'history';
 import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import addHours from 'date-fns/addHours';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/previewTokenService');
@@ -133,9 +132,10 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
   });
 
   test('shows a modal and calls the `onRevoke` handler on confirm when the revoke button is clicked', async () => {
-    const history = createMemoryHistory();
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     previewTokenService.getPreviewToken.mockResolvedValue(testToken);
+
+    const history = createMemoryHistory();
 
     const { user } = renderPage({ history });
 
@@ -228,7 +228,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
           <Router history={history}>
             <Route
               component={ReleaseApiDataSetPreviewTokenPage}
-              path={releaseApiDataSetPreviewRoute.path}
+              path={releaseApiDataSetPreviewTokenRoute.path}
             />
           </Router>
         </ReleaseContextProvider>
