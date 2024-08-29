@@ -33,7 +33,7 @@ public class ProcessCompletionOfNextDataSetVersionFunction(
         {
             await context.CallActivity(ActivityNames.UpdateFileStoragePath, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportMetadata, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.GenerateChanges, logger, context.InstanceId);
+            await context.CallActivity(ActivityNames.CreateChanges, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.WriteDataFiles, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CompleteNextDataSetVersionImportProcessing, logger,
@@ -50,14 +50,14 @@ public class ProcessCompletionOfNextDataSetVersionFunction(
         }
     }
 
-    [Function(ActivityNames.GenerateChanges)]
-    public async Task GenerateChanges(
+    [Function(ActivityNames.CreateChanges)]
+    public async Task CreateChanges(
         [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.GeneratingChanges, cancellationToken);
-        await dataSetVersionChangeService.GenerateChanges(dataSetVersionImport.DataSetVersionId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.CreatingChanges, cancellationToken);
+        await dataSetVersionChangeService.CreateChanges(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(ActivityNames.UpdateFileStoragePath)]

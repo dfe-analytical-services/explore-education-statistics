@@ -1,4 +1,3 @@
-using AngleSharp.Html;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 

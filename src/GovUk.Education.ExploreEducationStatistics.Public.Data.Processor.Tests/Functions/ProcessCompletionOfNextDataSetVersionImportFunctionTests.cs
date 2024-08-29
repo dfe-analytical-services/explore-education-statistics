@@ -50,7 +50,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             [
                 ActivityNames.UpdateFileStoragePath,
                 ActivityNames.ImportMetadata,
-                ActivityNames.GenerateChanges,
+                ActivityNames.CreateChanges,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
                 ActivityNames.CompleteNextDataSetVersionImportProcessing
@@ -123,22 +123,22 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public abstract class GenerateChangesTests(
+    public abstract class CreateChangesTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
     {
-        protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.GeneratingChanges;
+        protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.CreatingChanges;
 
-        protected async Task GenerateChanges(Guid instanceId)
+        protected async Task CreateChanges(Guid instanceId)
         {
             var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
-            await function.GenerateChanges(instanceId, CancellationToken.None);
+            await function.CreateChanges(instanceId, CancellationToken.None);
         }
     }
 
-    public class GenerateChangesTestsFilterTests(
+    public class CreateChangesTestsFilterTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : GenerateChangesTests(fixture)
+        : CreateChangesTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -157,7 +157,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             // Here we define what changes have occurred between the original and new data set versions.
             // The metadata and mappings are then automatically calculated and stored from this, which can then be used
-            // to generate the changes.
+            // to create the changes.
             List<FilterChange> allChanges =
             [
                 new FilterChange
@@ -323,7 +323,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 originalVersionFilterMetasWithLinksByPublicId: originalVersionLocationMetasWithLinksByPublicId,
                 newVersionFilterMetasWithLinksByPublicId: newVersionLocationMetasWithLinksByPublicId);
 
-            await GenerateChanges(instanceId);
+            await CreateChanges(instanceId);
 
             var newVersionWithChanges = await GetVersionWithChanges(newVersion);
 
@@ -675,9 +675,9 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class GenerateChangesTestsLocationTests(
+    public class CreateChangesTestsLocationTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : GenerateChangesTests(fixture)
+        : CreateChangesTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -694,7 +694,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             // Here we define what changes have occurred between the original and new data set versions.
             // The metadata and mappings are then automatically calculated and stored from this, which can then be used
-            // to generate the changes.
+            // to create the changes.
             List<LocationChange> allChanges =
             [
                 new LocationChange
@@ -812,7 +812,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 originalVersionLocationMetasWithLinksByLevel: originalVersionLocationMetasWithLinksByLevel,
                 newVersionLocationMetasWithLinksByLevel: newVersionLocationMetasWithLinksByLevel);
 
-            await GenerateChanges(instanceId);
+            await CreateChanges(instanceId);
 
             var newVersionWithChanges = await GetVersionWithChanges(newVersion);
 
