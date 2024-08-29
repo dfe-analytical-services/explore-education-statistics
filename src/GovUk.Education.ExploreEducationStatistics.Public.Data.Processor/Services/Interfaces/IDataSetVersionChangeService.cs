@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 
-public interface IDataSetVersionChangelogService
+public interface IDataSetVersionChangeService
 {
-    Task<Either<ActionResult, Unit>> GenerateChangelog(
+    Task<Either<ActionResult, Unit>> GenerateChanges(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default);
 }

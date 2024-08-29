@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class ProcessCompletionOfNextDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IDataSetVersionChangelogService dataSetVersionChangelogService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionChangeService dataSetVersionChangeService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(nameof(ProcessCompletionOfNextDataSetVersion))]
     public async Task ProcessCompletionOfNextDataSetVersion(
@@ -33,7 +33,7 @@ public class ProcessCompletionOfNextDataSetVersionFunction(
         {
             await context.CallActivity(ActivityNames.UpdateFileStoragePath, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportMetadata, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.GenerateChangelog, logger, context.InstanceId);
+            await context.CallActivity(ActivityNames.GenerateChanges, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.WriteDataFiles, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CompleteNextDataSetVersionImportProcessing, logger,
@@ -50,14 +50,14 @@ public class ProcessCompletionOfNextDataSetVersionFunction(
         }
     }
 
-    [Function(ActivityNames.GenerateChangelog)]
-    public async Task GenerateChangelog(
+    [Function(ActivityNames.GenerateChanges)]
+    public async Task GenerateChanges(
         [ActivityTrigger] Guid instanceId,
         CancellationToken cancellationToken)
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.GeneratingChangelog, cancellationToken);
-        await dataSetVersionChangelogService.GenerateChangelog(dataSetVersionImport.DataSetVersionId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.GeneratingChanges, cancellationToken);
+        await dataSetVersionChangeService.GenerateChanges(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(ActivityNames.UpdateFileStoragePath)]

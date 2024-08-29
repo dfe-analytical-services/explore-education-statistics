@@ -50,7 +50,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             [
                 ActivityNames.UpdateFileStoragePath,
                 ActivityNames.ImportMetadata,
-                ActivityNames.GenerateChangelog,
+                ActivityNames.GenerateChanges,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
                 ActivityNames.CompleteNextDataSetVersionImportProcessing
@@ -123,41 +123,41 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public abstract class GenerateChangelogTests(
+    public abstract class GenerateChangesTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
     {
-        protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.GeneratingChangelog;
+        protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.GeneratingChanges;
 
-        protected async Task GenerateChangelog(Guid instanceId)
+        protected async Task GenerateChanges(Guid instanceId)
         {
             var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
-            await function.GenerateChangelog(instanceId, CancellationToken.None);
+            await function.GenerateChanges(instanceId, CancellationToken.None);
         }
     }
 
-    public class GenerateChangelogTestsFilterTests(
+    public class GenerateChangesTestsFilterTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : GenerateChangelogTests(fixture)
+        : GenerateChangesTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             // SCENARIOS WE TEST:
-            // filter DELETED, with all options DELETED. ===> Should just have 1 changelog for the DELETED filter.
-            // filter ADDED, with ADDED options. ===> Should have 1 changelog for the ADDED filter, and 1 changelog for EACH of the ADDED options.
-            // filter UNCHANGED, options UNCHANGED. ===> Should have NO changelogs.
-            // filter UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 changelog EACH of the DELETED options and EACH of the ADDED options.
-            // filter UNCHANGED, SOME options CHANGED. ===> Should have 1 changelog for EACH of the CHANGED options.
-            // filter CHANGED, options UNCHANGED. ===> Should just have 1 changelog for the CHANGED filter.
-            // filter CHANGED + SOME options CHANGED. ===> Should have 1 changelog for the CHANGED filter, and 1 changelog for EACH of the CHANGED options.
+            // filter DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED filter.
+            // filter ADDED, with ADDED options. ===> Should have 1 change for the ADDED filter, and 1 change for EACH of the ADDED options.
+            // filter UNCHANGED, options UNCHANGED. ===> Should have NO changes.
+            // filter UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 change for EACH of the DELETED options and EACH of the ADDED options.
+            // filter UNCHANGED, SOME options CHANGED. ===> Should have 1 change for EACH of the CHANGED options.
+            // filter CHANGED, options UNCHANGED. ===> Should just have 1 change for the CHANGED filter.
+            // filter CHANGED + SOME options CHANGED. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the CHANGED options.
 
             var (instanceId, originalVersion, newVersion) = await CreateNextDataSetVersionWithMeta(
                 importStage: Stage.PreviousStage());
 
             // Here we define what changes have occurred between the original and new data set versions.
             // The metadata and mappings are then automatically calculated and stored from this, which can then be used
-            // to generate the changelogs.
+            // to generate the changes.
             List<FilterChange> allChanges =
                 [
                     new FilterChange {
@@ -298,18 +298,18 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 originalVersionFilterMetasWithLinksByPublicId: originalVersionLocationMetasWithLinksByPublicId,
                 newVersionFilterMetasWithLinksByPublicId: newVersionLocationMetasWithLinksByPublicId);
 
-            await GenerateChangelog(instanceId);
+            await GenerateChanges(instanceId);
 
-            var newVersionWithChangelogs = await GetVersionWithChangelogs(newVersion);
+            var newVersionWithChanges = await GetVersionWithChanges(newVersion);
 
             // Should have 2 FilterMetaChanges:
             // 1 for the DELETED 'filter 1'
             // 1 for the ADDED 'filter 2'.
             // NOTE: At the moment we are unable to detect FILTER mappings due to their public ID also being their key.
-            // We also don't currently have the functionality to map top-level filters either. So here, we are just checking for 2 changelogs.
-            // In the future, when we allow for top-level filter mappings, this will check for the other 2 changelogs from 'filter 6' and
+            // We also don't currently have the functionality to map top-level filters either. So here, we are just checking for 2 changes.
+            // In the future, when we allow for top-level filter mappings, this will check for the other 2 changes from 'filter 6' and
             // 'filter 7' too.
-            Assert.Equal(2, newVersionWithChangelogs.FilterMetaChanges.Count);
+            Assert.Equal(2, newVersionWithChanges.FilterMetaChanges.Count);
 
             // Should have 8 FilterOptionMetaChanges:
             // 2 for the 2 ADDED 'filter 2' options
@@ -317,38 +317,38 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             // 1 for the DELETED 'filter 4' option
             // 2 for the 2 CHANGED 'filter 5' options
             // 2 for the 2 CHANGED 'filter 7' options
-            Assert.Equal(8, newVersionWithChangelogs.FilterOptionMetaChanges.Count);
+            Assert.Equal(8, newVersionWithChanges.FilterOptionMetaChanges.Count);
 
-            // All changelogs should be for the new data set version
-            Assert.All(newVersionWithChangelogs.FilterMetaChanges, lmc => Assert.Equal(newVersionWithChangelogs.Id, lmc.DataSetVersionId));
-            Assert.All(newVersionWithChangelogs.FilterOptionMetaChanges, lomc => Assert.Equal(newVersionWithChangelogs.Id, lomc.DataSetVersionId));
+            // All changes should be for the new data set version
+            Assert.All(newVersionWithChanges.FilterMetaChanges, lmc => Assert.Equal(newVersionWithChanges.Id, lmc.DataSetVersionId));
+            Assert.All(newVersionWithChanges.FilterOptionMetaChanges, lomc => Assert.Equal(newVersionWithChanges.Id, lomc.DataSetVersionId));
 
             foreach (var parentChange in allChanges)
             {
                 originalVersionLocationMetasWithLinksByPublicId.TryGetValue(parentChange.ParentIdentifier, out var originalFilterMeta);
                 newVersionLocationMetasWithLinksByPublicId.TryGetValue(parentChange.ParentIdentifier, out var newFilterMeta);
 
-                // If the parent level has been DELETED, there should just be 1 changelog for this but none for the options - hence, we exit early
+                // If the parent level has been DELETED, there should just be 1 change for this but none for the options - hence, we exit early
                 if (parentChange.ChangeType is ChangeType.Deleted)
                 {
-                    Assert.Single(newVersionWithChangelogs.FilterMetaChanges, lmc =>
+                    Assert.Single(newVersionWithChanges.FilterMetaChanges, lmc =>
                         lmc.PreviousStateId == originalFilterMeta!.Id
                         && lmc.CurrentStateId == null);
 
                     continue;
                 }
 
-                // If the parent level has been ADDED, there should be 1 changelog for this. There will also be changelogs for the options - hence, we DON'T exit early
+                // If the parent level has been ADDED, there should be 1 change for this. There will also be changes for the options - hence, we DON'T exit early
                 if (parentChange.ChangeType is ChangeType.Added)
                 {
-                    Assert.Single(newVersionWithChangelogs.FilterMetaChanges, lmc =>
+                    Assert.Single(newVersionWithChanges.FilterMetaChanges, lmc =>
                         lmc.PreviousStateId == null
                         && lmc.CurrentStateId == newFilterMeta!.Id);
                 }
 
                 foreach (var optionChange in parentChange.OptionChanges)
                 {
-                    // If the option is UNCHANGED, there should be no changelog for this
+                    // If the option is UNCHANGED, there should be no change for this
                     if (optionChange.ChangeType is ChangeType.Unchanged)
                     {
                         continue;
@@ -359,23 +359,23 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
                     switch (optionChange.ChangeType)
                     {
-                        // If the option has been DELETED, ADDED or CHANGED, there should be 1 changelog for this
+                        // If the option has been DELETED, ADDED or CHANGED, there should be 1 change for this
                         case ChangeType.Deleted:
-                            Assert.Single(newVersionWithChangelogs.FilterOptionMetaChanges, lmc =>
+                            Assert.Single(newVersionWithChanges.FilterOptionMetaChanges, lmc =>
                                 lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
                                 && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
                                 && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
                                 && lmc.CurrentState == null);
                             break;
                         case ChangeType.Added:
-                            Assert.Single(newVersionWithChangelogs.FilterOptionMetaChanges, lmc =>
+                            Assert.Single(newVersionWithChanges.FilterOptionMetaChanges, lmc =>
                                 lmc.PreviousState == null
                                 && lmc.CurrentState?.MetaId == newOptionLink!.MetaId
                                 && lmc.CurrentState?.OptionId == newOptionLink.OptionId
                                 && lmc.CurrentState?.PublicId == newOptionLink.PublicId);
                             break;
                         case ChangeType.Changed:
-                            Assert.Single(newVersionWithChangelogs.FilterOptionMetaChanges, lmc =>
+                            Assert.Single(newVersionWithChanges.FilterOptionMetaChanges, lmc =>
                                 lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
                                 && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
                                 && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
@@ -630,26 +630,26 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class GenerateChangelogTestsLocationTests(
+    public class GenerateChangesTestsLocationTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : GenerateChangelogTests(fixture)
+        : GenerateChangesTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             // SCENARIOS WE TEST:
-            // location DELETED, with all options DELETED. ===> Should just have 1 changelog for the DELETED location.
-            // location ADDED, with ADDED options. ===> Should have 1 changelog for the ADDED location, and 1 changelog for EACH of the ADDED options.
-            // location UNCHANGED, options UNCHANGED. ===> Should have NO changelogs.
-            // location UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 changelog for EACH of the DELETED options and EACH of the ADDED options.
-            // location UNCHANGED, SOME options CHANGED. ===> Should have 1 changelog for EACH of the CHANGED options.
+            // location DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED location.
+            // location ADDED, with ADDED options. ===> Should have 1 change for the ADDED location, and 1 change for EACH of the ADDED options.
+            // location UNCHANGED, options UNCHANGED. ===> Should have NO changes.
+            // location UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 change for EACH of the DELETED options and EACH of the ADDED options.
+            // location UNCHANGED, SOME options CHANGED. ===> Should have 1 change for EACH of the CHANGED options.
 
             var (instanceId, originalVersion, newVersion) = await CreateNextDataSetVersionWithMeta(
                 importStage: Stage.PreviousStage());
 
             // Here we define what changes have occurred between the original and new data set versions.
             // The metadata and mappings are then automatically calculated and stored from this, which can then be used
-            // to generate the changelogs.
+            // to generate the changes.
             List<LocationChange> allChanges =
                 [
                     new LocationChange {
@@ -749,52 +749,52 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 originalVersionLocationMetasWithLinksByLevel: originalVersionLocationMetasWithLinksByLevel,
                 newVersionLocationMetasWithLinksByLevel: newVersionLocationMetasWithLinksByLevel);
 
-            await GenerateChangelog(instanceId);
+            await GenerateChanges(instanceId);
 
-            var newVersionWithChangelogs = await GetVersionWithChangelogs(newVersion);
+            var newVersionWithChanges = await GetVersionWithChanges(newVersion);
 
             // Should only have 2 LocationMetaChanges:
             // 1 for the DELETED 'LocalAuthority' level
             // 1 for the ADDED 'School' level.
-            Assert.Equal(2, newVersionWithChangelogs.LocationMetaChanges.Count);
+            Assert.Equal(2, newVersionWithChanges.LocationMetaChanges.Count);
 
             // Should have 6 LocationOptionMetaChanges:
             // 2 for the 2 ADDED 'School' options
             // 1 for the ADDED 'RscRegion' option
             // 1 for the DELETED 'RscRegion' option
             // 2 for the 2 CHANGED 'Provider' options
-            Assert.Equal(6, newVersionWithChangelogs.LocationOptionMetaChanges.Count);
+            Assert.Equal(6, newVersionWithChanges.LocationOptionMetaChanges.Count);
 
-            // All changelogs should be for the new data set version
-            Assert.All(newVersionWithChangelogs.LocationMetaChanges, lmc => Assert.Equal(newVersionWithChangelogs.Id, lmc.DataSetVersionId));
-            Assert.All(newVersionWithChangelogs.LocationOptionMetaChanges, lomc => Assert.Equal(newVersionWithChangelogs.Id, lomc.DataSetVersionId));
+            // All changes should be for the new data set version
+            Assert.All(newVersionWithChanges.LocationMetaChanges, lmc => Assert.Equal(newVersionWithChanges.Id, lmc.DataSetVersionId));
+            Assert.All(newVersionWithChanges.LocationOptionMetaChanges, lomc => Assert.Equal(newVersionWithChanges.Id, lomc.DataSetVersionId));
 
             foreach (var parentChange in allChanges)
             {
                 originalVersionLocationMetasWithLinksByLevel.TryGetValue(parentChange.ParentIdentifier, out var originalLocationMeta);
                 newVersionLocationMetasWithLinksByLevel.TryGetValue(parentChange.ParentIdentifier, out var newLocationMeta);
 
-                // If the parent level has been DELETED, there should just be 1 changelog for this but none for the options - hence, we exit early
+                // If the parent level has been DELETED, there should just be 1 change for this but none for the options - hence, we exit early
                 if (parentChange.ChangeType is ChangeType.Deleted)
                 {
-                    Assert.Single(newVersionWithChangelogs.LocationMetaChanges, lmc =>
+                    Assert.Single(newVersionWithChanges.LocationMetaChanges, lmc =>
                         lmc.PreviousStateId == originalLocationMeta!.Id
                         && lmc.CurrentStateId == null);
 
                     continue;
                 }
 
-                // If the parent level has been ADDED, there should be 1 changelog for this. There will also be changelogs for the options - hence, we DON'T exit early
+                // If the parent level has been ADDED, there should be 1 change for this. There will also be changes for the options - hence, we DON'T exit early
                 if (parentChange.ChangeType is ChangeType.Added)
                 {
-                    Assert.Single(newVersionWithChangelogs.LocationMetaChanges, lmc =>
+                    Assert.Single(newVersionWithChanges.LocationMetaChanges, lmc =>
                         lmc.PreviousStateId == null
                         && lmc.CurrentStateId == newLocationMeta!.Id);
                 }
 
                 foreach (var optionChange in parentChange.OptionChanges)
                 {
-                    // If the option is UNCHANGED, there should be no changelog for this
+                    // If the option is UNCHANGED, there should be no change for this
                     if (optionChange.ChangeType is ChangeType.Unchanged)
                     {
                         continue;
@@ -805,23 +805,23 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
                     switch (optionChange.ChangeType)
                     {
-                        // If the option has been DELETED, ADDED or CHANGED, there should be 1 changelog for this
+                        // If the option has been DELETED, ADDED or CHANGED, there should be 1 change for this
                         case ChangeType.Deleted:
-                            Assert.Single(newVersionWithChangelogs.LocationOptionMetaChanges, lmc =>
+                            Assert.Single(newVersionWithChanges.LocationOptionMetaChanges, lmc =>
                                 lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
                                 && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
                                 && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
                                 && lmc.CurrentState == null);
                             break;
                         case ChangeType.Added:
-                            Assert.Single(newVersionWithChangelogs.LocationOptionMetaChanges, lmc =>
+                            Assert.Single(newVersionWithChanges.LocationOptionMetaChanges, lmc =>
                                 lmc.PreviousState == null
                                 && lmc.CurrentState?.MetaId == newOptionLink!.MetaId
                                 && lmc.CurrentState?.OptionId == newOptionLink.OptionId
                                 && lmc.CurrentState?.PublicId == newOptionLink.PublicId);
                             break;
                         case ChangeType.Changed:
-                            Assert.Single(newVersionWithChangelogs.LocationOptionMetaChanges, lmc =>
+                            Assert.Single(newVersionWithChanges.LocationOptionMetaChanges, lmc =>
                                 lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
                                 && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
                                 && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
@@ -1285,7 +1285,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         });
     }
 
-    private async Task<DataSetVersion> GetVersionWithChangelogs(DataSetVersion version)
+    private async Task<DataSetVersion> GetVersionWithChanges(DataSetVersion version)
     {
         return await GetDbContext<PublicDataDbContext>()
             .DataSetVersions

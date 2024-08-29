@@ -9,10 +9,10 @@ using StackExchange.Profiling.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
-internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbContext)
-    : IDataSetVersionChangelogService
+internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbContext)
+    : IDataSetVersionChangeService
 {
-    public async Task<Either<ActionResult, Unit>> GenerateChangelog(
+    public async Task<Either<ActionResult, Unit>> GenerateChanges(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
     {
@@ -26,7 +26,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
             .DataSetVersionMappings
             .SingleAsync(dsvm => dsvm.TargetDataSetVersionId == nextDataSetVersionId, cancellationToken);
 
-        var (filterMetaChanges, filterOptionMetaChanges) = await GenerateFilterChangelogs(
+        var (filterMetaChanges, filterOptionMetaChanges) = await GenerateFilterChanges(
             nextVersion: nextVersion,
             mappings: mappings,
             cancellationToken: cancellationToken);
@@ -34,7 +34,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
         nextVersion.FilterMetaChanges = filterMetaChanges;
         nextVersion.FilterOptionMetaChanges = filterOptionMetaChanges;
 
-        var (locationMetaChanges, locationOptionMetaChanges) = await GenerateLocationChangelogs(
+        var (locationMetaChanges, locationOptionMetaChanges) = await GenerateLocationChanges(
             nextVersion: nextVersion,
             mappings: mappings,
             cancellationToken: cancellationToken);
@@ -42,19 +42,19 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
         nextVersion.LocationMetaChanges = locationMetaChanges;
         nextVersion.LocationOptionMetaChanges = locationOptionMetaChanges;
 
-        var geographicLevelMetaChange = await GenerateGeographicLevelChangelogs(
+        var geographicLevelMetaChange = await GenerateGeographicLevelChanges(
             nextVersion: nextVersion,
             cancellationToken: cancellationToken);
 
         nextVersion.GeographicLevelMetaChange = geographicLevelMetaChange;
 
-        var indicatorMetaChanges = await GenerateIndicatorChangelogs(
+        var indicatorMetaChanges = await GenerateIndicatorChanges(
             nextVersion: nextVersion,
             cancellationToken: cancellationToken);
 
         nextVersion.IndicatorMetaChanges = indicatorMetaChanges;
 
-        var timePeriodMetaChanges = await GenerateTimePeriodMetaChangelogs(
+        var timePeriodMetaChanges = await GenerateTimePeriodChanges(
             nextVersion: nextVersion,
             cancellationToken: cancellationToken);
 
@@ -65,7 +65,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
         return Unit.Instance;
     }
 
-    private async Task<(List<FilterMetaChange> filterMetaChanges, List<FilterOptionMetaChange> filterOptionMetaChanges)> GenerateFilterChangelogs(
+    private async Task<(List<FilterMetaChange> filterMetaChanges, List<FilterOptionMetaChange> filterOptionMetaChanges)> GenerateFilterChanges(
         DataSetVersion nextVersion, 
         DataSetVersionMapping mappings, 
         CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
                 cancellationToken);
 
         var filterMetaDeletionsAndChanges = mappings.FilterMappingPlan.Mappings
-            .Where(kv => kv.Key != kv.Value.CandidateKey) // DO NOT INCLUDE CHANGELOG ENTRIES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            .Where(kv => kv.Key != kv.Value.CandidateKey) // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
             .Select(kv => new FilterMetaChange
             {
                 DataSetVersionId = nextVersion.Id,
@@ -122,11 +122,11 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
             .ToList();
 
         var filterOptionMetaDeletionsAndChanges = mappings.FilterMappingPlan.Mappings
-            .Where(fm => fm.Value.CandidateKey.HasValue()) // DON'T CREATE A CHANGELOG ENTRY FOR ANY FILTER OPTIONS WHICH HAVE HAD THEIR ENTIRE FILTER DELETED
+            .Where(fm => fm.Value.CandidateKey.HasValue()) // DON'T CREATE A CHANGE FOR ANY FILTER OPTIONS WHICH HAVE HAD THEIR ENTIRE FILTER DELETED
             .SelectMany(
                 fm => fm.Value.OptionMappings,
                 (fm, fom) => new { FilterMapping = fm, OptionMapping = fom })
-            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey) // DO NOT INCLUDE CHANGELOG ENTRIES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey) // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
             .Select(a => new FilterOptionMetaChange
             {
                 DataSetVersionId = nextVersion.Id,
@@ -175,7 +175,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
         return (filterMetaChanges, filterOptionMetaChanges);
     }
 
-    private async Task<(List<LocationMetaChange> locationMetaChanges, List<LocationOptionMetaChange> locationOptionMetaChanges)> GenerateLocationChangelogs(
+    private async Task<(List<LocationMetaChange> locationMetaChanges, List<LocationOptionMetaChange> locationOptionMetaChanges)> GenerateLocationChanges(
         DataSetVersion nextVersion,
         DataSetVersionMapping mappings,
         CancellationToken cancellationToken)
@@ -225,11 +225,11 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
 
         var locationOptionMetaDeletionsAndChanges = mappings.LocationMappingPlan
             .Levels
-            .Where(locationGroupMappings => locationGroupMappings.Value.Candidates.Any()) // DON'T CREATE A CHANGELOG ENTRY FOR ANY LOCATION OPTIONS WHICH HAVE HAD THEIR ENTIRE LOCATION GROUP DELETED
+            .Where(locationGroupMappings => locationGroupMappings.Value.Candidates.Any()) // DON'T CREATE A CHANGE FOR ANY LOCATION OPTIONS WHICH HAVE HAD THEIR ENTIRE LOCATION GROUP DELETED
             .SelectMany(
                 lm => lm.Value.Mappings,
                 (lm, lom) => new { LocationGroup = lm.Key, OptionMapping = lom })
-            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey) // DO NOT INCLUDE CHANGELOG ENTRIES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey) // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
             .Select(a => new LocationOptionMetaChange
             {
                 DataSetVersionId = nextVersion.Id,
@@ -279,7 +279,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
         return (locationMetaChanges, locationOptionMetaChanges);
     }
 
-    private async Task<GeographicLevelMetaChange?> GenerateGeographicLevelChangelogs(
+    private async Task<GeographicLevelMetaChange?> GenerateGeographicLevelChanges(
         DataSetVersion nextVersion,
         CancellationToken cancellationToken)
     {
@@ -302,7 +302,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
             };
     }
 
-    private async Task<List<IndicatorMetaChange>> GenerateIndicatorChangelogs(
+    private async Task<List<IndicatorMetaChange>> GenerateIndicatorChanges(
         DataSetVersion nextVersion,
         CancellationToken cancellationToken)
     {
@@ -347,7 +347,7 @@ internal class DataSetVersionChangelogService(PublicDataDbContext publicDataDbCo
         return [.. indicatorMetaDeletions, .. indicatorMetaAdditions];
     }
 
-    private async Task<List<TimePeriodMetaChange>> GenerateTimePeriodMetaChangelogs(
+    private async Task<List<TimePeriodMetaChange>> GenerateTimePeriodChanges(
         DataSetVersion nextVersion,
         CancellationToken cancellationToken)
     {
