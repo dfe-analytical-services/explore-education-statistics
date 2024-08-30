@@ -142,7 +142,7 @@ User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value      Preview API data set                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
     user checks contents inside the cell value      View preview token log                    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
     user checks contents inside the cell value      Remove draft version                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/button
-    
+
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
@@ -297,7 +297,6 @@ Add data guidance to third release
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_5}
     ...    ${SUBJECT_NAME_5} Main guidance content
 
-
 Save data guidance
     user clicks button    Save guidance
 
@@ -342,4 +341,3 @@ Validate checklist error for a draft API dataset which shows mapping error
     ...    1 issue that must be resolved before this release can be published.
     user checks checklist errors contains link
     ...    All public API data set mappings must be completed
-
