@@ -83,7 +83,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                     var tenantId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.TenantId));
                     var clientId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.ClientId));
                     options.Authority = $"https://login.microsoftonline.com/{tenantId}";
-                    options.Audience = clientId.ToString();
+                    options.Audience = $"api://{clientId}";
                 });
         }
 
