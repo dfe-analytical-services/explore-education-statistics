@@ -898,7 +898,7 @@ public class SeedDataCommand : ICommand
 
             Directory.CreateDirectory(dataSetDir);
 
-            var versionDir = Path.Combine(dataSetDir, "v1.0");
+            var versionDir = Path.Combine(dataSetDir, "v1.0.0");
 
             Directory.CreateDirectory(versionDir);
 
