@@ -11,7 +11,6 @@ export const toolbarConfigFull: ReadonlyArray<ToolbarOption | ToolbarGroup> = [
   'heading',
   '|',
   'bold',
-  'italic',
   'link',
   '|',
   'bulletedList',
@@ -54,7 +53,6 @@ export const methodologyToolbarConfigFull: ReadonlyArray<
 
 export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
   'bold',
-  'italic',
   'link',
   '|',
   'bulletedList',
@@ -74,7 +72,7 @@ export const pluginsConfigLinksOnly: ReadonlySet<PluginName> =
   new Set<PluginName>(['Link']);
 
 export const pluginsConfigSimple: ReadonlySet<PluginName> = new Set<PluginName>(
-  ['Bold', 'Italic', 'Link', 'List'],
+  ['Bold', 'Link', 'List'],
 );
 
 export const defaultAllowedHeadings: string[] = ['h3', 'h4', 'h5'];

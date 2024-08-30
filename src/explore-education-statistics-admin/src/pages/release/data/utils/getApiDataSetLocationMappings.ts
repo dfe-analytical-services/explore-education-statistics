@@ -1,14 +1,17 @@
 import {
   LocationCandidate,
   LocationMapping,
+  LocationOptionSource,
   LocationsMapping,
 } from '@admin/services/apiDataSetVersionService';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
-import { camelCase } from 'lodash';
+import camelCase from 'lodash/camelCase';
+import sortBy from 'lodash/sortBy';
 
 export interface LocationCandidateWithKey extends LocationCandidate {
   key: string;
 }
+
 export interface LocationMappingWithKey extends LocationMapping {
   sourceKey: string;
 }
@@ -29,6 +32,10 @@ export default function getApiDataSetLocationMappings(
   autoMappedLocations: Partial<Record<LocationLevelKey, AutoMappedLocation[]>>;
   newLocations: Partial<Record<LocationLevelKey, LocationCandidateWithKey[]>>;
   mappableLocations: Partial<Record<LocationLevelKey, MappableLocation[]>>;
+  newLocationGroups: Partial<Record<LocationLevelKey, LocationOptionSource[]>>;
+  deletedLocationGroups: Partial<
+    Record<LocationLevelKey, LocationOptionSource[]>
+  >;
 } {
   const mappableLocations: Partial<
     Record<LocationLevelKey, MappableLocation[]>
@@ -40,16 +47,45 @@ export default function getApiDataSetLocationMappings(
     Record<LocationLevelKey, AutoMappedLocation[]>
   > = {};
 
-  Object.keys(locationsMapping.levels).forEach(level => {
-    const mappable: MappableLocation[] = [];
-    const autoMapped: AutoMappedLocation[] = [];
+  const newLocationGroups: Partial<
+    Record<LocationLevelKey, LocationOptionSource[]>
+  > = {};
+  const deletedLocationGroups: Partial<
+    Record<LocationLevelKey, LocationOptionSource[]>
+  > = {};
+
+  sortBy(Object.keys(locationsMapping.levels)).forEach(level => {
+    // TODO remove camelCase
+    const levelKey = camelCase(level) as LocationLevelKey;
 
     const levelMappings = locationsMapping.levels[level]?.mappings ?? {};
     const levelCandidates = locationsMapping.levels[level]?.candidates ?? {};
 
+    const levelMappingEntries = Object.entries(levelMappings);
+    const levelCandidateEntries = Object.entries(levelCandidates);
+
+    if (!levelMappingEntries.length) {
+      newLocationGroups[levelKey] = levelCandidateEntries.map(
+        ([, candidate]) => candidate,
+      );
+
+      return;
+    }
+
+    if (!levelCandidateEntries.length) {
+      deletedLocationGroups[levelKey] = levelMappingEntries.map(
+        ([, mapping]) => mapping.source,
+      );
+
+      return;
+    }
+
+    const mappable: MappableLocation[] = [];
+    const autoMapped: AutoMappedLocation[] = [];
+
     const mappedCandidateKeys = new Set<string>();
 
-    Object.entries(levelMappings).forEach(([key, mapping]) => {
+    levelMappingEntries.forEach(([key, mapping]) => {
       if (mapping.type === 'AutoMapped') {
         if (!mapping.candidateKey) {
           throw new Error(
@@ -121,17 +157,13 @@ export default function getApiDataSetLocationMappings(
     // - completely new locations (have a unique key)
     // - locations that were auto mapped but the mapping has been removed
     // (the original mapping and the candidate have the same key)
-    const newLocationsForLevel: LocationCandidateWithKey[] = Object.entries(
-      levelCandidates,
-    )
-      .filter(([key, _]) => !mappedCandidateKeys.has(key))
-      .map(([key, candidate]) => ({
-        ...candidate,
-        key,
-      }));
-
-    // TODO remove camelCase
-    const levelKey = camelCase(level) as LocationLevelKey;
+    const newLocationsForLevel: LocationCandidateWithKey[] =
+      levelCandidateEntries
+        .filter(([key, _]) => !mappedCandidateKeys.has(key))
+        .map(([key, candidate]) => ({
+          ...candidate,
+          key,
+        }));
 
     if (mappable.length) {
       mappableLocations[levelKey] = mappable;
@@ -150,5 +182,7 @@ export default function getApiDataSetLocationMappings(
     autoMappedLocations,
     newLocations,
     mappableLocations,
+    newLocationGroups,
+    deletedLocationGroups,
   };
 }

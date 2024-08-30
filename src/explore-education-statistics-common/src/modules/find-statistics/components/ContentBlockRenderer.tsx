@@ -46,7 +46,15 @@ const ContentBlockRenderer = ({
 
   switch (type) {
     case 'MarkDownBlock':
-      return <ReactMarkdown className="dfe-content">{body}</ReactMarkdown>;
+      return (
+        <ReactMarkdown
+          className="dfe-content"
+          allowedElements={defaultSanitizeOptions.allowedTags}
+          unwrapDisallowed
+        >
+          {body}
+        </ReactMarkdown>
+      );
     case 'HtmlBlock':
       return (
         <ContentHtml

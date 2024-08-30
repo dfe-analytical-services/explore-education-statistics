@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -2117,8 +2116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 .WithCreatedBy(User)
                                 .Generate(1))
                             .Generate(1)))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var contextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))

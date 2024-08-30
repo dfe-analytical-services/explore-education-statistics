@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -42,28 +43,12 @@ public abstract class DataSetVersionsControllerTests(
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
 
-    public class ListLiveVersionsTests(
+    public class ListVersionsTests(
         TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        private static readonly IReadOnlyList<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatuses =
-            new List<DataSetVersionStatus>(
-                [
-                    DataSetVersionStatus.Published,
-                    DataSetVersionStatus.Withdrawn,
-                    DataSetVersionStatus.Deprecated
-                ]
-            );
-
-        public static TheoryData<DataSetVersionStatus> PreviouslyPublishedDataSetVersionStatusesData = new(
-            PreviouslyPublishedDataSetVersionStatuses
-        );
-
-        public static TheoryData<DataSetVersionStatus> DraftDataSetVersionStatusesData = new(
-            EnumUtil.GetEnums<DataSetVersionStatus>().Except(PreviouslyPublishedDataSetVersionStatuses)
-        );
-
         [Theory]
-        [MemberData(nameof(PreviouslyPublishedDataSetVersionStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task OnlyPreviouslyPublishedVersionsReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -122,13 +107,19 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(currentDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(currentDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(currentDataSetVersion.VersionType, liveVersion.Type);
+
             Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
             Assert.Equal(releaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+
+            Assert.Equal(releaseFile.File.DataSetFileId, liveVersion.File.Id);
+            Assert.Equal(releaseFile.Name, liveVersion.File.Title);
+
             liveVersion.Published.AssertEqual(currentDataSetVersion.Published!.Value);
         }
 
         [Theory]
-        [MemberData(nameof(DraftDataSetVersionStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task DraftVersionsNotReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
@@ -306,8 +297,13 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(targetDataSetVersion.PublicVersion, liveVersion.Version);
             Assert.Equal(targetDataSetVersion.Status, liveVersion.Status);
             Assert.Equal(targetDataSetVersion.VersionType, liveVersion.Type);
+
             Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
             Assert.Equal(targetReleaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+
+            Assert.Equal(targetReleaseFile.File.DataSetFileId, liveVersion.File.Id);
+            Assert.Equal(targetReleaseFile.Name, liveVersion.File.Title);
+
             liveVersion.Published.AssertEqual(targetDataSetVersion.Published!.Value);
         }
 
@@ -325,6 +321,26 @@ public abstract class DataSetVersionsControllerTests(
             response.AssertForbidden();
         }
 
+        [Fact]
+        public async Task NoDataSetId_Returns400()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await client.GetAsync(BaseUrl);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasNotEmptyError("dataSetId");
+        }
+
+        [Fact]
+        public async Task DataSetDoesNotExist_Returns404()
+        {
+            var response = await ListLiveVersions(dataSetId: Guid.NewGuid());
+
+            response.AssertNotFound();
+        }
+
         private async Task<HttpResponseMessage> ListLiveVersions(
             Guid dataSetId,
             int? page = null,
@@ -335,11 +351,12 @@ public abstract class DataSetVersionsControllerTests(
 
             var queryParams = new Dictionary<string, string?>
             {
+                { "dataSetId", dataSetId.ToString() },
                 { "page", page?.ToString() },
                 { "pageSize", pageSize?.ToString() }
             };
 
-            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}", queryParams);
+            var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
 
             return await client.GetAsync(uri);
         }
@@ -939,27 +956,11 @@ public abstract class DataSetVersionsControllerTests(
         }
     }
 
-    public class UpdateVersionTests(
-        TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class UpdateVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        private static readonly IReadOnlyList<DataSetVersionStatus> EligibleUpdateDataSetVersionStatuses =
-            new List<DataSetVersionStatus>(
-                [
-                    DataSetVersionStatus.Draft,
-                    DataSetVersionStatus.Mapping
-                ]
-            );
-
-        public static TheoryData<DataSetVersionStatus> EligibleUpdateDataSetVersionStatusesData = new(
-            EligibleUpdateDataSetVersionStatuses
-        );
-
-        public static TheoryData<DataSetVersionStatus> NonEligibleUpdateDataSetVersionStatusesData = new(
-            EnumUtil.GetEnums<DataSetVersionStatus>().Except(EligibleUpdateDataSetVersionStatuses)
-        );
-
         [Theory]
-        [MemberData(nameof(EligibleUpdateDataSetVersionStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.UpdateableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task Success(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
@@ -1002,11 +1003,10 @@ public abstract class DataSetVersionsControllerTests(
 
             var updateRequest = new DataSetVersionUpdateRequest
             {
-                DataSetVersionId = nextDataSetVersion.Id,
                 Notes = "updated notes."
             };
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(nextDataSetVersion.Id, updateRequest);
 
             var viewModel = response.AssertOk<DataSetDraftVersionViewModel>();
 
@@ -1040,9 +1040,9 @@ public abstract class DataSetVersionsControllerTests(
         {
             var client = BuildApp(user: AuthenticatedUser()).CreateClient();
 
-            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = Guid.NewGuid() };
+            var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(updateRequest, client);
+            var response = await UpdateVersion(Guid.NewGuid(), updateRequest, client);
 
             response.AssertForbidden();
         }
@@ -1050,15 +1050,16 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task DataSetVersionDoesNotExist_Returns404()
         {
-            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = Guid.NewGuid() };
+            var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(Guid.NewGuid(), updateRequest);
 
             response.AssertNotFound();
         }
 
         [Theory]
-        [MemberData(nameof(NonEligibleUpdateDataSetVersionStatusesData))]
+        [MemberData(nameof(DataSetVersionStatusTheoryData.ReadOnlyStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData))]
         public async Task DataSetVersionCannotBeUpdated_Returns400(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
@@ -1087,9 +1088,9 @@ public abstract class DataSetVersionsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var updateRequest = new DataSetVersionUpdateRequest { DataSetVersionId = nextDataSetVersion.Id };
+            var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(nextDataSetVersion.Id, updateRequest);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1122,26 +1123,26 @@ public abstract class DataSetVersionsControllerTests(
 
             var updateRequest = new DataSetVersionUpdateRequest
             {
-                DataSetVersionId = dataSetVersion.Id,
                 Notes = "updated notes."
             };
 
-            var response = await UpdateVersion(updateRequest);
+            var response = await UpdateVersion(dataSetVersion.Id, updateRequest);
 
             var validationProblem = response.AssertValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "notes",
-                expectedCode: ValidationMessages.DataSetVersionCannotHaveChangelogNotes.Code);
+                expectedCode: ValidationMessages.DataSetVersionCannotHaveNotes.Code);
         }
 
         private async Task<HttpResponseMessage> UpdateVersion(
+            Guid dataSetVersionId,
             DataSetVersionUpdateRequest updateRequest,
             HttpClient? client = null)
         {
             client ??= BuildApp().CreateClient();
 
-            return await client.PatchAsync(BaseUrl, new JsonNetContent(updateRequest));
+            return await client.PatchAsJsonAsync($"{BaseUrl}/{dataSetVersionId}", updateRequest);
         }
     }
 

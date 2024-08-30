@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 
@@ -144,6 +145,30 @@ public abstract class DataSetVersionPathResolverTests
                     "v1.0.0"
                 ),
                 resolver.DirectoryPath(version));
+        }
+
+        [Theory]
+        [MemberData(nameof(GetEnvironmentNames))]
+        public void ValidDirectoryPath_OptionalVersionArgument(string environmentName)
+        {
+            DataSetVersion version = _dataFixture.DefaultDataSetVersion();
+
+            _webHostEnvironmentMock
+                .SetupGet(s => s.EnvironmentName)
+                .Returns(environmentName);
+
+            var resolver = BuildService(options: new DataFilesOptions
+            {
+                BasePath = Path.Combine("data", "data-files")
+            });
+
+            Assert.Equal(
+                Path.Combine(
+                    resolver.BasePath(),
+                    version.DataSetId.ToString(),
+                    "v1.2.3"
+                ),
+                resolver.DirectoryPath(version, new SemVersion(major: 1, minor: 2, patch: 3)));
         }
 
         [Theory]

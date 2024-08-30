@@ -580,8 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithReleases(_dataFixture
                     .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1))
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

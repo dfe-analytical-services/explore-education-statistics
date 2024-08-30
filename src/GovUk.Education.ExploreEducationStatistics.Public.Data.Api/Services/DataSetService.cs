@@ -183,7 +183,7 @@ internal class DataSetService(
             Version = dataSetVersion.PublicVersion,
             Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
-            Published = dataSetVersion.Published!.Value,
+            Published = dataSetVersion.Published,
             Withdrawn = dataSetVersion.Withdrawn,
             Notes = dataSetVersion.Notes,
             TotalResults = dataSetVersion.TotalResults,
@@ -260,7 +260,8 @@ internal class DataSetService(
             dataSetVersion.LocationMetas = await publicDataDbContext.LocationMetas
                 .AsNoTracking()
                 .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-                .Include(lm => lm.Options)
+                .Include(lm => lm.OptionLinks)
+                .ThenInclude(l => l.Option)
                 .ToListAsync(cancellationToken: cancellationToken);
         }
 

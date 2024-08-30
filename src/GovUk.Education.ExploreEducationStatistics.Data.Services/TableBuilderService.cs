@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     {
         private readonly StatisticsDbContext _context;
         private readonly IFilterItemRepository _filterItemRepository;
+        private readonly ILocationService _locationService;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly ISubjectResultMetaService _subjectResultMetaService;
@@ -45,10 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IUserService _userService;
         private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly TableBuilderOptions _options;
+        private readonly LocationsOptions _locationOptions;
 
         public TableBuilderService(
             StatisticsDbContext context,
             IFilterItemRepository filterItemRepository,
+            ILocationService locationService,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             ISubjectResultMetaService subjectResultMetaService,
@@ -56,10 +59,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectRepository subjectRepository,
             IUserService userService,
             IReleaseVersionRepository releaseVersionRepository,
-            IOptions<TableBuilderOptions> options)
+            IOptions<TableBuilderOptions> options,
+            IOptions<LocationsOptions> locationOptions)
         {
             _context = context;
             _filterItemRepository = filterItemRepository;
+            _locationService = locationService;
             _observationService = observationService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _subjectResultMetaService = subjectResultMetaService;
@@ -68,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _userService = userService;
             _releaseVersionRepository = releaseVersionRepository;
             _options = options.Value;
+            _locationOptions = locationOptions.Value;
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
@@ -75,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken = default)
         {
             return await FindLatestPublishedReleaseVersionId(query.SubjectId)
-                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, null, cancellationToken));
+                .OnSuccess(releaseVersionId => Query(releaseVersionId, query, boundaryLevelId: null, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
@@ -107,6 +113,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                     ObservationViewModelBuilder.BuildObservation(observation, query.Indicators))
                             };
                         });
+                });
+        }
+
+        public async Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> QueryForBoundaryLevel(
+            Guid releaseVersionId,
+            FullTableQuery query,
+            long boundaryLevelId,
+            CancellationToken cancellationToken = default)
+        {
+            return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
+                    releaseVersionId: releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewSubjectData)
+                .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
+                .OnSuccess(() => ListQueryObservations(query, cancellationToken))
+                .OnSuccess(async observations =>
+                {
+                    if (observations.Count == 0)
+                    {
+                        return [];
+                    }
+
+                    var locations = observations
+                        .Select(o => o.Location)
+                        .Distinct()
+                        .ToList();
+
+                    return await _locationService.GetLocationViewModels(locations, boundaryLevelId, _locationOptions.Hierarchies);
                 });
         }
 

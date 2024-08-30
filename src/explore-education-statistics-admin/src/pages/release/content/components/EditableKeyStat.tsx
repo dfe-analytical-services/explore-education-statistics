@@ -12,6 +12,7 @@ interface EditableKeyStatProps {
   isEditing?: boolean;
   isReordering?: boolean;
   keyStat: KeyStatistic;
+  keyStatisticGuidanceTitles?: (string | undefined)[];
   releaseId: string;
   testId?: string;
 }
@@ -20,6 +21,7 @@ const EditableKeyStat = ({
   isEditing = false,
   isReordering = false,
   keyStat,
+  keyStatisticGuidanceTitles,
   releaseId,
   testId = 'keyStat',
 }: EditableKeyStatProps) => {
@@ -35,6 +37,7 @@ const EditableKeyStat = ({
       return (
         <EditableKeyStatDataBlock
           keyStat={keyStat}
+          keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
           releaseId={releaseId}
           testId={testId}
           isEditing={isEditing}
@@ -65,6 +68,7 @@ const EditableKeyStat = ({
       return (
         <EditableKeyStatText
           keyStat={keyStat}
+          keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
           testId={testId}
           isEditing={isEditing}
           isReordering={isReordering}

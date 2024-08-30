@@ -15,6 +15,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static Moq.MockBehavior;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
@@ -48,13 +49,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                         MockUtils.SetupCall(statisticsPersistenceHelper, _releaseSubject);
 
-                        var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+                        var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
                         subjectRepository
                             .Setup(s => s.FindPublicationIdForSubject(_subject.Id, default))
                             .ReturnsAsync(PublicationId);
 
-                        var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+                        var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
 
                         releaseVersionRepository
                             .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
@@ -110,6 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private TableBuilderService BuildTableBuilderService(
             IFilterItemRepository? filterItemRepository = null,
+            ILocationService? locationService = null,
             IObservationService? observationService = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
             ISubjectResultMetaService? subjectResultMetaService = null,
@@ -117,23 +119,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
             IReleaseVersionRepository? releaseVersionRepository = null,
-            IOptions<TableBuilderOptions>? options = null)
+            IOptions<TableBuilderOptions>? tableBuilderOptions = null,
+            IOptions<LocationsOptions>? locationsOptions = null)
         {
             return new(
                 Mock.Of<StatisticsDbContext>(),
-                filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
-                observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
+                filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
+                locationService ?? Mock.Of<ILocationService>(Strict),
+                observationService ?? Mock.Of<IObservationService>(Strict),
                 statisticsPersistenceHelper ?? StatisticsPersistenceHelperMock(_subject).Object,
-                subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(MockBehavior.Strict),
-                subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(MockBehavior.Strict),
-                subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
-                userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
-                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
-                options ?? Options.Create(new TableBuilderOptions())
+                subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
+                subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
+                userService ?? Mock.Of<IUserService>(Strict),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
+                tableBuilderOptions ?? Options.Create(new TableBuilderOptions()),
+                locationsOptions ?? Options.Create(new LocationsOptions())
             );
         }
 
-        private Mock<IPersistenceHelper<StatisticsDbContext>> StatisticsPersistenceHelperMock(Subject subject)
+        private static Mock<IPersistenceHelper<StatisticsDbContext>> StatisticsPersistenceHelperMock(Subject subject)
         {
             return MockUtils.MockPersistenceHelper<StatisticsDbContext, Subject>(subject.Id, subject);
         }

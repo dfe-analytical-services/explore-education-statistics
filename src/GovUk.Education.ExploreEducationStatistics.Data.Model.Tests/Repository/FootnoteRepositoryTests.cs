@@ -1037,9 +1037,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFootnotes_FiltersByRelease()
         {
-            var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(2);
-
-            var (releaseVersion1, releaseVersion2) = releaseVersions.ToTuple2();
+            var (releaseVersion1, releaseVersion2) = _fixture.DefaultStatsReleaseVersion()
+                .GenerateTuple2();
 
             var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForRange(..2, s => s.SetReleaseVersion(releaseVersion1))

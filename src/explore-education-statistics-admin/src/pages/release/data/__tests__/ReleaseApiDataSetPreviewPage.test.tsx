@@ -111,7 +111,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(
-        '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview/token-id',
+        '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview-tokens/token-id',
       );
     });
   });

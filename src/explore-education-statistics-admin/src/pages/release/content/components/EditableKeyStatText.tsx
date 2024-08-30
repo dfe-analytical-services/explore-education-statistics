@@ -10,6 +10,7 @@ export interface EditableKeyStatTextProps {
   isEditing?: boolean;
   isReordering?: boolean;
   keyStat: KeyStatisticText;
+  keyStatisticGuidanceTitles?: (string | undefined)[];
   testId?: string;
   onRemove: () => void;
   onSubmit: (values: KeyStatTextFormValues) => void;
@@ -19,6 +20,7 @@ export default function EditableKeyStatText({
   isEditing = false,
   isReordering = false,
   keyStat,
+  keyStatisticGuidanceTitles,
   testId = 'keyStat',
   onRemove,
   onSubmit,
@@ -37,6 +39,7 @@ export default function EditableKeyStatText({
     return (
       <EditableKeyStatTextForm
         keyStat={keyStat}
+        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
         isReordering={isReordering}
         testId={testId}
         onSubmit={handleSubmit}

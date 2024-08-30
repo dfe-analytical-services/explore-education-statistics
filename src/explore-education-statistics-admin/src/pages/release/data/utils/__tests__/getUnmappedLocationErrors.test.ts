@@ -1,10 +1,12 @@
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
 import { MappableLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import { Dictionary } from '@common/types';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
+import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 
 describe('getUnmappedLocationErrors', () => {
-  const testMappableLocations: Dictionary<MappableLocation[]> = {
+  const testMappableLocations: Partial<
+    Record<LocationLevelKey, MappableLocation[]>
+  > = {
     localAuthority: [
       {
         mapping: {
@@ -106,10 +108,10 @@ describe('getUnmappedLocationErrors', () => {
   test('returns the error messages', () => {
     const expected: ErrorSummaryMessage[] = [
       {
-        id: 'mappable-localAuthority',
+        id: 'mappable-table-localAuthority',
         message: 'There are 2 unmapped local authorities',
       },
-      { id: 'mappable-region', message: 'There is 1 unmapped region' },
+      { id: 'mappable-table-region', message: 'There is 1 unmapped region' },
     ];
 
     expect(getUnmappedLocationErrors(testMappableLocations)).toEqual(expected);

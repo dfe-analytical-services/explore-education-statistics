@@ -1,7 +1,6 @@
 import { FilterMapping } from '@admin/services/apiDataSetVersionService';
 import ApiDataSetMappableFilterColumnOptionsModal from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnOptionsModal';
 import Tag from '@common/components/Tag';
-import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
 import React from 'react';
 
@@ -18,10 +17,8 @@ export default function ApiDataSetMappableFilterColumnsTable({
       id="mappable-filter-columns-table"
       data-testid="mappable-filter-columns-table"
     >
-      <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
-        <VisuallyHidden>
-          Table showing filter columns not found in the new data set
-        </VisuallyHidden>
+      <caption className="govuk-visually-hidden">
+        Table showing filter columns not found in the new data set
       </caption>
       <thead>
         <tr>
@@ -35,9 +32,12 @@ export default function ApiDataSetMappableFilterColumnsTable({
           return (
             <tr key={`column-${key}`}>
               <td>
-                {column.source.label} <br />
-                id: {key}
-                <br />{' '}
+                {column.source.label}
+                <br />
+                <span className="dfe-colour--dark-grey">
+                  ID: <code>{key}</code>
+                </span>
+                <br />
                 <ApiDataSetMappableFilterColumnOptionsModal
                   id={key}
                   label={column.source.label}

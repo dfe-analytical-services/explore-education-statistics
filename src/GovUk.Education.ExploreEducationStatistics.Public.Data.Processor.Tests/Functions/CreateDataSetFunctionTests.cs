@@ -45,8 +45,7 @@ public abstract class CreateDataSetFunctionTests(
                         .DefaultFile(FileType.Metadata)
                         .WithSubjectId(subjectId)
                 ])
-                .GenerateList()
-                .ToTuple2();
+                .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
             {
@@ -205,8 +204,7 @@ public abstract class CreateDataSetFunctionTests(
                         .DefaultFile(FileType.Metadata)
                         .WithSubjectId(subjectId)
                 ])
-                .GenerateList()
-                .ToTuple2();
+                .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
             {

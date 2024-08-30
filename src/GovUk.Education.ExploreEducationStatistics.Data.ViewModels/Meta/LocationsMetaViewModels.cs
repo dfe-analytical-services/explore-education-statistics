@@ -1,3 +1,4 @@
+using GeoJSON.Net.Feature;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
@@ -16,7 +17,7 @@ public record LocationAttributeViewModel : LabelValue
 {
     public Guid? Id { get; set; }
 
-    public dynamic? GeoJson { get; init; }
+    public Feature? GeoJson { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
     public GeographicLevel? Level { get; init; }

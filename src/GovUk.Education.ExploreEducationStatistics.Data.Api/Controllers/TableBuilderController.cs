@@ -12,9 +12,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
@@ -105,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
             Guid dataBlockParentId,
-            [FromQuery] long? boundaryLevelId)
+            [FromQuery] long? boundaryLevelId) // TODO: Remove in EES-5433
         {
             var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessDo(dataBlockVersion => this
@@ -116,6 +118,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             if (actionResult.Result is not NotFoundResult)
             {
                 Response.Headers["Cache-Control"] = "public,max-age=300";
+            }
+
+            return actionResult;
+        }
+
+        [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}/geojson")]
+        public async Task<ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>> QueryForDataBlockWithGeoJsonResult(
+            Guid dataBlockParentId,
+            [FromQuery] long boundaryLevelId)
+        {
+            var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+                .OnSuccessDo(dataBlockVersion => this
+                    .CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion))
+                .OnSuccess(dataBlockVersion => GetLocations(dataBlockVersion, boundaryLevelId))
+                .HandleFailuresOrOk();
+
+            if (actionResult.Result is not NotFoundResult)
+            {
+                Response.Headers.CacheControl = "public,max-age=300";
             }
 
             return actionResult;
@@ -143,6 +164,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             long? boundaryLevelId = null)
         {
             return _dataBlockService.GetDataBlockTableResult(
+                releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                dataBlockVersionId: dataBlockVersion.Id,
+                boundaryLevelId);
+        }
+
+        [BlobCache(typeof(LocationsForDataBlockCacheKey))]
+        private Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocations(
+            DataBlockVersion dataBlockVersion,
+            long boundaryLevelId)
+        {
+            return _dataBlockService.GetLocationsForDataBlock(
                 releaseVersionId: dataBlockVersion.ReleaseVersionId,
                 dataBlockVersionId: dataBlockVersion.Id,
                 boundaryLevelId);

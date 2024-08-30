@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 
@@ -29,7 +30,7 @@ public static class FilterMappingPlanGeneratorExtensions
             sourceFilter.Options.ForEach(option =>
             {
                 filterMappingGenerator.AddOptionMapping(
-                    sourceKey: MappingKeyFunctions.FilterOptionKeyGenerator(option),
+                    sourceKey: MappingKeyGenerators.FilterOptionMeta(option),
                     fixture
                         .DefaultFilterOptionMapping()
                         .WithSource(fixture
@@ -52,7 +53,7 @@ public static class FilterMappingPlanGeneratorExtensions
             targetFilter.Options.ForEach(option =>
             {
                 filterCandidateGenerator.AddOptionCandidate(
-                    targetKey: MappingKeyFunctions.FilterOptionKeyGenerator(option),
+                    targetKey: MappingKeyGenerators.FilterOptionMeta(option),
                     fixture
                         .DefaultMappableFilterOption()
                         .WithLabel(option.Label));

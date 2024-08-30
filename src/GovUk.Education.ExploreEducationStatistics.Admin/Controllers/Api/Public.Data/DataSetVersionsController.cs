@@ -18,16 +18,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 [Route("api/public-data/data-set-versions")]
 public class DataSetVersionsController(IDataSetVersionService dataSetVersionService) : ControllerBase
 {
-    [HttpGet("{dataSetId:guid}")]
+    [HttpGet]
     [Produces("application/json")]
-    public async Task<ActionResult<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListLiveVersions(
+    public async Task<ActionResult<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListVersions(
         [FromQuery] DataSetVersionListRequest request,
-        Guid dataSetId,
         CancellationToken cancellationToken)
     {
         return await dataSetVersionService
             .ListLiveVersions(
-                dataSetId: dataSetId,
+                dataSetId: request.DataSetId,
                 page: request.Page,
                 pageSize: request.PageSize,
                 cancellationToken: cancellationToken)
@@ -96,14 +95,16 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .HandleFailuresOrNoOp();
     }
 
-    [HttpPatch]
+    [HttpPatch("{dataSetVersionId:guid}")]
     [Produces("application/json")]
     public async Task<ActionResult<DataSetDraftVersionViewModel>> UpdateVersion(
+        Guid dataSetVersionId,
         [FromBody] DataSetVersionUpdateRequest dataSetVersionUpdateRequest,
         CancellationToken cancellationToken)
     {
         return await dataSetVersionService
             .UpdateVersion(
+                dataSetVersionId: dataSetVersionId,
                 updateRequest: dataSetVersionUpdateRequest,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
