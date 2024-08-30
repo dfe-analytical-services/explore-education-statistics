@@ -15,7 +15,7 @@ param requireAuthentication bool = true
 
 
 resource containerAppConfig 'Microsoft.App/containerApps/authConfigs@2024-03-01' = {
-  name: '${containerAppName}/authConfig'  
+  name: '${containerAppName}/current'  
   properties: {
     globalValidation: {
       unauthenticatedClientAction: requireAuthentication ? 'Return401' : null
