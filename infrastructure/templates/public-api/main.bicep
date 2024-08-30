@@ -393,6 +393,15 @@ resource appGatewayManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdenti
   name: appGatewayManagedIdentityName
 }
 
+// TODO EES-5382 - remove when the switch over the Key Vault RBAC is enabled.
+module appGatewayKeyVaultAccessPolicy 'components/keyVaultAccessPolicy.bicep' = {
+  name: 'appGatewayKeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: [appGatewayManagedIdentity.properties.principalId]
+  }
+}
+
 module appGatewayKeyVaultRoleAssignments 'components/keyVaultRoleAssignment.bicep' = {
   name: 'appGatewayKeyVaultRoleAssignment'
   params: {
