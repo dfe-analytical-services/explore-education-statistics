@@ -46,3 +46,22 @@ verify status of API Datasets
     user waits for caches to expire
     ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
     should be equal as strings    ${status_value}    ${expected_status}
+    
+user checks status in Draft version table
+    [Arguments]    ${text}    ${expected_status}
+    user waits for caches to expire
+    ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="${text}"]//strong)[2]
+    should be equal as strings    ${status_value}    ${expected_status}
+
+user checks contents inside the cell value
+    [Arguments]      ${expected_text}     ${locator}
+     ${status_value}=    get text    ${locator}
+    should be equal as strings    ${status_value}    ${expected_text}
+
+user checks table headings for Draft version details table
+    ${elements}=  create list  Version  Status  Release  Data set file  Geographic levels  Time periods  Indicators  Filters  Actions
+
+    FOR  ${element}  IN  @{elements}
+        ${xpath}=  set variable  //dl[@data-testid="draft-version-summary"]//div[@data-testid="${element}"]/dt
+        element should be visible  xpath=${xpath}
+    END
