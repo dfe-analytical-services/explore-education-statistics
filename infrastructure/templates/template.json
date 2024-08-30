@@ -1167,15 +1167,14 @@
     },
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
-    "keyVaultSecretsUserPrincipalIds": [
-      "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2022-09-01', 'Full').identity.principalId]",
-      "[reference(concat('Microsoft.Web/sites/', variables('adminAppName')), '2022-09-01', 'Full').identity.principalId]",
-      "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2022-09-01', 'Full').identity.principalId]",
-      "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2022-09-01', 'Full').identity.principalId]",
-      "[reference(concat('Microsoft.Web/sites/', variables('importerAppName')), '2022-09-01', 'Full').identity.principalId]",
-      "[reference(concat('Microsoft.Web/sites/', variables('contentAppName')), '2022-09-01', 'Full').identity.principalId]",
-      "[reference(concat('Microsoft.Web/sites/', variables('dataAppName')), '2022-09-01', 'Full').identity.principalId]",
-      "[parameters('devopsSPN')]"
+    "keyVaultSecretsUserPrincipalRefs": [
+      "[concat('Microsoft.DataFactory/factories/', variables('dataFactoryName'))]",
+      "[concat('Microsoft.Web/sites/', variables('adminAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
     ]
   },
   "resources": [
@@ -3726,14 +3725,25 @@
     {
       "copy": {
         "name": "keyVaultSecretUsersCopy",
-        "count": "[length(variables('keyVaultSecretsUserPrincipalIds'))]"
+        "count": "[length(variables('keyVaultSecretsUserPrincipalRefs'))]"
       },
       "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('keyVaultSecretsUserPrincipalIds')[copyIndex()])))]",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId))]",
       "properties": {
         "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
-        "principalId": "[variables('keyVaultSecretsUserPrincipalIds')[copyIndex()]]",
+        "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), parameters('devopsSPN'))))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[parameters('devopsSPN')]",
         "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
         "principalType": "ServicePrincipal"
       }
