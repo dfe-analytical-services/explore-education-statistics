@@ -211,14 +211,14 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             mappings.LocationMappingPlan.Levels[firstLevel.Level].Mappings[mappedOption1Key] = mappedOption1 with
             {
-                PublicId = "option-1-public-id",
+                PublicId = "id-1",
                 Type = MappingType.AutoMapped,
                 CandidateKey = mappedOption1Key
             };
 
             mappings.LocationMappingPlan.Levels[lastLevel.Level].Mappings[mappedOption2Key] = mappedOption2 with
             {
-                PublicId = "option-2-public-id",
+                PublicId = "id-2",
                 Type = MappingType.ManualMapped,
                 CandidateKey = mappedOption2Key
             };
@@ -275,10 +275,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             // Public Ids should be SQIDs based on the option's id unless otherwise directed by the
             // mappings.
             var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Source.Label);
-            Assert.Equal("option-1-public-id", actualMappedOption1Link.PublicId);
+            Assert.Equal("id-1", actualMappedOption1Link.PublicId);
 
             var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Source.Label);
-            Assert.Equal("option-2-public-id", actualMappedOption2Link.PublicId);
+            Assert.Equal("id-2", actualMappedOption2Link.PublicId);
 
             var otherLinks = actualLocations
                 .SelectMany(level => level.OptionLinks)
@@ -394,14 +394,14 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             var option1Mapping = new FilterOptionMapping
             {
-                PublicId = "option-1-public-id",
+                PublicId = "id-1",
                 Type = MappingType.AutoMapped,
                 CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption1)
             };
 
             var option2Mapping = new FilterOptionMapping
             {
-                PublicId = "option-2-public-id",
+                PublicId = "id-2",
                 Type = MappingType.ManualMapped,
                 CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption2)
             };
@@ -490,11 +490,11 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                             // with queries that use the source filter option's PublicId.
                             if (actualOptionLink.Option.Label == mappedOption1.Label)
                             {
-                                Assert.Equal("option-1-public-id", actualOptionLink.PublicId);
+                                Assert.Equal("id-1", actualOptionLink.PublicId);
                             }
                             else if (actualOptionLink.Option.Label == mappedOption2.Label)
                             {
-                                Assert.Equal("option-2-public-id", actualOptionLink.PublicId);
+                                Assert.Equal("id-2", actualOptionLink.PublicId);
                             }
                             else
                             {

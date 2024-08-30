@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Label = table.Column<string>(type: "text", nullable: false),
+                    Label = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     IsAggregate = table.Column<bool>(type: "boolean", nullable: true)
                 },
                 constraints: table =>
@@ -68,13 +68,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Label = table.Column<string>(type: "text", nullable: false),
+                    Label = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     Type = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    OldCode = table.Column<string>(type: "text", nullable: true),
-                    Urn = table.Column<string>(type: "text", nullable: true),
-                    LaEstab = table.Column<string>(type: "text", nullable: true),
-                    Ukprn = table.Column<string>(type: "text", nullable: true)
+                    Code = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    OldCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Urn = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    LaEstab = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Ukprn = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -115,10 +115,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    ReleaseFileId = table.Column<Guid>(type: "uuid", nullable: false),
                     VersionMajor = table.Column<int>(type: "integer", nullable: false),
                     VersionMinor = table.Column<int>(type: "integer", nullable: false),
                     VersionPatch = table.Column<int>(type: "integer", nullable: false),
+                    Release_Title = table.Column<string>(type: "text", nullable: false),
+                    Release_Slug = table.Column<string>(type: "text", nullable: false),
+                    Release_DataSetFileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Release_ReleaseFileId = table.Column<Guid>(type: "uuid", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),
                     TotalResults = table.Column<long>(type: "bigint", nullable: false),
                     MetaSummary = table.Column<string>(type: "jsonb", nullable: true),
@@ -199,8 +202,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PublicId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Label = table.Column<string>(type: "text", nullable: false),
+                    PublicId = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Column = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Label = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Hint = table.Column<string>(type: "text", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
@@ -245,8 +249,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PublicId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Label = table.Column<string>(type: "text", nullable: false),
+                    PublicId = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Column = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Label = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Unit = table.Column<string>(type: "text", nullable: true),
                     DecimalPlaces = table.Column<byte>(type: "smallint", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -316,7 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    Period = table.Column<string>(type: "text", nullable: false),
+                    Period = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -417,7 +422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     MetaId = table.Column<int>(type: "integer", nullable: false),
                     OptionId = table.Column<int>(type: "integer", nullable: false),
-                    PublicId = table.Column<string>(type: "text", nullable: false)
+                    PublicId = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -584,7 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     MetaId = table.Column<int>(type: "integer", nullable: false),
                     OptionId = table.Column<int>(type: "integer", nullable: false),
-                    PublicId = table.Column<string>(type: "text", nullable: false)
+                    PublicId = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -681,9 +686,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSetVersions_ReleaseFileId",
+                name: "IX_DataSetVersions_Release_DataSetFileId",
                 table: "DataSetVersions",
-                column: "ReleaseFileId");
+                column: "Release_DataSetFileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSetVersions_Release_ReleaseFileId",
+                table: "DataSetVersions",
+                column: "Release_ReleaseFileId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_FilterMetaChanges_CurrentStateId",
@@ -699,6 +710,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "IX_FilterMetaChanges_PreviousStateId",
                 table: "FilterMetaChanges",
                 column: "PreviousStateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FilterMetas_DataSetVersionId_Column",
+                table: "FilterMetas",
+                columns: new[] { "DataSetVersionId", "Column" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_FilterMetas_DataSetVersionId_PublicId",
@@ -743,11 +760,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "OptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilterOptionMetaLinks_PublicId",
-                table: "FilterOptionMetaLinks",
-                column: "PublicId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_GeographicLevelMetaChanges_CurrentStateId",
                 table: "GeographicLevelMetaChanges",
                 column: "CurrentStateId");
@@ -783,6 +795,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "IX_IndicatorMetaChanges_PreviousStateId",
                 table: "IndicatorMetaChanges",
                 column: "PreviousStateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IndicatorMetas_DataSetVersionId_Column",
+                table: "IndicatorMetas",
+                columns: new[] { "DataSetVersionId", "Column" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_IndicatorMetas_DataSetVersionId_PublicId",
@@ -837,14 +855,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "PreviousState_OptionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetaLinks_MetaId_PublicId",
+                table: "LocationOptionMetaLinks",
+                columns: new[] { "MetaId", "PublicId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LocationOptionMetaLinks_OptionId",
                 table: "LocationOptionMetaLinks",
                 column: "OptionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LocationOptionMetaLinks_PublicId",
-                table: "LocationOptionMetaLinks",
-                column: "PublicId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LocationOptionMetas_All",

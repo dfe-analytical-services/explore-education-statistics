@@ -35,7 +35,10 @@ public class IndicatorMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeO
                 .HasMaxLength(10);
 
             builder.Property(m => m.Column)
-                .HasMaxLength(100);
+                .HasMaxLength(50);
+
+            builder.Property(m => m.Label)
+                .HasMaxLength(80);
 
             builder.Property(m => m.Unit)
                 .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
