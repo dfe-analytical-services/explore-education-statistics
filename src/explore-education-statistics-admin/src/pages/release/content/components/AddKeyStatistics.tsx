@@ -10,7 +10,11 @@ import EditableKeyStatTextForm from '@admin/pages/release/content/components/Edi
 import ButtonGroup from '@common/components/ButtonGroup';
 import { KeyStatisticsProps } from '@admin/pages/release/content/components/KeyStatistics';
 
-const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
+interface Props extends KeyStatisticsProps {
+  keyStatisticGuidanceTitles?: (string | undefined)[];
+}
+
+const AddKeyStatistics = ({ keyStatisticGuidanceTitles, release }: Props) => {
   const [formType, setFormType] = useState<KeyStatisticType | undefined>(
     undefined,
   );
@@ -62,9 +66,10 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
       return (
         <div className={styles.textFormContainer}>
           <EditableKeyStatTextForm
+            keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+            testId="keyStatText-createForm"
             onSubmit={values => addKeyStatText(values)}
             onCancel={() => setFormType(undefined)}
-            testId="keyStatText-createForm"
           />
         </div>
       );

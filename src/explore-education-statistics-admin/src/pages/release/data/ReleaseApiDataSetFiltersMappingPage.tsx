@@ -108,9 +108,17 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
   const navItems: NavItem[] = useMemo(() => {
     return [
+      ...(Object.keys(mappableFilters).length > 0
+        ? [
+            {
+              id: 'mappable-filter-columns',
+              text: 'Filter columns not found in new data set',
+            },
+          ]
+        : []),
       {
         id: 'mappable-filter-options',
-        text: 'Filter options not found in the new data set',
+        text: 'Filter options not found in new data set',
         subNavItems: Object.keys(mappableFilterOptions).map(filterKey => {
           return {
             id: `mappable-filter-options-${kebabCase(filterKey)}`,
@@ -118,6 +126,14 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
           };
         }),
       },
+      ...(Object.keys(newFilters).length > 0
+        ? [
+            {
+              id: 'new-filter-columns',
+              text: 'New filter columns',
+            },
+          ]
+        : []),
       {
         id: 'new-filter-options',
         text: 'New filter options',
@@ -315,7 +331,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   className="govuk-heading-l dfe-flex dfe-align-items--center"
                   id="mappable-filter-columns"
                 >
-                  Filter columns not found in the new data set{' '}
+                  Filter columns not found in new data set{' '}
                   <Tag className="govuk-!-margin-left-2" colour="grey">
                     No action required
                   </Tag>
@@ -328,7 +344,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             )}
 
             <h3 className="govuk-heading-l" id="mappable-filter-options">
-              Filter options not found in the new data set
+              Filter options not found in new data set
             </h3>
 
             {Object.keys(mappableFilterOptions).length > 0 && filtersMapping ? (
@@ -349,9 +365,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                         <br />
                         <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
                           Column:{' '}
-                          <span className="govuk-!-font-weight-regular">
+                          <code className="govuk-!-font-weight-regular">
                             {filterKey}
-                          </span>
+                          </code>
                         </div>
                       </>
                     }
@@ -395,11 +411,12 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   if (newFilterOptions[filterKey].length) {
                     const filterLabel =
                       filtersMapping.candidates[filterKey].label;
+
                     return (
                       <AccordionSection
                         caption={
                           <>
-                            <strong>Column:</strong> {filterKey}
+                            <strong>Column:</strong> <code>{filterKey}</code>
                           </>
                         }
                         goToTop={false}
@@ -446,11 +463,12 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   ) {
                     const filterLabel =
                       filtersMapping.mappings[filterKey].source.label;
+
                     return (
                       <AccordionSection
                         caption={
                           <>
-                            <strong>Column:</strong> {filterKey}
+                            <strong>Column:</strong> <code>{filterKey}</code>
                           </>
                         }
                         goToTop={false}

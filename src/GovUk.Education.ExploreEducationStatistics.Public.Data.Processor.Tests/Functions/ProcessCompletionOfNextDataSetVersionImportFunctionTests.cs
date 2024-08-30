@@ -43,6 +43,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             string[] expectedActivitySequence =
             [
+                ActivityNames.UpdateFileStoragePath,
                 ActivityNames.ImportMetadata,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
@@ -74,7 +75,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.ImportMetadata,
+                    context.CallActivityAsync(ActivityNames.UpdateFileStoragePath,
                         mockOrchestrationContext.Object.InstanceId,
                         null))
                 .Throws<Exception>();
@@ -113,6 +114,78 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .Returns(instanceId?.ToString() ?? Guid.NewGuid().ToString());
 
             return mock;
+        }
+    }
+
+    public class UpdateFileStoragePathTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
+    {
+        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ManualMapping;
+
+        [Fact]
+        public async Task Success_PathUpdated()
+        {
+            var (initialDataSetVersion, _) = await CreateDataSet(
+                importStage: DataSetVersionImportStage.Completing,
+                status: DataSetVersionStatus.Published);
+
+            var defaultNextVersion = initialDataSetVersion.DefaultNextVersion();
+
+            var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
+                dataSetId: initialDataSetVersion.DataSetId,
+                importStage: Stage,
+                versionMajor: defaultNextVersion.Major,
+                versionMinor: defaultNextVersion.Minor);
+
+            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
+            var originalStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
+            Directory.CreateDirectory(originalStoragePath);
+
+            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
+
+            nextDataSetVersion.VersionMajor++;
+
+            publicDataDbContext.DataSetVersions.Attach(nextDataSetVersion);
+            publicDataDbContext.DataSetVersions.Update(nextDataSetVersion);
+            await publicDataDbContext.SaveChangesAsync();
+
+            var newStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
+
+            await UpdateFileStoragePath(instanceId);
+
+            Assert.False(Directory.Exists(originalStoragePath));
+            Assert.True(Directory.Exists(newStoragePath));
+        }
+        
+        [Fact]
+        public async Task Success_PathNotUpdated()
+        {
+            var (initialDataSetVersion, _) = await CreateDataSet(
+                importStage: DataSetVersionImportStage.Completing,
+                status: DataSetVersionStatus.Published);
+
+            var defaultNextVersion = initialDataSetVersion.DefaultNextVersion();
+
+            var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
+                dataSetId: initialDataSetVersion.DataSetId,
+                importStage: Stage,
+                versionMajor: defaultNextVersion.Major,
+                versionMinor: defaultNextVersion.Minor);
+
+            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
+            var originalStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
+            Directory.CreateDirectory(originalStoragePath);
+
+            await UpdateFileStoragePath(instanceId);
+
+            Assert.True(Directory.Exists(originalStoragePath));
+        }
+
+        private async Task UpdateFileStoragePath(Guid instanceId)
+        {
+            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
+            await function.UpdateFileStoragePath(instanceId, CancellationToken.None);
         }
     }
 

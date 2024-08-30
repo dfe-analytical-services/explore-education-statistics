@@ -1,30 +1,37 @@
-import { LocationCandidate } from '@admin/services/apiDataSetVersionService';
-import styles from '@admin/pages/release/data/components/ApiDataSetLocationCode.module.scss';
-import getApiDataSetLocationCodes from '@admin/pages/release/data/utils/getApiDataSetLocationCodes';
-import {
-  LocationCodeKey,
-  locationCodeKeys,
-} from '@common/utils/getLocationCodeEntries';
-import React from 'react';
+import { LocationOptionSource } from '@admin/services/apiDataSetVersionService';
+import intersperse from '@common/utils/array/intersperse';
+import getLocationCodeEntries from '@common/utils/getLocationCodeEntries';
+import classNames from 'classnames';
+import React, { Fragment } from 'react';
+
+interface Props {
+  block?: boolean;
+  location: LocationOptionSource;
+}
 
 export default function ApiDataSetLocationCode({
+  block = true,
   location,
-}: {
-  location: LocationCandidate;
-}) {
-  if (
-    Object.keys(location).some(key =>
-      locationCodeKeys.includes(key as LocationCodeKey),
-    )
-  ) {
-    return (
-      <>
-        <br />
-        <span className={styles.code}>
-          {getApiDataSetLocationCodes(location)}
-        </span>
-      </>
-    );
+}: Props) {
+  const entries = getLocationCodeEntries(location);
+
+  if (entries.length === 0) {
+    return null;
   }
-  return null;
+
+  const labels = entries.map(entry => (
+    <Fragment key={entry.key}>
+      {entry.label}: <code>{entry.value}</code>
+    </Fragment>
+  ));
+
+  return (
+    <span
+      className={classNames('dfe-colour--dark-grey', {
+        'govuk-!-display-block': block,
+      })}
+    >
+      {intersperse(labels, () => ', ')}
+    </span>
+  );
 }

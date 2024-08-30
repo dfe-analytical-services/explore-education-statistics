@@ -9,7 +9,9 @@ import {
 import _apiDataSetService, {
   ApiDataSet,
 } from '@admin/services/apiDataSetService';
-import testLocationsMapping from '@admin/pages/release/data/__data__/testLocationsMapping';
+import testLocationsMapping, {
+  testLocationsMappingGroups,
+} from '@admin/pages/release/data/__data__/testLocationsMapping';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import { Release } from '@admin/services/releaseService';
 import render from '@common-test/render';
@@ -84,7 +86,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // mappable
     expect(
       screen.getByRole('heading', {
-        name: 'Locations not found in the new data set',
+        name: 'Locations not found in new data set',
       }),
     ).toBeInTheDocument();
 
@@ -212,9 +214,11 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).getAllByRole('row');
     const mappableRow2Cells = within(mappableRows[2]).getAllByRole('cell');
     expect(mappableRow2Cells[0]).toHaveTextContent('Location 3');
-    expect(mappableRow2Cells[0]).toHaveTextContent('location-3-code');
+    expect(mappableRow2Cells[0]).toHaveTextContent('Code: location-3-code');
     expect(mappableRow2Cells[1]).toHaveTextContent('Location 3 updated');
-    expect(mappableRow2Cells[1]).toHaveTextContent('location-3-code-updated');
+    expect(mappableRow2Cells[1]).toHaveTextContent(
+      'Code: location-3-code-updated',
+    );
 
     // new locations
     const newRows = within(
@@ -230,9 +234,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).getAllByRole('row');
     const autoMappedRow1Cells = within(autoMappedRows[1]).getAllByRole('cell');
     expect(autoMappedRow1Cells[0]).toHaveTextContent('Location 1');
-    expect(autoMappedRow1Cells[0]).toHaveTextContent('location-1-code');
+    expect(autoMappedRow1Cells[0]).toHaveTextContent('Code: location-1-code');
     expect(autoMappedRow1Cells[1]).toHaveTextContent('Location 1');
-    expect(autoMappedRow1Cells[1]).toHaveTextContent('location-1-code');
+    expect(autoMappedRow1Cells[1]).toHaveTextContent('Code: location-1-code');
   });
 
   test('sets the mappable type to major if the location code has changed', async () => {
@@ -254,9 +258,11 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).getAllByRole('row');
     const mappableRow2Cells = within(mappableRows[2]).getAllByRole('cell');
     expect(mappableRow2Cells[0]).toHaveTextContent('Location 3');
-    expect(mappableRow2Cells[0]).toHaveTextContent('location-3-code');
+    expect(mappableRow2Cells[0]).toHaveTextContent('Code: location-3-code');
     expect(mappableRow2Cells[1]).toHaveTextContent('Location 3 updated');
-    expect(mappableRow2Cells[1]).toHaveTextContent('location-3-code-updated');
+    expect(mappableRow2Cells[1]).toHaveTextContent(
+      'Code: location-3-code-updated',
+    );
     expect(mappableRow2Cells[2]).toHaveTextContent('Major');
   });
 
@@ -271,19 +277,21 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     expect(await screen.findByText('Data set title')).toBeInTheDocument();
 
     const nav = within(
-      screen.getByRole('navigation', {
-        name: 'On this page',
-      }),
+      screen.getByRole('navigation', { name: 'On this page' }),
     );
+
     const navItems = nav.getAllByRole('listitem');
+
     expect(navItems).toHaveLength(10);
 
     expect(
       within(navItems[0]).getByRole('link', {
-        name: 'Locations not found in the new data set',
+        name: 'Locations not found in new data set',
       }),
     ).toHaveAttribute('href', '#mappable-locations');
+
     const mappableSubItems = within(navItems[0]).getAllByRole('listitem');
+
     expect(mappableSubItems).toHaveLength(2);
     expect(
       within(mappableSubItems[0]).getByRole('link', {
@@ -291,51 +299,44 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       }),
     ).toHaveAttribute('href', '#mappable-localAuthority');
     expect(
-      within(mappableSubItems[1]).getByRole('link', {
-        name: 'Regions',
-      }),
+      within(mappableSubItems[1]).getByRole('link', { name: 'Regions' }),
     ).toHaveAttribute('href', '#mappable-region');
 
     expect(
-      within(navItems[3]).getByRole('link', {
-        name: 'New locations',
-      }),
+      within(navItems[3]).getByRole('link', { name: 'New locations' }),
     ).toHaveAttribute('href', '#new-locations');
+
     const newSubItems = within(navItems[3]).getAllByRole('listitem');
+
     expect(newSubItems).toHaveLength(2);
     expect(
-      within(newSubItems[0]).getByRole('link', {
-        name: 'Local Authorities',
-      }),
+      within(newSubItems[0]).getByRole('link', { name: 'Local Authorities' }),
     ).toHaveAttribute('href', '#new-locations-localAuthority');
     expect(
-      within(newSubItems[1]).getByRole('link', {
-        name: 'Regions',
-      }),
+      within(newSubItems[1]).getByRole('link', { name: 'Regions' }),
     ).toHaveAttribute('href', '#new-locations-region');
 
     expect(
-      within(navItems[6]).getByRole('link', {
-        name: 'Auto mapped locations',
-      }),
+      within(navItems[6]).getByRole('link', { name: 'Auto mapped locations' }),
     ).toHaveAttribute('href', '#auto-mapped-locations');
+
     const autoMappedSubItems = within(navItems[6]).getAllByRole('listitem');
+
     expect(autoMappedSubItems).toHaveLength(3);
+
     expect(
       within(autoMappedSubItems[0]).getByRole('link', {
+        name: 'English Devolved Areas',
+      }),
+    ).toHaveAttribute('href', '#auto-mapped-englishDevolvedArea');
+    expect(
+      within(autoMappedSubItems[1]).getByRole('link', {
         name: 'Local Authorities',
       }),
     ).toHaveAttribute('href', '#auto-mapped-localAuthority');
     expect(
-      within(autoMappedSubItems[1]).getByRole('link', {
-        name: 'Regions',
-      }),
+      within(autoMappedSubItems[2]).getByRole('link', { name: 'Regions' }),
     ).toHaveAttribute('href', '#auto-mapped-region');
-    expect(
-      within(autoMappedSubItems[2]).getByRole('link', {
-        name: 'English Devolved Areas',
-      }),
-    ).toHaveAttribute('href', '#auto-mapped-englishDevolvedArea');
   });
 
   test('renders the notification banner if there are mappable locations', async () => {
@@ -359,7 +360,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       banner.getByRole('link', {
         name: 'There is 1 unmapped local authority',
       }),
-    ).toHaveAttribute('href', '#mappable-localAuthority');
+    ).toHaveAttribute('href', '#mappable-table-localAuthority');
   });
 
   test('does not render the notification banner if there are no unmapped locations', async () => {
@@ -442,7 +443,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Locations not found in the new data set',
+        name: 'Locations not found in new data set',
       }),
     ).toBeInTheDocument();
 
@@ -569,10 +570,107 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     expect(screen.queryByTestId('auto-mapped')).not.toBeInTheDocument();
   });
 
+  describe('with location group mappings', () => {
+    test('renders navigation items for location groups', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+      apiDataSetVersionService.getLocationsMapping.mockResolvedValue(
+        testLocationsMappingGroups,
+      );
+
+      renderPage();
+
+      expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+
+      const navItems = nav.getAllByRole('listitem');
+
+      expect(navItems).toHaveLength(12);
+
+      expect(
+        within(navItems[0]).getByRole('link', {
+          name: 'Location groups not found in new data set',
+        }),
+      ).toHaveAttribute('href', '#deleted-location-groups');
+
+      expect(
+        within(navItems[1]).getByRole('link', {
+          name: 'Locations not found in new data set',
+        }),
+      ).toHaveAttribute('href', '#mappable-locations');
+
+      expect(
+        within(navItems[4]).getByRole('link', { name: 'New location groups' }),
+      ).toHaveAttribute('href', '#new-location-groups');
+
+      expect(
+        within(navItems[5]).getByRole('link', { name: 'New locations' }),
+      ).toHaveAttribute('href', '#new-locations');
+
+      expect(
+        within(navItems[8]).getByRole('link', {
+          name: 'Auto mapped locations',
+        }),
+      ).toHaveAttribute('href', '#auto-mapped-locations');
+    });
+
+    test('renders tables for deleted and new location groups', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+      apiDataSetVersionService.getLocationsMapping.mockResolvedValue(
+        testLocationsMappingGroups,
+      );
+
+      renderPage();
+
+      expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+      expect(screen.getByText('Map locations')).toBeInTheDocument();
+
+      // Deleted location groups
+      const deletedGroupRows = within(
+        screen.getByTestId('deleted-location-groups-table'),
+      ).getAllByRole('row');
+
+      const deletedGroup1Cells = within(deletedGroupRows[1]).getAllByRole(
+        'cell',
+      );
+      expect(deletedGroup1Cells[0]).toHaveTextContent(
+        'Local Authority Districts',
+      );
+      expect(deletedGroup1Cells[1]).toHaveTextContent('No mapping available');
+      expect(deletedGroup1Cells[2]).toHaveTextContent('Major');
+
+      const deletedGroup2Cells = within(deletedGroupRows[2]).getAllByRole(
+        'cell',
+      );
+      expect(deletedGroup2Cells[0]).toHaveTextContent('Sponsors');
+      expect(deletedGroup2Cells[1]).toHaveTextContent('No mapping available');
+      expect(deletedGroup2Cells[2]).toHaveTextContent('Major');
+
+      // New location groups
+      const newGroupRows = within(
+        screen.getByTestId('new-location-groups-table'),
+      ).getAllByRole('row');
+
+      const newGroup1Cells = within(newGroupRows[1]).getAllByRole('cell');
+      expect(newGroup1Cells[0]).toHaveTextContent('No mapping available');
+      expect(newGroup1Cells[1]).toHaveTextContent('Opportunity Areas');
+      expect(newGroup1Cells[2]).toHaveTextContent('Minor');
+
+      const newGroup2Cells = within(newGroupRows[2]).getAllByRole('cell');
+      expect(newGroup2Cells[0]).toHaveTextContent('No mapping available');
+      expect(newGroup2Cells[1]).toHaveTextContent('Wards');
+      expect(newGroup2Cells[2]).toHaveTextContent('Minor');
+    });
+  });
+
   describe('updating mappings', () => {
     beforeEach(() => {
       jest.useFakeTimers({ advanceTimers: true });
     });
+
     afterEach(() => {
       jest.useRealTimers();
     });
@@ -591,7 +689,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {
@@ -712,7 +810,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {
@@ -795,7 +893,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {
@@ -993,7 +1091,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       expect(within(newLocationCells[1]).getByText('Location 1'));
     });
 
-    test('changing the mapping on an auto mapped location"', async () => {
+    test('changing the mapping on an auto mapped location', async () => {
       apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
       apiDataSetVersionService.getLocationsMapping.mockResolvedValue(
         testLocationsMapping,
@@ -1117,7 +1215,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         screen.getByRole('link', {
           name: 'There is 1 unmapped local authority',
         }),
-      ).toHaveAttribute('href', '#mappable-localAuthority');
+      ).toHaveAttribute('href', '#mappable-table-localAuthority');
 
       // unmapped table
       const unmappedTable = screen.getByRole('table', {

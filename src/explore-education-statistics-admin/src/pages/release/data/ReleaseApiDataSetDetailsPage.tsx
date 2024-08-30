@@ -7,11 +7,14 @@ import ApiDataSetFinaliseBanner from '@admin/pages/release/data/components/ApiDa
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
+  releaseApiDataSetChangelogRoute,
   releaseApiDataSetFiltersMappingRoute,
+  releaseApiDataSetVersionHistoryRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
   releaseApiDataSetsRoute,
+  ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
@@ -30,11 +33,6 @@ import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
-
-// TODO: EES-4367
-const showChangelog = false;
-// TODO: EES-4382
-const showVersionHistory = false;
 
 export default function ReleaseApiDataSetDetailsPage() {
   const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
@@ -60,12 +58,14 @@ export default function ReleaseApiDataSetDetailsPage() {
     },
   });
 
-  const canUpdateRelease = release.approvalStatus !== 'Approved';
-
-  const columnSizeClassName =
-    dataSet?.latestLiveVersion && dataSet?.draftVersion
-      ? 'govuk-grid-column-one-half-from-desktop'
-      : 'govuk-grid-column-two-thirds-from-desktop';
+  useEffect(() => {
+    if (
+      finalisingStatus === 'finalising' &&
+      dataSet?.draftVersion?.status !== 'Mapping'
+    ) {
+      setFinalisingStatus('finalised');
+    }
+  }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
 
   const handleFinalise = async () => {
     if (dataSet?.draftVersion) {
@@ -76,77 +76,97 @@ export default function ReleaseApiDataSetDetailsPage() {
     }
   };
 
-  useEffect(() => {
-    if (
-      finalisingStatus === 'finalising' &&
-      dataSet?.draftVersion?.status !== 'Mapping'
-    ) {
-      setFinalisingStatus('finalised');
-    }
-  }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
+  const columnSizeClassName =
+    dataSet?.latestLiveVersion && dataSet?.draftVersion
+      ? 'govuk-grid-column-one-half-from-desktop'
+      : 'govuk-grid-column-two-thirds-from-desktop';
+
+  const canUpdateRelease = release.approvalStatus !== 'Approved';
+
+  const showDraftVersionActions =
+    dataSet?.draftVersion?.status !== 'Processing';
 
   const draftVersionSummary = dataSet?.draftVersion ? (
     <ApiDataSetVersionSummaryList
-      dataSetVersion={dataSet?.draftVersion}
+      dataSetVersion={dataSet.draftVersion}
       id="draft-version-summary"
       publicationId={release.publicationId}
       collapsibleButtonHiddenText="for draft version"
       actions={
-        <ul className="govuk-list">
-          {dataSet.draftVersion.status === 'Draft' && (
-            <>
-              <li>
-                <Link
-                  to={generatePath<ReleaseDataSetRouteParams>(
-                    releaseApiDataSetPreviewRoute.path,
-                    {
-                      publicationId: release.publicationId,
-                      releaseId: release.id,
-                      dataSetId,
-                    },
-                  )}
-                >
-                  Preview API data set
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={generatePath<ReleaseDataSetRouteParams>(
-                    releaseApiDataSetPreviewTokenLogRoute.path,
-                    {
-                      publicationId: release.publicationId,
-                      releaseId: release.id,
-                      dataSetId,
-                    },
-                  )}
-                >
-                  View API data set token log
-                </Link>
-              </li>
-            </>
-          )}
-          {canUpdateRelease && dataSet.draftVersion.status !== 'Processing' && (
-            <li>
-              <DeleteDraftVersionButton
-                dataSet={dataSet}
-                dataSetVersion={dataSet.draftVersion}
-                onDeleted={() =>
-                  history.push(
-                    generatePath<ReleaseRouteParams>(
-                      releaseApiDataSetsRoute.path,
+        showDraftVersionActions && (
+          <ul className="govuk-list">
+            {dataSet.draftVersion.status === 'Draft' && (
+              <>
+                {dataSet.draftVersion.version !== '1.0' && (
+                  <li>
+                    <Link
+                      to={generatePath<ReleaseDataSetChangelogRouteParams>(
+                        releaseApiDataSetChangelogRoute.path,
+                        {
+                          publicationId: release.publicationId,
+                          releaseId: release.id,
+                          dataSetId,
+                          dataSetVersionId: dataSet.draftVersion.id,
+                        },
+                      )}
+                    >
+                      View changelog and guidance notes
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <Link
+                    to={generatePath<ReleaseDataSetRouteParams>(
+                      releaseApiDataSetPreviewRoute.path,
                       {
                         publicationId: release.publicationId,
                         releaseId: release.id,
+                        dataSetId,
                       },
-                    ),
-                  )
-                }
-              >
-                Remove draft version
-              </DeleteDraftVersionButton>
-            </li>
-          )}
-        </ul>
+                    )}
+                  >
+                    Preview API data set
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={generatePath<ReleaseDataSetRouteParams>(
+                      releaseApiDataSetPreviewTokenLogRoute.path,
+                      {
+                        publicationId: release.publicationId,
+                        releaseId: release.id,
+                        dataSetId,
+                      },
+                    )}
+                  >
+                    View preview token log
+                  </Link>
+                </li>
+              </>
+            )}
+            {canUpdateRelease && (
+              <li>
+                <DeleteDraftVersionButton
+                  dataSet={dataSet}
+                  dataSetVersion={dataSet.draftVersion}
+                  onDeleted={() =>
+                    history.push(
+                      generatePath<ReleaseRouteParams>(
+                        releaseApiDataSetsRoute.path,
+                        {
+                          publicationId: release.publicationId,
+                          releaseId: release.id,
+                        },
+                      ),
+                    )
+                  }
+                >
+                  Remove draft version
+                </DeleteDraftVersionButton>
+              </li>
+            )}
+          </ul>
+        )
       }
     />
   ) : null;
@@ -168,14 +188,37 @@ export default function ReleaseApiDataSetDetailsPage() {
               View live data set (opens in new tab)
             </a>
           </li>
-          {showChangelog && (
+          {dataSet.latestLiveVersion.version !== '1.0' && (
             <li>
-              <Link to="/todo">View changelog and guidance notes</Link>
+              <Link
+                to={generatePath<ReleaseDataSetChangelogRouteParams>(
+                  releaseApiDataSetChangelogRoute.path,
+                  {
+                    publicationId: release.publicationId,
+                    releaseId: dataSet.latestLiveVersion.releaseVersion.id,
+                    dataSetId,
+                    dataSetVersionId: dataSet.latestLiveVersion.id,
+                  },
+                )}
+              >
+                View changelog and guidance notes
+              </Link>
             </li>
           )}
-          {showVersionHistory && (
+          {dataSet.latestLiveVersion.version !== '1.0' && (
             <li>
-              <Link to="/todo">View version history</Link>
+              <Link
+                to={generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetVersionHistoryRoute.path,
+                  {
+                    publicationId: release.publicationId,
+                    releaseId: dataSet.latestLiveVersion.releaseVersion.id,
+                    dataSetId,
+                  },
+                )}
+              >
+                View version history
+              </Link>
             </li>
           )}
         </ul>
@@ -189,7 +232,9 @@ export default function ReleaseApiDataSetDetailsPage() {
     dataSet.draftVersion.mappingStatus.locationsComplete;
 
   const showDraftVersionTasks =
+    showDraftVersionActions &&
     finalisingStatus !== 'finalising' &&
+    dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
 
@@ -212,10 +257,14 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
-            {mappingComplete && (
+            {mappingComplete && dataSet.draftVersion && (
               <ApiDataSetFinaliseBanner
-                draftVersionStatus={dataSet.draftVersion?.status}
+                dataSetId={dataSetId}
+                dataSetVersionId={dataSet.draftVersion.id}
+                draftVersionStatus={dataSet.draftVersion.status}
                 finalisingStatus={finalisingStatus}
+                publicationId={release.publicationId}
+                releaseId={release.id}
                 onFinalise={handleFinalise}
               />
             )}
@@ -235,7 +284,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             </SummaryList>
 
             {showDraftVersionTasks && dataSet.draftVersion && (
-              <div className="govuk-grid-row">
+              <div className="govuk-grid-row" data-testid="draft-version-tasks">
                 <div className={columnSizeClassName}>
                   <h3>Draft version tasks</h3>
 

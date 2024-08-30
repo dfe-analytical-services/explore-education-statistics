@@ -263,7 +263,6 @@ export type PluginName =
   | 'ImageToolbar'
   | 'ImageUpload'
   | 'Indent'
-  | 'Italic'
   | 'Link'
   | 'List'
   | 'MediaEmbed'
@@ -286,7 +285,6 @@ export type ToolbarOption =
   | 'heading'
   | 'imageUpload'
   | 'insertTable'
-  | 'italic'
   | 'link'
   | 'numberedList'
   | 'redo'
@@ -297,4 +295,31 @@ export interface ToolbarGroup {
   label: string;
   icon: string;
   items: ToolbarOption[];
+}
+
+// Creating types for the result of calling `toJson` on
+// ckEditor Elements to make it easy to deal with.
+// The actual type is `Record<string, unknown>`.
+export interface JsonElement {
+  name: string;
+  attributes?: JsonElementAttributes;
+  children?: JsonElementChild[];
+}
+
+export interface JsonElementChild {
+  name?: string;
+  attributes?: JsonElementAttributes;
+  data?: string;
+  children?: JsonElementChild[];
+}
+
+// An uncomprehensive list of known attributes on Json Elements
+interface JsonElementAttributes {
+  alt?: string;
+  bold?: boolean;
+  headingColumns?: number;
+  headingRows?: number;
+  linkHref?: string;
+  linkOpenInNewTab?: boolean;
+  src?: string;
 }

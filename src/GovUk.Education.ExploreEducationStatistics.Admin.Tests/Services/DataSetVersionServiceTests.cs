@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -122,8 +121,7 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
                 .DefaultReleaseFile()
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion)
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
@@ -183,8 +181,7 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
         {
             var (releaseVersion1, releaseVersion2) = DataFixture
                 .DefaultReleaseVersion()
-                .Generate(2)
-                .ToTuple2();
+                .GenerateTuple2();
 
             ReleaseFile releaseVersion1DataFile = DataFixture
                 .DefaultReleaseFile()

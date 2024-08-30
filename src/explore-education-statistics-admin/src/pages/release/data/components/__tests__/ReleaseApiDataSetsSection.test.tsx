@@ -65,7 +65,15 @@ describe('ReleaseApiDataSetsSection', () => {
       },
       latestLiveVersion: {
         id: 'version-3',
+        file: {
+          id: 'file-id',
+          title: 'file-title',
+        },
         version: '1.0',
+        releaseVersion: {
+          id: 'release-version-id',
+          title: 'Release Version',
+        },
         status: 'Published',
         type: 'Major',
         published: '2024-05-01T09:30:00+00:00',
@@ -79,7 +87,15 @@ describe('ReleaseApiDataSetsSection', () => {
       status: 'Published',
       latestLiveVersion: {
         id: 'version-4',
+        file: {
+          id: 'file-id',
+          title: 'file-title',
+        },
         version: '1.0',
+        releaseVersion: {
+          id: 'release-version-id',
+          title: 'Release Version',
+        },
         status: 'Published',
         type: 'Major',
         published: '2024-05-01T09:30:00+00:00',

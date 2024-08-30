@@ -69,8 +69,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
@@ -106,8 +105,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
@@ -146,8 +144,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .WithThemes(_fixture.DefaultTheme()
                             .Generate(2))
                         .Generate(2))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
@@ -280,8 +277,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .Generate(1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication1Release1Version2Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[1]);
@@ -370,8 +366,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .Generate(1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
@@ -413,8 +408,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .WithThemes(_fixture.DefaultTheme()
                             .Generate(2))
                         .Generate(2))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
@@ -537,8 +531,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             .DefaultRelease(publishedVersions: 1, year: 2020)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication1Release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[1]);
@@ -609,8 +602,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             .DefaultRelease(publishedVersions: 1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication1Release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[1]);
@@ -774,8 +766,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
@@ -1008,8 +999,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1 = publication1.ReleaseVersions[0];
                 var publication2Release1Version1 = publication2.ReleaseVersions[0];
@@ -1067,8 +1057,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
-                    .Generate(2)
-                    .ToTuple2();
+                    .GenerateTuple2();
 
                 var publication1Release1Version1 = publication1.ReleaseVersions[0];
                 var publication2Release1Version1 = publication2.ReleaseVersions[0];

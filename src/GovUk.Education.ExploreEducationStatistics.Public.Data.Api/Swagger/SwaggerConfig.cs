@@ -11,6 +11,7 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
     public void Configure(SwaggerGenOptions options)
     {
         options.OperationFilter<DefaultValuesOperationFilter>();
+        options.OperationFilter<GeneralResponseOperationFilter>();
         options.SchemaFilter<JsonConverterSchemaFilter>();
         options.SchemaFilter<RequiredPropertySchemaFilter>();
         options.SchemaFilter<SwaggerEnumSchemaFilter>();

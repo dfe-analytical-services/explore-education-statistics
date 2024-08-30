@@ -1,5 +1,11 @@
 import client from '@admin/services/utils/service';
-import { ApiDataSet } from '@admin/services/apiDataSetService';
+import {
+  ApiDataSet,
+  ApiDataSetLiveVersionSummary,
+  ApiDataSetVersion,
+} from '@admin/services/apiDataSetService';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
+import { PaginatedList } from '@common/services/types/pagination';
 import { Dictionary } from '@common/types';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 
@@ -59,7 +65,7 @@ interface FilterOptionsMappingUpdateResponse {
   }[];
 }
 
-export interface LocationCandidate {
+export interface LocationOptionSource {
   label: string;
   code?: string;
   oldCode?: string;
@@ -68,11 +74,13 @@ export interface LocationCandidate {
   ukprn?: string;
 }
 
-export type LocationMapping = Mapping<LocationCandidate>;
+export type LocationCandidate = LocationOptionSource;
+
+export type LocationMapping = Mapping<LocationOptionSource>;
 
 export interface LocationsMapping {
   levels: Dictionary<{
-    candidates: Dictionary<LocationCandidate>;
+    candidates: Dictionary<LocationOptionSource>;
     mappings: Dictionary<LocationMapping>;
   }>;
 }
@@ -96,6 +104,12 @@ interface LocationsMappingUpdateResponse {
   }[];
 }
 
+export interface ListVersionsParams {
+  dataSetId: string;
+  page?: number;
+  pageSize?: number;
+}
+
 const apiDataSetVersionService = {
   createVersion(data: {
     dataSetId: string;
@@ -108,6 +122,13 @@ const apiDataSetVersionService = {
   },
   deleteVersion(dataSetVersionId: string): Promise<void> {
     return client.delete(`/public-data/data-set-versions/${dataSetVersionId}`);
+  },
+  listVersions(
+    params?: ListVersionsParams,
+  ): Promise<PaginatedList<ApiDataSetLiveVersionSummary>> {
+    return client.get(`/public-data/data-set-versions`, {
+      params,
+    });
   },
   getFiltersMapping(dataSetVersionId: string): Promise<FiltersMapping> {
     return client.get(
@@ -134,6 +155,22 @@ const apiDataSetVersionService = {
   ): Promise<LocationsMappingUpdateResponse> {
     return client.patch(
       `/public-data/data-set-versions/${dataSetVersionId}/mapping/locations`,
+      data,
+    );
+  },
+  getChanges(dataSetVersionId: string): Promise<ApiDataSetVersionChanges> {
+    return client.get(
+      `/public-data/data-set-versions/${dataSetVersionId}/changes`,
+    );
+  },
+  updateNotes(
+    dataSetVersionId: string,
+    data: {
+      notes: string;
+    },
+  ): Promise<ApiDataSetVersion> {
+    return client.patch(
+      `/public-data/data-set-versions/${dataSetVersionId}`,
       data,
     );
   },

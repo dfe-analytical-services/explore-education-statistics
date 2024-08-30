@@ -1,10 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -14,6 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
 
@@ -29,6 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         private readonly IGlossaryCacheService _glossaryCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IPublicationCacheService _publicationCacheService;
+
+        private const string GuidPattern = "[\\da-zA-Z]{8}-([\\da-zA-Z]{4}-){3}[\\da-zA-Z]{12}";
+        private const string ReleasePeriodPattern = "[0-9]{4}(-[^/]+)?\\";
+        private const string BoundaryLevelIdPattern = "\\d{1,3}";
+        private const string WildcardDirectoryNamePattern = "[^/]+";
 
         public BauCacheController(
             IPrivateBlobStorageService privateBlobStorageService,
@@ -55,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     BlobContainers.PrivateContent,
                     options: new DeleteBlobsOptions
                     {
-                        IncludeRegex = new Regex($"^releases/[^/]+/({pathString})/")
+                        IncludeRegex = new Regex($"^releases/{WildcardDirectoryNamePattern}/({pathString})/")
                     }
                 );
             }
@@ -112,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     BlobContainers.PublicContent,
                     options: new DeleteBlobsOptions
                     {
-                        IncludeRegex = new Regex($"^publications/[^/]+/releases/[^/]+/({pathString})/")
+                        IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/releases/{WildcardDirectoryNamePattern}/({pathString})/")
                     }
                 );
             }
@@ -163,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 BlobContainers.PublicContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^publications/[^/]+/{publicationJsonFilenameRegex}$")
+                    IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/{publicationJsonFilenameRegex}$")
                 });
 
             return NoContent();
@@ -192,7 +197,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     // publications/***/releases/1234-35.json
                     // publications/***/releases/1234-q1.json
                     // publications/***/releases/1234-35-q1.json
-                    IncludeRegex = new Regex($"^publications/[^/]+/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$")
+                    IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$")
+                });
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Clears all GeoJSON cached for Admin.
+        /// 
+        /// Useful for when the GeoJSON cache needs to be refreshed, without impacting associated data blocks.
+        /// </summary>
+        [HttpDelete("private-cache/data-blocks/geojson")]
+        public async Task<ActionResult> ClearPrivateGeoJsonCacheJson()
+        {
+            await _privateBlobStorageService.DeleteBlobs(
+                BlobContainers.PrivateContent,
+                options: new DeleteBlobsOptions
+                {
+                    // Match against pattern: releases/***/data-blocks/GUID-boundary-levels/GUID-2.json
+                    IncludeRegex = new Regex($"^releases/{WildcardDirectoryNamePattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$")
+                });
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Clears all GeoJSON cached for Data.
+        /// 
+        /// Useful for when the GeoJSON cache needs to be refreshed, without impacting associated data blocks.
+        /// </summary>
+        [HttpDelete("public-cache/data-blocks/geojson")]
+        public async Task<ActionResult> ClearPublicGeoJsonCacheJson()
+        {
+            await _publicBlobStorageService.DeleteBlobs(
+                BlobContainers.PublicContent,
+                options: new DeleteBlobsOptions
+                {
+                    // Match against patterns:
+                    //
+                    // publications/***/releases/1234/data-blocks/GUID-boundary-levels/GUID-1.json
+                    // publications/***/releases/1234-35/data-blocks/GUID-boundary-levels/GUID-12.json
+                    // publications/***/releases/1234-q1/data-blocks/GUID-boundary-levels/GUID-12.json
+                    // publications/***/releases/1234-35-q1/data-blocks/GUID-boundary-levels/GUID-123.json
+                    IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/releases/{ReleasePeriodPattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$")
                 });
 
             return NoContent();

@@ -19,6 +19,16 @@ public static class ValidationMessages
         Message: "The data set version is not in draft status."
     );
 
+    public static readonly LocalizableMessage DataSetVersionCannotHaveNotes = new(
+        Code: nameof(DataSetVersionCannotHaveNotes),
+        Message: "The data set version cannot have guidance notes as it is the first version."
+    );
+
+    public static readonly LocalizableMessage DataSetVersionCannotBeUpdated = new(
+        Code: nameof(DataSetVersionCannotBeUpdated),
+        Message: "The data set version cannot be updated."
+    );
+
     public static readonly LocalizableMessage DataSetVersionMappingSourcePathDoesNotExist = new(
         Code: nameof(DataSetVersionMappingSourcePathDoesNotExist),
         Message: "The source mapping does not exist."
@@ -52,16 +62,6 @@ public static class ValidationMessages
     public static readonly LocalizableMessage ZipFilenameMustEndDotZip = new(
         Code: nameof(ZipFilenameMustEndDotZip),
         Message: "The file provided '{0}' should have a filename ending in '.zip'."
-    );
-
-    public static readonly LocalizableMessage DataSetVersionCannotHaveChangelogNotes = new(
-        Code: nameof(DataSetVersionCannotHaveChangelogNotes),
-        Message: "The data set version is the first version of the series, and therefore cannot have any changelog notes."
-    );
-
-    public static readonly LocalizableMessage DataSetVersionCannotBeUpdated = new(
-        Code: nameof(DataSetVersionCannotBeUpdated),
-        Message: "The data set version cannot be updated."
     );
 
     public static ErrorViewModel GenerateErrorZipFilenameMustEndDotZip(string fullFilename)

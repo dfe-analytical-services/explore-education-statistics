@@ -1,3 +1,5 @@
+#nullable enable
+using System;
 using FluentValidation;
 using System.ComponentModel;
 
@@ -5,6 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 
 public record DataSetVersionListRequest
 {
+    public Guid DataSetId { get; init; }
+
     [DefaultValue(1)]
     public int Page { get; init; } = 1;
 
@@ -15,6 +19,8 @@ public record DataSetVersionListRequest
     {
         public Validator()
         {
+            RuleFor(request => request.DataSetId)
+                .NotEmpty();
             RuleFor(request => request.Page)
                 .GreaterThanOrEqualTo(1);
             RuleFor(request => request.PageSize)
