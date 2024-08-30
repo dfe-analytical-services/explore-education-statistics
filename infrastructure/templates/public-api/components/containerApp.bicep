@@ -169,14 +169,13 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   tags: tagValues
 }
 
-module azureAuthentication 'azureAuthentication.bicep' = if (entraIdAuthentication != null) {
+module azureAuthentication 'containerAppAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
   name: '${containerAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
-    siteName: fullApplicationName
+    containerAppName: fullApplicationName
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
-    requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
 }
 
