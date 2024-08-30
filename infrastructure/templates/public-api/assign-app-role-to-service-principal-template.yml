@@ -1,6 +1,6 @@
 parameters:
   - name: serviceConnection
-    type: strinh
+    type: string
   - name: appRoleName
     type: string
   - name: protectedResourceAppRegName
@@ -18,18 +18,18 @@ steps:
       inlineScript: |
         set -e
 
-        appRoleId=`az ad sp list --display-name ${{parameters.protectedResourceName}} --query "[0].appRoles[?value=='${{parameters.appRoleName}}'].id" --output tsv)`
+        appRoleId=`az ad sp list --display-name ${{parameters.protectedResourceAppRegName}} --query "[0].appRoles[?value=='${{parameters.appRoleName}}'].id" --output tsv)`
         principalId=`az resource list -n ${{parameters.servicePrincipalName}} --query [*].identity.principalId --out tsv`
 
         roleAlreadyAssigned=`az rest -u https://graph.microsoft.com/v1.0/servicePrincipals/$principalId/appRoleAssignments --query "value[?appRoleId == '$appRoleId']" | jq '. != []'`
         
         if [[ "$roleAlreadyAssigned" == "true" ]]; then
         
-          echo "App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceName}}\" is already assigned to \"${{parameters.servicePrincipalName}}\""
+          echo "App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceAppRegName}}\" is already assigned to \"${{parameters.servicePrincipalName}}\""
         
         else
 
-          echo "Assigning App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceName}}\" to \"${{parameters.servicePrincipalName}}\""
+          echo "Assigning App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceAppRegName}}\" to \"${{parameters.servicePrincipalName}}\""
           
           protectedResourceAppRegId=`az ad sp list --display-name $protectedResourceAppRegName --query [0].id --out tsv`
 
