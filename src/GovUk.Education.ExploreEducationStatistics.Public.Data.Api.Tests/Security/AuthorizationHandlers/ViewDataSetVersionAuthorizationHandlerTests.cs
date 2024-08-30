@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Constants;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
@@ -11,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -191,15 +192,15 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var handler = BuildHandler(
             environmentName: Environments.Development,
-            userAgentValue: Common.Security.SecurityConstants.AdminUserAgent);
-        
+            userAgentValue: SecurityConstants.AdminUserAgent);
+
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
         handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
@@ -208,18 +209,18 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
             .WithStatus(status);
-        
+
         var handler = BuildHandler(
             environmentName: Environments.Production,
-            userAgentValue: Common.Security.SecurityConstants.AdminUserAgent);
-        
+            userAgentValue: SecurityConstants.AdminUserAgent);
+
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
         handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
-    
+
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
@@ -228,11 +229,11 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
             .WithStatus(status);
-        
+
         var handler = BuildHandler(
             environmentName: Environments.Development,
             userAgentValue: "Incorrect User Agent");
-        
+
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
         handler.HandleAsync(context);
@@ -254,14 +255,14 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         var handler = BuildHandler(
             environmentName: Environments.Production,
             claimsPrincipal: userWithCorrectRole);
-        
+
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
         handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     [Theory]
     [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
         MemberType = typeof(DataSetVersionStatusViewTheoryData))]
@@ -276,7 +277,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         var handler = BuildHandler(
             environmentName: Environments.Production,
             claimsPrincipal: userWithIncorrectRole);
-        
+
         var context = CreateAnonymousAuthContext<ViewDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
         handler.HandleAsync(context);
@@ -303,25 +304,18 @@ public class ViewDataSetVersionAuthorizationHandlerTests
             {
                 HttpContext =
                 {
-                    User = claimsPrincipal ?? new ClaimsPrincipal(),
-                    Request =
-                    {
-                        Headers =
-                        {
-                            UserAgent = userAgentValue
-                        }
-                    }
+                    User = claimsPrincipal ?? new ClaimsPrincipal()
                 }
             }
         };
-        
-        var httpContext = new DefaultHttpContext();
 
-        var requestFeature = new HttpRequestFeature { Headers = new HeaderDictionary(requestHeaders?.ToDictionary()) };
-        httpContext.Features.Set<IHttpRequestFeature>(requestFeature);
+        var headers = httpContextAccessor.HttpContext.Request.Headers;
+        headers.UserAgent = userAgentValue;
+        requestHeaders?.ForEach(header => 
+            headers.Append(header.Key, header.Value));
 
         var environment = new Mock<IWebHostEnvironment>(MockBehavior.Strict);
-        
+
         environment
             .SetupGet(s => s.EnvironmentName)
             .Returns(environmentName ?? Environments.Production);

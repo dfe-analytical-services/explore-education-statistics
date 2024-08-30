@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -1683,7 +1684,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
-                dataSetVersion: dataSetVersion.Version,
+                dataSetVersion: dataSetVersion.PublicVersion,
                 user: userWithIncorrectRole);
 
             response.AssertForbidden();
@@ -1714,7 +1715,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
-                dataSetVersion: dataSetVersion.Version,
+                dataSetVersion: dataSetVersion.PublicVersion,
                 user: userWithCorrectRole);
 
             response.AssertOk();
@@ -1728,7 +1729,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             ClaimsPrincipal? user = null,
             IContentApiClient? contentApiClient = null)
         {
-            var client = BuildApp(contentApiClient).CreateClient();
+            var client = BuildApp(
+                    contentApiClient: contentApiClient,
+                    user: user)
+                .CreateClient();
             client.AddPreviewTokenHeader(previewTokenId);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes", UriKind.Relative);
@@ -1737,7 +1741,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
+    private WebApplicationFactory<Startup> BuildApp(
+        IContentApiClient? contentApiClient = null,
+        ClaimsPrincipal? user = null)
     {
         return TestApp
             .SetUser(user)
