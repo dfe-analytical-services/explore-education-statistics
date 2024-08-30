@@ -141,7 +141,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualLocation = actualLocations[index];
                     actualLocation.AssertDeepEqualTo(expectedLocation,
                         notEqualProperties: AssertExtensions.Except<LocationMeta>(
-                            l => l.Id,
                             l => l.DataSetVersionId,
                             l => l.Options,
                             l => l.OptionLinks,
@@ -250,7 +249,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualLocation = actualLocations[index];
                     actualLocation.AssertDeepEqualTo(expectedLocation,
                         notEqualProperties: AssertExtensions.Except<LocationMeta>(
-                            l => l.Id,
                             l => l.DataSetVersionId,
                             l => l.Options,
                             l => l.OptionLinks,
@@ -347,7 +345,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualFilter = actualFilters[index];
                     actualFilter.AssertDeepEqualTo(expectedFilter,
                         notEqualProperties: AssertExtensions.Except<FilterMeta>(
-                            fm => fm.Id,
                             fm => fm.DataSetVersionId,
                             fm => fm.Created,
                             fm => fm.Options,
@@ -466,7 +463,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualFilter = actualFilters[index];
                     actualFilter.AssertDeepEqualTo(expectedFilter,
                         notEqualProperties: AssertExtensions.Except<FilterMeta>(
-                            fm => fm.Id,
                             fm => fm.DataSetVersionId,
                             fm => fm.Created,
                             fm => fm.Options,
@@ -533,7 +529,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualIndicator = actualIndicators[index];
                     actualIndicator.AssertDeepEqualTo(expectedIndicator,
                         notEqualProperties: AssertExtensions.Except<IndicatorMeta>(
-                            im => im.Id,
                             im => im.DataSetVersionId,
                             im => im.Created
                         ));

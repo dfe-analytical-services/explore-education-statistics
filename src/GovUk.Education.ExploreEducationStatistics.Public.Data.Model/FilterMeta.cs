@@ -14,6 +14,8 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
 
     public required string PublicId { get; set; }
 
+    public required string Column { get; set; }
+
     public required string Label { get; set; }
 
     public string Hint { get; set; } = string.Empty;
@@ -31,9 +33,15 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
         public void Configure(EntityTypeBuilder<FilterMeta> builder)
         {
             builder.Property(m => m.PublicId)
+                .HasMaxLength(10);
+
+            builder.Property(m => m.Column)
                 .HasMaxLength(100);
 
             builder.HasIndex(m => new { m.DataSetVersionId, m.PublicId })
+                .IsUnique();
+
+            builder.HasIndex(m => new { m.DataSetVersionId, m.Column })
                 .IsUnique();
 
             builder.HasMany(m => m.Options)

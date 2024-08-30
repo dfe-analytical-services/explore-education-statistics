@@ -175,7 +175,7 @@ public abstract class ImportDataFunctionTests(
                         $"""
                          SELECT DISTINCT {FilterOptionsTable.TableName:raw}.*
                          FROM '{DataTable.TableName:raw}' JOIN '{FilterOptionsTable.TableName:raw}'
-                         ON {DataTable.Ref().Col(expectedFilter.PublicId):raw} = {FilterOptionsTable.Ref().Id:raw}
+                         ON {DataTable.Ref().Col(expectedFilter.Column):raw} = {FilterOptionsTable.Ref().Id:raw}
                          ORDER BY {FilterOptionsTable.Ref().Label:raw}
                          """
                     );

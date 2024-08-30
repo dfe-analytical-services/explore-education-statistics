@@ -16,6 +16,12 @@ public record IndicatorViewModel
     public required string Id { get; init; }
 
     /// <summary>
+    /// The name of the indicator CSV column.
+    /// </summary>
+    /// <example>sess_authorised</example>
+    public required string Column { get; init; }
+
+    /// <summary>
     /// The human-readable label of the indicator.
     /// </summary>
     public required string Label { get; init; }
@@ -36,6 +42,7 @@ public record IndicatorViewModel
         return new IndicatorViewModel
         {
             Id = meta.PublicId,
+            Column = meta.Column,
             Label = meta.Label,
             Unit = meta.Unit,
             DecimalPlaces = meta.DecimalPlaces

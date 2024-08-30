@@ -13,6 +13,12 @@ public record FilterViewModel
     public required string Id { get; init; }
 
     /// <summary>
+    /// The name of the filter CSV column.
+    /// </summary>
+    /// <example>school_type</example>
+    public required string Column { get; init; }
+
+    /// <summary>
     /// A hint to assist in describing the filter.
     /// </summary>
     public string Hint { get; init; } = string.Empty;
@@ -27,6 +33,7 @@ public record FilterViewModel
         return new FilterViewModel
         {
             Id = meta.PublicId,
+            Column = meta.Column,
             Label = meta.Label,
             Hint = meta.Hint
         };
