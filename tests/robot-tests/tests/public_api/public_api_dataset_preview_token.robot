@@ -208,6 +208,28 @@ User cancells to create API token
     user waits until page contains    Generate API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
+Verify the 'Active tokens' and 'Expired tokens' on preview token log page
+    user clicks link    Back to API data set details
+    user clicks link    View preview token log
+    user waits until page contains    API data set preview token log
+    user waits until h2 is visible    ${SUBJECT_NAME_1}
+
+    user checks table column heading contains    1    1    Reference
+    user checks table column heading contains    1    2    User
+    user checks table column heading contains    1    3    Date generated
+    user checks table column heading contains    1    4    Status
+    user checks table column heading contains    1    5    Expiry
+    user checks table column heading contains    1    6    Action
+
+    user checks table cell contains    1    4    Active
+    user checks table cell contains    2    4    Expired
+
+    user clicks button in table cell    1    6    Revoke
+    ${modal}=    user waits until modal is visible    Revoke this token
+    user clicks button    Confirm    ${modal}
+    user waits until page finishes loading
+    user checks table cell contains    1    4    Expired
+
 Add headline text block to Content page
     user clicks link    Back to API data set details
     user navigates to content page    ${PUBLICATION_NAME}
