@@ -58,7 +58,8 @@ public class SeedDataCommand : ICommand
             DataSetSeed.SpcEthnicityLanguage,
             DataSetSeed.SpcYearGroupGender,
             DataSetSeed.Nat01,
-            DataSetSeed.Qua01,
+            // QUA01 has filter option labels that are too long
+            // DataSetSeed.Qua01,
         };
 
         var stopwatch = Stopwatch.StartNew();
