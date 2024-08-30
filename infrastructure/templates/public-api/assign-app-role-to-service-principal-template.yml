@@ -1,6 +1,6 @@
 parameters:
   - name: serviceConnection
-    type: strinh
+    type: string
   - name: appRoleName
     type: string
   - name: protectedResourceAppRegName
