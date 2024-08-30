@@ -387,59 +387,88 @@ public class SeedDataCommand : ICommand
             IEnumerable<MetaFileRow> metaFileRows,
             IReadOnlySet<string> allowedColumns)
         {
+            var currentId = await _dbContext.NextSequenceValue(
+                PublicDataDbContext.IndicatorMetasIdSequence,
+                _cancellationToken);
+
             var metas = metaFileRows
                 .Where(row => row.ColType == MetaFileRow.ColumnType.Indicator
                               && allowedColumns.Contains(row.ColName))
                 .OrderBy(row => row.Label)
                 .ToList()
-                .Select(
-                    row => new IndicatorMeta
+                .Select(row =>
+                {
+                    var id = currentId++;
+
+                    return new IndicatorMeta
                     {
+                        Id = id,
                         DataSetVersionId = _seed.DataSetVersionId,
-                        PublicId = row.ColName,
+                        PublicId = SqidEncoder.Encode(id),
+                        Column = row.ColName,
                         Label = row.Label,
                         Unit = row.IndicatorUnit,
                         DecimalPlaces = row.IndicatorDp
-                    }
-                )
+                    };
+                })
                 .ToList();
 
             _dbContext.IndicatorMetas.AddRange(metas);
             await _dbContext.SaveChangesAsync(_cancellationToken);
+
+            await _dbContext.SetSequenceValue(
+                PublicDataDbContext.IndicatorMetasIdSequence,
+                currentId - 1,
+                _cancellationToken
+            );
         }
 
         private async Task CreateFilterMetas(
             IEnumerable<MetaFileRow> metaFileRows,
             IReadOnlySet<string> allowedColumns)
         {
+            var currentId = await _dbContext.NextSequenceValue(
+                PublicDataDbContext.FilterMetasIdSequence,
+                _cancellationToken);
+
             var metas = metaFileRows
                 .Where(
                     row => row.ColType == MetaFileRow.ColumnType.Filter
                            && allowedColumns.Contains(row.ColName)
                 )
                 .OrderBy(row => row.Label)
-                .Select(
-                    row => new FilterMeta
+                .Select(row =>
+                {
+                    var id = currentId++;
+
+                    return new FilterMeta
                     {
-                        PublicId = row.ColName,
+                        Id = id,
+                        PublicId = SqidEncoder.Encode(id),
+                        Column = row.ColName,
                         DataSetVersionId = _seed.DataSetVersionId,
                         Label = row.Label,
                         Hint = row.FilterHint ?? string.Empty,
-                    }
-                )
+                    };
+                })
                 .ToList();
 
             _dbContext.FilterMetas.AddRange(metas);
             await _dbContext.SaveChangesAsync(_cancellationToken);
 
+            await _dbContext.SetSequenceValue(
+                PublicDataDbContext.FilterMetasIdSequence,
+                currentId - 1,
+                _cancellationToken);
+
             foreach (var meta in metas)
             {
                 var options = (await _duckDbConnection.SqlBuilder(
                             $"""
-                             SELECT DISTINCT "{meta.PublicId:raw}"
+                             SELECT DISTINCT "{meta.Column:raw}"
                              FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true) AS data
-                             WHERE "{meta.PublicId:raw}" != ''
-                             ORDER BY "{meta.PublicId:raw}"
+                             WHERE "{meta.Column:raw}" != ''
+                             ORDER BY "{meta.Column:raw}"
                              """
                         ).QueryAsync<string>(cancellationToken: _cancellationToken)
                     )
@@ -514,7 +543,7 @@ public class SeedDataCommand : ICommand
                 if (insertedLinks != options.Count)
                 {
                     throw new InvalidOperationException(
-                        $"Inserted incorrect number of filter option meta links for {meta.PublicId}. " +
+                        $"Inserted incorrect number of filter option meta links for filter (id = {meta.Id}, column = {meta.Column}). " +
                         $"Inserted: {insertedLinks}, expected: {options.Count}");
                 }
 
@@ -813,8 +842,8 @@ public class SeedDataCommand : ICommand
                 ..version.FilterMetas.Select(
                     filter => $"""
                                LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
-                               ON {FilterOptionsTable.Ref(filter).FilterId} = '{filter.PublicId}'
-                               AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.PublicId)}
+                               ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'
+                               AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.Column)}
                                """
                 ),
                 $"""
@@ -891,18 +920,19 @@ public class SeedDataCommand : ICommand
 
         private async Task CreateParquetMetaTables(DataSetVersion version)
         {
-            await CreateParquetIndicatorTable(version);
-            await CreateParquetLocationMetaTable(version);
-            await CreateParquetFilterMetaTable(version);
-            await CreateParquetTimePeriodMetaTable(version);
+            await CreateParquetIndicatorsTable(version);
+            await CreateParquetLocationOptionsTable(version);
+            await CreateParquetFilterOptionsTable(version);
+            await CreateParquetTimePeriodsTable(version);
         }
 
-        private async Task CreateParquetIndicatorTable(DataSetVersion version)
+        private async Task CreateParquetIndicatorsTable(DataSetVersion version)
         {
             await _duckDbConnection.SqlBuilder(
                 $"""
                  CREATE TABLE {IndicatorsTable.TableName:raw}(
                      {IndicatorsTable.Cols.Id:raw} VARCHAR PRIMARY KEY,
+                     {IndicatorsTable.Cols.Column:raw} VARCHAR,
                      {IndicatorsTable.Cols.Label:raw} VARCHAR,
                      {IndicatorsTable.Cols.Unit:raw} VARCHAR,
                      {IndicatorsTable.Cols.DecimalPlaces:raw} TINYINT,
@@ -917,6 +947,7 @@ public class SeedDataCommand : ICommand
                 var insertRow = appender.CreateRow();
 
                 insertRow.AppendValue(meta.PublicId);
+                insertRow.AppendValue(meta.Column);
                 insertRow.AppendValue(meta.Label);
                 insertRow.AppendValue(meta.Unit?.GetEnumLabel() ?? string.Empty);
                 insertRow.AppendValue(meta.DecimalPlaces);
@@ -924,7 +955,7 @@ public class SeedDataCommand : ICommand
             }
         }
 
-        private async Task CreateParquetLocationMetaTable(DataSetVersion version)
+        private async Task CreateParquetLocationOptionsTable(DataSetVersion version)
         {
             await _duckDbConnection.SqlBuilder(
                 $"""
@@ -996,7 +1027,7 @@ public class SeedDataCommand : ICommand
             }
         }
 
-        private async Task CreateParquetFilterMetaTable(DataSetVersion version)
+        private async Task CreateParquetFilterOptionsTable(DataSetVersion version)
         {
             await _duckDbConnection.SqlBuilder(
                 $"""
@@ -1004,7 +1035,8 @@ public class SeedDataCommand : ICommand
                      {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
                      {FilterOptionsTable.Cols.Label:raw} VARCHAR,
                      {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
-                     {FilterOptionsTable.Cols.FilterId:raw} VARCHAR
+                     {FilterOptionsTable.Cols.FilterId:raw} VARCHAR,
+                     {FilterOptionsTable.Cols.FilterColumn:raw} VARCHAR
                  )
                  """
             ).ExecuteAsync(cancellationToken: _cancellationToken);
@@ -1023,13 +1055,14 @@ public class SeedDataCommand : ICommand
                     insertRow.AppendValue(link.Option.Label);
                     insertRow.AppendValue(link.PublicId);
                     insertRow.AppendValue(filter.PublicId);
+                    insertRow.AppendValue(filter.Column);
 
                     insertRow.EndRow();
                 }
             }
         }
 
-        private async Task CreateParquetTimePeriodMetaTable(DataSetVersion version)
+        private async Task CreateParquetTimePeriodsTable(DataSetVersion version)
         {
             await _duckDbConnection.SqlBuilder(
                 $"""

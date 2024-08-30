@@ -2,6 +2,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -17,9 +18,9 @@ public record DataSetQuerySort
     ///
     /// - `timePeriod` to sort by time period
     /// - `geographicLevel` to sort by the geographic level of the data
-    /// - `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)
-    /// - A filter ID (e.g. `characteristic`, `school_type`) to sort by the options in that filter
-    /// - An indicator ID (e.g. `sess_authorised`, `enrolments`) to sort by the values in that indicator
+    /// - `location|{level}` to sort by locations in a geographic level, where `{level}` is the level code (e.g. `REG`, `LA`)
+    /// - A filter ID (e.g. `3RxWP`) to sort by the options in that filter
+    /// - An indicator ID (e.g. `6VfPgZ`) to sort by the values in that indicator
     /// </summary>
     /// <example>timePeriod</example>
     public required string Field { get; init; }
@@ -31,6 +32,7 @@ public record DataSetQuerySort
     /// - `Desc` - sort by descending order
     /// </summary>
     /// <example>Asc</example>
+    [SwaggerEnum(typeof(SortDirection), SwaggerEnumSerializer.String)]
     public required string Direction { get; init; }
 
     public SortDirection ParsedDirection() => EnumUtil.GetFromEnumValue<SortDirection>(Direction);
