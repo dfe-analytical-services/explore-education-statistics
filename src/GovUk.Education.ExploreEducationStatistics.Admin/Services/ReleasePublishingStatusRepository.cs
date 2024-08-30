@@ -1,12 +1,16 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -18,63 +22,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
-            var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                QueryComparisons.Equal,
-                releaseVersionId.ToString());
-
-            if (overallStages.Any())
+            if (overallStages.Length == 0)
             {
-                var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) =>
-                {
-                    var stageFilter = TableQuery.GenerateFilterCondition(
-                        nameof(ReleasePublishingStatus.OverallStage),
-                        QueryComparisons.Equal,
-                        stage.ToString()
-                    );
-
-                    if (acc == "")
-                    {
-                        return stageFilter;
-                    }
-
-                    return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter);
-                });
-
-                filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
+                throw new ArgumentException("overallStages should not be empty");
             }
 
-            var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
-            return await publisherTableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
+            var result = await publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
+                PublisherReleaseStatusTableName,
+                status => status.PartitionKey == releaseVersionId.ToString());
+            var allStatusesForReleaseVersion = await result.ToListAsync();
+
+            var statusesForStages = allStatusesForReleaseVersion
+                .Where(status => overallStages.Contains(status.OverallStage))
+                .ToList();
+
+            return statusesForStages;
         }
 
         public async Task RemovePublisherReleaseStatuses(IReadOnlyList<Guid> releaseVersionIds)
         {
             if (releaseVersionIds.IsNullOrEmpty())
             {
-                // Return early as we want to do nothing in this case - without this,
-                // `filter` will be string.Empty and the query returns all table entities
                 return;
             }
 
-            var filter = string.Empty;
+            var filter = "";
             foreach (var releaseVersionId in releaseVersionIds)
             {
-                var newFilter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                    QueryComparisons.Equal, releaseVersionId.ToString());
+                var filterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                    status.PartitionKey == releaseVersionId.ToString());
 
-                filter = filter == string.Empty
-                    ? newFilter
-                    : TableQuery.CombineFilters(filter, TableOperators.Or, newFilter);
+                filter = filter == ""
+                    ? filterCondition
+                    : $"({filter}) or ({filterCondition})";
             }
 
-            var cloudTable = publisherTableStorageService.GetTable(PublisherReleaseStatusTableName);
-            var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
-            var releaseStatusesToRemove = cloudTable.ExecuteQuery(query);
+            var results = await publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    filter);
+            var statusesToRemove = await results.ToListAsync();
 
-            foreach (var releaseStatus in releaseStatusesToRemove)
-            {
-                await cloudTable.ExecuteAsync(TableOperation.Delete(releaseStatus));
-            }
+            await publisherTableStorageService.BatchManipulateEntities(
+                PublisherReleaseStatusTableName,
+                statusesToRemove,
+                TableTransactionActionType.Delete);
         }
     }
 }

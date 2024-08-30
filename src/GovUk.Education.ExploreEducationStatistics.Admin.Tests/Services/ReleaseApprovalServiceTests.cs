@@ -874,7 +874,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    It.Is<ReleasePublishingKeyOld>(key => key.ReleaseVersionId == releaseVersion.Id),
                     false,
                     CancellationToken.None
                 ))
@@ -1001,7 +1001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    It.Is<ReleasePublishingKeyOld>(key => key.ReleaseVersionId == releaseVersion.Id),
                     true,
                     CancellationToken.None
                 ))
@@ -1116,7 +1116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == amendedReleaseVersion.Id),
+                    It.Is<ReleasePublishingKeyOld>(key => key.ReleaseVersionId == amendedReleaseVersion.Id),
                     false,
                     CancellationToken.None
                 ))
@@ -1607,7 +1607,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<ReleasePublishingKey>(key => key.ReleaseVersionId == releaseVersion.Id),
+                    It.Is<ReleasePublishingKeyOld>(key => key.ReleaseVersionId == releaseVersion.Id),
                     false,
                     CancellationToken.None
                 ))

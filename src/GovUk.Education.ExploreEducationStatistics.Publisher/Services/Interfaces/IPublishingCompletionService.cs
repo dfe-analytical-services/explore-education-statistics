@@ -7,5 +7,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 public interface IPublishingCompletionService
 {
     Task CompletePublishingIfAllPriorStagesComplete(
-        IReadOnlyList<ReleasePublishingKey> releaseVersionAndReleaseStatusIds);
+        IReadOnlyList<ReleasePublishingKeyOld> releaseVersionAndReleaseStatusIds);
 }

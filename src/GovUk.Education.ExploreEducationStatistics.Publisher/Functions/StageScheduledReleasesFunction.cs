@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new ManualTriggerResponse(stagedReleaseVersionIds);
         }
 
-        private async Task PublishReleaseFilesAndStageContent(IReadOnlyList<ReleasePublishingKey> scheduled)
+        private async Task PublishReleaseFilesAndStageContent(IReadOnlyList<ReleasePublishingKeyOld> scheduled)
         {
             if (!scheduled.Any())
             {
@@ -87,13 +87,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await queueService.QueueStageReleaseContentMessages(scheduled);
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForToday()
+        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday()
         {
             return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 overall: ReleasePublishingStatusOverallStage.Scheduled);
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForTodayOrFuture(
+        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForTodayOrFuture(
             IReadOnlyList<Guid> releaseVersionIds)
         {
             return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(

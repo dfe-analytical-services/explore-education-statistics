@@ -72,13 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
         }
 
-        private async Task<ReleasePublishingKey> CreateReleaseStatus(
+        private async Task<ReleasePublishingKeyOld> CreateReleaseStatus(
             NotifyChangeMessage message,
             ReleasePublishingStatusState state,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
             return await releasePublishingStatusService.Create(
-                message.ReleasePublishingKey,
+                message.ReleasePublishingKeyOld,
                 state,
                 message.Immediate,
                 logMessages);

@@ -14,7 +14,7 @@ public class QueueService(
     ILogger<QueueService> logger)
     : IQueueService
 {
-    public async Task QueueStageReleaseContentMessages(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
+    public async Task QueueStageReleaseContentMessages(IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys)
     {
         logger.LogInformation(
             "Queuing generate content message for release versions: [{ReleaseVersionIds}]",
@@ -29,16 +29,16 @@ public class QueueService(
                     ReleasePublishingStatusContentStage.Queued));
     }
 
-    public async Task QueuePublishReleaseContentMessage(ReleasePublishingKey releasePublishingKey)
+    public async Task QueuePublishReleaseContentMessage(ReleasePublishingKeyOld releasePublishingKeyOld)
     {
         logger.LogInformation("Queuing publish content message for release version: {ReleaseVersionId}",
-            releasePublishingKey.ReleaseVersionId);
-        await publisherClient.PublishReleaseContent(releasePublishingKey);
-        await releasePublishingStatusService.UpdateContentStage(releasePublishingKey,
+            releasePublishingKeyOld.ReleaseVersionId);
+        await publisherClient.PublishReleaseContent(releasePublishingKeyOld);
+        await releasePublishingStatusService.UpdateContentStage(releasePublishingKeyOld,
             ReleasePublishingStatusContentStage.Queued);
     }
 
-    public async Task QueuePublishReleaseFilesMessages(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
+    public async Task QueuePublishReleaseFilesMessages(IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys)
     {
         logger.LogInformation(
             "Queuing files message for release versions: [{ReleaseVersionIds}]",

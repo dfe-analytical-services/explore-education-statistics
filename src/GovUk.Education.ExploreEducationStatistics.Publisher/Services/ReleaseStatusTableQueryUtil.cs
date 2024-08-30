@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public static class ReleaseStatusTableQueryUtil
     {
-        public static TableQuery<ReleasePublishingStatus> QueryPublishLessThanEndOfTodayWithStages(
+        public static TableQuery<ReleasePublishingStatusOld> QueryPublishLessThanEndOfTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return QueryPublishByDateWithStages(FilterPublishLessThanEndOfToday(), content, files, publishing, overall);
         }
 
-        public static TableQuery<ReleasePublishingStatus> QueryPublishTodayOrInFutureWithStages(
+        public static TableQuery<ReleasePublishingStatusOld> QueryPublishTodayOrInFutureWithStages(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return QueryPublishByDateWithStages(FilterPublishTodayOrInFuture(), content, files, publishing, overall);
         }
 
-        private static TableQuery<ReleasePublishingStatus> QueryPublishByDateWithStages(
+        private static TableQuery<ReleasePublishingStatusOld> QueryPublishByDateWithStages(
             string dateFilter,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
@@ -56,25 +56,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 filter = CombineFilters(filter, And, FilterOverallStageEquals(overall.Value));
             }
 
-            return new TableQuery<ReleasePublishingStatus>().Where(filter);
+            return new TableQuery<ReleasePublishingStatusOld>().Where(filter);
         }
 
         private static string FilterPublishLessThanEndOfToday() =>
-            GenerateFilterConditionForDate(nameof(ReleasePublishingStatus.Publish), LessThan, DateTime.Today.AddDays(1));
+            GenerateFilterConditionForDate(nameof(ReleasePublishingStatusOld.Publish), LessThan, DateTime.Today.AddDays(1));
 
         private static string FilterPublishTodayOrInFuture() =>
-            GenerateFilterConditionForDate(nameof(ReleasePublishingStatus.Publish), GreaterThanOrEqual, DateTime.Today);
+            GenerateFilterConditionForDate(nameof(ReleasePublishingStatusOld.Publish), GreaterThanOrEqual, DateTime.Today);
 
         private static string FilterContentStageEquals(ReleasePublishingStatusContentStage stage) =>
-            GenerateFilterCondition(nameof(ReleasePublishingStatus.ContentStage), Equal, stage.ToString());
+            GenerateFilterCondition(nameof(ReleasePublishingStatusOld.ContentStage), Equal, stage.ToString());
 
         private static string FilterFilesStageEquals(ReleasePublishingStatusFilesStage stage) =>
-            GenerateFilterCondition(nameof(ReleasePublishingStatus.FilesStage), Equal, stage.ToString());
+            GenerateFilterCondition(nameof(ReleasePublishingStatusOld.FilesStage), Equal, stage.ToString());
 
         private static string FilterPublishingStageEquals(ReleasePublishingStatusPublishingStage stage) =>
-            GenerateFilterCondition(nameof(ReleasePublishingStatus.PublishingStage), Equal, stage.ToString());
+            GenerateFilterCondition(nameof(ReleasePublishingStatusOld.PublishingStage), Equal, stage.ToString());
 
         private static string FilterOverallStageEquals(ReleasePublishingStatusOverallStage stage) =>
-            GenerateFilterCondition(nameof(ReleasePublishingStatus.OverallStage), Equal, stage.ToString());
+            GenerateFilterCondition(nameof(ReleasePublishingStatusOld.OverallStage), Equal, stage.ToString());
     }
 }

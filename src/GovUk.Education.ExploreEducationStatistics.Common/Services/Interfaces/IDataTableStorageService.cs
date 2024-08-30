@@ -50,6 +50,14 @@ public interface IDataTableStorageService
         CancellationToken cancellationToken = default)
         where TEntity : class, ITableEntity;
 
+    Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
+        string tableName,
+        string filter = "",
+        int? maxPerPage = 1000,
+        IEnumerable<string>? select = null,
+        CancellationToken cancellationToken = default)
+        where TEntity : class, ITableEntity;
+
     Task BatchManipulateEntities<TEntity>(
         string tableName,
         IEnumerable<TEntity> entities,
