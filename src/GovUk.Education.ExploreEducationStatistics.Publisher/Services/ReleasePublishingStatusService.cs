@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _context;
         private readonly ILogger<ReleasePublishingStatusService> _logger;
-        private readonly IPublisherTableStorageServiceOld _tableStorageServiceOld;
+        private readonly IPublisherTableStorageServiceOld _tableStorageServiceOld; // @MarkFix change
 
         public ReleasePublishingStatusService(
             ContentDbContext context,
