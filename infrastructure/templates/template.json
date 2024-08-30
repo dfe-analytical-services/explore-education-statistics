@@ -136,7 +136,10 @@
     "skuAdminSignalR": {
       "type": "string",
       "defaultValue": "Free_F1",
-      "allowedValues": ["Free_F1", "Standard_S1"]
+      "allowedValues": [
+        "Free_F1",
+        "Standard_S1"
+      ]
     },
     "adminSignalRCapacity": {
       "type": "int",
@@ -144,7 +147,15 @@
         "description": "The number of SignalR units."
       },
       "defaultValue": 1,
-      "allowedValues": [1, 2, 5, 10, 20, 50, 100]
+      "allowedValues": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100
+      ]
     },
     "adminFirewallRules": {
       "type": "array",
@@ -284,7 +295,10 @@
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true",
-      "allowedValues": ["true", "false"],
+      "allowedValues": [
+        "true",
+        "false"
+      ],
       "metadata": {
         "description": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
@@ -438,7 +452,11 @@
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
-      "allowedValues": ["-1.0", "1.1", "1.2"]
+      "allowedValues": [
+        "-1.0",
+        "1.1",
+        "1.2"
+      ]
     },
     "useSubnets": {
       "type": "bool",
@@ -562,11 +580,20 @@
     "branch": {
       "type": "string",
       "defaultValue": "master",
-      "allowedValues": ["master", "dev"]
+      "allowedValues": [
+        "master",
+        "dev"
+      ]
     },
     "skuContentDb": {
       "type": "string",
-      "allowedValues": ["Free", "Basic", "Standard", "Premium", "GP_S_Gen5"]
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GP_S_Gen5"
+      ]
     },
     "skuStatisticsDb": {
       "type": "string",
@@ -716,7 +743,6 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
-
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -1089,12 +1115,9 @@
         "id": "[variables('publisherSubnetRef')]"
       }
     ],
-
     "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
-
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
     "ees-notifier-templateid-release-amendment-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-amendment-published')]",
@@ -1106,37 +1129,29 @@
     "ees-notifier-templateid-api-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-confirmation')]",
     "ees-notifier-templateid-api-subscription-notification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-notification')]",
     "ees-notifier-templateid-api-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-verification')]",
-
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
     "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
     "ees-openidconnect-valid-audience": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-audience')]",
     "ees-openidconnect-fully-qualified-scope-name": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-fully-qualified-scope-name')]",
     "ees-openidconnect-valid-issuers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-issuers')]",
-
     "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
     "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
-
     "ees-signalr-admin-connectionstring": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-signalr-admin-connectionstring')]",
-
     "ees-sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-admin-password')]",
     "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
-
     "ees-sql-password-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-admin')]",
     "ees-sql-password-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-data')]",
     "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
     "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
-
     "ees-sql-user-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-admin')]",
     "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
     "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
     "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
-
     "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
     "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
     "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
     "ees-storage-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-publisher')]",
-
     "ipWhiteList": {
       "copy": [
         {
@@ -1150,7 +1165,17 @@
         }
       ]
     },
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+    "keyVaultSecretsUserPrincipalRefs": [
+      "[concat('Microsoft.DataFactory/factories/', variables('dataFactoryName'))]",
+      "[concat('Microsoft.Web/sites/', variables('adminAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
+    ]
   },
   "resources": [
     {
@@ -1233,7 +1258,6 @@
           ]
         }
       },
-
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
@@ -2174,7 +2198,9 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": ["[variables('coreStorageAccountName')]"]
+          "dependsOn": [
+            "[variables('coreStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -2190,7 +2216,9 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
-      "dependsOn": ["[variables('vNetRef')]"],
+      "dependsOn": [
+        "[variables('vNetRef')]"
+      ],
       "sku": {
         "name": "Standard_RAGRS"
       }
@@ -2224,7 +2252,9 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "dependsOn": ["[variables('coreSqlServerName')]"],
+          "dependsOn": [
+            "[variables('coreSqlServerName')]"
+          ],
           "sku": {
             "name": "[parameters('skuStatisticsDb')]",
             "tier": "[parameters('tierStatisticsDb')]",
@@ -2259,7 +2289,9 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "dependsOn": ["[variables('coreSqlServerName')]"],
+          "dependsOn": [
+            "[variables('coreSqlServerName')]"
+          ],
           "sku": {
             "name": "[parameters('skuContentDb')]",
             "tier": "[parameters('tierContentDb')]",
@@ -2314,7 +2346,6 @@
             "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('contentDbName'))]"
           ]
         },
-
         {
           "type": "securityAlertPolicies",
           "name": "Default",
@@ -2349,7 +2380,6 @@
             }
           }
         },
-
         {
           "condition": "[parameters('sqlAuditing')]",
           "type": "auditingSettings",
@@ -2662,7 +2692,9 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": ["[variables('notificationsstorageAccountName')]"]
+          "dependsOn": [
+            "[variables('notificationsstorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -2728,7 +2760,9 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": ["[variables('publicStorageAccountName')]"]
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -3259,7 +3293,9 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": ["[variables('publisherStorageAccountName')]"]
+          "dependsOn": [
+            "[variables('publisherStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -3299,7 +3335,9 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": ["[variables('loggingStorageAccountName')]"]
+          "dependsOn": [
+            "[variables('loggingStorageAccountName')]"
+          ]
         }
       ],
       "tags": {
@@ -3337,7 +3375,9 @@
       },
       "properties": {
         "addressSpace": {
-          "addressPrefixes": ["10.0.0.0/16"]
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
         },
         "subnets": [
           {
@@ -3795,6 +3835,7 @@
             }
           }
         ]
+        // "enableRbacAuthorization": true
       },
       "resources": [
         {
@@ -3846,6 +3887,32 @@
           }
         }
       ]
+    },
+    {
+      "copy": {
+        "name": "keyVaultSecretUsersCopy",
+        "count": "[length(variables('keyVaultSecretsUserPrincipalRefs'))]"
+      },
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()]))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), parameters('devopsSPN')))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[parameters('devopsSPN')]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
     },
     {
       "name": "[concat(variables('dataAppName'), '-autoscale')]",
@@ -4117,7 +4184,9 @@
         "description": "[variables('metricAlerts')[copyIndex()].description]",
         "enabled": "true",
         "severity": 3,
-        "scopes": ["[variables('metricAlerts')[copyIndex()].resourceId]"],
+        "scopes": [
+          "[variables('metricAlerts')[copyIndex()].resourceId]"
+        ],
         "evaluationFrequency": "PT1M",
         "windowSize": "PT5M",
         "criteria": {
