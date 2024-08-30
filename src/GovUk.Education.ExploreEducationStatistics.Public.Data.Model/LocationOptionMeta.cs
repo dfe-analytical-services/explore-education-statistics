@@ -50,23 +50,30 @@ public abstract class LocationOptionMeta
                 .HasValue<LocationRscRegionOptionMeta>(LocationRscRegionOptionMeta.TypeValue)
                 .HasValue<LocationSchoolOptionMeta>(LocationSchoolOptionMeta.TypeValue);
 
-            builder
-                .Property(o => o.Type)
+            builder.Property(m => m.Label)
+                .HasMaxLength(120);
+
+            builder.Property(o => o.Type)
                 .HasMaxLength(10);
 
             builder.Property(o => o.Code)
+                .HasMaxLength(30)
                 .IsRequired(false);
 
             builder.Property(o => o.OldCode)
+                .HasMaxLength(20)
                 .IsRequired(false);
 
             builder.Property(o => o.Urn)
+                .HasMaxLength(20)
                 .IsRequired(false);
 
             builder.Property(o => o.LaEstab)
+                .HasMaxLength(20)
                 .IsRequired(false);
 
             builder.Property(o => o.Ukprn)
+                .HasMaxLength(20)
                 .IsRequired(false);
 
             builder.HasIndex(o => o.Type);

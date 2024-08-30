@@ -36,7 +36,10 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
                 .HasMaxLength(10);
 
             builder.Property(m => m.Column)
-                .HasMaxLength(100);
+                .HasMaxLength(50);
+
+            builder.Property(m => m.Label)
+                .HasMaxLength(80);
 
             builder.HasIndex(m => new { m.DataSetVersionId, m.PublicId })
                 .IsUnique();

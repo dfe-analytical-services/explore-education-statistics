@@ -19,7 +19,11 @@ public class LocationOptionMetaLink
     {
         public void Configure(EntityTypeBuilder<LocationOptionMetaLink> builder)
         {
-            builder.HasIndex(o => o.PublicId);
+            builder.Property(l => l.PublicId)
+                .HasMaxLength(10);
+
+            builder.HasIndex(l => new { l.MetaId, l.PublicId })
+                .IsUnique();
         }
     }
 }

@@ -15,6 +15,9 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required TimeIdentifier Code { get; set; }
 
+    /// <summary>
+    /// In yyyy/yyyy format i.e. 2020/2021.
+    /// </summary>
     public required string Period { get; set; }
 
     public DateTimeOffset Created { get; set; }
@@ -25,11 +28,14 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     {
         public void Configure(EntityTypeBuilder<TimePeriodMeta> builder)
         {
-            builder.Property(o => o.Code)
+            builder.Property(m => m.Period)
+                .HasMaxLength(9);
+            
+            builder.Property(m => m.Code)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(10);
 
-            builder.HasIndex(o => new { o.DataSetVersionId, o.Code, o.Period })
+            builder.HasIndex(m => new { m.DataSetVersionId, m.Code, m.Period })
                 .IsUnique();
         }
     }
