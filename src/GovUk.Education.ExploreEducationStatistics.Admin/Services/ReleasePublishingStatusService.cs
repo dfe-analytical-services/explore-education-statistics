@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleasePublishingStatusService : IReleasePublishingStatusService
     {
         private readonly IMapper _mapper;
-        private readonly IPublisherTableStorageService _publisherTableStorageService;
+        private readonly IPublisherTableStorageServiceOld _publisherTableStorageServiceOld;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
@@ -30,12 +30,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPublisherTableStorageService publisherTableStorageService)
+            IPublisherTableStorageServiceOld publisherTableStorageServiceOld)
         {
             _mapper = mapper;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
-            _publisherTableStorageService = publisherTableStorageService;
+            _publisherTableStorageServiceOld = publisherTableStorageServiceOld;
         }
 
         public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(
@@ -46,11 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var query = new TableQuery<ReleasePublishingStatus>()
-                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
+                    var query = new TableQuery<ReleasePublishingStatusOld>()
+                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatusOld.PartitionKey),
                             QueryComparisons.Equal, releaseVersionId.ToString()));
 
-                    var result = await _publisherTableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
+                    var result = await _publisherTableStorageServiceOld.ExecuteQuery(PublisherReleaseStatusTableName, query);
                     var first = result.OrderByDescending(status => status.Created).FirstOrDefault();
                     return _mapper.Map<ReleasePublishingStatusViewModel>(first);
                 });

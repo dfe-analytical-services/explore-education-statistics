@@ -7,49 +7,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleasePublishingStatusService
     {
-        Task<ReleasePublishingKey> Create(
-            ReleasePublishingKey releasePublishingKey,
+        Task<ReleasePublishingKeyOld> Create(
+            ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
+        Task<IReadOnlyList<ReleasePublishingKeyOld>> GetWherePublishingDueTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
+        Task<IReadOnlyList<ReleasePublishingKeyOld>> GetWherePublishingDueTodayOrInFutureWithStages(
             IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
+        Task<IReadOnlyList<ReleasePublishingStatusOld>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages);
 
-        Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey);
+        Task<ReleasePublishingStatusOld> Get(ReleasePublishingKeyOld releasePublishingKeyOld);
 
-        Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId);
+        Task<ReleasePublishingStatusOld?> GetLatest(Guid releaseVersionId);
 
         Task UpdateState(
-            ReleasePublishingKey releasePublishingKey,
+            ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleasePublishingStatusState state);
 
         Task UpdateContentStage(
-            ReleasePublishingKey releasePublishingKey,
+            ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
 
         Task UpdateFilesStage(
-            ReleasePublishingKey releasePublishingKey,
+            ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
 
         Task UpdatePublishingStage(
-            ReleasePublishingKey releasePublishingKey,
+            ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
     }

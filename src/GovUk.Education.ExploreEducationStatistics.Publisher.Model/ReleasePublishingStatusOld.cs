@@ -2,19 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Azure;
-using Azure.Data.Tables;
+using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class ReleasePublishingStatus : ITableEntity
+    public class ReleasePublishingStatusOld : TableEntity // @MarkFix to remove
     {
-        public string PartitionKey { get; set; }
-        public string RowKey { get; set; }
-        public DateTimeOffset? Timestamp { get; set; }
-        public ETag ETag { get; set; }
-
         public DateTime Created { get; set; }
         public string PublicationSlug { get; set; }
         public DateTime? Publish { get; set; }
@@ -22,16 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string ContentStage { get; set; }
         public string FilesStage { get; set; }
         public string PublishingStage { get; set; }
-        public ReleasePublishingStatusOverallStage OverallStage { get; set; }
+        public string OverallStage { get; set; }
         public bool Immediate { get; set; }
         public string Messages { get; set; }
         private ReleasePublishingStatusState _state;
 
-        public ReleasePublishingStatus()
+        public ReleasePublishingStatusOld()
         {
         }
 
-        public ReleasePublishingStatus(
+        public ReleasePublishingStatusOld(
             string publicationSlug,
             DateTime? publish,
             Guid releaseVersionId,
@@ -61,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             {
                 if (_state == null)
                 {
-                    _state = new ReleasePublishingStatusState(ContentStage, FilesStage, PublishingStage, OverallStage.ToString());
+                    _state = new ReleasePublishingStatusState(ContentStage, FilesStage, PublishingStage, OverallStage);
                     _state.PropertyChanged += StateChangedCallback;
                 }
 
@@ -72,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 ContentStage = value.Content.ToString();
                 FilesStage = value.Files.ToString();
                 PublishingStage = value.Publishing.ToString();
-                OverallStage = value.Overall;
+                OverallStage = value.Overall.ToString();
 
                 _state = new ReleasePublishingStatusState(value.Content,
                     value.Files,
@@ -117,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                     break;
             }
 
-            OverallStage = _state.Overall;
+            OverallStage = _state.Overall.ToString();
         }
 
         public bool AllStagesPriorToPublishingComplete()
@@ -126,11 +120,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                    State.Files == ReleasePublishingStatusFilesStage.Complete;
         }
 
-        public ReleasePublishingKey AsTableRowKey()
+        public ReleasePublishingKeyOld AsTableRowKey()
         {
-            return new ReleasePublishingKey(ReleaseVersionId, Id);
+            return new ReleasePublishingKeyOld(ReleaseVersionId, Id);
         }
     }
 
-    public record ReleasePublishingKey(Guid ReleaseVersionId, Guid ReleaseStatusId);
+    public record ReleasePublishingKeyOld(Guid ReleaseVersionId, Guid ReleaseStatusId);
 }

@@ -33,12 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Started);
-                await contentService.UpdateContent(message.ReleasePublishingKey.ReleaseVersionId);
-                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Complete);
+                await UpdateContentStage(message.ReleasePublishingKeyOld, ReleasePublishingStatusContentStage.Started);
+                await contentService.UpdateContent(message.ReleasePublishingKeyOld.ReleaseVersionId);
+                await UpdateContentStage(message.ReleasePublishingKeyOld, ReleasePublishingStatusContentStage.Complete);
                 await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(new[]
                 {
-                    message.ReleasePublishingKey
+                    message.ReleasePublishingKeyOld
                 });
             }
             catch (Exception e)
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 logger.LogError(e, "Exception occured while executing {FunctionName}", context.FunctionDefinition.Name);
 
                 await UpdateContentStage(
-                    message.ReleasePublishingKey,
+                    message.ReleasePublishingKeyOld,
                     ReleasePublishingStatusContentStage.Failed,
                     new ReleasePublishingStatusLogMessage(
                         $"Exception publishing Release Content immediately: {e.Message}"));
@@ -56,12 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateContentStage(
-            ReleasePublishingKey releasePublishingKey,
+            ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await releasePublishingStatusService.UpdateContentStage(
-                releasePublishingKey,
+                releasePublishingKeyOld,
                 state,
                 logMessage);
         }

@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         CreatedById = _userService.GetUserId()
                     };
 
-                    var releasePublishingKey = new ReleasePublishingKey(releaseVersionId, releaseStatus.Id);
+                    var releasePublishingKey = new ReleasePublishingKeyOld(releaseVersionId, releaseStatus.Id);
 
                     return await
                         ValidateReleaseWithChecklist(releaseVersion)
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> NotifyPublisher(
-            ReleasePublishingKey releasePublishingKey,
+            ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleaseStatusCreateRequest request,
             ReleaseApprovalStatus oldStatus)
         {
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (oldStatus == ReleaseApprovalStatus.Approved ||
                 request.ApprovalStatus == ReleaseApprovalStatus.Approved)
             {
-                return await _publishingService.ReleaseChanged(releasePublishingKey,
+                return await _publishingService.ReleaseChanged(releasePublishingKeyOld,
                     immediate: request.PublishMethod == PublishMethod.Immediate);
             }
 

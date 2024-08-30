@@ -14,7 +14,7 @@ public interface IPublishingService
         Guid releaseVersionId, CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> ReleaseChanged(
-        ReleasePublishingKey releasePublishingKey, bool immediate = false,
+        ReleasePublishingKeyOld releasePublishingKeyOld, bool immediate = false,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> PublishMethodologyFiles(

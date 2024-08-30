@@ -25,7 +25,7 @@ public class PublishingCompletionService(
     : IPublishingCompletionService
 {
     public async Task CompletePublishingIfAllPriorStagesComplete(
-        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
+        IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys)
     {
         var releaseStatuses = await releasePublishingKeys
             .ToAsyncEnumerable()

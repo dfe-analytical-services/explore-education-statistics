@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMapper mapper = null,
             IUserService userService = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IPublisherTableStorageService publisherTableStorageService = null)
+            IPublisherTableStorageServiceOld publisherTableStorageServiceOld = null)
         {
             return new ReleasePublishingStatusService(
                 mapper ?? MapperUtils.AdminMapper(),
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 persistenceHelper ?? MockUtils
                     .MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion)
                     .Object,
-                publisherTableStorageService ?? new Mock<IPublisherTableStorageService>().Object
+                publisherTableStorageServiceOld ?? new Mock<IPublisherTableStorageServiceOld>().Object
             );
         }
     }

@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateFilesStage(
-            IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
+            IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdatePublishingStage(
-            IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
+            IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {

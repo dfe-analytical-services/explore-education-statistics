@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?)null));
 
-            CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
+            CreateMap<ReleasePublishingStatusOld, ReleasePublishingStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
             CreateMap<MethodologyNote, MethodologyNoteViewModel>();

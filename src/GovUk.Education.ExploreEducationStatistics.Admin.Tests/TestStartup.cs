@@ -58,6 +58,7 @@ public class TestStartup : Startup
             .MockService<IDataProcessorClient>()
             .MockService<IPublisherClient>()
             .MockService<IPublisherTableStorageService>()
+            .MockService<IPublisherTableStorageServiceOld>()
             .MockService<IPrivateBlobStorageService>()
             .MockService<IPublicBlobStorageService>()
             .RegisterControllers<Startup>();
