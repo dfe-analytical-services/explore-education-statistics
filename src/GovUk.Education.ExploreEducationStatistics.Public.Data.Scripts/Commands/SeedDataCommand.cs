@@ -58,7 +58,6 @@ public class SeedDataCommand : ICommand
             DataSetSeed.SpcEthnicityLanguage,
             DataSetSeed.SpcYearGroupGender,
             DataSetSeed.Nat01,
-            DataSetSeed.Qua01,
         };
 
         var stopwatch = Stopwatch.StartNew();
