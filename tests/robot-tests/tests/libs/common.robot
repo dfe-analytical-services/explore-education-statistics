@@ -844,6 +844,11 @@ user clicks checkbox
     user scrolls to element    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
     user clicks element    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
 
+user clicks checkbox by selector
+    [Arguments]    ${locator}
+    user scrolls to element     ${locator}
+    user clicks element    ${locator}
+
 user checks checkbox is checked
     [Arguments]    ${label}
     user checks checkbox input is checked
