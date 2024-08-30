@@ -29,7 +29,7 @@ resource containerAppConfig 'Microsoft.App/containerApps/authConfigs@2024-03-01'
         isAutoProvisioned: true 
         registration: {
           clientId: clientId
-          clientSecretSettingName: 'api-registry-password'
+          openIdIssuer: 'https://sts.windows.net/${tenant().tenantId}/v2.0'
         }
         validation: {
           allowedAudiences: [
