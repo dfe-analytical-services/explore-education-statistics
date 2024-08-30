@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -14,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleasePublishingStatusService : IReleasePublishingStatusService
     {
         private readonly IMapper _mapper;
-        private readonly IPublisherTableStorageServiceOld _publisherTableStorageServiceOld;
+        private readonly IPublisherTableStorageService _publisherTableStorageService;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
@@ -30,12 +30,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPublisherTableStorageServiceOld publisherTableStorageServiceOld)
+            IPublisherTableStorageService publisherTableStorageService)
         {
             _mapper = mapper;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
-            _publisherTableStorageServiceOld = publisherTableStorageServiceOld;
+            _publisherTableStorageService = publisherTableStorageService;
         }
 
         public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(
@@ -46,13 +46,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var query = new TableQuery<ReleasePublishingStatusOld>()
-                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatusOld.PartitionKey),
-                            QueryComparisons.Equal, releaseVersionId.ToString()));
+                    var asyncPageable = await _publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
+                        PublisherReleaseStatusTableName,
+                        ent => ent.PartitionKey == releaseVersionId.ToString());
+                    var statusList = await asyncPageable.ToListAsync();
+                    var latestStatus = statusList.MaxBy(status => status.Created);
 
-                    var result = await _publisherTableStorageServiceOld.ExecuteQuery(PublisherReleaseStatusTableName, query);
-                    var first = result.OrderByDescending(status => status.Created).FirstOrDefault();
-                    return _mapper.Map<ReleasePublishingStatusViewModel>(first);
+                    // NOTE: We don't check whether latestStatus is null, because it might be!
+                    // The frontend can check the status before the PublisherReleaseStatusTable row is created
+
+                    return _mapper.Map<ReleasePublishingStatusViewModel>(latestStatus);
                 });
         }
     }
