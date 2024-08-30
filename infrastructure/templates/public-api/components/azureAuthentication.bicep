@@ -58,7 +58,7 @@ resource siteAuthSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   properties: properties
 }
 
-resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = if (stagingSlotName != null) {
+resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = if (!empty(stagingSlotName)) {
   name: '${siteName}/${stagingSlotName}/authsettingsV2'
   properties: properties
 }
