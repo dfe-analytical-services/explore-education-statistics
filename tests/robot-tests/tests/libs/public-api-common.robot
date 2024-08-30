@@ -47,7 +47,7 @@ verify status of API Datasets
     ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
     should be equal as strings    ${status_value}    ${expected_status}
     
-user checks value inside the column heading in the 'Draft version' table
+user checks value inside the column heading in the Draft version table
     [Arguments]    ${text}    ${expected_status}
     user waits for caches to expire
     ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="${text}"]//strong)[2]
