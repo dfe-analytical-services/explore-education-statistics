@@ -106,6 +106,43 @@ Verify the contents inside the 'Draft API datasets' table
     user checks table cell contains    2    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
     
 
+Click on 'View Details' link
+    user clicks link in table cell    1    4    View details    xpath://table[@data-testid='draft-api-data-sets']
+    user waits until h3 is visible    Draft version details
+    user checks table headings for Draft version details table
+
+User checks row data contents inside the 'Draft API datasets' summary table
+    user checks contents inside the cell value    v1.0                                       xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
+    user checks contents inside the cell value    Ready                                      xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
+    user checks contents inside the cell value    Financial year 3000-01                     xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]
+    user checks contents inside the cell value    ${SUBJECT_NAME_1}                          xpath://div[@data-testid="Data set file"]//dd[@data-testid="Data set file-value"]
+    user checks contents inside the cell value    National                                   xpath://div[@data-testid="Geographic levels"]//dd[@data-testid="Geographic levels-value"]
+    user checks contents inside the cell value    2012/13                                    xpath://div[@data-testid="Time periods"]//dd[@data-testid="Time periods-value"]
+
+    
+    user checks contents inside the cell value    Lower quartile annualised earnings         xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[1]
+    user checks contents inside the cell value    Median annualised earnings                 xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[2]
+    user checks contents inside the cell value    Number of learners with earnings           xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[3]
+
+    user clicks button                              Show 1 more indicator                    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]
+
+    user checks contents inside the cell value      Upper quartile annualised earnings       xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[4]
+
+    user checks contents inside the cell value    	Cheese                                   xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[1]
+    user checks contents inside the cell value    	Colour                                   xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[2]
+    user checks contents inside the cell value    	Ethnicity group                          xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[3]
+    
+    user clicks button                              Show 4 more filters                      xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]
+
+    user checks contents inside the cell value    	Gender                                    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[4]
+    user checks contents inside the cell value    	Level of learning                         xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[5]
+    user checks contents inside the cell value      Number of years after achievement of learning aim    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[6]
+    user checks contents inside the cell value      Provision                                 xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[7]
+
+    user checks contents inside the cell value      Preview API data set                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
+    user checks contents inside the cell value      View preview token log                    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
+    user checks contents inside the cell value      Remove draft version                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/button
+
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
@@ -260,7 +297,6 @@ Add data guidance to third release
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_5}
     ...    ${SUBJECT_NAME_5} Main guidance content
 
-
 Save data guidance
     user clicks button    Save guidance
 
@@ -305,4 +341,3 @@ Validate checklist error for a draft API dataset which shows mapping error
     ...    1 issue that must be resolved before this release can be published.
     user checks checklist errors contains link
     ...    All public API data set mappings must be completed
-
