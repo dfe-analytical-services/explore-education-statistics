@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -70,6 +71,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .AsQueryable()
                 .Where(rs => rs.ReleaseVersionId == releaseVersionId && subjectsToInclude.Contains(rs.SubjectId))
                 .ToListAsync();
+
+            if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+                    releaseSubjects.Select(rs => rs.SubjectId).ToList(),
+                    subjectsToInclude
+                    ))
+            {
+                throw new DataException($"""
+                    Statistics DB has a different subjects than the Content DB
+                    StatsDB subjects: {releaseSubjects.Select(rs => rs.SubjectId).JoinToString(',')}
+                    ContentDb subjects: {subjectsToInclude.JoinToString(',')}
+                    """);
+            }
 
             var releaseFiles = await QueryReleaseDataFiles(releaseVersionId)
                 .Where(rf => rf.File.SubjectId.HasValue

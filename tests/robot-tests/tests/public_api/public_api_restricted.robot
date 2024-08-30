@@ -204,6 +204,11 @@ Add release note for new release amendment
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
 
+
+# When processing large API datasets, the current EES system returns one of two errors depending on the processing speed.
+# Additionally, there's an active bug ticket (EES-5420) - large data files are failing to create API datasets.
+# In response, I have added checks to handle either outcome.
+
 Validate checklist error while API data set is still processing or being failed
     user edits release status
     user checks checklist errors contains
@@ -321,6 +326,9 @@ Validate the summary contents inside the 'draft version details' table
 
     ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
     should be equal as strings    ${mapping_status}    Action required
+
+# Adding this headline text block is optional, but I chose to include it to focus specifically on the errors I'm targeting.
+# Without this, I might be inclined to add a checklist for headline-specific text block errors, which isn't necessary.
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}

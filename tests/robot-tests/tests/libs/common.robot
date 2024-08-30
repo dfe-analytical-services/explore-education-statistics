@@ -519,12 +519,10 @@ user clicks button
     user clicks element    ${button}
 
 user clicks button by index
-    [Arguments]    ${text}    ${index}=1
+    [Arguments]    ${text}    ${index}=1    ${parent}=css:body
     ${xpath}=    set variable    (//button[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
-    user clicks element   ${button}
-
-
+    user clicks element   ${button}    ${parent}
 
 user waits until button is clickable
     [Arguments]    ${button_text}

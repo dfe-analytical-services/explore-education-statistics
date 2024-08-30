@@ -134,11 +134,15 @@ public class DataSetVersionMappingService(
 
     private async Task UpdateMappingsCompleteAndVersion(Guid nextDataSetVersionId, CancellationToken cancellationToken)
     {
-        var locationMappingTypes = await GetDistinctLocationOptionMappingTypes(
+        var hasDeletedLocationLevels = await HasDeletedLocationLevels(
             nextDataSetVersionId: nextDataSetVersionId,
             cancellationToken: cancellationToken);
 
-        var filterAndOptionMappingTypes = await GetDistinctFilterAndOptionMappingTypes(
+        var locationMappingTypes = await GetLocationOptionMappingTypes(
+            nextDataSetVersionId: nextDataSetVersionId,
+            cancellationToken: cancellationToken);
+
+        var filterAndOptionMappingTypes = await GetFilterAndOptionMappingTypes(
             nextDataSetVersionId: nextDataSetVersionId,
             cancellationToken: cancellationToken);
 
@@ -150,6 +154,7 @@ public class DataSetVersionMappingService(
 
         await UpdateVersionNumber(
             nextDataSetVersionId: nextDataSetVersionId,
+            hasDeletedLocationLevels: hasDeletedLocationLevels,
             locationMappingTypes: locationMappingTypes,
             filterAndOptionMappingTypes: filterAndOptionMappingTypes,
             cancellationToken: cancellationToken);
@@ -157,15 +162,13 @@ public class DataSetVersionMappingService(
 
     private async Task UpdateVersionNumber(
         Guid nextDataSetVersionId,
+        bool hasDeletedLocationLevels,
         List<MappingType> locationMappingTypes,
         List<FilterAndOptionMappingTypes> filterAndOptionMappingTypes,
         CancellationToken cancellationToken)
     {
-        // Consider the current mappings to produce a major version change if any options from the
-        // original data set version are currently not mapped to options in the new version.
-        var isMajorVersionUpdate = locationMappingTypes
-            .Concat(filterAndOptionMappingTypes
-                .Select(mappings => mappings.OptionMappingType))
+        var hasUnmappedOptions = locationMappingTypes
+            .Concat(filterAndOptionMappingTypes.Select(mappings => mappings.OptionMappingType))
             .Any(type => NoMappingTypes.Contains(type));
 
         var sourceDataSetVersion = await publicDataDbContext
@@ -179,6 +182,8 @@ public class DataSetVersionMappingService(
             .Where(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId)
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
+
+        var isMajorVersionUpdate = hasDeletedLocationLevels || hasUnmappedOptions;
 
         if (isMajorVersionUpdate)
         {
@@ -236,25 +241,50 @@ public class DataSetVersionMappingService(
                 cancellationToken: cancellationToken);
     }
 
-    private async Task<List<MappingType>> GetDistinctLocationOptionMappingTypes(
+    private async Task<bool> HasDeletedLocationLevels(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
     {
         var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
 
-        // Find the distinct mapping types across all location options across all levels.
+        var deletedLevelCount = await publicDataDbContext.Database
+            .SqlQueryRaw<int>(
+                $$$"""
+                   SELECT DISTINCT COUNT(Level.key) "Value"
+                   FROM "{{{nameof(PublicDataDbContext.DataSetVersionMappings)}}}" Mapping,
+                        jsonb_each(Mapping."{{{nameof(DataSetVersionMapping.LocationMappingPlan)}}}"
+                                       -> '{{{nameof(LocationMappingPlan.Levels)}}}') Level
+                   WHERE "{{{nameof(DataSetVersionMapping.TargetDataSetVersionId)}}}" = @targetDataSetVersionId
+                     AND Level.value -> '{{{nameof(LocationLevelMappings.Candidates)}}}' = '{{}}'::jsonb
+                   """,
+                parameters: [targetDataSetVersionIdParam])
+            .FirstAsync(cancellationToken);
+
+        return deletedLevelCount > 0;
+    }
+
+    private async Task<List<MappingType>> GetLocationOptionMappingTypes(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken)
+    {
+        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
+
+        // Find the distinct mapping types for location options across location levels
+        // that still have candidates (and haven't been deleted).
         var types = await publicDataDbContext.Database
             .SqlQueryRaw<string>(
-                $"""
-                 SELECT DISTINCT OptionMappingType "Value" 
-                 FROM 
-                     "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
-                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.LocationMappingPlan)}" 
-                                    -> '{nameof(LocationMappingPlan.Levels)}') Level,
-                     jsonb_each(Level.value -> '{nameof(LocationLevelMappings.Mappings)}') OptionMapping,
-                     jsonb_extract_path_text(OptionMapping.value, '{nameof(LocationOptionMapping.Type)}') OptionMappingType
-                 WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
-                 """,
+                $$$"""
+                   SELECT DISTINCT OptionMappingType "Value"
+                   FROM
+                       "{{{nameof(PublicDataDbContext.DataSetVersionMappings)}}}" Mapping,
+                       jsonb_each(Mapping."{{{nameof(DataSetVersionMapping.LocationMappingPlan)}}}"
+                                    -> '{{{nameof(LocationMappingPlan.Levels)}}}') Level,
+                       jsonb_each(Level.value -> '{{{nameof(LocationLevelMappings.Mappings)}}}') OptionMapping,
+                       jsonb_extract_path_text(OptionMapping.value, '{{{nameof(LocationOptionMapping.Type)}}}') OptionMappingType
+                   WHERE "{{{nameof(DataSetVersionMapping.TargetDataSetVersionId)}}}" = @targetDataSetVersionId
+                     AND Level.value -> '{{{nameof(LocationLevelMappings.Candidates)}}}' != '{{}}'::jsonb
+                     AND Level.value -> '{{{nameof(LocationLevelMappings.Mappings)}}}' != '{{}}'::jsonb
+                   """,
                 parameters: [targetDataSetVersionIdParam])
             .ToListAsync(cancellationToken);
 
@@ -263,7 +293,7 @@ public class DataSetVersionMappingService(
             .ToList();
     }
 
-    private async Task<List<FilterAndOptionMappingTypes>> GetDistinctFilterAndOptionMappingTypes(
+    private async Task<List<FilterAndOptionMappingTypes>> GetFilterAndOptionMappingTypes(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken)
     {
@@ -271,7 +301,7 @@ public class DataSetVersionMappingService(
 
         // Find all the distinct combinations of parent filters' mapping types against the distinct
         // mapping types of their children.
-        var typeCombinations = await publicDataDbContext.Database
+        return await publicDataDbContext.Database
             .SqlQueryRaw<FilterAndOptionMappingTypes>(
                 $"""
                 SELECT DISTINCT 
@@ -292,8 +322,6 @@ public class DataSetVersionMappingService(
                 """,
                 parameters: [targetDataSetVersionIdParam])
             .ToListAsync(cancellationToken);
-
-        return typeCombinations;
     }
 
     /// <summary>

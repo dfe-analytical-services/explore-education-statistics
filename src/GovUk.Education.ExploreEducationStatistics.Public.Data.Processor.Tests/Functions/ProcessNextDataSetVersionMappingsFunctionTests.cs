@@ -495,18 +495,11 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         : ApplyAutoMappingsTests(fixture)
     {
         [Fact]
-        public async Task PartiallyComplete()
+        public async Task Incomplete_UnmappedOptionWithNoCandidate_MajorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            // Create a mapping plan based on 2 data set versions with partially overlapping locations and levels.
-            // Both have the "Local Authority" level and the "LA location 1" option, but the source has an additional
-            // "LA location 2" option that the target does not, and the target has an additional "LA location 3" option
-            // that the source does not.
-            //
-            // In addition to this, the source has a "RSC Region" level that the target does not have, and the target
-            // has a "Country" level that the source does not have.
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
@@ -517,12 +510,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         level: GeographicLevel.LocalAuthority,
                         mappings: DataFixture
                             .DefaultLocationLevelMappings()
+                            // 'LA Location 1' option is auto-mapped.
                             .AddMapping(
                                 sourceKey: "la-location-1-key",
                                 mapping: DataFixture
                                     .DefaultLocationOptionMapping()
                                     .WithSource(DataFixture.DefaultMappableLocationOption())
                                     .WithNoMapping())
+                            // 'LA Location 2' option has no candidate - it was deleted.
                             .AddMapping(
                                 sourceKey: "la-location-2-key",
                                 mapping: DataFixture
@@ -532,28 +527,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             )
                             .AddCandidate(
                                 targetKey: "la-location-1-key",
-                                candidate: DataFixture.DefaultMappableLocationOption())
-                            .AddCandidate(
-                                targetKey: "la-location-3-key",
-                                candidate: DataFixture.DefaultMappableLocationOption()))
-                    .AddLevel(
-                        level: GeographicLevel.RscRegion,
-                        mappings: DataFixture
-                            .DefaultLocationLevelMappings()
-                            .AddMapping(
-                                sourceKey: "rsc-location-1-key",
-                                mapping: DataFixture
-                                    .DefaultLocationOptionMapping()
-                                    .WithSource(DataFixture.DefaultMappableLocationOption())
-                                    .WithManualNone()))
-                    .AddLevel(
-                        level: GeographicLevel.Country,
-                        mappings: DataFixture
-                            .DefaultLocationLevelMappings()
-                            .AddCandidate(
-                                targetKey: "country-location-1-key",
-                                candidate: DataFixture
-                                    .DefaultMappableLocationOption())));
+                                candidate: DataFixture.DefaultMappableLocationOption())));
 
             await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
 
@@ -575,9 +549,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             var laMapping2 = mappings
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-2-key");
-
-            var rscMapping1 = mappings
-                .GetLocationOptionMapping(GeographicLevel.RscRegion, "rsc-location-1-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
@@ -604,6 +575,170 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         }
                     }
                 },
+            };
+
+            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+                expectedLevelMappings,
+                ignoreCollectionOrders: true);
+
+            Assert.False(updatedMappings.LocationMappingsComplete);
+
+            // Some options have no auto-mapped candidate - major version update.
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
+
+            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
+                .ReleaseFiles
+                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
+
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+        }
+
+        [Fact]
+        public async Task Incomplete_UnmappedOptionWithNewCandidate_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            // 'LA Location 1' is auto mapped.
+                            .AddMapping(
+                                sourceKey: "la-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            // 'LA Location 2' option is unmapped.
+                            .AddMapping(
+                                sourceKey: "la-location-2-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping()
+                            )
+                            .AddCandidate(
+                                targetKey: "la-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())
+                            // 'LA Location 3' option is new candidate that can be mapped.
+                            .AddCandidate(
+                                targetKey: "la-location-3-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())));
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
+
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile())
+                .WithPublicApiDataSetId(nextVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
+
+            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+
+            var laMapping1 = mappings
+                .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-1-key");
+
+            var laMapping2 = mappings
+                .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-2-key");
+
+            Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
+            {
+                {
+                    GeographicLevel.LocalAuthority,
+                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    {
+                        Mappings = new Dictionary<string, LocationOptionMapping>
+                        {
+                            {
+                                "la-location-1-key", laMapping1 with
+                                {
+                                    Type = MappingType.AutoMapped,
+                                    CandidateKey = "la-location-1-key"
+                                }
+                            },
+                            {
+                                "la-location-2-key", laMapping2 with
+                                {
+                                    Type = MappingType.AutoNone,
+                                    CandidateKey = null
+                                }
+                            }
+                        }
+                    }
+                },
+            };
+
+            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+                expectedLevelMappings,
+                ignoreCollectionOrders: true);
+
+            Assert.False(updatedMappings.LocationMappingsComplete);
+
+            // Some options have no auto-mapped candidate - major version update.
+            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
+
+            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
+                .ReleaseFiles
+                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
+
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+        }
+
+        [Fact]
+        public async Task Complete_DeletedLevel_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.RscRegion,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "rsc-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithManualNone())));
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
+
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile())
+                .WithPublicApiDataSetId(nextVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
+
+            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+
+            var rscMapping1 = mappings
+                .GetLocationOptionMapping(GeographicLevel.RscRegion, "rsc-location-1-key");
+
+            Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
+            {
                 {
                     GeographicLevel.RscRegion,
                     mappings.GetLocationLevelMappings(GeographicLevel.RscRegion) with
@@ -620,17 +755,15 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         }
                     }
                 },
-                { GeographicLevel.Country, mappings.GetLocationLevelMappings(GeographicLevel.Country) }
             };
 
             updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.False(updatedMappings.LocationMappingsComplete);
+            Assert.True(updatedMappings.LocationMappingsComplete);
 
-            // Some source location options have no equivalent candidate to be mapped to, thus
-            // resulting in a major version update.
+            // Level has been deleted (cannot be mapped) - major version update.
             Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
@@ -641,13 +774,68 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         }
 
         [Fact]
-        public async Task Complete_ExactMatch()
+        public async Task Complete_NewLevel_MinorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            // Create a mapping plan based on 2 data set versions with perfectly overlapping
-            // locations and levels.
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.Country,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddCandidate(
+                                targetKey: "country-location-1-key",
+                                candidate: DataFixture
+                                    .DefaultMappableLocationOption())));
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
+
+            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+                .WithId(nextVersion.Release.ReleaseFileId)
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithFile(DataFixture.DefaultFile())
+                .WithPublicApiDataSetId(nextVersion.DataSetId)
+                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
+
+            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+
+            Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
+            {
+                { GeographicLevel.Country, mappings.GetLocationLevelMappings(GeographicLevel.Country) }
+            };
+
+            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+                expectedLevelMappings,
+                ignoreCollectionOrders: true);
+
+            Assert.True(updatedMappings.LocationMappingsComplete);
+
+            // Level has been added - minor version update.
+            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
+
+            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
+                .ReleaseFiles
+                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
+
+            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+        }
+
+        [Fact]
+        public async Task Complete_ExactMatch_MinorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
@@ -710,8 +898,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             Assert.True(updatedMappings.LocationMappingsComplete);
 
-            // All source location options have equivalent candidates to be mapped to, thus
-            // resulting in a minor version update.
+            // All source options have auto-mapped candidates - minor version update.
             Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
@@ -722,17 +909,11 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         }
 
         [Fact]
-        public async Task Complete_AllSourcesMapped_OtherUnmappedCandidatesExist()
+        public async Task Complete_AutoMappedAndNewOptions_MinorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            // Create a mapping plan based on 2 data set versions with the same levels
-            // and location options, but additional options exist in the new version.
-            // Each source location option can be auto-mapped exactly to one in
-            // the target version, leaving some candidates and new levels unused but
-            // essentially the mapping is complete unless the user manually intervenes
-            // at this point.
             DataSetVersionMapping mappings = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
@@ -743,6 +924,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         level: GeographicLevel.LocalAuthority,
                         mappings: DataFixture
                             .DefaultLocationLevelMappings()
+                            // 'LA Location 1' option is auto-mapped.
                             .AddMapping(
                                 sourceKey: "la-location-1-key",
                                 mapping: DataFixture
@@ -752,13 +934,15 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             .AddCandidate(
                                 targetKey: "la-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())
+                            // 'LA Location 2' option is newly added.
                             .AddCandidate(
-                                targetKey: "la-location-3-key",
+                                targetKey: "la-location-2-key",
                                 candidate: DataFixture.DefaultMappableLocationOption()))
                     .AddLevel(
                         level: GeographicLevel.RscRegion,
                         mappings: DataFixture
                             .DefaultLocationLevelMappings()
+                            // 'RSC Location 1' is newly added.
                             .AddCandidate(
                                 targetKey: "rsc-location-1-key",
                                 candidate: DataFixture
@@ -809,9 +993,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             Assert.True(updatedMappings.LocationMappingsComplete);
 
-            // All source location options have equivalent candidates to be mapped to, thus
-            // resulting in a minor version update. The inclusion of new location options
-            // not present in the original version does not matter.
+            // All source options have auto-mapped candidates - minor version update.
             Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
 
             var updatedReleaseFile = await GetDbContext<ContentDbContext>()
