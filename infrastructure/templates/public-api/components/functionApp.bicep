@@ -355,6 +355,15 @@ var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
   ? [userAssignedManagedIdentityParams!.principalId]
   : [functionApp.identity.principalId, stagingSlot.identity.principalId]
 
+// TODO EES-5382 - remove when the switch over the Key Vault RBAC is enabled.
+module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
+  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: keyVaultPrincipalIds
+  }
+}
+
 module functionAppKeyVaultRoleAssignments 'keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}FunctionAppKeyVaultRoleAssignment'
   params: {
