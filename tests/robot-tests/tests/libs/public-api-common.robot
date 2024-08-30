@@ -47,7 +47,7 @@ verify status of API Datasets
     ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
     should be equal as strings    ${status_value}    ${expected_status}
     
-user checks value inside the column heading in the Draft version table
+user checks status in Draft version table
     [Arguments]    ${text}    ${expected_status}
     user waits for caches to expire
     ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="${text}"]//strong)[2]
@@ -58,7 +58,7 @@ user checks contents inside the cell value
      ${status_value}=    get text    ${locator}
     should be equal as strings    ${status_value}    ${expected_text}
 
-user checks row data heading in the Draft version details table
+user checks table headings for Draft version details table
     ${elements}=  create list  Version  Status  Release  Data set file  Geographic levels  Time periods  Indicators  Filters  Actions
 
     FOR  ${element}  IN  @{elements}

@@ -109,7 +109,7 @@ Verify the contents inside the 'Draft API datasets' table
 Click on 'View Details' link
     user clicks link in table cell    1    4    View details    xpath://table[@data-testid='draft-api-data-sets']
     user waits until h3 is visible    Draft version details
-    user checks row data heading in the Draft version details table
+    user checks table headings for Draft version details table
 
 User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value    v1.0                                       xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
