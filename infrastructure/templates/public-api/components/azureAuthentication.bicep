@@ -5,7 +5,7 @@ param clientId string
 param siteName string
 
 @description('Specifies an optional name of the staging slot of the site that is being protected, if a staging slot exists')
-param stagingSlotName string?
+param stagingSlotName string = 'none'
 
 @description('Specifies an optional set of App Registration Client Ids that represent resources that are allowed to access this resource')
 param allowedClientIds string[] = []
@@ -58,7 +58,7 @@ resource siteAuthSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   properties: properties
 }
 
-resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = if (!empty(stagingSlotName)) {
+resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = if (stagingSlotName != 'none') {
   name: '${siteName}/${stagingSlotName}/authsettingsV2'
   properties: properties
 }
