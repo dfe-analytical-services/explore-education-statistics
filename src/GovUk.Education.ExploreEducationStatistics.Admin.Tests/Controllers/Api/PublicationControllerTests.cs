@@ -8,11 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
@@ -158,7 +158,7 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             };
 
             var client = TestApp
-                .SetUser(AuthenticatedUser())
+                .SetUser(DataFixture.AuthenticatedUser())
                 .CreateClient();
 
             var response = await CreatePublication(request, client);
@@ -170,8 +170,12 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             PublicationCreateRequest request,
             HttpClient? client = null)
         {
+            var user = DataFixture
+                .AuthenticatedUser()
+                .WithClaim(SecurityClaimTypes.CreateAnyPublication.ToString());
+
             client ??= TestApp
-                .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.CreateAnyPublication)))
+                .SetUser(user)
                 .CreateClient();
 
             return await client.PostAsJsonAsync("api/publications", request);

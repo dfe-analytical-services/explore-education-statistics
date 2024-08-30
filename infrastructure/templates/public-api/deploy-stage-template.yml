@@ -76,7 +76,8 @@ stages:
                       deployContainerApp=$(deployContainerApp) \
                       updatePsqlFlexibleServer=$(updatePsqlFlexibleServer) \
                       dataProcessorFunctionAppExists=$dataProcessorExists \
-                      dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)'
+                      dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
+                      apiAppRegistrationClientId='$(apiAppRegistrationClientId)'
 
           - template: pipeline-variables-from-bicep-outputs-template.yml
             parameters:
@@ -199,3 +200,10 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --slot staging \
                   --target-slot production
+
+          - template: assign-app-role-to-service-principal-template.yml
+            parameters:
+              serviceConnection: ${{parameters.serviceConnection}}
+              appRoleName: Admin.Access
+              protectedResourceAppRegName: $subscription-ees-papi-ca-api-appreg
+              servicePrincipalName: $subscription-as-ees-admin

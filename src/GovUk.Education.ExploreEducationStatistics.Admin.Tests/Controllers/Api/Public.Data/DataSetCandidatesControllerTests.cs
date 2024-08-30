@@ -9,11 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.WebUtilities;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
@@ -61,7 +61,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Assert.Equal(3, candidates.Count);
             Assert.Contains(releaseFiles, releaseFile =>
                 candidates.Any(candidate => candidate.ReleaseFileId == releaseFile.Id
-                                                && candidate.Title == releaseFile.Name));
+                                            && candidate.Title == releaseFile.Name));
         }
 
         [Theory]
@@ -77,8 +77,8 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var authenticatedUser =
                 claimType.HasValue
-                ? AuthenticatedUser(SecurityClaim(claimType.Value))
-                : AuthenticatedUser();
+                    ? DataFixture.AuthenticatedUser().WithClaim(claimType.Value.ToString())
+                    : DataFixture.AuthenticatedUser();
 
             var client = TestApp
                 .SetUser(authenticatedUser)
@@ -253,8 +253,12 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Guid releaseVersionId,
             HttpClient? client = null)
         {
+            var user = DataFixture
+                .AuthenticatedUser()
+                .WithClaim(SecurityClaimTypes.AccessAllReleases.ToString());
+
             client ??= TestApp
-                .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.AccessAllReleases)))
+                .SetUser(user)
                 .CreateClient();
 
             var query = new Dictionary<string, string?>

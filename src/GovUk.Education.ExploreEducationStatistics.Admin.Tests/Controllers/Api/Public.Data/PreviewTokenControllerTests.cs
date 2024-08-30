@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -22,7 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -30,7 +30,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
 {
     private const string BaseUrl = "api/public-data/preview-tokens";
 
-    private static readonly ClaimsPrincipal BauUser = BauUser();
+    private static readonly ClaimsPrincipal BauUser = new DataFixture().BauUser();
 
     private static readonly User CreatedByBauUser = new()
     {
@@ -183,7 +183,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await CreatePreviewToken(dataSetVersion.Id, "Label", client);
 
@@ -309,7 +309,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await GetPreviewToken(dataSetVersion.PreviewTokens[0].Id, client);
 
@@ -497,7 +497,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await ListPreviewTokens(dataSetVersion.Id, client);
 
@@ -641,7 +641,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 context.DataSets.Update(dataSet);
             });
 
-            var client = BuildApp(AuthenticatedUser()).CreateClient();
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id, client);
 

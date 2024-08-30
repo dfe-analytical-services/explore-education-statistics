@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -30,10 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             MethodologyId = Guid.NewGuid()
         };
 
-        private static readonly Publication OwningPublication = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
+
+        private static readonly DataFixture DataFixture = new();
 
         public class ClaimsTests
         {
@@ -54,7 +54,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         _,
                         _) = CreateHandlerAndDependencies();
 
-                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var user = DataFixture
+                        .AuthenticatedUser(userId: UserId)
+                        .WithClaim(claim.ToString());
+
                     var authContext =
                         CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
                             (user, methodologyVersion);
@@ -88,7 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(publicationRole));
 
-                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Approver).Contains(publicationRole);
+                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Approver)
+                        .Contains(publicationRole);
 
                     if (!expectedToPassByRole)
                     {
@@ -97,7 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<ReleaseRole>());
                     }
 
-                    var user = CreateClaimsPrincipal(UserId);
+                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                     var authContext =
                         CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
@@ -119,7 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanUpdateMethodology()
             {
-                var expectedReleaseRolesToPass = ListOf(ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
+                var expectedReleaseRolesToPass =
+                    ListOf(ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
 
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {
@@ -142,7 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(releaseRole));
 
-                    var user = CreateClaimsPrincipal(UserId);
+                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                     var authContext =
                         CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
@@ -181,7 +188,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                 var authContext =
                     CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
                         (user, MethodologyVersion);

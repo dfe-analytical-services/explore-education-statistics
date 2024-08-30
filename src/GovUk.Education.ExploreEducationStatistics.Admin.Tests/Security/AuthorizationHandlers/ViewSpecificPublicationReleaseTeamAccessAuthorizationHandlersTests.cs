@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -22,10 +23,9 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 {
     private static readonly Guid UserId = Guid.NewGuid();
 
-    private static readonly Publication Publication = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
+
+    private readonly DataFixture _fixture = new();
 
     [Fact]
     public async Task ViewSpecificPublicationReleaseTeamAccess_SucceedsWithAccessAllPublicationsClaim()
@@ -47,7 +47,9 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 
             var handler = CreateHandler(userPublicationRoleRepository.Object);
 
-            var user = CreateClaimsPrincipal(UserId, claim);
+            var user = _fixture
+                .AuthenticatedUser(userId: UserId)
+                .WithClaim(claim.ToString());
 
             var authContext =
                 CreateAuthorizationHandlerContext<ViewSpecificPublicationReleaseTeamAccessRequirement, Publication>
@@ -74,7 +76,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 
             var handler = CreateHandler(userPublicationRoleRepository.Object);
 
-            var user = CreateClaimsPrincipal(UserId);
+            var user = _fixture.AuthenticatedUser(userId: UserId);
 
             var authContext =
                 CreateAuthorizationHandlerContext<ViewSpecificPublicationReleaseTeamAccessRequirement, Publication>

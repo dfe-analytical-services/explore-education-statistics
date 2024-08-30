@@ -64,7 +64,7 @@ public class TestStartup : Startup
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, _ => { });
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, null);
     }
 }
 
@@ -94,28 +94,21 @@ public static class TestStartupExtensions
 /// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
 /// for authentication and authorization mechanisms to use.
 /// </summary>
-internal class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+internal class TestAuthHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder,
+    ClaimsPrincipal? claimsPrincipal = null)
+    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    private readonly ClaimsPrincipal? _claimsPrincipal;
-
-    public TestAuthHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock,
-        ClaimsPrincipal? claimsPrincipal = null) : base(options, logger, encoder, clock)
-    {
-        _claimsPrincipal = claimsPrincipal;
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (_claimsPrincipal == null)
+        if (claimsPrincipal == null)
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var ticket = new AuthenticationTicket(_claimsPrincipal, JwtBearerDefaults.AuthenticationScheme);
+        var ticket = new AuthenticationTicket(claimsPrincipal, JwtBearerDefaults.AuthenticationScheme);
         var result = AuthenticateResult.Success(ticket);
         return Task.FromResult(result);
     }

@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     public class UpdateSpecificCommentAuthorizationHandlerTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task CanUpdateOwnCommentAuthorizationHandler_MatchingUser()
         {
-            var user = CreateClaimsPrincipal(Guid.NewGuid());
+            var user = _fixture.AuthenticatedUser().Generate();
+
             var comment = new Comment
             {
                 Id = Guid.NewGuid(),
@@ -21,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             };
 
             var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] {new UpdateSpecificCommentRequirement()}, user, comment);
+                new IAuthorizationRequirement[] { new UpdateSpecificCommentRequirement() }, user, comment);
 
             await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(authContext);
 
@@ -31,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public async Task CanUpdateOwnCommentAuthorizationHandler_MismatchingUser()
         {
-            var user = CreateClaimsPrincipal(Guid.NewGuid());
+            var user = _fixture.AuthenticatedUser();
+
             var comment = new Comment
             {
                 Id = Guid.NewGuid(),
@@ -39,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             };
 
             var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] {new UpdateSpecificCommentRequirement()}, user, comment);
+                new IAuthorizationRequirement[] { new UpdateSpecificCommentRequirement() }, user, comment);
 
             await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(authContext);
 

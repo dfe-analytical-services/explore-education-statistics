@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -1659,13 +1660,79 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertForbidden();
         }
 
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task VersionNotAvailable_UserMissingAdminAccessReadRole_Returns403(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            await TestApp
+                .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var userWithIncorrectRole = DataFixture.UnsupportedRoleUser();
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                user: userWithIncorrectRole);
+
+            response.AssertForbidden();
+        }
+
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task VersionNotAvailable_UserHasAdminAccessReadRole_Returns200(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            var userWithCorrectRole = DataFixture.AdminAccessUser();
+
+            await TestApp
+                .AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                user: userWithCorrectRole);
+
+            response.AssertOk();
+        }
+
+
         private async Task<HttpResponseMessage> GetDataSetVersionChanges(
             Guid dataSetId,
             string dataSetVersion,
             Guid? previewTokenId = null,
+            ClaimsPrincipal? user = null,
             IContentApiClient? contentApiClient = null)
         {
-            var client = BuildApp(contentApiClient).CreateClient();
+            var client = BuildApp(
+                    contentApiClient: contentApiClient,
+                    user: user)
+                .CreateClient();
             client.AddPreviewTokenHeader(previewTokenId);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes", UriKind.Relative);
@@ -1674,11 +1741,15 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
+    private WebApplicationFactory<Startup> BuildApp(
+        IContentApiClient? contentApiClient = null,
+        ClaimsPrincipal? user = null)
     {
-        return TestApp.ConfigureServices(services =>
-        {
-            services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>());
-        });
+        return TestApp
+            .SetUser(user)
+            .ConfigureServices(services =>
+            {
+                services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>());
+            });
     }
 }
