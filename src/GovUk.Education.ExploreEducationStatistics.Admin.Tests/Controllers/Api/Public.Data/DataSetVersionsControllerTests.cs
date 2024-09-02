@@ -32,7 +32,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
@@ -310,7 +309,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await ListLiveVersions(
                 dataSetId: Guid.NewGuid(),
@@ -452,7 +451,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await CreateNextVersion(
                 dataSetId: Guid.NewGuid(),
@@ -570,7 +569,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await CompleteNextVersionImport(
                 dataSetVersionId: Guid.NewGuid(),
@@ -634,7 +633,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await DeleteVersion(Guid.NewGuid(), client);
 
@@ -840,7 +839,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await GetVersionChanges(Guid.NewGuid(), client);
 
@@ -1001,10 +1000,7 @@ public abstract class DataSetVersionsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var updateRequest = new DataSetVersionUpdateRequest
-            {
-                Notes = "updated notes."
-            };
+            var updateRequest = new DataSetVersionUpdateRequest { Notes = "updated notes." };
 
             var response = await UpdateVersion(nextDataSetVersion.Id, updateRequest);
 
@@ -1038,7 +1034,7 @@ public abstract class DataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var updateRequest = new DataSetVersionUpdateRequest();
 
@@ -1121,10 +1117,7 @@ public abstract class DataSetVersionsControllerTests(
                 context.DataSets.Update(dataSet);
             });
 
-            var updateRequest = new DataSetVersionUpdateRequest
-            {
-                Notes = "updated notes."
-            };
+            var updateRequest = new DataSetVersionUpdateRequest { Notes = "updated notes." };
 
             var response = await UpdateVersion(dataSetVersion.Id, updateRequest);
 
@@ -1156,6 +1149,6 @@ public abstract class DataSetVersionsControllerTests(
                 services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>());
                 services.ReplaceService(publicDataApiClient ?? Mock.Of<IPublicDataApiClient>());
             })
-            .SetUser(user ?? BauUser());
+            .SetUser(user ?? DataFixture.BauUser());
     }
 }

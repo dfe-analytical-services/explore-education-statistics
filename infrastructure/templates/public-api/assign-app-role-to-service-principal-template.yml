@@ -1,0 +1,39 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: appRoleName
+    type: string
+  - name: protectedResourceAppRegName
+    type: string
+  - name: servicePrincipalName
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: Assign App Role "${{parameters.appRoleName}}" from "${{parameters.protectedResourceAppRegName}}" to Service Principal "${{parameters.servicePrincipalName}}"
+    inputs:
+      azureSubscription: ${{parameters.serviceConnection}}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        appRoleId=`az ad sp list --display-name ${{parameters.protectedResourceAppRegName}} --query "[0].appRoles[?value=='${{parameters.appRoleName}}'].id" --output tsv`
+        principalId=`az resource list -n ${{parameters.servicePrincipalName}} --query [*].identity.principalId --out tsv`
+
+        roleAlreadyAssigned=`az rest -u https://graph.microsoft.com/v1.0/servicePrincipals/$principalId/appRoleAssignments --query "value[?appRoleId == '$appRoleId']" | jq '. != []'`
+        
+        if [[ "$roleAlreadyAssigned" == "true" ]]; then
+        
+          echo "App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceAppRegName}}\" is already assigned to \"${{parameters.servicePrincipalName}}\""
+        
+        else
+
+          echo "Assigning App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceAppRegName}}\" to \"${{parameters.servicePrincipalName}}\""
+          
+          protectedResourceAppRegId=`az ad sp list --display-name $protectedResourceAppRegName --query [0].id --out tsv`
+
+          az rest -m POST -u https://graph.microsoft.com/v1.0/servicePrincipals/$principalId/appRoleAssignments \
+            -b "{\"principalId\": \"$principalId\", \"resourceId\": \"$protectedResourceAppRegId\",\"appRoleId\": \"$appRoleId\"}"
+
+        fi

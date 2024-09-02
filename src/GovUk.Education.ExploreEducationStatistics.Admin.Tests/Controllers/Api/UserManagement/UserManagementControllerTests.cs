@@ -1,14 +1,15 @@
 #nullable enable
-using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.UserManagement;
 
 public class UserManagementControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
+    private readonly DataFixture _fixture = new();
+
     public class DeleteUserTests(TestApplicationFactory testApp) : UserManagementControllerTests(testApp)
     {
         [Theory]
@@ -19,9 +20,10 @@ public class UserManagementControllerTests(TestApplicationFactory testApp) : Int
             string globalRoleName,
             bool successExpected)
         {
-            var claimsPrincipal = ClaimsPrincipalUtils.AuthenticatedUser(
-                ClaimsPrincipalUtils.RoleClaim(globalRoleName),
-                new Claim(ClaimTypes.Email, "user@education.gov.uk"));
+            var claimsPrincipal = _fixture
+                .AuthenticatedUser()
+                .WithRole(globalRoleName)
+                .WithEmail("user@education.gov.uk");
 
             var client = TestApp
                 .SetUser(claimsPrincipal)

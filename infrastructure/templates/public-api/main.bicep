@@ -81,6 +81,9 @@ param dataProcessorFunctionAppExists bool = false
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string = ''
 
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
+param apiAppRegistrationClientId string = ''
+
 var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
@@ -310,7 +313,25 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         name: 'DataFiles__BasePath'
         value: dataFilesFileShareMountPath
       }
+      {
+        name: 'OpenIdConnect__TenantId'
+        value: tenant().tenantId
+      }
+      {
+        name: 'OpenIdConnect__ClientId'
+        value: apiAppRegistrationClientId
+      }
     ]
+    entraIdAuthentication: {
+      appRegistrationClientId: apiAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+      ]
+      allowedPrincipalIds: [
+        adminAppPrincipalId
+      ]
+      requireAuthentication: false
+    }
     tagValues: tagValues
   }
   dependsOn: [
@@ -354,6 +375,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       allowedPrincipalIds: [
         adminAppPrincipalId
       ]
+      requireAuthentication: true
     }
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
@@ -391,6 +413,15 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
 // TODO EES-5407 - incorporate this change with the automating of the app gateway creation.
 resource appGatewayManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: appGatewayManagedIdentityName
+}
+
+// TODO EES-5382 - remove when the switch over the Key Vault RBAC is enabled.
+module appGatewayKeyVaultAccessPolicy 'components/keyVaultAccessPolicy.bicep' = {
+  name: 'appGatewayKeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: [appGatewayManagedIdentity.properties.principalId]
+  }
 }
 
 module appGatewayKeyVaultRoleAssignments 'components/keyVaultRoleAssignment.bicep' = {

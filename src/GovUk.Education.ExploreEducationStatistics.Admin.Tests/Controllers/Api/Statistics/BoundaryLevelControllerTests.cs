@@ -15,7 +15,6 @@ using System.Net.Http.Json;
 using System.Reflection;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
 public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
@@ -45,7 +44,7 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
         });
 
         var client = TestApp
-            .SetUser(AuthenticatedUser(RoleClaim(RoleNames.BauUser)))
+            .SetUser(DataFixture.BauUser())
             .CreateClient();
 
         var response = await client.GetAsync("api/boundary-level");
@@ -79,7 +78,7 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
         });
 
         var client = TestApp
-            .SetUser(AuthenticatedUser(RoleClaim(RoleNames.BauUser)))
+            .SetUser(DataFixture.BauUser())
             .CreateClient();
 
         var response = await client.GetAsync("api/boundary-level/1");
@@ -109,7 +108,7 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
         });
 
         var client = TestApp
-            .SetUser(AuthenticatedUser(RoleClaim(RoleNames.BauUser)))
+            .SetUser(DataFixture.BauUser())
             .CreateClient();
 
         var request = new BoundaryLevelUpdateRequest
@@ -137,7 +136,7 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
     public async Task CreateBoundaryLevel_Success()
     {
         var client = TestApp
-            .SetUser(AuthenticatedUser(RoleClaim(RoleNames.BauUser)))
+            .SetUser(DataFixture.BauUser())
             .CreateClient();
 
         var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Resources/REG - Regions England BUC 202212.geojson");

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -12,12 +14,12 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -33,10 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Status = MethodologyApprovalStatus.Approved,
         };
 
-        private static readonly Publication OwningPublication = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
+
+        private static readonly DataFixture DataFixture = new();
 
         public class ClaimsTests
         {
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseVersionRepository.Setup(s =>
                                 s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                            .ReturnsAsync((ReleaseVersion?) null);
+                            .ReturnsAsync((ReleaseVersion?)null);
 
                         userPublicationRoleRepository
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
@@ -80,7 +81,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<ReleaseRole>());
                     }
 
-                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var user = DataFixture
+                        .AuthenticatedUser(userId: UserId)
+                        .WithClaim(claim.ToString());
+
                     var authContext =
                         CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
@@ -128,10 +132,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         releaseVersionRepository
                             .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                            .ReturnsAsync((ReleaseVersion?) null);
+                            .ReturnsAsync((ReleaseVersion?)null);
                     }
 
-                    var user = CreateClaimsPrincipal(UserId);
+                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                     var authContext =
                         CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
@@ -183,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseVersionRepository
                             .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                            .ReturnsAsync((ReleaseVersion?) null);
+                            .ReturnsAsync((ReleaseVersion?)null);
                     }
 
                     userPublicationRoleRepository
@@ -194,7 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(releaseRole));
 
-                    var user = CreateClaimsPrincipal(UserId);
+                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                     var authContext =
                         CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
@@ -267,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         It.IsAny<DateTime>()))
                     .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
@@ -343,7 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         It.IsAny<DateTime>()))
                     .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Before });
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
@@ -405,7 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetLatestReleaseVersion(latestReleaseVersion.PublicationId, default))
                     .ReturnsAsync(latestReleaseVersion);
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
@@ -467,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetLatestReleaseVersion(latestReleaseVersion.PublicationId, default))
                     .ReturnsAsync(latestReleaseVersion);
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
@@ -517,9 +523,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 releaseVersionRepository
                     .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                    .ReturnsAsync((ReleaseVersion?) null);
+                    .ReturnsAsync((ReleaseVersion?)null);
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
@@ -568,9 +574,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 releaseVersionRepository
                     .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                    .ReturnsAsync((ReleaseVersion?) null);
+                    .ReturnsAsync((ReleaseVersion?)null);
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
+
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
                         (user, MethodologyVersion);

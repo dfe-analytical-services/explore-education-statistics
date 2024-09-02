@@ -54,6 +54,7 @@ param entraIdAuthentication {
   appRegistrationClientId: string
   allowedClientIds: string[]
   allowedPrincipalIds: string[]
+  requireAuthentication: bool
 }?
 
 @description('Specifies the SKU for the Function App hosting plan')
@@ -238,53 +239,16 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
   tags: tagValues
 }
 
-var authSettingsV2Properties = entraIdAuthentication == null ? {} : {
-  globalValidation: {
-    requireAuthentication: true
-    unauthenticatedClientAction: 'Return401'
+module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
+  name: '${functionAppName}AzureAuthentication'
+  params: {
+    clientId: entraIdAuthentication!.appRegistrationClientId
+    siteName: fullFunctionAppName
+    stagingSlotName: stagingSlot.name
+    allowedClientIds: entraIdAuthentication!.allowedClientIds
+    allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
+    requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
-  httpSettings: {
-    requireHttps: true
-  }
-  identityProviders: {
-    azureActiveDirectory: {
-      enabled: true
-      registration: {
-        clientId: entraIdAuthentication!.appRegistrationClientId
-        openIdIssuer: 'https://sts.windows.net/${tenant().tenantId}/v2.0'
-      }
-      validation: {
-        allowedAudiences: [
-          'api://${entraIdAuthentication!.appRegistrationClientId}'
-        ]
-        defaultAuthorizationPolicy: {
-          allowedApplications: union(
-            [entraIdAuthentication!.appRegistrationClientId],
-            entraIdAuthentication!.allowedClientIds
-          )
-          allowedPrincipals: {
-            identities: entraIdAuthentication!.allowedPrincipalIds
-          }
-        }
-      }
-    }
-  }
-  platform: {
-    enabled: true
-    runtimeVersion: '~1'
-  }
-}
-
-resource functionAppAuthSettings 'Microsoft.Web/sites/config@2023-12-01' = {
-  name: 'authsettingsV2'
-  parent: functionApp
-  properties: authSettingsV2Properties
-}
-
-resource stagingSlotAuthSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = {
-  name: 'authsettingsV2'
-  parent: stagingSlot
-  properties: authSettingsV2Properties
 }
 
 resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
@@ -354,6 +318,15 @@ resource stagingSlotUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@20
 var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
   ? [userAssignedManagedIdentityParams!.principalId]
   : [functionApp.identity.principalId, stagingSlot.identity.principalId]
+
+// TODO EES-5382 - remove when the switch over the Key Vault RBAC is enabled.
+module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
+  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: keyVaultPrincipalIds
+  }
+}
 
 module functionAppKeyVaultRoleAssignments 'keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}FunctionAppKeyVaultRoleAssignment'

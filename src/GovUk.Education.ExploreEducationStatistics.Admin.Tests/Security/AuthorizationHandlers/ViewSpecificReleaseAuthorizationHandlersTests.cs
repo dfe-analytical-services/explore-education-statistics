@@ -7,19 +7,23 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using ReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -29,11 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static readonly ReleaseVersion ReleaseVersion = new()
         {
             Id = Guid.NewGuid(),
-            Publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            }
+            Publication = new Publication { Id = Guid.NewGuid() }
         };
+
+        private static readonly DataFixture DataFixture = new();
 
         public class ClaimsTests
         {
@@ -65,10 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     ReleaseVersion,
-                    rolesExpectedToSucceed: new [] {
-                        PublicationRole.Owner,
-                        PublicationRole.Approver
-                    });
+                    rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Approver });
             }
         }
 
@@ -87,10 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ReleaseVersion,
                     rolesExpectedToSucceed: new[]
                     {
-                        ReleaseRole.Viewer,
-                        ReleaseRole.Lead,
-                        ReleaseRole.Contributor,
-                        ReleaseRole.Approver
+                        ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver
                     });
             }
 
@@ -102,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var successScenario = new ReleaseHandlerTestScenario
                 {
                     Entity = ReleaseVersion,
-                    User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
+                    User = DataFixture.AuthenticatedUser(userId: userId),
                     UserReleaseRoles = new List<UserReleaseRole>
                     {
                         new()
@@ -121,10 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 preReleaseService
                     .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
-                    .Returns(new PreReleaseWindowStatus
-                    {
-                        Access = PreReleaseAccess.Within
-                    });
+                    .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
                 // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
                 // if the Pre Release window is currently open.
@@ -143,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var failureScenario = new ReleaseHandlerTestScenario
                 {
                     Entity = ReleaseVersion,
-                    User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
+                    User = DataFixture.AuthenticatedUser(userId: userId),
                     UserReleaseRoles = new List<UserReleaseRole>
                     {
                         new()
@@ -169,10 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         preReleaseService
                             .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
-                            .Returns(new PreReleaseWindowStatus
-                            {
-                                Access = access
-                            });
+                            .Returns(new PreReleaseWindowStatus { Access = access });
 
                         // Assert that a User who specifically has the Pre Release role will cause this handler to fail
                         // IF the Pre Release window is NOT open

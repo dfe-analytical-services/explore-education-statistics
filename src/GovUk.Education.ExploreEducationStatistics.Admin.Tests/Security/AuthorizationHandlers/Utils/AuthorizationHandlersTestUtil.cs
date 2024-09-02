@@ -4,8 +4,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 {
     public static class AuthorizationHandlersTestUtil
     {
+        private static readonly DataFixture DataFixture = new();
+
         /**
          * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and is tested
          * against the supplied entity, and fails otherwise
@@ -77,10 +80,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .Select(
                     claim =>
                     {
-                        var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(
-                            Guid.NewGuid(),
-                            new Claim(claim.ToString(), "")
-                        );
+                        var user = DataFixture
+                            .AuthenticatedUser()
+                            .WithClaim(claim.ToString());
 
                         return new HandlerTestScenario
                         {
