@@ -156,7 +156,7 @@ function MapBlock({
   width,
   height,
   axes,
-}: MapBlockProps) {
+}: Omit<MapBlockProps, 'releaseId' | 'dataBlockParentId' | 'boundaryLevel'>) {
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
       ...axes.major,

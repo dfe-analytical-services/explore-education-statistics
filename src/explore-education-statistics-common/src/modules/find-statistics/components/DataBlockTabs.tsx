@@ -86,7 +86,7 @@ const DataBlockTabs = ({
 
                   const commonChartProps = {
                     ...chart,
-                    releaseId: releaseId,
+                    releaseId,
                     dataBlockParentId: dataBlock.dataBlockParentId,
                     id: `${id}-chart`,
                     axes,
