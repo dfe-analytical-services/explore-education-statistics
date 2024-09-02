@@ -1,12 +1,13 @@
-import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { render, screen } from '@testing-library/react';
+import render from '@common-test/render';
 import React from 'react';
+import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import { screen } from '@testing-library/react';
 
 jest.mock('recharts/lib/util/LogUtils');
 
