@@ -34,6 +34,7 @@ import orderBy from 'lodash/orderBy';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import mapLocationOptionsToFilters from '@common/modules/table-tool/utils/mapLocationOptionsToFilters';
+import WarningMessage from '@common/components/WarningMessage';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -131,7 +132,7 @@ export default function MapBlockWrapper(props: MapBlockProps): ReactNode {
   });
 
   if (isLoading) return <LoadingSpinner text="Gathering map data" />;
-  if (error) throw Error('failed to get geoJson');
+  if (error) return <WarningMessage>Could not load content</WarningMessage>;
 
   return (
     <MapBlock
