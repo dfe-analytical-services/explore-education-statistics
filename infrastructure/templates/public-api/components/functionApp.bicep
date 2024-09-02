@@ -36,8 +36,11 @@ param tagValues object
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
-@description('Specifies the subnet id')
+@description('Specifies the subnet id for the function app outbound traffic across the VNet')
 param subnetId string
+
+@description('Specifies the optional subnet id for function app inbound traffic from the VNet')
+param privateEndpointSubnetId string?
 
 @description('Specifies whether this Function App is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
@@ -435,6 +438,17 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     slot1FileShare
     slot2FileShare
   ]
+}
+
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetId != null) {
+  name: '${functionAppName}PrivateEndpointDeploy'
+  params: {
+    serviceId: functionApp.id
+    serviceName: functionApp.name
+    serviceType: 'sites'
+    subnetId: privateEndpointSubnetId!
+    tagValues: tagValues
+  }
 }
 
 output functionAppName string = functionApp.name

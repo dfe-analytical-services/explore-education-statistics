@@ -386,6 +386,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     location: location
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
+    privateEndpointSubnetId: vNetModule.outputs.dataProcessorPrivateEndpointSubnetRef
     publicNetworkAccessEnabled: false
     entraIdAuthentication: {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
@@ -428,6 +429,9 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
   }
+  dependsOn: [
+    privateDnsZonesModule
+  ]
 }
 
 // Create an Application Gateway to serve public traffic for the Public API Container App.
