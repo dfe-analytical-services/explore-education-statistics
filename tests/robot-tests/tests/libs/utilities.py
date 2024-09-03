@@ -300,7 +300,9 @@ def format_datetime(datetime: datetime, strf: str) -> str:
 def format_time_without_leading_zero(time_str: str) -> str:
     parts = time_str.split()
     hour, minute = parts[0].split(':')
-    hour = str(int(hour))  # Remove leading zero
+
+    # Remove leading zero in hour
+    hour = str(int(hour))
     return f"{hour}:{minute} {parts[1]}"
 
 
