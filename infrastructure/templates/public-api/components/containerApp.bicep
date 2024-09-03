@@ -173,7 +173,7 @@ module azureAuthentication 'containerAppAzureAuthentication.bicep' = if (entraId
   name: '${containerAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
-    containerAppName: fullApplicationName
+    containerAppName: containerApplicationName
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
   }

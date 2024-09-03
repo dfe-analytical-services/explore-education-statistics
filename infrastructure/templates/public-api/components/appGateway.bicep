@@ -1,7 +1,7 @@
 @description('Specifies the Key Vault name that this App Gateway will be permitted to get and list certificates from')
 param keyVaultName string
 
-@description('Specifies the Resource Prefix')
+@description('Specifies the resource prefix')
 param resourcePrefix string
 
 @description('Specifies the location for all resources')
@@ -16,7 +16,7 @@ param instanceName string = ''
 @description('Specifies a set of configurations for the App Gateway to use to direct traffic to backend resources')
 param sites {
   resourceName: string
-  publicHostName: string
+  publicFqdn: string
   backendFqdn: string
   healthProbeRelativeUrl: string
   certificateKeyVaultSecretName: string
@@ -52,8 +52,8 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 }
 
 // Allow the managed identity to access certificates from Key Vault.
-module managedIdentityKeyVaultRole 'keyVaultRoleAssignment.bicep' = {
-  name: '${appGatewayFullName}KeyVaultRoleAssignment'
+module keyVaultSecretsUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = {
+  name: '${appGatewayFullName}KeyVaultSecretsUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
     principalIds: [managedIdentity.properties.principalId]
@@ -61,17 +61,25 @@ module managedIdentityKeyVaultRole 'keyVaultRoleAssignment.bicep' = {
   }
 }
 
-module appGatewayKeyVaultRoleAssignments 'keyVaultRoleAssignment.bicep' = {
-  name: 'appGatewayKeyVaultRoleAssignment'
+module keyVaultCertificateUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = {
+  name: '${appGatewayFullName}KeyVaultCertificateUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
     principalIds: [managedIdentity.properties.principalId]
-    role: 'Secrets User'
+    role: 'Certificate User'
+  }
+}
+
+module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
+  name: '${appGatewayFullName}KeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: [managedIdentity.properties.principalId]
   }
 }
 
 // Create public IP addresses for every site we will expose through this App Gateway.
-resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2021-05-01' = [for site in sites: {
+resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for site in sites: {
   name: '${site.resourceName}-pip'
   location: location
   sku: {
@@ -82,14 +90,15 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2021-05-01' = [f
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
     dnsSettings: {
-      domainNameLabel: replace(site.publicHostName, '.', '')
-      fqdn: '${replace(site.publicHostName, '.', '')}.${location}.cloudapp.azure.com'
+      domainNameLabel: replace(site.publicFqdn, '.', '')
+      fqdn: '${replace(site.publicFqdn, '.', '')}.${location}.cloudapp.azure.com'
     }
   }
+  zones: availabilityZones
 }]
 
 // Add a Firewall Policy with OWASP and Bot rulesets, running in Prevention mode.
-module wafPolicy 'wafPolicy.bicep' = {
+module wafPolicyModule 'wafPolicy.bicep' = {
   name: 'wafPolicy'
   params: {
     name: '${appGatewayFullName}-waf-policy'
@@ -185,7 +194,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
         sslCertificate: {
           id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', appGatewayFullName, '${site.resourceName}-cert')
         }
-        hostName: site.publicHostName
+        hostName: site.publicFqdn
         requireServerNameIndication: true
       }
     }]
@@ -224,10 +233,13 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
       maxCapacity: 10
     }
     firewallPolicy: {
-      id: wafPolicy.outputs.id
+      id: wafPolicyModule.outputs.id
     }
   }
   dependsOn: [
     publicIPAddresses
+    keyVaultSecretsUserRoleAssignmentModule
+    keyVaultCertificateUserRoleAssignmentModule
+    keyVaultAccessPolicyModule
   ]
 }
