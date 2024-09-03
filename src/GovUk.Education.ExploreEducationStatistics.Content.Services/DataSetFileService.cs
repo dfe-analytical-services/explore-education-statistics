@@ -267,16 +267,14 @@ public class DataSetFileService : IDataSetFileService
             return new NotFoundResult();
         }
 
-        var stream = await DatafileStreamProvider();
+        var stream = await _publicBlobStorageService.StreamBlob(
+            containerName: BlobContainers.PublicReleaseFiles,
+            path: releaseFile.PublicPath());
 
         return new FileStreamResult(stream, "text/csv")
         {
             FileDownloadName = releaseFile.File.Filename,
         };
-
-        Task<Stream> DatafileStreamProvider() => _publicBlobStorageService.StreamBlob(
-            containerName: BlobContainers.PublicReleaseFiles,
-            path: releaseFile.PublicPath());
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(

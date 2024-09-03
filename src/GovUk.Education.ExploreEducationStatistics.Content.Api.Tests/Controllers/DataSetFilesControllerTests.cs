@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
@@ -1761,6 +1762,118 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable(It.IsAny<string>()))
                 .Returns((freeTextRanks ?? Array.Empty<FreeTextRank>()).AsQueryable().BuildMockDbSet().Object);
             return contentDbContext;
+        }
+    }
+
+    public class DownloadDataSetFileTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
+    {
+        public override async Task InitializeAsync() => await TestApp.StartAzurite();
+
+        [Fact]
+        public async Task DownloadDataSetFile()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFile(_fixture.DefaultFile(FileType.Data));
+
+            var testApp = BuildApp(enableAzurite: true);
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+
+            var formFile = CreateDataCsvFormFile("test file contents");
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+            var client = testApp.CreateClient();
+
+            var response = await client.GetAsync($"/api/data-set-files/{releaseFile.File.DataSetFileId}/download");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var contentType = response.Content.Headers.GetValues("Content-Type").First();
+            Assert.Equal("text/csv", contentType);
+
+            var contentDisposition = response.Content.Headers
+                .GetValues("Content-Disposition")
+                .First();
+            Assert.Contains("attachment;", contentDisposition);
+            Assert.Contains($"filename=\"{releaseFile.File.Filename}\";", contentDisposition);
+
+            var responseStream = await response.Content.ReadAsStreamAsync();
+            var responseStreamReader = new StreamReader(responseStream);
+            var responseContent = await responseStreamReader.ReadToEndAsync();
+            Assert.Equal("test file contents", responseContent);
+        }
+
+        [Fact]
+        public async Task DownloadDataSetFile_ReleaseFileDoesNotExist()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            var testApp = BuildApp();
+
+            var client = testApp.CreateClient();
+
+            var response = await client.GetAsync($"/api/data-set-files/{Guid.NewGuid()}/download");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task DownloadDataSetFile_NotPublished()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithFile(_fixture.DefaultFile(FileType.Data));
+
+            await TestApp.StartAzurite();
+
+            var testApp = BuildApp(enableAzurite: true);
+            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+
+            var formFile = CreateDataCsvFormFile("test file contents");
+
+            await publicBlobStorageService.UploadFile(
+                containerName: BlobContainers.PublicReleaseFiles,
+                releaseFile.PublicPath(),
+                formFile);
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+            var client = testApp.CreateClient();
+
+            var response = await client.GetAsync($"/api/data-set-files/{releaseFile.File.DataSetFileId}/download");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
     }
 
