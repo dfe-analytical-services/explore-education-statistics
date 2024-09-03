@@ -227,6 +227,35 @@ Verify the 'Active tokens' and 'Expired tokens' on preview token log page
     user clicks button    Confirm    ${modal}
     user waits until page finishes loading
     user checks table cell contains    1    4    Expired
+    
+User verifies the relevant fields on the 'View Log Details' page for the Active API token.
+    user clicks link    Generate preview token
+    user clicks button    Generate token
+
+    ${modal}=    user waits until modal is visible    Generate API token
+    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    API Token
+    user clicks checkbox by selector        css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
+    user clicks button    Continue
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Generate API token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token
+    user waits until h2 is visible    ${SUBJECT_NAME_1}
+
+    ${current_time_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    1    Europe/London
+
+    ${time_with_leading_zero}=    format uk to local datetime    ${current_time_tomorrow}    %I:%M %p
+    
+    ${time_end}=    format time without leading zero     ${time_with_leading_zero}
+    
+    user checks page contains    
+    ...     Token expiry time: tomorrow at ${time_end}
+
+    user checks page contains button    Copy preview token
+    user checks page contains button    Revoke this token
+    user checks page contains link    View API data set token log
+    User Checks Page Contains    API data set endpoints quick start
+
 
 Add headline text block to Content page
     user clicks link    Back to API data set details
