@@ -18,5 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [EnumLabelValue("pp", "pp")]
         PercentagePoint,
+
+        [EnumLabelValue("numberstring", "numberstring")]
+        NumberString,
     }
 }
