@@ -254,7 +254,7 @@ User verifies the relevant fields on the 'View Log Details' page for the Active 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke this token
     user checks page contains link    View API data set token log
-    User Checks Page Contains    API data set endpoints quick start
+    user checks page contains    API data set endpoints quick start
 
 
 Add headline text block to Content page
