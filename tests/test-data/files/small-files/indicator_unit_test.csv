@@ -1,7 +1,7 @@
-time_identifier,time_period,geographic_level,country_code,country_name,number,percent,pound,pp,million_pound
-Academic year,201819,national,E92000001,England,201819,1819,2018,1000,500
-Academic year,201718,national,E92000001,England,201718,17.18,2017.18,10.1,134.13
-Academic year,201617,national,E92000001,England,-201617,16,2016,-100,-1000
-Academic year,201516,national,E92000001,England,201516,-15,-2015,999,999
-Academic year,201415,national,E92000001,England,-201415,-14.15,-2014.15,109241,-10.149
-Academic year,201314,national,E92000001,England,0,0,0,0,0
+time_identifier,time_period,geographic_level,country_code,country_name,number,percent,pound,pp,million_pound,code
+Academic year,201819,national,E92000001,England,201819,1819,2018,1000,500,123123123
+Academic year,201718,national,E92000001,England,201718,17.18,2017.18,10.1,134.13,123.123123
+Academic year,201617,national,E92000001,England,-201617,16,2016,-100,-1000,ABCD
+Academic year,201516,national,E92000001,England,201516,-15,-2015,999,999,A123123
+Academic year,201415,national,E92000001,England,-201415,-14.15,-2014.15,109241,-10.149,123A
+Academic year,201314,national,E92000001,England,0,0,0,0,0,(*!$&
