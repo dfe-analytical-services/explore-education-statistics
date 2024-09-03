@@ -6,7 +6,6 @@ export const defaultMaxDecimalPlaces = 2;
 /**
  * Return a formatted {@param value} in a pretty format
  * i.e. 10,000,000.000.
- *
  * {@param unit} can be used to add a unit to the
  * formatted value. We will try and handle different
  * units to get a result that looks the best.
@@ -24,36 +23,39 @@ export default function formatPretty(
     case 'numberstring':
       return String(value);
     case '£': {
-      let formattedNumber = formatNumber(value, decimalPlaces);
+      const formattedNumber = formatNumber(value, decimalPlaces);
       if (formattedNumber.isNegative) {
         return `-£${formattedNumber.value.substring(1)}`;
       }
       return `£${formattedNumber.value}`;
     }
     case '£m': {
-      let formattedNumber = formatNumber(value, decimalPlaces);
+      const formattedNumber = formatNumber(value, decimalPlaces);
       if (formattedNumber.isNegative) {
         return `-£${formattedNumber.value.substring(1)}m`;
       }
       return `£${formattedNumber.value}m`;
     }
     case undefined: {
-      let formattedNumber = formatNumber(value, decimalPlaces);
+      const formattedNumber = formatNumber(value, decimalPlaces);
       return formattedNumber.value;
     }
     default: {
-      let formattedNumber = formatNumber(value, decimalPlaces);
+      const formattedNumber = formatNumber(value, decimalPlaces);
       return `${formattedNumber.value}${unit}`;
     }
   }
 }
 
 interface FormattedNumber {
-  value: string,
-  isNegative: boolean,
+  value: string;
+  isNegative: boolean;
 }
 
-function formatNumber(value: string | number, decimalPlaces?: number) : FormattedNumber {
+function formatNumber(
+  value: string | number,
+  decimalPlaces?: number,
+): FormattedNumber {
   let numberValue: number;
 
   if (typeof value === 'string') {
