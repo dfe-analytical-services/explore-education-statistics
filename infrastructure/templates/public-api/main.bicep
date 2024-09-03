@@ -72,7 +72,8 @@ param updatePsqlFlexibleServer bool = false
 @description('Public URLs of other components in the service.')
 param publicUrls {
   contentApi: string
-  publicApp: string
+  publicSite: string
+  publicApi: string
 }
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
@@ -101,7 +102,6 @@ var containerAppEnvironmentNameSuffix = '01'
 var dataFilesFileShareMountName = 'public-api-fileshare-mount'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 var publicApiStorageAccountName = '${subscription}eespapisa'
-var appGatewayManagedIdentityName = '${subscription}-ees-id-agw-01'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -268,7 +268,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     corsPolicy: {
       allowedOrigins: [
-        publicUrls.publicApp
+        publicUrls.publicSite
         'http://localhost:3000'
         'http://127.0.0.1'
       ]
@@ -410,26 +410,25 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   }
 }
 
-// TODO EES-5407 - incorporate this change with the automating of the app gateway creation.
-resource appGatewayManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: appGatewayManagedIdentityName
-}
-
-// TODO EES-5382 - remove when the switch over the Key Vault RBAC is enabled.
-module appGatewayKeyVaultAccessPolicy 'components/keyVaultAccessPolicy.bicep' = {
-  name: 'appGatewayKeyVaultAccessPolicy'
+// Create an Application Gateway to serve public traffic for the Public API Container App.
+module appGatewayModule 'components/appGateway.bicep' = {
+  name: 'appGatewayDeploy'
   params: {
+    location: location
+    resourcePrefix: subscription
+    instanceName: '01'
     keyVaultName: keyVaultName
-    principalIds: [appGatewayManagedIdentity.properties.principalId]
-  }
-}
-
-module appGatewayKeyVaultRoleAssignments 'components/keyVaultRoleAssignment.bicep' = {
-  name: 'appGatewayKeyVaultRoleAssignment'
-  params: {
-    keyVaultName: keyVaultName
-    principalIds: [appGatewayManagedIdentity.properties.principalId]
-    role: 'Secrets User'
+    subnetId: vNetModule.outputs.appGatewaySubnetRef
+    sites: [
+      {
+        resourceName: apiContainerAppModule.outputs.containerAppName
+        backendFqdn: apiContainerAppModule.outputs.containerAppFqdn
+        publicFqdn: replace(publicUrls.publicApi, 'https://', '')
+        certificateKeyVaultSecretName: '${apiContainerAppModule.outputs.containerAppName}-certificate'
+        healthProbeRelativeUrl: '/docs'
+      }
+    ]
+    tagValues: tagValues
   }
 }
 

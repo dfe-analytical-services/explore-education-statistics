@@ -31,7 +31,7 @@ steps:
 
           echo "Assigning App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceAppRegName}}\" to \"${{parameters.servicePrincipalName}}\""
           
-          protectedResourceAppRegId=`az ad sp list --display-name $protectedResourceAppRegName --query [0].id --out tsv`
+          protectedResourceAppRegId=`az ad sp list --display-name ${{parameters.protectedResourceAppRegName}} --query [0].id --out tsv`
 
           az rest -m POST -u https://graph.microsoft.com/v1.0/servicePrincipals/$principalId/appRoleAssignments \
             -b "{\"principalId\": \"$principalId\", \"resourceId\": \"$protectedResourceAppRegId\",\"appRoleId\": \"$appRoleId\"}"

@@ -8,13 +8,6 @@ parameters:
     displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
     default: false
 
-# This param is helpful for debugging to allow the selection of a particular branch from which to base a deploy from this pipeline.
-# This should be removed in the long term in favour of using the "Resources" selection from the "Run pipeline" dialog.
-#
-#  - name: buildBranchToDeploy
-#    displayName: Build branch to deploy. This allows a person who is manually running the pipeline to specify the use of the latest EESBuildPipeline build that was run against that branch.
-#    default: 'Branch from latest pipeline run'
-
 resources:
   pipelines:
     - pipeline: EESBuildPipeline
@@ -24,11 +17,6 @@ resources:
           - refs/heads/dev
           - refs/heads/test
           - refs/heads/master
-
-# This param is helpful for debugging to allow the selection of a particular branch from which to base a deploy from this pipeline.
-# This should be removed in the long term in favour of using the "Resources" selection from the "Run pipeline" dialog.
-#
-#      branch: ${{ replace(parameters.buildBranchToDeploy, 'Branch from latest pipeline run', '') }}
 
 variables:
   - group: Public API Infrastructure - common
@@ -80,6 +68,7 @@ stages:
     dependsOn: 'Validate_Against_Development'
     environment: 'Development'
     serviceConnection: $(serviceConnectionDevelopment)
+    subscription: $(subscription)
     parameterFile: $(devParamFile)
 
 - template: validate-stage-template.yml
@@ -97,6 +86,7 @@ stages:
     condition: and(succeeded(), eq(variables.isTest, true))
     environment: 'Test'
     serviceConnection: $(serviceConnectionTest)
+    subscription: $(subscription)
     parameterFile: $(testParamFile)
 
 #  - template: validate-stage-template.yml
@@ -114,6 +104,7 @@ stages:
 #      dependsOn: 'Validate_Against_PreProduction'
 #      environment: 'Pre-production'
 #      serviceConnection: $(serviceConnectionPreProduction)
+#      subscription: $(subscription)
 #      parameterFile: $(preProdParamFile)
 #
 #  - template: validate-stage-template.yml
@@ -131,4 +122,5 @@ stages:
 #      dependsOn: 'Validate_Against_Production'
 #      environment: 'Production'
 #      serviceConnection: $(serviceConnectionProduction)
+#      subscription: $(subscription)
 #      parameterFile: $(prodParamFile)

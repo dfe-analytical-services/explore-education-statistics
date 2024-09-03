@@ -7,6 +7,7 @@ param principalIds string[]
 @description('Specifies the Key Vault role to assign to the service principals. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles for possible roles to support here.')
 @allowed([
   'Secrets User'
+  'Certificate User'
 ])
 param role string
 
@@ -14,6 +15,7 @@ param role string
 var roleIds = {
 
   'Secrets User': '4633458b-17de-408a-b874-0445c86b69e6'
+  'Certificate User': 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba'
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {

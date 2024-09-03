@@ -42,6 +42,11 @@ resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@202
   parent: vNet
 }
 
+resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: '${subscription}-ees-snet-agw-01'
+  parent: vNet
+}
+
 @description('The fully qualified Azure resource ID of the Network.')
 output vNetRef string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
 
@@ -83,3 +88,6 @@ output psqlFlexibleServerSubnetStartIpAddress string = parseCidr(psqlFlexibleSer
 
 @description('The last usable IP address for the PSQL Flexible Server Subnet.')
 output psqlFlexibleServerSubnetEndIpAddress string = parseCidr(psqlFlexibleServerSubnet.properties.addressPrefix).lastUsable
+
+@description('The fully qualified Azure resource ID of the App Gateway Subnet.')
+output appGatewaySubnetRef string = appGatewaySubnet.id
