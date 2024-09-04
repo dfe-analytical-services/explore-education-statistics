@@ -447,6 +447,7 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
     serviceName: functionApp.name
     serviceType: 'sites'
     subnetId: privateEndpointSubnetId!
+    location: location
     tagValues: tagValues
   }
 }

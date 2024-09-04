@@ -10,10 +10,13 @@ param serviceId string
 @minLength(0)
 param subnetId string
 
+@description('Specifies the location for this resource.')
+param location string
+
 @description('Specifies the type of service being attached to the private endpoint')
 @allowed([
   'sites'
-  'postgresqlServer'
+  'postgres'
 ])
 param serviceType string
 
@@ -22,16 +25,18 @@ param tagValues object
 
 var zoneTypeToNames = {
   sites: 'privatelink.azurewebsites.net'
-  postgresqlServer: 'privatelink.postgres.database.azure.com'
+  postgres: 'privatelink.postgres.database.azure.com'
 }
 
-var privateEndpointName = '${serviceName}-plink'
+var privateEndpointName = '${serviceName}-pep'
 var privateDnsZoneName = zoneTypeToNames[serviceType]
 
-@description('A private endpoint that establishes a link between a VNet and an Azure service that supports Private Link. This takes the form of an IP address that is resolvable by a private DNS zone.')
+// A private endpoint that establishes a link between a VNet and an Azure service 
+// that supports Private Link. This takes the form of an IP address that is 
+// resolvable by a private DNS zone.
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
   name: privateEndpointName
-  location: 'westeurope'
+  location: location
   tags: tagValues
   properties: {
     privateLinkServiceConnections: [
@@ -59,7 +64,9 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing 
   name: privateDnsZoneName
 }
 
-@description('The private DNS zone group establishes a hard connection between the service being connected and the DNS records in the private DNS zone. It handles updates to DNS records automatically.')
+// The private DNS zone group establishes a hard connection between the service being 
+// connected and the DNS records in the private DNS zone. It handles updates to DNS
+// records automatically.
 resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
   name: 'default'
   parent: privateEndpoint

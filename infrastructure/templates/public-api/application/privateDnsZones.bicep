@@ -2,16 +2,17 @@
 @minLength(0)
 param vnetId string
 
-@description('Private DNS zone for handling private endpoints for PostgreSQL resources.')
+// Set up a Private DNS zone for handling private endpoints for PostgreSQL resources.
 module postgreSqlPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
   name: 'postgresPrivateDnsZoneDeploy'
   params: {
-    zoneType: 'postgresqlServer'
+    zoneType: 'postgres'
     vnetId: vnetId
   }
 }
 
-@description('Private DNS zone for handling private endpoints for site resources (e.g. App Services, Function Apps, Container Apps).')
+// Set up a Private DNS zone for handling private endpoints for site resources
+// (e.g. App Services, Function Apps, Container Apps).
 module sitesPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
   name: 'sitesPrivateDnsZoneDeploy'
   params: {

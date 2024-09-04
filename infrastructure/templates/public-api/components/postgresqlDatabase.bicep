@@ -133,8 +133,9 @@ module privateEndpointModule 'privateEndpoint.bicep' = {
   params: {
     serviceId: postgreSQLDatabase.id
     serviceName: postgreSQLDatabase.name
-    serviceType: 'postgresqlServer'
+    serviceType: 'postgres'
     subnetId: subnetId
+    location: location
     tagValues: tagValues
   }
 }

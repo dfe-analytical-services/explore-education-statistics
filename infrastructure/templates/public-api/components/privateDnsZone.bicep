@@ -1,32 +1,31 @@
 @description('Specifies the type of zone to create')
 @allowed([
   'sites'
-  'postgresqlServer'
+  'postgres'
 ])
 param zoneType string
 
 @description('Specifies the resource id of the VNet that this DNS Zone will be attached to')
-@minLength(0)
 param vnetId string
 
 var zoneTypeToNames = {
   sites: 'privatelink.azurewebsites.net'
-  postgresqlServer: 'privatelink.postgres.database.azure.com'
+  postgres: 'privatelink.postgres.database.azure.com'
 }
 
-var privateLinkDnsZoneName = zoneTypeToNames[zoneType]
+var zoneName = zoneTypeToNames[zoneType]
 
-@description('A DNS zone in which internal DNS records can be managed.')
+// A DNS zone in which internal DNS records can be managed.
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: privateLinkDnsZoneName
+  name: zoneName
   location: 'global'
   properties: {}
 }
 
-@description('A link which makes the internal DNS records within the DNS zone available to other resources on the VNet.')
+// A link which makes the internal DNS records within the DNS zone available to other resources on the VNet.
 resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: privateDnsZone
-  name: '${privateLinkDnsZoneName}-link'
+  name: '${zoneName}-link'
   location: 'global'
   properties: {
     registrationEnabled: false
