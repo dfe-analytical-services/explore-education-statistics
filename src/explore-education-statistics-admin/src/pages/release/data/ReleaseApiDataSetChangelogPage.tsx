@@ -11,6 +11,7 @@ import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import TagGroup from '@common/components/TagGroup';
 import useToggle from '@common/hooks/useToggle';
 import Button from '@common/components/Button';
 import ApiDataSetChangelog from '@common/modules/data-catalogue/components/ApiDataSetChangelog';
@@ -80,16 +81,15 @@ export default function ReleaseApiDataSetChangelogPage() {
             <h2>{dataSet?.title}</h2>
           </div>
         </div>
-        <p>
+
+        <TagGroup className="govuk-!-margin-bottom-7">
           <Tag colour={isDraft ? 'green' : 'blue'}>{`${
             isDraft ? 'Draft' : 'Published'
           } v${dataSetVersion?.version}`}</Tag>
-        </p>
-        <p>
           <Tag
             colour={dataSetVersion?.type === 'Major' ? 'blue' : 'grey'}
           >{`${dataSetVersion?.type} update`}</Tag>
-        </p>
+        </TagGroup>
 
         {isDraft && showForm ? (
           <ApiDataSetGuidanceNotesForm

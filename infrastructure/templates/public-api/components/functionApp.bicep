@@ -239,7 +239,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
   tags: tagValues
 }
 
-module azureAuthentication 'azureAuthentication.bicep' = if (entraIdAuthentication != null) {
+module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
   name: '${functionAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
