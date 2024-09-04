@@ -171,7 +171,7 @@ User revokes created API token
     user waits until modal is not visible    Revoke this token    %{WAIT_LONG}
     user waits until page contains    Generate API data set preview token
 
-User clicks on 'Generate Token'
+User again clicks on 'Generate Token'
     user clicks button     Generate token
 
 User creates API token through 'Generate API token' modal window
