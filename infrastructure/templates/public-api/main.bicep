@@ -61,7 +61,7 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.')
+@description('Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
 param deployContainerApp bool = true
 
 // TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
@@ -228,8 +228,18 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
 
 var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
 
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: apiContainerAppManagedIdentityName
+  location: location
+}
+
+module apiContainerAppAcrPullRoleAssignmentModule 'components/containerRegistryRoleAssignment.bicep' = {
+  name: '${apiContainerAppManagedIdentityName}AcrPullRoleAssignmentDeploy'
+  params: {
+    role: 'AcrPull'
+    containerRegistryName: acrName
+    principalIds: [apiContainerAppManagedIdentity.properties.principalId]
+  }
 }
 
 // Create a generic Container App Environment for any Container Apps to use.
@@ -336,6 +346,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   }
   dependsOn: [
     postgreSqlServerModule
+    acrPullRoleAssignmentModule
   ]
 }
 
