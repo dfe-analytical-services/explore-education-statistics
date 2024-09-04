@@ -346,7 +346,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
   }
   dependsOn: [
     postgreSqlServerModule
-    acrPullRoleAssignmentModule
+    apiContainerAppAcrPullRoleAssignmentModule
   ]
 }
 
