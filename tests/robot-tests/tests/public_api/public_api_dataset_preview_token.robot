@@ -13,7 +13,7 @@ Suite Teardown      user closes the browser
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api preview token %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - public api generate and preview token %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -146,7 +146,7 @@ User checks row data contents inside the 'Draft API datasets' summary table
 User clicks on 'Preview API dataset' link
     user clicks link containing text    Preview API data set
 
-User click on 'Generate Token'
+User clicks on 'Generate Token'
     user clicks button     Generate token
 
 User creates API token through 'Generate API token' modal window
@@ -168,7 +168,7 @@ User revokes created API token
     user waits until modal is not visible    Revoke this token    %{WAIT_LONG}
     user waits until page contains    Generate API data set preview token
 
-Again,user click on 'Generate Token'
+User clicks on 'Generate Token'
     user clicks button     Generate token
 
 User creates API token through 'Generate API token' modal window
@@ -182,7 +182,7 @@ User creates API token through 'Generate API token' modal window
     user waits until page contains    API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
-User cancells to revoke created API token
+User cancels to revoke created API token
     user clicks button    Revoke this token
     ${modal}=    user waits until modal is visible    Revoke this token
     user clicks button    Cancel
@@ -191,7 +191,7 @@ User cancells to revoke created API token
     user waits until page contains    API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
-User cancells to create API token
+User cancels to create API token
     user clicks link    Back to API data set details
     user clicks link containing text    Preview API data set
     user clicks button     Generate token
