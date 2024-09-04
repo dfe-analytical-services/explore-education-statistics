@@ -31,12 +31,6 @@ public record ProcessorTestData
 
     private string DirectoryPath => Path.Combine(DataFilesDirectoryPath, Name);
 
-    private static string DataFilesDirectoryPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "DataFiles"
-    );
-
     public static ProcessorTestData AbsenceSchool => new()
     {
         Name = nameof(AbsenceSchool),
@@ -81,30 +75,30 @@ public record ProcessorTestData
                     new LocationLocalAuthorityOptionMeta
                     {
                         Id = 1,
-                        OldCode = "302",
-                        Code = "E09000003",
-                        Label = "Barnet",
-                    },
-                    new LocationLocalAuthorityOptionMeta
-                    {
-                        Id = 2,
-                        OldCode = "314",
-                        Code = "E09000021 / E09000027",
-                        Label = "Kingston upon Thames / Richmond upon Thames",
-                    },
-                    new LocationLocalAuthorityOptionMeta
-                    {
-                        Id = 3,
                         OldCode = "370",
                         Code = "E08000016",
                         Label = "Barnsley",
                     },
                     new LocationLocalAuthorityOptionMeta
                     {
-                        Id = 4,
+                        Id = 2,
                         OldCode = "373",
                         Code = "E08000019",
                         Label = "Sheffield",
+                    },
+                    new LocationLocalAuthorityOptionMeta
+                    {
+                        Id = 3,
+                        OldCode = "302",
+                        Code = "E09000003",
+                        Label = "Barnet",
+                    },
+                    new LocationLocalAuthorityOptionMeta
+                    {
+                        Id = 4,
+                        OldCode = "314",
+                        Code = "E09000021 / E09000027",
+                        Label = "Kingston upon Thames / Richmond upon Thames",
                     },
                 ]
             },
@@ -339,4 +333,10 @@ public record ProcessorTestData
             },
         ],
     };
+
+    private static string DataFilesDirectoryPath => Path.Combine(
+        Assembly.GetExecutingAssembly().GetDirectoryPath(),
+        "Resources",
+        "DataFiles"
+    );
 }
