@@ -18,7 +18,7 @@ steps:
       inlineScript: |
         set -e
 
-        appRoleId=`az ad sp list --display-name ${{parameters.protectedResourceAppRegName}} --query "[0].appRoles[?value=='${{parameters.appRoleName}}'].id" --output tsv)`
+        appRoleId=`az ad sp list --display-name ${{parameters.protectedResourceAppRegName}} --query "[0].appRoles[?value=='${{parameters.appRoleName}}'].id" --output tsv`
         principalId=`az resource list -n ${{parameters.servicePrincipalName}} --query [*].identity.principalId --out tsv`
 
         roleAlreadyAssigned=`az rest -u https://graph.microsoft.com/v1.0/servicePrincipals/$principalId/appRoleAssignments --query "value[?appRoleId == '$appRoleId']" | jq '. != []'`
@@ -31,7 +31,7 @@ steps:
 
           echo "Assigning App Role \"${{parameters.appRoleName}}\" from \"${{parameters.protectedResourceAppRegName}}\" to \"${{parameters.servicePrincipalName}}\""
           
-          protectedResourceAppRegId=`az ad sp list --display-name $protectedResourceAppRegName --query [0].id --out tsv`
+          protectedResourceAppRegId=`az ad sp list --display-name ${{parameters.protectedResourceAppRegName}} --query [0].id --out tsv`
 
           az rest -m POST -u https://graph.microsoft.com/v1.0/servicePrincipals/$principalId/appRoleAssignments \
             -b "{\"principalId\": \"$principalId\", \"resourceId\": \"$protectedResourceAppRegId\",\"appRoleId\": \"$appRoleId\"}"

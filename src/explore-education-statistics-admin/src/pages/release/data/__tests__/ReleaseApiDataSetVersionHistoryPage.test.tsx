@@ -40,7 +40,7 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       },
       published: '2024-04-01',
       releaseVersion: {
-        id: 'release-version-3-1-id',
+        id: 'release-v3-1-id',
         title: 'Release version 3.1',
       },
       status: 'Published',
@@ -55,7 +55,7 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       },
       published: '2024-03-01',
       releaseVersion: {
-        id: 'release-version-3-id',
+        id: 'release-v3-id',
         title: 'Release version 3',
       },
       status: 'Published',
@@ -70,7 +70,7 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       },
       published: '2024-02-01',
       releaseVersion: {
-        id: 'release-version-2-id',
+        id: 'release-v2-id',
         title: 'Release version 2',
       },
       status: 'Published',
@@ -85,7 +85,7 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       },
       published: '2024-01-01',
       releaseVersion: {
-        id: 'release-version-1-id',
+        id: 'release-v1-id',
         title: 'Release version 1',
       },
       status: 'Published',
@@ -109,6 +109,8 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
 
     expect(await screen.findByText('Data set title')).toBeInTheDocument();
 
+    const { publicationId } = testRelease;
+
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows).toHaveLength(5);
 
@@ -118,7 +120,7 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       within(row1Cells[1]).getByRole('link', { name: 'Release version 3.1' }),
     ).toHaveAttribute(
       'href',
-      `/publication/${testRelease.publicationId}/release/release-version-3-1-id/summary`,
+      `/publication/${publicationId}/release/release-v3-1-id/summary`,
     );
     expect(row1Cells[2]).toHaveTextContent('Published');
     expect(row1Cells[2]).toHaveTextContent('Latest version');
@@ -126,12 +128,18 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       within(row1Cells[3]).getByRole('link', {
         name: 'View changelog for version 3.1',
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      `/publication/${publicationId}/release/release-v3-1-id/api-data-sets/data-set-id/changelog/version-3-1-id`,
+    );
     expect(
       within(row1Cells[3]).getByRole('link', {
-        name: 'View live data set for version 3.1 (opens in new tab)',
+        name: /View live data set for version 3.1/,
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/data-catalogue/data-set/version-3-1-file-id',
+    );
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('3.0');
@@ -139,19 +147,25 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       within(row2Cells[1]).getByRole('link', { name: 'Release version 3' }),
     ).toHaveAttribute(
       'href',
-      `/publication/${testRelease.publicationId}/release/release-version-3-id/summary`,
+      `/publication/${publicationId}/release/release-v3-id/summary`,
     );
     expect(row2Cells[2]).toHaveTextContent('Published');
     expect(
       within(row2Cells[3]).getByRole('link', {
         name: 'View changelog for version 3.0',
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      `/publication/${publicationId}/release/release-v3-id/api-data-sets/data-set-id/changelog/version-3-id`,
+    );
     expect(
       within(row2Cells[3]).getByRole('link', {
-        name: 'View live data set for version 3.0 (opens in new tab)',
+        name: /View live data set for version 3.0/,
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/data-catalogue/data-set/version-3-file-id',
+    );
 
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('2.0');
@@ -159,19 +173,25 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       within(row3Cells[1]).getByRole('link', { name: 'Release version 2' }),
     ).toHaveAttribute(
       'href',
-      `/publication/${testRelease.publicationId}/release/release-version-2-id/summary`,
+      `/publication/${publicationId}/release/release-v2-id/summary`,
     );
     expect(row3Cells[2]).toHaveTextContent('Published');
     expect(
       within(row3Cells[3]).getByRole('link', {
         name: 'View changelog for version 2.0',
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      `/publication/${publicationId}/release/release-v2-id/api-data-sets/data-set-id/changelog/version-2-id`,
+    );
     expect(
       within(row3Cells[3]).getByRole('link', {
-        name: 'View live data set for version 2.0 (opens in new tab)',
+        name: /View live data set for version 2.0/,
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/data-catalogue/data-set/version-2-file-id',
+    );
 
     const row4Cells = within(rows[4]).getAllByRole('cell');
     expect(row4Cells[0]).toHaveTextContent('1.0');
@@ -179,7 +199,7 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       within(row4Cells[1]).getByRole('link', { name: 'Release version 1' }),
     ).toHaveAttribute(
       'href',
-      `/publication/${testRelease.publicationId}/release/release-version-1-id/summary`,
+      `/publication/${publicationId}/release/release-v1-id/summary`,
     );
     expect(row4Cells[2]).toHaveTextContent('Published');
     expect(
@@ -189,12 +209,15 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
     ).not.toBeInTheDocument();
     expect(
       within(row4Cells[3]).getByRole('link', {
-        name: 'View live data set for version 1.0 (opens in new tab)',
+        name: /View live data set for version 1.0/,
       }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/data-catalogue/data-set/version-1-file-id',
+    );
   });
 
-  test('pagination', async () => {
+  test('pagination works correctly', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.listVersions.mockResolvedValueOnce({
       results: [testVersions[0], testVersions[1]],
