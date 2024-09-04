@@ -29,7 +29,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 // role.
 resource keyVaultRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: keyVault
-  name: guid(resourceGroup().id, rolesToRoleIds[role], principalId)
+  name: guid(resourceGroup().id, principalId, rolesToRoleIds[role])
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
     principalId: principalId
