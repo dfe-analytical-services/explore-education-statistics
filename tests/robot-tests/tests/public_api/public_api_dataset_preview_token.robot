@@ -13,8 +13,9 @@ Suite Teardown      user closes the browser
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api preview token %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Financial year 3000-01
+${PUBLICATION_NAME}=    UI tests - Public API - Generate and Preview API token %{RUN_IDENTIFIER}
+${RELEASE_NAME}=        Academic year Q1
+${ACADEMIC_YEAR}=       3000
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
 
@@ -23,14 +24,16 @@ ${SUBJECT_NAME_2}=      UI test subject 2
 
 *** Test Cases ***
 Create publication and release
-    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user creates test release via api    ${PUBLICATION_ID}    FY    3000
-    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME}
+    user selects dashboard theme and topic if possible
+    user clicks link    Create new publication
+    user waits until h1 is visible    Create new publication
+    user creates publication    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ACADEMIC_YEAR}
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    Financial year    3000-01    Accredited official statistics
+    user verifies release summary    Academic year Q1    3000/01    Accredited official statistics
 
 Upload data files
     user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
@@ -112,7 +115,7 @@ Click on 'View Details' link(First API dataset)
 User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value    v1.0                                       xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
     user checks contents inside the cell value    Ready                                      xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
-    user checks contents inside the cell value    Financial year 3000-01                     xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]
+    user checks contents inside the cell value    Academic year Q1 3000/01                    xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]
     user checks contents inside the cell value    ${SUBJECT_NAME_1}                          xpath://div[@data-testid="Data set file"]//dd[@data-testid="Data set file-value"]
     user checks contents inside the cell value    National                                   xpath://div[@data-testid="Geographic levels"]//dd[@data-testid="Geographic levels-value"]
     user checks contents inside the cell value    2012/13                                    xpath://div[@data-testid="Time periods"]//dd[@data-testid="Time periods-value"]
@@ -146,7 +149,7 @@ User checks row data contents inside the 'Draft API datasets' summary table
 User clicks on 'Preview API dataset' link
     user clicks link containing text    Preview API data set
 
-User click on 'Generate Token'
+User clicks on 'Generate Token'
     user clicks button     Generate token
 
 User creates API token through 'Generate API token' modal window
@@ -168,7 +171,7 @@ User revokes created API token
     user waits until modal is not visible    Revoke this token    %{WAIT_LONG}
     user waits until page contains    Generate API data set preview token
 
-Again,user click on 'Generate Token'
+User clicks on 'Generate Token'
     user clicks button     Generate token
 
 User creates API token through 'Generate API token' modal window
@@ -182,7 +185,7 @@ User creates API token through 'Generate API token' modal window
     user waits until page contains    API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
-User cancells to revoke created API token
+User cancels to revoke created API token
     user clicks button    Revoke this token
     ${modal}=    user waits until modal is visible    Revoke this token
     user clicks button    Cancel
@@ -191,7 +194,7 @@ User cancells to revoke created API token
     user waits until page contains    API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
-User cancells to create API token
+User cancels to create API token
     user clicks link    Back to API data set details
     user clicks link containing text    Preview API data set
     user clicks button     Generate token
