@@ -21,7 +21,7 @@ public interface IParquetFilterRepository
         IEnumerable<int> ids,
         CancellationToken cancellationToken = default);
 
-    Task<ISet<string>> ListFilterIds(
+    Task<Dictionary<string, string>> GetFilterColumnsById(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default);
 }

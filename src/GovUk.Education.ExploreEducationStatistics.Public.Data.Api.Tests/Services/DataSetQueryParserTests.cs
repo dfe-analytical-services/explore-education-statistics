@@ -80,7 +80,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -155,7 +155,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(3);
 
             var queryFilterOptionIds = filterOptions
@@ -205,8 +205,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForRange(..2, s => s.SetFilterId("field_a"))
-                .ForRange(2..4, s => s.SetFilterId("field_b"))
+                .ForRange(..2, s => s.SetFilterColumn("field_a"))
+                .ForRange(2..4, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -257,8 +257,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForRange(..2, s => s.SetFilterId("field_a"))
-                .ForRange(2..4, s => s.SetFilterId("field_b"))
+                .ForRange(..2, s => s.SetFilterColumn("field_a"))
+                .ForRange(2..4, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1273,7 +1273,7 @@ public abstract class DataSetQueryParserTests
 
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -1358,8 +1358,8 @@ public abstract class DataSetQueryParserTests
 
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1495,7 +1495,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -1540,8 +1540,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1636,9 +1636,9 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForRange(..2, s => s.SetFilterId("field_a"))
-                .ForIndex(2, s => s.SetFilterId("field_b"))
-                .ForRange(3..5, s => s.SetFilterId("field_c"))
+                .ForRange(..2, s => s.SetFilterColumn("field_a"))
+                .ForIndex(2, s => s.SetFilterColumn("field_b"))
+                .ForRange(3..5, s => s.SetFilterColumn("field_c"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1759,7 +1759,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -1804,8 +1804,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1900,9 +1900,9 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
-                .ForRange(2..5, s => s.SetFilterId("field_c"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
+                .ForRange(2..5, s => s.SetFilterColumn("field_c"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -2003,7 +2003,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -2045,8 +2045,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -2129,10 +2129,10 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
-                .ForIndex(2, s => s.SetFilterId("field_c"))
-                .ForRange(3..5, s => s.SetFilterId("field_d"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
+                .ForIndex(2, s => s.SetFilterColumn("field_c"))
+                .ForRange(3..5, s => s.SetFilterColumn("field_d"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions

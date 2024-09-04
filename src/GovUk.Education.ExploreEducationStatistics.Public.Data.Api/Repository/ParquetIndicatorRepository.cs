@@ -12,18 +12,24 @@ public class ParquetIndicatorRepository(
     IDataSetVersionPathResolver dataSetVersionPathResolver)
     : IParquetIndicatorRepository
 {
-    public async Task<ISet<string>> ListIds(
+    public async Task<Dictionary<string, string>> GetColumnsById(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)
     {
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT DISTINCT {IndicatorsTable.Cols.Id:raw}
+             SELECT DISTINCT 
+                {IndicatorsTable.Cols.Id:raw}, 
+                {IndicatorsTable.Cols.Column:raw}
              FROM '{dataSetVersionPathResolver.IndicatorsPath(dataSetVersion):raw}'
              """);
 
-        var indicators = await command.QueryAsync<string>(cancellationToken: cancellationToken);
+        var indicators = await command
+            .QueryAsync<(string Id, string Column)>(cancellationToken: cancellationToken);
 
-        return indicators.ToHashSet();
+        return indicators.ToDictionary(
+            tuple => tuple.Id,
+            tuple => tuple.Column
+        );
     }
 }
