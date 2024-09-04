@@ -233,12 +233,12 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
   location: location
 }
 
-module acrPullRoleAssignmentModule 'components/containerRegistryRoleAssignment.bicep' = {
+module apiContainerAppAcrPullRoleAssignmentModule 'components/containerRegistryRoleAssignment.bicep' = {
   name: '${apiContainerAppManagedIdentityName}AcrPullRoleAssignmentDeploy'
   params: {
     role: 'AcrPull'
     containerRegistryName: acrName
-    managedIdentityName: apiContainerAppManagedIdentity.name
+    principalIds: [apiContainerAppManagedIdentity.properties.principalId]
   }
 }
 

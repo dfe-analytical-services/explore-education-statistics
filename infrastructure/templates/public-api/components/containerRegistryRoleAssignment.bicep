@@ -1,14 +1,18 @@
-@description('A Container Registry-specific role to assign')
+@description('Specifies the name of an existing Container Registry to be use as the scope of the role assignment')
+param containerRegistryName string
+
+@description('Specifies the id of the service principals that should inherit this Key Vault policy')
+param principalIds string[]
+
+// A subset of allowed roles is supported here in accordance with role assignment conditions.
+// See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles for possible
+// roles to support here, in conjunction with the limited set of roles that the deploying service
+// principal is allowed to assign.
+@description('The Container Registry-specific role to assign')
 @allowed([
   'AcrPull'
 ])
 param role string
-
-@description('The name of an existing Container Registry to be use as the scope of the role assignment')
-param containerRegistryName string
-
-@description('The name of the Managed Identity that the role will be assigned to')
-param managedIdentityName string
 
 // See https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#containers for Container-specific built in role ids.
 var rolesToRoleIds = {
@@ -19,16 +23,15 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' e
   name: containerRegistryName
 }
 
-resource managedIdentitty 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: managedIdentityName
-}
-
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(containerRegistry.id, rolesToRoleIds[role], managedIdentitty.name)
+// Create the role assignment. Note that this is dependent on the deploying service principal having
+// "Microsoft.Authorization/roleAssignments/write" permissions on the Container Registry via an appropriate
+// role.
+resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
+  name: guid(containerRegistry.id, principalId, rolesToRoleIds[role])
   scope: containerRegistry
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
-    principalId: managedIdentitty.properties.principalId
+    principalId: principalId
     principalType: 'ServicePrincipal'
   }
-}
+}]
