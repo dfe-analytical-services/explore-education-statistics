@@ -347,7 +347,7 @@ describe('DataBlockTabs', () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
     );
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -367,7 +367,7 @@ describe('DataBlockTabs', () => {
         'block-1-parent',
       );
 
-      expect(tableBuilderService.getGeoJson).toBeCalledWith(
+      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
         'release-1',
         'block-1-parent',
         testMapConfiguration.type === 'map' &&
@@ -377,8 +377,8 @@ describe('DataBlockTabs', () => {
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
     await waitFor(() => {
-      expect(tableBuilderService.getGeoJson).toBeCalled();
-      expect(tableBuilderService.getGeoJson).toBeCalledTimes(1);
+      expect(tableBuilderService.getLocationGeoJson).toBeCalled();
+      expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
     });
   });
 

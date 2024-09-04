@@ -44,7 +44,13 @@ const DataBlockTabs = ({
     value: fullTable,
     isLoading,
     error,
-  } = useTableQuery(releaseId, dataBlock.dataBlockParentId);
+  } = useTableQuery(
+    releaseId,
+    dataBlock.dataBlockParentId,
+    dataBlock.charts[0].type === 'map'
+      ? dataBlock.charts[0].boundaryLevel
+      : undefined,
+  );
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 
@@ -61,7 +67,7 @@ const DataBlockTabs = ({
       <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
 
-        {!!dataBlock.charts?.length && (
+        {!!dataBlock.charts.length && (
           <TabsSection
             id={`${id}-charts`}
             lazy
@@ -84,22 +90,16 @@ const DataBlockTabs = ({
 
                   const axes = { ...chart.axes } as Required<AxesConfiguration>;
 
-                  const commonChartProps = {
-                    ...chart,
-                    releaseId,
-                    dataBlockParentId: dataBlock.dataBlockParentId,
-                    id: `${id}-chart`,
-                    axes,
-                    data: fullTable?.results,
-                    meta: fullTable?.subjectMeta,
-                    source: dataBlock?.source,
-                  };
-
-                  if (commonChartProps.type === 'infographic') {
+                  if (chart.type === 'infographic') {
                     return (
                       <ChartRenderer
-                        {...commonChartProps}
+                        {...chart}
+                        id={`${id}-chart`}
                         key={key}
+                        axes={axes}
+                        data={fullTable?.results}
+                        meta={fullTable?.subjectMeta}
+                        source={dataBlock?.source}
                         getInfographic={getInfographic}
                       />
                     );
@@ -107,9 +107,13 @@ const DataBlockTabs = ({
 
                   return (
                     <ChartRenderer
-                      {...commonChartProps}
-                      key={key}
+                      {...chart}
                       id={`${id}-chart`}
+                      key={key}
+                      axes={axes}
+                      data={fullTable?.results}
+                      meta={fullTable?.subjectMeta}
+                      source={dataBlock?.source}
                     />
                   );
                 })}

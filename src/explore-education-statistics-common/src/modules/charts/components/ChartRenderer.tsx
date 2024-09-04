@@ -31,8 +31,6 @@ export type ChartRendererProps = {
   | ({
       type: 'map';
     } & Omit<MapBlockProps, 'id'> & {
-        releaseId: string;
-        dataBlockParentId: string;
         boundaryLevel: number;
       })
   | ({

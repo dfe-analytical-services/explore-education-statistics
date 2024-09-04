@@ -10,7 +10,7 @@ const tableBuilderQueries = createQueryKeys('tableBuilder', {
     return {
       queryKey: ['geoJson', releaseId, dataBlockParentId, boundaryLevelId],
       queryFn: () =>
-        tableBuilderService.getGeoJson(
+        tableBuilderService.getLocationGeoJson(
           releaseId,
           dataBlockParentId,
           boundaryLevelId,

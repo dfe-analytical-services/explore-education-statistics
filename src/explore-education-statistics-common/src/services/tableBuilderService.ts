@@ -68,6 +68,8 @@ export interface LocationOption {
   geoJson?: GeoJsonFeature;
 }
 
+export interface LocationGeoJsonOption extends LocationOption { geoJson: GeoJsonFeature; }
+
 export interface LocationLeafOption {
   id?: string;
   label: string;
@@ -285,11 +287,11 @@ const tableBuilderService = {
   ): Promise<FastTrackTableAndReleaseMeta> {
     return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
   },
-  getGeoJson(
+  getLocationGeoJson(
     releaseId: string,
     dataBlockParentId: string,
     boundaryLevelId: number,
-  ): Promise<Dictionary<LocationOption[]>> {
+  ): Promise<Dictionary<LocationGeoJsonOption[]>> {
     return dataApi.get(
       `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}/geojson`,
       { params: { boundaryLevelId } },

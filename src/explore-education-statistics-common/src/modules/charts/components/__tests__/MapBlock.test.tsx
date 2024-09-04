@@ -29,9 +29,6 @@ describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
-    releaseId: 'release-1',
-    dataBlockParentId: 'data-block-parent-1',
-    boundaryLevel: 1,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
     legend: testMapConfiguration.legend as LegendConfiguration,
@@ -43,7 +40,7 @@ describe('MapBlock', () => {
   };
 
   test('renders legends and polygons correctly', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
     render(<MapBlock {...testBlockProps} />);
@@ -89,7 +86,7 @@ describe('MapBlock', () => {
   });
 
   test('renders legend groups correctly with custom 1 d.p decimal places', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -123,7 +120,7 @@ describe('MapBlock', () => {
   });
 
   test('renders legend groups correctly with custom 3 d.p decimal places', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -157,7 +154,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected data set changes legends and polygons', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -203,7 +200,7 @@ describe('MapBlock', () => {
   });
 
   test.skip('changing selected location focuses the correct polygon', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -238,7 +235,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location renders its indicator tile', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -270,7 +267,7 @@ describe('MapBlock', () => {
   });
 
   test('renders location indicator tiles correctly with custom decimal places', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -335,7 +332,7 @@ describe('MapBlock', () => {
   });
 
   test.skip('resetting the map when select None Selected', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -370,7 +367,7 @@ describe('MapBlock', () => {
   });
 
   test('ensure values with decimal places go are assigned the correct colour when the legend values are set to 0 decimal places', async () => {
-    tableBuilderService.getGeoJson.mockResolvedValue(
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 

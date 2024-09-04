@@ -31,11 +31,8 @@ import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
-import mapLocationOptionsToFilters from '@common/modules/table-tool/utils/mapLocationOptionsToFilters';
-import WarningMessage from '@common/components/WarningMessage';
-
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
   data: number;
@@ -51,9 +48,6 @@ export type MapFeatureCollection = FeatureCollection<
 >;
 
 export interface MapBlockProps extends ChartProps {
-  releaseId: string;
-  dataBlockParentId: string;
-  boundaryLevel: number;
   axes: {
     major: AxisConfiguration;
   };
@@ -116,36 +110,7 @@ export const mapBlockDefinition: ChartDefinition = {
   },
 };
 
-export default function MapBlockWrapper(props: MapBlockProps): ReactNode {
-  const { releaseId, dataBlockParentId, boundaryLevel, meta } = props;
-
-  const {
-    data: geoJson = {},
-    isLoading,
-    error,
-  } = useQuery({
-    ...tableBuilderQueries.getGeoJson(
-      releaseId,
-      dataBlockParentId,
-      boundaryLevel,
-    ),
-  });
-
-  if (isLoading) return <LoadingSpinner text="Gathering map data" />;
-  if (error) return <WarningMessage>Could not load content</WarningMessage>;
-
-  return (
-    <MapBlock
-      {...props}
-      meta={{
-        ...meta,
-        locations: mapLocationOptionsToFilters(geoJson),
-      }}
-    />
-  );
-}
-
-function MapBlock({
+export default function MapBlock({
   id,
   dataGroups: deprecatedDataGroups,
   dataClassification: deprecatedDataClassification,

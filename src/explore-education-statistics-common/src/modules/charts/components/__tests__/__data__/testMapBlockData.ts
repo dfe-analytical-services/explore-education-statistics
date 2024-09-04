@@ -14,8 +14,6 @@ import { Chart } from '@common/services/types/blocks';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 
 export const testMapConfiguration: Chart = {
-  releaseId: 'release-1',
-  dataBlockParentId: 'data-block-parent-1',
   boundaryLevel: 1,
   axes: {
     major: {
