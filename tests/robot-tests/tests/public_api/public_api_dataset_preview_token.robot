@@ -13,7 +13,7 @@ Suite Teardown      user closes the browser
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api generate and preview token %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - Public API - Generate and Preview API token %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
