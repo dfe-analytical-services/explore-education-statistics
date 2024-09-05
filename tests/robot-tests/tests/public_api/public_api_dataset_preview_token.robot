@@ -270,3 +270,61 @@ User checks relevant headings exist on API dataset details page
     user waits until h2 is visible    Using this data
     user waits until h2 is visible    API data set quick start
     user waits until h2 is visible    API data set version history
+
+User verifies the row headings and contents in 'Data set details' section
+    user checks row headinds within the api dataset section    Theme
+    user checks row headinds within the api dataset section    Publication
+    user checks row headinds within the api dataset section    Release
+    user checks row headinds within the api dataset section    Release type
+    user checks row headinds within the api dataset section    Geographic levels
+    user checks row headinds within the api dataset section    Indicators
+    user checks row headinds within the api dataset section    Filters
+    user checks row headinds within the api dataset section    Time period
+
+    user checks row headinds within the api dataset section    Notifications
+
+    user checks contents inside the cell value          Test theme                                                  css: #dataSetDetails [data-testid="Theme-value"]
+    user checks contents inside the cell value          ${PUBLICATION_NAME}                                         css:#dataSetDetails [data-testid="Publication-value"] 
+    user checks contents inside the cell value          Academic year Q1 3000/01                                    css:#dataSetDetails [data-testid="Release-value"]
+    User checks contents inside the release type        Accredited official statistics                              css:#dataSetDetails [data-testid="Release type-value"] > button
+    user checks contents inside the cell value          National                                                    css:#dataSetDetails [data-testid="Geographic levels-value"]
+
+
+    user checks contents inside the cell value           Lower quartile annualised earnings                         css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(1)
+    user checks contents inside the cell value           Median annualised earnings                                 css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(2)
+    user checks contents inside the cell value           Number of learners with earnings                           css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(3)
+    
+    user clicks button                                   Show 1 more indicator                                      css:#dataSetDetails [data-testid="Indicators-value"]
+    
+    user checks contents inside the cell value           Upper quartile annualised earnings                         css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(4)
+
+    user checks contents inside the cell value    	     Cheese                                                     css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(1)
+    user checks contents inside the cell value    	     Colour                                                     css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(2)
+    user checks contents inside the cell value    	     Ethnicity group                                            css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(3)
+
+    user clicks button                                   Show 4 more filters                                        css:#dataSetDetails [data-testid="Filters-value"] 
+
+    user checks contents inside the cell value    	     Gender                                                     css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(4)
+    user checks contents inside the cell value    	     Level of learning                                          css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(5)
+    user checks contents inside the cell value           Number of years after achievement of learning aim          css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(6)
+    user checks contents inside the cell value           Provision                                                  css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(7)
+
+    user checks contents inside the cell value           2012/13                                                    css:#dataSetDetails [data-testid="Time period-value"]
+    user checks contents inside the cell value           Get email updates about this API data set                  css:#dataSetDetails [data-testid="Notifications-value"] > a
+
+Validate API dataset version history column headings
+    user checks table column heading contains    1    1    Version    css:section[id="apiVersionHistory"]
+    user checks table column heading contains    1    2    Release    css:section[id="apiVersionHistory"]
+    user checks table column heading contains    1    3    Status     css:section[id="apiVersionHistory"]
+
+
+*** Keywords ***
+
+User checks contents inside the release type
+    [Arguments]      ${expected_text}     ${locator}
+     ${full_text}=    get text    ${locator}
+
+    # Split and remove the part after '?' and strip whitespace
+    ${button_text}=    set variable    ${full_text.split('?')[0].strip()}
+
+    should be equal as strings    ${button_text}    ${expected_text}
