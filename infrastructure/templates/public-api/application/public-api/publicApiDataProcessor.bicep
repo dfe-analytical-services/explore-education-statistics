@@ -1,17 +1,11 @@
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies the Data Processor Function App name.')
-param dataProcessorAppName string
+@description('Specifies the Public API resource prefix')
+param publicApiResourcePrefix string
 
-@description('Specifies the App Service plan name')
-param appServicePlanName string
-
-@description('Specifies the Managed Identity name.')
-param dataProcessorIdentityName string
-
-@description('Specifies the Data Processor Function App name.')
-param dataProcessorStorageAccountsPrefix string
+@description('Specifies the subscription name.')
+param subscription string
 
 @description('Specifies the name of an alerts group for reporting metric alerts')
 param alertsGroupName string
@@ -55,6 +49,12 @@ param storageFirewallRules {
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+var appName = '${publicApiResourcePrefix}-fa-processor'
+var appServicePlanName = '${publicApiResourcePrefix}-asp-processor'
+var identityName = '${publicApiResourcePrefix}-id-fa-processor'
+var storageAccountsNamePrefix = '${subscription}eessaprocessor'
+var publicApiDataFileShareMountPath = '/data/public-api-data'
+
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
   name: adminAppName
 }
@@ -72,7 +72,7 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' 
 }
 
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: dataProcessorIdentityName
+  name: identityName
   location: location
 }
 
@@ -80,9 +80,9 @@ resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/user
 module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
-    functionAppName: dataProcessorAppName
+    functionAppName: appName
     appServicePlanName: appServicePlanName
-    storageAccountsNamePrefix: dataProcessorStorageAccountsPrefix
+    storageAccountsNamePrefix: storageAccountsNamePrefix
     alertsGroupName: alertsGroupName
     location: location
     applicationInsightsKey: applicationInsightsKey
@@ -125,11 +125,13 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
       storageAccountName: publicApiStorageAccountName
       fileShareName: publicApiDataFileShareName
-      mountPath: '/data/public-api-data'
+      mountPath: publicApiDataFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
   }
 }
 
+output managedIdentityName string = dataProcessorFunctionAppManagedIdentity.name
 output managedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
+output publicApiDataFileShareMountPath string = publicApiDataFileShareMountPath
