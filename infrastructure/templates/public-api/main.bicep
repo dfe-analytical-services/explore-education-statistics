@@ -126,7 +126,6 @@ var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
 var apiAppName = '${publicApiResourcePrefix}-ca-api'
 var appGatewayName = '${commonResourcePrefix}-agw-01'
 var publicApiDataFileShareName = '${publicApiResourcePrefix}-fs-data'
-var appInsightsName = '${publicApiResourcePrefix}-ai'
 var logAnalyticsWorkspaceName = '${commonResourcePrefix}-log'
 var publicApiStorageAccountName = '${subscription}eespapisa'
 var dataFilesFileShareMountPath = '/data/public-api-data'
@@ -185,11 +184,11 @@ module publicApiStorageModule 'application/publicApiStorage.bicep' = {
 }
 
 // Deploy a single shared Application Insights for all relevant Public API resources to use.
-module applicationInsightsModule 'components/appInsights.bicep' = {
+module appInsightsModule 'application/publicApiAppInsights.bicep' = {
   name: 'appInsightsDeploy'
   params: {
     location: location
-    appInsightsName: appInsightsName
+    publicApiResourcePrefix: publicApiResourcePrefix
   }
 }
 
@@ -229,7 +228,7 @@ module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep'
     containerAppEnvironmentName: containerAppEnvironmentName
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
-    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     publicApiStorageAccountName: publicApiStorageModule.outputs.storageAccountName
     publicApiFileShareName: publicApiDataFileShareName
     tagValues: tagValues
@@ -270,7 +269,7 @@ module dataProcessorModule 'application/dataProcessor.bicep' = {
     keyVaultName: keyVaultName
     metricsNamePrefix: '${subscription}PublicDataProcessor'
     alertsGroupName: alertsGroupName
-    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     privateEndpointSubnetId: vNetModule.outputs.dataProcessorPrivateEndpointSubnetRef
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
