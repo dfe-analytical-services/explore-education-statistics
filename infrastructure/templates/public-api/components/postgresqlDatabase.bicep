@@ -72,7 +72,7 @@ param tagValues object
 param createMode string = 'Default'
 
 @description('The id of the subnet which will be used to install the private endpoint for allowing secure connection to the database server over the VNet')
-param subnetId string
+param privateEndpointSubnetId string
 
 resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: databaseServerName
@@ -127,7 +127,7 @@ module privateEndpointModule 'privateEndpoint.bicep' = {
     serviceId: postgreSQLDatabase.id
     serviceName: postgreSQLDatabase.name
     serviceType: 'postgres'
-    subnetId: subnetId
+    subnetId: privateEndpointSubnetId
     location: location
     tagValues: tagValues
   }
