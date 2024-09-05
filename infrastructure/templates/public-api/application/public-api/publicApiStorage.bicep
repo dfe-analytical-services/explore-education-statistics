@@ -30,7 +30,7 @@ param tagValues object
 
 // TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 // Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
-module publicApiStorageAccountModule '../components/storageAccount.bicep' = {
+module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
@@ -46,7 +46,7 @@ module publicApiStorageAccountModule '../components/storageAccount.bicep' = {
   }
 }
 
-module dataFilesFileShareModule '../components/fileShare.bicep' = {
+module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     fileShareName: publicApiDataFileShareName

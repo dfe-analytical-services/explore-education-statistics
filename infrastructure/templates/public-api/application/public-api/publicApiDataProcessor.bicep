@@ -77,7 +77,7 @@ resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/user
 }
 
 // Deploy Data Processor Function.
-module dataProcessorFunctionAppModule '../components/functionApp.bicep' = {
+module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
     functionAppName: dataProcessorAppName

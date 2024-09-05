@@ -7,7 +7,7 @@ param publicApiResourcePrefix string
 var appInsightsName = '${publicApiResourcePrefix}-ai'
 
 // Deploy a single shared Application Insights for all relevant Public API resources to use.
-module applicationInsightsModule '../components/appInsights.bicep' = {
+module applicationInsightsModule '../../components/appInsights.bicep' = {
   name: 'appInsightsDeploy'
   params: {
     location: location
