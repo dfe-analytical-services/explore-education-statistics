@@ -16,14 +16,15 @@ param applicationInsightsKey string
 @description('Specifies the name of the Public API storage account.')
 param publicApiStorageAccountName string
 
-@description('Specifies the access key of the Public API storage account.')
-param publicApiStorageAccountAccessKey string
-
 @description('Specifies the fileshare name of the Public API data.')
 param publicApiFileShareName string
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
+
+resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: publicApiStorageAccountName
+}
 
 module containerAppEnvironmentModule '../components/containerAppEnvironment.bicep' = {
   name: 'containerAppEnvironmentDeploy'
@@ -38,7 +39,7 @@ module containerAppEnvironmentModule '../components/containerAppEnvironment.bice
       {
         storageName: publicApiFileShareName
         storageAccountName: publicApiStorageAccountName
-        storageAccountKey: publicApiStorageAccountAccessKey
+        storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
         fileShareName: publicApiFileShareName
         accessMode: 'ReadWrite'
       }

@@ -187,31 +187,15 @@ module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
   }
 }
 
-// TODO EES-5128 - we're currently needing to look up the Public API Storage Account in order to get its access keys,
-// as it's not possible to feed Key Vault secret references into the "storageAccountKey" values for Azure File Storage
-// mounts.
-//
-// It would be possible to use KV references if restructuring main.bicep to make the creation of the Container App
-// and Data Processor their own sub-modules in the "application" folder.  Then, we could use @secure() params
-// and keyVaultResource.getSecret() to pass the secrets through.
-resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: publicApiStorageAccountName
-}
-
-var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0].value
-
 // Deploy File Share.
 module dataFilesFileShareModule 'components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     fileShareName: publicApiDataFileShareName
     fileShareQuota: fileShareQuota
-    storageAccountName: publicApiStorageAccountName
+    storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
   }
-  dependsOn: [
-    publicApiStorageAccountModule
-  ]
 }
 
 // Deploy a single shared Application Insights for all relevant Public API resources to use.
@@ -269,9 +253,8 @@ module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep'
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
-    publicApiStorageAccountName: publicApiStorageAccountName
+    publicApiStorageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     publicApiFileShareName: dataFilesFileShareModule.outputs.fileShareName
-    publicApiStorageAccountAccessKey: publicApiStorageAccountAccessKey
     tagValues: tagValues
   }
 }
@@ -316,8 +299,7 @@ module dataProcessorModule 'application/dataProcessor.bicep' = {
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     dataProcessorStorageAccountsPrefix: dataProcessorStorageAccountsPrefix
     publicApiDataFileShareName: publicApiDataFileShareName
-    publicApiStorageAccountAccessKey: publicApiStorageAccountAccessKey
-    publicApiStorageAccountName: publicApiStorageAccountName
+    publicApiStorageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     storageFirewallRules: storageFirewallRules
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
     tagValues: tagValues
