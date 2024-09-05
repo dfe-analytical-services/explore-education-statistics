@@ -46,9 +46,6 @@ param publicApiDataFileShareName string
 @description('Specifies the name of the Public API storage account.')
 param publicApiStorageAccountName string
 
-@description('Specifies the access key of the Public API storage account.')
-param publicApiStorageAccountAccessKey string
-
 @description('Public API Storage : Firewall rules.')
 param storageFirewallRules {
   name: string
@@ -69,6 +66,10 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
+
+resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: publicApiStorageAccountName
+}
 
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: dataProcessorIdentityName
@@ -121,7 +122,7 @@ module dataProcessorFunctionAppModule '../components/functionApp.bicep' = {
     }
     azureFileShares: [{
       storageName: publicApiDataFileShareName
-      storageAccountKey: publicApiStorageAccountAccessKey
+      storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
       storageAccountName: publicApiStorageAccountName
       fileShareName: publicApiDataFileShareName
       mountPath: '/data/public-api-data'
