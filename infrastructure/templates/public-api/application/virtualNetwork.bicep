@@ -33,7 +33,7 @@ resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-
 }
 
 resource dataProcessorPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}-plink'
+  name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}-pep'
   parent: vNet
 }
 

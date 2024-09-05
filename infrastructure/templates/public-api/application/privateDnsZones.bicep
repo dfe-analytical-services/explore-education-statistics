@@ -1,13 +1,13 @@
-@description('Specifies the resource id of the VNet that the DNS Zones will be attached to')
+@description('Specifies the name of the VNet that the DNS Zones will be attached to')
 @minLength(0)
-param vnetId string
+param vnetName string
 
 // Set up a Private DNS zone for handling private endpoints for PostgreSQL resources.
 module postgreSqlPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
   name: 'postgresPrivateDnsZoneDeploy'
   params: {
     zoneType: 'postgres'
-    vnetId: vnetId
+    vnetName: vnetName
   }
 }
 
@@ -17,7 +17,7 @@ module sitesPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
   name: 'sitesPrivateDnsZoneDeploy'
   params: {
     zoneType: 'sites'
-    vnetId: vnetId
+    vnetName: vnetName
   }
 }
 

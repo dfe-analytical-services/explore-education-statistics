@@ -137,7 +137,7 @@ module vNetModule 'application/virtualNetwork.bicep' = {
 module privateDnsZonesModule 'application/privateDnsZones.bicep' = {
   name: 'privateDnsZonesDeploy'
   params: {
-    vnetId: vNetModule.outputs.vnetId
+    vnetName: vNetName
   }
 }
 

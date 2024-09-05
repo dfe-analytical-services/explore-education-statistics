@@ -23,13 +23,18 @@ param serviceType string
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-var zoneTypeToNames = {
+var serviceTypeToDnsZoneNames = {
   sites: 'privatelink.azurewebsites.net'
   postgres: 'privatelink.postgres.database.azure.com'
 }
 
+var serviceTypeToGroupIds = {
+  sites: 'sites'
+  postgres: 'postgresqlServer'
+}
+
 var privateEndpointName = '${serviceName}-pep'
-var privateDnsZoneName = zoneTypeToNames[serviceType]
+var privateDnsZoneName = serviceTypeToDnsZoneNames[serviceType]
 
 // A private endpoint that establishes a link between a VNet and an Azure service 
 // that supports Private Link. This takes the form of an IP address that is 
@@ -45,7 +50,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
         properties: {
           privateLinkServiceId: serviceId
           groupIds: [
-            serviceType
+            serviceTypeToGroupIds[serviceType]
           ]
           privateLinkServiceConnectionState: {
             status: 'Approved'

@@ -5,8 +5,8 @@
 ])
 param zoneType string
 
-@description('Specifies the resource id of the VNet that this DNS Zone will be attached to')
-param vnetId string
+@description('Specifies the name of the VNet that this DNS Zone will be attached to')
+param vnetName string
 
 var zoneTypeToNames = {
   sites: 'privatelink.azurewebsites.net'
@@ -14,6 +14,10 @@ var zoneTypeToNames = {
 }
 
 var zoneName = zoneTypeToNames[zoneType]
+
+resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+  name: vnetName
+}
 
 // A DNS zone in which internal DNS records can be managed.
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
@@ -25,12 +29,12 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 // A link which makes the internal DNS records within the DNS zone available to other resources on the VNet.
 resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: privateDnsZone
-  name: '${zoneName}-link'
+  name: '${vnet.name}-${zoneName}-vnetlink'
   location: 'global'
   properties: {
     registrationEnabled: false
     virtualNetwork: {
-      id: vnetId
+      id: vnet.id
     }
   }
 }
