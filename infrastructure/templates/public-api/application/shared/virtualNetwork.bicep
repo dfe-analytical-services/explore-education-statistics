@@ -10,23 +10,12 @@ param commonResourcePrefix string
 @description('Specifies legacy resource prefix')
 param legacyResourcePrefix string
 
-@description('Specifies the name of the Data Processor Function App')
-param dataProcessorName string
-
-@description('Specifies the name of the Container App Environment')
-param containerAppEnvironmentName string
-
-@description('Specifies the name of the PSQL Flexible Servers')
-param psqlFlexibleServerName string
-
-@description('Specifies the name of the Application Gateway')
-param appGatewayName string
-
-@description('Specifies the name of the Admin App Service')
-param adminAppServiceName string
-
-@description('Specifies the name of the Publisher Function App')
-param publisherFunctionAppName string
+var adminAppServiceName = '${legacyResourcePrefix}-as-ees-admin'
+var publisherFunctionAppName = '${legacyResourcePrefix}-fa-ees-publisher'
+var dataProcessorName = '${publicApiResourcePrefix}-fa-processor'
+var psqlFlexibleServerName = '${commonResourcePrefix}-psql-flexibleserver'
+var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
+var appGatewayName = '${commonResourcePrefix}-agw-01'
 
 var dataProcessorSubnetName = replace(dataProcessorName, publicApiResourcePrefix, '${publicApiResourcePrefix}-snet-')
 var dataProcessorPrivateEndpointsSubnetName = '${dataProcessorSubnetName}-pep'

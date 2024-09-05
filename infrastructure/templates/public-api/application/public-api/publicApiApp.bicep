@@ -1,11 +1,8 @@
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies the API Container App name.')
-param apiAppName string
-
-@description('Specifies the Managed Identity name.')
-param apiAppIdentityName string
+@description('Specifies the Public API resource prefix')
+param publicApiResourcePrefix string
 
 @description('Specifies the Admin App Service name.')
 param adminAppName string
@@ -36,6 +33,9 @@ param publicApiDbConnectionStringTemplate string
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
+
+var apiAppName = '${publicApiResourcePrefix}-ca-api'
+var apiAppIdentityName = '${publicApiResourcePrefix}-id-ca-api'
 
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
@@ -152,3 +152,4 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
 
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn
 output containerAppName string = apiContainerAppModule.outputs.containerAppName
+output containerAppHealthProbeRelativeUrl string = '/docs'

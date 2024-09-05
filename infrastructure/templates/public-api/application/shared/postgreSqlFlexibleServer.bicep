@@ -1,15 +1,15 @@
 @description('Specifies the location for all resources.')
 param location string
 
-@description('PostgreSQL Flexible Server name.')
-param postgreSqlServerName string = ''
+@description('Specifies common resource prefix')
+param commonResourcePrefix string
 
 @description('Administrator login name.')
-param postgreSqlAdminName string = ''
+param postgreSqlAdminName string
 
 @description('Administrator password.')
 @secure()
-param postgreSqlAdminPassword string?
+param postgreSqlAdminPassword string
 
 @description('SKU name.')
 param postgreSqlSkuName string = 'Standard_B1ms'
@@ -32,6 +32,8 @@ param privateEndpointSubnetId string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+var postgreSqlServerName = '${commonResourcePrefix}-psql-flexibleserver'
+
 var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   name: replace(rule.name, ' ', '_')
   cidr: rule.cidr
@@ -44,7 +46,7 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
     location: location
     createMode: 'Default'
     adminName: postgreSqlAdminName
-    adminPassword: postgreSqlAdminPassword!
+    adminPassword: postgreSqlAdminPassword
     dbSkuName: postgreSqlSkuName
     dbStorageSizeGB: postgreSqlStorageSizeGB
     dbAutoGrowStatus: postgreSqlAutoGrowStatus

@@ -105,10 +105,8 @@ var legacyResourcePrefix = subscription
 
 
 //
-// Define the full names of all resources.
-//
-
 // Define full names for the pre-existing resources managed by the ARM template.
+//
 var adminAppName = '${legacyResourcePrefix}-as-ees-admin'
 var publisherAppFullName = '${legacyResourcePrefix}-fa-ees-publisher'
 var coreStorageAccountName = '${legacyResourcePrefix}saeescore'
@@ -117,24 +115,6 @@ var vNetName = '${legacyResourcePrefix}-vnet-ees'
 var alertsGroupName = '${legacyResourcePrefix}-ag-ees-alertedusers'
 var acrName = 'eesacr'
 
-// Define full names for new resources managed by the Bicep deployment.
-var dataProcessorAppName = '${publicApiResourcePrefix}-fa-processor'
-var dataProcessorAppServicePlanName = '${publicApiResourcePrefix}-asp-processor'
-var dataProcessorStorageAccountsPrefix = '${subscription}eessaprocessor'
-var postgreSqlServerName = '${subscription}-ees-psql-flexibleserver'
-var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
-var apiAppName = '${publicApiResourcePrefix}-ca-api'
-var appGatewayName = '${commonResourcePrefix}-agw-01'
-var publicApiDataFileShareName = '${publicApiResourcePrefix}-fs-data'
-var publicApiStorageAccountName = '${subscription}eespapisa'
-var dataFilesFileShareMountPath = '/data/public-api-data'
-
-// Define full names for managed identities used by Bicep-managed resources.
-var apiAppIdentityName = '${publicApiResourcePrefix}-id-ca-api'
-var dataProcessorIdentityName = '${publicApiResourcePrefix}-id-fa-processor'
-var appGatewayIdentityName = '${commonResourcePrefix}-id-agw-01'
-
-// Reference the existing core Storage Account as currently managed by the EES ARM template.
 resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: coreStorageAccountName
   scope: resourceGroup(resourceGroup().name)
@@ -151,12 +131,6 @@ module vNetModule 'application/shared/virtualNetwork.bicep' = {
     publicApiResourcePrefix: publicApiResourcePrefix
     commonResourcePrefix: commonResourcePrefix
     legacyResourcePrefix: legacyResourcePrefix
-    containerAppEnvironmentName: containerAppEnvironmentName
-    dataProcessorName: dataProcessorAppName
-    adminAppServiceName: adminAppName
-    psqlFlexibleServerName: postgreSqlServerName
-    publisherFunctionAppName: publisherAppFullName
-    appGatewayName: appGatewayName
   }
 }
 
@@ -171,11 +145,11 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
+    publicApiResourcePrefix: publicApiResourcePrefix
+    subscription: subscription
     keyVaultName: keyVaultName
     dataProcessorSubnetId: vNetModule.outputs.dataProcessorSubnetRef
     containerAppEnvironmentSubnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
-    publicApiStorageAccountName: publicApiStorageAccountName
-    publicApiDataFileShareName: publicApiDataFileShareName
     publicApiDataFileShareQuota: publicApiDataFileShareQuota
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
@@ -204,9 +178,9 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
   name: 'postgreSqlFlexibleServerModuleDeploy'
   params: {
     location: location
-    postgreSqlServerName: postgreSqlServerName
+    commonResourcePrefix: commonResourcePrefix
     postgreSqlAdminName: postgreSqlAdminName
-    postgreSqlAdminPassword: postgreSqlAdminPassword
+    postgreSqlAdminPassword: postgreSqlAdminPassword!
     privateEndpointSubnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
     postgreSqlAutoGrowStatus: postgreSqlAutoGrowStatus
     postgreSqlFirewallRules: postgreSqlFirewallRules
@@ -223,12 +197,12 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
   name: 'containerAppEnvironmentModuleDeploy'
   params: {
     location: location
-    containerAppEnvironmentName: containerAppEnvironmentName
+    commonResourcePrefix: commonResourcePrefix
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     publicApiStorageAccountName: publicApiStorageModule.outputs.storageAccountName
-    publicApiFileShareName: publicApiDataFileShareName
+    publicApiFileShareName: publicApiStorageModule.outputs.publicApiDataFileShareName
     tagValues: tagValues
   }
 }
@@ -238,17 +212,16 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
   name: 'publicApiAppModuleDeploy'
   params: {
     location: location
+    publicApiResourcePrefix: publicApiResourcePrefix
     acrName: acrName
     adminAppName: adminAppName
-    apiAppIdentityName: apiAppIdentityName
-    apiAppName: apiAppName
     apiAppRegistrationClientId: apiAppRegistrationClientId
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     contentApiUrl: publicUrls.contentApi
     publicApiUrl: publicUrls.publicApi
     dockerImagesTag: dockerImagesTag
     publicApiDbConnectionStringTemplate: postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
-    publicApiDataFileShareName: publicApiDataFileShareName
+    publicApiDataFileShareName: publicApiStorageModule.outputs.publicApiDataFileShareName
     tagValues: tagValues
   }
   dependsOn: [
@@ -260,9 +233,8 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
   name: 'publicApiDataProcessorModuleDeploy'
   params: {
     location: location
-    dataProcessorAppName: dataProcessorAppName
-    appServicePlanName: dataProcessorAppServicePlanName
-    dataProcessorIdentityName: dataProcessorIdentityName
+    subscription: subscription
+    publicApiResourcePrefix: publicApiResourcePrefix
     adminAppName: adminAppName
     keyVaultName: keyVaultName
     metricsNamePrefix: '${subscription}PublicDataProcessor'
@@ -271,8 +243,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     privateEndpointSubnetId: vNetModule.outputs.dataProcessorPrivateEndpointSubnetRef
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
-    dataProcessorStorageAccountsPrefix: dataProcessorStorageAccountsPrefix
-    publicApiDataFileShareName: publicApiDataFileShareName
+    publicApiDataFileShareName: publicApiStorageModule.outputs.publicApiDataFileShareName
     publicApiStorageAccountName: publicApiStorageModule.outputs.storageAccountName
     storageFirewallRules: storageFirewallRules
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
@@ -284,23 +255,20 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 }
 
 // Create an Application Gateway to serve public traffic for the Public API Container App.
-module appGatewayModule 'components/appGateway.bicep' = {
-  name: 'appGatewayDeploy'
+module appGatewayModule 'application/shared/appGateway.bicep' = {
+  name: 'appGatewayModuleDeploy'
   params: {
     location: location
-    appGatewayName: appGatewayName
-    managedIdentityName: appGatewayIdentityName
+    commonResourcePrefix: commonResourcePrefix
     keyVaultName: keyVaultName
     subnetId: vNetModule.outputs.appGatewaySubnetRef
-    sites: [
-      {
-        resourceName: apiAppModule.outputs.containerAppName
-        backendFqdn: apiAppModule.outputs.containerAppFqdn
-        publicFqdn: replace(publicUrls.publicApi, 'https://', '')
-        certificateKeyVaultSecretName: '${apiAppModule.outputs.containerAppName}-certificate'
-        healthProbeRelativeUrl: '/docs'
-      }
-    ]
+    publicApiContainerAppSettings: {
+      name: apiAppModule.outputs.containerAppName
+      backendFqdn: apiAppModule.outputs.containerAppFqdn
+      publicFqdn: replace(publicUrls.publicApi, 'https://', '')
+      certificateName: '${apiAppModule.outputs.containerAppName}-certificate'
+      healthProbeRelativeUrl: apiAppModule.outputs.containerAppHealthProbeRelativeUrl
+    }
     tagValues: tagValues
   }
 }
@@ -313,7 +281,7 @@ module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' 
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorIdentityName)
+    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorModule.outputs.managedIdentityName)
     contentType: 'text/plain'
   }
 }
@@ -364,4 +332,4 @@ output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorMod
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
 
-output dataFilesFileShareMountPath string = dataFilesFileShareMountPath
+output dataProcessorPublicApiDataFileShareMountPath string = dataProcessorModule.outputs.publicApiDataFileShareMountPath
