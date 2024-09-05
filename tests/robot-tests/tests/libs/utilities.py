@@ -102,7 +102,8 @@ def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
 
 
 def user_waits_until_parent_contains_element(
-    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None, retries: int = 5, delay: float = 1.0
+    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None,
+    retries: int = 5, delay: float = 1.0
 ):
     try:
         child_locator = _normalise_child_locator(child_locator)
@@ -143,6 +144,7 @@ def user_waits_until_parent_contains_element(
             f"with parent {parent_locator} and child locator {child_locator} - {err}"
         )
         raise_assertion_error(err)
+
 
 def user_waits_until_parent_contains_element_without_retries(
     parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None
@@ -293,6 +295,15 @@ def format_datetime(datetime: datetime, strf: str) -> str:
         strf = strf.replace("%-", "%#")
 
     return datetime.strftime(strf)
+
+
+def format_time_without_leading_zero(time_str: str) -> str:
+    parts = time_str.split()
+    hour, minute = parts[0].split(':')
+
+    # Remove leading zero in hour
+    hour = str(int(hour))
+    return f"{hour}:{minute} {parts[1]}"
 
 
 def user_should_be_at_top_of_page():
