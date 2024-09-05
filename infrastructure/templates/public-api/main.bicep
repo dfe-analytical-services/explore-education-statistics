@@ -126,7 +126,6 @@ var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
 var apiAppName = '${publicApiResourcePrefix}-ca-api'
 var appGatewayName = '${commonResourcePrefix}-agw-01'
 var publicApiDataFileShareName = '${publicApiResourcePrefix}-fs-data'
-var logAnalyticsWorkspaceName = '${commonResourcePrefix}-log'
 var publicApiStorageAccountName = '${subscription}eespapisa'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
@@ -184,7 +183,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
 }
 
 module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
-  name: 'appInsightsDeploy'
+  name: 'publicApiAppInsightsModuleDeploy'
   params: {
     location: location
     publicApiResourcePrefix: publicApiResourcePrefix
@@ -192,17 +191,17 @@ module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
 }
 
 // Create a generic, shared Log Analytics Workspace for any relevant resources to use.
-module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
-  name: 'logAnalyticsWorkspaceDeploy'
+module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bicep' = {
+  name: 'logAnalyticsWorkspaceModuleDeploy'
   params: {
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     location: location
+    commonResourcePrefix: commonResourcePrefix
     tagValues: tagValues
   }
 }
 
 module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
-  name: 'postgreSqlFlexibleServerDeploy'
+  name: 'postgreSqlFlexibleServerModuleDeploy'
   params: {
     location: location
     postgreSqlServerName: postgreSqlServerName
@@ -221,7 +220,7 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
 }
 
 module containerAppEnvironmentModule 'application/shared/containerAppEnvironment.bicep' = {
-  name: 'containerAppEnvironmentDeploy'
+  name: 'containerAppEnvironmentModuleDeploy'
   params: {
     location: location
     containerAppEnvironmentName: containerAppEnvironmentName
@@ -236,7 +235,7 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
 
 // Deploy main Public API Container App.
 module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployContainerApp) {
-  name: 'apiAppDeploy'
+  name: 'publicApiAppModuleDeploy'
   params: {
     location: location
     acrName: acrName
@@ -258,7 +257,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
 }
 
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = {
-  name: 'dataProcessorDeploy'
+  name: 'publicApiDataProcessorModuleDeploy'
   params: {
     location: location
     dataProcessorAppName: dataProcessorAppName
