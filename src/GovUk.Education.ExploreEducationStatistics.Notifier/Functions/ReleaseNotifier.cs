@@ -43,7 +43,7 @@ public class ReleaseNotifier(
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         // Send emails to subscribers of publication
-        var releaseSubscriberQuery = new TableQuery<SubscriptionEntity>()
+        var releaseSubscriberQuery = new TableQuery<SubscriptionEntityOld>()
             .Where(TableQuery.GenerateFilterCondition("PartitionKey",
                 QueryComparisons.Equal,
                 msg.PublicationId.ToString()));
@@ -61,7 +61,7 @@ public class ReleaseNotifier(
         // Send emails to subscribers of any associated superseded publication
         foreach (var supersededPublication in msg.SupersededPublications)
         {
-            var releaseSupersededPubSubsQuery = new TableQuery<SubscriptionEntity>()
+            var releaseSupersededPubSubsQuery = new TableQuery<SubscriptionEntityOld>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey",
                     QueryComparisons.Equal,
                     supersededPublication.Id.ToString()));
@@ -96,7 +96,7 @@ public class ReleaseNotifier(
 
     private static async Task<List<string>> GetSubscriberEmails(
         CloudTable table,
-        TableQuery<SubscriptionEntity> query)
+        TableQuery<SubscriptionEntityOld> query)
     {
         var emails = new List<string>();
 

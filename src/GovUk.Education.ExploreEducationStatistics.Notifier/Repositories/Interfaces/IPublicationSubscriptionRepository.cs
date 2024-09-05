@@ -6,11 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Inter
 
 public interface IPublicationSubscriptionRepository
 {
-    Task UpdateSubscriber(CloudTable table, SubscriptionEntity subscription);
+    Task UpdateSubscriber(CloudTable table, SubscriptionEntityOld subscription);
 
-    Task RemoveSubscriber(CloudTable table, SubscriptionEntity subscription);
+    Task RemoveSubscriber(CloudTable table, SubscriptionEntityOld subscription);
 
-    Task<SubscriptionEntity?> RetrieveSubscriber(CloudTable table, SubscriptionEntity subscription);
+    Task<SubscriptionEntityOld?> RetrieveSubscriber(CloudTable table, SubscriptionEntityOld subscription);
 
     Task<CloudTable> GetTable(string storageTableName);
 

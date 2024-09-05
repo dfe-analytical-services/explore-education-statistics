@@ -3,15 +3,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notify.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
@@ -27,7 +28,8 @@ public class PublicationSubscriptionFunctions(
     ITokenService tokenService,
     IEmailService emailService,
     IPublicationSubscriptionRepository publicationSubscriptionRepository,
-    IValidator<PendingPublicationSubscriptionCreateRequest> requestValidator)
+    IValidator<PendingPublicationSubscriptionCreateRequest> requestValidator,
+    IApiSubscriptionTableStorageService apiSubscriptionTableStorageService)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -101,7 +103,7 @@ public class PublicationSubscriptionFunctions(
                     var expiryDateTime = DateTime.UtcNow.AddHours(1);
                     var activationCode = tokenService.GenerateToken(req.Email, expiryDateTime);
                     await publicationSubscriptionRepository.UpdateSubscriber(pendingSubscriptionTable,
-                        new SubscriptionEntity(req.Id, req.Email, req.Title, req.Slug, expiryDateTime));
+                        new SubscriptionEntityOld(req.Id, req.Email, req.Title, req.Slug, expiryDateTime));
 
                     var values = new Dictionary<string, dynamic>
                     {
@@ -135,7 +137,7 @@ public class PublicationSubscriptionFunctions(
             if (subscription.Status is not SubscriptionStatus.SubscriptionPending)
             {
                 await publicationSubscriptionRepository.RemoveSubscriber(pendingSubscriptionTable,
-                    new SubscriptionEntity(req.Id, req.Email));
+                    new SubscriptionEntityOld(req.Id, req.Email));
             }
 
             return new BadRequestResult();
@@ -163,7 +165,7 @@ public class PublicationSubscriptionFunctions(
         }
 
         var table = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
-        var sub = await publicationSubscriptionRepository.RetrieveSubscriber(table, new SubscriptionEntity(id, email));
+        var sub = await publicationSubscriptionRepository.RetrieveSubscriber(table, new SubscriptionEntityOld(id, email));
         if (sub is null)
         {
             return new UnprocessableEntityObjectResult("Unable to unsubscribe. Given email is not currently subscribed.");
@@ -197,7 +199,7 @@ public class PublicationSubscriptionFunctions(
                 await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
 
             var sub = publicationSubscriptionRepository
-                .RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
+                .RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntityOld(id, email)).Result;
 
             if (sub != null)
             {
@@ -245,23 +247,17 @@ public class PublicationSubscriptionFunctions(
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var pendingSubscriptionsTbl = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
+        // @MarkFix check this
+        // @MarkFix could move this to a repository...
+        // @MarkFix could also rename ApiSubscriptionTableStorageService...
+        var results = await apiSubscriptionTableStorageService.QueryEntities<SubscriptionEntity>(
+            tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            sub => sub.DateTimeCreated < DateTime.UtcNow.AddHours(1));
+        var pendingSubsToRemove = await results.ToListAsync();
 
-        // Remove any pending subscriptions where the token has expired i.e. more than 1 hour old
-        var query = new TableQuery<SubscriptionEntity>()
-            .Where(TableQuery.GenerateFilterConditionForDate("DateTimeCreated", QueryComparisons.LessThan,
-                DateTime.UtcNow.AddHours(1)));
-
-        TableContinuationToken? token = null;
-        do
-        {
-            var resultSegment = await pendingSubscriptionsTbl.ExecuteQuerySegmentedAsync(query, token);
-            token = resultSegment.ContinuationToken;
-
-            foreach (var entity in resultSegment.Results)
-            {
-                await publicationSubscriptionRepository.RemoveSubscriber(pendingSubscriptionsTbl, entity);
-            }
-        } while (token != null);
+        await apiSubscriptionTableStorageService.BatchManipulateEntities(
+            NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            pendingSubsToRemove,
+            TableTransactionActionType.Delete);
     }
 }

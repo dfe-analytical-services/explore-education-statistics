@@ -54,7 +54,7 @@ public abstract class NotifierFunctionsIntegrationTest
         return GetRequiredService<IOptions<GovUkNotifyOptions>>().Value;
     }
 
-    protected async Task AddTestSubscription(string tableName, SubscriptionEntity subscription)
+    protected async Task AddTestSubscription(string tableName, SubscriptionEntityOld subscription)
     {
         var storageAccount = CloudStorageAccount.Parse(StorageConnectionString());
         var tableClient = storageAccount.CreateCloudTableClient();

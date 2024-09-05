@@ -13,18 +13,18 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
 
-    public async Task UpdateSubscriber(CloudTable table, SubscriptionEntity subscription)
+    public async Task UpdateSubscriber(CloudTable table, SubscriptionEntityOld subscription)
     {
         await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
     }
 
-    public async Task RemoveSubscriber(CloudTable table, SubscriptionEntity subscription)
+    public async Task RemoveSubscriber(CloudTable table, SubscriptionEntityOld subscription)
     {
         subscription.ETag = "*";
         await table.ExecuteAsync(TableOperation.Delete(subscription));
     }
 
-    public async Task<SubscriptionEntity?> RetrieveSubscriber(CloudTable table, SubscriptionEntity subscription)
+    public async Task<SubscriptionEntityOld?> RetrieveSubscriber(CloudTable table, SubscriptionEntityOld subscription)
     {
         // Need to define the extra columns to retrieve
         var columns = new List<string>
@@ -34,8 +34,8 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
             "Title"
         };
         var result = await table.ExecuteAsync(
-            TableOperation.Retrieve<SubscriptionEntity>(subscription.PartitionKey, subscription.RowKey, columns));
-        return (SubscriptionEntity)result.Result;
+            TableOperation.Retrieve<SubscriptionEntityOld>(subscription.PartitionKey, subscription.RowKey, columns));
+        return (SubscriptionEntityOld)result.Result;
     }
 
     public async Task<CloudTable> GetTable(string storageTableName)
@@ -51,7 +51,7 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
     {
         var pendingSub =
             await RetrieveSubscriber(await GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable),
-                new SubscriptionEntity(id, email));
+                new SubscriptionEntityOld(id, email));
         if (pendingSub is not null)
         {
             return new Subscription
@@ -62,7 +62,7 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
         }
 
         var activeSubscriber = await RetrieveSubscriber(await GetTable(NotifierTableStorage.PublicationSubscriptionsTable),
-            new SubscriptionEntity(id, email));
+            new SubscriptionEntityOld(id, email));
         if (activeSubscriber is not null)
         {
             return new Subscription
