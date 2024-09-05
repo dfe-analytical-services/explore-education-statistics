@@ -5,7 +5,7 @@ param subscription string = ''
 param location string = resourceGroup().location
 
 @description('Public API Storage : Size of the file share in GB.')
-param fileShareQuota int = 1
+param publicApiDataFileShareQuota int = 1
 
 @description('Public API Storage : Firewall rules.')
 param storageFirewallRules {
@@ -169,34 +169,21 @@ module privateDnsZonesModule 'application/privateDnsZones.bicep' = {
   }
 }
 
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
-// Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
-module publicApiStorageAccountModule 'components/storageAccount.bicep' = {
+module publicApiStorageModule 'application/publicApiStorage.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
-    storageAccountName: publicApiStorageAccountName
-    allowedSubnetIds: [
-      vNetModule.outputs.dataProcessorSubnetRef
-      vNetModule.outputs.containerAppEnvironmentSubnetRef
-    ]
-    firewallRules: storageFirewallRules
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
+    dataProcessorSubnetId: vNetModule.outputs.dataProcessorSubnetRef
+    containerAppEnvironmentSubnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
+    publicApiStorageAccountName: publicApiStorageAccountName
+    publicApiDataFileShareName: publicApiDataFileShareName
+    publicApiDataFileShareQuota: publicApiDataFileShareQuota
+    storageFirewallRules: storageFirewallRules
     tagValues: tagValues
   }
 }
 
-// Deploy File Share.
-module dataFilesFileShareModule 'components/fileShare.bicep' = {
-  name: 'fileShareDeploy'
-  params: {
-    fileShareName: publicApiDataFileShareName
-    fileShareQuota: fileShareQuota
-    storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
-    fileShareAccessTier: 'TransactionOptimized'
-  }
-}
 
 // Deploy a single shared Application Insights for all relevant Public API resources to use.
 module applicationInsightsModule 'components/appInsights.bicep' = {
@@ -253,8 +240,8 @@ module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep'
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
-    publicApiStorageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
-    publicApiFileShareName: dataFilesFileShareModule.outputs.fileShareName
+    publicApiStorageAccountName: publicApiStorageModule.outputs.storageAccountName
+    publicApiFileShareName: publicApiDataFileShareName
     tagValues: tagValues
   }
 }
@@ -299,7 +286,7 @@ module dataProcessorModule 'application/dataProcessor.bicep' = {
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     dataProcessorStorageAccountsPrefix: dataProcessorStorageAccountsPrefix
     publicApiDataFileShareName: publicApiDataFileShareName
-    publicApiStorageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
+    publicApiStorageAccountName: publicApiStorageModule.outputs.storageAccountName
     storageFirewallRules: storageFirewallRules
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
     tagValues: tagValues
