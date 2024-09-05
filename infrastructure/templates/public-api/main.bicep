@@ -129,18 +129,12 @@ var fileShareName = '${publicApiResourcePrefix}-fs-data'
 var appInsightsName = '${publicApiResourcePrefix}-ai'
 var logAnalyticsWorkspaceName = '${commonResourcePrefix}-log'
 var publicApiStorageAccountName = '${subscription}eespapisa'
-var dataFilesFileShareMountName = 'public-api-fileshare-mount'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
 // Define full names for managed identities used by Bicep-managed resources.
 var apiAppIdentityName = '${publicApiResourcePrefix}-id-ca-api'
 var dataProcessorIdentityName = '${publicApiResourcePrefix}-id-fa-processor'
 var appGatewayIdentityName = '${commonResourcePrefix}-id-agw-01'
-
-// Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: acrName
-}
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
 resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
@@ -267,22 +261,6 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
   ]
 }
 
-var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
-
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: apiAppIdentityName
-  location: location
-}
-
-module apiContainerAppAcrPullRoleAssignmentModule 'components/containerRegistryRoleAssignment.bicep' = {
-  name: '${apiAppIdentityName}AcrPullRoleAssignmentDeploy'
-  params: {
-    role: 'AcrPull'
-    containerRegistryName: acrName
-    principalIds: [apiContainerAppManagedIdentity.properties.principalId]
-  }
-}
-
 module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep' = {
   name: 'containerAppEnvironmentDeploy'
   params: {
@@ -299,86 +277,25 @@ module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep'
 }
 
 // Deploy main Public API Container App.
-module apiContainerAppModule 'components/containerApp.bicep' = if (deployContainerApp) {
-  name: 'apiContainerAppDeploy'
+module apiAppModule 'application/apiApp.bicep' = if (deployContainerApp) {
+  name: 'apiAppDeploy'
   params: {
     location: location
-    containerAppName: apiAppName
-    acrLoginServer: containerRegistry.properties.loginServer
-    containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
-    userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
-    managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
-    corsPolicy: {
-      allowedOrigins: [
-        publicUrls.publicSite
-        'http://localhost:3000'
-        'http://127.0.0.1'
-      ]
-    }
-    volumeMounts: [
-      {
-        volumeName: dataFilesFileShareMountName
-        mountPath: dataFilesFileShareMountPath
-      }
-    ]
-    volumes: [
-      {
-        name: dataFilesFileShareMountName
-        storageType: 'AzureFile'
-        storageName: dataFilesFileShareModule.outputs.fileShareName
-      }
-    ]
-    appSettings: [
-      // TODO EES-5128 - replace this with a Key Vault reference string.
-      {
-        name: 'ConnectionStrings__PublicDataDb'
-        value: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiAppIdentityName)
-      }
-      {
-        // This settings allows the Container App to identify which user-assigned identity it should use in order to
-        // perform Managed Identity-based authentication and authorization with other Azure services / resources.
-        //
-        // It is used in conjunction with the Azure.Identity .NET library to retrieve access tokens for the user-assigned
-        // identity.
-        name: 'AZURE_CLIENT_ID'
-        value: apiContainerAppManagedIdentity.properties.clientId
-      }
-      {
-        name: 'ContentApi__Url'
-        value: publicUrls.contentApi
-      }
-      {
-        name: 'MiniProfiler__Enabled'
-        value: 'true'
-      }
-      {
-        name: 'DataFiles__BasePath'
-        value: dataFilesFileShareMountPath
-      }
-      {
-        name: 'OpenIdConnect__TenantId'
-        value: tenant().tenantId
-      }
-      {
-        name: 'OpenIdConnect__ClientId'
-        value: apiAppRegistrationClientId
-      }
-    ]
-    entraIdAuthentication: {
-      appRegistrationClientId: apiAppRegistrationClientId
-      allowedClientIds: [
-        adminAppClientId
-      ]
-      allowedPrincipalIds: [
-        adminAppPrincipalId
-      ]
-      requireAuthentication: false
-    }
+    acrName: acrName
+    adminAppName: adminAppName
+    apiAppIdentityName: apiAppIdentityName
+    apiAppName: apiAppName
+    apiAppRegistrationClientId: apiAppRegistrationClientId
+    containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+    contentApiUrl: publicUrls.contentApi
+    publicApiUrl: publicUrls.publicApi
+    dockerImagesTag: dockerImagesTag
+    publicApiDbConnectionStringTemplate: postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
+    publicApiDataFileShareName: fileShareName
     tagValues: tagValues
   }
   dependsOn: [
     postgreSqlServerModule
-    apiContainerAppAcrPullRoleAssignmentModule
   ]
 }
 
@@ -392,7 +309,7 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 }
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
-var adminAppPrincipalId = adminAppService.identity.principalId
+var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: dataProcessorIdentityName
@@ -469,10 +386,10 @@ module appGatewayModule 'components/appGateway.bicep' = {
     subnetId: vNetModule.outputs.appGatewaySubnetRef
     sites: [
       {
-        resourceName: apiContainerAppModule.outputs.containerAppName
-        backendFqdn: apiContainerAppModule.outputs.containerAppFqdn
+        resourceName: apiAppModule.outputs.containerAppName
+        backendFqdn: apiAppModule.outputs.containerAppFqdn
         publicFqdn: replace(publicUrls.publicApi, 'https://', '')
-        certificateKeyVaultSecretName: '${apiContainerAppModule.outputs.containerAppName}-certificate'
+        certificateKeyVaultSecretName: '${apiAppModule.outputs.containerAppName}-certificate'
         healthProbeRelativeUrl: '/docs'
       }
     ]
@@ -488,7 +405,7 @@ module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' 
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppManagedIdentity.name)
+    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppManagedIdentity.name)
     contentType: 'text/plain'
   }
 }
@@ -501,7 +418,7 @@ module storePublisherPsqlConnectionString 'components/keyVaultSecret.bicep' = {
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: publisherPsqlConnectionStringSecretKey
-    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', publisherAppFullName)
+    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', publisherAppFullName)
     contentType: 'text/plain'
   }
 }
@@ -514,7 +431,7 @@ module storeAdminPsqlConnectionString 'components/keyVaultSecret.bicep' = {
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: adminPsqlConnectionStringSecretKey
-    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', adminAppName)
+    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', adminAppName)
     contentType: 'text/plain'
   }
 }
