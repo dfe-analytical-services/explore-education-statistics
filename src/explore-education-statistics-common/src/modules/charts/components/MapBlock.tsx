@@ -1,6 +1,3 @@
-import tableBuilderQueries from '@common/modules/find-statistics/queries/tableBuilderQueries';
-import { useQuery } from '@tanstack/react-query';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import { SelectOption } from '@common/components/form/FormSelect';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import createMapDataSetCategories, {
@@ -33,6 +30,7 @@ import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
+
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
   data: number;

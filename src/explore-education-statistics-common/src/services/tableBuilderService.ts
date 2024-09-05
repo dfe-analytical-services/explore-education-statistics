@@ -68,7 +68,9 @@ export interface LocationOption {
   geoJson?: GeoJsonFeature;
 }
 
-export interface LocationGeoJsonOption extends LocationOption { geoJson: GeoJsonFeature; }
+export interface LocationGeoJsonOption extends LocationOption {
+  geoJson: GeoJsonFeature;
+}
 
 export interface LocationLeafOption {
   id?: string;
@@ -162,7 +164,7 @@ export interface LocationsOrTimePeriodsQuery {
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
-  locations: Dictionary<LocationOption[]>;
+  locations: Dictionary<LocationOption[] | LocationGeoJsonOption[]>;
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{

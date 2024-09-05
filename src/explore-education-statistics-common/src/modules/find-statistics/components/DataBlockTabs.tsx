@@ -7,13 +7,14 @@ import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
-import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
+import { useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import React, { ReactNode } from 'react';
+import tableBuilderQueries from '../queries/tableBuilderQueries';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
 
@@ -41,15 +42,17 @@ const DataBlockTabs = ({
   onToggle,
 }: DataBlockTabsProps) => {
   const {
-    value: fullTable,
-    isLoading,
+    data: fullTable,
     error,
-  } = useTableQuery(
-    releaseId,
-    dataBlock.dataBlockParentId,
-    dataBlock.charts[0].type === 'map'
-      ? dataBlock.charts[0].boundaryLevel
-      : undefined,
+    isLoading,
+  } = useQuery(
+    tableBuilderQueries.getDataBlockTable(
+      releaseId,
+      dataBlock.dataBlockParentId,
+      dataBlock.charts[0].type === 'map'
+        ? dataBlock.charts[0].boundaryLevel
+        : undefined,
+    ),
   );
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;

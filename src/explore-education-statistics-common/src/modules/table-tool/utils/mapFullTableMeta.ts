@@ -41,7 +41,6 @@ export default function mapFullTableMeta(
   //  backend returns an empty string for the group label. This can cause table
   //  layout problems so we need to not group the locations when this is the
   //  case.
-  
   const addLocationGroup = locationEntries.some(
     ([, levelOptions]) =>
       levelOptions.some(levelOption => levelOption.options) &&
