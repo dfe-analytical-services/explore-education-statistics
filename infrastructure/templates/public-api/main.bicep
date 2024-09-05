@@ -145,7 +145,7 @@ var endpointSuffix = environment().suffixes.storage
 var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${coreStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${coreStorageAccountKey}'
 
 // Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
-module vNetModule 'application/virtualNetwork.bicep' = {
+module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'networkDeploy'
   params: {
     vNetName: vNetName
@@ -161,14 +161,14 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/privateDnsZones.bicep' = {
+module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = {
   name: 'privateDnsZonesDeploy'
   params: {
     vnetName: vNetName
   }
 }
 
-module publicApiStorageModule 'application/publicApiStorage.bicep' = {
+module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
@@ -183,8 +183,7 @@ module publicApiStorageModule 'application/publicApiStorage.bicep' = {
   }
 }
 
-// Deploy a single shared Application Insights for all relevant Public API resources to use.
-module appInsightsModule 'application/publicApiAppInsights.bicep' = {
+module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
   name: 'appInsightsDeploy'
   params: {
     location: location
@@ -202,7 +201,7 @@ module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
   }
 }
 
-module postgreSqlServerModule 'application/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
+module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
   name: 'postgreSqlFlexibleServerDeploy'
   params: {
     location: location
@@ -221,7 +220,7 @@ module postgreSqlServerModule 'application/postgreSqlFlexibleServer.bicep' = if 
   ]
 }
 
-module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep' = {
+module containerAppEnvironmentModule 'application/shared/containerAppEnvironment.bicep' = {
   name: 'containerAppEnvironmentDeploy'
   params: {
     location: location
@@ -236,7 +235,7 @@ module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep'
 }
 
 // Deploy main Public API Container App.
-module apiAppModule 'application/apiApp.bicep' = if (deployContainerApp) {
+module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployContainerApp) {
   name: 'apiAppDeploy'
   params: {
     location: location
@@ -258,7 +257,7 @@ module apiAppModule 'application/apiApp.bicep' = if (deployContainerApp) {
   ]
 }
 
-module dataProcessorModule 'application/dataProcessor.bicep' = {
+module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = {
   name: 'dataProcessorDeploy'
   params: {
     location: location

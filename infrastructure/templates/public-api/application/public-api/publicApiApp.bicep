@@ -60,7 +60,7 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
   location: location
 }
 
-module apiContainerAppAcrPullRoleAssignmentModule '../components/containerRegistryRoleAssignment.bicep' = {
+module apiContainerAppAcrPullRoleAssignmentModule '../../components/containerRegistryRoleAssignment.bicep' = {
   name: '${apiAppIdentityName}AcrPullRoleAssignmentDeploy'
   params: {
     role: 'AcrPull'
@@ -69,7 +69,7 @@ module apiContainerAppAcrPullRoleAssignmentModule '../components/containerRegist
   }
 }
 
-module apiContainerAppModule '../components/containerApp.bicep' = {
+module apiContainerAppModule '../../components/containerApp.bicep' = {
   name: 'apiContainerAppDeploy'
   params: {
     location: location

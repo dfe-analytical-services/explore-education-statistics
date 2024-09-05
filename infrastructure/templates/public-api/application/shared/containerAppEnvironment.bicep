@@ -26,7 +26,7 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' 
   name: publicApiStorageAccountName
 }
 
-module containerAppEnvironmentModule '../components/containerAppEnvironment.bicep' = {
+module containerAppEnvironmentModule '../../components/containerAppEnvironment.bicep' = {
   name: 'containerAppEnvironmentDeploy'
   params: {
     location: location
