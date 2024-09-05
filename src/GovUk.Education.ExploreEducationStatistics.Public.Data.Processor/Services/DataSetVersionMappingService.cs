@@ -396,6 +396,7 @@ internal class DataSetVersionMappingService(
                     new FilterMapping
                     {
                         Source = new MappableFilter { Label = filter.Label },
+                        PublicId = filter.PublicId,
                         OptionMappings = filter
                             .OptionLinks
                             .ToDictionary(

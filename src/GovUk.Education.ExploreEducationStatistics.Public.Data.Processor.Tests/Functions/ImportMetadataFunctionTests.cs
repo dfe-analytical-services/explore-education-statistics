@@ -396,17 +396,19 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             {
                 PublicId = "id-1",
                 Type = MappingType.AutoMapped,
-                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption1)
+                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption1),
+                Source = new MappableFilterOption { Label = "Option 1" }
             };
 
             var option2Mapping = new FilterOptionMapping
             {
                 PublicId = "id-2",
                 Type = MappingType.ManualMapped,
-                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption2)
+                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption2),
+                Source = new MappableFilterOption { Label = "Option 2" }
             };
 
-            var i = 0;
+            var optionId = 0;
 
             var mappings = new DataSetVersionMapping
             {
@@ -421,19 +423,32 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                             keySelector: MappingKeyGenerators.Filter,
                             elementSelector: filter => new FilterMapping
                             {
+                                Type = MappingType.AutoMapped,
+                                Source = new MappableFilter { Label = filter.Label },
+                                PublicId = filter.PublicId,
                                 OptionMappings = filter
                                     .Options
                                     .ToDictionary(
                                         keySelector: MappingKeyGenerators.FilterOptionMeta,
                                         elementSelector: option =>
-                                            option == mappedOption1 ? option1Mapping
-                                            : option == mappedOption2 ? option2Mapping
-                                            : new FilterOptionMapping
-                                            {
-                                                Type = i++ % 2 == 0
-                                                    ? MappingType.AutoNone
-                                                    : MappingType.ManualNone
-                                            })
+                                        {
+                                            optionId++;
+
+                                            return option == mappedOption1 ? option1Mapping
+                                                : option == mappedOption2 ? option2Mapping
+                                                : new FilterOptionMapping
+                                                {
+                                                    PublicId = optionId.ToString(),
+                                                    Type = optionId % 2 == 0
+                                                        ? MappingType.AutoNone
+                                                        : MappingType.ManualNone,
+                                                    Source = new MappableFilterOption
+                                                    {
+                                                        Label = option.Label
+                                                    },
+                                                };
+                                        }
+                                    )
                             })
                 }
             };

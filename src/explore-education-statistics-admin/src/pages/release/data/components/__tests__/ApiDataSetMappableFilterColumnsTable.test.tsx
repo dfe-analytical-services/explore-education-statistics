@@ -6,7 +6,7 @@ import { screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('ApiDataSetMappableFilterColumnsTable', () => {
-  const testFilterColumns: Dictionary<FilterMapping> = {
+  const testFilters: Dictionary<FilterMapping> = {
     Filter1Key: {
       optionMappings: {
         Filter1Option1Key: {
@@ -64,20 +64,20 @@ describe('ApiDataSetMappableFilterColumnsTable', () => {
 
   test('renders correctly', () => {
     render(
-      <ApiDataSetMappableFilterColumnsTable
-        mappableFilterColumns={testFilterColumns}
-      />,
+      <ApiDataSetMappableFilterColumnsTable mappableFilters={testFilters} />,
     );
+
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows).toHaveLength(3);
 
     // Row 1
     const row1Cells = within(rows[1]).getAllByRole('cell');
+
     expect(row1Cells[0]).toHaveTextContent('Filter 1');
-    expect(row1Cells[0]).toHaveTextContent('ID: Filter1Key');
+    expect(row1Cells[0]).toHaveTextContent('Column: Filter1Key');
     expect(
       within(row1Cells[0]).getByRole('button', {
-        name: 'View filter options',
+        name: 'View filter options for Filter 1',
       }),
     ).toBeInTheDocument();
     expect(row1Cells[1]).toHaveTextContent('No mapping available');
@@ -85,11 +85,12 @@ describe('ApiDataSetMappableFilterColumnsTable', () => {
 
     // Row 2
     const row2Cells = within(rows[2]).getAllByRole('cell');
+
     expect(row2Cells[0]).toHaveTextContent('Filter 2');
-    expect(row2Cells[0]).toHaveTextContent('ID: Filter2Key');
+    expect(row2Cells[0]).toHaveTextContent('Column: Filter2Key');
     expect(
       within(row2Cells[0]).getByRole('button', {
-        name: 'View filter options',
+        name: 'View filter options for Filter 2',
       }),
     ).toBeInTheDocument();
     expect(row2Cells[1]).toHaveTextContent('No mapping available');
