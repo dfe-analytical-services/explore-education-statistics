@@ -1077,7 +1077,7 @@
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
-    "publicApiDataProcessorPlinkSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-plink')]",
+    "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
@@ -3559,7 +3559,7 @@
             }
           },
           {
-            "name": "[variables('publicApiDataProcessorPlinkSubnetName')]",
+            "name": "[variables('publicApiDataProcessorPrivateEndpointsSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.7.0/24"
             }

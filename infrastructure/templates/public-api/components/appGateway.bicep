@@ -101,7 +101,7 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
 module wafPolicyModule 'wafPolicy.bicep' = {
   name: 'wafPolicy'
   params: {
-    name: '${appGatewayFullName}-waf-policy'
+    name: '${appGatewayFullName}-afwp'
     location: location
     tagValues: tagValues
   }
