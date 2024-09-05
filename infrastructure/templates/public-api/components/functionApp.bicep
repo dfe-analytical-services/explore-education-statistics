@@ -1,14 +1,17 @@
-@description('Specifies the subscription name - used for creating a shorter name for Storage Accounts')
-param subscription string
-
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
-
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies the Function App name suffix')
+@description('Specifies the Function App name')
 param functionAppName string
+
+@description('Specifies the App Service plan name')
+param appServicePlanName string
+
+@description('Specifies the name prefix for all storage accounts')
+param storageAccountsNamePrefix string
+
+@description('Specifies the name of an alerts group for reporting metric alerts')
+param alertsGroupName string
 
 @description('Function App Plan : operating system')
 @allowed([
@@ -96,9 +99,7 @@ param storageFirewallRules {
   cidr: string
 }[] = []
 
-var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux'
-var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
 
 var identity = userAssignedManagedIdentityParams != null
   ? {
@@ -124,10 +125,10 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
 // Configure a single shared storage account for access key storage, and 2 individual storage accounts to be split
 // between the production slot and staging slot for reliable execution. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-zero-downtime-deployment#status-check-with-slot
-var sharedStorageAccountName = replace('${subscription}eessa${functionAppName}mg', '-', '')
-var slot1StorageAccountName = replace('${subscription}eessa${functionAppName}s1', '-', '')
-var slot2StorageAccountName = replace('${subscription}eessa${functionAppName}s2', '-', '')
-var functionAppCodeFileShareName = '${fullFunctionAppName}-fs'
+var sharedStorageAccountName = '${storageAccountsNamePrefix}mg'
+var slot1StorageAccountName = '${storageAccountsNamePrefix}s1'
+var slot2StorageAccountName = '${storageAccountsNamePrefix}s1'
+var functionAppCodeFileShareName = '${functionAppName}-fs'
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
@@ -224,7 +225,7 @@ var commonSiteProperties = {
 
 // Create the main production deploy slot.
 resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
-  name: fullFunctionAppName
+  name: functionAppName
   location: location
   kind: 'functionapp'
   identity: identity
@@ -246,7 +247,7 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
   name: '${functionAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
-    siteName: fullFunctionAppName
+    siteName: functionAppName
     stagingSlotName: stagingSlot.name
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
@@ -255,7 +256,7 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
 }
 
 resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
-  name: '${subscription}-ag-ees-alertedusers'
+  name: alertsGroupName
 }
 
 var commonUnhealthyMetricAlertRuleProperties = {

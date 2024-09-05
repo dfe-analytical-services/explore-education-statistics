@@ -1,54 +1,77 @@
 @description('Specifies the full name of the existing VNet')
 param vNetName string
 
-@description('Specifies the Subscription name')
-param subscription string
+@description('Specifies the Public API resource prefix')
+param publicApiResourcePrefix string
 
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
+@description('Specifies common resource prefix')
+param commonResourcePrefix string
 
-@description('Specifies the name suffix of the Data Processor Function App')
-param dataProcessorFunctionAppNameSuffix string
+@description('Specifies legacy resource prefix')
+param legacyResourcePrefix string
 
-@description('Specifies the name suffix of the Container App Environment')
-param containerAppEnvironmentNameSuffix string
+@description('Specifies the name of the Data Processor Function App')
+param dataProcessorName string
+
+@description('Specifies the name of the Container App Environment')
+param containerAppEnvironmentName string
+
+@description('Specifies the name of the PSQL Flexible Servers')
+param psqlFlexibleServerName string
+
+@description('Specifies the name of the Application Gateway')
+param appGatewayName string
+
+@description('Specifies the name of the Admin App Service')
+param adminAppServiceName string
+
+@description('Specifies the name of the Publisher Function App')
+param publisherFunctionAppName string
+
+var dataProcessorSubnetName = replace(dataProcessorName, publicApiResourcePrefix, '${publicApiResourcePrefix}-snet-')
+var dataProcessorPrivateEndpointsSubnetName = '${dataProcessorSubnetName}-pep'
+var containerAppEnvironmentSubnetName = replace(containerAppEnvironmentName, commonResourcePrefix, '${commonResourcePrefix}-snet-')
+var psqlFlexibleServerSubnetName = replace(psqlFlexibleServerName, commonResourcePrefix, '${commonResourcePrefix}-snet-')
+var appGatewaySubnetName = replace(appGatewayName, commonResourcePrefix, '${commonResourcePrefix}-snet-')
+var adminAppServiceSubnetName = replace(adminAppServiceName, legacyResourcePrefix, '${legacyResourcePrefix}-snet-')
+var publisherFunctionAppSubnetName = replace(publisherFunctionAppName, legacyResourcePrefix, '${legacyResourcePrefix}-snet-')
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: vNetName
 }
 
 resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-snet-ees-admin'
+  name: adminAppServiceSubnetName
   parent: vNet
 }
 
 resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-snet-ees-publisher'
+  name: publisherFunctionAppSubnetName
   parent: vNet
 }
 
 resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}'
+  name: dataProcessorSubnetName
   parent: vNet
 }
 
 resource dataProcessorPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}-pep'
+  name: dataProcessorPrivateEndpointsSubnetName
   parent: vNet
 }
 
 resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-ees-snet-cae-${containerAppEnvironmentNameSuffix}'
+  name: containerAppEnvironmentSubnetName
   parent: vNet
 }
 
 resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-ees-snet-psql-flexibleserver'
+  name: psqlFlexibleServerSubnetName
   parent: vNet
 }
 
 resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-ees-snet-agw-01'
+  name: appGatewaySubnetName
   parent: vNet
 }
 
