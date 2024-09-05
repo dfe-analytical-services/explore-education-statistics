@@ -1,16 +1,15 @@
 import { FilterCandidate } from '@admin/services/apiDataSetVersionService';
 import ApiDataSetMappableFilterColumnOptionsModal from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnOptionsModal';
 import Tag from '@common/components/Tag';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
 import React from 'react';
 
 interface Props {
-  newFilterColumns: Dictionary<FilterCandidate>;
+  newFilters: Dictionary<FilterCandidate>;
 }
 
-export default function ApiDataSetNewFilterColumnsTable({
-  newFilterColumns,
-}: Props) {
+export default function ApiDataSetNewFilterColumnsTable({ newFilters }: Props) {
   return (
     <table id="new-filter-columns-table" data-testid="new-filter-columns-table">
       <caption className="govuk-visually-hidden">
@@ -24,23 +23,21 @@ export default function ApiDataSetNewFilterColumnsTable({
         </tr>
       </thead>
       <tbody>
-        {Object.entries(newFilterColumns).map(([key, column]) => {
+        {Object.entries(newFilters).map(([key, filter]) => {
           return (
             <tr key={`column-${key}`}>
               <td>No mapping available</td>
               <td>
-                {column.label}
+                {filter.label}
                 <br />
-                <span className="dfe-colour--dark-grey">
-                  ID: <code>{key}</code>
-                </span>
+                <VisuallyHidden>Column: </VisuallyHidden>
+                <code>{key}</code>
                 <br />
-                {column.options && Object.keys(column.options).length > 0 && (
+                {filter.options && Object.keys(filter.options).length > 0 && (
                   <ApiDataSetMappableFilterColumnOptionsModal
-                    id={key}
-                    label={column.label}
-                    modalLabel="New data set filter column"
-                    options={Object.values(column.options).map(
+                    column={key}
+                    label={filter.label}
+                    options={Object.values(filter.options).map(
                       option => option.label,
                     )}
                   />
